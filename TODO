@@ -14,17 +14,20 @@
   - enable/disable component
   - spatial query
   - runtime types pool
+  - off-line/off-memory/remote
+  - poly
   - ...
 
 WIP:
+* HP: headless view
 * HP: inject the registry to pools rather than passing it every time (fake vtable prep)
 * HP: fake vtable, see dino:: for a reasonable and customizable (pay-per-use) approach
 * HP: meta any/meta container: reduce instantiations with a single function fake vtable
+* HP: make view pack work also with groups, make packs input iterator only, add view adapter for external sources
+* HP: write documentation for custom storages and views!!
 * suppress warnings in meta.hpp (uninitialized members)
-* make view pack work also with groups, add multi-type iterator (not only input iterators)
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
-* HP: write documentation for custom storages and views!!
 * view pack: plain function as an alias for operator|, reverse iterators, rbegin and rend
 * what about using hashed string rather than hash values for meta types?
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.

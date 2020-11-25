@@ -304,14 +304,34 @@ inline constexpr auto is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 
 
 /**
+* @brief Provides the member constant `value` to true if a given type is
+* complete, false otherwise.
+* @tparam Type Potential complete type.
+*/
+template<typename Type, typename = void>
+struct is_complete: std::false_type {};
+
+
+/*! @copydoc is_complete */
+template<typename Type>
+struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {};
+
+
+/**
+* @brief Helper variable template.
+* @tparam Type Potential complete type.
+*/
+template<typename Type>
+inline constexpr auto is_complete_v = is_complete<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
  */
 template<typename Type, typename = void>
-struct is_empty
-    : ENTT_IS_EMPTY(Type)
-{};
+struct is_empty: ENTT_IS_EMPTY(Type) {};
 
 
 /**
