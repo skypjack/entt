@@ -24,19 +24,19 @@ namespace entt {
  * intended primary use is for custom storage and views, but it can also be very
  * convenient in everyday use.
  *
- * @tparam View Type of the leading view of the pack.
- * @tparam Other Types of all other views of the pack.
+ * @tparam Head Type of the leading view of the pack.
+ * @tparam Tail Types of all other views of the pack.
  */
-template<typename View, typename... Other>
+template<typename Head, typename... Tail>
 class view_pack {
     template<typename It>
     class view_pack_iterator final {
-        friend class view_pack<View, Other...>;
+        friend class view_pack<Head, Tail...>;
 
-        view_pack_iterator(It from, It to, const std::tuple<View, Other...> &ref) ENTT_NOEXCEPT
+        view_pack_iterator(It from, It to, const std::tuple<Tail...> &other) ENTT_NOEXCEPT
             : it{from},
               last{to},
-              pack{std::get<Other>(ref)...}
+              tail{other}
         {
             if(it != last && !valid()) {
                 ++(*this);
@@ -44,8 +44,7 @@ class view_pack {
         }
 
         [[nodiscard]] bool valid() const {
-            const auto entity = *it;
-            return (std::get<Other>(pack).contains(entity) && ...);
+            return std::apply([entity = *it](auto &&... curr) { return (curr.contains(entity) && ...); }, tail);
         }
 
     public:
@@ -80,22 +79,22 @@ class view_pack {
     private:
         It it;
         const It last;
-        const std::tuple<Other...> pack;
+        const std::tuple<Tail...> tail;
     };
 
     class iterable_view_pack final {
-        friend class view_pack<View, Other...>;
+        friend class view_pack<Head, Tail...>;
 
-        using iterable_view = decltype(std::declval<View>().each());
+        using iterable_view = decltype(std::declval<Head>().each());
 
         template<typename It>
         class iterable_view_pack_iterator final {
             friend class iterable_view_pack;
 
-            iterable_view_pack_iterator(It from, It to, const std::tuple<Other...> &ref) ENTT_NOEXCEPT
+            iterable_view_pack_iterator(It from, It to, const std::tuple<Tail...> &other) ENTT_NOEXCEPT
                 : it{from},
                   last{to},
-                  pack{ref}
+                  tail{other}
             {
                 if(it != last && !valid()) {
                     ++(*this);
@@ -103,13 +102,12 @@ class view_pack {
             }
 
             [[nodiscard]] bool valid() const {
-                const auto entity = std::get<0>(*it);
-                return (std::get<Other>(pack).contains(entity) && ...);
+                return std::apply([entity = std::get<0>(*it)](auto &&... curr) { return (curr.contains(entity) && ...); }, tail);
             }
 
         public:
             using difference_type = typename std::iterator_traits<It>::difference_type;
-            using value_type = decltype(std::tuple_cat(*std::declval<It>(), std::declval<Other>().get({})...));
+            using value_type = decltype(std::tuple_cat(*std::declval<It>(), std::declval<Tail>().get({})...));
             using pointer = void;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
@@ -125,8 +123,7 @@ class view_pack {
             }
 
             [[nodiscard]] reference operator*() const {
-                const auto curr = *it;
-                return std::tuple_cat(curr, std::get<Other>(pack).get(std::get<0>(curr))...);
+                return std::apply([value = *it](auto &&... curr) { return std::tuple_cat(value, curr.get(std::get<0>(value))...); }, tail);
             }
 
             [[nodiscard]] bool operator==(const iterable_view_pack_iterator &other) const ENTT_NOEXCEPT {
@@ -140,12 +137,12 @@ class view_pack {
         private:
             It it;
             const It last;
-            const std::tuple<Other...> pack;
+            const std::tuple<Tail...> tail;
         };
 
-        iterable_view_pack(const std::tuple<View, Other...> &ref)
-            : iterable{std::get<View>(ref).each()},
-              pack{std::get<Other>(ref)...}
+        iterable_view_pack(const Head &first, const std::tuple<Tail...> &last)
+            : iterable{first.each()},
+              tail{last}
         {}
 
     public:
@@ -153,43 +150,44 @@ class view_pack {
         using reverse_iterator = iterable_view_pack_iterator<typename iterable_view::reverse_iterator>;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return { iterable.begin(), iterable.end(), pack };
+            return { iterable.begin(), iterable.end(), tail };
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return { iterable.end(), iterable.end(), pack };
+            return { iterable.end(), iterable.end(), tail };
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return { iterable.rbegin(), iterable.rend(), pack };
+            return { iterable.rbegin(), iterable.rend(), tail };
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return { iterable.rend(), iterable.rend(), pack };
+            return { iterable.rend(), iterable.rend(), tail };
         }
 
     private:
         iterable_view iterable;
-        std::tuple<Other...> pack;
+        std::tuple<Tail...> tail;
     };
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = std::common_type_t<typename View::entity_type, typename Other::entity_type...>;
+    using entity_type = std::common_type_t<typename Head::entity_type, typename Tail::entity_type...>;
     /*! @brief Underlying entity identifier. */
-    using size_type = std::common_type_t<typename View::size_type, typename Other::size_type...>;
+    using size_type = std::common_type_t<typename Head::size_type, typename Tail::size_type...>;
     /*! @brief Input iterator type. */
-    using iterator = view_pack_iterator<typename View::iterator>;
+    using iterator = view_pack_iterator<typename Head::iterator>;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = view_pack_iterator<typename View::reverse_iterator>;
+    using reverse_iterator = view_pack_iterator<typename Head::reverse_iterator>;
 
     /**
      * @brief Constructs a pack from a bunch of views.
-     * @param view A reference to the leading view for the pack.
-     * @param other References to the other views to use to construct the pack.
+     * @param first A reference to the leading view for the pack.
+     * @param last References to the other views to use to construct the pack.
      */
-    view_pack(const View &view, const Other &... other)
-        : pack{view, other...}
+    view_pack(const Head &first, const Tail &... last)
+        : head{first},
+          tail{last...}
     {}
 
     /**
@@ -201,7 +199,7 @@ public:
      * @return An iterator to the first entity of the pack.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return { std::get<View>(pack).begin(), std::get<View>(pack).end(), pack };
+        return { head.begin(), head.end(), tail };
     }
 
     /**
@@ -214,7 +212,7 @@ public:
      * @return An iterator to the entity following the last entity of the pack.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return { std::get<View>(pack).end(), std::get<View>(pack).end(), pack };
+        return { head.end(), head.end(), tail };
     }
 
     /**
@@ -226,7 +224,7 @@ public:
      * @return An iterator to the first entity of the pack.
      */
     [[nodiscard]] reverse_iterator rbegin() const {
-        return { std::get<View>(pack).rbegin(), std::get<View>(pack).rend(), pack };
+        return { head.rbegin(), head.rend(), tail };
     }
 
     /**
@@ -241,7 +239,7 @@ public:
      * reversed pack.
      */
     [[nodiscard]] reverse_iterator rend() const {
-        return { std::get<View>(pack).rend(), std::get<View>(pack).rend(), pack };
+        return { head.rend(), head.rend(), tail };
     }
 
     /**
@@ -271,7 +269,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        iterator it{std::get<View>(pack).find(entt), std::get<View>(pack).end(), pack};
+        iterator it{head.find(entt), head.end(), tail};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -281,7 +279,7 @@ public:
      * @return True if the pack contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return std::get<View>(pack).contains(entt) && (std::get<Other>(pack).contains(entt) && ...);
+        return head.contains(entt) && std::apply([entt](auto &&... curr) { return (curr.contains(entt) && ...); }, tail);
     }
 
     /**
@@ -302,7 +300,7 @@ public:
     template<typename... Comp>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
-        auto component = std::tuple_cat(std::get<View>(pack).get(entt), std::get<Other>(pack).get(entt)...);
+        auto component = std::apply([this, entt](auto &&... curr) { return std::tuple_cat(head.get(entt), curr.get(entt)...); }, tail);
 
         if constexpr(sizeof...(Comp) == 0) {
             return component;
@@ -337,14 +335,14 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        for(const auto value: std::get<View>(pack).each()) {
-            const auto entity = std::get<0>(value);
+        for(auto &&value: head.each()) {
+            if(std::apply([&value](auto &&... curr) { return (curr.contains(std::get<0>(value)) && ...); }, tail)) {
+                auto args = std::apply([&value](auto &&... curr) { return std::tuple_cat(value, curr.get(std::get<0>(value))...); }, tail);
 
-            if((std::get<Other>(pack).contains(entity) && ...)) {
-                if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(value, std::get<Other>(pack).get(entity)...))>) {
-                    std::apply(func, std::tuple_cat(value, std::get<Other>(pack).get(entity)...));
+                if constexpr(is_applicable_v<Func, decltype(args)>) {
+                    std::apply(func, args);
                 } else {
-                    std::apply([&func](const auto, auto &&... component) { func(std::forward<decltype(component)>(component)...); }, std::tuple_cat(value, std::get<Other>(pack).get(entity)...));
+                    std::apply([&func](const auto, auto &&... component) { func(std::forward<decltype(component)>(component)...); }, args);
                 }
             }
         }
@@ -364,28 +362,26 @@ public:
      * @return An iterable object to use to _visit_ the pack.
      */
     [[nodiscard]] iterable_view_pack each() const ENTT_NOEXCEPT {
-        return pack;
+        return { head, tail };
     }
 
     /**
-     * @brief Returns a copy of the requested view from a pack.
-     * @tparam Type Type of the view to return.
-     * @return A copy of the requested view from the pack.
+     * @brief Returns a copy of the views stored by the pack.
+     * @return A copy of the views stored by the pack.
      */
-    template<typename Type>
-    operator Type() const ENTT_NOEXCEPT {
-        return std::get<Type>(pack);
+    std::tuple<Head, Tail...> pack() const ENTT_NOEXCEPT {
+        return std::apply([this](auto &&... curr) { return std::make_tuple(head, curr...); }, tail);
     }
 
     /**
      * @brief Appends a view to a pack.
      * @tparam Args View template arguments.
-     * @param view A reference to a view to append to the pack.
+     * @param other A reference to a view to append to the pack.
      * @return The extended pack.
      */
     template<typename... Args>
-    [[nodiscard]] auto operator|(const basic_view<Args...> &view) const {
-        return std::make_from_tuple<view_pack<View, Other..., basic_view<Args...>>>(std::tuple_cat(pack, std::make_tuple(view)));
+    [[nodiscard]] auto operator|(const basic_view<Args...> &other) const {
+        return std::make_from_tuple<view_pack<Head, Tail..., basic_view<Args...>>>(std::tuple_cat(std::make_tuple(head), tail, std::make_tuple(other)));
     }
 
     /**
@@ -396,11 +392,12 @@ public:
      */
     template<typename... Pack>
     [[nodiscard]] auto operator|(const view_pack<Pack...> &other) const {
-        return std::make_from_tuple<view_pack<View, Other..., Pack...>>(std::tuple_cat(pack, std::make_tuple(static_cast<Pack>(other)...)));
+        return std::make_from_tuple<view_pack<Head, Tail..., Pack...>>(std::tuple_cat(std::make_tuple(head), tail, other.pack()));
     }
 
 private:
-    std::tuple<View, Other...> pack;
+    Head head;
+    std::tuple<Tail...> tail;
 };
 
 
