@@ -261,10 +261,21 @@ struct is_applicable: std::false_type {};
 /**
  * @copybrief is_applicable
  * @tparam Func A valid function type.
+ * @tparam Tuple Tuple-like type.
  * @tparam Args The list of arguments to use to probe the function type.
  */
-template<typename Func, typename... Args>
-struct is_applicable<Func, std::tuple<Args...>>: std::is_invocable<Func, Args...> {};
+template<typename Func, template<typename...> class Tuple, typename... Args>
+struct is_applicable<Func, Tuple<Args...>>: std::is_invocable<Func, Args...> {};
+
+
+/**
+* @copybrief is_applicable
+* @tparam Func A valid function type.
+* @tparam Tuple Tuple-like type.
+* @tparam Args The list of arguments to use to probe the function type.
+*/
+template<typename Func, template<typename...> class Tuple, typename... Args>
+struct is_applicable<Func, const Tuple<Args...>>: std::is_invocable<Func, Args...> {};
 
 
 /**
