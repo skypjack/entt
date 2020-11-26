@@ -402,3 +402,19 @@ TEST(ViewPack, LongestPool) {
         }
     }
 }
+
+TEST(ViewPack, RepeatedType) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity, 3);
+
+    const auto view = registry.view<int>();
+    const auto pack = view | view;
+
+    for(auto [entt, i1, i2]: pack.each()) {
+        ASSERT_EQ(entt, entity);
+        ASSERT_EQ(i1, 3);
+        ASSERT_EQ(i1, i2);
+    }
+}
