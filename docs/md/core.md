@@ -409,14 +409,15 @@ Moreover, users are also provided with `std::apply`, a tool for combining
 invocable elements and tuples of arguments.
 
 It would therefore be a good idea to have a variant of `std::is_invocable` that
-also accepts its arguments in the form of a tuple, to complete the offer:
+also accepts its arguments in the form of a tuple-like type, so as to complete
+the offer:
 
 ```cpp
 constexpr bool result = entt::is_applicable<Func, std::tuple<a_type, another_type>>;
 ```
 
 This trait is built on top of `std::is_invocable` and does nothing but unpack a
-tuple and simplify the code at the call site.
+tuple-like type and simplify the code at the call site.
 
 ### Constness as
 
