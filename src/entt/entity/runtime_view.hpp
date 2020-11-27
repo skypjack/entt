@@ -129,18 +129,6 @@ class basic_runtime_view final {
         underlying_iterator it;
     };
 
-    basic_runtime_view(std::vector<const basic_sparse_set<Entity> *> cpools, std::vector<const basic_sparse_set<Entity> *> epools) ENTT_NOEXCEPT
-        : pools{std::move(cpools)},
-          filter{std::move(epools)}
-    {
-        const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
-            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
-        });
-
-        // brings the best candidate (if any) on front of the vector
-        std::rotate(pools.begin(), it, pools.end());
-    }
-
     [[nodiscard]] bool valid() const {
         return !pools.empty() && pools.front();
     }
@@ -152,6 +140,18 @@ public:
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
     using iterator = view_iterator;
+
+    basic_runtime_view(std::vector<const basic_sparse_set<Entity> *> cpools, std::vector<const basic_sparse_set<Entity> *> epools) ENTT_NOEXCEPT
+        : pools{std::move(cpools)},
+          filter{std::move(epools)}
+    {
+        const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
+            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
+        });
+
+        // brings the best candidate (if any) on front of the vector
+        std::rotate(pools.begin(), it, pools.end());
+    }
 
     /**
      * @brief Estimates the number of entities iterated by the view.
