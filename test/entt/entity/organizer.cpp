@@ -6,7 +6,7 @@ void ro_int_rw_char_double(entt::view<entt::exclude_t<>, const int, char>, doubl
 void ro_char_rw_int(entt::view<entt::exclude_t<>, int, const char>) {}
 void ro_char_rw_double(entt::view<entt::exclude_t<>, const char>, double &) {}
 void ro_int_double(entt::view<entt::exclude_t<>, const int>, const double &) {}
-void sync_point(entt::registry &) {}
+void sync_point(entt::registry &, entt::view<entt::exclude_t<>, const int>) {}
 
 struct clazz {
     void ro_int_char_double(entt::view<entt::exclude_t<>, const int, const char>, const double &) {}
@@ -186,14 +186,13 @@ TEST(Organizer, EmplaceDirectFunction) {
     ASSERT_FALSE(graph[2u].top_level());
     ASSERT_FALSE(graph[3u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 2u);
+    ASSERT_EQ(graph[0u].children().size(), 1u);
     ASSERT_EQ(graph[1u].children().size(), 1u);
     ASSERT_EQ(graph[2u].children().size(), 1u);
     ASSERT_EQ(graph[3u].children().size(), 0u);
 
     ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[0u].children()[1u], 2u);
-    ASSERT_EQ(graph[1u].children()[0u], 3u);
+    ASSERT_EQ(graph[1u].children()[0u], 2u);
     ASSERT_EQ(graph[2u].children()[0u], 3u);
 
     for(auto &&vertex: graph) {
@@ -211,27 +210,43 @@ TEST(Organizer, SyncPoint) {
     clazz instance;
 
     organizer.emplace<&ro_int_double>("before");
-    organizer.emplace<&sync_point>("sync");
-    organizer.emplace<&clazz::ro_int_char_double>(instance, "after");
+    organizer.emplace<&sync_point>("sync_1");
+    organizer.emplace<&clazz::ro_int_char_double>(instance, "mid_1");
+    organizer.emplace<&ro_int_double>("mid_2");
+    organizer.emplace<&sync_point>("sync_2");
+    organizer.emplace<&ro_int_double>("after");
 
     const auto graph = organizer.graph();
 
-    ASSERT_EQ(graph.size(), 3u);
+    ASSERT_EQ(graph.size(), 6u);
 
     ASSERT_STREQ(graph[0u].name(), "before");
-    ASSERT_STREQ(graph[1u].name(), "sync");
-    ASSERT_STREQ(graph[2u].name(), "after");
+    ASSERT_STREQ(graph[1u].name(), "sync_1");
+    ASSERT_STREQ(graph[2u].name(), "mid_1");
+    ASSERT_STREQ(graph[3u].name(), "mid_2");
+    ASSERT_STREQ(graph[4u].name(), "sync_2");
+    ASSERT_STREQ(graph[5u].name(), "after");
 
     ASSERT_TRUE(graph[0u].top_level());
     ASSERT_FALSE(graph[1u].top_level());
     ASSERT_FALSE(graph[2u].top_level());
+    ASSERT_FALSE(graph[3u].top_level());
+    ASSERT_FALSE(graph[4u].top_level());
+    ASSERT_FALSE(graph[5u].top_level());
 
     ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 0u);
+    ASSERT_EQ(graph[1u].children().size(), 2u);
+    ASSERT_EQ(graph[2u].children().size(), 1u);
+    ASSERT_EQ(graph[3u].children().size(), 1u);
+    ASSERT_EQ(graph[4u].children().size(), 1u);
+    ASSERT_EQ(graph[5u].children().size(), 0u);
 
     ASSERT_EQ(graph[0u].children()[0u], 1u);
     ASSERT_EQ(graph[1u].children()[0u], 2u);
+    ASSERT_EQ(graph[1u].children()[1u], 3u);
+    ASSERT_EQ(graph[2u].children()[0u], 4u);
+    ASSERT_EQ(graph[3u].children()[0u], 4u);
+    ASSERT_EQ(graph[4u].children()[0u], 5u);
 
     for(auto &&vertex: graph) {
         ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));

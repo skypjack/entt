@@ -165,7 +165,7 @@ class basic_organizer final {
 
     template<typename... RO, typename... RW>
     void track_dependencies(std::size_t index, const bool requires_registry, type_list<RO...>, type_list<RW...>) {
-        dependencies[type_hash<basic_registry<Entity>>::value()].emplace_back(index, requires_registry && (sizeof...(RO) + sizeof...(RW) == 0u));
+        dependencies[type_hash<basic_registry<Entity>>::value()].emplace_back(index, requires_registry || (sizeof...(RO) + sizeof...(RW) == 0u));
         (dependencies[type_hash<RO>::value()].emplace_back(index, false), ...);
         (dependencies[type_hash<RW>::value()].emplace_back(index, true), ...);
     }
