@@ -32,82 +32,96 @@ namespace internal {
 
 
 class meta_storage {
-    enum class operation { COPY, MOVE, DTOR };
+    enum class operation { COPY, MOVE, DTOR, REF };
 
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
-    using vtable_type = void(const operation, meta_storage &, void *);
-
-    template<typename Type, typename = void>
-    struct type_traits {
-        template<typename... Args>
-        static void ctor(meta_storage &buffer, Args &&... args) {
-            buffer.instance = new Type{std::forward<Args>(args)...};
-            new (&buffer.storage) Type *{static_cast<Type *>(buffer.instance)};
-        }
-
-        static void vtable(const operation op, meta_storage &self, void *instance) {
-            switch(op) {
-            case operation::COPY:
-                self.instance = new Type{std::as_const(*static_cast<Type *>(instance))};
-                new (&self.storage) Type *{static_cast<Type *>(self.instance)};
-                break;
-            case operation::MOVE:
-                new (&self.storage) Type *{static_cast<Type *>(instance)};
-                self.instance = instance;
-                break;
-            case operation::DTOR:
-                delete static_cast<Type *>(instance);
-                break;
-            }
-        }
-    };
+    using vtable_type = void(const operation, const meta_storage &, meta_storage *);
 
     template<typename Type>
-    struct type_traits<Type, std::enable_if_t<sizeof(Type) <= sizeof(void *) && std::is_nothrow_move_constructible_v<Type>>> {
-        template<typename... Args>
-        static void ctor(meta_storage &buffer, Args &&... args) {
-            buffer.instance = new (&buffer.storage) Type{std::forward<Args>(args)...};
-        }
+    static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type)
+        && std::is_nothrow_move_constructible_v<Type> && std::is_nothrow_copy_constructible_v<Type>;
 
-        static void vtable(const operation op, meta_storage &self, void *instance) {
+    template<typename Type>
+    static void basic_vtable(const operation op, const meta_storage &from, meta_storage *to) {
+        if constexpr(std::is_void_v<Type>) {
+            return;
+        } else if constexpr(std::is_lvalue_reference_v<Type>) {
             switch(op) {
             case operation::COPY:
-                self.instance = new (&self.storage) Type{std::as_const(*static_cast<Type *>(instance))};
+            case operation::MOVE:
+                to->instance = from.instance;
+                break;
+            case operation::REF:
+                to->vtable = from.vtable;
+                break;
+            case operation::DTOR:
+                break;
+            }
+        } else if constexpr(in_situ<Type>) {
+            switch(op) {
+            case operation::COPY:
+                to->instance = new (&to->storage) Type{std::as_const(*static_cast<Type *>(from.instance))};
                 break;
             case operation::MOVE:
-                self.instance = new (&self.storage) Type{std::move(*static_cast<Type *>(instance))};
+                to->instance = new (&to->storage) Type{std::move(*static_cast<Type *>(from.instance))};
                 [[fallthrough]];
             case operation::DTOR:
-                static_cast<Type *>(instance)->~Type();
+                static_cast<Type *>(from.instance)->~Type();
+                break;
+            case operation::REF:
+                to->vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
+                break;
+            }
+        } else {
+            switch(op) {
+            case operation::COPY:
+                to->instance = new Type{std::as_const(*static_cast<Type *>(from.instance))};
+                new (&to->storage) Type *{static_cast<Type *>(to->instance)};
+                break;
+            case operation::MOVE:
+                new (&to->storage) Type *{static_cast<Type *>(from.instance)};
+                to->instance = from.instance;
+                break;
+            case operation::DTOR:
+                delete static_cast<Type *>(from.instance);
+                break;
+            case operation::REF:
+                to->vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
                 break;
             }
         }
-    };
+    }
 
 public:
     /*! @brief Default constructor. */
     meta_storage() ENTT_NOEXCEPT
-        : storage{},
-          vtable{},
-          instance{}
+        : vtable{&basic_vtable<void>},
+          instance{},
+          storage{}
     {}
 
     template<typename Type, typename... Args>
     explicit meta_storage(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : meta_storage{}
+        : vtable{&basic_vtable<Type>},
+          instance{},
+          storage{}
     {
         if constexpr(!std::is_void_v<Type>) {
-            type_traits<Type>::ctor(*this, std::forward<Args>(args)...);
-            vtable = &type_traits<Type>::vtable;
+            if constexpr(in_situ<Type>) {
+                instance = new (&storage) Type{std::forward<Args>(args)...};
+            } else {
+                instance = new Type{std::forward<Args>(args)...};
+                new (&storage) Type *{static_cast<Type *>(instance)};
+            }
         }
     }
 
     template<typename Type>
     meta_storage(std::reference_wrapper<Type> value)
-        : meta_storage{}
-    {
-        instance = &value.get();
-    }
+        : vtable{&basic_vtable<std::add_lvalue_reference_t<Type>>},
+          instance{&value.get()},
+          storage{}
+    {}
 
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_storage>>>
     meta_storage(Type &&value)
@@ -117,28 +131,19 @@ public:
     meta_storage(const meta_storage &other)
         : meta_storage{}
     {
-        if(vtable = other.vtable; vtable) {
-            vtable(operation::COPY, *this, other.instance);
-        } else {
-            instance = other.instance;
-        }
+        vtable = other.vtable;
+        vtable(operation::COPY, other, this);
     }
 
     meta_storage(meta_storage &&other) ENTT_NOEXCEPT
         : meta_storage{}
     {
-        if(vtable = other.vtable; vtable) {
-            vtable(operation::MOVE, *this, other.instance);
-            other.vtable = nullptr;
-        } else {
-            instance = other.instance;
-        }
+        vtable = std::exchange(other.vtable, &basic_vtable<void>);
+        vtable(operation::MOVE, other, this);
     }
 
     ~meta_storage() {
-        if(vtable) {
-            vtable(operation::DTOR, *this, instance);
-        }
+        vtable(operation::DTOR, *this, nullptr);
     }
 
     meta_storage & operator=(meta_storage other) {
@@ -162,6 +167,7 @@ public:
     [[nodiscard]] meta_storage ref() const ENTT_NOEXCEPT {
         meta_storage other{};
         other.instance = instance;
+        vtable(operation::REF, *this, &other);
         return other;
     }
 
@@ -171,16 +177,16 @@ public:
 
     friend void swap(meta_storage &lhs, meta_storage &rhs) {
         meta_storage tmp{};
-        lhs.vtable ? lhs.vtable(operation::MOVE, tmp, lhs.instance) : std::swap(tmp.instance, lhs.instance);
-        rhs.vtable ? rhs.vtable(operation::MOVE, lhs, rhs.instance) : std::swap(lhs.instance, rhs.instance);
-        lhs.vtable ? lhs.vtable(operation::MOVE, rhs, tmp.instance) : std::swap(rhs.instance, tmp.instance);
+        lhs.vtable(operation::MOVE, lhs, &tmp);
+        rhs.vtable(operation::MOVE, rhs, &lhs);
+        lhs.vtable(operation::MOVE, tmp, &rhs);
         std::swap(lhs.vtable, rhs.vtable);
     }
 
 private:
-    storage_type storage;
     vtable_type *vtable;
     void *instance;
+    storage_type storage;
 };
 
 
