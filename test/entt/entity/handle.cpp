@@ -50,13 +50,28 @@ TEST(BasicHandle, Invalidation) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    handle = { registry, entity };
+    handle = {registry, entity};
 
     ASSERT_TRUE(handle);
     ASSERT_NE(handle.registry(), nullptr);
     ASSERT_NE(handle.entity(), entt::entity{entt::null});
 
     handle = {};
+
+    ASSERT_FALSE(handle);
+    ASSERT_EQ(handle.registry(), nullptr);
+    ASSERT_EQ(handle.entity(), entt::entity{entt::null});
+}
+
+TEST(BasicHandle, Destruction) {
+    entt::registry registry;
+    entt::handle handle{registry, registry.create()};
+
+    ASSERT_TRUE(handle);
+    ASSERT_NE(handle.registry(), nullptr);
+    ASSERT_NE(handle.entity(), entt::entity{entt::null});
+
+    handle.destroy();
 
     ASSERT_FALSE(handle);
     ASSERT_EQ(handle.registry(), nullptr);
@@ -100,8 +115,8 @@ TEST(BasicHandle, Comparison) {
     entt::registry other;
     const auto entt = other.create();
 
-    handle = { registry, entity };
-    chandle = { other, entt };
+    handle = {registry, entity};
+    chandle = {other, entt};
 
     ASSERT_NE(handle, chandle);
     ASSERT_FALSE(chandle == handle);

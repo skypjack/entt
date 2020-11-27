@@ -202,6 +202,16 @@ struct basic_handle {
     }
 
     /**
+     * @brief Destroys the entity associated with a handle.
+     * @sa basic_registry::destroy
+     */
+    void destroy() {
+        reg->destroy(entt);
+        reg = {};
+        entt = null;
+    }
+
+    /**
      * @brief Checks if a handle has all the given components.
      * @sa basic_registry::has
      * @tparam Component Components for which to perform the check.
