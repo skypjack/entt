@@ -32,86 +32,92 @@ namespace internal {
 
 
 class meta_storage {
-    enum class operation { COPY, MOVE, DTOR, REF };
+    enum class operation { COPY, MOVE, DTOR, ADDR, REF };
 
-    using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
-    using vtable_type = void(const operation, const meta_storage &, meta_storage *);
+    using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
+    using vtable_type = void *(const operation, const meta_storage &, meta_storage *);
 
     template<typename Type>
     static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type)
         && std::is_nothrow_move_constructible_v<Type> && std::is_nothrow_copy_constructible_v<Type>;
 
     template<typename Type>
-    static void basic_vtable(const operation op, const meta_storage &from, meta_storage *to) {
+    static void * basic_vtable(const operation op, const meta_storage &from, meta_storage *to) {
         if constexpr(std::is_void_v<Type>) {
-            return;
+            return nullptr;
         } else if constexpr(std::is_lvalue_reference_v<Type>) {
             switch(op) {
+            case operation::REF:
+                to->vtable = from.vtable;
+                [[fallthrough]];
             case operation::COPY:
             case operation::MOVE:
                 to->instance = from.instance;
                 break;
-            case operation::REF:
-                to->vtable = from.vtable;
-                break;
+            case operation::ADDR:
+                return from.instance;
             case operation::DTOR:
                 break;
             }
         } else if constexpr(in_situ<Type>) {
+            auto *instance = std::launder(reinterpret_cast<Type *>(&const_cast<storage_type &>(from.storage)));
+
             switch(op) {
             case operation::COPY:
-                to->instance = new (&to->storage) Type{std::as_const(*static_cast<Type *>(from.instance))};
+                new (&to->storage) Type{std::as_const(*instance)};
                 break;
             case operation::MOVE:
-                to->instance = new (&to->storage) Type{std::move(*static_cast<Type *>(from.instance))};
+                new (&to->storage) Type{std::move(*instance)};
                 [[fallthrough]];
             case operation::DTOR:
-                static_cast<Type *>(from.instance)->~Type();
+                instance->~Type();
                 break;
+            case operation::ADDR:
+                return instance;
             case operation::REF:
                 to->vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
+                to->instance = instance;
                 break;
             }
         } else {
             switch(op) {
             case operation::COPY:
                 to->instance = new Type{std::as_const(*static_cast<Type *>(from.instance))};
-                new (&to->storage) Type *{static_cast<Type *>(to->instance)};
                 break;
             case operation::MOVE:
-                new (&to->storage) Type *{static_cast<Type *>(from.instance)};
                 to->instance = from.instance;
                 break;
             case operation::DTOR:
                 delete static_cast<Type *>(from.instance);
                 break;
+            case operation::ADDR:
+                return from.instance;
             case operation::REF:
                 to->vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
+                to->instance = from.instance;
                 break;
             }
         }
+
+        return nullptr;
     }
 
 public:
     /*! @brief Default constructor. */
     meta_storage() ENTT_NOEXCEPT
         : vtable{&basic_vtable<void>},
-          instance{},
-          storage{}
+          instance{}
     {}
 
     template<typename Type, typename... Args>
     explicit meta_storage(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : vtable{&basic_vtable<Type>},
-          instance{},
-          storage{}
+        : vtable{&basic_vtable<Type>}
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(in_situ<Type>) {
-                instance = new (&storage) Type{std::forward<Args>(args)...};
+                new (&storage) Type{std::forward<Args>(args)...};
             } else {
                 instance = new Type{std::forward<Args>(args)...};
-                new (&storage) Type *{static_cast<Type *>(instance)};
             }
         }
     }
@@ -119,8 +125,7 @@ public:
     template<typename Type>
     meta_storage(std::reference_wrapper<Type> value)
         : vtable{&basic_vtable<std::add_lvalue_reference_t<Type>>},
-          instance{&value.get()},
-          storage{}
+          instance{&value.get()}
     {}
 
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_storage>>>
@@ -152,11 +157,11 @@ public:
     }
 
     [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
-        return instance;
+        return vtable(operation::ADDR, *this, nullptr);
     }
 
     [[nodiscard]] void * data() ENTT_NOEXCEPT {
-        return const_cast<void *>(std::as_const(*this).data());
+        return vtable(operation::ADDR, *this, nullptr);
     }
 
     template<typename Type, typename... Args>
@@ -166,13 +171,12 @@ public:
 
     [[nodiscard]] meta_storage ref() const ENTT_NOEXCEPT {
         meta_storage other{};
-        other.instance = instance;
         vtable(operation::REF, *this, &other);
         return other;
     }
 
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(instance == nullptr);
+        return !(vtable(operation::ADDR, *this, nullptr) == nullptr);
     }
 
     friend void swap(meta_storage &lhs, meta_storage &rhs) {
@@ -185,8 +189,7 @@ public:
 
 private:
     vtable_type *vtable;
-    void *instance;
-    storage_type storage;
+    union { void *instance; storage_type storage; };
 };
 
 
