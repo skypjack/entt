@@ -27,8 +27,12 @@
 
 
 #ifndef ENTT_ASSERT
-#   include <cassert>
-#   define ENTT_ASSERT(condition) assert(condition)
+#   ifndef ENTT_DISABLE_ASSERT
+#       include <cassert>
+#       define ENTT_ASSERT(condition) assert(condition)
+#   else
+#       define ENTT_ASSERT(...) ((void)0)
+#   endif
 #endif
 
 
