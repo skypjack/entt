@@ -68,13 +68,15 @@ TEST(BasicHandle, Destruction) {
     entt::handle handle{registry, registry.create()};
 
     ASSERT_TRUE(handle);
+    ASSERT_TRUE(handle.valid());
     ASSERT_NE(handle.registry(), nullptr);
     ASSERT_NE(handle.entity(), entt::entity{entt::null});
 
     handle.destroy();
 
     ASSERT_FALSE(handle);
-    ASSERT_EQ(handle.registry(), nullptr);
+    ASSERT_FALSE(handle.valid());
+    ASSERT_NE(handle.registry(), nullptr);
     ASSERT_EQ(handle.entity(), entt::entity{entt::null});
 }
 

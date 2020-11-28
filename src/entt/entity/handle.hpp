@@ -114,6 +114,29 @@ struct basic_handle {
     }
 
     /**
+     * @brief Destroys the entity associated with a handle.
+     * @sa basic_registry::destroy
+     */
+    void destroy() {
+        reg->destroy(entt);
+        entt = null;
+    }
+
+    /**
+     * @brief Destroys the entity associated with a handle.
+     *
+     * If the entity isn't already destroyed, the suggested version is used
+     * instead of the implicitly generated one.
+     *
+     * @sa basic_registry::destroy
+     * @param version A desired version upon destruction.
+     */
+    void destroy(const entity_type entity, const typename registry_type::version_type version) {
+        reg->destroy(entt, version);
+        entt = null;
+    }
+
+    /**
      * @brief Assigns the given component to a handle.
      * @sa basic_registry::emplace
      * @tparam Component Type of component to create.
@@ -199,16 +222,6 @@ struct basic_handle {
     void remove_all() const {
         static_assert(sizeof...(Type) == 0);
         reg->remove_all(entt);
-    }
-
-    /**
-     * @brief Destroys the entity associated with a handle.
-     * @sa basic_registry::destroy
-     */
-    void destroy() {
-        reg->destroy(entt);
-        reg = {};
-        entt = null;
     }
 
     /**
