@@ -38,8 +38,7 @@ class meta_storage {
     using vtable_type = void *(const operation, const meta_storage &, meta_storage *);
 
     template<typename Type>
-    static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type)
-        && std::is_nothrow_move_constructible_v<Type> && std::is_nothrow_copy_constructible_v<Type>;
+    static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     static void * basic_vtable(const operation op, const meta_storage &from, meta_storage *to) {
@@ -103,7 +102,6 @@ class meta_storage {
     }
 
 public:
-    /*! @brief Default constructor. */
     meta_storage() ENTT_NOEXCEPT
         : vtable{&basic_vtable<void>},
           instance{}
@@ -111,7 +109,8 @@ public:
 
     template<typename Type, typename... Args>
     explicit meta_storage(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : vtable{&basic_vtable<Type>}
+        : vtable{&basic_vtable<Type>},
+          instance{}
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(in_situ<Type>) {

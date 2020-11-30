@@ -13,6 +13,7 @@
   * [Wide characters](wide-characters)
   * [Conflicts](#conflicts)
 * [Monostate](#monostate)
+* [Any as in any type](#any-as-in-any-type)
 * [Type support](#type-support)
   * [Type info](#type-info)
     * [Almost unique identifiers](#almost-unique-identifiers)
@@ -213,6 +214,78 @@ entt::monostate<"mykey"_hs>{} = 42;
 const bool b = entt::monostate<"mykey"_hs>{};
 const int i = entt::monostate<entt::hashed_string{"mykey"}>{};
 ```
+
+# Any as in any type
+
+`EnTT` comes with its own `any` type. It may seem redundant considering that
+C++17 introduced `std::any`, but it is not (hopefully).<br/>
+In fact, the _type_ returned by an `std::any` is a const reference to an
+`std::type_info`, an implementation defined class that's not something everyone
+wants to see in a software. Furthermore, there is no way to connect it with the
+type system of the library and therefore with its integrated RTTI support.<br/>
+Note that this class is largely used internally by the library itself.
+
+The API is very similar to that of its most famous counterpart, mainly because
+this class serves the same purpose of being an opaque container for any type of
+value.<br/>
+Instances of `any` also minimize the number of allocations by relying on a well
+known technique called _small buffer optimization_ and a fake vtable.
+
+Creating an object of the `any` type, whether empty or not, is trivial:
+
+```cpp
+// an empty container
+entt::any empty{};
+
+// a container for an int
+entt::any any{0};
+
+// in place construction
+entt::any in_place{std::in_place_type<int>, 42};
+```
+
+The `any` class takes the burden of destroying the contained element when
+required, regardless of the storage strategy used for the specific object.<br/>
+Furthermore, an instance of `any` is not tied to an actual type. Therefore, the
+wrapper will be reconfigured by assigning it an object of a different type than
+the one contained, so as to be able to handle the new instance.<br/>
+When in doubt about the type of object contained, the `type` member function of
+`any` returns an instance of `type_info` associated with its element, or an
+invalid `type_info` object if the container is empty.
+
+A particularly interesting feature of this class is that it can also be used as
+an opaque container for non-const unmanaged elements:
+
+```cpp
+int value;
+entt::any any{std::ref(value)};
+```
+
+In other words, whenever `any` intercepts a `reference_wrapper`, it acts as a
+reference to the original instance rather than making a copy of or moving it
+internally. The contained object is never destroyed and users must ensure that
+its lifetime exceeds that of the container.<br/>
+Similarly, it's possible to create non-owning copies of `any` from an existing
+object:
+
+```cpp
+// aliasing constructor
+entt::any ref = other.ref();
+```
+
+In this case, it doesn't matter if the starting container actually holds an
+object or acts already as a reference for unmanaged elements, the new instance
+thus created won't create copies and will only serve as a reference for the
+original item.<br/>
+It means that, starting from the example above, both `ref` and` other` will
+point to the same object, whether it's initially contained in `other` or already
+an unmanaged element.
+
+To cast an instance of `any` to a type, the library offers a set of `any_cast`
+functions in all respects similar to their most famous counterparts.<br/>
+The only difference is that, in the case of `EnTT`, these won't raise exceptions
+but will only cross an assert in debug mode, otherwise resulting in undefined
+behavior in case of misuse in release mode.
 
 # Type support
 

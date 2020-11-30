@@ -35,6 +35,7 @@ struct fat_t: empty_t {
 
     int *foo{nullptr};
     int *bar{nullptr};
+    double gnam[4];
 };
 
 struct not_comparable_t {
