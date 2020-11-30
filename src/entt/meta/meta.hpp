@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../core/any.hpp"
 #include "../core/fwd.hpp"
 #include "../core/utility.hpp"
 #include "../core/type_info.hpp"
@@ -506,7 +507,7 @@ public:
     }
 
 private:
-    internal::meta_storage storage;
+    any storage;
     internal::meta_type_node *node;
     dereference_operator_type *deref;
     meta_sequence_container(* seq_factory)(void *);

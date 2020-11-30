@@ -8,7 +8,7 @@
 * [Introduction](#introduction)
 * [Names and identifiers](#names-and-identifiers)
 * [Reflection in a nutshell](#reflection-in-a-nutshell)
-  * [Any as in any type](#any-as-in-any-type)
+  * [Any to the rescue](#any-to-the-rescue)
   * [Enjoy the runtime](#enjoy-the-runtime)
   * [Container support](#container-support)
   * [Pointer-like types](#pointer-like-types)
@@ -192,75 +192,44 @@ Also, do not forget what these few lines hide under the hood: a built-in,
 non-intrusive and macro-free system for reflection in C++. Features that are
 definitely worth the price, at least for me.
 
-## Any as in any type
+## Any to the rescue
 
-The reflection system comes with its own `meta_any` type. It may seem redundant
-since C++17 introduced `std::any`, but it is not.<br/>
-In fact, the _type_ returned by an `std::any` is a const reference to an
-`std::type_info`, an implementation defined class that's not something everyone
-wants to see in a software. Furthermore, the class `std::type_info` suffers from
-some design flaws and there is even no way to _convert_ an `std::type_info` into
-a meta type, thus linking the two worlds.
+The reflection system offers a kind of _extended version_ of the `any` class
+(see the core module for more details).<br/>
+The purpose is to add some feature on top of those already present, so as to
+integrate it with the meta type system without having to duplicate the code.
 
-The class `meta_any` offers an API similar to that of its most famous
-counterpart and serves the same purpose of being an opaque container for any
-type of value.<br/>
-It minimizes the allocations required, which are almost absent thanks to _SBO_
-techniques. In fact, unless users deal with _fat types_ and create instances of
-them through the reflection system, allocations are at zero.
-
-Creating instances of `meta_any`, whether empty or from existing objects, is
-trivial:
+The API is very similar to that of the `any` type. The class `meta_any` _wraps_
+many of the feature to infer a meta node, before forwarding some or all of the
+arguments to the underlying storage.<br/>
+Among the few relevant differences, instances of `meta_any` are comparable,
+while those of `any` are not:
 
 ```cpp
-// a container for an int
-entt::meta_any any{0};
+entt::meta_any any{42};
+entt::meta_any other{'c'};
 
-// an empty container
-entt::meta_any empty{};
+const bool equal = (any == other);
 ```
 
-The `meta_any` class takes also the burden of destroying the contained object
-when required.<br/>
-Furthermore, an instance of `meta_any` is not tied to a specific type.
-Therefore, the wrapper will be reconfigured by assigning it an object of a
-different type than the one contained, so as to be able to handle the new
-instance.
-
-A particularly interesting feature of this class is that it can also be used as
-an opaque container for non-const unmanaged objects:
+Also, `meta_any` adds support for containers and pointer-like types (see the
+following sections for more details).<br/>
+Similar to `any`, this class can also be used to create _aliases_ for unmanaged
+objects. However, unlike `any`,` meta_any` treats an empty instance and one
+initialized with `void` differently:
 
 ```cpp
-int value;
-entt::meta_any any{std::ref(value)};
+entt::meta_any any{};
+entt::meta_any other{std::in_place_type<void>};
 ```
 
-In other words, whenever `meta_any` intercepts a `reference_wrapper`, it acts as
-a reference to the original instance rather than making a copy of it. The
-contained object is never destroyed and users must ensure that its lifetime
-exceeds that of the container.<br/>
-Similarly, it's possible to create non-owning copies of `meta_any` from existing
-ones:
-
-```cpp
-// aliasing constructor
-entt::meta_any ref = any.ref();
-```
-
-In this case, it doesn't matter if the starting container actually holds an
-object or acts already as a reference for unmanaged elements, the new instance
-thus created won't create copies and will only serve as a reference for the
-original item.<br/>
-It means that, starting from the example above, both `ref` and` any` will point
-to the same object, whether it's initially contained in `any` or already an
-unmanaged one. This is particularly useful for passing instances of `meta_any`
-belonging to the external context by reference to a function or a constructor
-rather than making copies of them.
-
-The `meta_any` class also has a `type` member function that returns the meta
-type of the contained value, if any. The member functions `try_cast`, `cast` and
-`convert` are then used to know if the underlying object has a given type as a
-base or if it can be converted implicitly to it.
+While `any` treats both objects as empty, `meta_any` treats objects initialized
+with `void` as if they were _valid_ ones. This allows to differentiate between
+failed function calls and function calls that are successful but return
+nothing.<br/>
+Finally, the member functions `try_cast`, `cast` and `convert` are used to know
+if the underlying object has a given type as a base or if it can be converted
+implicitly to it. There is in fact no `any_cast` equivalent for `meta_any`.
 
 ## Enjoy the runtime
 
