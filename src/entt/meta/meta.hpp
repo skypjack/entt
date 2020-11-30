@@ -164,42 +164,36 @@ private:
  * of memory allocations if possible. This should improve overall performance.
  */
 class meta_any {
-    using dereference_operator_type = meta_any(meta_any &);
+    enum class operation { DEREF, SEQ, ASSOC };
+
+    using vtable_type = void(const operation, meta_any &, void *);
 
     template<typename Type>
-    [[nodiscard]] static meta_any dereference_operator(meta_any &any) {
-        if constexpr(is_meta_pointer_like_v<Type>) {
-            using pointed_type = std::remove_reference_t<decltype(*std::declval<Type>())>;
+    static void basic_vtable(const operation op, [[maybe_unused]] meta_any &from, [[maybe_unused]] void *to) {
+        switch(op) {
+        case operation::DEREF:
+            if constexpr(is_meta_pointer_like_v<Type>) {
+                if(auto ptr = from.cast<Type>(); ptr) {
+                    using pointed_type = std::remove_reference_t<decltype(*std::declval<Type>())>;
 
-            if constexpr(std::is_const_v<pointed_type> && std::is_copy_constructible_v<pointed_type>) {
-                auto ptr = any.cast<Type>();
-                return ptr ? std::as_const(*ptr) : meta_any{};
-            } else if constexpr(!std::is_const_v<pointed_type>) {
-                auto ptr = any.cast<Type>();
-                return ptr ? std::ref(*ptr) : meta_any{};
-            } else {
-                return {};
+                    if constexpr(std::is_const_v<pointed_type> && std::is_copy_constructible_v<pointed_type>) {
+                        *static_cast<meta_any *>(to) = std::as_const(*ptr);
+                    } else if constexpr(!std::is_const_v<pointed_type>) {
+                        *static_cast<meta_any *>(to) = std::ref(*ptr);
+                    }
+                }
             }
-        } else {
-            return {};
-        }
-    }
-
-    template<typename Type>
-    [[nodiscard]] static meta_sequence_container meta_sequence_container_factory([[maybe_unused]] void *container) ENTT_NOEXCEPT {
-        if constexpr(has_meta_sequence_container_traits_v<Type>) {
-            return static_cast<Type *>(container);
-        } else {
-            return {};
-        }
-    }
-
-    template<typename Type>
-    [[nodiscard]] static meta_associative_container meta_associative_container_factory([[maybe_unused]] void *container) ENTT_NOEXCEPT {
-        if constexpr(has_meta_associative_container_traits_v<Type>) {
-            return static_cast<Type *>(container);
-        } else {
-            return {};
+            break;
+        case operation::SEQ:
+            if constexpr(has_meta_sequence_container_traits_v<Type>) {
+                *static_cast<meta_sequence_container *>(to) = static_cast<Type *>(from.data());
+            }
+            break;
+        case operation::ASSOC:
+            if constexpr(has_meta_associative_container_traits_v<Type>) {
+                *static_cast<meta_associative_container *>(to) = static_cast<Type *>(from.data());
+            }
+            break;
         }
     }
 
@@ -207,10 +201,8 @@ public:
     /*! @brief Default constructor. */
     meta_any() ENTT_NOEXCEPT
         : storage{},
-          node{},
-          deref{nullptr},
-          seq_factory{nullptr},
-          assoc_factory{nullptr}
+          vtable{},
+          node{}
     {}
 
     /**
@@ -222,10 +214,8 @@ public:
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
         : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
-          node{internal::meta_info<Type>::resolve()},
-          deref{&dereference_operator<Type>},
-          seq_factory{&meta_sequence_container_factory<Type>},
-          assoc_factory{&meta_associative_container_factory<Type>}
+          vtable{&basic_vtable<Type>},
+          node{internal::meta_info<Type>::resolve()}
     {}
 
     /**
@@ -236,10 +226,8 @@ public:
     template<typename Type>
     meta_any(std::reference_wrapper<Type> value)
         : storage{value},
-          node{internal::meta_info<Type>::resolve()},
-          deref{&dereference_operator<Type>},
-          seq_factory{&meta_sequence_container_factory<Type>},
-          assoc_factory{&meta_associative_container_factory<Type>}
+          vtable{&basic_vtable<Type>},
+          node{internal::meta_info<Type>::resolve()}
     {}
 
     /**
@@ -444,9 +432,7 @@ public:
         meta_any other{};
         other.node = node;
         other.storage = storage.ref();
-        other.deref = deref;
-        other.seq_factory = seq_factory;
-        other.assoc_factory = assoc_factory;
+        other.vtable = vtable;
         return other;
     }
 
@@ -455,7 +441,9 @@ public:
      * @return A sequence container proxy for the underlying object.
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() ENTT_NOEXCEPT {
-        return seq_factory(storage.data());
+        meta_sequence_container proxy;
+        vtable(operation::SEQ, *this, &proxy);
+        return proxy;
     }
 
     /**
@@ -463,7 +451,9 @@ public:
      * @return An associative container proxy for the underlying object.
      */
     [[nodiscard]] meta_associative_container as_associative_container() ENTT_NOEXCEPT {
-        return assoc_factory(storage.data());
+        meta_associative_container proxy;
+        vtable(operation::ASSOC, *this, &proxy);
+        return proxy;
     }
 
     /**
@@ -472,7 +462,9 @@ public:
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
     [[nodiscard]] meta_any operator*() ENTT_NOEXCEPT {
-        return deref(*this);
+        meta_any any{};
+        vtable(operation::DEREF, *this, &any);
+        return any;
     }
 
     /**
@@ -500,18 +492,14 @@ public:
     friend void swap(meta_any &lhs, meta_any &rhs) {
         using std::swap;
         swap(lhs.storage, rhs.storage);
+        swap(lhs.vtable, rhs.vtable);
         swap(lhs.node, rhs.node);
-        swap(lhs.deref, rhs.deref);
-        swap(lhs.seq_factory, rhs.seq_factory);
-        swap(lhs.assoc_factory, rhs.assoc_factory);
     }
 
 private:
     any storage;
+    vtable_type *vtable;
     internal::meta_type_node *node;
-    dereference_operator_type *deref;
-    meta_sequence_container(* seq_factory)(void *);
-    meta_associative_container(* assoc_factory)(void *);
 };
 
 
