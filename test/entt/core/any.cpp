@@ -540,6 +540,15 @@ TEST(Any, NoSBOWithVoidSwap) {
     ASSERT_EQ(entt::any_cast<fat>(lhs), (fat{{.1, .2, .3, .4}}));
 }
 
-TEST(Any, AnyCastTemporary) {
+TEST(Any, AnyCast) {
+    entt::any any{42};
+    const auto &cany = any;
+
+    ASSERT_EQ(entt::any_cast<char>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<char>(&cany), nullptr);
+    ASSERT_EQ(*entt::any_cast<int>(&any), 42);
+    ASSERT_EQ(*entt::any_cast<int>(&cany), 42);
+    ASSERT_EQ(entt::any_cast<int &>(any), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(cany), 42);
     ASSERT_EQ(entt::any_cast<int>(42), 42);
 }

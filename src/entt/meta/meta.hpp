@@ -476,8 +476,8 @@ public:
     }
 
     /**
-     * @brief Returns false if a wrapper is empty, true otherwise.
-     * @return False if the wrapper is empty, true otherwise.
+     * @brief Returns false if a wrapper is invalid, true otherwise.
+     * @return False if the wrapper is invalid, true otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);

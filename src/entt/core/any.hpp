@@ -13,6 +13,7 @@
 namespace entt {
 
 
+/*! @brief A type-safe container for single values of any type. */
 class any {
     enum class operation { COPY, MOVE, DTOR, ADDR, REF, TYPE };
 
@@ -99,6 +100,12 @@ public:
           instance{}
     {}
 
+    /**
+     * @brief Constructs an any by directly initializing the new object.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Args Types of arguments to use to construct the new instance.
+     * @param args Parameters to use to construct the instance.
+     */
     template<typename Type, typename... Args>
     explicit any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
         : vtable{&basic_vtable<Type>},
@@ -113,17 +120,31 @@ public:
         }
     }
 
+    /**
+     * @brief Constructs an any that holds an unmanaged object.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
+     */
     template<typename Type>
     any(std::reference_wrapper<Type> value)
         : vtable{&basic_vtable<std::add_lvalue_reference_t<Type>>},
           instance{&value.get()}
     {}
 
+    /**
+     * @brief Constructs an any from a given value.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
+     */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, any>>>
     any(Type &&value)
         : any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
     {}
 
+    /**
+     * @brief Copy constructor.
+     * @param other The instance to copy from.
+     */
     any(const any &other)
         : any{}
     {
@@ -131,6 +152,10 @@ public:
         vtable(operation::COPY, other, this);
     }
 
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
     any(any &&other) ENTT_NOEXCEPT
         : any{}
     {
@@ -138,44 +163,78 @@ public:
         vtable(operation::MOVE, other, this);
     }
 
+    /*! @brief Frees the internal storage, whatever it means. */
     ~any() {
         vtable(operation::DTOR, *this, nullptr);
     }
 
+    /**
+     * @brief Assignment operator.
+     * @param other The instance to assign from.
+     * @return This any any object.
+     */
     any & operator=(any other) {
         swap(*this, other);
         return *this;
     }
 
-    [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
-        return vtable(operation::ADDR, *this, nullptr);
-    }
-
-    [[nodiscard]] void * data() ENTT_NOEXCEPT {
-        return const_cast<void *>(std::as_const(*this).data());
-    }
-
-    template<typename Type, typename... Args>
-    void emplace(Args &&... args) {
-        *this = any{std::in_place_type<Type>, std::forward<Args>(args)...};
-    }
-
-    [[nodiscard]] any ref() const ENTT_NOEXCEPT {
-        any other{};
-        vtable(operation::REF, *this, &other);
-        return other;
-    }
-
+    /**
+     * @brief Returns the type of the contained object.
+     * @return The type of the contained object, if any.
+     */
     [[nodiscard]] type_info type() const ENTT_NOEXCEPT {
         type_info info;
         vtable(operation::TYPE, *this, &info);
         return info;
     }
 
+    /**
+     * @brief Returns an opaque pointer to the contained instance.
+     * @return An opaque pointer the contained instance, if any.
+     */
+    [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
+        return vtable(operation::ADDR, *this, nullptr);
+    }
+
+    /*! @copydoc data */
+    [[nodiscard]] void * data() ENTT_NOEXCEPT {
+        return const_cast<void *>(std::as_const(*this).data());
+    }
+
+    /**
+     * @brief Replaces the contained object by creating a new instance directly.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Args Types of arguments to use to construct the new instance.
+     * @param args Parameters to use to construct the instance.
+     */
+    template<typename Type, typename... Args>
+    void emplace(Args &&... args) {
+        *this = any{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /**
+     * @brief Aliasing constructor.
+     * @return An any that shares a reference to an unmanaged object.
+     */
+    [[nodiscard]] any ref() const ENTT_NOEXCEPT {
+        any other{};
+        vtable(operation::REF, *this, &other);
+        return other;
+    }
+
+    /**
+     * @brief Returns false if a wrapper is empty, true otherwise.
+     * @return False if the wrapper is empty, true otherwise.
+     */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(vtable(operation::ADDR, *this, nullptr) == nullptr);
     }
 
+    /**
+     * @brief Swaps two any objects.
+     * @param lhs A valid any object.
+     * @param rhs A valid any object.
+     */
     friend void swap(any &lhs, any &rhs) {
         any tmp{};
         lhs.vtable(operation::MOVE, lhs, &tmp);
@@ -190,33 +249,45 @@ private:
 };
 
 
+/**
+ * @brief Performs type-safe access to the contained object.
+ * @param any Target any object.
+ * @return The element converted to the requested type.
+ */
 template<typename Type>
 Type any_cast(const any &any) ENTT_NOEXCEPT {
-    ENTT_ASSERT(any.type() == type_id<Type>());
-    return *static_cast<const Type *>(any.data());
+    auto *instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&any);
+    ENTT_ASSERT(instance);
+    return static_cast<Type>(*instance);
 }
 
 
+/*! @copydoc any_cast */
 template<typename Type>
 Type any_cast(any &any) ENTT_NOEXCEPT {
-    ENTT_ASSERT(any.type() == type_id<Type>());
-    return *static_cast<Type *>(any.data());
+    auto *instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&any);
+    ENTT_ASSERT(instance);
+    return static_cast<Type>(*instance);
 }
 
 
+/*! @copydoc any_cast */
 template<typename Type>
 Type any_cast(any &&any) ENTT_NOEXCEPT {
-    ENTT_ASSERT(any.type() == type_id<Type>());
-    return std::move(*static_cast<Type *>(any.data()));
+    auto *instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&any);
+    ENTT_ASSERT(instance);
+    return static_cast<Type>(std::move(*instance));
 }
 
 
+/*! @copydoc any_cast */
 template<typename Type>
 const Type * any_cast(const any *any) ENTT_NOEXCEPT {
     return (any->type() == type_id<Type>() ? static_cast<const Type *>(any->data()) : nullptr);
 }
 
 
+/*! @copydoc any_cast */
 template<typename Type>
 Type * any_cast(any *any) ENTT_NOEXCEPT {
     return (any->type() == type_id<Type>() ? static_cast<Type *>(any->data()) : nullptr);
