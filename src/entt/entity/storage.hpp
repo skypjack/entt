@@ -169,7 +169,8 @@ class basic_storage: public basic_sparse_set<Entity> {
     }
 
     void swap_and_pop(const std::size_t pos) final {
-        instances[pos] = std::move(instances.back());
+        auto other = std::move(instances.back());
+        instances[pos] = std::move(other);
         instances.pop_back();
     }
 
@@ -466,7 +467,7 @@ public:
 
     /**
      * @brief Sort all elements according to the given comparison function.
-     * 
+     *
      * @sa sort_n
      *
      * @tparam Compare Type of comparison function object.
