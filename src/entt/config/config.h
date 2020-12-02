@@ -42,14 +42,14 @@
 
 
 #ifndef ENTT_STANDARD_CPP
-#    if defined _MSC_VER
-#       define ENTT_PRETTY_FUNCTION __FUNCSIG__
-#       define ENTT_PRETTY_FUNCTION_PREFIX '<'
-#       define ENTT_PRETTY_FUNCTION_SUFFIX '>'
-#    elif defined __clang__ || defined __GNUC__
+#    if defined __clang__ || defined __GNUC__
 #       define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #       define ENTT_PRETTY_FUNCTION_PREFIX '='
 #       define ENTT_PRETTY_FUNCTION_SUFFIX ']'
+#    elif defined _MSC_VER
+#       define ENTT_PRETTY_FUNCTION __FUNCSIG__
+#       define ENTT_PRETTY_FUNCTION_PREFIX '<'
+#       define ENTT_PRETTY_FUNCTION_SUFFIX '>'
 #   endif
 #endif
 
