@@ -56,6 +56,19 @@ TEST(TypeTraits, TypeList) {
     static_assert(!entt::type_list_contains_v<type, double>);
 }
 
+TEST(TypeTraits, ValueList) {
+    using value = entt::value_list<0, 2>;
+    using other = entt::value_list<1>;
+
+    static_assert(value::size == 2u);
+    static_assert(other::size == 1u);
+
+    static_assert(std::is_same_v<decltype(value{} + other{}), entt::value_list<0, 2, 1>>);
+    static_assert(std::is_same_v<entt::value_list_cat_t<value, other, value, other>, entt::value_list<0, 2, 1, 0, 2, 1>>);
+    static_assert(std::is_same_v<entt::value_list_cat_t<value, other>, entt::value_list<0, 2, 1>>);
+    static_assert(std::is_same_v<entt::value_list_cat_t<value, value>, entt::value_list<0, 2, 0, 2>>);
+}
+
 TEST(TypeTraits, IsEqualityComparable) {
     static_assert(entt::is_equality_comparable_v<int>);
     static_assert(!entt::is_equality_comparable_v<void>);

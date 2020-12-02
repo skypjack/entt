@@ -230,6 +230,74 @@ inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::val
 
 
 /**
+ * @brief A class to use to push around lists of constant values, nothing more.
+ * @tparam Value Values provided by the value list.
+ */
+template<auto... Value>
+struct value_list {
+    /*! @brief Value list type. */
+    using type = value_list;
+    /*! @brief Compile-time number of elements in the value list. */
+    static constexpr auto size = sizeof...(Value);
+};
+
+
+/**
+ * @brief Concatenates multiple value lists.
+ * @tparam Value Values provided by the first value list.
+ * @tparam Other Values provided by the second value list.
+ * @return A value list composed by the values of both the value lists.
+ */
+template<auto... Value, auto... Other>
+constexpr value_list<Value..., Other...> operator+(value_list<Value...>, value_list<Other...>) { return {}; }
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct value_list_cat;
+
+
+/*! @brief Concatenates multiple value lists. */
+template<>
+struct value_list_cat<> {
+    /*! @brief A value list composed by the values of all the value lists. */
+    using type = value_list<>;
+};
+
+
+/**
+ * @brief Concatenates multiple value lists.
+ * @tparam Value Values provided by the first value list.
+ * @tparam Other Values provided by the second value list.
+ * @tparam List Other value lists, if any.
+ */
+template<auto... Value, auto... Other, typename... List>
+struct value_list_cat<value_list<Value...>, value_list<Other...>, List...> {
+    /*! @brief A value list composed by the values of all the value lists. */
+    using type = typename value_list_cat<value_list<Value..., Other...>, List...>::type;
+};
+
+
+/**
+ * @brief Concatenates multiple value lists.
+ * @tparam Value Values provided by the value list.
+ */
+template<auto... Value>
+struct value_list_cat<value_list<Value...>> {
+    /*! @brief A value list composed by the values of all the value lists. */
+    using type = value_list<Value...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Value lists to concatenate.
+ */
+template<typename... List>
+using value_list_cat_t = typename value_list_cat<List...>::type;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
