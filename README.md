@@ -87,10 +87,11 @@ Here is a brief, yet incomplete list of what it offers today:
 * Views and groups to iterate entities and components and allow different access
   patterns, from **perfect SoA** to fully random.
 * A lot of **facilities** built on top of the entity-component system to help
-  the users and avoid reinventing the wheel (dependencies, snapshot, actor
-  class, support for **reactive systems** and so on).
+  the users and avoid reinventing the wheel (dependencies, snapshot, handles,
+  support for **reactive systems** and so on).
 * The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free runtime **reflection system**.
+* **Static polymorphism** made simple and within everyone's reach.
 * A **cooperative scheduler** for processes of any type.
 * All that is needed for **resource management** (cache, loaders, handles).
 * Delegates, **signal handlers** (with built-in support for collectors) and a

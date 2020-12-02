@@ -197,6 +197,10 @@ SETUP_BASIC_TEST(meta_prop entt/meta/meta_prop.cpp)
 SETUP_BASIC_TEST(meta_range entt/meta/meta_range.cpp)
 SETUP_BASIC_TEST(meta_type entt/meta/meta_type.cpp)
 
+# Test poly
+
+SETUP_BASIC_TEST(poly entt/poly/poly.cpp)
+
 # Test process
 
 SETUP_BASIC_TEST(process entt/process/process.cpp)
