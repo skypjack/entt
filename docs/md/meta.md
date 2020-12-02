@@ -194,8 +194,8 @@ definitely worth the price, at least for me.
 
 ## Any to the rescue
 
-The reflection system offers a kind of _extended version_ of the `any` class
-(see the core module for more details).<br/>
+The reflection system offers a kind of _extended version_ of the `entt::any`
+class (see the core module for more details).<br/>
 The purpose is to add some feature on top of those already present, so as to
 integrate it with the meta type system without having to duplicate the code.
 

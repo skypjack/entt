@@ -19,7 +19,6 @@
 
 WIP:
 * HP: headless (sparse set only) view
-* HP: fake vtable, see dino:: for a reasonable and customizable (pay-per-use) approach
 * HP: make view pack work also with groups, make packs input iterator only, add view adapter for external sources
 * HP: write documentation for custom storages and views!!
 * suppress warnings in meta.hpp (uninitialized members)

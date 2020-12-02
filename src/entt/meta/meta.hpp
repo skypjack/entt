@@ -212,7 +212,7 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit meta_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
+    explicit meta_any(std::in_place_type_t<Type>, Args &&... args)
         : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
           vtable{&basic_vtable<Type>},
           node{internal::meta_info<Type>::resolve()}
