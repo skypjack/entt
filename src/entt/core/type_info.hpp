@@ -31,7 +31,7 @@ struct ENTT_API type_seq final {
 
 
 template<typename Type>
-[[nodiscard]] constexpr auto type_name() ENTT_NOEXCEPT {
+[[nodiscard]] constexpr auto stripped_type_name() ENTT_NOEXCEPT {
 #if defined ENTT_PRETTY_FUNCTION
     std::string_view pretty_function{ENTT_PRETTY_FUNCTION};
     auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX)+1);
@@ -40,6 +40,37 @@ template<typename Type>
 #else
     return std::string_view{};
 #endif
+}
+
+
+template<typename Type, auto = stripped_type_name<Type>().find_first_of('.')>
+[[nodiscard]] static constexpr std::string_view type_name(int) ENTT_NOEXCEPT {
+    constexpr auto value = stripped_type_name<Type>();
+    return value;
+}
+
+
+template<typename Type>
+[[nodiscard]] static std::string_view type_name(char) ENTT_NOEXCEPT {
+    static const auto value = stripped_type_name<Type>();
+    return value;
+}
+
+
+template<typename Type, auto = stripped_type_name<Type>().find_first_of('.')>
+[[nodiscard]] static constexpr id_type type_hash(int) ENTT_NOEXCEPT {
+    constexpr auto stripped = stripped_type_name<Type>();
+    constexpr auto value = hashed_string::value(stripped.data(), stripped.size());
+    return value;
+}
+
+
+template<typename Type>
+[[nodiscard]] static id_type type_hash(char) ENTT_NOEXCEPT {
+    static const auto value = [](const auto stripped) {
+        return hashed_string::value(stripped.data(), stripped.size());
+    }(stripped_type_name<Type>());
+    return value;
 }
 
 
@@ -79,22 +110,14 @@ struct type_hash final {
      * @brief Returns the numeric representation of a given type.
      * @return The numeric representation of the given type.
      */
-#if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
+#if defined ENTT_PRETTY_FUNCTION
     [[nodiscard]] static constexpr id_type value() ENTT_NOEXCEPT {
-        constexpr auto stripped = internal::type_name<Type>();
-        constexpr auto value = hashed_string::value(stripped.data(), stripped.size());
-        return value;
-    }
-#elif defined ENTT_PRETTY_FUNCTION
-    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
-        static const auto value = [](const auto stripped) { return hashed_string::value(stripped.data(), stripped.size()); }(internal::type_name<Type>());
-        return value;
-    }
+        return internal::type_hash<Type>(0);
 #else
-    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr id_type value() ENTT_NOEXCEPT {
         return type_seq<Type>::value();
-    }
 #endif
+    }
 };
 
 
@@ -108,21 +131,9 @@ struct type_name final {
      * @brief Returns the name of a given type.
      * @return The name of the given type.
      */
-#if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
-        constexpr auto value = internal::type_name<Type>();
-        return value;
+        return internal::type_name<Type>(0);
     }
-#elif defined ENTT_PRETTY_FUNCTION
-    [[nodiscard]] static std::string_view value() ENTT_NOEXCEPT {
-        static const auto value = internal::type_name<Type>();
-        return value;
-    }
-#else
-    [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
-        return internal::type_name<Type>();
-    }
-#endif
 };
 
 
