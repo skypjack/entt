@@ -46,6 +46,11 @@ TEST(RuntimeView, Functionalities) {
         ASSERT_EQ(registry.get<int>(entity), 42);
         ASSERT_EQ(registry.get<char>(entity), '2');
     }
+
+    entt::runtime_view empty{};
+
+    ASSERT_EQ(empty.size_hint(), 0u);
+    ASSERT_EQ(empty.begin(), empty.end());
 }
 
 TEST(RuntimeView, Iterator) {

@@ -23,6 +23,7 @@ WIP:
 * HP: write documentation for custom storages and views!!
 * HP: any/poly: configurable sbo size, compile-time policies like sbo-required.
 * HP: registry: use a poly object for pools, no more pool_data type.
+* HP: make runtime views use opaque storage and therefore return also elements.
 * suppress warnings in meta.hpp (uninitialized members)
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views

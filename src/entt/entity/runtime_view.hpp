@@ -55,9 +55,6 @@ namespace entt {
  */
 template<typename Entity>
 class basic_runtime_view final {
-    /*! @brief A registry is allowed to create views. */
-    friend class basic_registry<Entity>;
-
     using underlying_iterator = typename basic_sparse_set<Entity>::iterator;
 
     class view_iterator final {
@@ -129,18 +126,6 @@ class basic_runtime_view final {
         underlying_iterator it;
     };
 
-    basic_runtime_view(std::vector<const basic_sparse_set<Entity> *> cpools, std::vector<const basic_sparse_set<Entity> *> epools) ENTT_NOEXCEPT
-        : pools{std::move(cpools)},
-          filter{std::move(epools)}
-    {
-        const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
-            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
-        });
-
-        // brings the best candidate (if any) on front of the vector
-        std::rotate(pools.begin(), it, pools.end());
-    }
-
     [[nodiscard]] bool valid() const {
         return !pools.empty() && pools.front();
     }
@@ -152,6 +137,29 @@ public:
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
     using iterator = view_iterator;
+
+    /*! @brief Default constructor to use to create empty, invalid views. */
+    basic_runtime_view() ENTT_NOEXCEPT
+        : pools{},
+          filter{}
+    {}
+
+    /**
+     * @brief Constructs a runtime view from a set of storage classes.
+     * @param cpools The storage for the types to iterate.
+     * @param epools The storage for the types used to filter the view.
+     */
+    basic_runtime_view(std::vector<const basic_sparse_set<Entity> *> cpools, std::vector<const basic_sparse_set<Entity> *> epools) ENTT_NOEXCEPT
+        : pools{std::move(cpools)},
+          filter{std::move(epools)}
+    {
+        const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
+            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
+        });
+
+        // brings the best candidate (if any) on front of the vector
+        std::rotate(pools.begin(), it, pools.end());
+    }
 
     /**
      * @brief Estimates the number of entities iterated by the view.
