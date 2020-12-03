@@ -26,7 +26,10 @@
 #endif
 
 
-#ifndef ENTT_ASSERT
+#ifdef ENTT_DISABLE_ASSERT
+#   undef ENTT_ASSERT
+#   define ENTT_ASSERT(...) (void(0))
+#elif !defined ENTT_ASSERT
 #   include <cassert>
 #   define ENTT_ASSERT(condition) assert(condition)
 #endif
