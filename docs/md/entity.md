@@ -692,8 +692,8 @@ copyable). An implication of this is that mutability becomes part of the
 type.
 
 There are two aliases that use `entt::entity` as their default entity:
-`entt::handle` and `entt::const_handle`. Users can also easily create their own
-aliases for custom identifiers as:
+`entt::handle` and `entt::const_handle`.<br/>
+Users can also easily create their own aliases for custom identifiers as:
 
 ```cpp
 using my_handle = entt::basic_handle<my_identifier>;

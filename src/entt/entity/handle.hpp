@@ -86,7 +86,7 @@ struct basic_handle {
      * @return True if the handle refers to non-null registry and entity, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return reg && entt != null;
+        return reg && reg->valid(entt);
     }
 
     /**
@@ -111,6 +111,23 @@ struct basic_handle {
      */
     [[nodiscard]] entity_type entity() const ENTT_NOEXCEPT {
         return entt;
+    }
+
+    /**
+     * @brief Destroys the entity associated with a handle.
+     * @sa basic_registry::destroy
+     */
+    void destroy() {
+        reg->destroy(entt);
+    }
+
+    /**
+     * @brief Destroys the entity associated with a handle.
+     * @sa basic_registry::destroy
+     * @param version A desired version upon destruction.
+     */
+    void destroy(const typename registry_type::version_type version) {
+        reg->destroy(entt, version);
     }
 
     /**
