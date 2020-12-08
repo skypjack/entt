@@ -15,6 +15,9 @@ struct clazz {
     void rw_int_char_double(entt::view<entt::exclude_t<>, int, char>, double &) {}
 };
 
+void ro_int_payload(clazz& payload, entt::view<entt::exclude_t<>, const int> view) {
+}
+
 void to_args_integrity(entt::view<entt::exclude_t<>, int> view, std::size_t &value, entt::registry &registry) {
     value = view.size();
 }
@@ -129,6 +132,19 @@ TEST(Organizer, EmplaceMemberFunction) {
     organizer.clear();
 
     ASSERT_EQ(organizer.graph().size(), 0u);
+}
+
+TEST(Organizer, EmplacePayloadedFunction) {
+    entt::organizer organizer;
+	clazz instance;
+
+    organizer.emplace<&ro_int_payload>(instance, "t1");
+
+    const auto graph = organizer.graph();
+
+    for(auto &&vertex: graph) {
+        ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));
+    }
 }
 
 TEST(Organizer, EmplaceDirectFunction) {
