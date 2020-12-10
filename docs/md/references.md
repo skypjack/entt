@@ -40,6 +40,8 @@ I hope this list can grow much more in the future:
 * Javascript:
   * [ecsy](https://github.com/MozillaReality/ecsy): I haven't had the time to
     investigate the underlying design of `ecsy` but it looks cool anyway.
+  * [@javelin/ecs](https://github.com/3mcd/javelin/tree/master/packages/ecs):
+    an archetype non-OO ECS
 
 * Rust:
   * [Legion](https://github.com/TomGillen/legion): a chunk based archetype ECS.
