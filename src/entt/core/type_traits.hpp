@@ -13,6 +13,29 @@ namespace entt {
 
 
 /**
+ * @brief Identity type trait.
+ *
+ * Useful to establish non-deduced contexts in template argument deduction
+ * (waiting for C++20) or to provide types through function arguments.
+ *
+ * @tparam Type A type.
+ */
+template<typename Type>
+struct type_identity {
+    /*! @brief Identity type. */
+    using type = Type;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Type A type.
+ */
+template<typename Type>
+using type_identity_t = typename type_identity<Type>::type;
+
+
+/**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
  * @tparam Type The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
