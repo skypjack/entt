@@ -238,17 +238,10 @@ private:
 template<typename Type>
 type_info type_id() ENTT_NOEXCEPT {
     return type_info{
-        type_seq<std::remove_reference_t<std::remove_const_t<Type>>>::value(),
-        type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value(),
-        type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value()
+        type_seq<std::remove_const_t<std::remove_reference_t<Type>>>::value(),
+        type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(),
+        type_name<std::remove_const_t<std::remove_reference_t<Type>>>::value()
     };
-}
-
-
-/*! @copydoc type_id */
-template<typename Type>
-type_info type_id(Type &&) ENTT_NOEXCEPT {
-    return type_id<Type>();
 }
 
 

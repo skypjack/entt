@@ -41,18 +41,11 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_NE(entt::type_id<int>(), entt::type_id<char>());
 
     auto info = entt::type_id<int>();
-    auto other = entt::type_id(42);
     entt::type_info empty{};
 
-    ASSERT_EQ(info, other);
     ASSERT_NE(info, empty);
-
     ASSERT_TRUE(info == info);
-    ASSERT_FALSE(info != other);
-
-    ASSERT_EQ(info.seq(), other.seq());
-    ASSERT_EQ(info.hash(), other.hash());
-    ASSERT_EQ(info.name(), other.name());
+    ASSERT_FALSE(info != info);
 
     ASSERT_EQ(info.seq(), entt::type_seq<int>::value());
     ASSERT_EQ(info.hash(), entt::type_hash<int>::value());
@@ -60,7 +53,6 @@ TEST(TypeInfo, Functionalities) {
 
     ASSERT_FALSE(empty);
     ASSERT_TRUE(info);
-    ASSERT_TRUE(other);
 
     empty = info;
 
@@ -70,9 +62,10 @@ TEST(TypeInfo, Functionalities) {
     empty = {};
 
     ASSERT_FALSE(empty);
+    ASSERT_NE(empty.hash(), info.hash());
 
-    empty = std::move(other);
+    empty = std::move(info);
 
     ASSERT_TRUE(empty);
-    ASSERT_EQ(empty.hash(), other.hash());
+    ASSERT_EQ(empty.hash(), info.hash());
 }
