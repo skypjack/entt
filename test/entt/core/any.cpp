@@ -54,7 +54,7 @@ TEST(Any, SBOInPlaceTypeConstruction) {
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<int>(any), 42);
 
-    auto other = any.ref();
+    auto other = as_ref(any);
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -72,7 +72,7 @@ TEST(Any, SBOAsRefConstruction) {
     ASSERT_EQ(entt::any_cast<int>(any), 42);
     ASSERT_EQ(any.data(), &value);
 
-    auto other = any.ref();
+    auto other = as_ref(any);
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -151,7 +151,7 @@ TEST(Any, NoSBOInPlaceTypeConstruction) {
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
 
-    auto other = any.ref();
+    auto other = as_ref(any);
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -169,7 +169,7 @@ TEST(Any, NoSBOAsRefConstruction) {
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
     ASSERT_EQ(any.data(), &instance);
 
-    auto other = any.ref();
+    auto other = as_ref(any);
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<fat>());

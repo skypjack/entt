@@ -13,7 +13,7 @@
 namespace entt {
 
 
-/*! @brief A type-safe container for single values of any type. */
+/*! @brief A SBO friendly, type-safe container for single values of any type. */
 class any {
     enum class operation { COPY, MOVE, DTOR, ADDR, REF, TYPE };
 
@@ -126,7 +126,7 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    any(std::reference_wrapper<Type> value)
+    any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
         : vtable{&basic_vtable<std::add_lvalue_reference_t<Type>>},
           instance{&value.get()}
     {}
@@ -213,16 +213,6 @@ public:
     }
 
     /**
-     * @brief Aliasing constructor.
-     * @return An any that shares a reference to an unmanaged object.
-     */
-    [[nodiscard]] any ref() const ENTT_NOEXCEPT {
-        any other{};
-        vtable(operation::REF, *this, &other);
-        return other;
-    }
-
-    /**
      * @brief Returns false if a wrapper is empty, true otherwise.
      * @return False if the wrapper is empty, true otherwise.
      */
@@ -241,6 +231,17 @@ public:
         rhs.vtable(operation::MOVE, rhs, &lhs);
         lhs.vtable(operation::MOVE, tmp, &rhs);
         std::swap(lhs.vtable, rhs.vtable);
+    }
+
+    /**
+     * @brief Aliasing constructor.
+     * @param other A reference to an object that isn't necessarily initialized.
+     * @return An any that shares a reference to an unmanaged object.
+     */
+    [[nodiscard]] friend any as_ref(const any &other) ENTT_NOEXCEPT {
+        any ref{};
+        other.vtable(operation::REF, other, &ref);
+        return ref;
     }
 
 private:

@@ -157,12 +157,7 @@ private:
 };
 
 
-/**
- * @brief Opaque wrapper for values of any type.
- *
- * This class uses a technique called small buffer optimization (SBO) to get rid
- * of memory allocations if possible. This should improve overall performance.
- */
+/*! @brief Opaque wrapper for values of any type. */
 class meta_any {
     enum class operation { DEREF, SEQ, ASSOC };
 
@@ -425,18 +420,6 @@ public:
     }
 
     /**
-     * @brief Aliasing constructor.
-     * @return A meta any that shares a reference to an unmanaged object.
-     */
-    [[nodiscard]] meta_any ref() const ENTT_NOEXCEPT {
-        meta_any other{};
-        other.node = node;
-        other.storage = storage.ref();
-        other.vtable = vtable;
-        return other;
-    }
-
-    /**
      * @brief Returns a sequence container proxy.
      * @return A sequence container proxy for the underlying object.
      */
@@ -496,6 +479,19 @@ public:
         swap(lhs.node, rhs.node);
     }
 
+    /**
+     * @brief Aliasing constructor.
+     * @param other A reference to an object that isn't necessarily initialized.
+     * @return A meta any that shares a reference to an unmanaged object.
+     */
+    [[nodiscard]] friend meta_any as_ref(const meta_any &other) ENTT_NOEXCEPT {
+        meta_any ref{};
+        ref.node = other.node;
+        ref.storage = as_ref(other.storage);
+        ref.vtable = other.vtable;
+        return ref;
+    }
+
 private:
     any storage;
     vtable_type *vtable;
@@ -535,7 +531,7 @@ struct meta_handle {
         : meta_handle{}
     {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
-            any = value.ref();
+            any = as_ref(value);
         } else {
             any = std::ref(value);
         }
@@ -1673,7 +1669,7 @@ public:
 
     /*! @brief Pre-increment operator. @return This iterator. */
     meta_iterator & operator++() ENTT_NOEXCEPT {
-        return next_fn(handle.ref()), *this;
+        return next_fn(as_ref(handle)), *this;
     }
 
     /*! @brief Post-increment operator. @return This iterator. */
@@ -1707,7 +1703,7 @@ public:
      * @return The element to which the meta pointer points.
      */
     [[nodiscard]] reference operator*() const {
-        return get_fn(handle.ref());
+        return get_fn(as_ref(handle));
     }
 
     /**
@@ -1838,7 +1834,7 @@ inline bool meta_sequence_container::clear() {
  * case of success) and a bool denoting whether the insertion took place.
  */
 inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::insert(iterator it, meta_any value) {
-    return insert_fn(instance, it, value.ref());
+    return insert_fn(instance, it, as_ref(value));
 }
 
 
@@ -1931,7 +1927,7 @@ public:
 
     /*! @brief Pre-increment operator. @return This iterator. */
     meta_iterator & operator++() ENTT_NOEXCEPT {
-        return next_fn(handle.ref()), *this;
+        return next_fn(as_ref(handle)), *this;
     }
 
     /*! @brief Post-increment operator. @return This iterator. */
@@ -1965,7 +1961,7 @@ public:
      * @return The element to which the meta pointer points.
      */
     [[nodiscard]] reference operator*() const {
-        return { key_fn(handle.ref()), value_fn(handle.ref()) };
+        return { key_fn(as_ref(handle)), value_fn(as_ref(handle)) };
     }
 
     /**
@@ -2117,7 +2113,7 @@ inline bool meta_associative_container::clear() {
  * @return A bool denoting whether the insertion took place.
  */
 inline bool meta_associative_container::insert(meta_any key, meta_any value = {}) {
-    return insert_fn(instance, key.ref(), value.ref());
+    return insert_fn(instance, as_ref(key), as_ref(value));
 }
 
 
@@ -2127,7 +2123,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
  * @return A bool denoting whether the removal took place.
  */
 inline bool meta_associative_container::erase(meta_any key) {
-    return erase_fn(instance, key.ref());
+    return erase_fn(instance, as_ref(key));
 }
 
 
@@ -2138,7 +2134,7 @@ inline bool meta_associative_container::erase(meta_any key) {
  * @return An iterator to the element with the given key, if any.
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
-    return find_fn(instance, key.ref());
+    return find_fn(instance, as_ref(key));
 }
 
 

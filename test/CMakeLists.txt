@@ -169,6 +169,7 @@ SETUP_BASIC_TEST(group entt/entity/group.cpp)
 SETUP_BASIC_TEST(handle entt/entity/handle.cpp)
 SETUP_BASIC_TEST(helper entt/entity/helper.cpp)
 SETUP_BASIC_TEST(observer entt/entity/observer.cpp)
+SETUP_BASIC_TEST(poly_storage entt/entity/poly_storage.cpp)
 SETUP_BASIC_TEST(organizer entt/entity/organizer.cpp)
 SETUP_BASIC_TEST(registry entt/entity/registry.cpp)
 SETUP_BASIC_TEST(registry_no_eto entt/entity/registry_no_eto.cpp ENTT_NO_ETO)
@@ -199,7 +200,8 @@ SETUP_BASIC_TEST(meta_type entt/meta/meta_type.cpp)
 
 # Test poly
 
-SETUP_BASIC_TEST(poly entt/poly/poly.cpp)
+SETUP_BASIC_TEST(poly_deduced entt/poly/poly_deduced.cpp)
+SETUP_BASIC_TEST(poly_defined entt/poly/poly_defined.cpp)
 
 # Test process
 

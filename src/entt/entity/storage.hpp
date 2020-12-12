@@ -787,8 +787,7 @@ private:
 
 
 /**
- * @brief Applies component-to-storage conversion and defines the resulting type
- * as the member typedef type.
+ * @brief Defines the component-to-storage conversion.
  *
  * Formally:
  *

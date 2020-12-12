@@ -337,7 +337,7 @@ TEST_F(MetaFunc, ByReference) {
     int value = 4;
 
     ASSERT_EQ(func.invoke({}, std::ref(value)).cast<int>(), 8);
-    ASSERT_EQ(func.invoke({}, any.ref()).cast<int>(), 6);
+    ASSERT_EQ(func.invoke({}, as_ref(any)).cast<int>(), 6);
     ASSERT_EQ(any.cast<int>(), 6);
     ASSERT_EQ(value, 8);
 }
