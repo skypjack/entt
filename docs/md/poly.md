@@ -320,8 +320,15 @@ circle c;
 drawable d{std::ref(c)};
 ```
 
-In this case, although the interface of the `poly` object doesn't change, it
-won't construct any element or take care of destroying the referenced object.
+Similarly, it's possible to create non-owning copies of `poly` from an existing
+object:
+
+```cpp
+drawable other = as_ref(d);
+```
+
+In both cases, although the interface of the `poly` object doesn't change, it
+won't construct any element or take care of destroying the referenced objects.
 
 Note also how the underlying concept is accessed via a call to `operator->` and
 not directly as `d.draw()`.<br/>

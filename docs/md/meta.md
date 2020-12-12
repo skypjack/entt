@@ -215,11 +215,12 @@ const bool equal = (any == other);
 Also, `meta_any` adds support for containers and pointer-like types (see the
 following sections for more details).<br/>
 Similar to `any`, this class can also be used to create _aliases_ for unmanaged
-objects. However, unlike `any`,` meta_any` treats an empty instance and one
-initialized with `void` differently:
+objects either upon construction using `std::ref` or from an existing instance
+by means of the `as_ref` function. However, unlike `any`,` meta_any` treats an
+empty instance and one initialized with `void` differently:
 
 ```cpp
-entt::meta_any any{};
+entt::meta_any empty{};
 entt::meta_any other{std::in_place_type<void>};
 ```
 
