@@ -27,9 +27,6 @@ WIP:
 * HP: any/poly: configurable sbo size, compile-time policies like sbo-required.
 * HP: registry: use a poly object for pools, no more pool_data type.
 * HP: make runtime views use opaque storage and therefore return also elements.
-* HP: make try_get part of the storage adapter and use it in the poly storage.
-* HP: make poly storage optionally disabled
-* HP: poly support for data members and predefined vtable type (no need to adhere to the api of type)
 * suppress warnings in meta.hpp (uninitialized members)
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views

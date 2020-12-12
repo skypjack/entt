@@ -26,8 +26,6 @@
     * [Context variables](#context-variables)
     * [Organizer](#organizer)
   * [Meet the runtime](#meet-the-runtime)
-    * [Cloning a registry](#cloning-a-registry)
-    * [Stamping an entity](#stamping-an-entity)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
     * [Continuous loader](#continuous-loader)
@@ -880,153 +878,57 @@ use the preferred tool.
 
 ## Meet the runtime
 
-Type identifiers are stable in `EnTT` during executions and most of the times
-also across different executions and across boundaries. This makes them suitable
-to mix runtime and compile-time features.<br/>
-The registry offers a function to _visit_ it and get the types of components it
-manages:
+`EnTT` takes full advantage of what the language offers at compile-time.<br/>
+However, by combining these feature with a tool for static polymorphism, it's
+also possible to have opaque proxies to work with _type-less_ pools at runtime.
+
+These objects are returned by the `storage` member function, which accepts a
+`type_info` object as an argument rather than a compile-time type (the same
+returned by the `visit` member function):
 
 ```cpp
-registry.visit([](const auto component) {
-    // ...
+auto storage = registry.storage(info);
+```
+
+By default and to stay true with the philosophy of the library, the API of a
+proxy is minimal and doesn't allow users to do much.<br/>
+However, it's also completely customizable in a generic way and with the
+possibility of defining specific behaviors for given types.
+
+This section won't go into detail on how to define a poly storage to get all the
+possible functionalities out of it. `EnTT` already contains enough snippets to
+get inspiration from, both in the test suite and in the `example` folder.<br/>
+In short, users will have to define their own _concepts_ (see the `entt::poly`
+documentation for this) and register them via the `poly_storage_traits` class
+template, which has been designed as sfinae-friendly for the purpose.
+
+Once the concept that a poly storage must adhere to has been properly defined,
+copying an entity will be as easy as:
+
+```cpp
+registry.visit(entity, [&](const auto info) {
+    auto storage = registry.storage(info);
+    storage->emplace(registry, other, storage->get(entity));
 });
 ```
 
-Moreover, there exists an overload to _visit_ a specific entity:
+Where `other` is the entity to which the elements should be replicated.<br/>
+Similarly, copying entire pools between different registries can look like this:
 
 ```cpp
-registry.visit(entity, [](const auto component) {
-    // ...
+registry.visit([&](const auto info) {
+    auto storage = registry.storage(info);
+    other.storage(info)->insert(other, storage->data(), storage->raw(), storage->size());
 });
 ```
 
-This helps to create a bridge between the registry, that is heavily based on the
-C++ type system, and any other context where the compile-time isn't an option.
-For example: plugin systems, meta system, serialization, and so on.
+Where this time `other` represents the destination registry.
 
-### Cloning a registry
-
-Cloning a registry isn't a suggested practice since it could trigger many copies
-and cut down the performance. Moreover, because of how the `registry` class is
-designed, supporting this as a built-in feature would increase the compilation
-times also for the users that aren't interested in cloning. Even worse, it would
-make difficult to define different _cloning policies_ for different types when
-required.<br/>
-This is why function definitions for cloning have been moved to the user space.
-The `visit` member function of the `registry` class can help filling the gap,
-along with the `insert` functionality.
-
-A general purpose cloning function could be defined as:
-
-```cpp
-template<typename Type>
-void clone(const entt::registry &from, entt::registry &to) {
-    const auto *data = from.data<Type>();
-    const auto size = from.size<Type>();
-
-    if constexpr(ENTT_IS_EMPTY(Type)) {
-        to.insert<Type>(data, data + size);
-    } else {
-        const auto *raw = from.raw<Type>();
-        to.insert<Type>(data, data + size, raw, raw + size);
-    }
-}
-```
-
-This is probably the fastest method to inject entities and components in a
-registry that isn't necessarily empty. All new elements are _appended_ to the
-existing ones, if any.<br/>
-This function is also eligible for type erasure in order to create a mapping
-between type identifiers and opaque methods for cloning:
-
-```cpp
-using clone_fn_type = void(const entt::registry &, entt::registry &);
-std::unordered_map<entt::id_type, clone_fn_type *> clone_functions;
-
-// ...
-
-clone_functions[entt::type_hash<position>::value()] = &clone<position>;
-clone_functions[entt::type_hash<velocity>::value()] = &clone<velocity>;
-```
-
-Stamping a registry becomes straightforward with such a mapping then:
-
-```cpp
-entt::registry from;
-entt::registry to;
-
-// ...
-
-from.visit([this, &to](const auto type_id) {
-    clone_functions[type_id](from, to);
-});
-```
-
-Custom cloning functions are also pretty easy to define. Moreover, also cloning
-registries specialized with different identifiers is possible this way.<br/>
-As a side note, cloning functions could be also attached to a reflection system
-where meta types are resolved using the runtime type identifiers.
-
-### Stamping an entity
-
-Using multiple registries at the same time is quite common. Examples are the
-separation of the UI from the simulation or the loading of different scenes in
-the background, possibly on a separate thread, without having to keep track of
-which entity belongs to which scene.<br/>
-In fact, with `EnTT` this is even a recommended practice, as the registry is
-nothing more than an opaque container you can swap at any time.
-
-Once there are multiple registries available, one or more methods are needed to
-transfer information from one container to another though.<br/>
-This is where the `visit` member function of the `registry` class enters the
-game.
-
-Since stamping a component could require different methods for different types
-and not all users want to benefit from this feature, function definitions have
-been moved from the registry to the user space.<br/>
-This helped to reduce compilation times and to allow for maximum flexibility,
-even though it requires users to set up their own stamping functions.
-
-The best bet here is probably to define a reflection system or a mapping between
-the type identifiers and their opaque functions for stamping. As an example:
-
-```cpp
-template<typename Type>
-void stamp(const entt::registry &from, const entt::entity src, entt::registry &to, const entt::entity dst) {
-    to.emplace_or_replace<Type>(dst, from.get<Type>(src));
-}
-```
-
-If the definition above is treated as a general purpose function for stamping,
-one can easily construct a map like the following one as a data member of a
-dedicate system:
-
-```cpp
-using stamp_fn_type = void(const entt::registry &, const entt::entity, entt::registry &, const entt::entity);
-std::unordered_map<entt::id_type, stamp_fn_type *> stamp_functions;
-
-// ...
-
-stamp_functions[entt::type_hash<position>::value()] = &stamp<position>;
-stamp_functions[entt::type_hash<velocity>::value()] = &stamp<velocity>;
-```
-
-Then _stamp_ entities across different registries as:
-
-```cpp
-entt::registry from;
-entt::registry to;
-
-// ...
-
-from.visit(src, [this, &to, dst](const auto type_id) {
-    stamp_functions[type_id](from, src, to, dst);
-});
-```
-
-This way it's also pretty easy to define custom stamping functions for _special_
-types if needed. Moreover, stamping entities across registries specialized with
-different identifiers is possibile in practice.
+So, all in all, `EnTT` shifts the complexity to the one-time definition of a
+_concept_ that reflects the user's needs, and then leaves room for ease of use
+within the codebase.<br/>
+The possibility of extreme customization is the icing on the cake in this sense,
+allowing users to design this tool around their own requirements.
 
 ## Snapshot: complete vs continuous
 

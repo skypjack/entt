@@ -270,10 +270,10 @@ object:
 
 ```cpp
 // aliasing constructor
-entt::any ref = other.ref();
+entt::any ref = as_ref(other);
 ```
 
-In this case, it doesn't matter if the starting container actually holds an
+In this case, it doesn't matter if the original container actually holds an
 object or acts already as a reference for unmanaged elements, the new instance
 thus created won't create copies and will only serve as a reference for the
 original item.<br/>
@@ -305,11 +305,7 @@ A type info object is an opaque class that is also copy and move constructible.
 This class is returned by the `type_id` function template:
 
 ```cpp
-// generates an info object from a type ...
 auto info = entt::type_id<a_type>();
-
-// ... or directly from a variable
-auto other = entt::type_id(42);
 ```
 
 These are the information made available by this object:
