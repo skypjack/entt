@@ -20,7 +20,7 @@
   * [Type traits](#type-traits)
     * [Size of](#size-of)
     * [Is applicable](#is-applicable)
-    * [Constness as][#constness-as]
+    * [Constness as](#constness-as)
     * [Member class type](#member-class-type)
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
