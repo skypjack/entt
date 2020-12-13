@@ -117,6 +117,9 @@ mind.
 struct position {
     float x;
     float y;
+    position(float x, float y)
+      : x(x), y(y)
+    {}
 };
 
 struct velocity {
@@ -156,7 +159,9 @@ int main() {
 
     for(auto i = 0; i < 10; ++i) {
         auto entity = registry.create();
+        // uses parameterized constructor ...
         registry.emplace<position>(entity, i * 1.f, i * 1.f);
+        // uses aggregate initialization ...
         if(i % 2 == 0) { registry.emplace<velocity>(entity, i * .1f, i * .1f); }
     }
 

@@ -230,6 +230,41 @@ vel.dx = 0.;
 vel.dy = 0.;
 ```
 
+The `emplace` member function utilizes [std::forward](https://en.cppreference.com/w/cpp/utility/forward)
+to allow you to pass your component's parameterized constructor's arguments:
+
+```cpp
+struct position {
+    float x;	    
+    float y;
+    position(float x, float y)
+      : x(x), y(y)
+    {}
+};
+
+
+// ...
+
+auto &vel = registry.emplace<position>(entity,  100.0f, 100.0f);
+```
+
+Using `emplace`, you can take advantage of [aggregate initialization](https://en.cppreference.com/w/cpp/language/aggregate_initialization). As long as your component structs adhere to 
+the rules of aggregate types, registry.emplace will utilize aggregate
+initializatiion which sets property values in the order in which they are 
+declared in the structure.
+
+```cpp
+struct velocity {
+    float dx;
+    float dy;
+}
+
+// ...
+
+auto &vel = registry.emplace<velocity>(entity,  0.0f, 0.0f);
+```
+
+
 Similarly, `insert` does it for multiple entities and accepts a range rather
 than a single entity in order to:
 
