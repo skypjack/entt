@@ -230,43 +230,12 @@ vel.dx = 0.;
 vel.dy = 0.;
 ```
 
-The `emplace` member function utilizes [std::forward](https://en.cppreference.com/w/cpp/utility/forward)
-to allow you to pass your component's parameterized constructor's arguments:
+The default storage _detects_ aggregate types internally and exploits aggregate
+initialization when possible.<br/>
+Therefore, it's not strictly necessary to define a constructor for each type, in
+accordance with the rules of the language.
 
-```cpp
-struct position {
-    float x;	    
-    float y;
-    position(float x, float y)
-      : x(x), y(y)
-    {}
-};
-
-
-// ...
-
-auto &vel = registry.emplace<position>(entity,  100.0f, 100.0f);
-```
-
-Using `emplace`, you can take advantage of [aggregate initialization](https://en.cppreference.com/w/cpp/language/aggregate_initialization). As long as your component structs adhere to 
-the rules of aggregate types, registry.emplace will utilize aggregate
-initializatiion which sets property values in the order in which they are 
-declared in the structure.
-
-```cpp
-struct velocity {
-    float dx;
-    float dy;
-}
-
-// ...
-
-auto &vel = registry.emplace<velocity>(entity,  0.0f, 0.0f);
-```
-
-
-Similarly, `insert` does it for multiple entities and accepts a range rather
-than a single entity in order to:
+On the other hand, `insert` works with _ranges_ and can be used to:
 
 * Assign the same component to all entities at once when a type is specified as
   a template parameter or an instance is passed as an argument:
@@ -279,7 +248,7 @@ than a single entity in order to:
   registry.insert(from, to, position{0., 0.});
   ```
 
-* Assign a range of components to the entities when a range is provided (the
+* Assign a set of components to the entities when a range is provided (the
   length of the range of components must be the same of that of entities):
 
   ```cpp
