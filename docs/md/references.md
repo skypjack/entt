@@ -38,6 +38,8 @@ I hope this list can grow much more in the future:
     by `EnTT`.
 
 * Javascript:
+  * [@javelin/ecs](https://github.com/3mcd/javelin/tree/master/packages/ecs): an
+    archetype ECS in TypeScript.
   * [ecsy](https://github.com/MozillaReality/ecsy): I haven't had the time to
     investigate the underlying design of `ecsy` but it looks cool anyway.
 
