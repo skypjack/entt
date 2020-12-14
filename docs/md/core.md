@@ -254,16 +254,17 @@ When in doubt about the type of object contained, the `type` member function of
 invalid `type_info` object if the container is empty.
 
 A particularly interesting feature of this class is that it can also be used as
-an opaque container for non-const unmanaged elements:
+an opaque container for const and non-const references:
 
 ```cpp
 int value;
 entt::any any{std::ref(value)};
+entt::any cany{std::cref(value)};
 ```
 
 In other words, whenever `any` intercepts a `reference_wrapper`, it acts as a
-reference to the original instance rather than making a copy of or moving it
-internally. The contained object is never destroyed and users must ensure that
+pointer to the original instance rather than making a copy of it or moving it
+internally. The _contained_ object is never destroyed and users must ensure that
 its lifetime exceeds that of the container.<br/>
 Similarly, it's possible to create non-owning copies of `any` from an existing
 object:
@@ -277,14 +278,20 @@ In this case, it doesn't matter if the original container actually holds an
 object or acts already as a reference for unmanaged elements, the new instance
 thus created won't create copies and will only serve as a reference for the
 original item.<br/>
-It means that, starting from the example above, both `ref` and` other` will
+This means that, starting from the example above, both `ref` and` other` will
 point to the same object, whether it's initially contained in `other` or already
 an unmanaged element.
+
+As a side note, it's worth mentioning that, while everything works transparently
+when it comes to non-const references, there are some exceptions when it comes
+to const references.<br/>
+In particular, the `data` member function invoked on a non-const instance of
+`any` that wraps a const reference will return a null pointer in all cases.
 
 To cast an instance of `any` to a type, the library offers a set of `any_cast`
 functions in all respects similar to their most famous counterparts.<br/>
 The only difference is that, in the case of `EnTT`, these won't raise exceptions
-but will only cross an assert in debug mode, otherwise resulting in undefined
+but will only trigger an assert in debug mode, otherwise resulting in undefined
 behavior in case of misuse in release mode.
 
 # Type support

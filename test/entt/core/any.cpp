@@ -80,6 +80,27 @@ TEST(Any, SBOAsRefConstruction) {
     ASSERT_EQ(other.data(), any.data());
 }
 
+TEST(Any, SBOAsConstRefConstruction) {
+    int value = 42;
+    entt::any any{std::cref(value)};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::type_id<int>());
+    ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<const int &>(any), 42);
+    ASSERT_EQ(entt::any_cast<int>(any), 42);
+    ASSERT_EQ(any.data(), nullptr);
+    ASSERT_EQ(std::as_const(any).data(), &value);
+
+    auto other = as_ref(any);
+
+    ASSERT_TRUE(other);
+    ASSERT_EQ(other.type(), entt::type_id<int>());
+    ASSERT_EQ(entt::any_cast<int>(other), 42);
+    ASSERT_EQ(other.data(), any.data());
+}
+
 TEST(Any, SBOCopyConstruction) {
     entt::any any{42};
     entt::any other{any};
@@ -168,6 +189,27 @@ TEST(Any, NoSBOAsRefConstruction) {
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
     ASSERT_EQ(any.data(), &instance);
+
+    auto other = as_ref(any);
+
+    ASSERT_TRUE(other);
+    ASSERT_EQ(other.type(), entt::type_id<fat>());
+    ASSERT_EQ(entt::any_cast<fat>(other), (fat{{.1, .2, .3, .4}}));
+    ASSERT_EQ(other.data(), any.data());
+}
+
+TEST(Any, NoSBOAsConstRefConstruction) {
+    fat instance{{.1, .2, .3, .4}};
+    entt::any any{std::cref(instance)};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::type_id<fat>());
+    ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<fat>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<const fat &>(any), instance);
+    ASSERT_EQ(entt::any_cast<fat>(any), instance);
+    ASSERT_EQ(any.data(), nullptr);
+    ASSERT_EQ(std::as_const(any).data(), &instance);
 
     auto other = as_ref(any);
 
@@ -440,6 +482,23 @@ TEST(Any, SBOWithRefSwap) {
     ASSERT_EQ(rhs.data(), &value);
 }
 
+TEST(Any, SBOWithConstRefSwap) {
+    int value = 3;
+    entt::any lhs{std::cref(value)};
+    entt::any rhs{'c'};
+
+    std::swap(lhs, rhs);
+
+    ASSERT_EQ(lhs.type(), entt::type_id<char>());
+    ASSERT_EQ(rhs.type(), entt::type_id<int>());
+    ASSERT_EQ(entt::any_cast<int>(&lhs), nullptr);
+    ASSERT_EQ(entt::any_cast<char>(&rhs), nullptr);
+    ASSERT_EQ(entt::any_cast<char>(lhs), 'c');
+    ASSERT_EQ(entt::any_cast<int>(rhs), 3);
+    ASSERT_EQ(rhs.data(), nullptr);
+    ASSERT_EQ(std::as_const(rhs).data(), &value);
+}
+
 TEST(Any, SBOWithEmptySwap) {
     entt::any lhs{'c'};
     entt::any rhs{};
@@ -496,6 +555,23 @@ TEST(Any, NoSBOWithRefSwap) {
     ASSERT_EQ(entt::any_cast<fat>(lhs), (fat{{.1, .2, .3, .4}}));
     ASSERT_EQ(entt::any_cast<int>(rhs), 3);
     ASSERT_EQ(rhs.data(), &value);
+}
+
+TEST(Any, NoSBOWithConstRefSwap) {
+    int value = 3;
+    entt::any lhs{std::cref(value)};
+    entt::any rhs{fat{{.1, .2, .3, .4}}};
+
+    std::swap(lhs, rhs);
+
+    ASSERT_EQ(lhs.type(), entt::type_id<fat>());
+    ASSERT_EQ(rhs.type(), entt::type_id<int>());
+    ASSERT_EQ(entt::any_cast<int>(&lhs), nullptr);
+    ASSERT_EQ(entt::any_cast<fat>(&rhs), nullptr);
+    ASSERT_EQ(entt::any_cast<fat>(lhs), (fat{{.1, .2, .3, .4}}));
+    ASSERT_EQ(entt::any_cast<int>(rhs), 3);
+    ASSERT_EQ(rhs.data(), nullptr);
+    ASSERT_EQ(std::as_const(rhs).data(), &value);
 }
 
 TEST(Any, NoSBOWithEmptySwap) {

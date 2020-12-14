@@ -8,6 +8,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "type_info.hpp"
+#include "type_traits.hpp"
 
 
 namespace entt {
@@ -15,7 +16,7 @@ namespace entt {
 
 /*! @brief A SBO friendly, type-safe container for single values of any type. */
 class any {
-    enum class operation { COPY, MOVE, DTOR, ADDR, REF, TYPE };
+    enum class operation { COPY, MOVE, DTOR, ADDR, CADDR, REF, TYPE };
 
     using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
     using vtable_type = const void *(const operation, const any &, const void *);
@@ -47,6 +48,8 @@ class any {
             case operation::DTOR:
                 break;
             case operation::ADDR:
+                return std::is_const_v<std::remove_reference_t<Type>> ? nullptr : from.instance;
+            case operation::CADDR:
                 return from.instance;
             case operation::TYPE:
                 as_type_info(to) = type_id<std::remove_reference_t<Type>>();
@@ -66,6 +69,7 @@ class any {
                 instance->~Type();
                 break;
             case operation::ADDR:
+            case operation::CADDR:
                 return instance;
             case operation::REF:
                 as_any(to).vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
@@ -87,6 +91,7 @@ class any {
                 delete static_cast<const Type *>(from.instance);
                 break;
             case operation::ADDR:
+            case operation::CADDR:
                 return from.instance;
             case operation::REF:
                 as_any(to).vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
@@ -201,12 +206,12 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
-        return vtable(operation::ADDR, *this, nullptr);
+        return vtable(operation::CADDR, *this, nullptr);
     }
 
     /*! @copydoc data */
     [[nodiscard]] void * data() ENTT_NOEXCEPT {
-        return const_cast<void *>(std::as_const(*this).data());
+        return const_cast<void *>(vtable(operation::ADDR, *this, nullptr));
     }
 
     /**
@@ -225,7 +230,7 @@ public:
      * @return False if the wrapper is empty, true otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(vtable(operation::ADDR, *this, nullptr) == nullptr);
+        return !(vtable(operation::CADDR, *this, nullptr) == nullptr);
     }
 
     /**
@@ -260,12 +265,12 @@ private:
 
 /**
  * @brief Performs type-safe access to the contained object.
- * @param any Target any object.
+ * @param data Target any object.
  * @return The element converted to the requested type.
  */
 template<typename Type>
-Type any_cast(const any &any) ENTT_NOEXCEPT {
-    auto *instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&any);
+Type any_cast(const any &data) ENTT_NOEXCEPT {
+    auto * const instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
 }
@@ -273,17 +278,24 @@ Type any_cast(const any &any) ENTT_NOEXCEPT {
 
 /*! @copydoc any_cast */
 template<typename Type>
-Type any_cast(any &any) ENTT_NOEXCEPT {
-    auto *instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&any);
-    ENTT_ASSERT(instance);
-    return static_cast<Type>(*instance);
+Type any_cast(any &data) ENTT_NOEXCEPT {
+    if constexpr(!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>>) {
+        // last attempt to make wrappers for const references return their values
+        auto * const instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&std::as_const(data));
+        ENTT_ASSERT(instance);
+        return static_cast<Type>(*instance);
+    } else {
+        auto * const instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&data);
+        ENTT_ASSERT(instance);
+        return static_cast<Type>(*instance);
+    }
 }
 
 
 /*! @copydoc any_cast */
 template<typename Type>
-Type any_cast(any &&any) ENTT_NOEXCEPT {
-    auto *instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&any);
+Type any_cast(any &&data) ENTT_NOEXCEPT {
+    auto * const instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(std::move(*instance));
 }
@@ -291,15 +303,15 @@ Type any_cast(any &&any) ENTT_NOEXCEPT {
 
 /*! @copydoc any_cast */
 template<typename Type>
-const Type * any_cast(const any *any) ENTT_NOEXCEPT {
-    return (any->type() == type_id<Type>() ? static_cast<const Type *>(any->data()) : nullptr);
+const Type * any_cast(const any *data) ENTT_NOEXCEPT {
+    return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
 }
 
 
 /*! @copydoc any_cast */
 template<typename Type>
-Type * any_cast(any *any) ENTT_NOEXCEPT {
-    return (any->type() == type_id<Type>() ? static_cast<Type *>(any->data()) : nullptr);
+Type * any_cast(any *data) ENTT_NOEXCEPT {
+    return (data->type() == type_id<Type>() ? static_cast<Type *>(data->data()) : nullptr);
 }
 
 
