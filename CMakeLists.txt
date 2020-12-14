@@ -33,6 +33,11 @@ project(
     LANGUAGES CXX
 )
 
+set(MAIN_PROJECT OFF)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(MAIN_PROJECT ON)
+endif()
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
@@ -148,9 +153,7 @@ export(PACKAGE EnTT)
 # Tests
 #
 
-include(CTest)
-
-option(ENTT_BUILD_TESTING "Enable building tests." OFF)
+option(ENTT_BUILD_TESTING "Enable building tests." ${MAIN_PROJECT})
 
 if(ENTT_BUILD_TESTING)
     option(ENTT_FIND_GTEST_PACKAGE "Enable finding gtest package." OFF)
@@ -159,6 +162,7 @@ if(ENTT_BUILD_TESTING)
     option(ENTT_BUILD_LIB "Build lib tests." OFF)
     option(ENTT_BUILD_SNAPSHOT "Build snapshot test with Cereal." OFF)
 
+    include(CTest)
     enable_testing()
     add_subdirectory(test)
 endif()
