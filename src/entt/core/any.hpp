@@ -18,13 +18,13 @@ class any {
     enum class operation { COPY, MOVE, DTOR, ADDR, REF, TYPE };
 
     using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
-    using vtable_type = void *(const operation, const any &, void *);
+    using vtable_type = const void *(const operation, const any &, void *);
 
     template<typename Type>
     static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
-    static void * basic_vtable(const operation op, const any &from, void *to) {
+    static const void * basic_vtable(const operation op, const any &from, void *to) {
         if constexpr(std::is_void_v<Type>) {
             return nullptr;
         } else if constexpr(std::is_lvalue_reference_v<Type>) {
