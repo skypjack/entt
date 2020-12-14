@@ -7,6 +7,7 @@
 #include <utility>
 #include <functional>
 #include <type_traits>
+#include "../core/type_traits.hpp"
 #include "../config/config.h"
 
 
@@ -107,7 +108,7 @@ class delegate<Ret(Args...)> {
     [[nodiscard]] auto wrap(Type &, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         return [](const void *payload, Args... args) -> Ret {
             [[maybe_unused]] const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
-            Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
+            Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
             return Ret(std::invoke(Candidate, *curr, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(arguments))...));
         };
     }
@@ -116,7 +117,7 @@ class delegate<Ret(Args...)> {
     [[nodiscard]] auto wrap(Type *, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         return [](const void *payload, Args... args) -> Ret {
             [[maybe_unused]] const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
-            Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
+            Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
             return Ret(std::invoke(Candidate, curr, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(arguments))...));
         };
     }
@@ -206,7 +207,7 @@ public:
 
         if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Type &, Args...>) {
             fn = [](const void *payload, Args... args) -> Ret {
-                Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
+                Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
                 return Ret(std::invoke(Candidate, *curr, std::forward<Args>(args)...));
             };
         } else {
@@ -230,7 +231,7 @@ public:
 
         if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, Args...>) {
             fn = [](const void *payload, Args... args) -> Ret {
-                Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
+                Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
                 return Ret(std::invoke(Candidate, curr, std::forward<Args>(args)...));
             };
         } else {
