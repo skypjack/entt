@@ -18,30 +18,38 @@ class any {
     enum class operation { COPY, MOVE, DTOR, ADDR, REF, TYPE };
 
     using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
-    using vtable_type = const void *(const operation, const any &, void *);
+    using vtable_type = const void *(const operation, const any &, const void *);
 
     template<typename Type>
     static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
+    static type_info & as_type_info(const void *data) {
+        return *const_cast<type_info *>(static_cast<const type_info *>(data));
+    }
+
+    static any & as_any(const void *data) {
+        return *const_cast<any *>(static_cast<const any *>(data));
+    }
+
     template<typename Type>
-    static const void * basic_vtable(const operation op, const any &from, void *to) {
+    static const void * basic_vtable(const operation op, const any &from, const void *to) {
         if constexpr(std::is_void_v<Type>) {
             return nullptr;
         } else if constexpr(std::is_lvalue_reference_v<Type>) {
             switch(op) {
             case operation::REF:
-                static_cast<any *>(to)->vtable = from.vtable;
+                as_any(to).vtable = from.vtable;
                 [[fallthrough]];
             case operation::COPY:
             case operation::MOVE:
-                static_cast<any *>(to)->instance = from.instance;
+                as_any(to).instance = from.instance;
                 [[fallthrough]];
             case operation::DTOR:
                 break;
             case operation::ADDR:
                 return from.instance;
             case operation::TYPE:
-                *static_cast<type_info *>(to) = type_id<std::remove_reference_t<Type>>();
+                as_type_info(to) = type_id<std::remove_reference_t<Type>>();
                 break;
             }
         } else if constexpr(in_situ<Type>) {
@@ -49,10 +57,10 @@ class any {
 
             switch(op) {
             case operation::COPY:
-                new (&static_cast<any *>(to)->storage) Type{std::as_const(*instance)};
+                new (&as_any(to).storage) Type{std::as_const(*instance)};
                 break;
             case operation::MOVE:
-                new (&static_cast<any *>(to)->storage) Type{std::move(*instance)};
+                new (&as_any(to).storage) Type{std::move(*instance)};
                 [[fallthrough]];
             case operation::DTOR:
                 instance->~Type();
@@ -60,32 +68,32 @@ class any {
             case operation::ADDR:
                 return instance;
             case operation::REF:
-                static_cast<any *>(to)->vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
-                static_cast<any *>(to)->instance = instance;
+                as_any(to).vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
+                as_any(to).instance = instance;
                 break;
             case operation::TYPE:
-                *static_cast<type_info *>(to) = type_id<Type>();
+                as_type_info(to) = type_id<Type>();
                 break;
             }
         } else {
             switch(op) {
             case operation::COPY:
-                static_cast<any *>(to)->instance = new Type{std::as_const(*static_cast<Type *>(from.instance))};
+                as_any(to).instance = new Type{*static_cast<const Type *>(from.instance)};
                 break;
             case operation::MOVE:
-                static_cast<any *>(to)->instance = from.instance;
+                as_any(to).instance = from.instance;
                 break;
             case operation::DTOR:
-                delete static_cast<Type *>(from.instance);
+                delete static_cast<const Type *>(from.instance);
                 break;
             case operation::ADDR:
                 return from.instance;
             case operation::REF:
-                static_cast<any *>(to)->vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
-                static_cast<any *>(to)->instance = from.instance;
+                as_any(to).vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
+                as_any(to).instance = from.instance;
                 break;
             case operation::TYPE:
-                *static_cast<type_info *>(to) = type_id<Type>();
+                as_type_info(to) = type_id<Type>();
                 break;
             }
         }
@@ -246,7 +254,7 @@ public:
 
 private:
     vtable_type *vtable;
-    union { void *instance; storage_type storage; };
+    union { const void *instance; storage_type storage; };
 };
 
 
