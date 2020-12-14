@@ -13,6 +13,10 @@ struct clazz {
     void rw_int(entt::view<entt::exclude_t<>, int>) {}
     void rw_int_char(entt::view<entt::exclude_t<>, int, char>) {}
     void rw_int_char_double(entt::view<entt::exclude_t<>, int, char>, double &) {}
+
+    static void ro_int_with_payload(const clazz &, entt::view<entt::exclude_t<>, const int>) {}
+    static void ro_char_with_payload(const clazz &, entt::view<entt::exclude_t<>, const char>) {}
+    static void ro_int_char_with_payload(clazz &, entt::view<entt::exclude_t<>, const int, const char>) {}
 };
 
 void to_args_integrity(entt::view<entt::exclude_t<>, int> view, std::size_t &value, entt::registry &registry) {
@@ -121,6 +125,72 @@ TEST(Organizer, EmplaceMemberFunction) {
     ASSERT_EQ(graph[0u].children()[0u], 1u);
     ASSERT_EQ(graph[1u].children()[0u], 2u);
     ASSERT_EQ(graph[2u].children()[0u], 3u);
+
+    for(auto &&vertex: graph) {
+        ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));
+    }
+
+    organizer.clear();
+
+    ASSERT_EQ(organizer.graph().size(), 0u);
+}
+
+TEST(Organizer, EmplaceFreeFunctionWithPayload) {
+    entt::organizer organizer;
+    entt::registry registry;
+    clazz instance;
+
+    // TODO
+
+    organizer.emplace<&clazz::ro_int_char_double>(instance, "t1");
+    organizer.emplace<&clazz::ro_int_with_payload>(instance, "t2");
+    organizer.emplace<&clazz::ro_char_with_payload, const clazz>(instance, "t3");
+    organizer.emplace<&clazz::ro_int_char_with_payload, clazz>(instance, "t4");
+    organizer.emplace<&clazz::rw_int_char>(instance, "t5");
+
+    const auto graph = organizer.graph();
+
+    ASSERT_EQ(graph.size(), 5u);
+
+    ASSERT_STREQ(graph[0u].name(), "t1");
+    ASSERT_STREQ(graph[1u].name(), "t2");
+    ASSERT_STREQ(graph[2u].name(), "t3");
+    ASSERT_STREQ(graph[3u].name(), "t4");
+    ASSERT_STREQ(graph[4u].name(), "t5");
+
+    ASSERT_EQ(graph[0u].ro_count(), 3u);
+    ASSERT_EQ(graph[1u].ro_count(), 1u);
+    ASSERT_EQ(graph[2u].ro_count(), 2u);
+    ASSERT_EQ(graph[3u].ro_count(), 2u);
+    ASSERT_EQ(graph[4u].ro_count(), 0u);
+
+    ASSERT_EQ(graph[0u].rw_count(), 0u);
+    ASSERT_EQ(graph[1u].rw_count(), 0u);
+    ASSERT_EQ(graph[2u].rw_count(), 0u);
+    ASSERT_EQ(graph[3u].rw_count(), 1u);
+    ASSERT_EQ(graph[4u].rw_count(), 2u);
+
+    ASSERT_NE(graph[0u].info(), graph[1u].info());
+    ASSERT_NE(graph[1u].info(), graph[2u].info());
+    ASSERT_NE(graph[2u].info(), graph[3u].info());
+    ASSERT_NE(graph[3u].info(), graph[4u].info());
+
+    ASSERT_TRUE(graph[0u].top_level());
+    ASSERT_TRUE(graph[1u].top_level());
+    ASSERT_TRUE(graph[2u].top_level());
+    ASSERT_FALSE(graph[3u].top_level());
+    ASSERT_FALSE(graph[4u].top_level());
+
+    ASSERT_EQ(graph[0u].children().size(), 1u);
+    ASSERT_EQ(graph[1u].children().size(), 1u);
+    ASSERT_EQ(graph[2u].children().size(), 1u);
+    ASSERT_EQ(graph[3u].children().size(), 1u);
+    ASSERT_EQ(graph[4u].children().size(), 0u);
+
+    ASSERT_EQ(graph[0u].children()[0u], 4u);
+    ASSERT_EQ(graph[1u].children()[0u], 4u);
+    ASSERT_EQ(graph[2u].children()[0u], 3u);
+    ASSERT_EQ(graph[3u].children()[0u], 4u);
 
     for(auto &&vertex: graph) {
         ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));
