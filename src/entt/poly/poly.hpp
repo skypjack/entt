@@ -87,10 +87,10 @@ class poly_vtable {
         };
     }
 
-    template<typename Type, auto... Candidate, auto... Index>
-    [[nodiscard]] static auto fill_vtable(value_list<Candidate...>, std::index_sequence<Index...>) {
+    template<typename Type, auto... Index>
+    [[nodiscard]] static auto fill_vtable(std::index_sequence<Index...>) {
         type impl{};
-        (fill_vtable_entry<Type, Candidate>(std::get<Index>(impl)), ...);
+        (fill_vtable_entry<Type, value_list_element_v<Index, typename Concept::template impl<Type>>>(std::get<Index>(impl)), ...);
         return impl;
     }
 
@@ -105,7 +105,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] static const auto * instance() {
-        static const auto vtable = fill_vtable<Type>(typename Concept::template impl<Type>{}, std::make_index_sequence<std::tuple_size_v<type>>{});
+        static const auto vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
         return &vtable;
     }
 };
