@@ -132,6 +132,44 @@ struct type_list {
 };
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<std::size_t, typename>
+struct type_list_element;
+
+
+/**
+ * @brief Provides compile-time indexed access to the types of a type list.
+ * @tparam Index Index of the type to return.
+ * @tparam Type First type provided by the type list.
+ * @tparam Other Other types provided by the type list.
+ */
+template<std::size_t Index, typename Type, typename... Other>
+struct type_list_element<Index, type_list<Type, Other...>>
+    : type_list_element<Index - 1u, type_list<Other...>>
+{};
+
+
+/**
+ * @brief Provides compile-time indexed access to the types of a type list.
+ * @tparam Type First type provided by the type list.
+ * @tparam Other Other types provided by the type list.
+ */
+template<typename Type, typename... Other>
+struct type_list_element<0u, type_list<Type, Other...>> {
+    /*! @brief Searched type. */
+    using type = Type;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Index Index of the type to return.
+ * @tparam List Type list to search into.
+ */
+template<std::size_t Index, typename List>
+using type_list_element_t = typename type_list_element<Index, List>::type;
+
+
 /**
  * @brief Concatenates multiple type lists.
  * @tparam Type Types provided by the first type list.
@@ -263,6 +301,44 @@ struct value_list {
     /*! @brief Compile-time number of elements in the value list. */
     static constexpr auto size = sizeof...(Value);
 };
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<std::size_t, typename>
+struct value_list_element;
+
+
+/**
+ * @brief Provides compile-time indexed access to the values of a value list.
+ * @tparam Index Index of the value to return.
+ * @tparam Value First value provided by the value list.
+ * @tparam Other Other values provided by the value list.
+ */
+template<std::size_t Index, auto Value, auto... Other>
+struct value_list_element<Index, value_list<Value, Other...>>
+    : value_list_element<Index - 1u, value_list<Other...>>
+{};
+
+
+/**
+ * @brief Provides compile-time indexed access to the types of a type list.
+ * @tparam Value First value provided by the value list.
+ * @tparam Other Other values provided by the value list.
+ */
+template<auto Value, auto... Other>
+struct value_list_element<0u, value_list<Value, Other...>> {
+    /*! @brief Searched value. */
+    static constexpr auto value = Value;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Index Index of the value to return.
+ * @tparam List Value list to search into.
+ */
+template<std::size_t Index, typename List>
+inline constexpr auto value_list_element_v = value_list_element<Index, List>::value;
 
 
 /**
