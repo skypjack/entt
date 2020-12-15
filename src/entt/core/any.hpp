@@ -270,7 +270,7 @@ private:
  */
 template<typename Type>
 Type any_cast(const any &data) ENTT_NOEXCEPT {
-    auto * const instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&data);
+    auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
 }
@@ -279,23 +279,16 @@ Type any_cast(const any &data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type>
 Type any_cast(any &data) ENTT_NOEXCEPT {
-    if constexpr(!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>>) {
-        // last attempt to make wrappers for const references return their values
-        auto * const instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&std::as_const(data));
-        ENTT_ASSERT(instance);
-        return static_cast<Type>(*instance);
-    } else {
-        auto * const instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&data);
-        ENTT_ASSERT(instance);
-        return static_cast<Type>(*instance);
-    }
+    auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
+    ENTT_ASSERT(instance);
+    return static_cast<Type>(*instance);
 }
 
 
 /*! @copydoc any_cast */
 template<typename Type>
 Type any_cast(any &&data) ENTT_NOEXCEPT {
-    auto * const instance = any_cast<std::remove_cv_t<std::remove_reference_t<Type>>>(&data);
+    auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(std::move(*instance));
 }
@@ -311,7 +304,12 @@ const Type * any_cast(const any *data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type>
 Type * any_cast(any *data) ENTT_NOEXCEPT {
-    return (data->type() == type_id<Type>() ? static_cast<Type *>(data->data()) : nullptr);
+    if constexpr(std::is_const_v<Type>) {
+        // last attempt to make wrappers for const references return their values
+        return any_cast<std::remove_const_t<Type>>(&std::as_const(*data));
+    } else {
+        return (data->type() == type_id<Type>() ? static_cast<Type *>(data->data()) : nullptr);
+    }
 }
 
 

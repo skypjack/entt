@@ -68,9 +68,18 @@ TEST(Any, SBOAsRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<int>());
+
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<const int>(&any), &value);
+    ASSERT_EQ(entt::any_cast<int>(&any), &value);
+    ASSERT_EQ(entt::any_cast<const int>(&std::as_const(any)), &value);
+    ASSERT_EQ(entt::any_cast<int>(&std::as_const(any)), &value);
+
+    ASSERT_EQ(entt::any_cast<const int &>(any), 42);
     ASSERT_EQ(entt::any_cast<int>(any), 42);
+
     ASSERT_EQ(any.data(), &value);
+    ASSERT_EQ(std::as_const(any).data(), &value);
 
     auto other = as_ref(any);
 
@@ -86,10 +95,16 @@ TEST(Any, SBOAsConstRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<int>());
+
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<const int>(&any), &value);
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<const int>(&std::as_const(any)), &value);
+    ASSERT_EQ(entt::any_cast<int>(&std::as_const(any)), &value);
+
     ASSERT_EQ(entt::any_cast<const int &>(any), 42);
     ASSERT_EQ(entt::any_cast<int>(any), 42);
+
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
@@ -186,9 +201,18 @@ TEST(Any, NoSBOAsRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
+
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<const fat>(&any), &instance);
+    ASSERT_EQ(entt::any_cast<fat>(&any), &instance);
+    ASSERT_EQ(entt::any_cast<const fat>(&std::as_const(any)), &instance);
+    ASSERT_EQ(entt::any_cast<fat>(&std::as_const(any)), &instance);
+
+    ASSERT_EQ(entt::any_cast<const fat &>(any), instance);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
+
     ASSERT_EQ(any.data(), &instance);
+    ASSERT_EQ(std::as_const(any).data(), &instance);
 
     auto other = as_ref(any);
 
@@ -204,10 +228,16 @@ TEST(Any, NoSBOAsConstRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
+
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<const fat>(&any), &instance);
     ASSERT_EQ(entt::any_cast<fat>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<const fat>(&std::as_const(any)), &instance);
+    ASSERT_EQ(entt::any_cast<fat>(&std::as_const(any)), &instance);
+
     ASSERT_EQ(entt::any_cast<const fat &>(any), instance);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
+
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
