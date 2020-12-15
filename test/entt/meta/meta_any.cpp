@@ -586,10 +586,6 @@ TEST_F(MetaAny, Cast) {
 
     ASSERT_EQ(any.cast<fat_t>().gnam[0u], 0.);
 
-    any.cast<fat_t>().gnam[0u] = 3.;
-
-    ASSERT_EQ(any.cast<fat_t>().gnam[0u], 0.);
-
     any.cast<fat_t &>().gnam[0u] = 3.;
 
     ASSERT_EQ(any.cast<fat_t>().gnam[0u], 3.);
