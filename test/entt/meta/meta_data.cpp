@@ -224,7 +224,7 @@ TEST_F(MetaData, GetMetaAnyArg) {
     using namespace entt::literals;
 
     entt::meta_any any{clazz_t{}};
-    any.cast<clazz_t>().i = 99;
+    any.cast<clazz_t &>().i = 99;
     const auto value = entt::resolve<clazz_t>().data("i"_hs).get(any);
 
     ASSERT_TRUE(value);
@@ -433,8 +433,8 @@ TEST_F(MetaData, AsRef) {
     ASSERT_EQ(h_data.type(), entt::resolve<int>());
     ASSERT_EQ(i_data.type(), entt::resolve<int>());
 
-    h_data.get(instance).cast<int>() = 3;
-    i_data.get(instance).cast<int>() = 3;
+    h_data.get(instance).cast<int &>() = 3;
+    i_data.get(instance).cast<int &>() = 3;
 
     ASSERT_NE(instance.h, 3);
     ASSERT_EQ(instance.i, 3);

@@ -111,9 +111,9 @@ TEST_F(MetaContainer, StdVector) {
     ASSERT_EQ(view.size(), 3u);
     ASSERT_NE(view.begin(), view.end());
 
-    view[0].cast<int>() = 2;
-    view[1].cast<int>() = 3;
-    view[2].cast<int>() = 4;
+    view[0].cast<int &>() = 2;
+    view[1].cast<int &>() = 3;
+    view[2].cast<int &>() = 4;
 
     ASSERT_EQ(view[1u].cast<int>(), 3);
 
@@ -153,9 +153,9 @@ TEST_F(MetaContainer, StdArray) {
     ASSERT_FALSE(view.resize(5u));
     ASSERT_EQ(view.size(), 3u);
 
-    view[0].cast<int>() = 2;
-    view[1].cast<int>() = 3;
-    view[2].cast<int>() = 4;
+    view[0].cast<int &>() = 2;
+    view[1].cast<int &>() = 3;
+    view[2].cast<int &>() = 4;
 
     ASSERT_EQ(view[1u].cast<int>(), 3);
 
@@ -216,7 +216,7 @@ TEST_F(MetaContainer, StdMap) {
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
-    (*view.find(1)).second.cast<char>() = 'f';
+    (*view.find(1)).second.cast<char &>() = 'f';
 
     ASSERT_EQ((*view.find(1)).second.cast<char>(), 'f');
 
@@ -259,7 +259,7 @@ TEST_F(MetaContainer, StdSet) {
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
-    (*view.find(1)).first.cast<int>() = 42;
+    (*view.find(1)).first.cast<int &>() = 42;
 
     ASSERT_EQ((*view.find(1)).first.cast<int>(), 1);
 

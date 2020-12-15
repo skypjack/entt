@@ -40,7 +40,7 @@ TEST(MetaPointerLike, DereferenceOperatorConstType) {
     ASSERT_FALSE(deref.type().is_pointer_like());
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-    deref.cast<int>() = 42;
+    deref.cast<int &>() = 42;
 
     ASSERT_EQ(*any.cast<const int *>(), 0);
     ASSERT_EQ(value, 0);
@@ -61,7 +61,7 @@ TEST(MetaPointerLike, DereferenceOperatorRawPointer) {
     ASSERT_FALSE(deref.type().is_pointer_like());
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-    deref.cast<int>() = 42;
+    deref.cast<int &>() = 42;
 
     ASSERT_EQ(*any.cast<int *>(), 42);
     ASSERT_EQ(value, 42);
@@ -82,7 +82,7 @@ TEST(MetaPointerLike, DereferenceOperatorSmartPointer) {
     ASSERT_FALSE(deref.type().is_pointer_like());
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-    deref.cast<int>() = 42;
+    deref.cast<int &>() = 42;
 
     ASSERT_EQ(*any.cast<std::shared_ptr<int>>(), 42);
     ASSERT_EQ(*value, 42);

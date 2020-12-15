@@ -322,7 +322,7 @@ TEST_F(MetaFunc, AsRef) {
 
     func_t instance{};
     auto func = entt::resolve<func_t>().func("a"_hs);
-    func.invoke(instance).cast<int>() = 3;
+    func.invoke(instance).cast<int &>() = 3;
 
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_EQ(instance.value, 3);

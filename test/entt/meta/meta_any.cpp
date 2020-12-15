@@ -579,11 +579,20 @@ TEST_F(MetaAny, Cast) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
-    ASSERT_EQ(any.try_cast<std::size_t>(), nullptr);
-    ASSERT_NE(any.try_cast<empty_t>(), nullptr);
-    ASSERT_EQ(any.try_cast<fat_t>(), any.data());
-    ASSERT_EQ(std::as_const(any).try_cast<empty_t>(), any.try_cast<empty_t>());
-    ASSERT_EQ(std::as_const(any).try_cast<fat_t>(), any.data());
+    ASSERT_EQ(std::as_const(any).cast<const fat_t &>(), fat_t{});
+    ASSERT_EQ(any.cast<const fat_t>(), fat_t{});
+    ASSERT_EQ(any.cast<fat_t &>(), fat_t{});
+    ASSERT_EQ(any.cast<fat_t>(), fat_t{});
+
+    ASSERT_EQ(any.cast<fat_t>().gnam[0u], 0.);
+
+    any.cast<fat_t>().gnam[0u] = 3.;
+
+    ASSERT_EQ(any.cast<fat_t>().gnam[0u], 0.);
+
+    any.cast<fat_t &>().gnam[0u] = 3.;
+
+    ASSERT_EQ(any.cast<fat_t>().gnam[0u], 3.);
 }
 
 TEST_F(MetaAny, Convert) {
