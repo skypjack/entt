@@ -1270,7 +1270,7 @@ public:
             } else {
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
                 for(auto *first = std::get<0>(cpools)->data(), *last = first + std::get<0>(cpools)->size(); first != last; ++first) {
-                    handler->template maybe_valid_if<std::tuple_element_t<0, std::tuple<std::decay_t<Owned>...>>>(*this, *first);
+                    handler->template maybe_valid_if<type_list_element_t<0, type_list<std::decay_t<Owned>...>>>(*this, *first);
                 }
             }
         }
