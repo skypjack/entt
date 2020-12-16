@@ -330,7 +330,7 @@ public:
     [[nodiscard]] const Type * try_cast() const {
         if(node) {
             if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
-                return static_cast<const Type *>(storage.data());
+                return any_cast<Type>(&storage);
             } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
                 return static_cast<const Type *>(base->cast(storage.data()));
             }
@@ -344,12 +344,12 @@ public:
     [[nodiscard]] Type * try_cast() {
         if(node) {
             if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
-                return static_cast<Type *>(storage.data());
+                return any_cast<Type>(&storage);
             } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
-                return static_cast<Type *>(const_cast<void *>(base->cast(storage.data())));
+                return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
             }
         }
-
+        
         return nullptr;
     }
 
@@ -367,7 +367,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] Type cast() const {
-        auto * const actual = try_cast<std::remove_cv_t<std::remove_reference_t<Type>>>();
+        auto * const actual = try_cast<std::remove_reference_t<Type>>();
         ENTT_ASSERT(actual);
         return static_cast<Type>(*actual);
     }
@@ -375,30 +375,26 @@ public:
     /*! @copydoc cast */
     template<typename Type>
     [[nodiscard]] Type cast() {
-        if constexpr(!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>>) {
-            // last attempt to make wrappers for const references return their values
-            auto * const actual = std::as_const(*this).try_cast<std::remove_cv_t<std::remove_reference_t<Type>>>();
-            ENTT_ASSERT(actual);
-            return static_cast<Type>(*actual);
-        } else {
-            auto * const actual = try_cast<std::remove_cv_t<std::remove_reference_t<Type>>>();
-            ENTT_ASSERT(actual);
-            return static_cast<Type>(*actual);
-        }
+        // forces const on non-reference types to make them work also with wrappers for const references
+        auto * const actual = try_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>();
+        ENTT_ASSERT(actual);
+        return static_cast<Type>(*actual);
     }
 
     /**
-     * @brief Tries to convert an instance to a given type and returns it.
-     * @tparam Type Type to which to convert the instance.
-     * @return A valid meta any object if the conversion is possible, an invalid
-     * one otherwise.
+     * @brief Tries to make an instance castable to a certain type.
+     * @tparam Type Type to which the cast is requested.
+     * @return A valid meta any object if there exists a a viable conversion
+     * that makes the cast possible, an invalid object otherwise.
      */
     template<typename Type>
-    [[nodiscard]] meta_any convert() const {
-        if(node) {
-            if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
-                return *this;
-            } else if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type()->info == info; }, node); conv) {
+    [[nodiscard]] meta_any allow_cast() const {
+        if(try_cast<std::remove_reference_t<Type>>() != nullptr) {
+            return as_ref(*this);
+        } else if(node) {
+            if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
+                return curr->type()->info == info;
+            }, node); conv) {
                 return conv->conv(storage.data());
             }
         }
@@ -407,22 +403,25 @@ public:
     }
 
     /**
-     * @brief Tries to convert an instance to a given type.
-     * @tparam Type Type to which to convert the instance.
-     * @return True if the conversion is possible, false otherwise.
+     * @brief Tries to make an instance castable to a certain type.
+     * @tparam Type Type to which the cast is requested.
+     * @return True if there exists a a viable conversion that makes the cast
+     * possible, false otherwise.
      */
     template<typename Type>
-    bool convert() {
-        bool valid = (node && node->info == internal::meta_info<Type>::resolve()->info);
-
-        if(!valid) {
-            if(auto any = std::as_const(*this).convert<Type>(); any) {
-                swap(any, *this);
-                valid = true;
+    bool allow_cast() {
+        if(try_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>() != nullptr) {
+            return true;
+        } else if(node) {
+            if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
+                return curr->type()->info == info;
+            }, node); conv) {
+                swap(conv->conv(std::as_const(storage).data()), *this);
+                return true;
             }
         }
 
-        return valid;
+        return false;
     }
 
     /**
@@ -567,6 +566,11 @@ struct meta_handle {
      * @return A meta any that shares a reference to an unmanaged object.
      */
     [[nodiscard]] meta_any * operator->() {
+        return &any;
+    }
+
+    /*! @brief operator-> */
+    [[nodiscard]] const meta_any * operator->() const {
         return &any;
     }
 
@@ -1767,8 +1771,8 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static std::pair<iterator, bool> insert(void *container, iterator it, meta_any value) {
-        if(const auto *v_ptr = value.try_cast<typename traits_type::value_type>(); v_ptr || value.convert<typename traits_type::value_type>()) {
-            auto ret = traits_type::insert(*static_cast<Type *>(container), it.handle.cast<const typename traits_type::iterator &>(), v_ptr ? *v_ptr : value.cast<const typename traits_type::value_type &>());
+        if(value.allow_cast<const typename traits_type::value_type &>()) {
+            auto ret = traits_type::insert(*static_cast<Type *>(container), it.handle.cast<const typename traits_type::iterator &>(), value.cast<const typename traits_type::value_type &>());
             return { iterator{std::move(ret.first)}, ret.second };
         }
 
@@ -2034,12 +2038,12 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool insert(void *container, meta_any key, meta_any value) {
-        if(const auto *k_ptr = key.try_cast<typename traits_type::key_type>(); k_ptr || key.convert<typename traits_type::key_type>()) {
+        if(key.allow_cast<const typename traits_type::key_type &>()) {
             if constexpr(is_key_only_meta_associative_container_v<Type>) {
-                return traits_type::insert(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<const typename traits_type::key_type &>());
+                return traits_type::insert(*static_cast<Type *>(container), key.cast<const typename traits_type::key_type &>());
             } else {
-                if(const auto *m_ptr = value.try_cast<typename traits_type::mapped_type>(); m_ptr || value.convert<typename traits_type::mapped_type>()) {
-                    return traits_type::insert(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<const typename traits_type::key_type &>(), m_ptr ? *m_ptr : value.cast<const typename traits_type::mapped_type &>());
+                if(value.allow_cast<const typename traits_type::mapped_type &>()) {
+                    return traits_type::insert(*static_cast<Type *>(container), key.cast<const typename traits_type::key_type &>(), value.cast<const typename traits_type::mapped_type &>());
                 }
             }
         }
@@ -2048,16 +2052,16 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool erase(void *container, meta_any key) {
-        if(const auto *k_ptr = key.try_cast<typename traits_type::key_type>(); k_ptr || key.convert<typename traits_type::key_type>()) {
-            return traits_type::erase(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<const typename traits_type::key_type &>());
+        if(key.allow_cast<const typename traits_type::key_type &>()) {
+            return traits_type::erase(*static_cast<Type *>(container), key.cast<const typename traits_type::key_type &>());
         }
 
         return false;
     }
 
     [[nodiscard]] static iterator find(void *container, meta_any key) {
-        if(const auto *k_ptr = key.try_cast<typename traits_type::key_type>(); k_ptr || key.convert<typename traits_type::key_type>()) {
-            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<const typename traits_type::key_type &>())};
+        if(key.allow_cast<const typename traits_type::key_type &>()) {
+            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*static_cast<Type *>(container), key.cast<const typename traits_type::key_type &>())};
         }
 
         return {};

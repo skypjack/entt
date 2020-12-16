@@ -596,11 +596,11 @@ TEST_F(MetaAny, Convert) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<double>());
-    ASSERT_TRUE(any.convert<double>());
-    ASSERT_FALSE(any.convert<char>());
+    ASSERT_TRUE(any.allow_cast<double>());
+    ASSERT_FALSE(any.allow_cast<char>());
     ASSERT_EQ(any.type(), entt::resolve<double>());
     ASSERT_EQ(any.cast<double>(), 42.);
-    ASSERT_TRUE(any.convert<int>());
+    ASSERT_TRUE(any.allow_cast<int>());
     ASSERT_EQ(any.type(), entt::resolve<int>());
     ASSERT_EQ(any.cast<int>(), 42);
 }
@@ -610,12 +610,12 @@ TEST_F(MetaAny, ConstConvert) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<double>());
-    ASSERT_TRUE(any.convert<double>());
-    ASSERT_FALSE(any.convert<char>());
+    ASSERT_TRUE(any.allow_cast<double>());
+    ASSERT_FALSE(any.allow_cast<char>());
     ASSERT_EQ(any.type(), entt::resolve<double>());
     ASSERT_EQ(any.cast<double>(), 42.);
 
-    auto other = any.convert<int>();
+    auto other = any.allow_cast<int>();
 
     ASSERT_EQ(any.type(), entt::resolve<double>());
     ASSERT_EQ(any.cast<double>(), 42.);
@@ -638,11 +638,11 @@ TEST_F(MetaAny, UnmanageableType) {
     ASSERT_EQ(any.try_cast<int>(), nullptr);
     ASSERT_NE(any.try_cast<unmanageable_t>(), nullptr);
 
-    ASSERT_TRUE(any.convert<unmanageable_t>());
-    ASSERT_FALSE(any.convert<int>());
+    ASSERT_TRUE(any.allow_cast<unmanageable_t>());
+    ASSERT_FALSE(any.allow_cast<int>());
 
-    ASSERT_TRUE(std::as_const(any).convert<unmanageable_t>());
-    ASSERT_FALSE(std::as_const(any).convert<int>());
+    ASSERT_TRUE(std::as_const(any).allow_cast<unmanageable_t>());
+    ASSERT_FALSE(std::as_const(any).allow_cast<int>());
 }
 
 TEST_F(MetaAny, Invoke) {

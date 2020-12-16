@@ -35,7 +35,7 @@ TEST(Lib, Meta) {
     ASSERT_EQ(pos.type().data("y"_hs).get(pos).cast<int>(), 3);
 
     ASSERT_EQ(vel.type().data("dx"_hs).type(), entt::resolve<double>());
-    ASSERT_TRUE(vel.type().data("dy"_hs).get(vel).convert<double>());
+    ASSERT_TRUE(vel.type().data("dy"_hs).get(vel).allow_cast<double>());
     ASSERT_EQ(vel.type().data("dx"_hs).get(vel).cast<double>(), 0.);
     ASSERT_EQ(vel.type().data("dy"_hs).get(vel).cast<double>(), 0.);
 

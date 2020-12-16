@@ -583,8 +583,8 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::meta_any any{42.};
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE(any.convert<int>());
-    ASSERT_TRUE(any.convert<float>());
+    ASSERT_FALSE(any.allow_cast<int>());
+    ASSERT_TRUE(any.allow_cast<float>());
 
     ASSERT_FALSE(entt::resolve("derived"_hs));
     ASSERT_TRUE(entt::resolve("double"_hs));

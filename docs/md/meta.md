@@ -215,9 +215,9 @@ const bool equal = (any == other);
 Also, `meta_any` adds support for containers and pointer-like types (see the
 following sections for more details).<br/>
 Similar to `any`, this class can also be used to create _aliases_ for unmanaged
-objects either upon construction using `std::ref` or from an existing instance
-by means of the `as_ref` function. However, unlike `any`,` meta_any` treats an
-empty instance and one initialized with `void` differently:
+objects either upon construction using `std::ref` and `std::cref` or from an
+existing instance by means of the `as_ref` function. However, unlike `any`,
+`meta_any` treats an empty instance and one initialized with `void` differently:
 
 ```cpp
 entt::meta_any empty{};
@@ -228,9 +228,10 @@ While `any` treats both objects as empty, `meta_any` treats objects initialized
 with `void` as if they were _valid_ ones. This allows to differentiate between
 failed function calls and function calls that are successful but return
 nothing.<br/>
-Finally, the member functions `try_cast`, `cast` and `convert` are used to know
-if the underlying object has a given type as a base or if it can be converted
-implicitly to it. There is in fact no `any_cast` equivalent for `meta_any`.
+Finally, the member functions `try_cast`, `cast` and `allow_cast` are used to
+cast the underlying object to a given type (either a reference or a value type)
+or to _convert_ a `meta_any` in such a way that a cast becomes viable for the
+resulting object. There is in fact no `any_cast` equivalent for `meta_any`.
 
 ## Enjoy the runtime
 
@@ -684,13 +685,14 @@ There are a few alternatives available at the moment:
   entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
   ```
 
-* The _as-ref_ policy, associated with the type `entt::as_ref_t`.<br/>
-  It allows to build wrappers that act as references to unmanaged objects.
-  Modifying the object contained in the wrapper for which the _reference_ was
-  requested will make it possible to directly modify the instance used to
+* The _as-ref_ and _as-cref_ policies, associated with the types
+  `entt::as_ref_t` and `entt::as_cref_t`.<br/>
+  They allow to build wrappers that act as references to unmanaged objects.
+  Accessing the object contained in the wrapper for which the _reference_ was
+  requested will make it possible to directly access the instance used to
   initialize the wrapper itself.<br/>
-  This policy works with constructors (for example, when objects are taken from
-  an external container rather than created on demand), data members and
+  These policies work with constructors (for example, when objects are taken
+  from an external container rather than created on demand), data members and
   functions in general (as long as their return types are lvalue references).
 
   As an example of use:

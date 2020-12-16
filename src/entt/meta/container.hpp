@@ -273,12 +273,12 @@ struct fixed_sequence_container {
 template<typename Type, typename... Args>
 struct meta_sequence_container_traits<std::vector<Type, Args...>>
         : container_traits<
-            std::vector<Type, Args...>,
-            basic_container,
-            basic_dynamic_container,
-            basic_sequence_container,
-            dynamic_sequence_container
-        >
+              std::vector<Type, Args...>,
+              basic_container,
+              basic_dynamic_container,
+              basic_sequence_container,
+              dynamic_sequence_container
+          >
 {};
 
 
@@ -290,11 +290,11 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>
 template<typename Type, auto N>
 struct meta_sequence_container_traits<std::array<Type, N>>
         : container_traits<
-            std::array<Type, N>,
-            basic_container,
-            basic_sequence_container,
-            fixed_sequence_container
-        >
+              std::array<Type, N>,
+              basic_container,
+              basic_sequence_container,
+              fixed_sequence_container
+          >
 {};
 
 
@@ -307,13 +307,13 @@ struct meta_sequence_container_traits<std::array<Type, N>>
 template<typename Key, typename Value, typename... Args>
 struct meta_associative_container_traits<std::map<Key, Value, Args...>>
         : container_traits<
-            std::map<Key, Value, Args...>,
-            basic_container,
-            basic_associative_container,
-            basic_dynamic_container,
-            basic_dynamic_associative_container,
-            dynamic_associative_key_value_container
-        >
+              std::map<Key, Value, Args...>,
+              basic_container,
+              basic_associative_container,
+              basic_dynamic_container,
+              basic_dynamic_associative_container,
+              dynamic_associative_key_value_container
+          >
 {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
@@ -330,13 +330,13 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>
 template<typename Key, typename Value, typename... Args>
 struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>>
         : container_traits<
-            std::unordered_map<Key, Value, Args...>,
-            basic_container,
-            basic_associative_container,
-            basic_dynamic_container,
-            basic_dynamic_associative_container,
-            dynamic_associative_key_value_container
-        >
+              std::unordered_map<Key, Value, Args...>,
+              basic_container,
+              basic_associative_container,
+              basic_dynamic_container,
+              basic_dynamic_associative_container,
+              dynamic_associative_key_value_container
+          >
 {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
@@ -351,13 +351,13 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
 template<typename Key, typename... Args>
 struct meta_associative_container_traits<std::set<Key, Args...>>
         : container_traits<
-            std::set<Key, Args...>,
-            basic_container,
-            basic_associative_container,
-            basic_dynamic_container,
-            basic_dynamic_associative_container,
-            dynamic_associative_key_only_container
-        >
+              std::set<Key, Args...>,
+              basic_container,
+              basic_associative_container,
+              basic_dynamic_container,
+              basic_dynamic_associative_container,
+              dynamic_associative_key_only_container
+          >
 {};
 
 
@@ -370,13 +370,13 @@ struct meta_associative_container_traits<std::set<Key, Args...>>
 template<typename Key, typename... Args>
 struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
         : container_traits<
-            std::unordered_set<Key, Args...>,
-            basic_container,
-            basic_associative_container,
-            basic_dynamic_container,
-            basic_dynamic_associative_container,
-            dynamic_associative_key_only_container
-        >
+              std::unordered_set<Key, Args...>,
+              basic_container,
+              basic_associative_container,
+              basic_dynamic_container,
+              basic_dynamic_associative_container,
+              dynamic_associative_key_only_container
+          >
 {};
 
 
