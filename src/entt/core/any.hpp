@@ -72,7 +72,7 @@ class any {
             case operation::CADDR:
                 return instance;
             case operation::REF:
-                as_any(to).vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
+                as_any(to).vtable = basic_vtable<Type &>;
                 as_any(to).instance = instance;
                 break;
             case operation::TYPE:
@@ -94,7 +94,7 @@ class any {
             case operation::CADDR:
                 return from.instance;
             case operation::REF:
-                as_any(to).vtable = basic_vtable<std::add_lvalue_reference_t<Type>>;
+                as_any(to).vtable = basic_vtable<Type &>;
                 as_any(to).instance = from.instance;
                 break;
             case operation::TYPE:
@@ -140,7 +140,7 @@ public:
      */
     template<typename Type>
     any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : vtable{&basic_vtable<std::add_lvalue_reference_t<Type>>},
+        : vtable{&basic_vtable<Type &>},
           instance{&value.get()}
     {}
 
@@ -279,6 +279,7 @@ Type any_cast(const any &data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type>
 Type any_cast(any &data) ENTT_NOEXCEPT {
+    // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
@@ -288,6 +289,7 @@ Type any_cast(any &data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type>
 Type any_cast(any &&data) ENTT_NOEXCEPT {
+    // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(std::move(*instance));
@@ -304,12 +306,8 @@ const Type * any_cast(const any *data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type>
 Type * any_cast(any *data) ENTT_NOEXCEPT {
-    if constexpr(std::is_const_v<Type>) {
-        // last attempt to make wrappers for const references return their values
-        return any_cast<std::remove_const_t<Type>>(&std::as_const(*data));
-    } else {
-        return (data->type() == type_id<Type>() ? static_cast<Type *>(data->data()) : nullptr);
-    }
+    // last attempt to make wrappers for const references return their values
+    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<any, Type> *>(data)->data()) : nullptr);
 }
 
 

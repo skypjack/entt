@@ -305,9 +305,9 @@ public:
         if constexpr(sizeof...(Comp) == 0) {
             return component;
         } else if constexpr(sizeof...(Comp) == 1) {
-            return (std::get<std::add_lvalue_reference_t<Comp>>(component), ...);
+            return (std::get<Comp &>(component), ...);
         } else {
-            return std::forward_as_tuple(std::get<std::add_lvalue_reference_t<Comp>>(component)...);
+            return std::forward_as_tuple(std::get<Comp &>(component)...);
         }
     }
 

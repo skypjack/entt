@@ -261,8 +261,8 @@ public:
                 return extent(dim, std::make_index_sequence<std::rank_v<Type>>{});
             },
             &compare, // workaround for an issue with VS2017
-            &meta_node<std::remove_const_t<std::remove_pointer_t<Type>>>::resolve,
-            &meta_node<std::remove_const_t<std::remove_extent_t<Type>>>::resolve
+            &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
+            &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve
         };
 
         return &node;

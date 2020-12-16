@@ -48,17 +48,17 @@ class basic_snapshot {
         }
     }
 
-    template<typename... Component, typename Archive, typename It, std::size_t... Indexes>
-    void component(Archive &archive, It first, It last, std::index_sequence<Indexes...>) const {
-        std::array<std::size_t, sizeof...(Indexes)> size{};
+    template<typename... Component, typename Archive, typename It, std::size_t... Index>
+    void component(Archive &archive, It first, It last, std::index_sequence<Index...>) const {
+        std::array<std::size_t, sizeof...(Index)> size{};
         auto begin = first;
 
         while(begin != last) {
             const auto entt = *(begin++);
-            ((reg->template has<Component>(entt) ? ++size[Indexes] : size[Indexes]), ...);
+            ((reg->template has<Component>(entt) ? ++size[Index] : size[Index]), ...);
         }
 
-        (get<Component>(archive, size[Indexes], first, last), ...);
+        (get<Component>(archive, size[Index], first, last), ...);
     }
 
 public:
