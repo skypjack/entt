@@ -105,6 +105,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] static const auto * instance() {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>);
         static const auto vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
         return &vtable;
     }
@@ -205,7 +206,7 @@ public:
     template<typename Type>
     poly(std::reference_wrapper<Type> value)
         : storage{value},
-          vtable{poly_vtable<Concept>::template instance<Type>()}
+          vtable{poly_vtable<Concept>::template instance<std::remove_const_t<Type>>()}
     {}
 
     /**
@@ -314,6 +315,13 @@ public:
      * @param other A reference to an object that isn't necessarily initialized.
      * @return A poly that shares a reference to an unmanaged object.
      */
+    [[nodiscard]] friend poly as_ref(poly &other) ENTT_NOEXCEPT {
+        poly ref = as_ref(std::as_const(other));
+        ref.storage = as_ref(other.storage);
+        return ref;
+    }
+
+    /*! @copydoc as_ref */
     [[nodiscard]] friend poly as_ref(const poly &other) ENTT_NOEXCEPT {
         poly ref;
         ref.storage = as_ref(other.storage);

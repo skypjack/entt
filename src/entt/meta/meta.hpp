@@ -221,7 +221,7 @@ public:
     template<typename Type>
     meta_any(std::reference_wrapper<Type> value)
         : storage{value},
-          vtable{&basic_vtable<Type>},
+          vtable{&basic_vtable<std::remove_const_t<Type>>},
           node{internal::meta_info<Type>::resolve()}
     {}
 
@@ -500,6 +500,13 @@ public:
      * @param other A reference to an object that isn't necessarily initialized.
      * @return A meta any that shares a reference to an unmanaged object.
      */
+    [[nodiscard]] friend meta_any as_ref(meta_any &other) ENTT_NOEXCEPT {
+        meta_any ref = as_ref(std::as_const(other));
+        ref.storage = as_ref(other.storage);
+        return ref;
+    }
+
+    /*! @copydoc as_ref */
     [[nodiscard]] friend meta_any as_ref(const meta_any &other) ENTT_NOEXCEPT {
         meta_any ref{};
         ref.node = other.node;
@@ -1655,9 +1662,9 @@ class meta_sequence_container::meta_iterator {
     template<typename It>
     [[nodiscard]] static meta_any deref(meta_any any) {
         if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<It>())>>) {
-            return *any.cast<It &>();
+            return *any.cast<const It &>();
         } else {
-            return std::ref(*any.cast<It &>());
+            return std::ref(*any.cast<const It &>());
         }
     }
 
@@ -1901,9 +1908,9 @@ class meta_associative_container::meta_iterator {
     template<bool KeyOnly, typename It>
     [[nodiscard]] static meta_any key(meta_any any) {
         if constexpr(KeyOnly) {
-            return *any.cast<It &>();
+            return *any.cast<const It &>();
         } else {
-            return any.cast<It &>()->first;
+            return any.cast<const It &>()->first;
         }
     }
 
@@ -1912,7 +1919,7 @@ class meta_associative_container::meta_iterator {
         if constexpr(KeyOnly) {
             return meta_any{};
         } else {
-            return std::ref(any.cast<It &>()->second);
+            return std::ref(any.cast<const It &>()->second);
         }
     }
 

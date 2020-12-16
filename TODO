@@ -18,9 +18,8 @@
   - ...
 
 WIP:
-* HP: any/meta_any/poly: ::REF -> ::CREF?
+* HP: const poly storage function for the registry
 * HP: meta, support for custom deref function other than operator*
-* HP: meta, as_cref_t other than as_ref_t
 * HP: headless (sparse set only) view
 * HP: pass the registry to pools, basic poly storage should have only component member
 * HP: make view pack work also with groups, make packs input iterator only, add view adapter for external sources

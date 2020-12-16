@@ -16,7 +16,7 @@ namespace entt {
 
 /*! @brief A SBO friendly, type-safe container for single values of any type. */
 class any {
-    enum class operation { COPY, MOVE, DTOR, ADDR, CADDR, REF, TYPE };
+    enum class operation { COPY, MOVE, DTOR, ADDR, CADDR, REF, CREF, TYPE };
 
     using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
     using vtable_type = const void *(const operation, const any &, const void *);
@@ -39,7 +39,8 @@ class any {
         } else if constexpr(std::is_lvalue_reference_v<Type>) {
             switch(op) {
             case operation::REF:
-                as_any(to).vtable = from.vtable;
+            case operation::CREF:
+                as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
                 [[fallthrough]];
             case operation::COPY:
             case operation::MOVE:
@@ -72,7 +73,8 @@ class any {
             case operation::CADDR:
                 return instance;
             case operation::REF:
-                as_any(to).vtable = basic_vtable<Type &>;
+            case operation::CREF:
+                as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
                 as_any(to).instance = instance;
                 break;
             case operation::TYPE:
@@ -84,6 +86,10 @@ class any {
             case operation::COPY:
                 as_any(to).instance = new Type{*static_cast<const Type *>(from.instance)};
                 break;
+            case operation::REF:
+            case operation::CREF:
+                as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
+                [[fallthrough]];
             case operation::MOVE:
                 as_any(to).instance = from.instance;
                 break;
@@ -93,10 +99,6 @@ class any {
             case operation::ADDR:
             case operation::CADDR:
                 return from.instance;
-            case operation::REF:
-                as_any(to).vtable = basic_vtable<Type &>;
-                as_any(to).instance = from.instance;
-                break;
             case operation::TYPE:
                 as_type_info(to) = type_id<Type>();
                 break;
@@ -251,9 +253,16 @@ public:
      * @param other A reference to an object that isn't necessarily initialized.
      * @return An any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend any as_ref(const any &other) ENTT_NOEXCEPT {
+    [[nodiscard]] friend any as_ref(any &other) ENTT_NOEXCEPT {
         any ref{};
         other.vtable(operation::REF, other, &ref);
+        return ref;
+    }
+
+    /*! @copydoc as_ref */
+    [[nodiscard]] friend any as_ref(const any &other) ENTT_NOEXCEPT {
+        any ref{};
+        other.vtable(operation::CREF, other, &ref);
         return ref;
     }
 
