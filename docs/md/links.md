@@ -3,8 +3,8 @@
 `EnTT` is widely used in private and commercial applications. I cannot even
 mention most of them because of some signatures I put on some documents time
 ago. Fortunately, there are also people who took the time to implement open
-source projects based on `EnTT` and did not hold back when it came to
-documenting them.
+source projects based on `EnTT` and didn't hold back when it came to documenting
+them.
 
 Below an incomplete list of games, applications and articles that can be used as
 a reference. Where I put the word _apparently_ means that the use of `EnTT` is
@@ -58,6 +58,9 @@ I hope this list can grow much more in the future:
   * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
     [Tilted Phoques](https://github.com/tiltedphoques): Skyrim and Fallout 4 mod
     to play online.
+  * [War of Rights](https://store.steampowered.com/app/424030/War_of_Rights/): a
+    multiplayer game set during the perilous days of the American Civil War, by
+    Campfire Games.
 
 * Engines and the like:
   * [Fling Engine](https://github.com/flingengine/FlingEngine): a Vulkan game
@@ -134,6 +137,9 @@ I hope this list can grow much more in the future:
     - [Transform Component UI](https://www.youtube.com/watch?v=8JqcXYbzPJc).
     - [Adding/Removing Entities and Components UI](https://www.youtube.com/watch?v=PsyGmsIgp9M).
     - [Saving and Loading Scenes](https://www.youtube.com/watch?v=IEiOP7Y-Mbc).
+    - ... And so on.
+      [Check out](https://www.youtube.com/channel/UCQ-W1KE9EYfdxhL6S4twUNw) the
+      _Game Engine Series_ by The Cherno for more videos.
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect).
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
