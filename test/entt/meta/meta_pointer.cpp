@@ -26,7 +26,7 @@ TEST(MetaPointerLike, DereferenceOperatorInvalidType) {
 }
 
 TEST(MetaPointerLike, DereferenceOperatorConstType) {
-    const int value = 0;
+    const int value = 42;
     entt::meta_any any{&value};
 
     ASSERT_TRUE(any.type().is_pointer());
@@ -40,10 +40,9 @@ TEST(MetaPointerLike, DereferenceOperatorConstType) {
     ASSERT_FALSE(deref.type().is_pointer_like());
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-    deref.cast<int &>() = 42;
-
-    ASSERT_EQ(*any.cast<const int *>(), 0);
-    ASSERT_EQ(value, 0);
+    ASSERT_EQ(deref.try_cast<int>(), nullptr);
+    ASSERT_NE(deref.try_cast<const int>(), nullptr);
+    ASSERT_EQ(deref.cast<const int &>(), 42);
 }
 
 TEST(MetaPointerLike, DereferenceOperatorRawPointer) {
@@ -93,5 +92,5 @@ TEST(MetaPointerLike, PointerToMoveOnlyType) {
     entt::meta_any any{&instance};
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE(*any);
+    ASSERT_TRUE(*any);
 }

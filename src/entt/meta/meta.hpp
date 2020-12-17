@@ -76,16 +76,16 @@ public:
     [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
 
 private:
-    meta_type(* value_type_fn)() ENTT_NOEXCEPT;
-    size_type(* size_fn)(const void *) ENTT_NOEXCEPT;
-    bool(* resize_fn)(void *, size_type);
-    bool(* clear_fn)(void *);
-    iterator(* begin_fn)(void *);
-    iterator(* end_fn)(void *);
-    std::pair<iterator, bool>(* insert_fn)(void *, iterator, meta_any);
-    std::pair<iterator, bool>(* erase_fn)(void *, iterator);
-    meta_any(* get_fn)(void *, size_type);
-    void *instance;
+    meta_type(* value_type_fn)() ENTT_NOEXCEPT = nullptr;
+    size_type(* size_fn)(const void *) ENTT_NOEXCEPT = nullptr;
+    bool(* resize_fn)(void *, size_type) = nullptr;
+    bool(* clear_fn)(void *) = nullptr;
+    iterator(* begin_fn)(void *) = nullptr;
+    iterator(* end_fn)(void *) = nullptr;
+    std::pair<iterator, bool>(* insert_fn)(void *, iterator, meta_any) = nullptr;
+    std::pair<iterator, bool>(* erase_fn)(void *, iterator) = nullptr;
+    meta_any(* get_fn)(void *, size_type) = nullptr;
+    void *instance{};
 };
 
 
@@ -142,18 +142,18 @@ public:
     [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
 
 private:
-    bool key_only_container;
-    meta_type(* key_type_fn)() ENTT_NOEXCEPT;
-    meta_type(* mapped_type_fn)() ENTT_NOEXCEPT;
-    meta_type(* value_type_fn)() ENTT_NOEXCEPT;
-    size_type(* size_fn)(const void *) ENTT_NOEXCEPT;
-    bool(* clear_fn)(void *);
-    iterator(* begin_fn)(void *);
-    iterator(* end_fn)(void *);
-    bool(* insert_fn)(void *, meta_any, meta_any);
-    bool(* erase_fn)(void *, meta_any);
-    iterator(* find_fn)(void *, meta_any);
-    void *instance;
+    bool key_only_container{};
+    meta_type(* key_type_fn)() ENTT_NOEXCEPT = nullptr;
+    meta_type(* mapped_type_fn)() ENTT_NOEXCEPT = nullptr;
+    meta_type(* value_type_fn)() ENTT_NOEXCEPT = nullptr;
+    size_type(* size_fn)(const void *) ENTT_NOEXCEPT = nullptr;
+    bool(* clear_fn)(void *) = nullptr;
+    iterator(* begin_fn)(void *) = nullptr;
+    iterator(* end_fn)(void *) = nullptr;
+    bool(* insert_fn)(void *, meta_any, meta_any) = nullptr;
+    bool(* erase_fn)(void *, meta_any) = nullptr;
+    iterator(* find_fn)(void *, meta_any) = nullptr;
+    void *instance{};
 };
 
 
@@ -169,13 +169,7 @@ class meta_any {
         case operation::DEREF:
             if constexpr(is_meta_pointer_like_v<Type>) {
                 if(auto ptr = from.cast<Type>(); ptr) {
-                    using pointed_type = std::remove_reference_t<decltype(*std::declval<Type>())>;
-
-                    if constexpr(std::is_const_v<pointed_type> && std::is_copy_constructible_v<pointed_type>) {
-                        *static_cast<meta_any *>(to) = std::as_const(*ptr);
-                    } else if constexpr(!std::is_const_v<pointed_type>) {
-                        *static_cast<meta_any *>(to) = std::ref(*ptr);
-                    }
+                    *static_cast<meta_any *>(to) = std::reference_wrapper{*ptr};
                 }
             }
             break;
@@ -556,7 +550,7 @@ struct meta_handle {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
             any = as_ref(value);
         } else {
-            any = std::ref(value);
+            any = std::reference_wrapper{value};
         }
     }
 
@@ -576,7 +570,10 @@ struct meta_handle {
         return &any;
     }
 
-    /*! @brief operator-> */
+    /**
+     * @brief Access operator for accessing the contained opaque object.
+     * @return A meta any that shares a reference to an unmanaged object.
+     */
     [[nodiscard]] const meta_any * operator->() const {
         return &any;
     }
@@ -1664,7 +1661,7 @@ class meta_sequence_container::meta_iterator {
         if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<It>())>>) {
             return *any.cast<const It &>();
         } else {
-            return std::ref(*any.cast<const It &>());
+            return std::reference_wrapper{*any.cast<const It &>()};
         }
     }
 
@@ -1792,7 +1789,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static meta_any get(void *container, size_type pos) {
-        return std::ref(traits_type::get(*static_cast<Type *>(container), pos));
+        return std::reference_wrapper{traits_type::get(*static_cast<Type *>(container), pos)};
     }
 };
 
@@ -1919,7 +1916,7 @@ class meta_associative_container::meta_iterator {
         if constexpr(KeyOnly) {
             return meta_any{};
         } else {
-            return std::ref(any.cast<const It &>()->second);
+            return std::reference_wrapper{any.cast<const It &>()->second};
         }
     }
 
