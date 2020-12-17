@@ -410,7 +410,8 @@ public:
             if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
                 return curr->type()->info == info;
             }, node); conv) {
-                swap(conv->conv(std::as_const(storage).data()), *this);
+                auto other = conv->conv(std::as_const(storage).data());
+                swap(other, *this);
                 return true;
             }
         }
