@@ -72,6 +72,7 @@ struct MetaData: ::testing::Test {
 
         entt::meta<clazz_t>().type("clazz"_hs)
             .data<&clazz_t::i, entt::as_ref_t>("i"_hs).prop(3, 0)
+            .data<&clazz_t::i, entt::as_cref_t>("ci"_hs)
             .data<&clazz_t::j>("j"_hs).prop(true, 1)
             .data<&clazz_t::h>("h"_hs).prop(property_t::random, 2)
             .data<&clazz_t::k>("k"_hs).prop(property_t::value, 3)
@@ -276,6 +277,40 @@ TEST_F(MetaData, SetConvert) {
     ASSERT_EQ(instance.i, 3);
 }
 
+TEST_F(MetaData, SetByRef) {
+    using namespace entt::literals;
+
+    entt::meta_any any{clazz_t{}};
+    int value{42};
+
+    ASSERT_EQ(any.cast<clazz_t>().i, 0);
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, std::ref(value)));
+    ASSERT_EQ(any.cast<clazz_t>().i, 42);
+
+    value = 3;
+    entt::meta_any wrapper{std::ref(value)};
+
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, as_ref(wrapper)));
+    ASSERT_EQ(any.cast<clazz_t>().i, 3);
+}
+
+TEST_F(MetaData, SetByConstRef) {
+    using namespace entt::literals;
+
+    entt::meta_any any{clazz_t{}};
+    int value{42};
+
+    ASSERT_EQ(any.cast<clazz_t>().i, 0);
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, std::cref(value)));
+    ASSERT_EQ(any.cast<clazz_t>().i, 42);
+
+    value = 3;
+    entt::meta_any wrapper{std::cref(value)};
+
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, as_ref(wrapper)));
+    ASSERT_EQ(any.cast<clazz_t>().i, 3);
+}
+
 TEST_F(MetaData, SetterGetterAsFreeFunctions) {
     using namespace entt::literals;
 
@@ -378,6 +413,27 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
 }
 
+TEST_F(MetaData, ConstInstance) {
+    using namespace entt::literals;
+
+    clazz_t instance{};
+
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).get(instance));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(instance, 3));
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).get(std::as_const(instance)));
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).set(std::as_const(instance), 3));
+
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("ci"_hs).get(instance));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("ci"_hs).set(instance, 3));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("ci"_hs).get(std::as_const(instance)));
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("ci"_hs).set(std::as_const(instance), 3));
+
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs).get(instance));
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs).set(instance, 3));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs).get(std::as_const(instance)));
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs).set(std::as_const(instance), 3));
+}
+
 TEST_F(MetaData, ArrayStatic) {
     using namespace entt::literals;
 
@@ -426,18 +482,28 @@ TEST_F(MetaData, AsRef) {
     using namespace entt::literals;
 
     clazz_t instance{};
+    auto data = entt::resolve<clazz_t>().data("i"_hs);
 
-    auto h_data = entt::resolve<clazz_t>().data("h"_hs);
-    auto i_data = entt::resolve<clazz_t>().data("i"_hs);
+    ASSERT_EQ(instance.i, 0);
+    ASSERT_EQ(data.type(), entt::resolve<int>());
 
-    ASSERT_EQ(h_data.type(), entt::resolve<int>());
-    ASSERT_EQ(i_data.type(), entt::resolve<int>());
+    data.get(instance).cast<int &>() = 3;
 
-    h_data.get(instance).cast<int &>() = 3;
-    i_data.get(instance).cast<int &>() = 3;
-
-    ASSERT_NE(instance.h, 3);
     ASSERT_EQ(instance.i, 3);
+}
+
+TEST_F(MetaData, AsConstRef) {
+    using namespace entt::literals;
+
+    clazz_t instance{};
+    auto data = entt::resolve<clazz_t>().data("ci"_hs);
+
+    ASSERT_EQ(instance.i, 0);
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_DEATH(data.get(instance).cast<int &>() = 3, ".*");
+    ASSERT_EQ(data.get(instance).cast<const int &>(), 0);
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_EQ(instance.i, 0);
 }
 
 TEST_F(MetaData, FromBase) {

@@ -136,8 +136,19 @@ TEST_F(MetaCtor, CastAndConvert) {
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
 }
 
+TEST_F(MetaCtor, ConstNonConstRefArgs) {
+    int ivalue = 42;
+    char cvalue = 'c';
+
+    auto any = entt::resolve<clazz_t>().ctor<int, char>().invoke(std::ref(ivalue), std::cref(cvalue));
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<clazz_t>().i, 42);
+    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+}
+
 TEST_F(MetaCtor, FuncMetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().ctor<base_t, int>().invoke(entt::meta_any{base_t{'c'}}, entt::meta_any{42});
+    auto any = entt::resolve<clazz_t>().ctor<int>().invoke(entt::meta_any{42});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
@@ -145,8 +156,8 @@ TEST_F(MetaCtor, FuncMetaAnyArgs) {
 }
 
 TEST_F(MetaCtor, FuncInvalidArgs) {
-    auto ctor = entt::resolve<clazz_t>().ctor<const base_t &, int>();
-    ASSERT_FALSE(ctor.invoke(base_t{}, 'c'));
+    auto ctor = entt::resolve<clazz_t>().ctor<int>();
+    ASSERT_FALSE(ctor.invoke('c'));
 }
 
 TEST_F(MetaCtor, FuncCastAndConvert) {
@@ -155,6 +166,19 @@ TEST_F(MetaCtor, FuncCastAndConvert) {
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 9);
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+}
+
+TEST_F(MetaCtor, FuncConstNonConstRefArgs) {
+    int ivalue = 42;
+    auto ctor = entt::resolve<clazz_t>().ctor<int>();
+
+    auto any = ctor.invoke(std::ref(ivalue));
+    auto other = ctor.invoke(std::cref(ivalue));
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(other);
+    ASSERT_EQ(any.cast<clazz_t>().i, 42);
+    ASSERT_EQ(other.cast<clazz_t>().i, 42);
 }
 
 TEST_F(MetaCtor, ExternalMemberFunction) {

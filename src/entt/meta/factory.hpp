@@ -82,8 +82,6 @@ template<typename Type, typename... Args, std::size_t... Index>
 
 template<typename Type, auto Data>
 [[nodiscard]] bool setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
-    bool accepted = false;
-
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
         using helper_type = meta_function_helper_t<Type, decltype(Data)>;
         using data_type = type_list_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
@@ -91,7 +89,7 @@ template<typename Type, auto Data>
         if(auto * const clazz = instance->try_cast<Type>(); clazz) {
             if(value.allow_cast<data_type>()) {
                 std::invoke(Data, *clazz, value.cast<data_type>());
-                accepted = true;
+                return true;
             }
         }
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
@@ -101,7 +99,7 @@ template<typename Type, auto Data>
             if(auto * const clazz = instance->try_cast<Type>(); clazz) {
                 if(value.allow_cast<data_type>()) {
                     std::invoke(Data, clazz) = value.cast<data_type>();
-                    accepted = true;
+                    return true;
                 }
             }
         }
@@ -111,12 +109,12 @@ template<typename Type, auto Data>
         if constexpr(!std::is_array_v<data_type>) {
             if(value.allow_cast<data_type>()) {
                 *Data = value.cast<data_type>();
-                accepted = true;
+                return true;
             }
         }
     }
 
-    return accepted;
+    return false;
 }
 
 

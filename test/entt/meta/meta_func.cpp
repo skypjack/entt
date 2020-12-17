@@ -76,7 +76,8 @@ struct MetaFunc: ::testing::Test {
             .func<&func_t::h>("h"_hs).prop(true, false)
             .func<&func_t::k>("k"_hs).prop(true, false)
             .func<&func_t::v, entt::as_void_t>("v"_hs)
-            .func<&func_t::a, entt::as_ref_t>("a"_hs);
+            .func<&func_t::a, entt::as_ref_t>("a"_hs)
+            .func<&func_t::a, entt::as_cref_t>("ca"_hs);
     }
 
     void SetUp() override {
@@ -306,6 +307,46 @@ TEST_F(MetaFunc, CastAndConvert) {
     ASSERT_EQ(any.cast<int>(), 9);
 }
 
+TEST_F(MetaFunc, ArgsByRef) {
+    using namespace entt::literals;
+
+    auto func = entt::resolve<func_t>().func("h"_hs);
+    func_t::value = 2;
+    entt::meta_any any{3};
+    int value = 4;
+
+    ASSERT_EQ(func.invoke({}, std::ref(value)).cast<int>(), 8);
+    ASSERT_EQ(func.invoke({}, as_ref(any)).cast<int>(), 6);
+    ASSERT_EQ(any.cast<int>(), 6);
+    ASSERT_EQ(value, 8);
+}
+
+TEST_F(MetaFunc, ArgsByConstRef) {
+    using namespace entt::literals;
+
+    func_t instance{};
+    auto func = entt::resolve<func_t>().func("g"_hs);
+    entt::meta_any any{2};
+    int value = 3;
+
+    ASSERT_TRUE(func.invoke(instance, std::cref(value)));
+    ASSERT_EQ(func_t::value, 9);
+
+    ASSERT_TRUE(func.invoke(instance, as_ref(std::as_const(any))));
+    ASSERT_EQ(func_t::value, 4);
+}
+
+TEST_F(MetaFunc, ConstInstance) {
+    using namespace entt::literals;
+
+    func_t instance{};
+    auto any = entt::resolve<func_t>().func("f1"_hs).invoke(std::as_const(instance), 2);
+
+    ASSERT_FALSE(entt::resolve<func_t>().func("g"_hs).invoke(std::as_const(instance), 42));
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 4);
+}
+
 TEST_F(MetaFunc, AsVoid) {
     using namespace entt::literals;
 
@@ -328,18 +369,16 @@ TEST_F(MetaFunc, AsRef) {
     ASSERT_EQ(instance.value, 3);
 }
 
-TEST_F(MetaFunc, ByReference) {
+TEST_F(MetaFunc, AsConstRef) {
     using namespace entt::literals;
 
-    auto func = entt::resolve<func_t>().func("h"_hs);
-    func_t::value = 2;
-    entt::meta_any any{3};
-    int value = 4;
+    func_t instance{};
+    auto func = entt::resolve<func_t>().func("ca"_hs);
 
-    ASSERT_EQ(func.invoke({}, std::ref(value)).cast<int>(), 8);
-    ASSERT_EQ(func.invoke({}, as_ref(any)).cast<int>(), 6);
-    ASSERT_EQ(any.cast<int>(), 6);
-    ASSERT_EQ(value, 8);
+    ASSERT_DEATH((func.invoke(instance).cast<int &>() = 3), ".*");
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+    ASSERT_EQ(func.invoke(instance).cast<const int &>(), 3);
+    ASSERT_EQ(func.invoke(instance).cast<int>(), 3);
 }
 
 TEST_F(MetaFunc, FromBase) {

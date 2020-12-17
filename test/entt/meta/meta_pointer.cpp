@@ -41,7 +41,8 @@ TEST(MetaPointerLike, DereferenceOperatorConstType) {
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
     ASSERT_EQ(deref.try_cast<int>(), nullptr);
-    ASSERT_NE(deref.try_cast<const int>(), nullptr);
+    ASSERT_EQ(deref.try_cast<const int>(), &value);
+    ASSERT_DEATH(deref.cast<int &>(), ".*");
     ASSERT_EQ(deref.cast<const int &>(), 42);
 }
 
@@ -87,10 +88,15 @@ TEST(MetaPointerLike, DereferenceOperatorSmartPointer) {
     ASSERT_EQ(*value, 42);
 }
 
-TEST(MetaPointerLike, PointerToMoveOnlyType) {
+TEST(MetaPointerLike, PointerToConstMoveOnlyType) {
     const not_copyable_t instance;
     entt::meta_any any{&instance};
+    auto deref = *any;
 
     ASSERT_TRUE(any);
-    ASSERT_TRUE(*any);
+    ASSERT_TRUE(deref);
+
+    ASSERT_DEATH(deref.cast<not_copyable_t &>(), ".*");
+    ASSERT_EQ(deref.try_cast<not_copyable_t>(), nullptr);
+    ASSERT_NE(deref.try_cast<const not_copyable_t>(), nullptr);
 }
