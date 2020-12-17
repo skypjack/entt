@@ -646,6 +646,53 @@ TEST(Any, NoSBOWithVoidSwap) {
     ASSERT_EQ(entt::any_cast<fat>(lhs), (fat{{.1, .2, .3, .4}}));
 }
 
+TEST(Any, AsRef) {
+    entt::any any{42};
+    auto ref = as_ref(any);
+    auto cref = as_ref(std::as_const(any));
+
+    ASSERT_EQ(entt::any_cast<int>(&any), any.data());
+    ASSERT_EQ(entt::any_cast<int>(&ref), any.data());
+    ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
+
+    ASSERT_EQ(entt::any_cast<const int>(&any), any.data());
+    ASSERT_EQ(entt::any_cast<const int>(&ref), any.data());
+    ASSERT_EQ(entt::any_cast<const int>(&cref), any.data());
+
+    ASSERT_EQ(entt::any_cast<int>(any), 42);
+    ASSERT_EQ(entt::any_cast<int>(ref), 42);
+    ASSERT_EQ(entt::any_cast<const int>(cref), 42);
+
+    ASSERT_EQ(entt::any_cast<int &>(any), 42);
+    ASSERT_EQ(entt::any_cast<int &>(ref), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(cref), 42);
+
+    entt::any_cast<int &>(any) = 3;
+
+    ASSERT_EQ(entt::any_cast<int>(any), 3);
+    ASSERT_EQ(entt::any_cast<int>(ref), 3);
+    ASSERT_EQ(entt::any_cast<const int>(cref), 3);
+
+    std::swap(ref, cref);
+
+    ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(&cref), any.data());
+
+    ref = as_ref(ref);
+    cref = as_ref(std::as_const(cref));
+
+    ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
+
+    ref = 42;
+    cref = 42;
+
+    ASSERT_NE(entt::any_cast<int>(&ref), nullptr);
+    ASSERT_NE(entt::any_cast<int>(&cref), nullptr);
+    ASSERT_NE(entt::any_cast<int>(&ref), any.data());
+    ASSERT_NE(entt::any_cast<int>(&cref), any.data());
+}
+
 TEST(Any, AnyCast) {
     entt::any any{42};
     const auto &cany = any;
