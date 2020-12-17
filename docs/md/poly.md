@@ -313,7 +313,7 @@ The `poly` class template offers a wide range of constructors, from the default
 one (which will return an uninitialized `poly` object) to the copy and move
 constructor, as well as the ability to create objects in-place.<br/>
 Among others, there is a constructor that allows users to wrap unmanaged objects
-in a `poly` instance:
+in a `poly` instance (either const or non-const ones):
 
 ```cpp
 circle c;
