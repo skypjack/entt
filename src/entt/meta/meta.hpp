@@ -1677,11 +1677,7 @@ class meta_sequence_container::meta_iterator {
 
     template<typename It>
     [[nodiscard]] static meta_any deref(meta_any any) {
-        if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<It>())>>) {
-            return *any.cast<const It &>();
-        } else {
-            return std::reference_wrapper{*any.cast<const It &>()};
-        }
+        return std::reference_wrapper{*any.cast<const It &>()};
     }
 
 public:
