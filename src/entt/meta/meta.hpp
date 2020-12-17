@@ -239,7 +239,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    meta_any(meta_any &&other)
+    meta_any(meta_any &&other) ENTT_NOEXCEPT
         : meta_any{}
     {
         swap(*this, other);
@@ -294,6 +294,10 @@ public:
     template<typename... Args>
     meta_any invoke(const id_type id, Args &&... args) const;
 
+    /*! @copydoc invoke */
+    template<typename... Args>
+    meta_any invoke(const id_type id, Args &&... args);
+
     /**
      * @brief Sets the value of a given variable.
      *
@@ -306,7 +310,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     template<typename Type>
-    bool set(const id_type id, Type &&value) const;
+    bool set(const id_type id, Type &&value);
 
     /**
      * @brief Gets the value of a given variable.
@@ -314,6 +318,9 @@ public:
      * @return A meta any containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(const id_type id) const;
+
+    /*! @copydoc get */
+    [[nodiscard]] meta_any get(const id_type id);
 
     /**
      * @brief Tries to cast an instance to a given type.
@@ -1581,13 +1588,24 @@ meta_any meta_any::invoke(const id_type id, Args &&... args) const {
 }
 
 
+template<typename... Args>
+meta_any meta_any::invoke(const id_type id, Args &&... args) {
+    return type().invoke(id, *this, std::forward<Args>(args)...);
+}
+
+
 template<typename Type>
-bool meta_any::set(const id_type id, Type &&value) const {
+bool meta_any::set(const id_type id, Type &&value) {
     return type().set(id, *this, std::forward<Type>(value));
 }
 
 
 [[nodiscard]] inline meta_any meta_any::get(const id_type id) const {
+    return type().get(id, *this);
+}
+
+
+[[nodiscard]] inline meta_any meta_any::get(const id_type id) {
     return type().get(id, *this);
 }
 
