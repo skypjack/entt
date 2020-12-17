@@ -661,17 +661,24 @@ TEST(Any, AsRef) {
 
     ASSERT_EQ(entt::any_cast<int>(any), 42);
     ASSERT_EQ(entt::any_cast<int>(ref), 42);
+    ASSERT_EQ(entt::any_cast<int>(cref), 42);
+
+    ASSERT_EQ(entt::any_cast<const int>(any), 42);
+    ASSERT_EQ(entt::any_cast<const int>(ref), 42);
     ASSERT_EQ(entt::any_cast<const int>(cref), 42);
 
     ASSERT_EQ(entt::any_cast<int &>(any), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(any), 42);
     ASSERT_EQ(entt::any_cast<int &>(ref), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(ref), 42);
+    ASSERT_DEATH(entt::any_cast<int &>(cref), ".*");
     ASSERT_EQ(entt::any_cast<const int &>(cref), 42);
 
     entt::any_cast<int &>(any) = 3;
 
     ASSERT_EQ(entt::any_cast<int>(any), 3);
     ASSERT_EQ(entt::any_cast<int>(ref), 3);
-    ASSERT_EQ(entt::any_cast<const int>(cref), 3);
+    ASSERT_EQ(entt::any_cast<int>(cref), 3);
 
     std::swap(ref, cref);
 
@@ -683,12 +690,24 @@ TEST(Any, AsRef) {
 
     ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
     ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
+    ASSERT_EQ(entt::any_cast<const int>(&ref), any.data());
+    ASSERT_EQ(entt::any_cast<const int>(&cref), any.data());
+
+    ASSERT_DEATH(entt::any_cast<int &>(ref), ".*");
+    ASSERT_DEATH(entt::any_cast<int &>(cref), ".*");
+
+    ASSERT_EQ(entt::any_cast<const int &>(ref), 3);
+    ASSERT_EQ(entt::any_cast<const int &>(cref), 3);
 
     ref = 42;
     cref = 42;
 
     ASSERT_NE(entt::any_cast<int>(&ref), nullptr);
     ASSERT_NE(entt::any_cast<int>(&cref), nullptr);
+    ASSERT_EQ(entt::any_cast<int &>(ref), 42);
+    ASSERT_EQ(entt::any_cast<int &>(cref), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(ref), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(cref), 42);
     ASSERT_NE(entt::any_cast<int>(&ref), any.data());
     ASSERT_NE(entt::any_cast<int>(&cref), any.data());
 }

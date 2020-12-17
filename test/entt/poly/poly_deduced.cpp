@@ -11,13 +11,13 @@ struct Deduced: entt::type_list<> {
         void set(int v) { entt::poly_call<1>(*this, v); }
         int get() const { return entt::poly_call<2>(*this); }
         void decr() { entt::poly_call<3>(*this); }
-        int mul(int v) { return entt::poly_call<4>(*this, v); }
+        int mul(int v) const { return entt::poly_call<4>(*this, v); }
     };
 
     template<typename Type>
     struct members {
         static void decr(Type &self) { self.set(self.get()-1); }
-        static double mul(Type &self, double v) { return v * self.get(); }
+        static double mul(const Type &self, double v) { return v * self.get(); }
     };
 
     template<typename Type>
@@ -35,7 +35,7 @@ struct impl {
     void set(int v) { value = v; }
     int get() const { return value; }
     void decrement() { --value; }
-    double multiply(double v) { return v * value; }
+    double multiply(double v) const { return v * value; }
     int value{};
 };
 
@@ -123,7 +123,7 @@ TEST(PolyDeduced, Owned) {
     ASSERT_EQ(poly->mul(3), 3);
 }
 
-TEST(PolyDeduced, Alias) {
+TEST(PolyDeduced, Reference) {
     impl instance{};
     entt::poly<Deduced> poly{std::ref(instance)};
 
@@ -145,4 +145,59 @@ TEST(PolyDeduced, Alias) {
     ASSERT_EQ(instance.value, 1);
     ASSERT_EQ(poly->get(), 1);
     ASSERT_EQ(poly->mul(3), 3);
+}
+
+TEST(PolyDeduced, ConstReference) {
+    impl instance{};
+    entt::poly<Deduced> poly{std::cref(instance)};
+
+    ASSERT_TRUE(poly);
+    ASSERT_EQ(poly.data(), nullptr);
+    ASSERT_NE(std::as_const(poly).data(), nullptr);
+    ASSERT_EQ(instance.value, 0);
+    ASSERT_EQ(poly->get(), 0);
+
+    ASSERT_DEATH(poly->set(1), ".*");
+    ASSERT_DEATH(poly->incr(), ".*");
+
+    ASSERT_EQ(instance.value, 0);
+    ASSERT_EQ(poly->get(), 0);
+    ASSERT_EQ(poly->mul(3), 0);
+
+    ASSERT_DEATH(poly->decr(), ".*");
+
+    ASSERT_EQ(instance.value, 0);
+    ASSERT_EQ(poly->get(), 0);
+    ASSERT_EQ(poly->mul(3), 0);
+}
+
+TEST(PolyDeduced, AsRef) {
+    entt::poly<Deduced> poly{impl{}};
+    auto ref = as_ref(poly);
+    auto cref = as_ref(std::as_const(poly));
+
+    ASSERT_NE(poly.data(), nullptr);
+    ASSERT_NE(ref.data(), nullptr);
+    ASSERT_EQ(cref.data(), nullptr);
+    ASSERT_NE(std::as_const(cref).data(), nullptr);
+
+    std::swap(ref, cref);
+
+    ASSERT_EQ(ref.data(), nullptr);
+    ASSERT_NE(std::as_const(ref).data(), nullptr);
+    ASSERT_NE(cref.data(), nullptr);
+
+    ref = as_ref(ref);
+    cref = as_ref(std::as_const(cref));
+
+    ASSERT_EQ(ref.data(), nullptr);
+    ASSERT_NE(std::as_const(ref).data(), nullptr);
+    ASSERT_EQ(cref.data(), nullptr);
+    ASSERT_NE(std::as_const(cref).data(), nullptr);
+
+    ref = impl{};
+    cref = impl{};
+
+    ASSERT_NE(ref.data(), nullptr);
+    ASSERT_NE(cref.data(), nullptr);
 }

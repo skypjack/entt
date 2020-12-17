@@ -263,7 +263,7 @@ public:
 
     /*! @copydoc data */
     [[nodiscard]] void * data() ENTT_NOEXCEPT {
-        return const_cast<void *>(std::as_const(*this).data());
+        return storage.data();
     }
 
     /**
