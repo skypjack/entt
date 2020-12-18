@@ -105,7 +105,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] static const auto * instance() {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>);
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Type differs from its decayed form");
         static const auto vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
         return &vtable;
     }
