@@ -16,9 +16,10 @@
 much more written in **modern C++**, mainly known for its innovative
 **entity-component-system (ECS)** model.<br/>
 [Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's used
-in [**Minecraft**](https://minecraft.net/en-us/attribution/) by Mojang and the
-[**ArcGIS Runtime SDKs**](https://developers.arcgis.com/arcgis-runtime/) by
-Esri.<br/>
+in [**Minecraft**](https://minecraft.net/en-us/attribution/) and
+[**Minecraft Earth**](https://www.minecraft.net/en-us/about-earth) by Mojang,
+and the [**ArcGIS Runtime SDKs**](https://developers.arcgis.com/arcgis-runtime/)
+by Esri.<br/>
 If you don't see your project in the list, please open an issue, submit a PR or
 add the [#entt](https://github.com/topics/entt) tag to your _topics_! :+1:
 

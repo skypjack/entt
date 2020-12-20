@@ -17,6 +17,9 @@ I hope this list can grow much more in the future:
   * [Minecraft](https://minecraft.net/en-us/attribution/) by
     [Mojang](https://mojang.com/): of course, **that** Minecraft, see the
     open source attributions page for more details.
+  * [Minecraft Earth](https://www.minecraft.net/en-us/about-earth) by
+    [Mojang](https://mojang.com/): an augmented reality game for mobile, that
+    lets users bring Minecraft into the real world.
   * [Land of the Rair](https://github.com/LandOfTheRair/core2): the new backend
     of [a retro-style MUD](https://rair.land/) for the new age.
   * [Openblack](https://github.com/openblack/openblack): open source
