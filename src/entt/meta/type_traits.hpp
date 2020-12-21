@@ -106,6 +106,15 @@ struct is_meta_pointer_like: std::false_type {};
 
 
 /**
+ * @brief Partial specialization to ensure that const pointer-like types are
+ * also accepted.
+ * @tparam Type Potentially pointer-like type.
+ */
+template<typename Type>
+struct is_meta_pointer_like<const Type>: is_meta_pointer_like<Type> {};
+
+
+/**
  * @brief Helper variable template.
  * @tparam Type Potentially pointer-like type.
  */

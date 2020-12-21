@@ -215,7 +215,7 @@ public:
     template<typename Type>
     meta_any(std::reference_wrapper<Type> value)
         : storage{value},
-          vtable{&basic_vtable<std::remove_const_t<Type>>},
+          vtable{&basic_vtable<Type>},
           node{internal::meta_info<Type>::resolve()}
     {}
 

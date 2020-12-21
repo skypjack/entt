@@ -42,7 +42,7 @@ TEST(MetaPointerLike, DereferenceOperatorConstType) {
 
     ASSERT_EQ(deref.try_cast<int>(), nullptr);
     ASSERT_EQ(deref.try_cast<const int>(), &value);
-    ASSERT_DEATH(deref.cast<int &>(), ".*");
+    ASSERT_DEATH(deref.cast<int &>() = 0, ".*");
     ASSERT_EQ(deref.cast<const int &>(), 42);
 }
 
@@ -96,7 +96,51 @@ TEST(MetaPointerLike, PointerToConstMoveOnlyType) {
     ASSERT_TRUE(any);
     ASSERT_TRUE(deref);
 
-    ASSERT_DEATH(deref.cast<not_copyable_t &>(), ".*");
+    ASSERT_DEATH(deref.cast<not_copyable_t &>() = {}, ".*");
     ASSERT_EQ(deref.try_cast<not_copyable_t>(), nullptr);
     ASSERT_NE(deref.try_cast<const not_copyable_t>(), nullptr);
+}
+
+TEST(MetaPointerLike, AsRef) {
+    int value = 0;
+    int * ptr = &value;
+    entt::meta_any any{std::ref(ptr)};
+
+    ASSERT_TRUE(any.type().is_pointer());
+    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_EQ(any.type(), entt::resolve<int *>());
+
+    auto deref = *any;
+
+    ASSERT_TRUE(deref);
+    ASSERT_FALSE(deref.type().is_pointer());
+    ASSERT_FALSE(deref.type().is_pointer_like());
+    ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+    deref.cast<int &>() = 42;
+
+    ASSERT_EQ(*any.cast<int *>(), 42);
+    ASSERT_EQ(value, 42);
+}
+
+TEST(MetaPointerLike, AsConstRef) {
+    int value = 42;
+    int * ptr = &value;
+    entt::meta_any any{std::cref(ptr)};
+
+    ASSERT_TRUE(any.type().is_pointer());
+    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_EQ(any.type(), entt::resolve<int *>());
+
+    auto deref = *any;
+
+    ASSERT_TRUE(deref);
+    ASSERT_FALSE(deref.type().is_pointer());
+    ASSERT_FALSE(deref.type().is_pointer_like());
+    ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+    deref.cast<int &>() = 42;
+
+    ASSERT_EQ(*any.cast<int *>(), 42);
+    ASSERT_EQ(value, 42);
 }
