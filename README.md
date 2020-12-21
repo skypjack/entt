@@ -146,7 +146,6 @@ void update(entt::registry &registry) {
 
 int main() {
     entt::registry registry;
-    entt::entity entities[10u];
 
     for(auto i = 0u; i < 10u; ++i) {
         const auto entity = registry.create();
