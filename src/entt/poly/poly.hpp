@@ -7,6 +7,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "../config/config.h"
 #include "../core/any.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
@@ -195,7 +196,7 @@ public:
     template<typename Type, typename... Args>
     explicit poly(std::in_place_type_t<Type>, Args &&... args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept>::template instance<Type>()}
+          vtable{poly_vtable<Concept>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
     {}
 
     /**
@@ -205,8 +206,7 @@ public:
      */
     template<typename Type>
     poly(std::reference_wrapper<Type> value)
-        : storage{value},
-          vtable{poly_vtable<Concept>::template instance<std::remove_const_t<Type>>()}
+        : poly{std::in_place_type<Type &>, &value.get()}
     {}
 
     /**
@@ -316,8 +316,9 @@ public:
      * @return A poly that shares a reference to an unmanaged object.
      */
     [[nodiscard]] friend poly as_ref(poly &other) ENTT_NOEXCEPT {
-        poly ref = as_ref(std::as_const(other));
+        poly ref;
         ref.storage = as_ref(other.storage);
+        ref.vtable = other.vtable;
         return ref;
     }
 

@@ -118,7 +118,6 @@ struct meta_type_node {
     const bool is_associative_container;
     const size_type rank;
     size_type(* const extent)(size_type);
-    bool(* const compare)(const void *, const void *);
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
     meta_base_node *base{nullptr};
@@ -219,14 +218,6 @@ template<typename Type>
 class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
-    [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
-        if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
-            return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
-        } else {
-            return lhs == rhs;
-        }
-    }
-
     template<std::size_t... Index>
     [[nodiscard]] static auto extent(meta_type_node::size_type dim, std::index_sequence<Index...>) {
         meta_type_node::size_type ext{};
@@ -260,7 +251,6 @@ public:
             [](meta_type_node::size_type dim) {
                 return extent(dim, std::make_index_sequence<std::rank_v<Type>>{});
             },
-            &compare, // workaround for an issue with VS2017
             &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
             &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve
         };

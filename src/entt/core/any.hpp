@@ -128,8 +128,7 @@ class any {
 public:
     /*! @brief Default constructor. */
     any() ENTT_NOEXCEPT
-        : vtable{&basic_vtable<void>},
-          instance{}
+        : any{std::in_place_type<void>}
     {}
 
     /**
@@ -144,7 +143,11 @@ public:
           instance{}
     {
         if constexpr(!std::is_void_v<Type>) {
-            if constexpr(in_situ<Type>) {
+            if constexpr(std::is_lvalue_reference_v<Type>) {
+                static_assert(sizeof...(Args) == 1u && (std::is_pointer_v<std::remove_reference_t<Args>> && ...));
+                ENTT_ASSERT(((args != nullptr) && ...));
+                instance = (args, ...);
+            } else if constexpr(in_situ<Type>) {
                 new (&storage) Type{std::forward<Args>(args)...};
             } else {
                 instance = new Type{std::forward<Args>(args)...};
@@ -159,8 +162,7 @@ public:
      */
     template<typename Type>
     any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : vtable{&basic_vtable<Type &>},
-          instance{&value.get()}
+        : any{std::in_place_type<Type &>, &value.get()}
     {}
 
     /**
@@ -316,7 +318,7 @@ private:
  */
 template<typename Type>
 Type any_cast(const any &data) ENTT_NOEXCEPT {
-    auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
+    const auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
 }

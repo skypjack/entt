@@ -33,6 +33,16 @@ template<typename Type, typename = void>
 struct has_meta_sequence_container_traits: std::false_type {};
 
 
+/**
+ * @brief TODO
+ * @tparam Type TODO
+ */
+template<typename Type>
+struct has_meta_sequence_container_traits<const Type>
+    : has_meta_sequence_container_traits<Type>
+{};
+
+
 /*! @copydoc has_meta_sequence_container_traits */
 template<typename Type>
 struct has_meta_sequence_container_traits<Type, std::void_t<typename meta_sequence_container_traits<Type>::value_type>>
@@ -57,6 +67,16 @@ template<typename, typename = void>
 struct has_meta_associative_container_traits: std::false_type {};
 
 
+/**
+ * @brief TODO
+ * @tparam Type TODO
+ */
+template<typename Type>
+struct has_meta_associative_container_traits<const Type>
+    : has_meta_associative_container_traits<Type>
+{};
+
+
 /*! @copydoc has_meta_associative_container_traits */
 template<typename Type>
 struct has_meta_associative_container_traits<Type, std::void_t<typename meta_associative_container_traits<Type>::key_type>>
@@ -79,6 +99,16 @@ inline constexpr auto has_meta_associative_container_traits_v = has_meta_associa
  */
 template<typename, typename = void>
 struct is_key_only_meta_associative_container: std::true_type {};
+
+
+/**
+ * @brief TODO
+ * @tparam Type TODO
+ */
+template<typename Type>
+struct is_key_only_meta_associative_container<const Type>
+    : is_key_only_meta_associative_container<Type>
+{};
 
 
 /*! @copydoc is_key_only_meta_associative_container */
