@@ -18,6 +18,10 @@ struct empty {
     ~empty() { ++counter; }
 };
 
+struct not_comparable {
+    bool operator==(const not_comparable &) const = delete;
+};
+
 TEST(Any, SBO) {
     entt::any any{'c'};
 
@@ -710,6 +714,57 @@ TEST(Any, AsRef) {
     ASSERT_EQ(entt::any_cast<const int &>(cref), 42);
     ASSERT_NE(entt::any_cast<int>(&ref), any.data());
     ASSERT_NE(entt::any_cast<int>(&cref), any.data());
+}
+
+TEST(Any, Comparable) {
+    auto test = [](auto value, auto other) {
+        entt::any any{value};
+
+        ASSERT_EQ(any, any);
+        ASSERT_EQ(any, entt::any{value});
+        ASSERT_NE(entt::any{other}, any);
+        ASSERT_NE(any, entt::any{});
+
+        ASSERT_TRUE(any == any);
+        ASSERT_TRUE(any == entt::any{value});
+        ASSERT_FALSE(entt::any{other} == any);
+        ASSERT_TRUE(any != entt::any{other});
+        ASSERT_TRUE(entt::any{} != any);
+    };
+
+    int value = 42;
+
+    test('c', 'a');
+    test(fat{{.1, .2, .3, .4}}, fat{{.0, .1, .2, .3}});
+    test(std::ref(value), 3);
+    test(3, std::cref(value));
+}
+
+TEST(Any, NotComparable) {
+    entt::any any{not_comparable{}};
+
+    ASSERT_EQ(any, any);
+    ASSERT_NE(any, entt::any{not_comparable{}});
+    ASSERT_NE(entt::any{}, any);
+
+    ASSERT_TRUE(any == any);
+    ASSERT_FALSE(any == entt::any{not_comparable{}});
+    ASSERT_TRUE(entt::any{} != any);
+}
+
+TEST(Any, CompareVoid) {
+    entt::any any{std::in_place_type<void>};
+
+    ASSERT_EQ(any, any);
+    ASSERT_EQ(any, entt::any{std::in_place_type<void>});
+    ASSERT_NE(entt::any{'a'}, any);
+    ASSERT_EQ(any, entt::any{});
+
+    ASSERT_TRUE(any == any);
+    ASSERT_TRUE(any == entt::any{std::in_place_type<void>});
+    ASSERT_FALSE(entt::any{'a'} == any);
+    ASSERT_TRUE(any != entt::any{'a'});
+    ASSERT_FALSE(entt::any{} != any);
 }
 
 TEST(Any, AnyCast) {

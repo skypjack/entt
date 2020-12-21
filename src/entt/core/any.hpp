@@ -16,13 +16,22 @@ namespace entt {
 
 /*! @brief A SBO friendly, type-safe container for single values of any type. */
 class any {
-    enum class operation { COPY, MOVE, DTOR, ADDR, CADDR, REF, CREF, TYPE };
+    enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
 
     using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
     using vtable_type = const void *(const operation, const any &, const void *);
 
     template<typename Type>
     static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
+
+    template<typename Type>
+    [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
+        if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
+            return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
+        } else {
+            return lhs == rhs;
+        }
+    }
 
     static type_info & as_type_info(const void *data) {
         return *const_cast<type_info *>(static_cast<const type_info *>(data));
@@ -50,6 +59,8 @@ class any {
                 [[fallthrough]];
             case operation::DTOR:
                 break;
+            case operation::COMP:
+                return compare<base_type>(from.instance, to) ? to : nullptr;
             case operation::ADDR:
                 return std::is_const_v<base_type> ? nullptr : from.instance;
             case operation::CADDR:
@@ -71,6 +82,8 @@ class any {
             case operation::DTOR:
                 instance->~Type();
                 break;
+            case operation::COMP:
+                return compare<Type>(instance, to) ? to : nullptr;
             case operation::ADDR:
             case operation::CADDR:
                 return instance;
@@ -98,6 +111,8 @@ class any {
             case operation::DTOR:
                 delete static_cast<const Type *>(from.instance);
                 break;
+            case operation::COMP:
+                return compare<Type>(from.instance, to) ? to : nullptr;
             case operation::ADDR:
             case operation::CADDR:
                 return from.instance;
@@ -188,7 +203,7 @@ public:
     /**
      * @brief Assignment operator.
      * @param other The instance to assign from.
-     * @return This any any object.
+     * @return This any object.
      */
     any & operator=(any other) {
         swap(*this, other);
@@ -238,6 +253,15 @@ public:
     }
 
     /**
+     * @brief Checks if two wrappers differ in their content.
+     * @param other Wrapper with which to compare.
+     * @return False if the two objects differ in their content, true otherwise.
+     */
+    bool operator==(const any &other) const ENTT_NOEXCEPT {
+        return type() == other.type() && (vtable(operation::COMP, *this, other.data()) == other.data());
+    }
+
+    /**
      * @brief Swaps two any objects.
      * @param lhs A valid any object.
      * @param rhs A valid any object.
@@ -272,6 +296,17 @@ private:
     vtable_type *vtable;
     union { const void *instance; storage_type storage; };
 };
+
+
+/**
+ * @brief Checks if two wrappers differ in their content.
+ * @param lhs A wrapper, either empty or not.
+ * @param rhs A wrapper, either empty or not.
+ * @return True if the two wrappers differ in their content, false otherwise.
+ */
+[[nodiscard]] inline bool operator!=(const any &lhs, const any &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**

@@ -251,7 +251,17 @@ wrapper will be reconfigured by assigning it an object of a different type than
 the one contained, so as to be able to handle the new instance.<br/>
 When in doubt about the type of object contained, the `type` member function of
 `any` returns an instance of `type_info` associated with its element, or an
-invalid `type_info` object if the container is empty.
+invalid `type_info` object if the container is empty. The type is also used
+internally when comparing two `any` objects:
+
+```cpp
+if(any == empty) { /* ... */ }
+```
+
+In this case, before proceeding with a comparison, it's verified that the _type_
+of the two objects is actually the same.<br/>
+Refer to the `EnTT` type system documentation for more details on how
+`type_info` works and on possible risks of a comparison.
 
 A particularly interesting feature of this class is that it can also be used as
 an opaque container for const and non-const references:

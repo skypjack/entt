@@ -202,18 +202,9 @@ integrate it with the meta type system without having to duplicate the code.
 The API is very similar to that of the `any` type. The class `meta_any` _wraps_
 many of the feature to infer a meta node, before forwarding some or all of the
 arguments to the underlying storage.<br/>
-Among the few relevant differences, instances of `meta_any` are comparable,
-while those of `any` are not:
-
-```cpp
-entt::meta_any any{42};
-entt::meta_any other{'c'};
-
-const bool equal = (any == other);
-```
-
-Also, `meta_any` adds support for containers and pointer-like types (see the
-following sections for more details).<br/>
+Among the few relevant differences, `meta_any` adds support for containers and
+pointer-like types (see the following sections for more details), while `any`
+does not.<br/>
 Similar to `any`, this class can also be used to create _aliases_ for unmanaged
 objects either upon construction using `std::ref` and `std::cref` or from an
 existing instance by means of the `as_ref` function. However, unlike `any`,
