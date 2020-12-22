@@ -1702,14 +1702,20 @@ class meta_sequence_container::meta_iterator {
     /*! @brief A meta sequence container can access the underlying iterator. */
     friend class meta_sequence_container;
 
-    template<typename It>
-    static void incr(any &ref) {
-        ++any_cast<It &>(ref);
-    }
+    enum class operation { INCR, DEREF };
+
+    using vtable_type = void(const operation, const any &, void *);
 
     template<typename It>
-    [[nodiscard]] static meta_any deref(const any &ref) {
-        return std::reference_wrapper{*any_cast<const It &>(ref)};
+    static void basic_vtable(const operation op, const any &from, void *to) {
+        switch(op) {
+        case operation::INCR:
+            ++any_cast<It &>(const_cast<any &>(from));
+            break;
+        case operation::DEREF:
+            *static_cast<meta_any *>(to) = std::reference_wrapper{*any_cast<const It &>(from)};
+            break;
+        }
     }
 
 public:
@@ -1734,14 +1740,13 @@ public:
      */
     template<typename It>
     meta_iterator(It iter)
-        : next_fn{&incr<It>},
-          get_fn{&deref<It>},
+        : vtable{&basic_vtable<It>},
           handle{std::move(iter)}
     {}
 
     /*! @brief Pre-increment operator. @return This iterator. */
     meta_iterator & operator++() ENTT_NOEXCEPT {
-        return next_fn(handle), *this;
+        return vtable(operation::INCR, handle, nullptr), *this;
     }
 
     /*! @brief Post-increment operator. @return This iterator. */
@@ -1775,7 +1780,9 @@ public:
      * @return The element to which the meta pointer points.
      */
     [[nodiscard]] reference operator*() const {
-        return get_fn(handle);
+        meta_any other;
+        vtable(operation::DEREF, handle, &other);
+        return other;
     }
 
     /**
@@ -1787,8 +1794,7 @@ public:
     }
 
 private:
-    void(* next_fn)(any &);
-    meta_any(* get_fn)(const any &);
+    vtable_type *vtable;
     any handle;
 };
 
@@ -1944,26 +1950,23 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 /*! @brief Opaque iterator for meta associative containers. */
 class meta_associative_container::meta_iterator {
-    template<typename It>
-    static void incr(any &any) {
-        ++any_cast<It &>(any);
-    }
+    enum operation { INCR, DEREF };
+
+    using vtable_type = void(const operation, const any &, void *);
 
     template<bool KeyOnly, typename It>
-    [[nodiscard]] static meta_any key(const any &ref) {
-        if constexpr(KeyOnly) {
-            return *any_cast<const It &>(ref);
-        } else {
-            return any_cast<const It &>(ref)->first;
-        }
-    }
-
-    template<bool KeyOnly, typename It>
-    [[nodiscard]] static meta_any value([[maybe_unused]] const any &ref) {
-        if constexpr(KeyOnly) {
-            return meta_any{};
-        } else {
-            return std::reference_wrapper{any_cast<const It &>(ref)->second};
+    static void basic_vtable(const operation op, const any &from, void *to) {
+        switch(op) {
+        case operation::INCR:
+            ++any_cast<It &>(const_cast<any &>(from));
+            break;
+        case operation::DEREF:
+            if constexpr(KeyOnly) {
+                static_cast<std::pair<meta_any, meta_any> *>(to)->first = *any_cast<const It &>(from);
+            } else {
+                *static_cast<std::pair<meta_any, meta_any> *>(to) = std::make_pair<meta_any, meta_any>(any_cast<const It &>(from)->first, std::reference_wrapper{any_cast<const It &>(from)->second});
+            }
+            break;
         }
     }
 
@@ -1991,15 +1994,13 @@ public:
      */
     template<bool KeyOnly, typename It>
     meta_iterator(std::integral_constant<bool, KeyOnly>, It iter)
-        : next_fn{&incr<It>},
-          key_fn{&key<KeyOnly, It>},
-          value_fn{&value<KeyOnly, It>},
+        : vtable{&basic_vtable<KeyOnly, It>},
           handle{std::move(iter)}
     {}
 
     /*! @brief Pre-increment operator. @return This iterator. */
     meta_iterator & operator++() ENTT_NOEXCEPT {
-        return next_fn(handle), *this;
+        return vtable(operation::INCR, handle, nullptr), *this;
     }
 
     /*! @brief Post-increment operator. @return This iterator. */
@@ -2033,7 +2034,9 @@ public:
      * @return The element to which the meta pointer points.
      */
     [[nodiscard]] reference operator*() const {
-        return { key_fn(handle), value_fn(handle) };
+        reference other;
+        vtable(operation::DEREF, handle, &other);
+        return other;
     }
 
     /**
@@ -2045,9 +2048,7 @@ public:
     }
 
 private:
-    void(* next_fn)(any &);
-    meta_any(* key_fn)(const any &);
-    meta_any(* value_fn)(const any &);
+    vtable_type *vtable;
     any handle;
 };
 
