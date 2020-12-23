@@ -9,7 +9,7 @@
 template<typename Type>
 struct wrapped_shared_ptr {
     wrapped_shared_ptr(Type init): ptr{new Type {init}} {}
-    
+
     Type & deref() const { return *ptr; }
 
 private:

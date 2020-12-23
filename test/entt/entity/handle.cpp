@@ -175,11 +175,11 @@ TEST(BasicHandle, Component) {
 
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_TRUE(handle.orphan());
-    
+
     ASSERT_EQ(42, handle.get_or_emplace<int>(42));
     ASSERT_EQ(42, handle.get_or_emplace<int>(1));
     ASSERT_EQ(42, handle.get<int>());
-    
+
     ASSERT_EQ(42, *handle.try_get<int>());
     ASSERT_EQ(nullptr, handle.try_get<char>());
     ASSERT_EQ(nullptr, std::get<1>(handle.try_get<int, char, double>()));

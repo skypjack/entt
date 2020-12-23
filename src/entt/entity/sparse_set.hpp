@@ -526,7 +526,7 @@ public:
 
     /**
      * @brief Sort all elements according to the given comparison function.
-     * 
+     *
      * @sa sort_n
      *
      * @tparam Compare Type of comparison function object.

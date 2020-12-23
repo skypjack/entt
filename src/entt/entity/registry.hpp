@@ -361,10 +361,10 @@ public:
 
     /**
      * @brief Returns the head of the list of destroyed entities.
-     * 
+     *
      * This function is intended for use in conjunction with `assign`.<br/>
      * The returned entity has an invalid identifier in all cases.
-     * 
+     *
      * @return The head of the list of destroyed entities.
      */
     [[nodiscard]] entity_type destroyed() const ENTT_NOEXCEPT {
