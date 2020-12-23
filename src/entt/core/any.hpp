@@ -51,7 +51,7 @@ class any {
             switch(op) {
             case operation::REF:
             case operation::CREF:
-                as_any(to).vtable = (op == operation::REF) ? basic_vtable<base_type &> : basic_vtable<const base_type &>;
+                as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type> : basic_vtable<const base_type &>;
                 [[fallthrough]];
             case operation::COPY:
             case operation::MOVE:
@@ -60,13 +60,13 @@ class any {
             case operation::DTOR:
                 break;
             case operation::COMP:
-                return compare<base_type>(from.instance, to) ? to : nullptr;
+                return compare<std::remove_const_t<base_type>>(from.instance, to) ? to : nullptr;
             case operation::ADDR:
                 return std::is_const_v<base_type> ? nullptr : from.instance;
             case operation::CADDR:
                 return from.instance;
             case operation::TYPE:
-                as_type_info(to) = type_id<base_type>();
+                as_type_info(to) = type_id<std::remove_const_t<base_type>>();
                 break;
             }
         } else if constexpr(in_situ<Type>) {
