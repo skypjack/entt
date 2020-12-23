@@ -1,8 +1,44 @@
+#include <memory>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/pointer.hpp>
 #include <entt/meta/resolve.hpp>
+
+template<typename Type>
+struct wrapped_shared_ptr {
+    wrapped_shared_ptr(Type init): ptr{new Type {init}} {}
+    
+    Type & deref() const { return *ptr; }
+
+private:
+    std::shared_ptr<Type> ptr;
+};
+
+template<typename Type>
+struct adl_wrapped_shared_ptr: wrapped_shared_ptr<Type> {};
+
+template<typename Type>
+struct spec_wrapped_shared_ptr: wrapped_shared_ptr<Type> {};
+
+template<typename Type>
+struct entt::is_meta_pointer_like<adl_wrapped_shared_ptr<Type>>: std::true_type {};
+
+template<typename Type>
+struct entt::is_meta_pointer_like<spec_wrapped_shared_ptr<Type>>: std::true_type {};
+
+template<typename Type>
+Type & dereference_meta_pointer_like(const adl_wrapped_shared_ptr<Type> &ptr) {
+    return ptr.deref();
+}
+
+template<typename Type>
+struct entt::adl_meta_pointer_like<spec_wrapped_shared_ptr<Type>> {
+    static decltype(auto) dereference(const spec_wrapped_shared_ptr<Type> &ptr) {
+        return ptr.deref();
+    }
+};
 
 struct not_copyable_t {
     not_copyable_t() = default;
@@ -164,4 +200,44 @@ TEST(MetaPointerLike, AsConstRef) {
 
     ASSERT_EQ(*any.cast<int *>(), 42);
     ASSERT_EQ(value, 42);
+}
+
+TEST(MetaPointerLike, DereferenceMetaPointerLikeOverload) {
+    auto test = [](entt::meta_any any) {
+        ASSERT_FALSE(any.type().is_pointer());
+        ASSERT_TRUE(any.type().is_pointer_like());
+
+        auto deref = *any;
+
+        ASSERT_TRUE(deref);
+        ASSERT_FALSE(deref.type().is_pointer());
+        ASSERT_FALSE(deref.type().is_pointer_like());
+        ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+        ASSERT_EQ(deref.cast<int &>(), 42);
+        ASSERT_EQ(deref.cast<const int &>(), 42);
+    };
+
+    test(adl_wrapped_shared_ptr<int>{42});
+    test(spec_wrapped_shared_ptr<int>{42});
+}
+
+TEST(MetaPointerLike, DereferenceMetaPointerToConstLikeOverload) {
+    auto test = [](entt::meta_any any) {
+        ASSERT_FALSE(any.type().is_pointer());
+        ASSERT_TRUE(any.type().is_pointer_like());
+
+        auto deref = *any;
+
+        ASSERT_TRUE(deref);
+        ASSERT_FALSE(deref.type().is_pointer());
+        ASSERT_FALSE(deref.type().is_pointer_like());
+        ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+        ASSERT_DEATH(deref.cast<int &>() = 42, ".*");
+        ASSERT_EQ(deref.cast<const int &>(), 42);
+    };
+
+    test(adl_wrapped_shared_ptr<const int>{42});
+    test(spec_wrapped_shared_ptr<const int>{42});
 }

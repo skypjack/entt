@@ -25,6 +25,7 @@
 #include "entity/view.hpp"
 #include "entity/view_pack.hpp"
 #include "locator/locator.hpp"
+#include "meta/adl_pointer.hpp"
 #include "meta/container.hpp"
 #include "meta/ctx.hpp"
 #include "meta/factory.hpp"

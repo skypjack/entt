@@ -19,7 +19,6 @@
 
 WIP:
 * HP: const poly storage function for the registry
-* HP: meta, support for custom deref function other than operator*
 * HP: headless (sparse set only) view
 * HP: pass the registry to pools, basic poly storage should have only component member
 * HP: make view pack work also with groups, make packs input iterator only, add view adapter for external sources
@@ -27,9 +26,7 @@ WIP:
 * HP: any/poly: configurable sbo size, compile-time policies like sbo-required.
 * HP: registry: use a poly object for pools, no more pool_data type.
 * HP: make runtime views use opaque storage and therefore return also elements.
-* HP: meta_sequence_container & Co can be replaced by a poly object.
 * HP: poly: support for data members
-* suppress warnings in meta.hpp (uninitialized members)
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * view pack: plain function as an alias for operator|, reverse iterators, rbegin and rend

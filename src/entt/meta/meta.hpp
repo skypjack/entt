@@ -14,6 +14,7 @@
 #include "../core/fwd.hpp"
 #include "../core/utility.hpp"
 #include "../core/type_info.hpp"
+#include "adl_pointer.hpp"
 #include "ctx.hpp"
 #include "internal.hpp"
 #include "range.hpp"
@@ -164,12 +165,12 @@ class meta_any {
         switch(op) {
         case operation::DEREF:
             if constexpr(is_meta_pointer_like_v<Type>) {
-                *static_cast<meta_any *>(to) = std::reference_wrapper{*any_cast<const Type>(from)};
+                *static_cast<meta_any *>(to) = std::reference_wrapper{adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from))};
             }
             break;
         case operation::CDEREF:
             if constexpr(is_meta_pointer_like_v<Type>) {
-                *static_cast<meta_any *>(to) = std::cref(*any_cast<const Type>(from));
+                *static_cast<meta_any *>(to) = std::cref(adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from)));
             }
             break;
         case operation::SEQ:
@@ -357,7 +358,7 @@ public:
                 return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
             }
         }
-        
+
         return nullptr;
     }
 

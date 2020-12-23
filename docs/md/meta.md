@@ -611,7 +611,7 @@ the `is_meta_pointer_like` class. `EnTT` already exports the specializations for
 some common classes. In particular:
 
 * All types of raw pointers.
-* `std::uniqe_ptr` and `std::shared_ptr`.
+* `std::unique_ptr` and `std::shared_ptr`.
 
 It's important to include the header file `pointer.hpp` to make these
 specializations available to the compiler when needed.<br/>
@@ -635,12 +635,41 @@ if(any.type().is_pointer_like()) {
 }
 ```
 
-It goes without saying that it's not necessary to perform a double check.
-Instead, it's sufficient to query the meta type or verify that the returned
-object is valid. For example, invalid instances are returned when the wrapped
-object hasn't a pointer-like type.<br/>
+Of course, it's not necessary to perform a double check. Instead, it's enough to
+query the meta type or verify that the returned object is valid. For example,
+invalid instances are returned when the wrapped object isn't a pointer-like
+type.<br/>
 Note that dereferencing a pointer-like object returns an instance of `meta_any`
 which refers to the pointed object and allows users to modify it directly.
+
+In general, _dereferencing_ a pointer-like type boils down to a `*ptr`. However,
+`EnTT` also supports classes that don't offer an `operator*`. In particular:
+
+* It's possible to exploit a solution based on ADL lookup by offering a function
+  (also a template one) named `dereference_meta_pointer_like`:
+
+  ```cpp
+  template<typename Type>
+  Type & dereference_meta_pointer_like(const custom_pointer_type<Type> &ptr) {
+      return ptr.deref();
+  }
+  ```
+
+* When not in control of the type's namespace, it's possible to inject into the
+  `entt` namespace a specialization of `adl_meta_pointer_like` class template to
+  bypass the adl lookup as a whole:
+
+  ```cpp
+  template<typename Type>
+  struct entt::adl_meta_pointer_like<custom_pointer_type<Type>> {
+      static decltype(auto) dereference(const custom_pointer_type<Type> &ptr) {
+          return ptr.deref();
+      }
+  };
+  ```
+
+In all other cases, that is, when dereferencing a pointer works as expected and
+regardless of the pointed type, no user intervention is required.
 
 ## Policies: the more, the less
 
