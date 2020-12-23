@@ -34,7 +34,9 @@ struct meta_container_traits: public Trait<Container>... {};
 template<typename Container>
 struct basic_container {
     /*! @brief Iterator type of the container. */
-    using iterator = std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator>;
+    using iterator = typename Container::iterator;
+    /*! @brief Iterator type of the container. */
+    using const_iterator = typename Container::const_iterator;
     /*! @brief Unsigned integer type. */
     using size_type = typename Container::size_type;
     /*! @brief Value type of the container. */
@@ -58,12 +60,22 @@ struct basic_container {
         return cont.begin();
     }
 
+    /*! @copydoc begin */
+    [[nodiscard]] static const_iterator cbegin(const Container &cont) {
+        return cont.begin();
+    }
+
     /**
      * @brief Returns an iterator past the last element of the given container.
      * @param cont The container for which to return the iterator.
      * @return An iterator past the last element of the given container.
      */
     [[nodiscard]] static iterator end(Container &cont) {
+        return cont.end();
+    }
+
+    /*! @copydoc end */
+    [[nodiscard]] static const_iterator cend(const Container &cont) {
         return cont.end();
     }
 };
@@ -85,7 +97,12 @@ struct basic_associative_container {
      * @param key The key of the element to search.
      * @return An iterator to the element with the given key, if any.
      */
-    [[nodiscard]] static std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator> find(Container &cont, const key_type &key) {
+    [[nodiscard]] static typename Container::iterator find(Container &cont, const key_type &key) {
+        return cont.find(key);
+    }
+
+    /*! @copydoc find */
+    [[nodiscard]] static typename Container::const_iterator cfind(const Container &cont, const key_type &key) {
         return cont.find(key);
     }
 };
@@ -103,11 +120,7 @@ struct basic_dynamic_container {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool clear([[maybe_unused]] Container &cont) {
-        if constexpr(std::is_const_v<Container>) {
-            return false;
-        } else {
-            return cont.clear(), true;
-        }
+        return cont.clear(), true;
     }
 };
 
@@ -125,12 +138,8 @@ struct basic_dynamic_associative_container {
      * @return A bool denoting whether the removal took place.
      */
     [[nodiscard]] static bool erase([[maybe_unused]] Container &cont, [[maybe_unused]] const typename Container::key_type &key) {
-        if constexpr(std::is_const_v<Container>) {
-            return false;
-        } else {
-            const auto sz = cont.size();
-            return cont.erase(key) != sz;
-        }
+        const auto sz = cont.size();
+        return cont.erase(key) != sz;
     }
 };
 
@@ -148,7 +157,12 @@ struct basic_sequence_container {
      * @param pos The position of the element to return.
      * @return A reference to the requested element.
      */
-    [[nodiscard]] static constness_as_t<typename Container::value_type, Container> & get(Container &cont, typename Container::size_type pos) {
+    [[nodiscard]] static typename Container::value_type & get(Container &cont, typename Container::size_type pos) {
+        return cont[pos];
+    }
+
+    /*! @copydoc get */
+    [[nodiscard]] static const typename Container::value_type & cget(const Container &cont, typename Container::size_type pos) {
         return cont[pos];
     }
 };
@@ -167,11 +181,7 @@ struct dynamic_associative_key_only_container {
      * @return A bool denoting whether the insertion took place.
      */
     [[nodiscard]] static bool insert([[maybe_unused]] Container &cont, [[maybe_unused]] const typename Container::key_type &key) {
-        if constexpr(std::is_const_v<Container>) {
-            return false;
-        } else {
-            return cont.insert(key).second;
-        }
+        return cont.insert(key).second;
     }
 };
 
@@ -190,11 +200,7 @@ struct dynamic_associative_key_value_container {
      * @return A bool denoting whether the insertion took place.
      */
     [[nodiscard]] static bool insert([[maybe_unused]] Container &cont, [[maybe_unused]] const typename Container::key_type &key, [[maybe_unused]] const typename Container::mapped_type &value) {
-        if constexpr(std::is_const_v<Container>) {
-            return false;
-        } else {
-            return cont.insert(std::make_pair(key, value)).second;
-        }
+        return cont.insert(std::make_pair(key, value)).second;
     }
 };
 
@@ -213,11 +219,7 @@ struct dynamic_sequence_container {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool resize([[maybe_unused]] Container &cont, [[maybe_unused]] typename Container::size_type sz) {
-        if constexpr(std::is_const_v<Container>) {
-            return false;
-        } else {
-            return cont.resize(sz), true;
-        }
+        return cont.resize(sz), true;
     }
 
     /**
@@ -229,13 +231,8 @@ struct dynamic_sequence_container {
      * @return A pair consisting of an iterator to the inserted element (in case
      * of success) and a bool denoting whether the insertion took place.
      */
-    [[nodiscard]] static std::pair<std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator>, bool>
-    insert([[maybe_unused]] Container &cont, [[maybe_unused]] std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator> it, [[maybe_unused]] const typename Container::value_type &value) {
-        if constexpr(std::is_const_v<Container>) {
-            return { {}, false };
-        } else {
-            return { cont.insert(it, value), true };
-        }
+    [[nodiscard]] static std::pair<typename Container::iterator, bool> insert([[maybe_unused]] Container &cont, [[maybe_unused]] typename Container::const_iterator it, [[maybe_unused]] const typename Container::value_type &value) {
+        return { cont.insert(it, value), true };
     }
 
     /**
@@ -247,13 +244,8 @@ struct dynamic_sequence_container {
      * element (in case of success) and a bool denoting whether the insertion
      * took place.
      */
-    [[nodiscard]] static std::pair<std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator>, bool>
-    erase([[maybe_unused]] Container &cont, [[maybe_unused]] std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator> it) {
-        if constexpr(std::is_const_v<Container>) {
-            return { {}, false };
-        } else {
-            return { cont.erase(it), true };
-        }
+    [[nodiscard]] static std::pair<typename Container::iterator, bool> erase([[maybe_unused]] Container &cont, [[maybe_unused]] typename Container::const_iterator it) {
+        return { cont.erase(it), true };
     }
 };
 
@@ -285,8 +277,7 @@ struct fixed_sequence_container {
      * @return A pair consisting of an invalid iterator and a false value to
      * indicate failure in all cases.
      */
-    [[nodiscard]] static std::pair<std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator>, bool>
-    insert(const Container &, std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator>, const typename Container::value_type &) {
+    [[nodiscard]] static std::pair<typename Container::iterator, bool> insert(const Container &, typename Container::const_iterator, const typename Container::value_type &) {
         return { {}, false };
     }
 
@@ -295,8 +286,7 @@ struct fixed_sequence_container {
      * @return A pair consisting of an invalid iterator and a false value to
      * indicate failure in all cases.
      */
-    [[nodiscard]] static std::pair<std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator>, bool>
-    erase(const Container &, std::conditional_t<std::is_const_v<Container>, typename Container::const_iterator, typename Container::iterator>) {
+    [[nodiscard]] static std::pair<typename Container::iterator, bool> erase(const Container &, typename Container::const_iterator) {
         return { {}, false };
     }
 };
@@ -311,23 +301,6 @@ template<typename Type, typename... Args>
 struct meta_sequence_container_traits<std::vector<Type, Args...>>
         : meta_container_traits<
               std::vector<Type, Args...>,
-              basic_container,
-              basic_dynamic_container,
-              basic_sequence_container,
-              dynamic_sequence_container
-          >
-{};
-
-
-/**
- * @brief Meta sequence container traits for const `std::vector`s of any type.
- * @tparam Type The type of elements.
- * @tparam Args Other arguments.
- */
-template<typename Type, typename... Args>
-struct meta_sequence_container_traits<const std::vector<Type, Args...>>
-        : meta_container_traits<
-              const std::vector<Type, Args...>,
               basic_container,
               basic_dynamic_container,
               basic_sequence_container,
@@ -353,22 +326,6 @@ struct meta_sequence_container_traits<std::array<Type, N>>
 
 
 /**
- * @brief Meta sequence container traits for const `std::array`s of any type.
- * @tparam Type The type of elements.
- * @tparam N The number of elements.
- */
-template<typename Type, auto N>
-struct meta_sequence_container_traits<const std::array<Type, N>>
-        : meta_container_traits<
-              const std::array<Type, N>,
-              basic_container,
-              basic_sequence_container,
-              fixed_sequence_container
-          >
-{};
-
-
-/**
  * @brief Meta associative container traits for `std::map`s of any type.
  * @tparam Key The key type of elements.
  * @tparam Value The value type of elements.
@@ -378,28 +335,6 @@ template<typename Key, typename Value, typename... Args>
 struct meta_associative_container_traits<std::map<Key, Value, Args...>>
         : meta_container_traits<
               std::map<Key, Value, Args...>,
-              basic_container,
-              basic_associative_container,
-              basic_dynamic_container,
-              basic_dynamic_associative_container,
-              dynamic_associative_key_value_container
-          >
-{
-    /*! @brief Mapped type of the sequence container. */
-    using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
-};
-
-
-/**
- * @brief Meta associative container traits for const `std::map`s of any type.
- * @tparam Key The key type of elements.
- * @tparam Value The value type of elements.
- * @tparam Args Other arguments.
- */
-template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits<const std::map<Key, Value, Args...>>
-        : meta_container_traits<
-              const std::map<Key, Value, Args...>,
               basic_container,
               basic_associative_container,
               basic_dynamic_container,
@@ -436,29 +371,6 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
 
 
 /**
- * @brief Meta associative container traits for const `std::unordered_map`s of
- * any type.
- * @tparam Key The key type of elements.
- * @tparam Value The value type of elements.
- * @tparam Args Other arguments.
- */
-template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits<const std::unordered_map<Key, Value, Args...>>
-        : meta_container_traits<
-              const std::unordered_map<Key, Value, Args...>,
-              basic_container,
-              basic_associative_container,
-              basic_dynamic_container,
-              basic_dynamic_associative_container,
-              dynamic_associative_key_value_container
-          >
-{
-    /*! @brief Mapped type of the sequence container. */
-    using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
-};
-
-
-/**
  * @brief Meta associative container traits for `std::set`s of any type.
  * @tparam Key The type of elements.
  * @tparam Args Other arguments.
@@ -467,24 +379,6 @@ template<typename Key, typename... Args>
 struct meta_associative_container_traits<std::set<Key, Args...>>
         : meta_container_traits<
               std::set<Key, Args...>,
-              basic_container,
-              basic_associative_container,
-              basic_dynamic_container,
-              basic_dynamic_associative_container,
-              dynamic_associative_key_only_container
-          >
-{};
-
-
-/**
- * @brief Meta associative container traits for const `std::set`s of any type.
- * @tparam Key The type of elements.
- * @tparam Args Other arguments.
- */
-template<typename Key, typename... Args>
-struct meta_associative_container_traits<const std::set<Key, Args...>>
-        : meta_container_traits<
-              const std::set<Key, Args...>,
               basic_container,
               basic_associative_container,
               basic_dynamic_container,
@@ -504,25 +398,6 @@ template<typename Key, typename... Args>
 struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
         : meta_container_traits<
               std::unordered_set<Key, Args...>,
-              basic_container,
-              basic_associative_container,
-              basic_dynamic_container,
-              basic_dynamic_associative_container,
-              dynamic_associative_key_only_container
-          >
-{};
-
-
-/**
- * @brief Meta associative container traits for const `std::unordered_set`s of
- * any type.
- * @tparam Key The type of elements.
- * @tparam Args Other arguments.
- */
-template<typename Key, typename... Args>
-struct meta_associative_container_traits<const std::unordered_set<Key, Args...>>
-        : meta_container_traits<
-              const std::unordered_set<Key, Args...>,
               basic_container,
               basic_associative_container,
               basic_dynamic_container,
