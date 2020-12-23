@@ -717,18 +717,14 @@ TEST(Any, AsRef) {
 }
 
 TEST(Any, Comparable) {
-    auto test = [](auto value, auto other) {
-        entt::any any{value};
-
+    auto test = [](entt::any any, entt::any other) {
         ASSERT_EQ(any, any);
-        ASSERT_EQ(any, entt::any{value});
-        ASSERT_NE(entt::any{other}, any);
+        ASSERT_NE(other, any);
         ASSERT_NE(any, entt::any{});
 
         ASSERT_TRUE(any == any);
-        ASSERT_TRUE(any == entt::any{value});
-        ASSERT_FALSE(entt::any{other} == any);
-        ASSERT_TRUE(any != entt::any{other});
+        ASSERT_FALSE(other == any);
+        ASSERT_TRUE(any != other);
         ASSERT_TRUE(entt::any{} != any);
     };
 
