@@ -60,7 +60,11 @@ struct basic_container {
         return cont.begin();
     }
 
-    /*! @copydoc begin */
+    /**
+     * @brief Returns an iterator to the first element of the given container.
+     * @param cont The container for which to return the iterator.
+     * @return An iterator to the first element of the given container.
+     */
     [[nodiscard]] static const_iterator cbegin(const Container &cont) {
         return cont.begin();
     }
@@ -74,7 +78,11 @@ struct basic_container {
         return cont.end();
     }
 
-    /*! @copydoc end */
+    /**
+     * @brief Returns an iterator past the last element of the given container.
+     * @param cont The container for which to return the iterator.
+     * @return An iterator past the last element of the given container.
+     */
     [[nodiscard]] static const_iterator cend(const Container &cont) {
         return cont.end();
     }
