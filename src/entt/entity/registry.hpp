@@ -180,9 +180,10 @@ public:
     }
 
     /**
-     * @brief TODO
-     * @param info TODO
-     * @return TODO
+     * @brief Returns a poly storage for a given type.
+     * @param info The type for which to return a poly storage.
+     * @return A valid poly storage if a pool for the given type exists, an
+     * empty and thus invalid element otherwise.
      */
     poly_storage storage(const type_info info) {
         return info.seq() < pools.size() ? pools[info.seq()].poly : poly_storage{};
