@@ -189,6 +189,12 @@ public:
         return info.seq() < pools.size() ? pools[info.seq()].poly : poly_storage{};
     }
 
+    /*! @copydoc storage */
+    poly_storage storage(const type_info info) const {
+        // as_ref forces a constness conversion for the underlying pool
+        return info.seq() < pools.size() ? as_ref(pools[info.seq()].poly) : poly_storage{};
+    }
+
     /**
      * @brief Returns the number of existing components of the given type.
      * @tparam Component Type of component of which to return the size.

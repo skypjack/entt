@@ -133,3 +133,22 @@ TEST(PolyStorage, CopyRegistry) {
 
     ASSERT_EQ(registry.size(), other.size());
 }
+
+TEST(PolyStorage, Constness) {
+    entt::registry registry;
+    const auto &cregistry = registry;
+
+    entt::entity entity[1];
+    entity[0] = registry.create();
+    registry.emplace<int>(entity[0], 42);
+
+    auto cstorage = cregistry.storage(entt::type_id<int>());
+
+    ASSERT_DEATH(cstorage->remove(registry, std::begin(entity), std::end(entity)), ".*");
+    ASSERT_TRUE(registry.has<int>(entity[0]));
+
+    auto storage = registry.storage(entt::type_id<int>());
+    storage->remove(registry, std::begin(entity), std::end(entity));
+
+    ASSERT_FALSE(registry.has<int>(entity[0]));
+}
