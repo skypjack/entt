@@ -42,7 +42,7 @@ class any {
     }
 
     template<typename Type>
-    static const void * basic_vtable(const operation op, const any &from, const void *to) {
+    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] const void *to) {
         if constexpr(std::is_void_v<Type>) {
             return nullptr;
         } else if constexpr(std::is_lvalue_reference_v<Type>) {
