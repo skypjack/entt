@@ -178,8 +178,8 @@ class poly: private Concept::template type<poly_base<poly<Concept>>> {
     using vtable_type = typename poly_vtable<Concept>::type;
 
 public:
-    /*! @brief Concept interface type. */
-    using interface = typename Concept::template type<poly_base<poly<Concept>>>;
+    /*! @brief Concept type. */
+    using concept_type = typename Concept::template type<poly_base<poly<Concept>>>;
 
     /*! @brief Default constructor. */
     poly() ENTT_NOEXCEPT
@@ -290,12 +290,12 @@ public:
      * @brief Returns a pointer to the underlying concept.
      * @return A pointer to the underlying concept.
      */
-    [[nodiscard]] interface * operator->() ENTT_NOEXCEPT {
+    [[nodiscard]] concept_type * operator->() ENTT_NOEXCEPT {
         return this;
     }
 
     /*! @copydoc operator-> */
-    [[nodiscard]] const interface * operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] const concept_type * operator->() const ENTT_NOEXCEPT {
         return this;
     }
 
