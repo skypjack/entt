@@ -58,7 +58,7 @@ struct insertion_sort {
     template<typename It, typename Compare = std::less<>>
     void operator()(It first, It last, Compare compare = Compare{}) const {
         if(first < last) {
-            for(auto it = first+1; it < last; ++it) {
+            for(auto it = first + 1; it < last; ++it) {
                 auto value = std::move(*it);
                 auto pre = it;
 
@@ -111,17 +111,17 @@ struct radix_sort {
                 std::size_t index[buckets]{};
                 std::size_t count[buckets]{};
 
-                std::for_each(from, to, [&getter, &count, start](const value_type &item) {
-                    ++count[(getter(item) >> start) & mask];
-                });
+                for(auto it = from; it != to; ++it) {
+                    ++count[(getter(*it) >> start) & mask];
+                }
 
-                std::for_each(std::next(std::begin(index)), std::end(index), [index = std::begin(index), count = std::begin(count)](auto &item) mutable {
-                    item = *(index++) + *(count++);
-                });
+                for(std::size_t pos{}, end = buckets - 1u; pos < end; ++pos) {
+                    index[pos + 1u] = index[pos] + count[pos];
+                }
 
-                std::for_each(from, to, [&getter, &out, &index, start](value_type &item) {
-                    out[index[(getter(item) >> start) & mask]++] = std::move(item);
-                });
+                for(auto it = from; it != to; ++it) {
+                    out[index[(getter(*it) >> start) & mask]++] = std::move(*it);
+                }
             };
 
             for(std::size_t pass = 0; pass < (passes & ~1); pass += 2) {
