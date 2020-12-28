@@ -313,6 +313,7 @@ private:
 
 /**
  * @brief Performs type-safe access to the contained object.
+ * @tparam Type Type to which conversion is required.
  * @param data Target any object.
  * @return The element converted to the requested type.
  */
