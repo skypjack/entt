@@ -14,6 +14,8 @@ details.
 I hope this list can grow much more in the future:
 
 * C:
+  * [destral_ecs](https://github.com/roig/destral_ecs): a single-file ECS based
+    on sparse sets.
   * [Diana](https://github.com/discoloda/Diana): an ECS that uses sparse sets to
     keep track of entities in systems.
   * [Flecs](https://github.com/SanderMertens/flecs): a multithreaded archetype
