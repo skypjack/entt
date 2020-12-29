@@ -79,7 +79,7 @@ class poly_vtable {
 
     template<typename Type, auto Candidate, typename Ret, typename Any, typename... Args>
     static void fill_vtable_entry(Ret(* &entry)(Any &, Args...)) {
-        entry = +[](Any &any, Args... args) -> Ret {
+        entry = +[]([[maybe_unused]] Any &any, Args... args) -> Ret {
             if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
                 return std::invoke(Candidate, std::forward<Args>(args)...);
             } else {

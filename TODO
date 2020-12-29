@@ -18,6 +18,7 @@
   - ...
 
 WIP:
+* HP: test, enable warnings for unused variables
 * HP: headless (sparse set only) view
 * HP: pass the registry to pools, basic poly storage should have only component member
 * HP: make view pack work also with groups, make packs input iterator only, add view adapter for external sources
