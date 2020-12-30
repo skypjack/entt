@@ -20,10 +20,18 @@ I hope this list can grow much more in the future:
   * [Minecraft Earth](https://www.minecraft.net/en-us/about-earth) by
     [Mojang](https://mojang.com/): an augmented reality game for mobile, that
     lets users bring Minecraft into the real world.
-  * [Land of the Rair](https://github.com/LandOfTheRair/core2): the new backend
-    of [a retro-style MUD](https://rair.land/) for the new age.
+  * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
+    [Tilted Phoques](https://github.com/tiltedphoques): Skyrim and Fallout 4 mod
+    to play online.
+  * [Antkeeper](https://github.com/antkeeper/antkeeper-source): an ant colony
+    simulation [game](https://antkeeper.com/).
+  * [War of Rights](https://store.steampowered.com/app/424030/War_of_Rights/): a
+    multiplayer game set during the perilous days of the American Civil War, by
+    Campfire Games.
   * [Openblack](https://github.com/openblack/openblack): open source
     reimplementation of the game _Black & White_ (2001).
+  * [Land of the Rair](https://github.com/LandOfTheRair/core2): the new backend
+    of [a retro-style MUD](https://rair.land/) for the new age.
   * [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
     a game to play with your face.
   * [EnTT Pacman](https://github.com/Kerndog73/EnTT-Pacman): an example of how
@@ -56,18 +64,26 @@ I hope this list can grow much more in the future:
   * [DungeonSlayer](https://github.com/alohaeee/DungeonSlayer): 2D game made
     from scratch in C++.
   * [3DGame](https://github.com/kwarkGorny/3DGame): 2.5D top-down space shooter.
-  * [Antkeeper](https://github.com/antkeeper/antkeeper-source): an ant colony
-    simulation [game](https://antkeeper.com/).
-  * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
-    [Tilted Phoques](https://github.com/tiltedphoques): Skyrim and Fallout 4 mod
-    to play online.
-  * [War of Rights](https://store.steampowered.com/app/424030/War_of_Rights/): a
-    multiplayer game set during the perilous days of the American Civil War, by
-    Campfire Games.
 
 * Engines and the like:
+  * [Aether Engine](https://hadean.com/spatial-simulation/)
+    [v1.1+](https://docs.hadean.com/v1.1/Licenses/) by
+    [Hadean](https://hadean.com/): a library designed for spatially partitioning
+    agent-based simulations.
   * [Fling Engine](https://github.com/flingengine/FlingEngine): a Vulkan game
     engine with a focus on data oriented design.
+  * [NovusCore](https://github.com/novuscore/NovusCore): a modern take on World
+    of Warcraft emulation.
+  * [Chrysalis](https://github.com/ivanhawkes/Chrysalis): action RPG SDK for
+    CRYENGINE games.
+  * [LM-Engine](https://github.com/Lawrencemm/LM-Engine): the Vim of game
+    engines.
+  * [Edyn](https://github.com/xissburg/edyn): a real-time physics engine
+    organized as an ECS.
+  * [MushMachine](https://github.com/MadeOfJelly/MushMachine): engine...
+    vrooooommm.
+  * [Antara Gaming SDK](https://github.com/KomodoPlatform/antara-gaming-sdk):
+    the Komodo Gaming Software Development Kit.
   * [Apparently](https://teamwisp.github.io/credits/)
     [Wisp](https://teamwisp.github.io/product/) by
     [Team Wisp](https://teamwisp.github.io/): an advanced real-time ray tracing
@@ -78,8 +94,6 @@ I hope this list can grow much more in the future:
     [Qub3d](https://qub3d.org/): because blocks should be open source.
   * [shiva](https://github.com/Milerius/shiva): modern C++ engine with
     modularity.
-  * [NovusCore](https://github.com/novuscore/NovusCore): a modern take on World
-    of Warcraft emulation.
   * [ImGui/EnTT editor](https://github.com/Green-Sky/imgui_entt_entity_editor):
     a drop-in, single-file entity editor for `EnTT` that uses `ImGui` as
     graphical backend (with
@@ -88,16 +102,8 @@ I hope this list can grow much more in the future:
     developed for educational purposes.
   * [Lumos](https://github.com/jmorton06/Lumos): game engine written in C++
     using OpenGL and Vulkan.
-  * [Chrysalis](https://github.com/ivanhawkes/Chrysalis): action RPG SDK for
-    CRYENGINE games.
-  * [LM-Engine](https://github.com/Lawrencemm/LM-Engine): the Vim of game
-    engines.
-  * [Edyn](https://github.com/xissburg/edyn): a real-time physics engine
-    organized as an ECS.
   * [Silvanus](https://github.com/hobbyistmaker/silvanus): Silvanus Fusion 360
     Box Generator.
-  * [MushMachine](https://github.com/MadeOfJelly/MushMachine): engine...
-    vrooooommm.
   * [Lina Engine](https://github.com/inanevin/LinaEngine): an open-source,
     modular, tiny and fast C++ game engine, aimed to develop 3D desktop games.
 
@@ -105,24 +111,6 @@ I hope this list can grow much more in the future:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
     [blog](https://skypjack.github.io/) are about `EnTT`, for those who want to
     know **more** on this project.
-  * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
-    huge space battle built entirely from scratch.
-  * [Space Battle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
-    battle built on `UE4`.
-  * [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html):
-    interesting article about `UE4` and `EnTT`.
-  * [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle):
-    giant space battle.
-  * [Conan Adventures (SFML and EnTT in C++)](https://leinnan.github.io/blog/conan-adventuressfml-and-entt-in-c.html):
-    create projects in modern C++ using `SFML`, `EnTT`, `Conan` and `CMake`.
-  * [Adding EnTT ECS to Chrysalis](https://www.tauradius.com/post/adding-an-ecs-to-chrysalis/):
-    a blog entry (and its 
-    [follow-up](https://www.tauradius.com/post/chrysalis-update-2020-08-02/)) 
-    about the integration of `EnTT` into `Chrysalis`, an action RPG SDK for
-    CRYENGINE games.
-  * [Creating Minecraft in One Week with C++ and Vulkan](https://vazgriz.com/189/creating-minecraft-in-one-week-with-c-and-vulkan/):
-    a crack at recreating Minecraft in one week using a custom C++ engine and
-    Vulkan ([code included](https://github.com/vazgriz/VoxelGame)).
   * [Game Engine series](https://www.youtube.com/c/TheChernoProject/videos) by
     [The Cherno](https://github.com/TheCherno) (not only about `EnTT` but also
     on the use of an ECS in general):
@@ -143,6 +131,24 @@ I hope this list can grow much more in the future:
     - ... And so on.
       [Check out](https://www.youtube.com/channel/UCQ-W1KE9EYfdxhL6S4twUNw) the
       _Game Engine Series_ by The Cherno for more videos.
+  * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
+    huge space battle built entirely from scratch.
+  * [Space Battle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
+    battle built on `UE4`.
+  * [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html):
+    interesting article about `UE4` and `EnTT`.
+  * [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle):
+    giant space battle.
+  * [Conan Adventures (SFML and EnTT in C++)](https://leinnan.github.io/blog/conan-adventuressfml-and-entt-in-c.html):
+    create projects in modern C++ using `SFML`, `EnTT`, `Conan` and `CMake`.
+  * [Adding EnTT ECS to Chrysalis](https://www.tauradius.com/post/adding-an-ecs-to-chrysalis/):
+    a blog entry (and its 
+    [follow-up](https://www.tauradius.com/post/chrysalis-update-2020-08-02/)) 
+    about the integration of `EnTT` into `Chrysalis`, an action RPG SDK for
+    CRYENGINE games.
+  * [Creating Minecraft in One Week with C++ and Vulkan](https://vazgriz.com/189/creating-minecraft-in-one-week-with-c-and-vulkan/):
+    a crack at recreating Minecraft in one week using a custom C++ engine and
+    Vulkan ([code included](https://github.com/vazgriz/VoxelGame)).
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect).
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
@@ -160,6 +166,8 @@ I hope this list can grow much more in the future:
     by [Cenit](http://www.cenit.com/en_EN/about-us/overview.html): they use
     `EnTT` to drive their simulation, that is, the communication between robot
     controller emulator and renderer.
+  * [AtomicDEX](https://github.com/KomodoPlatform/atomicDEX-Desktop): a secure
+    wallet and non-custodial decentralized exchange rolled into one application.
   * [Apparently](https://www.linkedin.com/in/skypjack/)
     [NIO](https://www.nio.io/): there was a collaboration to make some changes
     to `EnTT`, at the time used for internal projects.
