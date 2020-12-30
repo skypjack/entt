@@ -5,7 +5,6 @@
 #include <utility>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/type_traits.hpp"
 
 
 namespace entt {
@@ -83,31 +82,31 @@ class process {
     };
 
     template<typename Target = Derived>
-    auto next(integral_constant<state::UNINITIALIZED>)
+    auto next(std::integral_constant<state, state::UNINITIALIZED>)
     -> decltype(std::declval<Target>().init(), void()) {
         static_cast<Target *>(this)->init();
     }
 
     template<typename Target = Derived>
-    auto next(integral_constant<state::RUNNING>, Delta delta, void *data)
+    auto next(std::integral_constant<state, state::RUNNING>, Delta delta, void *data)
     -> decltype(std::declval<Target>().update(delta, data), void()) {
         static_cast<Target *>(this)->update(delta, data);
     }
 
     template<typename Target = Derived>
-    auto next(integral_constant<state::SUCCEEDED>)
+    auto next(std::integral_constant<state, state::SUCCEEDED>)
     -> decltype(std::declval<Target>().succeeded(), void()) {
         static_cast<Target *>(this)->succeeded();
     }
 
     template<typename Target = Derived>
-    auto next(integral_constant<state::FAILED>)
+    auto next(std::integral_constant<state, state::FAILED>)
     -> decltype(std::declval<Target>().failed(), void()) {
         static_cast<Target *>(this)->failed();
     }
 
     template<typename Target = Derived>
-    auto next(integral_constant<state::ABORTED>)
+    auto next(std::integral_constant<state, state::ABORTED>)
     -> decltype(std::declval<Target>().aborted(), void()) {
         static_cast<Target *>(this)->aborted();
     }
@@ -230,11 +229,11 @@ public:
     void tick(const Delta delta, void *data = nullptr) {
         switch (current) {
         case state::UNINITIALIZED:
-            next(integral_constant<state::UNINITIALIZED>{});
+            next(std::integral_constant<state, state::UNINITIALIZED>{});
             current = state::RUNNING;
             break;
         case state::RUNNING:
-            next(integral_constant<state::RUNNING>{}, delta, data);
+            next(std::integral_constant<state, state::RUNNING>{}, delta, data);
             break;
         default:
             // suppress warnings
@@ -244,16 +243,16 @@ public:
         // if it's dead, it must be notified and removed immediately
         switch(current) {
         case state::SUCCEEDED:
-            next(integral_constant<state::SUCCEEDED>{});
+            next(std::integral_constant<state, state::SUCCEEDED>{});
             current = state::FINISHED;
             break;
         case state::FAILED:
-            next(integral_constant<state::FAILED>{});
+            next(std::integral_constant<state, state::FAILED>{});
             current = state::FINISHED;
             stopped = true;
             break;
         case state::ABORTED:
-            next(integral_constant<state::ABORTED>{});
+            next(std::integral_constant<state, state::ABORTED>{});
             current = state::FINISHED;
             stopped = true;
             break;

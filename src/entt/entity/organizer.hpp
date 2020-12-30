@@ -391,7 +391,7 @@ public:
             callback,
             +[](const bool rw, type_info *buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             +[](basic_registry<entity_type> &reg) { void(to_args(reg, typename resource_type::args{})); },
-            type_id<integral_constant<Candidate>>()
+            type_id<std::integral_constant<decltype(Candidate), Candidate>>()
         });
     }
 
@@ -428,7 +428,7 @@ public:
             +[](basic_registry<entity_type> &reg) {
                 void(to_args(reg, typename resource_type::args{}));
             },
-            type_id<integral_constant<Candidate>>()
+            type_id<std::integral_constant<decltype(Candidate), Candidate>>()
         });
     }
 
