@@ -174,7 +174,7 @@ In this case, the user defined literal to use to create hashed strings on the
 fly is `_hws`:
 
 ```cpp
-constexpr auto str = "text"_hws;
+constexpr auto str = L"text"_hws;
 ```
 
 Note that the hash type of the `hashed_wstring` is the same of its counterpart.
