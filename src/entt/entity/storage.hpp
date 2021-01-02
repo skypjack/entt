@@ -815,11 +815,13 @@ struct storage_traits {
  */
 template<typename Type>
 [[nodiscard]] auto get_as_tuple([[maybe_unused]] Type &container, [[maybe_unused]] const typename Type::entity_type entity) {
-    if constexpr(std::is_same_v<typename Type::storage_category, empty_storage_tag>) {
-        return std::make_tuple();
-    } else {
-        static_assert(std::is_same_v<typename Type::storage_category, dense_storage_tag>, "Unknown storage category");
+    static_assert(std::is_same_v<std::remove_const_t<Type>, typename storage_traits<typename Type::entity_type, typename Type::value_type>::storage_type>);
+
+    if constexpr(std::is_base_of_v<dense_storage_tag, typename Type::storage_category>) {
         return std::forward_as_tuple(container.get(entity));
+    } else {
+        static_assert(std::is_base_of_v<empty_storage_tag, typename Type::storage_category>, "Unknown storage category");
+        return std::make_tuple();
     }
 }
 
