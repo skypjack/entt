@@ -43,8 +43,8 @@ I hope this list can grow much more in the future:
   * [The Machine](https://github.com/Kerndog73/The-Machine): a box pushing
     puzzler with logic gates and other cool stuff.
     [Check it out](https://indi-kernick.itch.io/the-machine-web-version).
-  * [EnttPong](https://github.com/reworks/EnttPong): an example of how to make
-    Pong with `EnTT`.
+  * [EnttPong 2.0](https://github.com/DomRe/EnttPong): a basic game made to
+    showcase different parts of EnTT and C++17.
   * [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
     playground.
   * [EnTT Tower Defense](https://github.com/Daivuk/tddod): a data oriented tower
@@ -88,8 +88,6 @@ I hope this list can grow much more in the future:
     [Wisp](https://teamwisp.github.io/product/) by
     [Team Wisp](https://teamwisp.github.io/): an advanced real-time ray tracing
     renderer built for the demands of video game artists.
-  * [starlight](https://github.com/DomRe/starlight): game programming framework
-    using `Allegro`, `Lua` and modern C++.
   * [Apparently](https://github.com/JosiahWI/qub3d-libdeps)
     [Qub3d](https://qub3d.org/): because blocks should be open source.
   * [shiva](https://github.com/Milerius/shiva): modern C++ engine with
