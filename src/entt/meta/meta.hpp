@@ -1051,7 +1051,7 @@ private:
 
 /*! @brief Opaque wrapper for meta types. */
 class meta_type {
-    bool can_cast_or_convert(const meta_type type, const type_info info) const ENTT_NOEXCEPT {
+    static bool can_cast_or_convert(const meta_type type, const type_info info) ENTT_NOEXCEPT {
         for(auto curr: type.conv()) {
             if(curr.type().info() == info) {
                 return true;
@@ -1065,6 +1065,17 @@ class meta_type {
         }
 
         return false;
+    }
+
+    template<typename... Args, auto... Index>
+    [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node * const curr, std::index_sequence<Index...>) {
+        for(const auto &candidate: internal::meta_range{curr}) {
+            if(candidate.size == sizeof...(Args) && ([](auto *from, auto *to) { return from->info == to->info || can_cast_or_convert(from, to->info); }(internal::meta_info<Args>::resolve(), candidate.arg(Index)) && ...)) {
+                return &candidate;
+            }
+        }
+
+        return nullptr;
     }
 
 public:
@@ -1318,13 +1329,7 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_ctor ctor() const {
-        for(const auto &candidate: internal::meta_range{node->ctor}) {
-            if(size_type index{}; candidate.size == sizeof...(Args) && ([this](auto *from, auto *to) { return from->info == to->info || can_cast_or_convert(from, to->info); }(internal::meta_info<Args>::resolve(), candidate.arg(index++)) && ...)) {
-                return &candidate;
-            }
-        }
-
-        return nullptr;
+        return ctor<Args...>(node->ctor, std::make_index_sequence<sizeof...(Args)>{});
     }
 
     /**
