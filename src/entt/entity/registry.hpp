@@ -1298,7 +1298,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>..., std::is_const<Get>...>, "Invalid non-const type");
 
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
@@ -1332,15 +1332,15 @@ public:
     /**
      * @brief Returns a group for the given components.
      *
-     * @sa group
+     * @sa group_if_exists
      *
      * @tparam Owned Types of components owned by the group.
      * @tparam Exclude Types of components used to filter the group.
      * @return A newly created group.
      */
     template<typename... Owned, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
-        return group<Owned...>(get_t<>{}, exclude<Exclude...>);
+    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group_if_exists(exclude_t<Exclude...> = {}) const {
+        return group_if_exists<Owned...>(get_t<>{}, exclude<Exclude...>);
     }
 
     /**

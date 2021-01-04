@@ -89,7 +89,11 @@ struct as_group {
      */
     template<typename Exclude, typename Get, typename... Owned>
     operator basic_group<entity_type, Exclude, Get, Owned...>() const {
-        return reg.template group<Owned...>(Get{}, Exclude{});
+        if constexpr(std::is_const_v<registry_type>) {
+            return reg.template group_if_exists<Owned...>(Get{}, Exclude{});
+        } else {
+            return reg.template group<Owned...>(Get{}, Exclude{});
+        }
     }
 
 private:
