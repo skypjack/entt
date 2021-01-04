@@ -39,7 +39,7 @@ endif()
 
 message(VERBOSE "*")
 message(VERBOSE "* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
-message(VERBOSE "* Copyright (c) 2017-2020 Michele Caini <michele.caini@gmail.com>")
+message(VERBOSE "* Copyright (c) 2017-2021 Michele Caini <michele.caini@gmail.com>")
 message(VERBOSE "*")
 
 option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." ON)
