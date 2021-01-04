@@ -1,4 +1,4 @@
-![EnTT: Gaming meets modern C++](https://user-images.githubusercontent.com/1812216/42513718-ee6e98d0-8457-11e8-9baf-8d83f61a3097.png)
+![EnTT: Gaming meets modern C++](https://user-images.githubusercontent.com/1812216/103550016-90752280-4ea8-11eb-8667-12ed2219e137.png)
 
 <!--
 @cond TURN_OFF_DOXYGEN
@@ -395,13 +395,13 @@ know who has participated so far.
 # License
 
 Code and documentation Copyright (c) 2017-2021 Michele Caini.<br/>
-Logo Copyright (c) 2018-2021 Richard Caseres.
+Colorful logo Copyright (c) 2018-2021 Richard Caseres.
 
 Code released under
-[the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
+[the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).<br/>
 Documentation released under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).<br/>
-Logo released under
+All logos released under
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 <!--
