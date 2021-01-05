@@ -252,6 +252,14 @@ public:
     }
 
     /**
+     * @brief Reserves enough space to store `count` pools.
+     * @param count Number of pools to reserve space for.
+     */
+    void reserve_pools(const size_t count) {
+        pools.reserve(count);
+    }
+
+    /**
      * @brief Returns the capacity of the pool for the given component.
      * @tparam Component Type of component in which one is interested.
      * @return Capacity of the pool of the given component.
