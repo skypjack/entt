@@ -16,7 +16,7 @@ namespace entt {
 
 /*! @brief A SBO friendly, type-safe container for single values of any type. */
 class any {
-    enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
+    enum class operation { COPY, MOVE, DTOR, COMP, HASH, ADDR, CADDR, REF, CREF, TYPE };
 
     using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
     using vtable_type = const void *(const operation, const any &, const void *);
@@ -30,6 +30,16 @@ class any {
             return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
         } else {
             return lhs == rhs;
+        }
+    }
+
+    template<typename Type>
+    [[nodiscard]] static size_t hash(const void *data) {
+        if constexpr(is_std_hashable_v<Type>) {
+            std::hash<Type> h;
+            return h(*static_cast<const Type *>(data));
+        } else {
+            return 0;
         }
     }
 
@@ -60,6 +70,8 @@ class any {
                     break;
                 case operation::COMP:
                     return compare<std::remove_const_t<base_type>>(from.instance, to) ? to : nullptr;
+                case operation::HASH:
+                    return reinterpret_cast<const void*>(hash<std::remove_const_t<base_type>>(from.instance));
                 case operation::ADDR:
                     return std::is_const_v<base_type> ? nullptr : from.instance;
                 case operation::CADDR:
@@ -83,6 +95,8 @@ class any {
                     break;
                 case operation::COMP:
                     return compare<Type>(instance, to) ? to : nullptr;
+                case operation::HASH:
+                    return reinterpret_cast<const void*>(hash<Type>(instance));
                 case operation::ADDR:
                 case operation::CADDR:
                     return instance;
@@ -112,6 +126,8 @@ class any {
                     break;
                 case operation::COMP:
                     return compare<Type>(from.instance, to) ? to : nullptr;
+                case operation::HASH:
+                    return reinterpret_cast<const void*>(hash<Type>(from.instance));
                 case operation::ADDR:
                 case operation::CADDR:
                     return from.instance;
@@ -264,6 +280,14 @@ public:
     }
 
     /**
+     * @brief Returns std::hash of the contained object, 0 if std::hash is not defined for contained object type
+     * @return std::hash of the contained object, 0 if std::hash is not defined for contained object type
+     */
+    size_t hash() const ENTT_NOEXCEPT {
+        return reinterpret_cast<uintptr_t>(vtable(operation::HASH, *this, nullptr));
+    }
+
+    /**
      * @brief Swaps two any objects.
      * @param lhs A valid any object.
      * @param rhs A valid any object.
@@ -358,6 +382,21 @@ Type * any_cast(any *data) ENTT_NOEXCEPT {
     // last attempt to make wrappers for const references return their values
     return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<any, Type> *>(data)->data()) : nullptr);
 }
+
+
+}
+
+
+namespace std
+{
+
+
+template<> struct hash<entt::any>
+{
+    std::size_t operator()(const entt::any& s) const ENTT_NOEXCEPT {
+        return s.hash();
+    }
+};
 
 
 }

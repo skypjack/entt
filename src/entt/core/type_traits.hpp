@@ -420,6 +420,30 @@ template<class Type>
 inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
 
 
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::void_t<decltype(std::declval<std::hash<Type>>()(std::declval<Type>()))>>
+        : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
 /*! @brief Same as std::is_invocable, but with tuples. */
 template<typename, typename>
 struct is_applicable: std::false_type {};
