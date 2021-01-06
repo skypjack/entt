@@ -174,6 +174,8 @@ I hope this list can grow much more in the future:
     listed on their software stack.
   * [Sequentity](https://github.com/alanjfs/sequentity): A MIDI-like
     sequencer/tracker for C++ and `ImGui` (with `Magnum` and `EnTT`).
+  * [EnTT meets Sol2](https://github.com/skaarj1989/entt-meets-sol2): freely
+    available examples of how to combine `EnTT` and `Sol2`.
   * [Godot meets EnTT](https://github.com/portaloffreedom/godot_entt_example/):
     a simple example on how to use `EnTT` within
     [`Godot`](https://godotengine.org/).
