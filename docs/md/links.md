@@ -164,6 +164,8 @@ I hope this list can grow much more in the future:
     by [Cenit](http://www.cenit.com/en_EN/about-us/overview.html): they use
     `EnTT` to drive their simulation, that is, the communication between robot
     controller emulator and renderer.
+  * [Ragdoll](https://ragdolldynamics.com/): real-time physics for Autodesk Maya
+    2020.
   * [AtomicDEX](https://github.com/KomodoPlatform/atomicDEX-Desktop): a secure
     wallet and non-custodial decentralized exchange rolled into one application.
   * [Apparently](https://www.linkedin.com/in/skypjack/)
