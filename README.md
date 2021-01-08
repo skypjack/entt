@@ -13,13 +13,12 @@
 [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/skypjack)
 
 `EnTT` is a header-only, tiny and easy to use library for game programming and
-much more written in **modern C++**, mainly known for its innovative
-**entity-component-system (ECS)** model.<br/>
+much more written in **modern C++**.<br/>
 [Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's used
 in [**Minecraft**](https://minecraft.net/en-us/attribution/) by Mojang, the
 [**ArcGIS Runtime SDKs**](https://developers.arcgis.com/arcgis-runtime/) by Esri
-and the amazing [Ragdoll](https://ragdolldynamics.com/), an Autodesk Maya plugin
-for real-time physics.<br/>
+and the amazing [**Ragdoll**](https://ragdolldynamics.com/) Autodesk Maya
+plugin.<br/>
 If you don't see your project in the list, please open an issue, submit a PR or
 add the [#entt](https://github.com/topics/entt) tag to your _topics_! :+1:
 
