@@ -68,7 +68,7 @@ struct overloaded_func_t {
 
     float f(int a, float b) {
         value = a;
-        return e(b);
+        return static_cast<float>(e(static_cast<int>(b)));
     }
 
     int g(int v) const {

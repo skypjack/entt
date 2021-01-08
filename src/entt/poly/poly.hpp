@@ -85,7 +85,7 @@ class poly_vtable {
             };
         } else {
             entry = +[](Any &any, Args... args) -> Ret {
-                return std::invoke(Candidate, any_cast<constness_as_t<Type, Any> &>(any), std::forward<Args>(args)...);
+                return static_cast<Ret>(std::invoke(Candidate, any_cast<constness_as_t<Type, Any> &>(any), std::forward<Args>(args)...));
             };
         }
     }

@@ -11,7 +11,7 @@ struct Deduced: entt::type_list<> {
         void set(int v) { entt::poly_call<1>(*this, v); }
         int get() const { return entt::poly_call<2>(*this); }
         void decr() { entt::poly_call<3>(*this); }
-        int mul(int v) const { return entt::poly_call<4>(*this, v); }
+        int mul(int v) const { return static_cast<int>(entt::poly_call<4>(*this, v)); }
     };
 
     template<typename Type>
