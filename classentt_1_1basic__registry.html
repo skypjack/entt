@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -96,6 +96,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a6a44260f861a699f1353097391c51636">size_type</a> = std::size_t</td></tr>
 <tr class="memdesc:a6a44260f861a699f1353097391c51636"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
 <tr class="separator:a6a44260f861a699f1353097391c51636"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad36d8c035f2315d7013277e973dcffb"><td class="memItemLeft" align="right" valign="top"><a id="aad36d8c035f2315d7013277e973dcffb"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#aad36d8c035f2315d7013277e973dcffb">poly_storage</a> = typename <a class="el" href="structentt_1_1poly__storage__traits.html">poly_storage_traits</a>&lt; Entity &gt;::storage_type</td></tr>
+<tr class="memdesc:aad36d8c035f2315d7013277e973dcffb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Poly storage type. <br /></td></tr>
+<tr class="separator:aad36d8c035f2315d7013277e973dcffb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -114,6 +118,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aad398e6279c6bbee2068b94c74bf83d6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#aad398e6279c6bbee2068b94c74bf83d6">prepare</a> ()</td></tr>
 <tr class="memdesc:aad398e6279c6bbee2068b94c74bf83d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepares a pool for the given type if required.  <a href="classentt_1_1basic__registry.html#aad398e6279c6bbee2068b94c74bf83d6">More...</a><br /></td></tr>
 <tr class="separator:aad398e6279c6bbee2068b94c74bf83d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3a5f8db0821da67ac53ee6163515cff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__registry.html#aad36d8c035f2315d7013277e973dcffb">poly_storage</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#ab3a5f8db0821da67ac53ee6163515cff">storage</a> (const <a class="el" href="classentt_1_1type__info.html">type_info</a> info)</td></tr>
+<tr class="memdesc:ab3a5f8db0821da67ac53ee6163515cff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a poly storage for a given type.  <a href="classentt_1_1basic__registry.html#ab3a5f8db0821da67ac53ee6163515cff">More...</a><br /></td></tr>
+<tr class="separator:ab3a5f8db0821da67ac53ee6163515cff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f054455310be0f1b1f53f05dd0fc13d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__registry.html#aad36d8c035f2315d7013277e973dcffb">poly_storage</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a0f054455310be0f1b1f53f05dd0fc13d">storage</a> (const <a class="el" href="classentt_1_1type__info.html">type_info</a> info) const</td></tr>
+<tr class="memdesc:a0f054455310be0f1b1f53f05dd0fc13d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a poly storage for a given type.  <a href="classentt_1_1basic__registry.html#a0f054455310be0f1b1f53f05dd0fc13d">More...</a><br /></td></tr>
+<tr class="separator:a0f054455310be0f1b1f53f05dd0fc13d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a747d182de87516a3445f8df77d65e815"><td class="memTemplParams" colspan="2">template&lt;typename Component &gt; </td></tr>
 <tr class="memitem:a747d182de87516a3445f8df77d65e815"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__registry.html#a6a44260f861a699f1353097391c51636">size_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815">size</a> () const</td></tr>
 <tr class="memdesc:a747d182de87516a3445f8df77d65e815"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of existing components of the given type.  <a href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815">More...</a><br /></td></tr>
@@ -128,6 +138,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a632adf32f7b23f1dae8bf4f8800a0bbe"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a632adf32f7b23f1dae8bf4f8800a0bbe">reserve</a> (const <a class="el" href="classentt_1_1basic__registry.html#a6a44260f861a699f1353097391c51636">size_type</a> cap)</td></tr>
 <tr class="memdesc:a632adf32f7b23f1dae8bf4f8800a0bbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the capacity of the registry or of the pools for the given components.  <a href="classentt_1_1basic__registry.html#a632adf32f7b23f1dae8bf4f8800a0bbe">More...</a><br /></td></tr>
 <tr class="separator:a632adf32f7b23f1dae8bf4f8800a0bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38bbefe07c81d2c5ed69ff8e4da45c48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a38bbefe07c81d2c5ed69ff8e4da45c48">reserve_pools</a> (const size_t count)</td></tr>
+<tr class="memdesc:a38bbefe07c81d2c5ed69ff8e4da45c48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves enough space to store <code>count</code> pools.  <a href="classentt_1_1basic__registry.html#a38bbefe07c81d2c5ed69ff8e4da45c48">More...</a><br /></td></tr>
+<tr class="separator:a38bbefe07c81d2c5ed69ff8e4da45c48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40c4a407d4a7a74fec41d44e915c4d89"><td class="memTemplParams" colspan="2">template&lt;typename Component &gt; </td></tr>
 <tr class="memitem:a40c4a407d4a7a74fec41d44e915c4d89"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__registry.html#a6a44260f861a699f1353097391c51636">size_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a40c4a407d4a7a74fec41d44e915c4d89">capacity</a> () const</td></tr>
 <tr class="memdesc:a40c4a407d4a7a74fec41d44e915c4d89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the capacity of the pool for the given component.  <a href="classentt_1_1basic__registry.html#a40c4a407d4a7a74fec41d44e915c4d89">More...</a><br /></td></tr>
@@ -158,6 +171,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a62001aa75a17144bf3f78e43f1c28be7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a62001aa75a17144bf3f78e43f1c28be7">data</a> () const noexcept</td></tr>
 <tr class="memdesc:a62001aa75a17144bf3f78e43f1c28be7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the list of entities of a registry.  <a href="classentt_1_1basic__registry.html#a62001aa75a17144bf3f78e43f1c28be7">More...</a><br /></td></tr>
 <tr class="separator:a62001aa75a17144bf3f78e43f1c28be7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e7a0f4223ab5bded3bd69e2f8d351f3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a3e7a0f4223ab5bded3bd69e2f8d351f3">destroyed</a> () const noexcept</td></tr>
+<tr class="memdesc:a3e7a0f4223ab5bded3bd69e2f8d351f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the head of the list of destroyed entities.  <a href="classentt_1_1basic__registry.html#a3e7a0f4223ab5bded3bd69e2f8d351f3">More...</a><br /></td></tr>
+<tr class="separator:a3e7a0f4223ab5bded3bd69e2f8d351f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1795b1221d728f806319a685930f520d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a> (const <a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>) const</td></tr>
 <tr class="memdesc:a1795b1221d728f806319a685930f520d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an entity identifier refers to a valid entity.  <a href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">More...</a><br /></td></tr>
 <tr class="separator:a1795b1221d728f806319a685930f520d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,10 +190,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a334768416fdf6372ecfdef9ec4f03e83"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a334768416fdf6372ecfdef9ec4f03e83">create</a> (It first, It last)</td></tr>
 <tr class="memdesc:a334768416fdf6372ecfdef9ec4f03e83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns each element in a range an entity.  <a href="classentt_1_1basic__registry.html#a334768416fdf6372ecfdef9ec4f03e83">More...</a><br /></td></tr>
 <tr class="separator:a334768416fdf6372ecfdef9ec4f03e83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fe685b0635d51619b8c60f23e016e85"><td class="memTemplParams" colspan="2">template&lt;typename It &gt; </td></tr>
-<tr class="memitem:a8fe685b0635d51619b8c60f23e016e85"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a8fe685b0635d51619b8c60f23e016e85">assign</a> (It first, It last)</td></tr>
-<tr class="memdesc:a8fe685b0635d51619b8c60f23e016e85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns entities to an empty registry.  <a href="classentt_1_1basic__registry.html#a8fe685b0635d51619b8c60f23e016e85">More...</a><br /></td></tr>
-<tr class="separator:a8fe685b0635d51619b8c60f23e016e85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35d217b9bc09235d55388941de380f72"><td class="memTemplParams" colspan="2">template&lt;typename It &gt; </td></tr>
+<tr class="memitem:a35d217b9bc09235d55388941de380f72"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a35d217b9bc09235d55388941de380f72">assign</a> (It first, It last, const <a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a> <a class="el" href="classentt_1_1basic__registry.html#a3e7a0f4223ab5bded3bd69e2f8d351f3">destroyed</a>)</td></tr>
+<tr class="memdesc:a35d217b9bc09235d55388941de380f72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns entities to an empty registry.  <a href="classentt_1_1basic__registry.html#a35d217b9bc09235d55388941de380f72">More...</a><br /></td></tr>
+<tr class="separator:a35d217b9bc09235d55388941de380f72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af58f3add442cfb3f1fa470402db072bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a> (const <a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>)</td></tr>
 <tr class="memdesc:af58f3add442cfb3f1fa470402db072bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys an entity.  <a href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">More...</a><br /></td></tr>
 <tr class="separator:af58f3add442cfb3f1fa470402db072bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -298,18 +314,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a716510eb0a63f8512ddc932381fa105f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt; Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt;, Owned... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a716510eb0a63f8512ddc932381fa105f">group</a> (<a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt;, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;={})</td></tr>
 <tr class="memdesc:a716510eb0a63f8512ddc932381fa105f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a group for the given components.  <a href="classentt_1_1basic__registry.html#a716510eb0a63f8512ddc932381fa105f">More...</a><br /></td></tr>
 <tr class="separator:a716510eb0a63f8512ddc932381fa105f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a506c832fa36ceffecaff352ff03b7540"><td class="memTemplParams" colspan="2">template&lt;typename... Owned, typename... Get, typename... Exclude&gt; </td></tr>
-<tr class="memitem:a506c832fa36ceffecaff352ff03b7540"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt; Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt;, Owned... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a506c832fa36ceffecaff352ff03b7540">group</a> (<a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt;, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;={}) const</td></tr>
-<tr class="memdesc:a506c832fa36ceffecaff352ff03b7540"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a group for the given components.  <a href="classentt_1_1basic__registry.html#a506c832fa36ceffecaff352ff03b7540">More...</a><br /></td></tr>
-<tr class="separator:a506c832fa36ceffecaff352ff03b7540"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90a874102031c324b1759f8907d5b733"><td class="memTemplParams" colspan="2">template&lt;typename... Owned, typename... Get, typename... Exclude&gt; </td></tr>
+<tr class="memitem:a90a874102031c324b1759f8907d5b733"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt; Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt;, Owned... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a90a874102031c324b1759f8907d5b733">group_if_exists</a> (<a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt;, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;={}) const</td></tr>
+<tr class="memdesc:a90a874102031c324b1759f8907d5b733"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a group for the given components.  <a href="classentt_1_1basic__registry.html#a90a874102031c324b1759f8907d5b733">More...</a><br /></td></tr>
+<tr class="separator:a90a874102031c324b1759f8907d5b733"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa05eacbf8368ae162fa4b7828fa26976"><td class="memTemplParams" colspan="2">template&lt;typename... Owned, typename... Exclude&gt; </td></tr>
 <tr class="memitem:aa05eacbf8368ae162fa4b7828fa26976"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt; Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;&gt;, Owned... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#aa05eacbf8368ae162fa4b7828fa26976">group</a> (<a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;={})</td></tr>
 <tr class="memdesc:aa05eacbf8368ae162fa4b7828fa26976"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a group for the given components.  <a href="classentt_1_1basic__registry.html#aa05eacbf8368ae162fa4b7828fa26976">More...</a><br /></td></tr>
 <tr class="separator:aa05eacbf8368ae162fa4b7828fa26976"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a831f89457e70109e4263cef8a4e93e73"><td class="memTemplParams" colspan="2">template&lt;typename... Owned, typename... Exclude&gt; </td></tr>
-<tr class="memitem:a831f89457e70109e4263cef8a4e93e73"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt; Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;&gt;, Owned... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a831f89457e70109e4263cef8a4e93e73">group</a> (<a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;={}) const</td></tr>
-<tr class="memdesc:a831f89457e70109e4263cef8a4e93e73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a group for the given components.  <a href="classentt_1_1basic__registry.html#a831f89457e70109e4263cef8a4e93e73">More...</a><br /></td></tr>
-<tr class="separator:a831f89457e70109e4263cef8a4e93e73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4f4170eb9c1c08592b6df7ffeaeada2"><td class="memTemplParams" colspan="2">template&lt;typename... Owned, typename... Exclude&gt; </td></tr>
+<tr class="memitem:ab4f4170eb9c1c08592b6df7ffeaeada2"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt; Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;&gt;, Owned... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#ab4f4170eb9c1c08592b6df7ffeaeada2">group_if_exists</a> (<a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;={}) const</td></tr>
+<tr class="memdesc:ab4f4170eb9c1c08592b6df7ffeaeada2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a group for the given components.  <a href="classentt_1_1basic__registry.html#ab4f4170eb9c1c08592b6df7ffeaeada2">More...</a><br /></td></tr>
+<tr class="separator:ab4f4170eb9c1c08592b6df7ffeaeada2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f7af56d6b9fca94a6ebd6ab13896b27"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:a5f7af56d6b9fca94a6ebd6ab13896b27"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a5f7af56d6b9fca94a6ebd6ab13896b27">sortable</a> () const</td></tr>
 <tr class="memdesc:a5f7af56d6b9fca94a6ebd6ab13896b27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the given components belong to any group.  <a href="classentt_1_1basic__registry.html#a5f7af56d6b9fca94a6ebd6ab13896b27">More...</a><br /></td></tr>
@@ -328,11 +344,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2907f89b80fb692b16727e5e67a91c5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef8bac41fdb48e3c8c589dee21b96980"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
 <tr class="memitem:aef8bac41fdb48e3c8c589dee21b96980"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#aef8bac41fdb48e3c8c589dee21b96980">visit</a> (<a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>, Func func) const</td></tr>
-<tr class="memdesc:aef8bac41fdb48e3c8c589dee21b96980"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits an entity and returns the types for its components.  <a href="classentt_1_1basic__registry.html#aef8bac41fdb48e3c8c589dee21b96980">More...</a><br /></td></tr>
+<tr class="memdesc:aef8bac41fdb48e3c8c589dee21b96980"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits an entity and returns the type info for its components.  <a href="classentt_1_1basic__registry.html#aef8bac41fdb48e3c8c589dee21b96980">More...</a><br /></td></tr>
 <tr class="separator:aef8bac41fdb48e3c8c589dee21b96980"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedc179d58adaab31202fc000a0bee068"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
 <tr class="memitem:aedc179d58adaab31202fc000a0bee068"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#aedc179d58adaab31202fc000a0bee068">visit</a> (Func func) const</td></tr>
-<tr class="memdesc:aedc179d58adaab31202fc000a0bee068"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a registry and returns the types for its components.  <a href="classentt_1_1basic__registry.html#aedc179d58adaab31202fc000a0bee068">More...</a><br /></td></tr>
+<tr class="memdesc:aedc179d58adaab31202fc000a0bee068"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a registry and returns the type info for its components.  <a href="classentt_1_1basic__registry.html#aedc179d58adaab31202fc000a0bee068">More...</a><br /></td></tr>
 <tr class="separator:aedc179d58adaab31202fc000a0bee068"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d771eee6e8e573bf1b8e4e8501ea7f1"><td class="memTemplParams" colspan="2">template&lt;typename Type , typename... Args&gt; </td></tr>
 <tr class="memitem:a7d771eee6e8e573bf1b8e4e8501ea7f1"><td class="memTemplItemLeft" align="right" valign="top">Type &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#a7d771eee6e8e573bf1b8e4e8501ea7f1">set</a> (Args &amp;&amp;... args)</td></tr>
@@ -364,7 +380,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a03031127c53abc80f8dcb835290fa765"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adebb39eff1162ede07bffded9528e710"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
 <tr class="memitem:adebb39eff1162ede07bffded9528e710"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__registry.html#adebb39eff1162ede07bffded9528e710">ctx</a> (Func func) const</td></tr>
-<tr class="memdesc:adebb39eff1162ede07bffded9528e710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a registry and returns the types for its context variables.  <a href="classentt_1_1basic__registry.html#adebb39eff1162ede07bffded9528e710">More...</a><br /></td></tr>
+<tr class="memdesc:adebb39eff1162ede07bffded9528e710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a registry and returns the type info for its context variables.  <a href="classentt_1_1basic__registry.html#adebb39eff1162ede07bffded9528e710">More...</a><br /></td></tr>
 <tr class="separator:adebb39eff1162ede07bffded9528e710"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
@@ -390,7 +406,7 @@ class entt::basic_registry&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00043">43</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00044">44</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a7a42cddcb9bd14802bd597e789ff341f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7a42cddcb9bd14802bd597e789ff341f">&#9670;&nbsp;</a></span>alive()</h2>
@@ -420,7 +436,7 @@ template&lt;typename Entity &gt; </div>
 <p>Returns the number of entities still in use. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of entities still in use. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00272">272</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00221">221</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -438,7 +454,7 @@ template&lt;typename... Component&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::any </td>
+          <td class="memname">bool <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="classentt_1_1any.html">any</a> </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a>&#160;</td>
           <td class="paramname"><em>entity</em></td><td>)</td>
@@ -453,8 +469,7 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Checks if an entity has at least one of the given components. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Components for which to perform the check. </td></tr>
@@ -469,12 +484,12 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the entity has at least one of the given components, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00892">892</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00828">828</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a8fe685b0635d51619b8c60f23e016e85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8fe685b0635d51619b8c60f23e016e85">&#9670;&nbsp;</a></span>assign()</h2>
+<a id="a35d217b9bc09235d55388941de380f72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35d217b9bc09235d55388941de380f72">&#9670;&nbsp;</a></span>assign()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -496,7 +511,13 @@ template&lt;typename It &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">It&#160;</td>
-          <td class="paramname"><em>last</em>&#160;</td>
+          <td class="paramname"><em>last</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a>&#160;</td>
+          <td class="paramname"><em>destroyed</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -512,9 +533,9 @@ template&lt;typename It &gt; </div>
 </div><div class="memdoc">
 
 <p>Assigns entities to an empty registry. </p>
-<p>This function is intended for use in conjunction with <code>raw</code>.<br  />
- Don't try to inject ranges of randomly generated entities. There is no guarantee that a registry will continue to work properly in this case.</p>
-<dl class="section warning"><dt>Warning</dt><dd>An assertion will abort the execution at runtime in debug mode if all pools aren't empty.</dd></dl>
+<p>This function is intended for use in conjunction with <code>raw</code> and <code>assign</code>.<br  />
+ Don't try to inject ranges of randomly generated entities nor the <em>wrong</em> head for the list of destroyed entities. There is no guarantee that a registry will continue to work properly in this case.</p>
+<dl class="section warning"><dt>Warning</dt><dd>All pools must be empty for this to work properly.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">It</td><td>Type of input iterator. </td></tr>
@@ -525,11 +546,12 @@ template&lt;typename It &gt; </div>
   <table class="params">
     <tr><td class="paramname">first</td><td>An iterator to the first element of the range of entities. </td></tr>
     <tr><td class="paramname">last</td><td>An iterator past the last element of the range of entities. </td></tr>
+    <tr><td class="paramname">destroyed</td><td>The head of the list of destroyed entities. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00556">556</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00520">520</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -569,7 +591,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Capacity of the pool of the given component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00311">311</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00268">268</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -601,7 +623,7 @@ template&lt;typename Entity &gt; </div>
 <p>Returns the number of entities that a registry has currently allocated space for. </p>
 <dl class="section return"><dt>Returns</dt><dd>Capacity of the registry. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00320">320</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00278">278</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -640,7 +662,7 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01005">1005</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00939">939</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -677,7 +699,7 @@ template&lt;typename Entity &gt; </div>
 </ul>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00473">473</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00443">443</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -718,7 +740,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00501">501</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00458">458</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -776,7 +798,7 @@ template&lt;typename It &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00536">536</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00492">492</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -808,8 +830,7 @@ template&lt;typename Type &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns a reference to an object in the context of the registry. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to get a context variable that doesn't exist results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid requests.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to get a context variable that doesn't exist results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Type</td><td>Type of object to get. </td></tr>
@@ -818,7 +839,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid reference to the object in the context of the registry. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01674">1674</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01612">1612</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -850,8 +871,7 @@ template&lt;typename Type &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns a reference to an object in the context of the registry. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to get a context variable that doesn't exist results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid requests.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to get a context variable that doesn't exist results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Type</td><td>Type of object to get. </td></tr>
@@ -860,7 +880,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid reference to the object in the context of the registry. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01666">1666</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01604">1604</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -892,11 +912,11 @@ template&lt;typename Func &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Visits a registry and returns the types for its context variables. </p>
+<p>Visits a registry and returns the type info for its context variables. </p>
 <p>The signature of the function should be equivalent to the following:</p>
-<div class="fragment"><div class="line">void(<span class="keyword">const</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>);</div>
+<div class="fragment"><div class="line">void(<span class="keyword">const</span> type_info);</div>
 </div><!-- fragment --><p>Returned identifiers are those of the context variables currently set.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="structentt_1_1type__info.html" title="Type info.">type_info</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1type__info.html" title="Implementation specific information about a type.">type_info</a></dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>It's not specified whether a context variable created during the visit is returned or not to the caller.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -911,7 +931,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01699">1699</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01638">1638</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -960,7 +980,7 @@ template&lt;typename Type , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the object in the context of the registry. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01630">1630</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01570">1570</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -991,8 +1011,7 @@ template&lt;typename Entity &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the actual version for an entity identifier. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an entity that doesn't belong to the registry results in undefined behavior. An entity belongs to the registry even if it has been previously destroyed and/or recycled.<br  />
- An assertion will abort the execution at runtime in debug mode if the registry doesn't own the given entity.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an entity that doesn't belong to the registry results in undefined behavior. An entity belongs to the registry even if it has been previously destroyed and/or recycled.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
@@ -1001,7 +1020,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Actual version for the given entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00457">457</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00427">427</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1033,7 +1052,7 @@ template&lt;typename Component &gt; </div>
 </div><div class="memdoc">
 
 <p>Direct access to the list of entities of a given pool. </p>
-<p>The returned pointer is such that range <code>[data&lt;Component&gt;(), data&lt;Component&gt;() + size&lt;Component&gt;()]</code> is always a valid range, even if the container is empty.</p>
+<p>The returned pointer is such that range <code>[data&lt;Component&gt;(), data&lt;Component&gt;() + size&lt;Component&gt;())</code> is always a valid range, even if the container is empty.</p>
 <p>Entities are in the reverse order as imposed by the sorting functionalities.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -1043,7 +1062,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of entities. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00396">396</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00355">355</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1073,11 +1092,11 @@ template&lt;typename Entity &gt; </div>
 </div><div class="memdoc">
 
 <p>Direct access to the list of entities of a registry. </p>
-<p>The returned pointer is such that range <code>[<a class="el" href="classentt_1_1basic__registry.html#a1db6c4749dda201f7f74004ea22de193" title="Direct access to the list of entities of a given pool.">data()</a>, <a class="el" href="classentt_1_1basic__registry.html#a1db6c4749dda201f7f74004ea22de193" title="Direct access to the list of entities of a given pool.">data()</a> + <a class="el" href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815" title="Returns the number of existing components of the given type.">size()</a>]</code> is always a valid range, even if the container is empty.</p>
+<p>The returned pointer is such that range <code>[<a class="el" href="classentt_1_1basic__registry.html#a1db6c4749dda201f7f74004ea22de193" title="Direct access to the list of entities of a given pool.">data()</a>, <a class="el" href="classentt_1_1basic__registry.html#a1db6c4749dda201f7f74004ea22de193" title="Direct access to the list of entities of a given pool.">data()</a> + <a class="el" href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815" title="Returns the number of existing components of the given type.">size()</a>)</code> is always a valid range, even if the container is empty.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This list contains both valid and destroyed entities and isn't suitable for direct use.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of entities. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00412">412</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00372">372</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1117,7 +1136,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00580">580</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00536">536</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1168,7 +1187,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00595">595</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00551">551</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1226,7 +1245,41 @@ template&lt;typename It &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00613">613</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00566">566</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3e7a0f4223ab5bded3bd69e2f8d351f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e7a0f4223ab5bded3bd69e2f8d351f3">&#9670;&nbsp;</a></span>destroyed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1basic__registry.html#a7df39ef4ca62af9540f593dfb5550138">entity_type</a> <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::destroyed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the head of the list of destroyed entities. </p>
+<p>This function is intended for use in conjunction with <code>assign</code>.<br  />
+ The returned entity has an invalid identifier in all cases.</p>
+<dl class="section return"><dt>Returns</dt><dd>The head of the list of destroyed entities. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00384">384</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1276,7 +1329,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01034">1034</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00977">977</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1320,8 +1373,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 
 <p>Assigns the given component to an entity. </p>
 <p>A new instance of the given component is created and initialized with the arguments provided (the component must have a proper constructor or be of aggregate type). Then the component is assigned to the given entity.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to assign a component to an entity that already owns it results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity or if the entity already owns an instance of the given component.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to assign a component to an entity that already owns it results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to create. </td></tr>
@@ -1338,7 +1390,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00638">638</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00590">590</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1384,8 +1436,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 <p>Equivalent to the following snippet (pseudocode):</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> &amp;component = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.has&lt;Component&gt;(<a class="code" href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entity</a>) ? <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.replace&lt;Component&gt;(<a class="code" href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entity</a>, args...) : <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.emplace&lt;Component&gt;(<a class="code" href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entity</a>, args...);</div>
 </div><!-- fragment --><p>Prefer this function anyway because it has slightly better performance.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to assign or replace. </td></tr>
@@ -1402,7 +1453,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00703">703</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00653">653</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1443,7 +1494,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the registry or the pools of the given components are empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00346">346</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00304">304</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1482,7 +1533,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The entity identifier without the version. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00431">431</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00403">403</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1515,8 +1566,7 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Returns references to the given components for an entity. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to get a component from an entity that doesn't own it results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity or if the entity doesn't own an instance of the given component.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to get a component from an entity that doesn't own it results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components to get. </td></tr>
@@ -1531,7 +1581,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00924">924</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00857">857</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1564,8 +1614,7 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Returns references to the given components for an entity. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to get a component from an entity that doesn't own it results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity or if the entity doesn't own an instance of the given component.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to get a component from an entity that doesn't own it results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components to get. </td></tr>
@@ -1580,7 +1629,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00912">912</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00845">845</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1627,8 +1676,7 @@ template&lt;typename Component , typename... Args&gt; </div>
  Equivalent to the following snippet (pseudocode):</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> &amp;component = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.has&lt;Component&gt;(<a class="code" href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entity</a>) ? <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.get&lt;Component&gt;(<a class="code" href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entity</a>) : <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.emplace&lt;Component&gt;(<a class="code" href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entity</a>, args...);</div>
 </div><!-- fragment --><p>Prefer this function anyway because it has slightly better performance.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to get. </td></tr>
@@ -1645,12 +1693,12 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Reference to the component owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00959">959</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00890">890</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
 <a id="aa05eacbf8368ae162fa4b7828fa26976"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa05eacbf8368ae162fa4b7828fa26976">&#9670;&nbsp;</a></span>group() <span class="overload">[1/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa05eacbf8368ae162fa4b7828fa26976">&#9670;&nbsp;</a></span>group() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1663,7 +1711,7 @@ template&lt;typename... Owned, typename... Exclude&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;&gt;, Owned...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> </td>
+          <td class="memname"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;&gt;, Owned...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;&#160;</td>
           <td class="paramname"> = <code>{}</code></td><td>)</td>
@@ -1688,55 +1736,12 @@ template&lt;typename... Owned, typename... Exclude&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created group. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01390">1390</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a831f89457e70109e4263cef8a4e93e73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a831f89457e70109e4263cef8a4e93e73">&#9670;&nbsp;</a></span>group() <span class="overload">[2/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity &gt; </div>
-<div class="memtemplate">
-template&lt;typename... Owned, typename... Exclude&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;&gt;, Owned...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;&#160;</td>
-          <td class="paramname"> = <code>{}</code></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns a group for the given components. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a716510eb0a63f8512ddc932381fa105f" title="Returns a group for the given components.">group</a></dd></dl>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Owned</td><td>Types of components owned by the group. </td></tr>
-    <tr><td class="paramname">Exclude</td><td>Types of components used to filter the group. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A newly created group. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01404">1404</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01336">1336</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a716510eb0a63f8512ddc932381fa105f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a716510eb0a63f8512ddc932381fa105f">&#9670;&nbsp;</a></span>group() <span class="overload">[3/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a716510eb0a63f8512ddc932381fa105f">&#9670;&nbsp;</a></span>group() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1749,7 +1754,7 @@ template&lt;typename... Owned, typename... Get, typename... Exclude&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;Get...&gt;, Owned...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> </td>
+          <td class="memname"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;Get...&gt;, Owned...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt;&#160;</td>
           <td class="paramname">, </td>
@@ -1790,12 +1795,55 @@ template&lt;typename... Owned, typename... Get, typename... Exclude&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created group. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01281">1281</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01219">1219</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a506c832fa36ceffecaff352ff03b7540"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a506c832fa36ceffecaff352ff03b7540">&#9670;&nbsp;</a></span>group() <span class="overload">[4/4]</span></h2>
+<a id="ab4f4170eb9c1c08592b6df7ffeaeada2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4f4170eb9c1c08592b6df7ffeaeada2">&#9670;&nbsp;</a></span>group_if_exists() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<div class="memtemplate">
+template&lt;typename... Owned, typename... Exclude&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;&gt;, Owned...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::group_if_exists </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;&#160;</td>
+          <td class="paramname"> = <code>{}</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a group for the given components. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a90a874102031c324b1759f8907d5b733" title="Returns a group for the given components.">group_if_exists</a></dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Owned</td><td>Types of components owned by the group. </td></tr>
+    <tr><td class="paramname">Exclude</td><td>Types of components used to filter the group. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A newly created group. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01350">1350</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a90a874102031c324b1759f8907d5b733"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90a874102031c324b1759f8907d5b733">&#9670;&nbsp;</a></span>group_if_exists() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1808,7 +1856,7 @@ template&lt;typename... Owned, typename... Get, typename... Exclude&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;Get...&gt;, Owned...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> </td>
+          <td class="memname"><a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt;Get...&gt;, Owned...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::group_if_exists </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt;&#160;</td>
           <td class="paramname">, </td>
@@ -1844,7 +1892,7 @@ template&lt;typename... Owned, typename... Get, typename... Exclude&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created group. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01375">1375</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01309">1309</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1877,8 +1925,7 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Checks if an entity has all the given components. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Components for which to perform the check. </td></tr>
@@ -1893,7 +1940,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the entity has all the components, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00873">873</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00811">811</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1967,7 +2014,7 @@ template&lt;typename Component , typename EIt , typename CIt &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00674">674</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00626">626</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2033,7 +2080,7 @@ template&lt;typename Component , typename It &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00655">655</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00607">607</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2065,10 +2112,9 @@ template&lt;typename Component &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns a sink object for the given component. </p>
-<p>A sink is an opaque object used to connect listeners to components.<br  />
- The sink returned by this function can be used to receive notifications whenever a new instance of the given component is created and assigned to an entity.</p>
-<p>The function type for a listener is equivalent to:</p>
-<div class="fragment"><div class="line">void(registry&lt;Entity&gt; &amp;, Entity);</div>
+<p>The sink returned by this function can be used to receive notifications whenever a new instance of the given component is created and assigned to an entity.<br  />
+ The function type for a listener is equivalent to:</p>
+<div class="fragment"><div class="line">void(basic_registry&lt;Entity&gt; &amp;, Entity);</div>
 </div><!-- fragment --><p>Listeners are invoked <b>after</b> the component has been assigned to the entity.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1sink.html" title="Sink class.">sink</a></dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -2079,7 +2125,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A temporary sink object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01106">1106</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01047">1047</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2111,10 +2157,9 @@ template&lt;typename Component &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns a sink object for the given component. </p>
-<p>A sink is an opaque object used to connect listeners to components.<br  />
- The sink returned by this function can be used to receive notifications whenever an instance of the given component is removed from an entity and thus destroyed.</p>
-<p>The function type for a listener is equivalent to:</p>
-<div class="fragment"><div class="line">void(registry&lt;Entity&gt; &amp;, Entity);</div>
+<p>The sink returned by this function can be used to receive notifications whenever an instance of the given component is removed from an entity and thus destroyed.<br  />
+ The function type for a listener is equivalent to:</p>
+<div class="fragment"><div class="line">void(basic_registry&lt;Entity&gt; &amp;, Entity);</div>
 </div><!-- fragment --><p>Listeners are invoked <b>before</b> the component has been removed from the entity.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1sink.html" title="Sink class.">sink</a></dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -2125,7 +2170,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A temporary sink object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01158">1158</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01095">1095</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2157,10 +2202,9 @@ template&lt;typename Component &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns a sink object for the given component. </p>
-<p>A sink is an opaque object used to connect listeners to components.<br  />
- The sink returned by this function can be used to receive notifications whenever an instance of the given component is explicitly updated.</p>
-<p>The function type for a listener is equivalent to:</p>
-<div class="fragment"><div class="line">void(registry&lt;Entity&gt; &amp;, Entity);</div>
+<p>The sink returned by this function can be used to receive notifications whenever an instance of the given component is explicitly updated.<br  />
+ The function type for a listener is equivalent to:</p>
+<div class="fragment"><div class="line">void(basic_registry&lt;Entity&gt; &amp;, Entity);</div>
 </div><!-- fragment --><p>Listeners are invoked <b>after</b> the component has been updated.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1sink.html" title="Sink class.">sink</a></dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -2171,7 +2215,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A temporary sink object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01131">1131</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01070">1070</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2241,7 +2285,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the entity has no components assigned, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01053">1053</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00996">996</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2291,7 +2335,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01075">1075</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01018">1018</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2337,8 +2381,7 @@ template&lt;typename Component , typename... Func&gt; </div>
 <p>The signature of the functions should be equivalent to the following:</p>
 <div class="fragment"><div class="line">void(Component &amp;);</div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Empty types aren't explicitly instantiated and therefore they are never returned. However, this function can be used to trigger an update signal for them.</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to patch a component of an entity that doesn't own it results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity or if the entity doesn't own an instance of the given component.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to patch a component of an entity that doesn't own it results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to patch. </td></tr>
@@ -2355,7 +2398,7 @@ template&lt;typename Component , typename... Func&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the patched component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00740">740</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00687">687</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2394,7 +2437,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00245">245</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00177">177</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2426,7 +2469,7 @@ template&lt;typename Component &gt; </div>
 </div><div class="memdoc">
 
 <p>Direct access to the list of components of a given pool. </p>
-<p>The returned pointer is such that range <code>[raw&lt;Component&gt;(), raw&lt;Component&gt;() + size&lt;Component&gt;()]</code> is always a valid range, even if the container is empty.</p>
+<p>The returned pointer is such that range <code>[raw&lt;Component&gt;(), raw&lt;Component&gt;() + size&lt;Component&gt;())</code> is always a valid range, even if the container is empty.</p>
 <p>Components are in the reverse order as imposed by the sorting functionalities.</p>
 <dl class="section note"><dt>Note</dt><dd>Empty components aren't explicitly instantiated. Therefore, this function isn't available for them. A compilation error will occur if invoked.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -2437,7 +2480,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of components of the given type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00378">378</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00337">337</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2469,7 +2512,7 @@ template&lt;typename Component &gt; </div>
 </div><div class="memdoc">
 
 <p>Direct access to the list of components of a given pool. </p>
-<p>The returned pointer is such that range <code>[raw&lt;Component&gt;(), raw&lt;Component&gt;() + size&lt;Component&gt;()]</code> is always a valid range, even if the container is empty.</p>
+<p>The returned pointer is such that range <code>[raw&lt;Component&gt;(), raw&lt;Component&gt;() + size&lt;Component&gt;())</code> is always a valid range, even if the container is empty.</p>
 <p>Components are in the reverse order as imposed by the sorting functionalities.</p>
 <dl class="section note"><dt>Note</dt><dd>Empty components aren't explicitly instantiated. Therefore, this function isn't available for them. A compilation error will occur if invoked.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -2480,7 +2523,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of components of the given type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00372">372</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00330">330</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2513,8 +2556,7 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Removes the given components from an entity. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to remove a component from an entity that doesn't own it results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity or if the entity doesn't own an instance of the given component.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to remove a component from an entity that doesn't own it results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components to remove. </td></tr>
@@ -2528,7 +2570,7 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00784">784</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00725">725</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2587,7 +2629,7 @@ template&lt;typename... Component, typename It &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00800">800</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00742">742</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2620,8 +2662,7 @@ template&lt;typename Entity &gt; </div>
 <p>Removes all the components from an entity and makes it orphaned. </p>
 <dl class="section warning"><dt>Warning</dt><dd>In case there are listeners that observe the destruction of components and assign other components to the entity in their bodies, the result of invoking this function may not be as expected. In the worst case, it could lead to undefined behavior.</dd>
 <dd>
-Attempting to use an invalid entity results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+Attempting to use an invalid entity results in undefined behavior.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
@@ -2629,7 +2670,7 @@ Attempting to use an invalid entity results in undefined behavior.<br  />
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00850">850</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00789">789</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2665,8 +2706,7 @@ template&lt;typename... Component&gt; </div>
 <p>Equivalent to the following snippet (pseudocode):</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span>(<a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.has&lt;Component&gt;(<a class="code" href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entity</a>)) { <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.remove&lt;Component&gt;(<a class="code" href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entity</a>) }</div>
 </div><!-- fragment --><p>Prefer this function anyway because it has slightly better performance.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components to remove. </td></tr>
@@ -2681,7 +2721,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of components actually removed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00826">826</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00767">767</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2725,8 +2765,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 
 <p>Replaces the given component for an entity. </p>
 <p>A new instance of the given component is created and initialized with the arguments provided (the component must have a proper constructor or be of aggregate type). Then the component is assigned to the given entity.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to replace a component of an entity that doesn't own it results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity or if the entity doesn't own an instance of the given component.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to replace a component of an entity that doesn't own it results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to replace. </td></tr>
@@ -2743,7 +2782,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the component being replaced. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00766">766</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00710">710</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2791,7 +2830,45 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00297">297</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00246">246</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a38bbefe07c81d2c5ed69ff8e4da45c48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38bbefe07c81d2c5ed69ff8e4da45c48">&#9670;&nbsp;</a></span>reserve_pools()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::reserve_pools </td>
+          <td>(</td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>count</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reserves enough space to store <code>count</code> pools. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>Number of pools to reserve space for. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00258">258</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2868,7 +2945,7 @@ template&lt;typename ItComp , typename ItExcl  = id_type *&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created runtime view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01236">1236</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01174">1174</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2917,7 +2994,7 @@ template&lt;typename Type , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01601">1601</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01541">1541</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2956,7 +3033,7 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00330">330</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00288">288</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2996,7 +3073,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Number of existing components of the given type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00256">256</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00204">204</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3028,7 +3105,7 @@ template&lt;typename Entity &gt; </div>
 <p>Returns the number of entities created so far. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of entities created so far. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00264">264</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00213">213</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3069,8 +3146,7 @@ template&lt;typename To , typename From &gt; </div>
 <li>All the entities in <code>A</code> that are not in <code>B</code> are returned in no particular order after all the other entities.</li>
 </ul>
 <p>Any subsequent change to <code>B</code> won't affect the order in <code>A</code>.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Pools of components owned by a group cannot be sorted.<br  />
- An assertion will abort the execution at runtime in debug mode in case the pool is owned by a group.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Pools of components owned by a group cannot be sorted.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">To</td><td>Type of components to sort. </td></tr>
@@ -3079,7 +3155,7 @@ template&lt;typename To , typename From &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01525">1525</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01465">1465</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3141,8 +3217,7 @@ template&lt;typename Component , typename Compare , typename Sort  = std_sort, t
 <li>A comparison function to use to compare the elements.</li>
 </ul>
 <p>The comparison funtion object received by the sort function object hasn't necessarily the type of the one passed along with the other parameters to this member function.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Pools of components owned by a group cannot be sorted.<br  />
- An assertion will abort the execution at runtime in debug mode in case the pool is owned by a group.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Pools of components owned by a group cannot be sorted.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of components to sort. </td></tr>
@@ -3161,7 +3236,7 @@ template&lt;typename Component , typename Compare , typename Sort  = std_sort, t
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01483">1483</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01426">1426</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3201,7 +3276,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the pools of the given components are sortable, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01416">1416</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01361">1361</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3244,7 +3319,85 @@ template&lt;typename... Owned, typename... Get, typename... Exclude&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the group can be sorted, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01428">1428</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01373">1373</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab3a5f8db0821da67ac53ee6163515cff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3a5f8db0821da67ac53ee6163515cff">&#9670;&nbsp;</a></span>storage() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1basic__registry.html#aad36d8c035f2315d7013277e973dcffb">poly_storage</a> <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1type__info.html">type_info</a>&#160;</td>
+          <td class="paramname"><em>info</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a poly storage for a given type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">info</td><td>The type for which to return a poly storage. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A valid poly storage if a pool for the given type exists, an empty and thus invalid element otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00188">188</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a0f054455310be0f1b1f53f05dd0fc13d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f054455310be0f1b1f53f05dd0fc13d">&#9670;&nbsp;</a></span>storage() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1basic__registry.html#aad36d8c035f2315d7013277e973dcffb">poly_storage</a> <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1type__info.html">type_info</a>&#160;</td>
+          <td class="paramname"><em>info</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a poly storage for a given type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">info</td><td>The type for which to return a poly storage. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A valid poly storage if a pool for the given type exists, an empty and thus invalid element otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00193">193</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3284,7 +3437,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the object if it exists in the context of the registry, a null pointer otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01649">1649</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01589">1589</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3324,7 +3477,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the object if it exists in the context of the registry, a null pointer otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01642">1642</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01582">1582</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3357,8 +3510,8 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Returns pointers to the given components for an entity. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The registry retains ownership of the pointed-to components.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components to get. </td></tr>
@@ -3373,7 +3526,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointers to the components owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00990">990</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00923">923</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3406,8 +3559,8 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Returns pointers to the given components for an entity. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br  />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The registry retains ownership of the pointed-to components.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components to get. </td></tr>
@@ -3422,7 +3575,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointers to the components owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00978">978</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00910">910</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3461,7 +3614,7 @@ template&lt;typename Type &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01612">1612</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01552">1552</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3500,7 +3653,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the identifier is valid, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00421">421</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00393">393</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3539,7 +3692,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The version stored along with the given entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00440">440</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00412">412</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3557,7 +3710,7 @@ template&lt;typename... Component, typename... Exclude&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__view.html">basic_view</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, Component...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> </td>
+          <td class="memname"><a class="el" href="classentt_1_1basic__view.html">basic_view</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, Component...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;&#160;</td>
           <td class="paramname"> = <code>{}</code></td><td>)</td>
@@ -3592,7 +3745,7 @@ template&lt;typename... Component, typename... Exclude&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01202">1202</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01140">1140</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3610,7 +3763,7 @@ template&lt;typename... Component, typename... Exclude&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__view.html">basic_view</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, Component...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> </td>
+          <td class="memname"><a class="el" href="classentt_1_1basic__view.html">basic_view</a>&lt;Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt;Exclude...&gt;, Component...&gt; <a class="el" href="classentt_1_1basic__registry.html">entt::basic_registry</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;&#160;</td>
           <td class="paramname"> = <code>{}</code></td><td>)</td>
@@ -3645,7 +3798,7 @@ template&lt;typename... Component, typename... Exclude&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01195">1195</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01132">1132</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3687,11 +3840,11 @@ template&lt;typename Func &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Visits an entity and returns the types for its components. </p>
+<p>Visits an entity and returns the type info for its components. </p>
 <p>The signature of the function should be equivalent to the following:</p>
-<div class="fragment"><div class="line">void(<span class="keyword">const</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>);</div>
+<div class="fragment"><div class="line">void(<span class="keyword">const</span> type_info);</div>
 </div><!-- fragment --><p>Returned identifiers are those of the components owned by the entity.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="structentt_1_1type__info.html" title="Type info.">type_info</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1type__info.html" title="Implementation specific information about a type.">type_info</a></dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>It's not specified whether a component attached to or removed from the given entity during the visit is returned or not to the caller.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -3707,7 +3860,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01552">1552</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01492">1492</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3739,11 +3892,11 @@ template&lt;typename Func &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Visits a registry and returns the types for its components. </p>
+<p>Visits a registry and returns the type info for its components. </p>
 <p>The signature of the function should be equivalent to the following:</p>
-<div class="fragment"><div class="line">void(<span class="keyword">const</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>);</div>
+<div class="fragment"><div class="line">void(<span class="keyword">const</span> type_info);</div>
 </div><!-- fragment --><p>Returned identifiers are those of the components managed by the registry.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="structentt_1_1type__info.html" title="Type info.">type_info</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1type__info.html" title="Implementation specific information about a type.">type_info</a></dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>It's not specified whether a component for which a pool is created during the visit is returned or not to the caller.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -3758,7 +3911,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01581">1581</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01521">1521</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -3767,9 +3920,8 @@ template&lt;typename Func &gt; </div>
 <li>src/entt/entity/<a class="el" href="registry_8hpp_source.html">registry.hpp</a></li>
 </ul>
 </div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1basic__registry_html_aafb56d442d5cf9a2b8ef02cae5735152"><div class="ttname"><a href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entt::basic_registry::entity</a></div><div class="ttdeci">static entity_type entity(const entity_type entity) noexcept</div><div class="ttdoc">Returns the entity identifier without the version.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00431">registry.hpp:431</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a292643317d1dbb13e45824f757bd1086"><div class="ttname"><a href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">entt::registry</a></div><div class="ttdeci">basic_registry&lt; entity &gt; registry</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00056">fwd.hpp:56</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00012">fwd.hpp:12</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_aafb56d442d5cf9a2b8ef02cae5735152"><div class="ttname"><a href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entt::basic_registry::entity</a></div><div class="ttdeci">static entity_type entity(const entity_type entity) noexcept</div><div class="ttdoc">Returns the entity identifier without the version.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00403">registry.hpp:403</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a292643317d1dbb13e45824f757bd1086"><div class="ttname"><a href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">entt::registry</a></div><div class="ttdeci">basic_registry&lt; entity &gt; registry</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00076">fwd.hpp:76</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20

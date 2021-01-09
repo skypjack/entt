@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -66,13 +66,13 @@ $(function() {
 <div class="title">Crash Course: entity-component system </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md31"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md33"></a>
 Introduction</h1>
 <p><code>EnTT</code> is a header-only, tiny and easy to use entity-component system (and much more) written in modern C++.<br  />
  The entity-component-system (also known as <em>ECS</em>) is an architectural pattern used mostly in game development.</p>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md34"></a>
 Design decisions</h1>
-<h2><a class="anchor" id="autotoc_md33"></a>
+<h2><a class="anchor" id="autotoc_md35"></a>
 A bitset-free entity-component system</h2>
 <p><code>EnTT</code> offers a <em>bitset-free</em> entity-component system that doesn't require users to specify the set of components neither at compile-time nor at runtime.<br  />
  This is why users can instantiate the core class simply like:</p>
@@ -80,23 +80,23 @@ A bitset-free entity-component system</h2>
 </div><!-- fragment --><p>In place of its more annoying and error-prone counterpart:</p>
 <div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__registry.html">entt::registry</a>&lt;comp_0, comp_1, ..., comp_n&gt; <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>;</div>
 </div><!-- fragment --><p>Furthermore, it isn't necessary to announce the existence of a component type. When the time comes, just use it and that's all.</p>
-<h2><a class="anchor" id="autotoc_md34"></a>
+<h2><a class="anchor" id="autotoc_md36"></a>
 Pay per use</h2>
 <p><code>EnTT</code> is entirely designed around the principle that users have to pay only for what they want.</p>
 <p>When it comes to using an entity-component system, the tradeoff is usually between performance and memory usage. The faster it is, the more memory it uses. Even worse, some approaches tend to heavily affect other functionalities like the construction and destruction of components to favor iterations, even when it isn't strictly required. In fact, slightly worse performance along non-critical paths are the right price to pay to reduce memory usage and have overall better perfomance sometimes and I've always wondered why this kind of tools do not leave me the choice.<br  />
  <code>EnTT</code> follows a completely different approach. It gets the best out from the basic data structures and gives users the possibility to pay more for higher performance where needed.</p>
 <p>So far, this choice has proven to be a good one and I really hope it can be for many others besides me.</p>
-<h2><a class="anchor" id="autotoc_md35"></a>
+<h2><a class="anchor" id="autotoc_md37"></a>
 All or nothing</h2>
 <p><code>EnTT</code> is such that at every moment a pair <code>(T *, size)</code> is available to directly access all the instances of a given component type <code>T</code>.<br  />
  This was a guideline and a design decision that influenced many choices, for better and for worse. I cannot say whether it will be useful or not to the reader, but it's worth to mention it since it's one of the corner stones of this library.</p>
 <p>Many of the tools described below give the possibility to get this information and have been designed around this need.<br  />
  The rest is experimentation and the desire to invent something new, hoping to have succeeded.</p>
-<h2><a class="anchor" id="autotoc_md36"></a>
+<h2><a class="anchor" id="autotoc_md38"></a>
 Stateless systems</h2>
 <p><code>EnTT</code> is designed so that it can work with <em>stateless systems</em>. In other words, all systems can be free functions and there is no need to define them as classes (although nothing prevents users from doing so).<br  />
  This is possible because the main class with which the users will work provides all what is needed to act as the sole <em>source of truth</em> of an application.</p>
-<h1><a class="anchor" id="autotoc_md37"></a>
+<h1><a class="anchor" id="autotoc_md39"></a>
 Vademecum</h1>
 <p>The registry to store, the views and the groups to iterate. That's all.</p>
 <p>An entity (the <em>E</em> of an <em>ECS</em>) is an opaque identifier that users should use as-is. Inspecting an identifier isn't recommended since its format can change in future and a registry has all the functionalities to query them out-of-the-box. The type <code><a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a" title="Default entity identifier.">entt::entity</a></code> implements the concept of <em>entity identifier</em>.<br  />
@@ -104,13 +104,13 @@ Vademecum</h1>
  Systems (the <em>S</em> of an <em>ECS</em>) can be plain functions, functors, lambdas and so on. It's not required to announce them in any case and have no requirements.</p>
 <p>The following sections explain in short how to use the entity-component system, the core part of the whole library.<br  />
  The project is composed of many other classes in addition to those describe below. For more details, please refer to the inline documentation.</p>
-<h1><a class="anchor" id="autotoc_md38"></a>
+<h1><a class="anchor" id="autotoc_md40"></a>
 Pools</h1>
 <p>In <code>EnTT</code>, pools of components are made available through a specialized version of a sparse set.</p>
 <p>Each pool contains all the instances of a single component, as well as all the entities to which it's assigned. Sparse arrays are also <em>paged</em> to avoid wasting memory in some cases while packed arrays are not for obvious reasons.<br  />
  Pools also make available at any time a pointer to the packed lists of entities and components they contain, in addition to the number of elements in use. For this reason, pools can rearrange their items in order to keep the internal arrays tightly packed and maximize performance.</p>
 <p>At the moment, it's possible to specialize pools within certain limits, although a more flexible and user-friendly model is under development.</p>
-<h1><a class="anchor" id="autotoc_md39"></a>
+<h1><a class="anchor" id="autotoc_md41"></a>
 The Registry, the Entity and the Component</h1>
 <p>A registry can store and manage entities, as well as create views and groups to iterate the underlying data structures.<br  />
  The class template <code>basic_registry</code> lets users decide what's the preferred type to represent an entity. Because <code>std::uint32_t</code> is large enough for almost all the cases, there exists also the enum class <code><a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a" title="Default entity identifier.">entt::entity</a></code> that <em>wraps</em> it and the alias <code><a class="el" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086" title="Alias declaration for the most common use case.">entt::registry</a></code> for <code><a class="el" href="classentt_1_1basic__registry.html" title="Fast and reliable entity-component system.">entt::basic_registry</a>&lt;<a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a" title="Default entity identifier.">entt::entity</a>&gt;</code>.</p>
@@ -124,8 +124,8 @@ The Registry, the Entity and the Component</h1>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.destroy(entity);</div>
 </div><!-- fragment --><p>The <code>create</code> member function accepts also a hint and has an overload that gets two iterators and can be used to generate multiple entities at once efficiently. Similarly, the <code>destroy</code> member function works also with a range of entities:</p>
 <div class="fragment"><div class="line"><span class="comment">// destroys all the entities in a range</span></div>
-<div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;a_component, another_component&gt;();</div>
-<div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.destroy(<a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.begin(), <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.end());</div>
+<div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;a_component, another_component&gt;();</div>
+<div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.destroy(<a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.begin(), <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.end());</div>
 </div><!-- fragment --><p>When an entity is destroyed, the registry can freely reuse it internally with a slightly different identifier. In particular, the version of an entity is increased after destruction (unless the overload that forces a version is used instead of the default one).<br  />
  Users can probe an identifier to know the information it carries:</p>
 <div class="fragment"><div class="line"><span class="comment">// returns true if the entity is still valid, false otherwise</span></div>
@@ -145,7 +145,9 @@ The Registry, the Entity and the Component</h1>
 <div class="line"><span class="keyword">auto</span> &amp;vel = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.emplace&lt;velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
 <div class="line">vel.dx = 0.;</div>
 <div class="line">vel.dy = 0.;</div>
-</div><!-- fragment --><p>Similarly, <code>insert</code> does it for multiple entities and accepts a range rather than a single entity in order to:</p>
+</div><!-- fragment --><p>The default storage <em>detects</em> aggregate types internally and exploits aggregate initialization when possible.<br  />
+ Therefore, it's not strictly necessary to define a constructor for each type, in accordance with the rules of the language.</p>
+<p>On the other hand, <code>insert</code> works with <em>ranges</em> and can be used to:</p>
 <ul>
 <li>Assign the same component to all entities at once when a type is specified as a template parameter or an instance is passed as an argument:</li>
 </ul>
@@ -155,7 +157,7 @@ The Registry, the Entity and the Component</h1>
 <div class="line"><span class="comment">// user-defined instance assigned by copy to all entities</span></div>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.insert(from, to, position{0., 0.});</div>
 </div><!-- fragment --><ul>
-<li>Assign a range of components to the entities when a range is provided (the length of the range of components must be the same of that of entities):</li>
+<li>Assign a set of components to the entities when a range is provided (the length of the range of components must be the same of that of entities):</li>
 </ul>
 <div class="fragment"><div class="line"><span class="comment">// first and last specify the range of entities, instances points to the first element of the range of components</span></div>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.insert&lt;position&gt;(first, last, instances);</div>
@@ -179,7 +181,7 @@ The Registry, the Entity and the Component</h1>
 <div class="line"> </div>
 <div class="line"><span class="comment">// true if entity has at least one of the given components</span></div>
 <div class="line"><span class="keywordtype">bool</span> any = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.any&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-</div><!-- fragment --><p>If the goal is to delete a single component from an entity that owns it, the <code>remove</code> member function template is the way to go:</p>
+</div><!-- fragment --><p>If the goal is to delete a component from an entity that owns it, the <code>remove</code> member function template is the way to go:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.remove&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
 </div><!-- fragment --><p>When in doubt whether the entity owns the component, use the <code>remove_if_exists</code> member function instead. It behaves similarly to <code>remove</code> but it discards the component if and only if it exists, otherwise it returns safely to the caller:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.remove_if_exists&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
@@ -203,7 +205,7 @@ The Registry, the Entity and the Component</h1>
 <div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> [cpos, cvel] = cregistry.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
 <div class="line"><span class="keyword">auto</span> [pos, vel] = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
 </div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the component of an entity stored in the underlying data structures of the registry. There exists also an alternative member function named <code>try_get</code> that returns a pointer to the component owned by an entity if any, a null pointer otherwise.</p>
-<h2><a class="anchor" id="autotoc_md40"></a>
+<h2><a class="anchor" id="autotoc_md42"></a>
 Observe changes</h2>
 <p>Because of how the registry works internally, it stores a bunch of signal handlers for each pool in order to notify some of its data structures on the construction and destruction of components or when an instance of a component is explicitly replaced by the user.<br  />
  These signal handlers are also exposed and made available to users. These are the basic bricks to build fancy things like dependencies and reactive systems.</p>
@@ -219,7 +221,7 @@ Observe changes</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// disconnects a member function</span></div>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.on_construct&lt;position&gt;().disconnect&lt;&amp;my_class::member&gt;(instance);</div>
-</div><!-- fragment --><p>To be notified when components are destroyed, use the <code>on_destroy</code> member function instead. Finally, the <code>on_update</code> member function will return a sink to which to connect listeners to observe changes.<br  />
+</div><!-- fragment --><p>To be notified when a component is destroyed, use the <code>on_destroy</code> member function instead. Finally, the <code>on_update</code> member function will return a sink to which to connect listeners to observe changes.<br  />
  In the last case, given the way C++ works, it's also necessary to use specific member functions to allow the signal to be triggered. In particular, listeners attached to <code>on_update</code> will only be invoked following a call to <code>replace</code> or <code>patch</code>.</p>
 <p>The function type of a listener should be equivalent to the following:</p>
 <div class="fragment"><div class="line">void(<a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;, <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entt::entity</a>);</div>
@@ -240,7 +242,7 @@ Observe changes</h2>
 <p>Events and therefore listeners must not be used as replacements for systems. They shouldn't contain much logic and interactions with a registry should be kept to a minimum. Moreover, the greater the number of listeners, the greater the performance hit when components are created or destroyed.</p>
 <p>Please, refer to the documentation of the signal class to know all the features it offers.<br  />
  There are many useful but less known functionalities that aren't described here, such as the connection objects or the possibility to attach listeners with a list of parameters that is shorter than that of the signal itself.</p>
-<h3><a class="anchor" id="autotoc_md41"></a>
+<h3><a class="anchor" id="autotoc_md43"></a>
 They call me Reactive System</h3>
 <p>Signals are the basic tools to construct reactive systems, even if they aren't enough on their own. <code>EnTT</code> tries to take another step in that direction with the <code>observer</code> class template.<br  />
  In order to explain what reactive systems are, this is a slightly revised quote from the documentation of the library that first introduced this tool, <a href="https://github.com/sschmid/Entitas-CSharp">Entitas</a>:</p>
@@ -286,7 +288,7 @@ They call me Reactive System</h3>
 </div><!-- fragment --><p>This clause introduces a way to intercept entities if and only if they are already part of a hypothetical group. If they are not, they aren't returned by the observer, no matter if they matched the given rule.<br  />
  In the example above, whenever the component <code>sprite</code> of an entity is updated, the observer probes the entity itself to verify that it has at least <code>position</code> and has not <code>velocity</code> before to store it aside. If one of the two conditions of the filter isn't respected, the entity is discared, no matter what.</p>
 <p>A <code>where</code> clause accepts a theoretically unlimited number of types as well as multiple elements in the exclusion list. Moreover, every matcher can have its own clause and multiple clauses for the same matcher are combined in a single one.</p>
-<h2><a class="anchor" id="autotoc_md42"></a>
+<h2><a class="anchor" id="autotoc_md44"></a>
 Sorting: is it possible?</h2>
 <p>Sorting entities and components is possible with <code>EnTT</code>. In particular, it's feasible with an in-place algorithm that doesn't require memory allocations nor anything else and is therefore particularly convenient.<br  />
  With this in mind, there are two functions that respond to slightly different needs:</p>
@@ -307,11 +309,11 @@ Sorting: is it possible?</h2>
 <div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.sort&lt;movement, physics&gt;();</div>
 </div><!-- fragment --><p>In this case, instances of <code>movement</code> are arranged in memory so that cache misses are minimized when the two components are iterated together.</p>
 <p>As a side note, the use of groups limits the possibility of sorting pools of components. Refer to the specific documentation for more details.</p>
-<h2><a class="anchor" id="autotoc_md43"></a>
+<h2><a class="anchor" id="autotoc_md45"></a>
 Helpers</h2>
 <p>The so called <em>helpers</em> are small classes and functions mainly designed to offer built-in support for the most basic functionalities.<br  />
  The list of helpers will grow longer as time passes and new ideas come out.</p>
-<h3><a class="anchor" id="autotoc_md44"></a>
+<h3><a class="anchor" id="autotoc_md46"></a>
 Null entity</h3>
 <p>In <code>EnTT</code>, the <code><a class="el" href="namespaceentt.html#a2f0c0a1c1d953ea991591748744cdd8b" title="Compile-time constant for null entities.">entt::null</a></code> variable models the concept of <em>null entity</em>.<br  />
  The library guarantees that the following expression always returns false:</p>
@@ -323,13 +325,13 @@ Null entity</h3>
 <div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.create();</div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">bool</span> <span class="keyword">null</span> = (<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> == <a class="code" href="namespaceentt.html#a2f0c0a1c1d953ea991591748744cdd8b">entt::null</a>);</div>
 </div><!-- fragment --><p>Be aware that <code><a class="el" href="namespaceentt.html#a2f0c0a1c1d953ea991591748744cdd8b" title="Compile-time constant for null entities.">entt::null</a></code> and entity 0 aren't the same thing. Likewise, a zero initialized entity isn't the same as <code><a class="el" href="namespaceentt.html#a2f0c0a1c1d953ea991591748744cdd8b" title="Compile-time constant for null entities.">entt::null</a></code>. Therefore, although <code><a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a" title="Default entity identifier.">entt::entity</a>{}</code> is in some sense an alias for entity 0, none of them can be used to create a null entity.</p>
-<h3><a class="anchor" id="autotoc_md45"></a>
+<h3><a class="anchor" id="autotoc_md47"></a>
 To entity</h3>
 <p>Sometimes it's useful to get the entity from a component instance.<br  />
  This is what the <code><a class="el" href="namespaceentt.html#adb31e9165a07456c03f8c64295117824" title="Returns the entity associated with a given component.">entt::to_entity</a></code> helper does. It accepts a registry and an instance of a component and returns the entity associated with the latter:</p>
 <div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> = <a class="code" href="namespaceentt.html#adb31e9165a07456c03f8c64295117824">entt::to_entity</a>(registry, position);</div>
 </div><!-- fragment --><p>This utility doesn't perform any check on the validity of the component. Therefore, trying to take the entity of an invalid element or of an instance that isn't associated with the given registry can result in undefined behavior.</p>
-<h3><a class="anchor" id="autotoc_md46"></a>
+<h3><a class="anchor" id="autotoc_md48"></a>
 Dependencies</h3>
 <p>The <code>registry</code> class is designed to be able to create short circuits between its functions. This simplifies the definition of <em>dependencies</em> between different operations.<br  />
  For example, the following adds (or replaces) the component <code>a_type</code> whenever <code>my_type</code> is assigned to an entity:</p>
@@ -339,23 +341,25 @@ Dependencies</h3>
 </div><!-- fragment --><p>A dependency can also be easily broken as follows:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.on_construct&lt;my_type&gt;().disconnect&lt;&amp;entt::registry::emplace_or_replace&lt;a_type&gt;&gt;();</div>
 </div><!-- fragment --><p>There are many other types of dependencies. In general, most of the functions that accept an entity as the first argument are good candidates for this purpose.</p>
-<h3><a class="anchor" id="autotoc_md47"></a>
+<h3><a class="anchor" id="autotoc_md49"></a>
 Invoke</h3>
 <p>Sometimes it's useful to be able to directly invoke a member function of a component as a callback. It's already possible in practice but requires users to <em>extend</em> their classes and this may not always be possible.<br  />
  The <code>invoke</code> helper allows to <em>propagate</em> the signal in these cases:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.on_construct&lt;clazz&gt;().connect&lt;entt::invoke&lt;&amp;clazz::func&gt;&gt;();</div>
 </div><!-- fragment --><p>All it does is pick up the <em>right</em> component for the received entity and invoke the requested method, passing on the arguments if necessary.</p>
-<h3><a class="anchor" id="autotoc_md48"></a>
+<h3><a class="anchor" id="autotoc_md50"></a>
 Handle</h3>
 <p>A handle is a thin wrapper around an entity and a registry. It provides the same functions that the registry offers for working with components, such as <code>emplace</code>, <code>get</code>, <code>patch</code>, <code>remove</code> and so on. The difference being that the entity is implicitly passed to the registry.<br  />
+ It's default constructible as an invalid handle that contains a null registry and a null entity. When it contains a null registry, calling functions that delegate execution to the registry will cause an undefined behavior, so it's recommended to check the validity of the handle with implicit cast to <code>bool</code> when in doubt.<br  />
  A handle is also non-owning, meaning that it can be freely copied and moved around without affecting its entity (in fact, handles happen to be trivially copyable). An implication of this is that mutability becomes part of the type.</p>
-<p>There are two aliases that use <code><a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a" title="Default entity identifier.">entt::entity</a></code> as their default entity: <code><a class="el" href="namespaceentt.html#a5a0027b922894421f703102c374c234c" title="Alias declaration for the most common use case.">entt::handle</a></code> and <code><a class="el" href="namespaceentt.html#a54ab1aae5e5786a3ebb3b9bf1c7e82bd" title="Alias declaration for the most common use case.">entt::const_handle</a></code>. Users can also easily create their own aliases for custom identifiers as:</p>
+<p>There are two aliases that use <code><a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a" title="Default entity identifier.">entt::entity</a></code> as their default entity: <code><a class="el" href="namespaceentt.html#a5a0027b922894421f703102c374c234c" title="Alias declaration for the most common use case.">entt::handle</a></code> and <code><a class="el" href="namespaceentt.html#a54ab1aae5e5786a3ebb3b9bf1c7e82bd" title="Alias declaration for the most common use case.">entt::const_handle</a></code>.<br  />
+ Users can also easily create their own aliases for custom identifiers as:</p>
 <div class="fragment"><div class="line"><span class="keyword">using</span> my_handle = <a class="code" href="structentt_1_1basic__handle.html">entt::basic_handle&lt;my_identifier&gt;</a>;</div>
 <div class="line"><span class="keyword">using</span> my_const_handle = <a class="code" href="structentt_1_1basic__handle.html">entt::basic_handle&lt;const my_identifier&gt;</a>;</div>
 </div><!-- fragment --><p>Handles are also implicitly convertible to const handles out of the box but not the other way around.<br  />
  A handle stores a non-const pointer to a registry and therefore it can do all the things that can be done with a non-const registry. On the other hand, a const handles store const pointers to registries and offer a restricted set of functionalities.</p>
 <p>This class is intended to simplify function signatures. In case of functions that take a registry and an entity and do most of their work on that entity, users might want to consider using handles, either const or non-const.</p>
-<h3><a class="anchor" id="autotoc_md49"></a>
+<h3><a class="anchor" id="autotoc_md51"></a>
 Context variables</h3>
 <p>It is often convenient to assign context variables to a registry, so as to make it the only <em>source of truth</em> of an application.<br  />
  This is possible by means of a member function named <code>set</code> to use to create a context variable from a given type. Either <code>ctx</code> or <code>try_ctx</code> can be used to retrieve the newly created instance, while <code>unset</code> is meant to clear the variable if needed.</p>
@@ -374,87 +378,86 @@ Context variables</h3>
 <div class="line"><span class="comment">// unsets the context variable</span></div>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.unset&lt;my_type&gt;();</div>
 </div><!-- fragment --><p>The type of a context variable must be such that it's default constructible and can be moved. The <code>set</code> member function either creates a new instance of the context variable or overwrites an already existing one if any. The <code>try_ctx</code> member function returns a pointer to the context variable if it exists, otherwise it returns a null pointer.</p>
-<h2><a class="anchor" id="autotoc_md50"></a>
-Meet the runtime</h2>
-<p>Type identifiers are stable in <code>EnTT</code> during executions and most of the times also across different executions and across boundaries. This makes them suitable to mix runtime and compile-time features.<br  />
- The registry offers a function to <em>visit</em> it and get the types of components it manages:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.visit([](<span class="keyword">const</span> <span class="keyword">auto</span> component) {</div>
-<div class="line">    <span class="comment">// ...</span></div>
-<div class="line">});</div>
-</div><!-- fragment --><p>Moreover, there exists an overload to <em>visit</em> a specific entity:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.visit(entity, [](<span class="keyword">const</span> <span class="keyword">auto</span> component) {</div>
-<div class="line">    <span class="comment">// ...</span></div>
-<div class="line">});</div>
-</div><!-- fragment --><p>This helps to create a bridge between the registry, that is heavily based on the C++ type system, and any other context where the compile-time isn't an option. For example: plugin systems, meta system, serialization, and so on.</p>
-<h3><a class="anchor" id="autotoc_md51"></a>
-Cloning a registry</h3>
-<p>Cloning a registry isn't a suggested practice since it could trigger many copies and cut down the performance. Moreover, because of how the <code>registry</code> class is designed, supporting this as a built-in feature would increase the compilation times also for the users that aren't interested in cloning. Even worse, it would make difficult to define different <em>cloning policies</em> for different types when required.<br  />
- This is why function definitions for cloning have been moved to the user space. The <code>visit</code> member function of the <code>registry</code> class can help filling the gap, along with the <code>insert</code> functionality.</p>
-<p>A general purpose cloning function could be defined as:</p>
-<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><span class="keywordtype">void</span> clone(<span class="keyword">const</span> <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;from, <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;to) {</div>
-<div class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> *data = from.<a class="code" href="classentt_1_1basic__registry.html#a1db6c4749dda201f7f74004ea22de193">data</a>&lt;Type&gt;();</div>
-<div class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> size = from.<a class="code" href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815">size</a>&lt;Type&gt;();</div>
-<div class="line"> </div>
-<div class="line">    <span class="keywordflow">if</span> constexpr(ENTT_IS_EMPTY(Type)) {</div>
-<div class="line">        to.<a class="code" href="classentt_1_1basic__registry.html#a3587004bdab85280c2a2a1b6371fd4c5">insert</a>&lt;Type&gt;(data, data + size);</div>
-<div class="line">    } <span class="keywordflow">else</span> {</div>
-<div class="line">        <span class="keyword">const</span> <span class="keyword">auto</span> *raw = from.<a class="code" href="classentt_1_1basic__registry.html#a195a60b85fe32562541dc5139cdc7f94">raw</a>&lt;Type&gt;();</div>
-<div class="line">        to.<a class="code" href="classentt_1_1basic__registry.html#a3587004bdab85280c2a2a1b6371fd4c5">insert</a>&lt;Type&gt;(data, data + size, raw, raw + size);</div>
-<div class="line">    }</div>
-<div class="line">}</div>
-</div><!-- fragment --><p>This is probably the fastest method to inject entities and components in a registry that isn't necessarily empty. All new elements are <em>appended</em> to the existing ones, if any.<br  />
- This function is also eligible for type erasure in order to create a mapping between type identifiers and opaque methods for cloning:</p>
-<div class="fragment"><div class="line"><span class="keyword">using</span> clone_fn_type = void(<span class="keyword">const</span> <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;, <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;);</div>
-<div class="line">std::unordered_map&lt;entt::id_type, clone_fn_type *&gt; clone_functions;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// ...</span></div>
-<div class="line"> </div>
-<div class="line">clone_functions[<a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>()] = &amp;clone&lt;position&gt;;</div>
-<div class="line">clone_functions[<a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>()] = &amp;clone&lt;velocity&gt;;</div>
-</div><!-- fragment --><p>Stamping a registry becomes straightforward with such a mapping then:</p>
-<div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> from;</div>
-<div class="line"><a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> to;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// ...</span></div>
-<div class="line"> </div>
-<div class="line">from.<a class="code" href="classentt_1_1basic__registry.html#aef8bac41fdb48e3c8c589dee21b96980">visit</a>([<span class="keyword">this</span>, &amp;to](<span class="keyword">const</span> <span class="keyword">auto</span> type_id) {</div>
-<div class="line">    clone_functions[type_id](from, to);</div>
-<div class="line">});</div>
-</div><!-- fragment --><p>Custom cloning functions are also pretty easy to define. Moreover, also cloning registries specialized with different identifiers is possible this way.<br  />
- As a side note, cloning functions could be also attached to a reflection system where meta types are resolved using the runtime type identifiers.</p>
 <h3><a class="anchor" id="autotoc_md52"></a>
-Stamping an entity</h3>
-<p>Using multiple registries at the same time is quite common. Examples are the separation of the UI from the simulation or the loading of different scenes in the background, possibly on a separate thread, without having to keep track of which entity belongs to which scene.<br  />
- In fact, with <code>EnTT</code> this is even a recommended practice, as the registry is nothing more than an opaque container you can swap at any time.</p>
-<p>Once there are multiple registries available, one or more methods are needed to transfer information from one container to another though.<br  />
- This is where the <code>visit</code> member function of the <code>registry</code> class enters the game.</p>
-<p>Since stamping a component could require different methods for different types and not all users want to benefit from this feature, function definitions have been moved from the registry to the user space.<br  />
- This helped to reduce compilation times and to allow for maximum flexibility, even though it requires users to set up their own stamping functions.</p>
-<p>The best bet here is probably to define a reflection system or a mapping between the type identifiers and their opaque functions for stamping. As an example:</p>
-<div class="fragment"><div class="line">template&lt;typename Type&gt;</div>
-<div class="line">void stamp(const entt::registry &amp;from, const entt::entity src, entt::registry &amp;to, const entt::entity dst) {</div>
-<div class="line">    to.emplace_or_replace&lt;Type&gt;(dst, from.get&lt;Type&gt;(src));</div>
+Organizer</h3>
+<p>The <code>organizer</code> class template offers minimal support (but sufficient in many cases) for creating an execution graph from functions and their requirements on resources.<br  />
+ The resulting tasks aren't executed in any case. This isn't the goal of this tool. Instead, they are returned to the user in the form of a graph that allows for safe execution.</p>
+<p>The functions are added in order of execution to the organizer. Free functions and member functions are supported as template parameters, however there is also the possibility to pass pointers to free functions or decayed lambdas as parameters to the <code>emplace</code> member function:</p>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__organizer.html">entt::organizer</a> <a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// adds a free function to the organizer</span></div>
+<div class="line"><a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.emplace&lt;&amp;free_function&gt;();</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// adds a member function and an instance on which to invoke it to the organizer</span></div>
+<div class="line">clazz instance;</div>
+<div class="line"><a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.emplace&lt;&amp;clazz::member_function&gt;(&amp;instance);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// adds a decayed lambda directly</span></div>
+<div class="line"><a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.emplace(+[](<span class="keyword">const</span> <span class="keywordtype">void</span> *, <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;) { <span class="comment">/* ... */</span> });</div>
+</div><!-- fragment --><p>As for free functions and member functions, these are the parameters that can be presented by their function types and that will be correctly handled:</p>
+<ul>
+<li>A possibly constant reference to a registry. The one passed to the task when it's run will also be passed to the function as-is.</li>
+<li>An <code><a class="el" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943" title="Alias declaration for the most common use case.">entt::view</a></code> with any possible combination of types. It will be created from the registry passed to the task and supplied directly to the function.</li>
+<li>A possibly constant reference to any type <code>T</code>. It will be interpreted as context variable, which will be created within the registry and passed to the function.</li>
+</ul>
+<p>The function type for free functions and decayed lambdas passed as parameters to <code>emplace</code> is <code>void(const void *, entt::registry &amp;)</code> instead. The registry is the same as provided to the task. The first parameter is an optional pointer to user defined data to provide upon registration:</p>
+<div class="fragment"><div class="line">clazz instance;</div>
+<div class="line"><a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.emplace(+[](<span class="keyword">const</span> <span class="keywordtype">void</span> *, <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;) { <span class="comment">/* ... */</span> }, &amp;instance);</div>
+</div><!-- fragment --><p>In all cases, it's also possible to associate a name with the task when creating it. For example:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.emplace&lt;&amp;free_function&gt;(<span class="stringliteral">&quot;func&quot;</span>);</div>
+</div><!-- fragment --><p>When a function of any type is registered with the organizer, everything it accesses is considered a <em>resource</em> (views are <em>unpacked</em> and their types are treated as resources). The <em>constness</em> of the type also dictates its access mode (RO/RW). In turn, this affects the resulting graph, since it influences the possibility of launching tasks in parallel.<br  />
+ As for the registry, if a function doesn't explicitly request it or requires a constant reference to it, it's considered a read-only access. Otherwise, it's considered as read-write access. All functions will still have the registry among their resources.</p>
+<p>When registering a function, users can also require resources that aren't in the list of parameters of the function itself. These are declared as template parameters:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.emplace&lt;&amp;free_function, position, velocity&gt;(<span class="stringliteral">&quot;func&quot;</span>);</div>
+</div><!-- fragment --><p>Similarly, users can override the access mode of a type again via template parameters:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.emplace&lt;&amp;free_function, <span class="keyword">const</span> renderable&gt;(<span class="stringliteral">&quot;func&quot;</span>);</div>
+</div><!-- fragment --><p>In this case, even if <code>renderable</code> appears among the parameters of the function as not constant, it will be treated as constant as regards the generation of the task graph.</p>
+<p>To generate the task graph, the organizer offers the <code>graph</code> member function:</p>
+<div class="fragment"><div class="line">std::vector&lt;entt::organizer::vertex&gt; graph = <a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.graph();</div>
+</div><!-- fragment --><p>The graph is returned in the form of an adjacency list. Each vertex offers the following features:</p>
+<ul>
+<li><code>ro_count</code> and <code>rw_count</code>: they return the number of resources accessed in read-only or read-write mode.</li>
+<li><code>ro_dependency</code> and <code>rw_dependency</code>: useful for retrieving the type info objects associated with the parameters of the underlying function.</li>
+<li><code>top_level</code>: indicates whether a node is a top level one, that is, it has no entering edges.</li>
+<li><code>info</code>: returns the type info object associated with the underlying function.</li>
+<li><code>name</code>: returns the name associated with the given vertex if any, a null pointer otherwise.</li>
+<li><code>callback</code>: a pointer to the function to execute and whose function type is <code>void(const void *, entt::registry &amp;)</code>.</li>
+<li><code>data</code>: optional data to provide to the callback.</li>
+<li><code>children</code>: the vertices reachable from the given node, in the form of indices within the adjacency list.</li>
+</ul>
+<p>Since the creation of pools and resources within the registry isn't necessarily thread safe, each vertex also offers a <code>prepare</code> function which can be called to setup a registry for execution with the created graph:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> graph = <a class="code" href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">organizer</a>.graph();</div>
+<div class="line"><a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;node: graph) {</div>
+<div class="line">    node.prepare(registry);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>If the definition above is treated as a general purpose function for stamping, one can easily construct a map like the following one as a data member of a dedicate system:</p>
-<div class="fragment"><div class="line"><span class="keyword">using</span> stamp_fn_type = void(<span class="keyword">const</span> <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;, <span class="keyword">const</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entt::entity</a>, <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;, <span class="keyword">const</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entt::entity</a>);</div>
-<div class="line">std::unordered_map&lt;entt::id_type, stamp_fn_type *&gt; stamp_functions;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// ...</span></div>
-<div class="line"> </div>
-<div class="line">stamp_functions[<a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>()] = &amp;stamp&lt;position&gt;;</div>
-<div class="line">stamp_functions[<a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>()] = &amp;stamp&lt;velocity&gt;;</div>
-</div><!-- fragment --><p>Then <em>stamp</em> entities across different registries as:</p>
-<div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> from;</div>
-<div class="line"><a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> to;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// ...</span></div>
-<div class="line"> </div>
-<div class="line">from.<a class="code" href="classentt_1_1basic__registry.html#aef8bac41fdb48e3c8c589dee21b96980">visit</a>(src, [<span class="keyword">this</span>, &amp;to, dst](<span class="keyword">const</span> <span class="keyword">auto</span> type_id) {</div>
-<div class="line">    stamp_functions[type_id](from, src, to, dst);</div>
-<div class="line">});</div>
-</div><!-- fragment --><p>This way it's also pretty easy to define custom stamping functions for <em>special</em> types if needed. Moreover, stamping entities across registries specialized with different identifiers is possibile in practice.</p>
+</div><!-- fragment --><p>The actual scheduling of the tasks is the responsibility of the user, who can use the preferred tool.</p>
 <h2><a class="anchor" id="autotoc_md53"></a>
+Meet the runtime</h2>
+<p><code>EnTT</code> takes full advantage of what the language offers at compile-time.<br  />
+ However, by combining these feature with a tool for static polymorphism, it's also possible to have opaque proxies to work with <em>type-less</em> pools at runtime.</p>
+<p>These objects are returned by the <code>storage</code> member function, which accepts a <code>type_info</code> object as an argument rather than a compile-time type (the same returned by the <code>visit</code> member function):</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.storage(info);</div>
+</div><!-- fragment --><p>By default and to stay true with the philosophy of the library, the API of a proxy is minimal and doesn't allow users to do much.<br  />
+ However, it's also completely customizable in a generic way and with the possibility of defining specific behaviors for given types.</p>
+<p>This section won't go into detail on how to define a poly storage to get all the possible functionalities out of it. <code>EnTT</code> already contains enough snippets to get inspiration from, both in the test suite and in the <code>example</code> folder.<br  />
+ In short, users will have to define their own <em>concepts</em> (see the <code><a class="el" href="classentt_1_1poly.html" title="Static polymorphism made simple and within everyone&#39;s reach.">entt::poly</a></code> documentation for this) and register them via the <code>poly_storage_traits</code> class template, which has been designed as sfinae-friendly for the purpose.</p>
+<p>Once the concept that a poly storage must adhere to has been properly defined, copying an entity will be as easy as:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.visit(entity, [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> info) {</div>
+<div class="line">    <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.storage(info);</div>
+<div class="line">    <a class="code" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a>-&gt;emplace(registry, other, <a class="code" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a>-&gt;get(entity));</div>
+<div class="line">});</div>
+</div><!-- fragment --><p>Where <code>other</code> is the entity to which the elements should be replicated.<br  />
+ Similarly, copying entire pools between different registries can look like this:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.visit([&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> info) {</div>
+<div class="line">    <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.storage(info);</div>
+<div class="line">    other.storage(info)-&gt;insert(other, <a class="code" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a>-&gt;data(), <a class="code" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a>-&gt;raw(), <a class="code" href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">storage</a>-&gt;size());</div>
+<div class="line">});</div>
+</div><!-- fragment --><p>Where this time <code>other</code> represents the destination registry.</p>
+<p>So, all in all, <code>EnTT</code> shifts the complexity to the one-time definition of a <em>concept</em> that reflects the user's needs, and then leaves room for ease of use within the codebase.<br  />
+ The possibility of extreme customization is the icing on the cake in this sense, allowing users to design this tool around their own requirements.</p>
+<h2><a class="anchor" id="autotoc_md54"></a>
 Snapshot: complete vs continuous</h2>
 <p>The <code>registry</code> class offers basic support to serialization.<br  />
  It doesn't convert components to bytes directly, there wasn't the need of another tool for serialization out there. Instead, it accepts an opaque object with a suitable interface (namely an <em>archive</em>) to serialize its internal data structures and restore them later. The way types and instances are converted to a bunch of bytes is completely in charge to the archive and thus to final users.</p>
@@ -475,14 +478,14 @@ Snapshot: complete vs continuous</h2>
 </ul>
 <p>There exists also another version of the <code>component</code> member function that accepts a range of entities to serialize. This version is a bit slower than the other one, mainly because it iterates the range of entities more than once for internal purposes. However, it can be used to filter out those entities that shouldn't be serialized for some reasons.<br  />
  As an example:</p>
-<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;serialize&gt;();</div>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;serialize&gt;();</div>
 <div class="line">output_archive output;</div>
 <div class="line"> </div>
-<div class="line"><a class="code" href="classentt_1_1basic__snapshot.html">entt::snapshot</a>{<a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>}.component&lt;a_component, another_component&gt;(output, <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.cbegin(), <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.cend());</div>
+<div class="line"><a class="code" href="classentt_1_1basic__snapshot.html">entt::snapshot</a>{<a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>}.component&lt;a_component, another_component&gt;(output, <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.cbegin(), <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.cend());</div>
 </div><!-- fragment --><p>Note that <code>component</code> stores items along with entities. It means that it works properly without a call to the <code>entities</code> member function.</p>
 <p>Once a snapshot is created, there exist mainly two <em>ways</em> to load it: as a whole and in a kind of <em>continuous mode</em>.<br  />
  The following sections describe both loaders and archives in details.</p>
-<h3><a class="anchor" id="autotoc_md54"></a>
+<h3><a class="anchor" id="autotoc_md55"></a>
 Snapshot loader</h3>
 <p>A snapshot loader requires that the destination registry be empty and loads all the data at once while keeping intact the identifiers that the entities originally had.<br  />
  To use it, just pass to the constructor a valid registry:</p>
@@ -496,7 +499,7 @@ Snapshot loader</h3>
 <p>The <code>entities</code> member function restores the sets of entities and the versions that they originally had at the source.</p>
 <p>The <code>component</code> member function restores all and only the components specified and assigns them to the right entities. Note that the template parameter list must be exactly the same used during the serialization.</p>
 <p>The <code>orphans</code> member function literally destroys those entities that have no components attached. It's usually useless if the snapshot is a full dump of the source. However, in case all the entities are serialized but only few components are saved, it could happen that some of the entities have no components once restored. The best the users can do to deal with them is to destroy those entities and thus update their versions.</p>
-<h3><a class="anchor" id="autotoc_md55"></a>
+<h3><a class="anchor" id="autotoc_md56"></a>
 Continuous loader</h3>
 <p>A continuous loader is designed to load data from a source registry to a (possibly) non-empty destination. The loader can accommodate in a registry more than one snapshot in a sort of <em>continuous loading</em> that updates the destination one step at a time.<br  />
  Identifiers that entities originally had are not transferred to the target. Instead, the loader maps remote identifiers to local ones while restoring a snapshot. Because of that, this kind of loader offers a way to update automatically identifiers that are part of components (as an example, as data members or gathered in a container).<br  />
@@ -515,7 +518,7 @@ Continuous loader</h3>
  In case the component contains entities itself (either as data members of type <code><a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a" title="Default entity identifier.">entt::entity</a></code> or as containers of entities), the loader can update them automatically. To do that, it's enough to specify the data members to update as shown in the example.</p>
 <p>The <code>orphans</code> member function literally destroys those entities that have no components after a restore. It has exactly the same purpose described in the previous section and works the same way.</p>
 <p>Finally, <code>shrink</code> helps to purge local entities that no longer have a remote conterpart. Users should invoke this member function after restoring each snapshot, unless they know exactly what they are doing.</p>
-<h3><a class="anchor" id="autotoc_md56"></a>
+<h3><a class="anchor" id="autotoc_md57"></a>
 Archives</h3>
 <p>Archives must publicly expose a predefined set of member functions. The API is straightforward and consists only of a group of function call operators that are invoked by the snapshot class and the loaders.</p>
 <p>In particular:</p>
@@ -539,12 +542,12 @@ Archives</h3>
 </div><!-- fragment --><p>In addition, the archive must accept a pair of references to an entity and its component for each type to be restored. Therefore, given a type <code>T</code>, the archive must contain a function call operator with the following signature:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> operator()(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entt::entity</a> &amp;, T &amp;);</div>
 </div><!-- fragment --><p>Every time such an operator is invoked, the archive must read the next elements from the underlying storage and copy them in the given variables.</p>
-<h3><a class="anchor" id="autotoc_md57"></a>
+<h3><a class="anchor" id="autotoc_md58"></a>
 One example to rule them all</h3>
 <p><code>EnTT</code> comes with some examples (actually some tests) that show how to integrate a well known library for serialization as an archive. It uses <a href="https://uscilab.github.io/cereal/"><code>Cereal C++</code></a> under the hood, mainly because I wanted to learn how it works at the time I was writing the code.</p>
 <p>The code is not production-ready and it isn't neither the only nor (probably) the best way to do it. However, feel free to use it at your own risk.</p>
 <p>The basic idea is to store everything in a group of queues in memory, then bring everything back to the registry with different loaders.</p>
-<h1><a class="anchor" id="autotoc_md58"></a>
+<h1><a class="anchor" id="autotoc_md59"></a>
 Views and Groups</h1>
 <p>First of all, it's worth answering a question: why views and groups?<br  />
  Briefly, they're a good tool to enforce single responsibility. A system that has access to a registry can create and destroy entities, as well as assign and remove components. On the other side, a system that has access to a view or a group can only iterate, read and update entities and components.<br  />
@@ -560,16 +563,17 @@ Views and Groups</h1>
 <p>Groups come in three different flavors: <em>full-owning groups</em>, <em>partial-owning groups</em> and <em>non-owning groups</em>. The main difference between them is in terms of performance.<br  />
  Groups can literally <em>own</em> one or more component types. They are allowed to rearrange pools so as to speed up iterations. Roughly speaking: the more components a group owns, the faster it is to iterate them.<br  />
  A given component can belong to multiple groups only if they are <em>nested</em>, so users have to define groups carefully to get the best out of them.</p>
-<h2><a class="anchor" id="autotoc_md59"></a>
+<h2><a class="anchor" id="autotoc_md60"></a>
 Views</h2>
 <p>A view behaves differently if it's constructed for a single component or if it has been created to iterate multiple components. Even the API is slightly different in the two cases.</p>
 <p>Single component views are specialized in order to give a boost in terms of performance in all the situations. This kind of views can access the underlying data structures directly and avoid superfluous checks. There is nothing as fast as a single component view. In fact, they walk through a packed array of components and return them one at a time.<br  />
  Single component views offer a bunch of functionalities to get the number of entities they are going to return and a raw access to the entity list as well as to the component list. It's also possible to ask a view if it contains a given entity.<br  />
  Refer to the inline documentation for all the details.</p>
 <p>Multi component views iterate entities that have at least all the given components in their bags. During construction, these views look at the number of entities available for each component and pick up a reference to the smallest set of candidates in order to speed up iterations.<br  />
- They offer fewer functionalities than single component views. In particular, a multi component view exposes utility functions to get the estimated number of entities it is going to return and to know whether it's empty or not. It's also possible to ask a view if it contains a given entity.<br  />
+ They offer fewer functionalities than single component views. In particular, a multi component view exposes utility functions to get the estimated number of entities it is going to return and to know if it contains a given entity.<br  />
  Refer to the inline documentation for all the details.</p>
-<p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. Views also return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.</p>
+<p>There is no need to store views aside for they are extremely cheap to construct, even though valid views can be copied without problems and reused freely.<br  />
+ Views also return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.</p>
 <p>Views share the way they are created by means of a registry:</p>
 <div class="fragment"><div class="line"><span class="comment">// single component view</span></div>
 <div class="line"><span class="keyword">auto</span> single = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position&gt;();</div>
@@ -577,75 +581,97 @@ Views</h2>
 <div class="line"><span class="comment">// multi component view</span></div>
 <div class="line"><span class="keyword">auto</span> multi = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, velocity&gt;();</div>
 </div><!-- fragment --><p>Filtering entities by components is also supported:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, velocity&gt;(entt::exclude&lt;renderable&gt;);</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, velocity&gt;(entt::exclude&lt;renderable&gt;);</div>
 </div><!-- fragment --><p>To iterate a view, either use it in a range-for loop:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, velocity&gt;();</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, velocity, renderable&gt;();</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div>
 <div class="line">    <span class="comment">// a component at a time ...</span></div>
-<div class="line">    <span class="keyword">auto</span> &amp;position = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line">    <span class="keyword">auto</span> &amp;velocity = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">    <span class="keyword">auto</span> &amp;position = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">    <span class="keyword">auto</span> &amp;velocity = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">// ... or multiple components at once</span></div>
-<div class="line">    <span class="keyword">auto</span> [pos, vel] = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">    <span class="comment">// ... multiple components ...</span></div>
+<div class="line">    <span class="keyword">auto</span> [pos, vel] = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// ... all components at once</span></div>
+<div class="line">    <span class="keyword">auto</span> [pos, vel, rend] = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get(entity);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Or rely on the <code>each</code> and <code>proxy</code> member functions to iterate both entities and components at once:</p>
+</div><!-- fragment --><p>Or rely on the <code>each</code> member functions to iterate both entities and components at once:</p>
 <div class="fragment"><div class="line"><span class="comment">// through a callback</span></div>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, velocity&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;pos, <span class="keyword">auto</span> &amp;vel) {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">});</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// using an input iterator</span></div>
-<div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;[entity, pos, vel]: <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, velocity&gt;().proxy()) {</div>
+<div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;[entity, pos, vel]: <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, velocity&gt;().each()) {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Note that entities can also be excluded from the parameter list when received through a callback and this can improve even further the performance during iterations.<br  />
  Since they aren't explicitly instantiated, empty components aren't returned in any case.</p>
-<p>There is also a third method for iterating over entities and components for multi component views. It's a chunk based iteration and is made available by means of the <code>chunked</code> member function.<br  />
- Since this is a particular iteration method with fairly specific purposes, I recommend referring to the official documentation for more details and I won't further investigate the topic here.</p>
-<p>As a side note, in the case of single component views, <code>get</code> accepts but doesn't strictly require a template parameter, since the type is implicitly defined:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;<span class="keyword">const</span> renderable&gt;();</div>
+<p>As a side note, in the case of single component views, <code>get</code> accepts but doesn't strictly require a template parameter, since the type is implicitly defined. However, when the type isn't specified, for consistency with the multi component view, the instance will be returned using a tuple:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;<span class="keyword">const</span> renderable&gt;();</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div>
-<div class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;renderable = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get(entity);</div>
+<div class="line">    <span class="keyword">auto</span> [renderable] = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get(entity);</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p><b>Note</b>: prefer the <code>get</code> member function of a view instead of that of a registry during iterations to get the types iterated by the view itself.</p>
-<h2><a class="anchor" id="autotoc_md60"></a>
-Runtime views</h2>
+<h3><a class="anchor" id="autotoc_md61"></a>
+View pack</h3>
+<p>The view pack allows users to combine multiple views into a single <em>view-like</em> iterable object, while also giving them full control over which view should lead the iteration.<br  />
+ This object returns all and only the entities present in all views. Its intended primary use is for custom storage and views, but it can also be very convenient in everyday use.</p>
+<p>The creation of a view pack tries to mimic C++20 ranges:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position&gt;();</div>
+<div class="line"><span class="keyword">auto</span> other = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;velocity&gt;();</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">auto</span> pack = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> | other;</div>
+</div><!-- fragment --><p>The return type is a specialization of the class template <code><a class="el" href="classentt_1_1view__pack.html" title="View pack.">entt::view_pack</a></code>. This is nothing more than a <em>view-like</em> iterable object that combines two or more views into a single instance.<br  />
+ The first view used to create a pack will also be the same that will lead the iteration.</p>
+<p>A view pack offers functionalities similar to those of a multi component view, especially with regard to the possibilities of iteration. In particular, it only returns entities if iterated directly:</p>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a>: pack) {</div>
+<div class="line">    <span class="comment">// ...</span></div>
+<div class="line">}</div>
+</div><!-- fragment --><p>On the other hand, both the (optional) entity and the components are returned when the <code>each</code> member function is used, be it with callback or to get an extended iterable object:</p>
+<div class="fragment"><div class="line"><span class="comment">// with a callback</span></div>
+<div class="line">pack.each([](<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a>, <span class="keyword">auto</span> &amp;pos, <span class="keyword">auto</span> &amp;vel) { <span class="comment">/* ... */</span> });</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// with an extended iterable object</span></div>
+<div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> [<a class="code" href="namespaceentt.html">entt</a>, pos, vel]: pack.each()) {</div>
+<div class="line">    <span class="comment">// ...</span></div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Furthermore, the constness of the types returned by a view pack is directly inherited by the views that compose it:</p>
+<div class="fragment"><div class="line">(registry.view&lt;position&gt;() | registry.view&lt;const velocity&gt;()).each([](auto &amp;pos, const auto &amp;vel) {</div>
+<div class="line">    // ...</div>
+<div class="line">});</div>
+</div><!-- fragment --><p>Read also the dedicated section to know how a view pack is involved in the creation and use of custom storage and pools.</p>
+<h3><a class="anchor" id="autotoc_md62"></a>
+Runtime views</h3>
 <p>Runtime views iterate entities that have at least all the given components in their bags. During construction, these views look at the number of entities available for each component and pick up a reference to the smallest set of candidates in order to speed up iterations.<br  />
  They offer more or less the same functionalities of a multi component view. However, they don't expose a <code>get</code> member function and users should refer to the registry that generated the view to access components. In particular, a runtime view exposes utility functions to get the estimated number of entities it is going to return and to know whether it's empty or not. It's also possible to ask a runtime view if it contains a given entity.<br  />
  Refer to the inline documentation for all the details.</p>
-<p>Runtime views are pretty cheap to construct and should not be stored around in any case. They should be used immediately after creation and then they should be thrown away. The reasons for this go far beyond the scope of this document.<br  />
+<p>Runtime views are pretty cheap to construct and should not be stored aside in any case. They should be used immediately after creation and then they should be thrown away. The reasons for this go far beyond the scope of this document.<br  />
  To iterate a runtime view, either use it in a range-for loop:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> types[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>(), <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
-<div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.runtime_view(std::cbegin(types), std::cend(types));</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> types[] = { <a class="code" href="structentt_1_1type__hash.html#a925c3666663e463a28897f04a7e2c314">entt::type_hash&lt;position&gt;::value</a>(), <a class="code" href="structentt_1_1type__hash.html#a925c3666663e463a28897f04a7e2c314">entt::type_hash&lt;velocity&gt;::value</a>() };</div>
+<div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.runtime_view(std::cbegin(types), std::cend(types));</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div>
-<div class="line">    <span class="comment">// a component at a time ...</span></div>
-<div class="line">    <span class="keyword">auto</span> &amp;position = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.get&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line">    <span class="keyword">auto</span> &amp;velocity = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.get&lt;velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// ... or multiple components at once</span></div>
-<div class="line">    <span class="keyword">auto</span> [pos, vel] = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line"> </div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> types[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>(), <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> types[] = { <a class="code" href="structentt_1_1type__hash.html#a925c3666663e463a28897f04a7e2c314">entt::type_hash&lt;position&gt;::value</a>(), <a class="code" href="structentt_1_1type__hash.html#a925c3666663e463a28897f04a7e2c314">entt::type_hash&lt;velocity&gt;::value</a>() };</div>
 <div class="line"> </div>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.runtime_view(std::cbegin(types), std::cend(types)).each([](<span class="keyword">auto</span> entity) {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">});</div>
 </div><!-- fragment --><p>Performance are exactly the same in both cases.<br  />
  Filtering entities by components is also supported for this kind of views:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> components[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>() };</div>
-<div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> filter[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
-<div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.runtime_view(std::cbegin(components), std::cend(components), std::cbegin(filter), std::cend(filter));</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> components[] = { <a class="code" href="structentt_1_1type__hash.html#a925c3666663e463a28897f04a7e2c314">entt::type_hash&lt;position&gt;::value</a>() };</div>
+<div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> filter[] = { <a class="code" href="structentt_1_1type__hash.html#a925c3666663e463a28897f04a7e2c314">entt::type_hash&lt;velocity&gt;::value</a>() };</div>
+<div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.runtime_view(std::cbegin(components), std::cend(components), std::cbegin(filter), std::cend(filter));</div>
 </div><!-- fragment --><p><b>Note</b>: runtime views are meant for all those cases where users don't know at compile-time what components to <em>use</em> to iterate entities. If possible, don't use runtime views as their performance are inferior to those of the other views.</p>
-<h2><a class="anchor" id="autotoc_md61"></a>
+<h2><a class="anchor" id="autotoc_md63"></a>
 Groups</h2>
 <p>Groups are meant to iterate multiple components at once and to offer a faster alternative to multi component views.<br  />
  Groups overcome the performance of the other tools available but require to get the ownership of components and this sets some constraints on pools. On the other side, groups aren't an automatism that increases memory consumption, affects functionalities and tries to optimize iterations for all the possible combinations of components. Users can decide when to pay for groups and to what extent.<br  />
@@ -655,61 +681,65 @@ Groups</h2>
  That being said, the way groups operate is beyond the scope of this document. However, it's unlikely that users will be able to appreciate the impact of groups on the other functionalities of a registry.</p>
 <p>Groups offer a bunch of functionalities to get the number of entities they are going to return and a raw access to the entity list as well as to the component list for owned components. It's also possible to ask a group if it contains a given entity.<br  />
  Refer to the inline documentation for all the details.</p>
-<p>There is no need to store groups around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. A group performs an initialization step the very first time it's requested and this could be quite costly. To avoid it, consider creating the group when no components have been assigned yet. If the registry is empty, preparation is extremely fast. Groups also return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.</p>
+<p>There is no need to store groups aside for they are extremely cheap to construct, even though valid groups can be copied without problems and reused freely.<br  />
+ A group performs an initialization step the very first time it's requested and this could be quite costly. To avoid it, consider creating the group when no components have been assigned yet. If the registry is empty, preparation is extremely fast. Groups also return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.</p>
 <p>To iterate groups, either use them in a range-for loop:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity&gt;);</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity, renderable&gt;);</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: group) {</div>
 <div class="line">    <span class="comment">// a component at a time ...</span></div>
-<div class="line">    <span class="keyword">auto</span> &amp;position = <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a>.get&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line">    <span class="keyword">auto</span> &amp;velocity = <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a>.get&lt;velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">    <span class="keyword">auto</span> &amp;position = <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a>.get&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">    <span class="keyword">auto</span> &amp;velocity = <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a>.get&lt;velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">// ... or multiple components at once</span></div>
-<div class="line">    <span class="keyword">auto</span> [pos, vel] = <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a>.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">    <span class="comment">// ... multiple components ...</span></div>
+<div class="line">    <span class="keyword">auto</span> [pos, vel] = <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a>.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// ... all components at once</span></div>
+<div class="line">    <span class="keyword">auto</span> [pos, vel, rend] = <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a>.get(entity);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Or rely on the <code>each</code> and <code>proxy</code> member functions to iterate both entities and components at once:</p>
+</div><!-- fragment --><p>Or rely on the <code>each</code> member functions to iterate both entities and components at once:</p>
 <div class="fragment"><div class="line"><span class="comment">// through a callback</span></div>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity&gt;).each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;pos, <span class="keyword">auto</span> &amp;vel) {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">});</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// using an input iterator</span></div>
-<div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;[entity, pos, vel]: <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity&gt;).proxy()) {</div>
+<div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;[entity, pos, vel]: <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity&gt;).each()) {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Note that entities can also be excluded from the parameter list when received through a callback and this can improve even further the performance during iterations.<br  />
  Since they aren't explicitly instantiated, empty components aren't returned in any case.</p>
 <p><b>Note</b>: prefer the <code>get</code> member function of a group instead of that of a registry during iterations to get the types iterated by the group itself.</p>
-<h3><a class="anchor" id="autotoc_md62"></a>
+<h3><a class="anchor" id="autotoc_md64"></a>
 Full-owning groups</h3>
 <p>A full-owning group is the fastest tool an user can expect to use to iterate multiple components at once. It iterates all the components directly, no indirection required. This type of groups performs more or less as if users are accessing sequentially a bunch of packed arrays of components all sorted identically, with no jumps nor branches.</p>
 <p>A full-owning group is created as:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position, velocity&gt;();</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position, velocity&gt;();</div>
 </div><!-- fragment --><p>Filtering entities by components is also supported:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position, velocity&gt;(entt::exclude&lt;renderable&gt;);</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position, velocity&gt;(entt::exclude&lt;renderable&gt;);</div>
 </div><!-- fragment --><p>Once created, the group gets the ownership of all the components specified in the template parameter list and arranges their pools as needed.</p>
 <p>Sorting owned components is no longer allowed once the group has been created. However, full-owning groups can be sorted by means of their <code>sort</code> member functions. Sorting a full-owning group affects all its instances.</p>
-<h3><a class="anchor" id="autotoc_md63"></a>
+<h3><a class="anchor" id="autotoc_md65"></a>
 Partial-owning groups</h3>
 <p>A partial-owning group works similarly to a full-owning group for the components it owns, but relies on indirection to get components owned by other groups. This isn't as fast as a full-owning group, but it's already much faster than views when there are only one or two free components to retrieve (the most common cases likely). In the worst case, it's not slower than views anyway.</p>
 <p>A partial-owning group is created as:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity&gt;);</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity&gt;);</div>
 </div><!-- fragment --><p>Filtering entities by components is also supported:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity&gt;, entt::exclude&lt;renderable&gt;);</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;position&gt;(entt::get&lt;velocity&gt;, entt::exclude&lt;renderable&gt;);</div>
 </div><!-- fragment --><p>Once created, the group gets the ownership of all the components specified in the template parameter list and arranges their pools as needed. The ownership of the types provided via <code><a class="el" href="namespaceentt.html#a8c24ecc5ab0055f9f2a4725c95afb29e" title="Variable template for lists of observed components.">entt::get</a></code> doesn't pass to the group instead.</p>
 <p>Sorting owned components is no longer allowed once the group has been created. However, partial-owning groups can be sorted by means of their <code>sort</code> member functions. Sorting a partial-owning group affects all its instances.</p>
-<h3><a class="anchor" id="autotoc_md64"></a>
+<h3><a class="anchor" id="autotoc_md66"></a>
 Non-owning groups</h3>
 <p>Non-owning groups are usually fast enough, for sure faster than views and well suited for most of the cases. However, they require custom data structures to work properly and they increase memory consumption. As a rule of thumb, users should avoid using non-owning groups, if possible.</p>
 <p>A non-owning group is created as:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;&gt;(entt::get&lt;position, velocity&gt;);</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;&gt;(entt::get&lt;position, velocity&gt;);</div>
 </div><!-- fragment --><p>Filtering entities by components is also supported:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;&gt;(entt::get&lt;position, velocity&gt;, entt::exclude&lt;renderable&gt;);</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">group</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.group&lt;&gt;(entt::get&lt;position, velocity&gt;, entt::exclude&lt;renderable&gt;);</div>
 </div><!-- fragment --><p>The group doesn't receive the ownership of any type of component in this case. This type of groups is therefore the least performing in general, but also the only one that can be used in any situation to slightly improve performance.</p>
 <p>Non-owning groups can be sorted by means of their <code>sort</code> member functions. Sorting a non-owning group affects all its instances.</p>
-<h3><a class="anchor" id="autotoc_md65"></a>
+<h3><a class="anchor" id="autotoc_md67"></a>
 Nested groups</h3>
 <p>A type of component cannot be owned by two or more conflicting groups such as:</p>
 <ul>
@@ -754,31 +784,40 @@ Nested groups</h3>
  In fact, given a list of component types involved by a group, the greater the number of those owned, the greater the performance of the group itself.</p>
 <p>As a side note, it's no longer possible to sort all groups when defining nested ones. This is because the most restrictive group shares its elements with the less restrictive ones and ordering the latter would invalidate the former.<br  />
  However, given a family of nested groups, it's still possible to sort the most restrictive of them. To prevent users from having to remember which of their groups is the most restrictive, the registry class offers the <code>sortable</code> member function to know if a group can be sorted or not.</p>
-<h2><a class="anchor" id="autotoc_md66"></a>
+<h2><a class="anchor" id="autotoc_md68"></a>
+Invalid views and groups</h2>
+<p>Views and groups as returned by a registry are generally valid. However, there are some exceptions where an invalid object might be returned.<br  />
+ In these cases, they should be renewed as soon as possible. In fact, an invalid view or group contains a broken reference to one or more pools and this will never be fixed. The view or the group will continue to return no data, even if the pool for the pending reference is created in the registry in the meantime.</p>
+<p>There is only one case in which an invalid object can be returned, that is when the view or the group is created from a constant reference to a registry in which the required pools haven't yet been created.<br  />
+ Pools are typically created whenever any method is used on a non-const registry. This also means that creating views and groups from a non-const registry can never result in an invalid object.</p>
+<p>It's also perfectly fine to use an invalid view or group, to invoke <code>each</code> on them or to iterate them like any other object. The only difference from a valid view or group is that the invalid ones will always appear as <em>empty</em>.<br  />
+ In general, when views and groups are created on the fly and used at the same time, then discarded immediately afterwards, it doesn't matter whether or not they may be invalid. Therefore, this remains the recommended approach.</p>
+<p>To know if a view or a group is properly initialized, both can be converted to bool explicitly and used in a guard.</p>
+<h2><a class="anchor" id="autotoc_md69"></a>
 Types: const, non-const and all in between</h2>
-<p>The <code>registry</code> class offers two overloads when it comes to constructing views and groups: a const version and a non-const one. The former accepts both const and non-const types as template parameters, the latter accepts only const types instead.<br  />
+<p>The <code>registry</code> class offers two overloads when it comes to constructing views and groups: a const version and a non-const one. The former accepts only const types as template parameters, the latter accepts both const and non-const types instead.<br  />
  It means that views and groups can be constructed from a const registry and they propagate the constness of the registry to the types involved. As an example:</p>
-<div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__view.html">entt::view&lt;const position, const velocity&gt;</a> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = std::as_const(registry).view&lt;<span class="keyword">const</span> position, <span class="keyword">const</span> velocity&gt;();</div>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__view.html">entt::view&lt;const position, const velocity&gt;</a> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = std::as_const(registry).view&lt;<span class="keyword">const</span> position, <span class="keyword">const</span> velocity&gt;();</div>
 </div><!-- fragment --><p>Consider the following definition for a non-const view instead:</p>
-<div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__view.html">entt::view&lt;position, const velocity&gt;</a> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, <span class="keyword">const</span> velocity&gt;();</div>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__view.html">entt::view&lt;position, const velocity&gt;</a> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, <span class="keyword">const</span> velocity&gt;();</div>
 </div><!-- fragment --><p>In the example above, <code>view</code> can be used to access either read-only or writable <code>position</code> components while <code>velocity</code> components are read-only in all cases.<br  />
  Similarly, these statements are all valid:</p>
-<div class="fragment"><div class="line">position &amp;pos = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line"><span class="keyword">const</span> position &amp;cpos = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;<span class="keyword">const</span> position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line"><span class="keyword">const</span> velocity &amp;cpos = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;<span class="keyword">const</span> velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line">std::tuple&lt;position &amp;, const velocity &amp;&gt; tup = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;position, <span class="keyword">const</span> velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line">std::tuple&lt;const position &amp;, const velocity &amp;&gt; ctup = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;<span class="keyword">const</span> position, <span class="keyword">const</span> velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="fragment"><div class="line">position &amp;pos = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line"><span class="keyword">const</span> position &amp;cpos = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;<span class="keyword">const</span> position&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line"><span class="keyword">const</span> velocity &amp;cpos = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;<span class="keyword">const</span> velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">std::tuple&lt;position &amp;, const velocity &amp;&gt; tup = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;position, <span class="keyword">const</span> velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">std::tuple&lt;const position &amp;, const velocity &amp;&gt; ctup = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;<span class="keyword">const</span> position, <span class="keyword">const</span> velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
 </div><!-- fragment --><p>It's not possible to get non-const references to <code>velocity</code> components from the same view instead and these will result in compilation errors:</p>
-<div class="fragment"><div class="line">velocity &amp;cpos = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line">std::tuple&lt;position &amp;, velocity &amp;&gt; tup = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line">std::tuple&lt;const position &amp;, velocity &amp;&gt; ctup = <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.get&lt;<span class="keyword">const</span> position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="fragment"><div class="line">velocity &amp;cpos = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">std::tuple&lt;position &amp;, velocity &amp;&gt; tup = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line">std::tuple&lt;const position &amp;, velocity &amp;&gt; ctup = <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.get&lt;<span class="keyword">const</span> position, velocity&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
 </div><!-- fragment --><p>The <code>each</code> member functions also propagates constness to its <em>return values</em>:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.each([](<span class="keyword">auto</span> entity, position &amp;pos, <span class="keyword">const</span> velocity &amp;vel) {</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.each([](<span class="keyword">auto</span> entity, position &amp;pos, <span class="keyword">const</span> velocity &amp;vel) {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">});</div>
 </div><!-- fragment --><p>A caller can still refer to the <code>position</code> components through a const reference because of the rules of the language that fortunately already allow it.</p>
 <p>The same concepts apply to groups as well.</p>
-<h2><a class="anchor" id="autotoc_md67"></a>
+<h2><a class="anchor" id="autotoc_md70"></a>
 Give me everything</h2>
 <p>Views and groups are narrow windows on the entire list of entities. They work by filtering entities according to their components.<br  />
  In some cases there may be the need to iterate all the entities still in use regardless of their components. The registry offers a specific member function to do that:</p>
@@ -796,7 +835,7 @@ Give me everything</h2>
 </div><!-- fragment --><p>To test the <em>orphanity</em> of a single entity, use the member function <code>orphan</code> instead. It accepts a valid entity identifer as an argument and returns true in case the entity is an orphan, false otherwise.</p>
 <p>In general, all these functions can result in poor performance.<br  />
  <code>each</code> is fairly slow because of some checks it performs on each and every entity. For similar reasons, <code>orphans</code> can be even slower. Both functions should not be used frequently to avoid the risk of a performance hit.</p>
-<h2><a class="anchor" id="autotoc_md68"></a>
+<h2><a class="anchor" id="autotoc_md71"></a>
 What is allowed and what is not</h2>
 <p>Most of the <em>ECS</em> available out there don't allow to create and destroy entities and components during iterations.<br  />
  <code>EnTT</code> partially solves the problem with a few limitations:</p>
@@ -818,7 +857,7 @@ What is allowed and what is not</h2>
 <li>Mark entities and components with a proper tag component that indicates they must be purged, then perform a second iteration to clean them up one by one.</li>
 </ul>
 <p>A notable side effect of this feature is that the number of required allocations is further reduced in most of the cases.</p>
-<h3><a class="anchor" id="autotoc_md69"></a>
+<h3><a class="anchor" id="autotoc_md72"></a>
 More performance, more constraints</h3>
 <p>Groups are a (much) faster alternative to views. However, the higher the performance, the greater the constraints on what is allowed and what is not.<br  />
  In particular, groups add in some rare cases a limitation on the creation of components during iterations. It happens in quite particular cases. Given the nature and the scope of the groups, it isn't something in which it will happen to come across probably, but it's good to know it anyway.</p>
@@ -831,7 +870,7 @@ More performance, more constraints</h3>
 </ul>
 <p>In other words, the limitation doesn't exist as long as a type is treated as a free type (as an example with multi component views and partial- or non-owning groups) or iterated with its own group, but it can occur if the type is used as a main type to rule on an iteration.<br  />
  This happens because groups own the pools of their components and organize the data internally to maximize performance. Because of that, full consistency for owned components is guaranteed only when they are iterated as part of their groups or as free types with multi component views and groups in general.</p>
-<h1><a class="anchor" id="autotoc_md70"></a>
+<h1><a class="anchor" id="autotoc_md73"></a>
 Empty type optimization</h1>
 <p>An empty type <code>T</code> is such that <code>std::is_empty_v&lt;T&gt;</code> returns true. They are also the same types for which <em>empty base optimization</em> (EBO) is possibile.<br  />
  <code>EnTT</code> handles these types in a special way, optimizing both in terms of performance and memory usage. However, this also has consequences that are worth mentioning.</p>
@@ -843,7 +882,7 @@ Empty type optimization</h1>
 </div><!-- fragment --><p>On the other hand, iterations are faster because only the entities to which the type is assigned are considered. Moreover, less memory is used, mainly because there doesn't exist any instance of the component, no matter how many entities it is assigned to.</p>
 <p>More in general, none of the features offered by the library is affected, but for the ones that require to return actual instances.<br  />
  This optimization can be disabled by defining the <code>ENTT_NO_ETO</code> macro. In this case, empty types will be treated like all other types, no matter what.</p>
-<h1><a class="anchor" id="autotoc_md71"></a>
+<h1><a class="anchor" id="autotoc_md74"></a>
 Multithreading</h1>
 <p>In general, the entire registry isn't thread safe as it is. Thread safety isn't something that users should want out of the box for several reasons. Just to mention one of them: performance.<br  />
  Views, groups and consequently the approach adopted by <code>EnTT</code> are the great exception to the rule. It's true that views, groups and iterators in general aren't thread safe by themselves. Because of this users shouldn't try to iterate a set of components and modify the same set concurrently. However:</p>
@@ -853,49 +892,51 @@ Multithreading</h1>
 </ul>
 <p>This kind of entity-component systems can be used in single threaded applications as well as along with async stuff or multiple threads. Moreover, typical thread based models for <em>ECS</em> don't require a fully thread safe registry to work. Actually, users can reach the goal with the registry as it is while working with most of the common models.</p>
 <p>Because of the few reasons mentioned above and many others not mentioned, users are completely responsible for synchronization whether required. On the other hand, they could get away with it without having to resort to particular expedients.</p>
-<h2><a class="anchor" id="autotoc_md72"></a>
+<p>Finally, <code>EnTT</code> can be configured via a few compile-time definitions to make some of its parts implicitly thread-safe, roughly speaking only the ones that really make sense and can't be turned around.<br  />
+ In particular, when multiple instances of objects referencing the type index generator (such as the <code>registry</code> class) are used in different threads, then it might be useful to define <code>ENTT_USE_ATOMIC</code>.<br  />
+ See the relevant documentation for more information.</p>
+<h2><a class="anchor" id="autotoc_md75"></a>
 Iterators</h2>
 <p>A special mention is needed for the iterators returned by views and groups. Most of the times they meet the requirements of random access iterators, in all cases they meet at least the requirements of bidirectional iterators.<br  />
  In other terms, they are suitable for use with the parallel algorithms of the standard library. If it's not clear, this is a great thing.</p>
 <p>As an example, this kind of iterators can be used in combination with <code>std::for_each</code> and <code>std::execution::par</code> to parallelize the visit and therefore the update of the components returned by a view or a group, as long as the constraints previously discussed are respected:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, <span class="keyword">const</span> velocity&gt;();</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.view&lt;position, <span class="keyword">const</span> velocity&gt;();</div>
 <div class="line"> </div>
-<div class="line">std::for_each(std::execution::par_unseq, <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.begin(), <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a>.end(), [&amp;view](<span class="keyword">auto</span> entity) {</div>
+<div class="line">std::for_each(std::execution::par_unseq, <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.begin(), <a class="code" href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">view</a>.end(), [&amp;view](<span class="keyword">auto</span> entity) {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">});</div>
 </div><!-- fragment --><p>This can increase the throughput considerably, even without resorting to who knows what artifacts that are difficult to maintain over time.</p>
-<p>Unfortunately, because of the limitations of the current revision of the standard, the parallel <code>std::for_each</code> accepts only forward iterators. This means that the iterators provided by the library cannot return proxy objects as references and <b>must</b> return actual reference types instead.<br  />
- This may change in the future and the iterators will almost certainly return both the entities and a list of references to their components sooner or later. Multi-pass guarantee won't break in any case and the performance should even benefit from it further.</p>
-<h1><a class="anchor" id="autotoc_md73"></a>
+<p>Unfortunately, because of the limitations of the current revision of the standard, the parallel <code>std::for_each</code> accepts only forward iterators. This means that the default iterators provided by the library cannot return proxy objects as references and <b>must</b> return actual reference types instead.<br  />
+ This may change in the future and the iterators will almost certainly return both the entities and a list of references to their components by default sooner or later. Multi-pass guarantee won't break in any case and the performance should even benefit from it further.</p>
+<h1><a class="anchor" id="autotoc_md76"></a>
 Beyond this document</h1>
 <p>There are many other features and functions not listed in this document.<br  />
  <code>EnTT</code> and in particular its ECS part is in continuous development and some things could be forgotten, others could have been omitted on purpose to reduce the size of this file. Unfortunately, some parts may even be outdated and still to be updated.</p>
 <p>For further information, it's recommended to refer to the documentation included in the code itself or join the official channels to ask a question. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
-<div class="ttc" id="aclassentt_1_1basic__registry_html_aafb56d442d5cf9a2b8ef02cae5735152"><div class="ttname"><a href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entt::basic_registry::entity</a></div><div class="ttdeci">static entity_type entity(const entity_type entity) noexcept</div><div class="ttdoc">Returns the entity identifier without the version.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00431">registry.hpp:431</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a292643317d1dbb13e45824f757bd1086"><div class="ttname"><a href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">entt::registry</a></div><div class="ttdeci">basic_registry&lt; entity &gt; registry</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00056">fwd.hpp:56</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__observer_html"><div class="ttname"><a href="classentt_1_1basic__observer.html">entt::basic_observer</a></div><div class="ttdoc">Observer.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00171">observer.hpp:171</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a1db6c4749dda201f7f74004ea22de193"><div class="ttname"><a href="classentt_1_1basic__registry.html#a1db6c4749dda201f7f74004ea22de193">entt::basic_registry::data</a></div><div class="ttdeci">const entity_type * data() const</div><div class="ttdoc">Direct access to the list of entities of a given pool.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00396">registry.hpp:396</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot_html"><div class="ttname"><a href="classentt_1_1basic__snapshot.html">entt::basic_snapshot</a></div><div class="ttdoc">Utility class to create snapshots from a registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00031">snapshot.hpp:31</a></div></div>
-<div class="ttc" id="astructentt_1_1basic__handle_html"><div class="ttname"><a href="structentt_1_1basic__handle.html">entt::basic_handle</a></div><div class="ttdoc">Non-owning handle to an entity.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2handle_8hpp_source.html#l00019">handle.hpp:19</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a48dfbb2991c5a19c6e2578830f7e3eda"><div class="ttname"><a href="namespaceentt.html#a48dfbb2991c5a19c6e2578830f7e3eda">entt::observer</a></div><div class="ttdeci">basic_observer&lt; entity &gt; observer</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00060">fwd.hpp:60</a></div></div>
-<div class="ttc" id="anamespaceentt_html_af2118c00dea16193aee017d1408beb53"><div class="ttname"><a href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">entt::view</a></div><div class="ttdeci">basic_view&lt; entity, Types... &gt; view</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00092">fwd.hpp:92</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_aafb56d442d5cf9a2b8ef02cae5735152"><div class="ttname"><a href="classentt_1_1basic__registry.html#aafb56d442d5cf9a2b8ef02cae5735152">entt::basic_registry::entity</a></div><div class="ttdeci">static entity_type entity(const entity_type entity) noexcept</div><div class="ttdoc">Returns the entity identifier without the version.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00403">registry.hpp:403</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a292643317d1dbb13e45824f757bd1086"><div class="ttname"><a href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">entt::registry</a></div><div class="ttdeci">basic_registry&lt; entity &gt; registry</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00076">fwd.hpp:76</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__observer_html"><div class="ttname"><a href="classentt_1_1basic__observer.html">entt::basic_observer</a></div><div class="ttdoc">Observer.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00172">observer.hpp:172</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a2628e82fa8042f75d817c58fc09c7aaf"><div class="ttname"><a href="namespaceentt.html#a2628e82fa8042f75d817c58fc09c7aaf">entt::group</a></div><div class="ttdeci">basic_group&lt; entity, Args... &gt; group</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00140">fwd.hpp:140</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot_html"><div class="ttname"><a href="classentt_1_1basic__snapshot.html">entt::basic_snapshot</a></div><div class="ttdoc">Utility class to create snapshots from a registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00034">snapshot.hpp:34</a></div></div>
+<div class="ttc" id="anamespaceentt_html_acc5a93cf82f9378248fe6385376cd943"><div class="ttname"><a href="namespaceentt.html#acc5a93cf82f9378248fe6385376cd943">entt::view</a></div><div class="ttdeci">basic_view&lt; entity, Args... &gt; view</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00128">fwd.hpp:128</a></div></div>
+<div class="ttc" id="astructentt_1_1basic__handle_html"><div class="ttname"><a href="structentt_1_1basic__handle.html">entt::basic_handle</a></div><div class="ttdoc">Non-owning handle to an entity.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2handle_8hpp_source.html#l00026">handle.hpp:26</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a48dfbb2991c5a19c6e2578830f7e3eda"><div class="ttname"><a href="namespaceentt.html#a48dfbb2991c5a19c6e2578830f7e3eda">entt::observer</a></div><div class="ttdeci">basic_observer&lt; entity &gt; observer</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00080">fwd.hpp:80</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00012">fwd.hpp:12</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a747d182de87516a3445f8df77d65e815"><div class="ttname"><a href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815">entt::basic_registry::size</a></div><div class="ttdeci">size_type size() const</div><div class="ttdoc">Returns the number of existing components of the given type.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00256">registry.hpp:256</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a010d1bbf234dbca47e6755fc278e36b5"><div class="ttname"><a href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">entt::group</a></div><div class="ttdeci">basic_group&lt; entity, Types... &gt; group</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00104">fwd.hpp:104</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_aef8bac41fdb48e3c8c589dee21b96980"><div class="ttname"><a href="classentt_1_1basic__registry.html#aef8bac41fdb48e3c8c589dee21b96980">entt::basic_registry::visit</a></div><div class="ttdeci">void visit(entity_type entity, Func func) const</div><div class="ttdoc">Visits an entity and returns the types for its components.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l01552">registry.hpp:1552</a></div></div>
-<div class="ttc" id="anamespaceentt_html_adb31e9165a07456c03f8c64295117824"><div class="ttname"><a href="namespaceentt.html#adb31e9165a07456c03f8c64295117824">entt::to_entity</a></div><div class="ttdeci">Entity to_entity(const basic_registry&lt; Entity &gt; &amp;reg, const Component &amp;component)</div><div class="ttdoc">Returns the entity associated with a given component.</div><div class="ttdef"><b>Definition:</b> <a href="helper_8hpp_source.html#l00141">helper.hpp:141</a></div></div>
-<div class="ttc" id="astructentt_1_1type__info_html_aefa2a63e4b4f41dbb783718bdc8c5a76"><div class="ttname"><a href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info::id</a></div><div class="ttdeci">static id_type id() noexcept</div><div class="ttdoc">Returns the numeric representation of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="type__info_8hpp_source.html#l00114">type_info.hpp:114</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a3587004bdab85280c2a2a1b6371fd4c5"><div class="ttname"><a href="classentt_1_1basic__registry.html#a3587004bdab85280c2a2a1b6371fd4c5">entt::basic_registry::insert</a></div><div class="ttdeci">void insert(It first, It last, const Component &amp;value={})</div><div class="ttdoc">Assigns each entity in a range the given component.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00655">registry.hpp:655</a></div></div>
-<div class="ttc" id="anamespaceentt_html_aea8b073b774362fe800d9cce3542927a"><div class="ttname"><a href="namespaceentt.html#aea8b073b774362fe800d9cce3542927a">entt::collector</a></div><div class="ttdeci">constexpr basic_collector collector</div><div class="ttdoc">Variable template used to ease the definition of collectors.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00118">observer.hpp:118</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html">entt::basic_continuous_loader</a></div><div class="ttdoc">Utility class for continuous loading.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00301">snapshot.hpp:301</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a5870a148e25a503557bdd47327c7a05a"><div class="ttname"><a href="namespaceentt.html#a5870a148e25a503557bdd47327c7a05a">entt::organizer</a></div><div class="ttdeci">basic_organizer&lt; entity &gt; organizer</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00084">fwd.hpp:84</a></div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
+<div class="ttc" id="anamespaceentt_html_adb31e9165a07456c03f8c64295117824"><div class="ttname"><a href="namespaceentt.html#adb31e9165a07456c03f8c64295117824">entt::to_entity</a></div><div class="ttdeci">Entity to_entity(const basic_registry&lt; Entity &gt; &amp;reg, const Component &amp;component)</div><div class="ttdoc">Returns the entity associated with a given component.</div><div class="ttdef"><b>Definition:</b> <a href="helper_8hpp_source.html#l00147">helper.hpp:147</a></div></div>
+<div class="ttc" id="astructentt_1_1type__hash_html_a925c3666663e463a28897f04a7e2c314"><div class="ttname"><a href="structentt_1_1type__hash.html#a925c3666663e463a28897f04a7e2c314">entt::type_hash::value</a></div><div class="ttdeci">static constexpr id_type value() noexcept</div><div class="ttdoc">Returns the numeric representation of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="type__info_8hpp_source.html#l00117">type_info.hpp:117</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__organizer_html"><div class="ttname"><a href="classentt_1_1basic__organizer.html">entt::basic_organizer</a></div><div class="ttdoc">Utility class for creating a static task graph.</div><div class="ttdef"><b>Definition:</b> <a href="organizer_8hpp_source.html#l00125">organizer.hpp:125</a></div></div>
+<div class="ttc" id="anamespaceentt_html_abcedb8f29753130e2bf3185bca211f05"><div class="ttname"><a href="namespaceentt.html#abcedb8f29753130e2bf3185bca211f05">entt::storage</a></div><div class="ttdeci">basic_storage&lt; entity, Args... &gt; storage</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00072">fwd.hpp:72</a></div></div>
+<div class="ttc" id="anamespaceentt_html_aea8b073b774362fe800d9cce3542927a"><div class="ttname"><a href="namespaceentt.html#aea8b073b774362fe800d9cce3542927a">entt::collector</a></div><div class="ttdeci">constexpr basic_collector collector</div><div class="ttdoc">Variable template used to ease the definition of collectors.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00119">observer.hpp:119</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html">entt::basic_continuous_loader</a></div><div class="ttdoc">Utility class for continuous loading.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00298">snapshot.hpp:298</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a2f0c0a1c1d953ea991591748744cdd8b"><div class="ttname"><a href="namespaceentt.html#a2f0c0a1c1d953ea991591748744cdd8b">entt::null</a></div><div class="ttdeci">constexpr null_t null</div><div class="ttdoc">Compile-time constant for null entities.</div><div class="ttdef"><b>Definition:</b> <a href="entity_8hpp_source.html#l00189">entity.hpp:189</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html"><div class="ttname"><a href="classentt_1_1basic__registry.html">entt::basic_registry</a></div><div class="ttdoc">Fast and reliable entity-component system.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00043">registry.hpp:43</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__view_html"><div class="ttname"><a href="classentt_1_1basic__view.html">entt::basic_view</a></div><div class="ttdoc">View.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00016">fwd.hpp:16</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a0b54e231d069e8a231e14b223388808a"><div class="ttname"><a href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entt::entity</a></div><div class="ttdeci">entity</div><div class="ttdoc">Default entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00052">fwd.hpp:52</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a195a60b85fe32562541dc5139cdc7f94"><div class="ttname"><a href="classentt_1_1basic__registry.html#a195a60b85fe32562541dc5139cdc7f94">entt::basic_registry::raw</a></div><div class="ttdeci">const Component * raw() const</div><div class="ttdoc">Direct access to the list of components of a given pool.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00372">registry.hpp:372</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html">entt::basic_snapshot_loader</a></div><div class="ttdoc">Utility class to restore a snapshot as a whole.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00163">snapshot.hpp:163</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html"><div class="ttname"><a href="classentt_1_1basic__registry.html">entt::basic_registry</a></div><div class="ttdoc">Fast and reliable entity-component system.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00044">registry.hpp:44</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__view_html"><div class="ttname"><a href="classentt_1_1basic__view.html">entt::basic_view</a></div><div class="ttdoc">View.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00024">fwd.hpp:24</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a0b54e231d069e8a231e14b223388808a"><div class="ttname"><a href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entt::entity</a></div><div class="ttdeci">entity</div><div class="ttdoc">Default entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00060">fwd.hpp:60</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html">entt::basic_snapshot_loader</a></div><div class="ttdoc">Utility class to restore a snapshot as a whole.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00160">snapshot.hpp:160</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20

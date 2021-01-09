@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -134,20 +134,24 @@ $(function() {
 <div class="line"><a name="l00105"></a><span class="lineno"><a class="line" href="structentt_1_1is__meta__pointer__like.html">  105</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1is__meta__pointer__like.html">is_meta_pointer_like</a>: std::false_type {};</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="namespaceentt.html#aaa8c390cfe71301a0c10f4844e98424c">  113</a></span>&#160;<span class="keyword">inline</span> constexpr <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#aaa8c390cfe71301a0c10f4844e98424c">is_meta_pointer_like_v</a> = <a class="code" href="structentt_1_1is__meta__pointer__like.html">is_meta_pointer_like&lt;Type&gt;::value</a>;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00114"></a><span class="lineno"><a class="line" href="structentt_1_1is__meta__pointer__like_3_01const_01Type_01_4.html">  114</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1is__meta__pointer__like.html">is_meta_pointer_like</a>&lt;const Type&gt;: <a class="code" href="structentt_1_1is__meta__pointer__like.html">is_meta_pointer_like</a>&lt;Type&gt; {};</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;}</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00122"></a><span class="lineno"><a class="line" href="namespaceentt.html#aaa8c390cfe71301a0c10f4844e98424c">  122</a></span>&#160;<span class="keyword">inline</span> constexpr <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#aaa8c390cfe71301a0c10f4844e98424c">is_meta_pointer_like_v</a> = <a class="code" href="structentt_1_1is__meta__pointer__like.html">is_meta_pointer_like&lt;Type&gt;::value</a>;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;}</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructentt_1_1is__meta__pointer__like_html"><div class="ttname"><a href="structentt_1_1is__meta__pointer__like.html">entt::is_meta_pointer_like</a></div><div class="ttdoc">Provides the member constant value to true if a given type is a pointer-like type from the point of v...</div><div class="ttdef"><b>Definition:</b> <a href="meta_2type__traits_8hpp_source.html#l00105">type_traits.hpp:105</a></div></div>
 <div class="ttc" id="astructentt_1_1has__meta__associative__container__traits_html"><div class="ttname"><a href="structentt_1_1has__meta__associative__container__traits.html">entt::has_meta_associative_container_traits</a></div><div class="ttdoc">Provides the member constant value to true if support for meta associative containers is enabled for ...</div><div class="ttdef"><b>Definition:</b> <a href="meta_2type__traits_8hpp_source.html#l00057">type_traits.hpp:57</a></div></div>
 <div class="ttc" id="astructentt_1_1is__key__only__meta__associative__container_html"><div class="ttname"><a href="structentt_1_1is__key__only__meta__associative__container.html">entt::is_key_only_meta_associative_container</a></div><div class="ttdoc">Provides the member constant value to true if a meta associative container claims to wrap a key-only ...</div><div class="ttdef"><b>Definition:</b> <a href="meta_2type__traits_8hpp_source.html#l00081">type_traits.hpp:81</a></div></div>
 <div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
-<div class="ttc" id="anamespaceentt_html_aaa8c390cfe71301a0c10f4844e98424c"><div class="ttname"><a href="namespaceentt.html#aaa8c390cfe71301a0c10f4844e98424c">entt::is_meta_pointer_like_v</a></div><div class="ttdeci">constexpr auto is_meta_pointer_like_v</div><div class="ttdoc">Helper variable template.</div><div class="ttdef"><b>Definition:</b> <a href="meta_2type__traits_8hpp_source.html#l00113">type_traits.hpp:113</a></div></div>
+<div class="ttc" id="anamespaceentt_html_aaa8c390cfe71301a0c10f4844e98424c"><div class="ttname"><a href="namespaceentt.html#aaa8c390cfe71301a0c10f4844e98424c">entt::is_meta_pointer_like_v</a></div><div class="ttdeci">constexpr auto is_meta_pointer_like_v</div><div class="ttdoc">Helper variable template.</div><div class="ttdef"><b>Definition:</b> <a href="meta_2type__traits_8hpp_source.html#l00122">type_traits.hpp:122</a></div></div>
 <div class="ttc" id="astructentt_1_1meta__associative__container__traits_html"><div class="ttname"><a href="structentt_1_1meta__associative__container__traits.html">entt::meta_associative_container_traits</a></div><div class="ttdoc">Traits class template to be specialized to enable support for meta associative containers.</div><div class="ttdef"><b>Definition:</b> <a href="meta_2type__traits_8hpp_source.html#l00024">type_traits.hpp:24</a></div></div>
 <div class="ttc" id="anamespaceentt_html_ad454bd385d2c2be989c83dbbaaaef828"><div class="ttname"><a href="namespaceentt.html#ad454bd385d2c2be989c83dbbaaaef828">entt::has_meta_associative_container_traits_v</a></div><div class="ttdeci">constexpr auto has_meta_associative_container_traits_v</div><div class="ttdoc">Helper variable template.</div><div class="ttdef"><b>Definition:</b> <a href="meta_2type__traits_8hpp_source.html#l00072">type_traits.hpp:72</a></div></div>
 <div class="ttc" id="astructentt_1_1has__meta__sequence__container__traits_html"><div class="ttname"><a href="structentt_1_1has__meta__sequence__container__traits.html">entt::has_meta_sequence_container_traits</a></div><div class="ttdoc">Provides the member constant value to true if support for meta sequence containers is enabled for the...</div><div class="ttdef"><b>Definition:</b> <a href="meta_2type__traits_8hpp_source.html#l00033">type_traits.hpp:33</a></div></div>

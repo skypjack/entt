@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -70,7 +70,6 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classentt_1_1basic__runtime__view-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">entt::basic_runtime_view&lt; Entity &gt; Class Template Reference</div>  </div>
@@ -99,12 +98,16 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab91318abb3728adf349cd08c428c2be8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__runtime__view.html#aabb4450ce3d686fe05bd92e5975d11fb">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__runtime__view.html#ab91318abb3728adf349cd08c428c2be8">size</a> () const</td></tr>
-<tr class="memdesc:ab91318abb3728adf349cd08c428c2be8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Estimates the number of entities that have the given components.  <a href="classentt_1_1basic__runtime__view.html#ab91318abb3728adf349cd08c428c2be8">More...</a><br /></td></tr>
-<tr class="separator:ab91318abb3728adf349cd08c428c2be8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b4be964c6e2a95073ab112693ff1fd1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__runtime__view.html#a2b4be964c6e2a95073ab112693ff1fd1">empty</a> () const</td></tr>
-<tr class="memdesc:a2b4be964c6e2a95073ab112693ff1fd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the view is definitely empty.  <a href="classentt_1_1basic__runtime__view.html#a2b4be964c6e2a95073ab112693ff1fd1">More...</a><br /></td></tr>
-<tr class="separator:a2b4be964c6e2a95073ab112693ff1fd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09a9df1f5e3d453858748d4827530b30"><td class="memItemLeft" align="right" valign="top"><a id="a09a9df1f5e3d453858748d4827530b30"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__runtime__view.html#a09a9df1f5e3d453858748d4827530b30">basic_runtime_view</a> () noexcept</td></tr>
+<tr class="memdesc:a09a9df1f5e3d453858748d4827530b30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor to use to create empty, invalid views. <br /></td></tr>
+<tr class="separator:a09a9df1f5e3d453858748d4827530b30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e2165cca4c7dc6afc263a121c106a31"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__runtime__view.html#a4e2165cca4c7dc6afc263a121c106a31">basic_runtime_view</a> (std::vector&lt; const <a class="el" href="classentt_1_1basic__sparse__set.html">basic_sparse_set</a>&lt; Entity &gt; * &gt; cpools, std::vector&lt; const <a class="el" href="classentt_1_1basic__sparse__set.html">basic_sparse_set</a>&lt; Entity &gt; * &gt; epools) noexcept</td></tr>
+<tr class="memdesc:a4e2165cca4c7dc6afc263a121c106a31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a runtime view from a set of storage classes.  <a href="classentt_1_1basic__runtime__view.html#a4e2165cca4c7dc6afc263a121c106a31">More...</a><br /></td></tr>
+<tr class="separator:a4e2165cca4c7dc6afc263a121c106a31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc03b5d755f01f2417beadca306a30f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__runtime__view.html#aabb4450ce3d686fe05bd92e5975d11fb">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__runtime__view.html#afc03b5d755f01f2417beadca306a30f7">size_hint</a> () const</td></tr>
+<tr class="memdesc:afc03b5d755f01f2417beadca306a30f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Estimates the number of entities iterated by the view.  <a href="classentt_1_1basic__runtime__view.html#afc03b5d755f01f2417beadca306a30f7">More...</a><br /></td></tr>
+<tr class="separator:afc03b5d755f01f2417beadca306a30f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1d8a9b29404f27c02ff496fb52318ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__runtime__view.html#a9ae6398953c3d724227e0fb25a7b61bd">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__runtime__view.html#aa1d8a9b29404f27c02ff496fb52318ec">begin</a> () const</td></tr>
 <tr class="memdesc:aa1d8a9b29404f27c02ff496fb52318ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first entity that has the given components.  <a href="classentt_1_1basic__runtime__view.html#aa1d8a9b29404f27c02ff496fb52318ec">More...</a><br /></td></tr>
 <tr class="separator:aa1d8a9b29404f27c02ff496fb52318ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,13 +121,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a79fe059a28f768f4dc82edf48438cce0"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__runtime__view.html#a79fe059a28f768f4dc82edf48438cce0">each</a> (Func func) const</td></tr>
 <tr class="memdesc:a79fe059a28f768f4dc82edf48438cce0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates entities and applies the given function object to them.  <a href="classentt_1_1basic__runtime__view.html#a79fe059a28f768f4dc82edf48438cce0">More...</a><br /></td></tr>
 <tr class="separator:a79fe059a28f768f4dc82edf48438cce0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a60c928831c22b7dd2216dbc469f68f24"><td class="memItemLeft" align="right" valign="top"><a id="a60c928831c22b7dd2216dbc469f68f24"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__runtime__view.html#a60c928831c22b7dd2216dbc469f68f24">basic_registry&lt; Entity &gt;</a></td></tr>
-<tr class="memdesc:a60c928831c22b7dd2216dbc469f68f24"><td class="mdescLeft">&#160;</td><td class="mdescRight">A registry is allowed to create views. <br /></td></tr>
-<tr class="separator:a60c928831c22b7dd2216dbc469f68f24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity&gt;<br />
@@ -132,7 +128,7 @@ class entt::basic_runtime_view&lt; Entity &gt;</h3>
 
 <p>Runtime view. </p>
 <p>Runtime views iterate over those entities that have at least all the given components in their bags. During initialization, a runtime view looks at the number of entities available for each component and picks up a reference to the smallest set of candidate entities in order to get a performance boost when iterate.<br  />
- Order of elements during iterations are highly dependent on the order of the underlying data structures. See <a class="el" href="classentt_1_1sparse__set.html" title="Basic sparse set implementation.">sparse_set</a> and its specializations for more details.</p>
+ Order of elements during iterations are highly dependent on the order of the underlying data structures. See sparse_set and its specializations for more details.</p>
 <p><b>Important</b> </p>
 <p>Iterators aren't invalidated if:</p>
 <ul>
@@ -151,7 +147,57 @@ class entt::basic_runtime_view&lt; Entity &gt;</h3>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00057">57</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a4e2165cca4c7dc6afc263a121c106a31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e2165cca4c7dc6afc263a121c106a31">&#9670;&nbsp;</a></span>basic_runtime_view()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1basic__runtime__view.html">entt::basic_runtime_view</a>&lt; Entity &gt;::<a class="el" href="classentt_1_1basic__runtime__view.html">basic_runtime_view</a> </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; const <a class="el" href="classentt_1_1basic__sparse__set.html">basic_sparse_set</a>&lt; Entity &gt; * &gt;&#160;</td>
+          <td class="paramname"><em>cpools</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; const <a class="el" href="classentt_1_1basic__sparse__set.html">basic_sparse_set</a>&lt; Entity &gt; * &gt;&#160;</td>
+          <td class="paramname"><em>epools</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a runtime view from a set of storage classes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cpools</td><td>The storage for the types to iterate. </td></tr>
+    <tr><td class="paramname">epools</td><td>The storage for the types used to filter the view. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00152">152</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="aa1d8a9b29404f27c02ff496fb52318ec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa1d8a9b29404f27c02ff496fb52318ec">&#9670;&nbsp;</a></span>begin()</h2>
 
@@ -179,10 +225,9 @@ template&lt;typename Entity &gt; </div>
 
 <p>Returns an iterator to the first entity that has the given components. </p>
 <p>The returned iterator points to the first entity that has the given components. If the view is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__runtime__view.html#a5fc38f0e738d83d81a98b65b0e45d30b" title="Returns an iterator that is past the last entity that has the given components.">end()</a></code>.</p>
-<dl class="section note"><dt>Note</dt><dd>Iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00186">186</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00182">182</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -221,7 +266,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the view contains the given entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00214">214</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00206">206</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -270,39 +315,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00235">235</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a2b4be964c6e2a95073ab112693ff1fd1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b4be964c6e2a95073ab112693ff1fd1">&#9670;&nbsp;</a></span>empty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classentt_1_1basic__runtime__view.html">entt::basic_runtime_view</a>&lt; Entity &gt;::empty </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Checks if the view is definitely empty. </p>
-<dl class="section return"><dt>Returns</dt><dd>True if the view is definitely empty, false otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00168">168</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00227">227</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -333,15 +346,14 @@ template&lt;typename Entity &gt; </div>
 
 <p>Returns an iterator that is past the last entity that has the given components. </p>
 <p>The returned iterator points to the entity following the last entity that has the given components. Attempting to dereference the returned iterator results in undefined behavior.</p>
-<dl class="section note"><dt>Note</dt><dd>Iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00205">205</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00197">197</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ab91318abb3728adf349cd08c428c2be8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab91318abb3728adf349cd08c428c2be8">&#9670;&nbsp;</a></span>size()</h2>
+<a id="afc03b5d755f01f2417beadca306a30f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc03b5d755f01f2417beadca306a30f7">&#9670;&nbsp;</a></span>size_hint()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -352,7 +364,7 @@ template&lt;typename Entity &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__runtime__view.html#aabb4450ce3d686fe05bd92e5975d11fb">size_type</a> <a class="el" href="classentt_1_1basic__runtime__view.html">entt::basic_runtime_view</a>&lt; Entity &gt;::size </td>
+          <td class="memname"><a class="el" href="classentt_1_1basic__runtime__view.html#aabb4450ce3d686fe05bd92e5975d11fb">size_type</a> <a class="el" href="classentt_1_1basic__runtime__view.html">entt::basic_runtime_view</a>&lt; Entity &gt;::size_hint </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -365,10 +377,10 @@ template&lt;typename Entity &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Estimates the number of entities that have the given components. </p>
-<dl class="section return"><dt>Returns</dt><dd>Estimated number of entities that have the given components. </dd></dl>
+<p>Estimates the number of entities iterated by the view. </p>
+<dl class="section return"><dt>Returns</dt><dd>Estimated number of entities iterated by the view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00160">160</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00168">168</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -377,7 +389,7 @@ template&lt;typename Entity &gt; </div>
 <li>src/entt/entity/<a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a></li>
 </ul>
 </div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1basic__runtime__view_html_a7ede80f53e93473099819167d42bf2f1"><div class="ttname"><a href="classentt_1_1basic__runtime__view.html#a7ede80f53e93473099819167d42bf2f1">entt::basic_runtime_view::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="runtime__view_8hpp_source.html#l00150">runtime_view.hpp:150</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__runtime__view_html_a7ede80f53e93473099819167d42bf2f1"><div class="ttname"><a href="classentt_1_1basic__runtime__view.html#a7ede80f53e93473099819167d42bf2f1">entt::basic_runtime_view::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="runtime__view_8hpp_source.html#l00135">runtime_view.hpp:135</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20

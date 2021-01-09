@@ -1,5 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1internal_1_1basic__container.html" title=" " alt="" coords="5,49,175,105"/>
-<area shape="rect" id="node2" href="$structentt_1_1internal_1_1container__traits.html" title=" " alt="" coords="223,5,483,149"/>
-<area shape="rect" id="node3" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::maps of any type." alt="" coords="531,49,733,105"/>
+<area shape="rect" id="node1" href="$structentt_1_1constness__as_3_01To_00_01const_01From_01_4.html" title="Transcribes the constness of a type to another type." alt="" coords="5,5,140,47"/>
 </map>

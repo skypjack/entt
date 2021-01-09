@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['const_5fhandle_807',['const_handle',['../namespaceentt.html#a54ab1aae5e5786a3ebb3b9bf1c7e82bd',1,'entt']]],
-  ['const_5fiterator_808',['const_iterator',['../classentt_1_1storage.html#a1ce01ec25f3e24f4741685ac40b4254d',1,'entt::storage']]],
-  ['const_5freverse_5fiterator_809',['const_reverse_iterator',['../classentt_1_1storage.html#aa2aea6066f19aec455f9250458f8a669',1,'entt::storage']]],
-  ['continuous_5floader_810',['continuous_loader',['../namespaceentt.html#a37b5b489846f6f2a5d143db2b4aea5d0',1,'entt']]],
-  ['current_5ftype_811',['current_type',['../structentt_1_1basic__collector_3_01matcher_3_01type__list_3_01Reject_8_8_8_01_4_00_01type__list_98a79514dcad34a82f321f0796064ffb.html#ac7c32cf26795aa4fc08d21597c68bc3d',1,'entt::basic_collector&lt; matcher&lt; type_list&lt; Reject... &gt;, type_list&lt; Require... &gt;, Rule... &gt;, Other... &gt;']]]
+  ['delta_5ftype_980',['delta_type',['../classentt_1_1process.html#a625b574ea6d83e3a4933acc3d0279295',1,'entt::process']]],
+  ['difference_5ftype_981',['difference_type',['../structentt_1_1entt__traits_3_01std_1_1uint32__t_01_4.html#a9809b457e16f4a071a91530b23c930d6',1,'entt::entt_traits&lt; std::uint32_t &gt;::difference_type()'],['../structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#afba2f77f80b0bf89a208f6876ab67271',1,'entt::entt_traits&lt; std::uint64_t &gt;::difference_type()'],['../classentt_1_1meta__sequence__container_1_1meta__iterator.html#ae4a39185109f86cd44d997beb3a3b3f5',1,'entt::meta_sequence_container::meta_iterator::difference_type()'],['../classentt_1_1meta__associative__container_1_1meta__iterator.html#a901506acc5d79943261e81b3782825ea',1,'entt::meta_associative_container::meta_iterator::difference_type()']]]
 ];

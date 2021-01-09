@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['meta_5fsequence_5fcontainer_861',['meta_sequence_container',['../classentt_1_1meta__sequence__container_1_1meta__iterator.html#a6919bcefed41cd55d6154072fcea2e43',1,'entt::meta_sequence_container::meta_iterator']]]
+  ['emitter_1038',['emitter',['../structentt_1_1emitter_1_1connection.html#a0f3bb10ad57dc0e06298fc9ba38a7bd9',1,'entt::emitter::connection']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['object_5ftype_833',['object_type',['../classentt_1_1storage.html#a631919f749405616e64372326052a285',1,'entt::storage::object_type()'],['../classentt_1_1storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01is__eto__eligible__v_3_01Type_01_4_01_4_01_4.html#adea6539f51a7df32b1b08c53d9aaca27',1,'entt::storage&lt; Entity, Type, std::enable_if_t&lt; is_eto_eligible_v&lt; Type &gt; &gt; &gt;::object_type()']]],
-  ['observer_834',['observer',['../namespaceentt.html#a48dfbb2991c5a19c6e2578830f7e3eda',1,'entt']]]
+  ['pointer_1005',['pointer',['../classentt_1_1meta__sequence__container_1_1meta__iterator.html#a5ce414ee556eed15b08b248af0473d1a',1,'entt::meta_sequence_container::meta_iterator::pointer()'],['../classentt_1_1meta__associative__container_1_1meta__iterator.html#a6e07c05c8778bc8c9f45f1dea44b4c40',1,'entt::meta_associative_container::meta_iterator::pointer()']]],
+  ['poly_5fstorage_1006',['poly_storage',['../classentt_1_1basic__registry.html#aad36d8c035f2315d7013277e973dcffb',1,'entt::basic_registry']]]
 ];

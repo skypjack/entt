@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -66,14 +66,14 @@ $(function() {
 <div class="title">Crash Course: events, signals and everything in between </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md115"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md127"></a>
 Introduction</h1>
 <p>Signals are usually a core part of games and software architectures in general.<br  />
  Roughly speaking, they help to decouple the various parts of a system while allowing them to communicate with each other somehow.</p>
 <p>The so called <em>modern C++</em> comes with a tool that can be useful in these terms, the <code>std::function</code>. As an example, it can be used to create delegates.<br  />
  However, there is no guarantee that an <code>std::function</code> does not perform allocations under the hood and this could be problematic sometimes. Furthermore, it solves a problem but may not adapt well to other requirements that may arise from time to time.</p>
 <p>In case that the flexibility and power of an <code>std::function</code> isn't required or if the price to pay for them is too high,<code>EnTT</code> offers a complete set of lightweight classes to solve the same and many other problems.</p>
-<h1><a class="anchor" id="autotoc_md116"></a>
+<h1><a class="anchor" id="autotoc_md128"></a>
 Delegate</h1>
 <p>A delegate can be used as a general purpose invoker with no memory overhead for free functions and members provided along with an instance on which to invoke them.<br  />
  It doesn't claim to be a drop-in replacement for an <code>std::function</code>, so don't expect to use it whenever an <code>std::function</code> fits well. That said, it's most likely even a better fit than an <code>std::function</code> in a lot of cases, so expect to use it quite a lot anyway.</p>
@@ -120,14 +120,14 @@ Delegate</h1>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> ret = <a class="code" href="namespaceentt.html#a865c97b32a0858165d34ed9820cbdef1">delegate</a>(42);</div>
 </div><!-- fragment --><p>In all cases, the listeners don't have to strictly follow the signature of the delegate. As long as a listener can be invoked with the given arguments to yield a result that is convertible to the given result type, everything works just fine.</p>
 <p>As a side note, members of classes may or may not be associated with instances. If they are not, the first argument of the function type must be that of the class on which the members operate and an instance of this class must obviously be passed when invoking the delegate:</p>
-<div class="fragment"><div class="line">entt::delegate&lt;void(my_struct &amp;, int)&gt; delegate;</div>
-<div class="line">delegate.connect&lt;&amp;my_struct::f&gt;();</div>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1delegate.html">entt::delegate</a>&lt;void(my_struct &amp;, <span class="keywordtype">int</span>)&gt; <a class="code" href="namespaceentt.html#a865c97b32a0858165d34ed9820cbdef1">delegate</a>;</div>
+<div class="line"><a class="code" href="namespaceentt.html#a865c97b32a0858165d34ed9820cbdef1">delegate</a>.connect&lt;&amp;my_struct::f&gt;();</div>
 <div class="line"> </div>
 <div class="line">my_struct instance;</div>
-<div class="line">delegate(instance, 42);</div>
+<div class="line"><a class="code" href="namespaceentt.html#a865c97b32a0858165d34ed9820cbdef1">delegate</a>(instance, 42);</div>
 </div><!-- fragment --><p>In this case, it's not possible to deduce the function type since the first argument doesn't necessarily have to be a reference (for example, it can be a pointer, as well as a const reference).<br  />
  Therefore, the function type must be declared explicitly for unbound members.</p>
-<h2><a class="anchor" id="autotoc_md117"></a>
+<h2><a class="anchor" id="autotoc_md129"></a>
 Runtime arguments</h2>
 <p>The <code>delegate</code> class is meant to be used primarily with template arguments. However, as a consequence of its design, it can also offer minimal support for runtime arguments.<br  />
  When used in this modality, some feature aren't supported though. In particular:</p>
@@ -149,7 +149,7 @@ Runtime arguments</h2>
 <div class="line"><a class="code" href="namespaceentt.html#a865c97b32a0858165d34ed9820cbdef1">delegate</a>.connect(&amp;func, &amp;value);</div>
 </div><!-- fragment --><p>The type of the delegate is deduced from the function if possible. In this case, since the first argument is an implementation detail, the deduced function type is <code>int(int)</code>.<br  />
  Invoking a delegate built in this way follows the same rules as previously explained.</p>
-<h2><a class="anchor" id="autotoc_md118"></a>
+<h2><a class="anchor" id="autotoc_md130"></a>
 Lambda support</h2>
 <p>In general, the <code>delegate</code> class doesn't fully support lambda functions in all their nuances. The reason is pretty simple: a <code>delegate</code> isn't a drop-in replacement for an <code>std::function</code>. Instead, it tries to overcome the problems with the latter.<br  />
  That being said, non-capturing lambda functions are supported, even though some feature aren't available in this case.</p>
@@ -167,7 +167,7 @@ Lambda support</h2>
 <div class="line">    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>my_struct *<span class="keyword">&gt;</span>(ptr)-&gt;f(value);</div>
 <div class="line">}, &amp;instance);</div>
 </div><!-- fragment --><p>As above, the first parameter (<code>const void *</code>) isn't part of the function type of the delegate and is used to dispatch arbitrary user data back and forth. In other terms, the function type of the delegate above is <code>int(int)</code>.</p>
-<h1><a class="anchor" id="autotoc_md119"></a>
+<h1><a class="anchor" id="autotoc_md131"></a>
 Signals</h1>
 <p>Signal handlers work with references to classes, function pointers and pointers to members. Listeners can be any kind of objects and users are in charge of connecting and disconnecting them from a signal to avoid crashes due to different lifetimes. On the other side, performance shouldn't be affected that much by the presence of such a signal handler.<br  />
  Signals make use of delegates internally and therefore they undergo the same rules and offer similar functionalities. It may be a good idea to consult the documentation of the <code>delegate</code> class for further information.</p>
@@ -242,7 +242,7 @@ Signals</h1>
 <div class="line"> </div>
 <div class="line">my_collector <a class="code" href="namespaceentt.html#aea8b073b774362fe800d9cce3542927a">collector</a>;</div>
 <div class="line">signal.collect(std::ref(collector));</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md120"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md132"></a>
 Event dispatcher</h1>
 <p>The event dispatcher class is designed so as to be used in a loop. It allows users both to trigger immediate events or to queue events to be published all together once per tick.<br  />
  This class shares part of its API with the one of the signal handler, but it doesn't require that all the types of events are specified when declared:</p>
@@ -281,7 +281,7 @@ Event dispatcher</h1>
 <div class="line"><span class="comment">// emits all the events queued so far at once</span></div>
 <div class="line">dispatcher.update();</div>
 </div><!-- fragment --><p>This way users can embed the dispatcher in a loop and literally dispatch events once per tick to their systems.</p>
-<h1><a class="anchor" id="autotoc_md121"></a>
+<h1><a class="anchor" id="autotoc_md133"></a>
 Event emitter</h1>
 <p>A general purpose event emitter thought mainly for those cases where it comes to working with asynchronous stuff.<br  />
  Originally designed to fit the requirements of <a href="https://github.com/skypjack/uvw"><code>uvw</code></a> (a wrapper for <code>libuv</code> written in modern C++), it was adapted later to be included in this library.</p>
@@ -343,10 +343,10 @@ Event emitter</h1>
 <div class="ttc" id="aclassentt_1_1sigh_html"><div class="ttname"><a href="classentt_1_1sigh.html">entt::sigh</a></div><div class="ttdoc">Unmanaged signal handler.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00030">fwd.hpp:30</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a1367d938e16a6c5b6aaedab5cf10f295"><div class="ttname"><a href="namespaceentt.html#a1367d938e16a6c5b6aaedab5cf10f295">entt::sink</a></div><div class="ttdeci">sink(sigh&lt; Ret(Args...)&gt; &amp;) noexcept -&gt; sink&lt; Ret(Args...)&gt;</div><div class="ttdoc">Deduction guide.</div></div>
 <div class="ttc" id="anamespaceentt_html_a865c97b32a0858165d34ed9820cbdef1"><div class="ttname"><a href="namespaceentt.html#a865c97b32a0858165d34ed9820cbdef1">entt::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Candidate &gt;) noexcept -&gt; delegate&lt; std::remove_pointer_t&lt; internal::function_pointer_t&lt; decltype(Candidate)&gt;&gt;&gt;</div><div class="ttdoc">Deduction guide.</div></div>
-<div class="ttc" id="anamespaceentt_html_aea8b073b774362fe800d9cce3542927a"><div class="ttname"><a href="namespaceentt.html#aea8b073b774362fe800d9cce3542927a">entt::collector</a></div><div class="ttdeci">constexpr basic_collector collector</div><div class="ttdoc">Variable template used to ease the definition of collectors.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00118">observer.hpp:118</a></div></div>
+<div class="ttc" id="anamespaceentt_html_aea8b073b774362fe800d9cce3542927a"><div class="ttname"><a href="namespaceentt.html#aea8b073b774362fe800d9cce3542927a">entt::collector</a></div><div class="ttdeci">constexpr basic_collector collector</div><div class="ttdoc">Variable template used to ease the definition of collectors.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00119">observer.hpp:119</a></div></div>
 <div class="ttc" id="aclassentt_1_1dispatcher_html"><div class="ttname"><a href="classentt_1_1dispatcher.html">entt::dispatcher</a></div><div class="ttdoc">Basic dispatcher implementation.</div><div class="ttdef"><b>Definition:</b> <a href="dispatcher_8hpp_source.html#l00031">dispatcher.hpp:31</a></div></div>
 <div class="ttc" id="aclassentt_1_1sink_html"><div class="ttname"><a href="classentt_1_1sink.html">entt::sink</a></div><div class="ttdoc">Sink class.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00026">fwd.hpp:26</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_html"><div class="ttname"><a href="classentt_1_1delegate.html">entt::delegate</a></div><div class="ttdoc">Basic delegate implementation.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00081">delegate.hpp:81</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_html"><div class="ttname"><a href="classentt_1_1delegate.html">entt::delegate</a></div><div class="ttdoc">Basic delegate implementation.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00082">delegate.hpp:82</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20

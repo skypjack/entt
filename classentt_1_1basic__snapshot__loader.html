@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -69,7 +69,6 @@ $(function() {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classentt_1_1basic__snapshot__loader-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">entt::basic_snapshot_loader&lt; Entity &gt; Class Template Reference</div>  </div>
@@ -111,13 +110,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acd881016761f5eb598763fbf3595a625"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__snapshot__loader.html#acd881016761f5eb598763fbf3595a625">orphans</a> () const</td></tr>
 <tr class="memdesc:acd881016761f5eb598763fbf3595a625"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys those entities that have no components.  <a href="classentt_1_1basic__snapshot__loader.html#acd881016761f5eb598763fbf3595a625">More...</a><br /></td></tr>
 <tr class="separator:acd881016761f5eb598763fbf3595a625"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a60c928831c22b7dd2216dbc469f68f24"><td class="memItemLeft" align="right" valign="top"><a id="a60c928831c22b7dd2216dbc469f68f24"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__snapshot__loader.html#a60c928831c22b7dd2216dbc469f68f24">basic_registry&lt; Entity &gt;</a></td></tr>
-<tr class="memdesc:a60c928831c22b7dd2216dbc469f68f24"><td class="mdescLeft">&#160;</td><td class="mdescRight">A registry is allowed to create snapshot loaders. <br /></td></tr>
-<tr class="separator:a60c928831c22b7dd2216dbc469f68f24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity&gt;<br />
@@ -133,7 +125,7 @@ class entt::basic_snapshot_loader&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00163">163</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00160">160</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a03d8dd8dee059da759e407387b09ff8d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a03d8dd8dee059da759e407387b09ff8d">&#9670;&nbsp;</a></span>basic_snapshot_loader()</h2>
@@ -169,7 +161,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00203">203</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00197">197</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +211,7 @@ template&lt;typename... Component, typename Archive &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid loader to continue restoring data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00256">256</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00253">253</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +259,7 @@ template&lt;typename Archive &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid loader to continue restoring data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00227">227</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00221">221</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +324,7 @@ template&lt;typename Entity &gt; </div>
  This functions helps to identify and destroy those entities.</p>
 <dl class="section return"><dt>Returns</dt><dd>A valid loader to continue restoring data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00271">271</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00268">268</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>

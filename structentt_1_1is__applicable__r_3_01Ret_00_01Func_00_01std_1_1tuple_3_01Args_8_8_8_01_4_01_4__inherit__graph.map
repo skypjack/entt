@@ -1,0 +1,4 @@
+<map id="entt::is_applicable_r&lt; Ret, Func, std::tuple&lt; Args... &gt; &gt;" name="entt::is_applicable_r&lt; Ret, Func, std::tuple&lt; Args... &gt; &gt;">
+<area shape="rect" id="node1" title="Same as std::is_invocable_r, but with tuples for arguments." alt="" coords="13,95,149,151"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,5,156,47"/>
+</map>

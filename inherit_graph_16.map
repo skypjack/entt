@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1basic__registry.html" title="Fast and reliable entity&#45;component system." alt="" coords="5,5,139,47"/>
+<area shape="rect" id="node1" href="$structentt_1_1basic__container.html" title=" " alt="" coords="5,42,175,98"/>
+<area shape="rect" id="node2" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="223,5,456,135"/>
+<area shape="rect" id="node3" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1unordered__map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::unordered_maps of any type." alt="" coords="504,35,703,105"/>
 </map>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -74,12 +74,12 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define ENTT_CORE_IDENT_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;tuple&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;cstddef&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;utility&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;fwd.hpp&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;cstddef&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;utility&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;fwd.hpp&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;type_traits.hpp&quot;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
@@ -87,30 +87,30 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Types&gt;</div>
 <div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classentt_1_1identifier.html">   44</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1identifier.html">identifier</a> {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">using</span> tuple_type = std::tuple&lt;std::decay_t&lt;Types&gt;...&gt;;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type, std::size_t... Indexes&gt;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    [[nodiscard]] <span class="keyword">static</span> constexpr <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> get(std::index_sequence&lt;Indexes...&gt;) {</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        static_assert(std::disjunction_v&lt;std::is_same&lt;Type, Types&gt;...&gt;, <span class="stringliteral">&quot;Invalid type&quot;</span>);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordflow">return</span> (0 + ... + (std::is_same_v&lt;Type, std::tuple_element_t&lt;Indexes, tuple_type&gt;&gt; ? <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>(Indexes) : <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>{}));</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">   55</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">identifier_type</a> = <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">   59</a></span>&#160;    <span class="keyword">static</span> constexpr <a class="code" href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">identifier_type</a> <a class="code" href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">type</a> = get&lt;std::decay_t&lt;Type&gt;&gt;(std::index_sequence_for&lt;Types...&gt;{});</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;};</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type, std::size_t... Index&gt;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    [[nodiscard]] <span class="keyword">static</span> constexpr <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> get(std::index_sequence&lt;Index...&gt;) {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        static_assert(std::disjunction_v&lt;std::is_same&lt;Type, Types&gt;...&gt;, <span class="stringliteral">&quot;Invalid type&quot;</span>);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordflow">return</span> (0 + ... + (std::is_same_v&lt;Type, <a class="code" href="namespaceentt.html#ac839c1a03dba2436791d0056d6d0d1b6">type_list_element_t</a>&lt;Index, <a class="code" href="structentt_1_1type__list.html">type_list</a>&lt;std::decay_t&lt;Types&gt;...&gt;&gt;&gt; ? <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>{Index} : <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>{}));</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">   53</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">identifier_type</a> = <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">   57</a></span>&#160;    <span class="keyword">static</span> constexpr <a class="code" href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">identifier_type</a> <a class="code" href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">type</a> = get&lt;std::decay_t&lt;Type&gt;&gt;(std::index_sequence_for&lt;Types...&gt;{});</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;};</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;}</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1identifier_html_a5ed0559dce16ea40707502274dba382b"><div class="ttname"><a href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">entt::identifier::identifier_type</a></div><div class="ttdeci">id_type identifier_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00055">ident.hpp:55</a></div></div>
-<div class="ttc" id="aclassentt_1_1identifier_html_adb3aad553b8d57ef94581af39fc53178"><div class="ttname"><a href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">entt::identifier::type</a></div><div class="ttdeci">static constexpr identifier_type type</div><div class="ttdoc">Statically generated unique identifier for the given type.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00059">ident.hpp:59</a></div></div>
+<div class="ttc" id="astructentt_1_1type__list_html"><div class="ttname"><a href="structentt_1_1type__list.html">entt::type_list</a></div><div class="ttdoc">A class to use to push around lists of types, nothing more.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00127">type_traits.hpp:127</a></div></div>
+<div class="ttc" id="aclassentt_1_1identifier_html_a5ed0559dce16ea40707502274dba382b"><div class="ttname"><a href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">entt::identifier::identifier_type</a></div><div class="ttdeci">id_type identifier_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00053">ident.hpp:53</a></div></div>
+<div class="ttc" id="aclassentt_1_1identifier_html_adb3aad553b8d57ef94581af39fc53178"><div class="ttname"><a href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">entt::identifier::type</a></div><div class="ttdeci">static constexpr identifier_type type</div><div class="ttdoc">Statically generated unique identifier for the given type.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00057">ident.hpp:57</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00012">fwd.hpp:12</a></div></div>
+<div class="ttc" id="anamespaceentt_html_ac839c1a03dba2436791d0056d6d0d1b6"><div class="ttname"><a href="namespaceentt.html#ac839c1a03dba2436791d0056d6d0d1b6">entt::type_list_element_t</a></div><div class="ttdeci">typename type_list_element&lt; Index, List &gt;::type type_list_element_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00170">type_traits.hpp:170</a></div></div>
 <div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
 <div class="ttc" id="aclassentt_1_1identifier_html"><div class="ttname"><a href="classentt_1_1identifier.html">entt::identifier</a></div><div class="ttdoc">Types identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00044">ident.hpp:44</a></div></div>
 <!-- start footer part -->

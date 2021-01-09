@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -66,11 +66,11 @@ $(function() {
 <div class="title">Crash Course: service locator </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md91"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md94"></a>
 Introduction</h1>
 <p>Usually service locators are tightly bound to the services they expose and it's hard to define a general purpose solution. This template based implementation tries to fill the gap and to get rid of the burden of defining a different specific locator for each application.<br  />
  This class is tiny, partially unsafe and thus risky to use. Moreover it doesn't fit probably most of the scenarios in which a service locator is required. Look at it as a small tool that can sometimes be useful if users know how to handle it.</p>
-<h1><a class="anchor" id="autotoc_md92"></a>
+<h1><a class="anchor" id="autotoc_md95"></a>
 Service locator</h1>
 <p>The API is straightforward. The basic idea is that services are implemented by means of interfaces and rely on polymorphism.<br  />
  The locator is instantiated with the base type of the service if any and a concrete implementation is provided along with all the parameters required to initialize it. As an example:</p>

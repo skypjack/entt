@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['resource_5fcache_3c_20resource_20_3e_862',['resource_cache&lt; Resource &gt;',['../classentt_1_1resource__handle.html#a1cc23ee577fee7c2e019e4d2949d3cbe',1,'entt::resource_handle::resource_cache&lt; Resource &gt;()'],['../classentt_1_1resource__loader.html#a1cc23ee577fee7c2e019e4d2949d3cbe',1,'entt::resource_loader::resource_cache&lt; Resource &gt;()']]]
+  ['meta_5fsequence_5fcontainer_1039',['meta_sequence_container',['../classentt_1_1meta__sequence__container_1_1meta__iterator.html#a6919bcefed41cd55d6154072fcea2e43',1,'entt::meta_sequence_container::meta_iterator']]]
 ];

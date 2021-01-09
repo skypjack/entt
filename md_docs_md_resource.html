@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -66,13 +66,13 @@ $(function() {
 <div class="title">Crash Course: resource management </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md112"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md124"></a>
 Introduction</h1>
 <p>Resource management is usually one of the most critical part of a software like a game. Solutions are often tuned to the particular application. There exist several approaches and all of them are perfectly fine as long as they fit the requirements of the piece of software in which they are used.<br  />
  Examples are loading everything on start, loading on request, predictive loading, and so on.</p>
 <p><code>EnTT</code> doesn't pretend to offer a <em>one-fits-all</em> solution for the different cases. Instead, it offers a minimal and perhaps trivial cache that can be useful most of the time during prototyping and sometimes even in a production environment.<br  />
  For those interested in the subject, the plan is to improve it considerably over time in terms of performance, memory usage and functionalities. Hoping to make it, of course, one step at a time.</p>
-<h1><a class="anchor" id="autotoc_md113"></a>
+<h1><a class="anchor" id="autotoc_md125"></a>
 The resource, the loader and the cache</h1>
 <p>There are three main actors in the model: the resource, the loader and the cache.</p>
 <p>The <em>resource</em> is whatever users want it to be. An image, a video, an audio, whatever. There are no limits.<br  />
@@ -166,7 +166,7 @@ The resource, the loader and the cache</h1>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <div class="ttc" id="aclassentt_1_1resource__loader_html"><div class="ttname"><a href="classentt_1_1resource__loader.html">entt::resource_loader</a></div><div class="ttdoc">Base class for resource loaders.</div><div class="ttdef"><b>Definition:</b> <a href="loader_8hpp_source.html#l00045">loader.hpp:45</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a5a0027b922894421f703102c374c234c"><div class="ttname"><a href="namespaceentt.html#a5a0027b922894421f703102c374c234c">entt::handle</a></div><div class="ttdeci">basic_handle&lt; entity &gt; handle</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00068">fwd.hpp:68</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a5a0027b922894421f703102c374c234c"><div class="ttname"><a href="namespaceentt.html#a5a0027b922894421f703102c374c234c">entt::handle</a></div><div class="ttdeci">basic_handle&lt; entity &gt; handle</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00088">fwd.hpp:88</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00012">fwd.hpp:12</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__hashed__string_html"><div class="ttname"><a href="classentt_1_1basic__hashed__string.html">entt::basic_hashed_string</a></div><div class="ttdoc">Zero overhead unique identifier.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00064">hashed_string.hpp:64</a></div></div>
 <div class="ttc" id="astructentt_1_1resource__cache_html"><div class="ttname"><a href="structentt_1_1resource__cache.html">entt::resource_cache</a></div><div class="ttdoc">Simple cache for resources of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="cache_8hpp_source.html#l00030">cache.hpp:30</a></div></div>

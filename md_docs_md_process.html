@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -66,11 +66,11 @@ $(function() {
 <div class="title">Crash Course: cooperative scheduler </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md106"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md118"></a>
 Introduction</h1>
 <p>Sometimes processes are a useful tool to work around the strict definition of a system and introduce logic in a different way, usually without resorting to the introduction of other components.</p>
 <p><code>EnTT</code> offers a minimal support to this paradigm by introducing a few classes that users can use to define and execute cooperative processes.</p>
-<h1><a class="anchor" id="autotoc_md107"></a>
+<h1><a class="anchor" id="autotoc_md119"></a>
 The process</h1>
 <p>A typical process must inherit from the <code>process</code> class template that stays true to the CRTP idiom. Moreover, derived classes must specify what's the intended type for elapsed times.</p>
 <p>A process should expose publicly the following member functions whether required (note that it isn't required to define a function unless the derived class wants to <em>override</em> the default behavior):</p>
@@ -113,7 +113,7 @@ The process</h1>
 <div class="line"><span class="keyword">private</span>:</div>
 <div class="line">    delta_type remaining;</div>
 <div class="line">};</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md108"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md120"></a>
 Adaptor</h2>
 <p>Lambdas and functors can't be used directly with a scheduler for they are not properly defined processes with managed life cycles.<br  />
  This class helps in filling the gap and turning lambdas and functors into full featured processes usable by a scheduler.</p>
@@ -128,7 +128,7 @@ Adaptor</h2>
 </ul>
 <p>Both <code>succeed</code> and <code>fail</code> accept no parameters at all.</p>
 <p>Note that usually users shouldn't worry about creating adaptors at all. A scheduler creates them internally each and every time a lambda or a functor is used as a process.</p>
-<h1><a class="anchor" id="autotoc_md109"></a>
+<h1><a class="anchor" id="autotoc_md121"></a>
 The scheduler</h1>
 <p>A cooperative scheduler runs different processes and helps managing their life cycles.</p>
 <p>Each process is invoked once per tick. If it terminates, it's removed automatically from the scheduler and it's never invoked again. Otherwise it's a good candidate to run one more time the next tick.<br  />
@@ -180,9 +180,9 @@ The scheduler</h1>
 </div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <div class="ttc" id="aclassentt_1_1scheduler_html_a5a0f92dbe54b58751237a567e86805e0"><div class="ttname"><a href="classentt_1_1scheduler.html#a5a0f92dbe54b58751237a567e86805e0">entt::scheduler::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Discards all scheduled processes.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00147">scheduler.hpp:147</a></div></div>
-<div class="ttc" id="aclassentt_1_1process_html_a4380dab12dc4c7559ada2182468aa1db"><div class="ttname"><a href="classentt_1_1process.html#a4380dab12dc4c7559ada2182468aa1db">entt::process::succeed</a></div><div class="ttdeci">void succeed() noexcept</div><div class="ttdoc">Terminates a process with success if it's still alive.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00124">process.hpp:124</a></div></div>
+<div class="ttc" id="aclassentt_1_1process_html_a4380dab12dc4c7559ada2182468aa1db"><div class="ttname"><a href="classentt_1_1process.html#a4380dab12dc4c7559ada2182468aa1db">entt::process::succeed</a></div><div class="ttdeci">void succeed() noexcept</div><div class="ttdoc">Terminates a process with success if it's still alive.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00123">process.hpp:123</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html"><div class="ttname"><a href="classentt_1_1scheduler.html">entt::scheduler</a></div><div class="ttdoc">Cooperative scheduler for processes.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00044">scheduler.hpp:44</a></div></div>
-<div class="ttc" id="aclassentt_1_1process_html"><div class="ttname"><a href="classentt_1_1process.html">entt::process</a></div><div class="ttdoc">Base class for processes.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00074">process.hpp:74</a></div></div>
+<div class="ttc" id="aclassentt_1_1process_html"><div class="ttname"><a href="classentt_1_1process.html">entt::process</a></div><div class="ttdoc">Base class for processes.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00073">process.hpp:73</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_afcec47d6ec28a994af2a7097348ce59f"><div class="ttname"><a href="classentt_1_1scheduler.html#afcec47d6ec28a994af2a7097348ce59f">entt::scheduler::size_type</a></div><div class="ttdeci">std::size_t size_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00114">scheduler.hpp:114</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_a991b4a1e5c02f66734552ded7acec4df"><div class="ttname"><a href="classentt_1_1scheduler.html#a991b4a1e5c02f66734552ded7acec4df">entt::scheduler::size</a></div><div class="ttdeci">size_type size() const noexcept</div><div class="ttdoc">Number of processes currently scheduled.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00129">scheduler.hpp:129</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_a729c83e1983123c642a08cda67e486e3"><div class="ttname"><a href="classentt_1_1scheduler.html#a729c83e1983123c642a08cda67e486e3">entt::scheduler::attach</a></div><div class="ttdeci">auto attach(Args &amp;&amp;... args)</div><div class="ttdoc">Schedules a process for the next tick.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00177">scheduler.hpp:177</a></div></div>

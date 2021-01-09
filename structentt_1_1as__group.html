@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.20"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnTT: entt::as_group&lt; Const, Entity &gt; Struct Template Reference</title>
+<title>EnTT: entt::as_group&lt; Entity &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="structentt_1_1as__group-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">entt::as_group&lt; Const, Entity &gt; Struct Template Reference</div>  </div>
+<div class="title">entt::as_group&lt; Entity &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -82,29 +82,32 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a0931353ef28b22e1bd4b910e4f99e53f"><td class="memItemLeft" align="right" valign="top"><a id="a0931353ef28b22e1bd4b910e4f99e53f"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1as__group.html#a0931353ef28b22e1bd4b910e4f99e53f">registry_type</a> = std::conditional_t&lt; Const, const <a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; Entity &gt;, <a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; Entity &gt; &gt;</td></tr>
-<tr class="memdesc:a0931353ef28b22e1bd4b910e4f99e53f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of registry to convert. <br /></td></tr>
-<tr class="separator:a0931353ef28b22e1bd4b910e4f99e53f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9e7aee21b99a979368535a5d5054137"><td class="memItemLeft" align="right" valign="top"><a id="ab9e7aee21b99a979368535a5d5054137"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1as__group.html#ab9e7aee21b99a979368535a5d5054137">entity_type</a> = std::remove_const_t&lt; Entity &gt;</td></tr>
+<tr class="memdesc:ab9e7aee21b99a979368535a5d5054137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity identifier. <br /></td></tr>
+<tr class="separator:ab9e7aee21b99a979368535a5d5054137"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6aa30140ac29c50156197aad66b54ccb"><td class="memItemLeft" align="right" valign="top"><a id="a6aa30140ac29c50156197aad66b54ccb"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1as__group.html#a6aa30140ac29c50156197aad66b54ccb">registry_type</a> = <a class="el" href="namespaceentt.html#a7b051461867d3c5c97f77f10b662c26b">constness_as_t</a>&lt; <a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; <a class="el" href="structentt_1_1as__group.html#ab9e7aee21b99a979368535a5d5054137">entity_type</a> &gt;, Entity &gt;</td></tr>
+<tr class="memdesc:a6aa30140ac29c50156197aad66b54ccb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of registry to convert. <br /></td></tr>
+<tr class="separator:a6aa30140ac29c50156197aad66b54ccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aba20c0ec4b20a3ea050d5a1d9a06214b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1as__group.html#aba20c0ec4b20a3ea050d5a1d9a06214b">as_group</a> (<a class="el" href="structentt_1_1as__group.html#a0931353ef28b22e1bd4b910e4f99e53f">registry_type</a> &amp;source) noexcept</td></tr>
-<tr class="memdesc:aba20c0ec4b20a3ea050d5a1d9a06214b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a converter for a given registry.  <a href="structentt_1_1as__group.html#aba20c0ec4b20a3ea050d5a1d9a06214b">More...</a><br /></td></tr>
-<tr class="separator:aba20c0ec4b20a3ea050d5a1d9a06214b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b2cca9ea1f730bce2619c0f5e58393f"><td class="memTemplParams" colspan="2">template&lt;typename Exclude , typename Get , typename... Owned&gt; </td></tr>
-<tr class="memitem:a1b2cca9ea1f730bce2619c0f5e58393f"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1as__group.html#a1b2cca9ea1f730bce2619c0f5e58393f">operator basic_group&lt; Entity, Exclude, Get, Owned... &gt;</a> () const</td></tr>
-<tr class="memdesc:a1b2cca9ea1f730bce2619c0f5e58393f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion function from a registry to a group.  <a href="structentt_1_1as__group.html#a1b2cca9ea1f730bce2619c0f5e58393f">More...</a><br /></td></tr>
-<tr class="separator:a1b2cca9ea1f730bce2619c0f5e58393f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a631a3000218160018872f3046bce4a9a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1as__group.html#a631a3000218160018872f3046bce4a9a">as_group</a> (<a class="el" href="structentt_1_1as__group.html#a6aa30140ac29c50156197aad66b54ccb">registry_type</a> &amp;source) noexcept</td></tr>
+<tr class="memdesc:a631a3000218160018872f3046bce4a9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a converter for a given registry.  <a href="structentt_1_1as__group.html#a631a3000218160018872f3046bce4a9a">More...</a><br /></td></tr>
+<tr class="separator:a631a3000218160018872f3046bce4a9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96ea6c8822b55542d4f59530039394db"><td class="memTemplParams" colspan="2">template&lt;typename Exclude , typename Get , typename... Owned&gt; </td></tr>
+<tr class="memitem:a96ea6c8822b55542d4f59530039394db"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1as__group.html#a96ea6c8822b55542d4f59530039394db">operator basic_group&lt; entity_type, Exclude, Get, Owned... &gt;</a> () const</td></tr>
+<tr class="memdesc:a96ea6c8822b55542d4f59530039394db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion function from a registry to a group.  <a href="structentt_1_1as__group.html#a96ea6c8822b55542d4f59530039394db">More...</a><br /></td></tr>
+<tr class="separator:a96ea6c8822b55542d4f59530039394db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;bool Const, typename Entity&gt;<br />
-struct entt::as_group&lt; Const, Entity &gt;</h3>
+<div class="textblock"><h3>template&lt;typename Entity&gt;<br />
+struct entt::as_group&lt; Entity &gt;</h3>
 
 <p>Converts a registry to a group. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Const</td><td>Constness of the accepted registry. </td></tr>
     <tr><td class="paramname">Entity</td><td>A valid entity type (see <a class="el" href="structentt_1_1entt__traits.html" title="Entity traits.">entt_traits</a> for more details). </td></tr>
   </table>
   </dd>
@@ -112,21 +115,21 @@ struct entt::as_group&lt; Const, Entity &gt;</h3>
 
 <p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00071">71</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aba20c0ec4b20a3ea050d5a1d9a06214b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba20c0ec4b20a3ea050d5a1d9a06214b">&#9670;&nbsp;</a></span>as_group()</h2>
+<a id="a631a3000218160018872f3046bce4a9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a631a3000218160018872f3046bce4a9a">&#9670;&nbsp;</a></span>as_group()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;bool Const, typename Entity &gt; </div>
+template&lt;typename Entity &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1as__group.html">entt::as_group</a>&lt; Const, Entity &gt;::<a class="el" href="structentt_1_1as__group.html">as_group</a> </td>
+          <td class="memname"><a class="el" href="structentt_1_1as__group.html">entt::as_group</a>&lt; Entity &gt;::<a class="el" href="structentt_1_1as__group.html">as_group</a> </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structentt_1_1as__group.html#a0931353ef28b22e1bd4b910e4f99e53f">registry_type</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structentt_1_1as__group.html#a6aa30140ac29c50156197aad66b54ccb">registry_type</a> &amp;&#160;</td>
           <td class="paramname"><em>source</em></td><td>)</td>
           <td></td>
         </tr>
@@ -146,18 +149,18 @@ template&lt;bool Const, typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00079">79</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00081">81</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a1b2cca9ea1f730bce2619c0f5e58393f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b2cca9ea1f730bce2619c0f5e58393f">&#9670;&nbsp;</a></span>operator basic_group&lt; Entity, Exclude, Get, Owned... &gt;()</h2>
+<a id="a96ea6c8822b55542d4f59530039394db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96ea6c8822b55542d4f59530039394db">&#9670;&nbsp;</a></span>operator basic_group&lt; entity_type, Exclude, Get, Owned... &gt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;bool Const, typename Entity &gt; </div>
+template&lt;typename Entity &gt; </div>
 <div class="memtemplate">
 template&lt;typename Exclude , typename Get , typename... Owned&gt; </div>
 <table class="mlabels">
@@ -165,7 +168,7 @@ template&lt;typename Exclude , typename Get , typename... Owned&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1as__group.html">entt::as_group</a>&lt; Const, Entity &gt;::operator <a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt; Entity, Exclude, Get, Owned... &gt; </td>
+          <td class="memname"><a class="el" href="structentt_1_1as__group.html">entt::as_group</a>&lt; Entity &gt;::operator <a class="el" href="classentt_1_1basic__group.html">basic_group</a>&lt; <a class="el" href="structentt_1_1as__group.html#ab9e7aee21b99a979368535a5d5054137">entity_type</a>, Exclude, Get, Owned... &gt; </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -189,7 +192,7 @@ template&lt;typename Exclude , typename Get , typename... Owned&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created group. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00089">89</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00091">91</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>

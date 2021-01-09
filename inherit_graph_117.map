@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1y__combinator.html" title="Basic implementation of a y&#45;combinator." alt="" coords="5,5,136,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,46,56,73"/>
+<area shape="rect" id="node2" href="$structentt_1_1sigh__storage__mixin.html" title="Mixin type to use to add signal support to storage types." alt="" coords="113,5,240,47"/>
+<area shape="rect" id="node3" href="$structentt_1_1storage__adapter__mixin.html" title="Mixin type to use to wrap basic storage classes." alt="" coords="104,71,249,112"/>
 </map>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.2</span>
+   &#160;<span id="projectnumber">3.6.0</span>
    </div>
   </td>
  </tr>
@@ -97,7 +97,7 @@ $(function() {
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> It, <span class="keyword">typename</span> Compare = std::less&lt;&gt;&gt;</div>
 <div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="structentt_1_1insertion__sort.html#a73a5644fe5b683f9b9376c89ac47f2b8">   59</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structentt_1_1insertion__sort.html#a73a5644fe5b683f9b9376c89ac47f2b8">operator()</a>(It first, It last, Compare compare = Compare{}) <span class="keyword">const</span> {</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">if</span>(first &lt; last) {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = first+1; it &lt; last; ++it) {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = first + 1; it &lt; last; ++it) {</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <span class="keyword">auto</span> value = std::move(*it);</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <span class="keyword">auto</span> pre = it;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
@@ -130,17 +130,17 @@ $(function() {
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                std::size_t index[buckets]{};</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                std::size_t count[buckets]{};</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                std::for_each(from, to, [&amp;getter, &amp;count, start](<span class="keyword">const</span> value_type &amp;item) {</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                    ++count[(getter(item) &gt;&gt; start) &amp; mask];</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                });</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = from; it != to; ++it) {</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                    ++count[(getter(*it) &gt;&gt; start) &amp; mask];</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                }</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;                std::for_each(std::next(std::begin(index)), std::end(index), [index = std::begin(index), count = std::begin(count)](<span class="keyword">auto</span> &amp;item) <span class="keyword">mutable</span> {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;                    item = *(index++) + *(count++);</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                });</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;                <span class="keywordflow">for</span>(std::size_t pos{}, end = buckets - 1u; pos &lt; end; ++pos) {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;                    index[pos + 1u] = index[pos] + count[pos];</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                }</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;                std::for_each(from, to, [&amp;getter, &amp;out, &amp;index, start](value_type &amp;item) {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;                    out[index[(getter(item) &gt;&gt; start) &amp; mask]++] = std::move(item);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;                });</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;                <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = from; it != to; ++it) {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;                    out[index[(getter(*it) &gt;&gt; start) &amp; mask]++] = std::move(*it);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;                }</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            };</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <span class="keywordflow">for</span>(std::size_t pass = 0; pass &lt; (passes &amp; ~1); pass += 2) {</div>
