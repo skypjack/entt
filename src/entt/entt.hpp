@@ -29,7 +29,6 @@
 #include "meta/container.hpp"
 #include "meta/ctx.hpp"
 #include "meta/factory.hpp"
-#include "meta/internal.hpp"
 #include "meta/meta.hpp"
 #include "meta/pointer.hpp"
 #include "meta/policy.hpp"

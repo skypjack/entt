@@ -12,7 +12,6 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
-#include "internal.hpp"
 #include "meta.hpp"
 #include "policy.hpp"
 

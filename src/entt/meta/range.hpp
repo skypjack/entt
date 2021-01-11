@@ -4,7 +4,6 @@
 
 #include <cstddef>
 #include <iterator>
-#include "internal.hpp"
 
 
 namespace entt {
