@@ -129,84 +129,20 @@ struct meta_type_node {
 };
 
 
-template<typename Node>
-class meta_range {
-    struct range_iterator {
-        using difference_type = std::ptrdiff_t;
-        using value_type = Node;
-        using pointer = value_type *;
-        using reference = value_type &;
-        using iterator_category = std::forward_iterator_tag;
-
-        range_iterator() ENTT_NOEXCEPT = default;
-
-        range_iterator(Node *head) ENTT_NOEXCEPT
-            : node{head}
-        {}
-
-        range_iterator & operator++() ENTT_NOEXCEPT {
-            return node = node->next, *this;
-        }
-
-        range_iterator operator++(int) ENTT_NOEXCEPT {
-            range_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
-            return other.node == node;
-        }
-
-        [[nodiscard]] bool operator!=(const range_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            return node;
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return *operator->();
-        }
-
-    private:
-        Node *node{nullptr};
-    };
-
-public:
-    using iterator = range_iterator;
-
-    meta_range() ENTT_NOEXCEPT = default;
-
-    meta_range(Node *head)
-        : node{head}
-    {}
-
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{node};
-    }
-
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{};
-    }
-
-private:
-    Node *node{nullptr};
-};
-
-
-template<auto Member, typename Op>
-auto find_if(const Op &op, const meta_type_node *node)
+template<auto Member, typename Op, typename Node>
+auto meta_visit(const Op &op, const Node *node)
 -> std::decay_t<decltype(node->*Member)> {
-    for(auto &&curr: meta_range{node->*Member}) {
-        if(op(&curr)) {
-            return &curr;
+    for(auto *curr = node->*Member; curr; curr = curr->next) {
+        if(op(curr)) {
+            return curr;
         }
     }
 
-    for(auto &&curr: meta_range{node->base}) {
-        if(auto *ret = find_if<Member>(op, curr.type()); ret) {
-            return ret;
+    if constexpr(std::is_same_v<Node, meta_type_node>) {
+        for(auto *curr = node->base; curr; curr = curr->next) {
+            if(auto *ret = meta_visit<Member>(op, curr->type()); ret) {
+                return ret;
+            }
         }
     }
 

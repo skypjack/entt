@@ -31,16 +31,16 @@ class meta_range {
         {}
 
         range_iterator & operator++() ENTT_NOEXCEPT {
-            return ++it, *this;
+            return (it = it->next), *this;
         }
 
         range_iterator operator++(int) ENTT_NOEXCEPT {
             range_iterator orig = *this;
-            return it++, orig;
+            return ++(*this), orig;
         }
 
         [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return it.operator->();
+            return it;
         }
 
         [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
@@ -52,7 +52,7 @@ class meta_range {
         }
 
     private:
-        typename internal::meta_range<node_type>::iterator it{};
+        node_type *it{};
     };
 
 public:

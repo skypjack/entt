@@ -38,8 +38,13 @@ template<typename Type>
  * @return The meta type associated with the given identifier, if any.
  */
 [[nodiscard]] inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
-    internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.begin(), range.end(), [id](const auto &curr) { return curr.id == id; }).operator->();
+    for(auto *curr = *internal::meta_context::global(); curr; curr = curr->next) {
+        if(curr->id == id) {
+            return curr;
+        }
+    }
+
+    return {};
 }
 
 
@@ -50,8 +55,13 @@ template<typename Type>
  * @return The meta type associated with the given type info object, if any.
  */
 [[nodiscard]] inline meta_type resolve(const type_info info) ENTT_NOEXCEPT {
-    internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.begin(), range.end(), [info](const auto &curr) { return curr.info == info; }).operator->();
+    for(auto *curr = *internal::meta_context::global(); curr; curr = curr->next) {
+        if(curr->info == info) {
+            return curr;
+        }
+    }
+
+    return {};
 }
 
 
