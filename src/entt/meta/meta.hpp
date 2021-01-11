@@ -164,33 +164,22 @@ class meta_any {
     static void basic_vtable(const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] void *to) {
         switch(op) {
         case operation::DEREF:
-            if constexpr(is_meta_pointer_like_v<Type>) {
-                *static_cast<meta_any *>(to) = std::reference_wrapper{adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from))};
-            }
-            break;
         case operation::CDEREF:
             if constexpr(is_meta_pointer_like_v<Type>) {
-                *static_cast<meta_any *>(to) = std::cref(adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from)));
+                auto &&obj = adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from));
+                *static_cast<meta_any *>(to) = op == operation::DEREF ? meta_any{std::reference_wrapper{obj}} : meta_any{std::cref(obj)};
             }
             break;
         case operation::SEQ:
-            if constexpr(has_meta_sequence_container_traits_v<Type>) {
-                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, as_ref(const_cast<any &>(from)) };
-            }
-            break;
         case operation::CSEQ:
             if constexpr(has_meta_sequence_container_traits_v<Type>) {
-                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, as_ref(from) };
+                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, (op == operation::SEQ ? as_ref(const_cast<any &>(from)) : as_ref(from)) };
             }
             break;
         case operation::ASSOC:
-            if constexpr(has_meta_associative_container_traits_v<Type>) {
-                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, as_ref(const_cast<any &>(from)) };
-            }
-            break;
         case operation::CASSOC:
             if constexpr(has_meta_associative_container_traits_v<Type>) {
-                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, as_ref(from) };
+                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, (op == operation::ASSOC ? as_ref(const_cast<any &>(from)) : as_ref(from)) };
             }
             break;
         }
@@ -424,8 +413,7 @@ public:
             if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
                 return curr->type()->info == info;
             }, node); conv) {
-                auto other = conv->conv(std::as_const(storage).data());
-                swap(other, *this);
+                *this = conv->conv(std::as_const(storage).data());
                 return true;
             }
         }
