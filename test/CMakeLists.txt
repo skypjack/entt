@@ -187,7 +187,6 @@ SETUP_BASIC_TEST(locator entt/locator/locator.cpp)
 # Test meta
 
 SETUP_BASIC_TEST(meta_any entt/meta/meta_any.cpp)
-SETUP_BASIC_TEST(meta_base entt/meta/meta_base.cpp)
 SETUP_BASIC_TEST(meta_container entt/meta/meta_container.cpp)
 SETUP_BASIC_TEST(meta_ctor entt/meta/meta_ctor.cpp)
 SETUP_BASIC_TEST(meta_data entt/meta/meta_data.cpp)

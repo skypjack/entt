@@ -661,47 +661,6 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for base classes. */
-struct meta_base {
-    /*! @brief Node type. */
-    using node_type = internal::meta_base_node;
-
-    /*! @copydoc meta_prop::meta_prop */
-    meta_base(const node_type *curr = nullptr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-    /**
-     * @brief Returns the type to which an object belongs.
-     * @return The type to which the object belongs.
-     */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
-
-    /*! @copydoc meta_any::type */
-    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
-
-    /**
-     * @brief Casts an instance from a parent type to a base type.
-     * @param instance The instance to cast.
-     * @return An opaque pointer to the base type.
-     */
-    [[nodiscard]] const void * cast(const void *instance) const ENTT_NOEXCEPT {
-        return node->cast(instance);
-    }
-
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(node == nullptr);
-    }
-
-private:
-    const node_type *node;
-};
-
-
 /*! @brief Opaque wrapper for constructors. */
 struct meta_ctor {
     /*! @brief Node type. */
@@ -714,7 +673,10 @@ struct meta_ctor {
         : node{curr}
     {}
 
-    /*! @copydoc meta_base::parent */
+    /**
+     * @brief Returns the type to which an object belongs.
+     * @return The type to which the object belongs.
+     */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
@@ -807,7 +769,7 @@ struct meta_data {
         return node->id;
     }
 
-    /*! @copydoc meta_base::parent */
+    /*! @copydoc meta_ctor::parent */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
@@ -906,7 +868,7 @@ struct meta_func {
         return node->id;
     }
 
-    /*! @copydoc meta_base::parent */
+    /*! @copydoc meta_ctor::parent */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
@@ -1233,25 +1195,6 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level bases.
-     * @return An iterable range to use to visit top-level bases.
-     */
-    [[nodiscard]] meta_range<meta_base> base() const ENTT_NOEXCEPT {
-        return node->base;
-    }
-
-    /**
-     * @brief Returns the base associated with a given identifier.
-     * @param id Unique identifier.
-     * @return The base associated with the given identifier, if any.
-     */
-    [[nodiscard]] meta_base base(const id_type id) const {
-        return internal::find_if<&node_type::base>([id](const auto *curr) {
-            return curr->type()->id == id;
-        }, node);
-    }
-
-    /**
      * @brief Returns a range to use to visit top-level constructors.
      * @return An iterable range to use to visit top-level constructors.
      */
@@ -1574,16 +1517,6 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 [[nodiscard]] inline meta_any meta_any::get(const id_type id) {
     return type().get(id, *this);
-}
-
-
-[[nodiscard]] inline meta_type meta_base::parent() const ENTT_NOEXCEPT {
-    return node->parent;
-}
-
-
-[[nodiscard]] inline meta_type meta_base::type() const ENTT_NOEXCEPT {
-    return node->type();
 }
 
 

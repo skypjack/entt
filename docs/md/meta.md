@@ -344,11 +344,11 @@ member function in its API. Destructors are invoked implicitly by `meta_any`
 behind the scenes and users have not to deal with them explicitly. Furthermore,
 they have no name, cannot be searched and wouldn't have member functions to
 expose anyway.<br/>
-Similarly, conversion functions aren't directly accessible. They are used under
-the hood by `meta_any` and the other meta objects when needed.<br/>
-It wouldn't make sense to give direct access to these objects and to open the
+Similarly, conversion functions and base types aren't directly accessible. They
+are used internally by `meta_any` and the meta objects when needed.<br/>
+It wouldn't make sense to give direct access to these elements and to open the
 doors to the possibility of making mistakes. On the other side, the library
-already offers enough methods to use them correctly.
+already offers enough ways to use them correctly.
 
 Meta types and meta objects in general contain much more than what is said: a
 plethora of functions in addition to those listed whose purposes and uses go
