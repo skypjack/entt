@@ -266,23 +266,6 @@ TEST_F(MetaType, Base) {
     ASSERT_EQ(type.base("base"_hs).type(), entt::resolve<base_t>());
 }
 
-TEST_F(MetaType, Conv) {
-    auto type = entt::resolve<double>();
-    bool iterate = false;
-
-    for(auto curr: type.conv()) {
-        ASSERT_EQ(curr.type(), entt::resolve<int>());
-        iterate = true;
-    }
-
-    ASSERT_TRUE(iterate);
-
-    auto conv = type.conv<int>();
-
-    ASSERT_EQ(conv.type(), entt::resolve<int>());
-    ASSERT_FALSE(type.conv<char>());
-}
-
 TEST_F(MetaType, Ctor) {
     auto type = entt::resolve<clazz_t>();
     int counter{};

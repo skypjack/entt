@@ -314,19 +314,6 @@ The meta objects that compose a meta type are accessed in the following ways:
   accessible. They expose only a few methods to use to know the meta type of the
   base class and to convert a raw pointer between types.
 
-* _Meta conversion functions_. They are accessed by type:
-
-  ```cpp
-  auto conv = entt::resolve<double>().conv<int>();
-  ```
-
-  The returned type is `meta_conv` and may be invalid if there is no meta
-  conversion function associated with the given type.<br/>
-  The meta conversion functions are as thin as the meta bases and with a very
-  similar interface. The sole difference is that they return a newly created
-  instance wrapped in a `meta_any` object when they convert between different
-  types.
-
 All the objects thus obtained as well as the meta types can be explicitly
 converted to a boolean value to check if they are valid:
 
@@ -353,12 +340,15 @@ or may not be initialized, depending on whether a suitable constructor has been
 found or not.
 
 There is no object that wraps the destructor of a meta type nor a `destroy`
-member function in its API. The reason is quickly explained: destructors are
-invoked implicitly by `meta_any` behind the scenes and users have not to deal
-with them explicitly. Furthermore, they have no name, cannot be searched and
-wouldn't have member functions to expose anyway.<br/>
-Therefore, exposing destructors would be pointless and would add nothing to the
-library itself.
+member function in its API. Destructors are invoked implicitly by `meta_any`
+behind the scenes and users have not to deal with them explicitly. Furthermore,
+they have no name, cannot be searched and wouldn't have member functions to
+expose anyway.<br/>
+Similarly, conversion functions aren't directly accessible. They are used under
+the hood by `meta_any` and the other meta objects when needed.<br/>
+It wouldn't make sense to give direct access to these objects and to open the
+doors to the possibility of making mistakes. On the other side, the library
+already offers enough methods to use them correctly.
 
 Meta types and meta objects in general contain much more than what is said: a
 plethora of functions in addition to those listed whose purposes and uses go

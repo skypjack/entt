@@ -702,44 +702,6 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for conversion functions. */
-struct meta_conv {
-    /*! @brief Node type. */
-    using node_type = internal::meta_conv_node;
-
-    /*! @copydoc meta_prop::meta_prop */
-    meta_conv(const node_type *curr = nullptr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-    /*! @copydoc meta_base::parent */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
-
-    /*! @copydoc meta_any::type */
-    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
-
-    /**
-     * @brief Converts an instance to the underlying type.
-     * @param instance The instance to convert.
-     * @return An opaque pointer to the instance to convert.
-     */
-    [[nodiscard]] meta_any convert(const void *instance) const {
-        return node->conv(instance);
-    }
-
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(node == nullptr);
-    }
-
-private:
-    const node_type *node;
-};
-
-
 /*! @brief Opaque wrapper for constructors. */
 struct meta_ctor {
     /*! @brief Node type. */
@@ -1049,15 +1011,15 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
-    static bool can_cast_or_convert(const meta_type type, const type_info info) ENTT_NOEXCEPT {
-        for(auto curr: type.conv()) {
-            if(curr.type().info() == info) {
+    static bool can_cast_or_convert(const internal::meta_type_node *type, const type_info info) ENTT_NOEXCEPT {
+        for(const auto *curr = type->conv; curr; curr = curr->next) {
+            if(curr->type()->info == info) {
                 return true;
             }
         }
 
-        for(auto curr: type.base()) {
-            if(curr.type().info() == info || can_cast_or_convert(curr.type(), info)) {
+        for(const auto *curr = type->base; curr; curr = curr->next) {
+            if(auto *target = curr->type(); target->info == info || can_cast_or_convert(target, info)) {
                 return true;
             }
         }
@@ -1290,26 +1252,6 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level conversion functions.
-     * @return An iterable range to use to visit top-level conversion functions.
-     */
-    [[nodiscard]] meta_range<meta_conv> conv() const ENTT_NOEXCEPT {
-        return node->conv;
-    }
-
-    /**
-     * @brief Returns the conversion function associated with a given type.
-     * @tparam Type The type to use to search for a conversion function.
-     * @return The conversion function associated with the given type, if any.
-     */
-    template<typename Type>
-    [[nodiscard]] meta_conv conv() const {
-        return internal::find_if<&node_type::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-            return curr->type()->info == info;
-        }, node);
-    }
-
-    /**
      * @brief Returns a range to use to visit top-level constructors.
      * @return An iterable range to use to visit top-level constructors.
      */
@@ -1434,7 +1376,7 @@ public:
             for(size_type next{}; next < sz && next == (direct + ext); ++next) {
                 const auto type = args[next].type();
                 const auto req = it->arg(next)->info;
-                type.info() == req ? ++direct : (ext += can_cast_or_convert(type, req));
+                type.info() == req ? ++direct : (ext += can_cast_or_convert(type.node, req));
             }
 
             if((direct + ext) == sz) {
@@ -1641,16 +1583,6 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_base::type() const ENTT_NOEXCEPT {
-    return node->type();
-}
-
-
-[[nodiscard]] inline meta_type meta_conv::parent() const ENTT_NOEXCEPT {
-    return node->parent;
-}
-
-
-[[nodiscard]] inline meta_type meta_conv::type() const ENTT_NOEXCEPT {
     return node->type();
 }
 
