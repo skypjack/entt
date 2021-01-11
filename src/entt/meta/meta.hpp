@@ -378,19 +378,17 @@ public:
     }
 
     /**
-     * @brief Tries to make an instance castable to a certain type.
+     * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return A valid meta any object if there exists a viable conversion that
-     * makes the cast possible, an invalid object otherwise.
+     * @return A valid meta any object if there exists a viable conversion, an
+     * invalid one otherwise.
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         if(try_cast<std::remove_reference_t<Type>>() != nullptr) {
             return as_ref(*this);
         } else if(node) {
-            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-                return curr->type()->info == info;
-            }, node); conv) {
+            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) { return curr->type()->info == info; }, node); conv) {
                 return conv->conv(storage.data());
             }
         }
@@ -399,19 +397,16 @@ public:
     }
 
     /**
-     * @brief Tries to make an instance castable to a certain type.
+     * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return True if there exists a viable conversion that makes the cast
-     * possible, false otherwise.
+     * @return True if there exists a viable conversion, false otherwise.
      */
     template<typename Type>
     bool allow_cast() {
         if(try_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>() != nullptr) {
             return true;
         } else if(node) {
-            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-                return curr->type()->info == info;
-            }, node); conv) {
+            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) { return curr->type()->info == info; }, node); conv) {
                 *this = conv->conv(std::as_const(storage).data());
                 return true;
             }
@@ -1123,8 +1118,7 @@ public:
 
     /**
      * @brief Checks whether a type refers to a sequence container or not.
-     * @return True if the underlying type is a sequence container, false
-     * otherwise.
+     * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const ENTT_NOEXCEPT {
         return node->is_sequence_container;
@@ -1132,29 +1126,25 @@ public:
 
     /**
      * @brief Checks whether a type refers to an associative container or not.
-     * @return True if the underlying type is an associative container, false
-     * otherwise.
+     * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const ENTT_NOEXCEPT {
         return node->is_associative_container;
     }
 
     /**
-     * @brief If a type refers to an array type, provides the number of
-     * dimensions of the array.
-     * @return The number of dimensions of the array if the underlying type is
-     * an array type, 0 otherwise.
+     * @brief Provides the number of dimensions of an array type.
+     * @return The number of dimensions in case of array types, 0 otherwise.
      */
     [[nodiscard]] size_type rank() const ENTT_NOEXCEPT {
         return node->rank;
     }
 
     /**
-     * @brief If a type refers to an array type, provides the number of elements
-     * along the given dimension of the array.
+     * @brief The number of elements along the given dimension of an array type.
      * @param dim The dimension of which to return the number of elements.
-     * @return The number of elements along the given dimension of the array if
-     * the underlying type is an array type, 0 otherwise.
+     * @return The number of elements along the given dimension in case of array
+     * types, 0 otherwise.
      */
     [[nodiscard]] size_type extent(size_type dim = {}) const ENTT_NOEXCEPT {
         return node->extent(dim);
@@ -1212,9 +1202,7 @@ public:
      * @return The data associated with the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        return internal::meta_visit<&node_type::data>([id](const auto *curr) {
-            return curr->id == id;
-        }, node);
+        return internal::meta_visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
@@ -1236,9 +1224,7 @@ public:
      * @return The function associated with the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        return internal::meta_visit<&node_type::func>([id](const auto *curr) {
-            return curr->id == id;
-        }, node);
+        return internal::meta_visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
@@ -1253,11 +1239,7 @@ public:
      */
     [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
         meta_any any{};
-
-        internal::meta_visit<&node_type::ctor>([args, sz, &any](const auto *curr) {
-            return (curr->size == sz) && (any = curr->invoke(args));
-        }, node);
-
+        internal::meta_visit<&node_type::ctor>([args, sz, &any](const auto *curr) { return (curr->size == sz) && (any = curr->invoke(args)); }, node);
         return any;
     }
 
@@ -1390,9 +1372,7 @@ public:
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([key = std::move(key)](const auto *curr) {
-            return curr->key() == key;
-        }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->key() == key; }, node);
     }
 
     /**
@@ -1425,7 +1405,7 @@ public:
     void reset() ENTT_NOEXCEPT {
         auto** it = internal::meta_context::global();
 
-        while (*it && *it != node) {
+        while(*it && *it != node) {
             it = &(*it)->next;
         }
 
@@ -1652,23 +1632,17 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static bool resize(any &container, size_type sz) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::resize(*cont, sz);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::resize(*cont, sz) : false;
     }
 
     [[nodiscard]] static bool clear(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::clear(*cont);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::clear(*cont) : false;
     }
 
     [[nodiscard]] static iterator begin(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{traits_type::begin(*cont)};
         }
 
@@ -1676,7 +1650,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static iterator end(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{traits_type::end(*cont)};
         }
 
@@ -1684,7 +1658,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static std::pair<iterator, bool> insert(any &container, iterator it, meta_any &value) {
-        if(auto *cont = any_cast<Type>(&container); cont && value.allow_cast<const typename traits_type::value_type &>()) {
+        if(auto * const cont = any_cast<Type>(&container); cont && value.allow_cast<const typename traits_type::value_type &>()) {
             auto ret = traits_type::insert(*cont, any_cast<const typename traits_type::iterator &>(it.handle), value.cast<const typename traits_type::value_type &>());
             return { iterator{std::move(ret.first)}, ret.second };
         }
@@ -1693,7 +1667,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static std::pair<iterator, bool> erase(any &container, iterator it) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             auto ret = traits_type::erase(*cont, any_cast<const typename traits_type::iterator &>(it.handle));
             return { iterator{std::move(ret.first)}, ret.second };
         }
@@ -1702,7 +1676,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static meta_any get(any &container, size_type pos) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return std::reference_wrapper{traits_type::get(*cont, pos)};
         }
 
@@ -1936,15 +1910,12 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool clear(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::clear(*cont);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::clear(*cont) : false;
     }
 
     [[nodiscard]] static iterator begin(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::begin(*cont)};
         }
 
@@ -1952,7 +1923,7 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static iterator end(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::end(*cont)};
         }
 
@@ -1960,7 +1931,7 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, meta_any &value) {
-        if(auto *cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
+        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
             if constexpr(is_key_only_meta_associative_container_v<Type>) {
                 return traits_type::insert(*cont, key.cast<const typename traits_type::key_type &>());
             } else {
@@ -1974,7 +1945,7 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool erase(any &container, meta_any &key) {
-        if(auto *cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
+        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
             return traits_type::erase(*cont, key.cast<const typename traits_type::key_type &>());
         }
 
@@ -1983,7 +1954,7 @@ struct meta_associative_container::meta_associative_container_proxy {
 
     [[nodiscard]] static iterator find(any &container, meta_any &key) {
         if(key.allow_cast<const typename traits_type::key_type &>()) {
-            if(auto *cont = any_cast<Type>(&container); cont) {
+            if(auto * const cont = any_cast<Type>(&container); cont) {
                 return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*cont, key.cast<const typename traits_type::key_type &>())};
             }
 
