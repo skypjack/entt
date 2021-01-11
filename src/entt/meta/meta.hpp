@@ -271,8 +271,8 @@ public:
     }
 
     /**
-     * @brief Returns the meta type of the underlying object.
-     * @return The meta type of the underlying object, if any.
+     * @brief Returns the type of the underlying object.
+     * @return The type of the underlying object, if any.
      */
     [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
@@ -292,7 +292,7 @@ public:
     /**
      * @brief Invokes the underlying function, if possible.
      *
-     * @sa invoke
+     * @sa meta_func::invoke
      *
      * @tparam Args Types of arguments to use to invoke the function.
      * @param id Unique identifier.
@@ -368,8 +368,7 @@ public:
      * The type of the instance must be such that the cast is possible.
      *
      * @warning
-     * Attempting to perform a cast that isn't viable results in undefined
-     * behavior.
+     * Attempting to perform an invalid cast results in undefined behavior.
      *
      * @tparam Type Type to which to cast the instance.
      * @return A reference to the contained instance.
@@ -393,8 +392,8 @@ public:
     /**
      * @brief Tries to make an instance castable to a certain type.
      * @tparam Type Type to which the cast is requested.
-     * @return A valid meta any object if there exists a a viable conversion
-     * that makes the cast possible, an invalid object otherwise.
+     * @return A valid meta any object if there exists a viable conversion that
+     * makes the cast possible, an invalid object otherwise.
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
@@ -414,7 +413,7 @@ public:
     /**
      * @brief Tries to make an instance castable to a certain type.
      * @tparam Type Type to which the cast is requested.
-     * @return True if there exists a a viable conversion that makes the cast
+     * @return True if there exists a viable conversion that makes the cast
      * possible, false otherwise.
      */
     template<typename Type>
@@ -569,7 +568,7 @@ private:
  *
  * A handle doesn't perform copies and isn't responsible for the contained
  * object. It doesn't prolong the lifetime of the pointed instance.<br/>
- * Handles are used to generate meta references to actual objects when needed.
+ * Handles are used to generate references to actual objects when needed.
  */
 struct meta_handle {
     /*! @brief Default constructor. */
@@ -620,7 +619,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta properties of any type. */
+/*! @brief Opaque wrapper for properties of any type. */
 struct meta_prop {
     /*! @brief Node type. */
     using node_type = internal::meta_prop_node;
@@ -650,8 +649,8 @@ struct meta_prop {
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -662,7 +661,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta base classes. */
+/*! @brief Opaque wrapper for base classes. */
 struct meta_base {
     /*! @brief Node type. */
     using node_type = internal::meta_base_node;
@@ -673,8 +672,8 @@ struct meta_base {
     {}
 
     /**
-     * @brief Returns the meta type to which a meta object belongs.
-     * @return The meta type to which the meta object belongs.
+     * @brief Returns the type to which an object belongs.
+     * @return The type to which the object belongs.
      */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
@@ -691,8 +690,8 @@ struct meta_base {
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -703,7 +702,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta conversion functions. */
+/*! @brief Opaque wrapper for conversion functions. */
 struct meta_conv {
     /*! @brief Node type. */
     using node_type = internal::meta_conv_node;
@@ -729,8 +728,8 @@ struct meta_conv {
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -741,7 +740,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta constructors. */
+/*! @brief Opaque wrapper for constructors. */
 struct meta_ctor {
     /*! @brief Node type. */
     using node_type = internal::meta_ctor_node;
@@ -757,26 +756,25 @@ struct meta_ctor {
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the number of arguments accepted by a meta constructor.
-     * @return The number of arguments accepted by the meta constructor.
+     * @brief Returns the number of arguments accepted by a constructor.
+     * @return The number of arguments accepted by the constructor.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return node->size;
     }
 
     /**
-     * @brief Returns the meta type of the i-th argument of a meta constructor.
-     * @param index The index of the argument of which to return the meta type.
-     * @return The meta type of the i-th argument of a meta constructor, if any.
+     * @brief Returns the type of the i-th argument of a constructor.
+     * @param index The index of the argument of which to return the type.
+     * @return The type of the i-th argument of a constructor, if any.
      */
     [[nodiscard]] meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * To create a valid instance, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.
+     * Parameters must be such that a cast or conversion to the required types
+     * is possible. Otherwise, an empty and thus invalid wrapper is returned.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
@@ -802,8 +800,8 @@ struct meta_ctor {
     }
 
     /**
-     * @brief Returns a range to use to visit all meta properties.
-     * @return An iterable range to use to visit all meta properties.
+     * @brief Returns a range to use to visit all properties.
+     * @return An iterable range to use to visit all properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
@@ -820,8 +818,8 @@ struct meta_ctor {
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -832,7 +830,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta data. */
+/*! @brief Opaque wrapper for data members. */
 struct meta_data {
     /*! @brief Node type. */
     using node_type = internal::meta_data_node;
@@ -851,16 +849,16 @@ struct meta_data {
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Indicates whether a meta data is constant or not.
-     * @return True if the meta data is constant, false otherwise.
+     * @brief Indicates whether a data member is constant or not.
+     * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
         return (node->set == nullptr);
     }
 
     /**
-     * @brief Indicates whether a meta data is static or not.
-     * @return True if the meta data is static, false otherwise.
+     * @brief Indicates whether a data member is static or not.
+     * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
         return node->is_static;
@@ -872,8 +870,8 @@ struct meta_data {
     /**
      * @brief Sets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the setter results in an undefined
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
@@ -891,8 +889,8 @@ struct meta_data {
     /**
      * @brief Gets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the getter results in an undefined behavior.
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the getter results in an undefined behavior.
      *
      * @param instance An opaque instance of the underlying type.
      * @return A meta any containing the value of the underlying variable.
@@ -917,8 +915,8 @@ struct meta_data {
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -929,7 +927,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta functions. */
+/*! @brief Opaque wrapper for member functions. */
 struct meta_func {
     /*! @brief Node type. */
     using node_type = internal::meta_func_node;
@@ -950,49 +948,49 @@ struct meta_func {
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the number of arguments accepted by a meta function.
-     * @return The number of arguments accepted by the meta function.
+     * @brief Returns the number of arguments accepted by a member function.
+     * @return The number of arguments accepted by the member function.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return node->size;
     }
 
     /**
-     * @brief Indicates whether a meta function is constant or not.
-     * @return True if the meta function is constant, false otherwise.
+     * @brief Indicates whether a member function is constant or not.
+     * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
         return node->is_const;
     }
 
     /**
-     * @brief Indicates whether a meta function is static or not.
-     * @return True if the meta function is static, false otherwise.
+     * @brief Indicates whether a member function is static or not.
+     * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
         return node->is_static;
     }
 
     /**
-     * @brief Returns the meta type of the return type of a meta function.
-     * @return The meta type of the return type of the meta function.
+     * @brief Returns the return type of a member function.
+     * @return The return type of the member function.
      */
     [[nodiscard]] inline meta_type ret() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the meta type of the i-th argument of a meta function.
-     * @param index The index of the argument of which to return the meta type.
-     * @return The meta type of the i-th argument of a meta function, if any.
+     * @brief Returns the type of the i-th argument of a member function.
+     * @param index The index of the argument of which to return the type.
+     * @return The type of the i-th argument of a member function, if any.
      */
     [[nodiscard]] inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Invokes the underlying function, if possible.
      *
-     * To invoke a meta function, the parameters must be such that a cast or
+     * To invoke a member function, the parameters must be such that a cast or
      * conversion to the required types is possible. Otherwise, an empty and
      * thus invalid wrapper is returned.<br/>
-     * It must be possible to cast the instance to the parent type of the meta
+     * It must be possible to cast the instance to the parent type of the member
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
      *
@@ -1037,8 +1035,8 @@ struct meta_func {
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -1049,7 +1047,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta types. */
+/*! @brief Opaque wrapper for types. */
 class meta_type {
     static bool can_cast_or_convert(const meta_type type, const type_info info) ENTT_NOEXCEPT {
         for(auto curr: type.conv()) {
@@ -1098,8 +1096,8 @@ public:
     }
 
     /**
-     * @brief Returns the identifier assigned to a meta object.
-     * @return The identifier assigned to the meta object.
+     * @brief Returns the identifier assigned to a type.
+     * @return The identifier assigned to the type.
      */
     [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
@@ -1255,35 +1253,35 @@ public:
     }
 
     /**
-     * @brief Provides the meta type for which the pointer is defined.
-     * @return The meta type for which the pointer is defined or this meta type
-     * if it doesn't refer to a pointer type.
+     * @brief Provides the type for which the pointer is defined.
+     * @return The type for which the pointer is defined or this type if it
+     * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const ENTT_NOEXCEPT {
         return node->remove_pointer();
     }
 
     /**
-     * @brief Provides the meta type for which the array is defined.
-     * @return The meta type for which the array is defined or this meta type
-     * if it doesn't refer to an array type.
+     * @brief Provides the type for which the array is defined.
+     * @return The type for which the array is defined or this type if it
+     * doesn't refer to an array type.
      */
     [[nodiscard]] meta_type remove_extent() const ENTT_NOEXCEPT {
         return node->remove_extent();
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta bases.
-     * @return An iterable range to use to visit top-level meta bases.
+     * @brief Returns a range to use to visit top-level bases.
+     * @return An iterable range to use to visit top-level bases.
      */
     [[nodiscard]] meta_range<meta_base> base() const ENTT_NOEXCEPT {
         return node->base;
     }
 
     /**
-     * @brief Returns the meta base associated with a given identifier.
+     * @brief Returns the base associated with a given identifier.
      * @param id Unique identifier.
-     * @return The meta base associated with the given identifier, if any.
+     * @return The base associated with the given identifier, if any.
      */
     [[nodiscard]] meta_base base(const id_type id) const {
         return internal::find_if<&node_type::base>([id](const auto *curr) {
@@ -1292,20 +1290,17 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta conversion
-     * functions.
-     * @return An iterable range to use to visit top-level meta conversion
-     * functions.
+     * @brief Returns a range to use to visit top-level conversion functions.
+     * @return An iterable range to use to visit top-level conversion functions.
      */
     [[nodiscard]] meta_range<meta_conv> conv() const ENTT_NOEXCEPT {
         return node->conv;
     }
 
     /**
-     * @brief Returns the meta conversion function associated with a given type.
-     * @tparam Type The type to use to search for a meta conversion function.
-     * @return The meta conversion function associated with the given type, if
-     * any.
+     * @brief Returns the conversion function associated with a given type.
+     * @tparam Type The type to use to search for a conversion function.
+     * @return The conversion function associated with the given type, if any.
      */
     template<typename Type>
     [[nodiscard]] meta_conv conv() const {
@@ -1315,17 +1310,16 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta constructors.
-     * @return An iterable range to use to visit top-level meta constructors.
+     * @brief Returns a range to use to visit top-level constructors.
+     * @return An iterable range to use to visit top-level constructors.
      */
     [[nodiscard]] meta_range<meta_ctor> ctor() const ENTT_NOEXCEPT {
         return node->ctor;
     }
 
     /**
-     * @brief Returns the meta constructor that accepts a given list of types of
-     * arguments.
-     * @return The requested meta constructor, if any.
+     * @brief Returns a constructor for a given list of types of arguments.
+     * @return The requested constructor, if any.
      */
     template<typename... Args>
     [[nodiscard]] meta_ctor ctor() const {
@@ -1333,20 +1327,20 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta data.
-     * @return An iterable range to use to visit top-level meta data.
+     * @brief Returns a range to use to visit top-level data.
+     * @return An iterable range to use to visit top-level data.
      */
     [[nodiscard]] meta_range<meta_data> data() const ENTT_NOEXCEPT {
         return node->data;
     }
 
     /**
-     * @brief Returns the meta data associated with a given identifier.
+     * @brief Returns the data associated with a given identifier.
      *
-     * The meta data of the base classes will also be visited, if any.
+     * The data of the base classes will also be visited, if any.
      *
      * @param id Unique identifier.
-     * @return The meta data associated with the given identifier, if any.
+     * @return The data associated with the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
         return internal::find_if<&node_type::data>([id](const auto *curr) {
@@ -1355,22 +1349,22 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta functions.
-     * @return An iterable range to use to visit top-level meta functions.
+     * @brief Returns a range to use to visit top-level functions.
+     * @return An iterable range to use to visit top-level functions.
      */
     [[nodiscard]] meta_range<meta_func> func() const ENTT_NOEXCEPT {
         return node->func;
     }
 
     /**
-     * @brief Returns the meta function associated with a given identifier.
+     * @brief Returns the function associated with a given identifier.
      *
-     * The meta functions of the base classes will also be visited, if any.<br/>
-     * In the case of overloaded meta functions, the first one with the required
-     * id will be returned.
+     * The functions of the base classes will also be visited, if any.<br/>
+     * In the case of overloaded functions, the first one with the required
+     * identifier will be returned.
      *
      * @param id Unique identifier.
-     * @return The meta function associated with the given identifier, if any.
+     * @return The function associated with the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
         return internal::find_if<&node_type::func>([id](const auto *curr) {
@@ -1381,9 +1375,8 @@ public:
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * To create a valid instance, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.
+     * Parameters must be such that a cast or conversion to the required types
+     * is possible. Otherwise, an empty and thus invalid wrapper is returned.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
@@ -1417,12 +1410,11 @@ public:
     /**
      * @brief Invokes the function with the given identifier, if possible.
      *
-     * To invoke a meta function, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.<br/>
-     * It must be possible to cast the instance to the parent type of the meta
+     * It must be possible to cast the instance to the parent type of the member
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
+     *
+     * @sa meta_func::invoke
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
@@ -1479,8 +1471,8 @@ public:
     /**
      * @brief Sets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the setter results in an undefined
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
@@ -1500,8 +1492,8 @@ public:
     /**
      * @brief Gets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the getter results in an undefined behavior.
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the getter results in an undefined behavior.
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
@@ -1513,8 +1505,8 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta properties.
-     * @return An iterable range to use to visit top-level meta properties.
+     * @brief Returns a range to use to visit top-level properties.
+     * @return An iterable range to use to visit top-level properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
@@ -1535,32 +1527,31 @@ public:
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
     /**
-     * @brief Checks if two meta objects refer to the same type.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same type, false
-     * otherwise.
+     * @brief Checks if two objects refer to the same type.
+     * @param other The object with which to compare.
+     * @return True if the objects refer to the same type, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
         return (!node && !other.node) || (node && other.node && node->info == other.node->info);
     }
 
     /**
-     * @brief Resets a meta type and all its parts.
+     * @brief Resets a type and all its parts.
      *
-     * This function resets a meta type and all its data members, member
-     * functions and properties, as well as its constructors, destructors and
-     * conversion functions if any.<br/>
+     * This function resets a type and all its data members, member functions
+     * and properties, as well as its constructors, destructors and conversion
+     * functions if any.<br/>
      * Base classes aren't reset but the link between the two types is removed.
      *
-     * The meta type is also removed from the list of searchable types.
+     * The type is also removed from the list of searchable types.
      */
     void reset() ENTT_NOEXCEPT {
         auto** it = internal::meta_context::global();
@@ -1601,10 +1592,10 @@ private:
 
 
 /**
- * @brief Checks if two meta objects refer to the same type.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return False if the two meta objects refer to the same node, true otherwise.
+ * @brief Checks if two objects refer to the same type.
+ * @param lhs An object, either valid or not.
+ * @param rhs An object, either valid or not.
+ * @return False if the objects refer to the same node, true otherwise.
  */
 [[nodiscard]] inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
@@ -1699,9 +1690,9 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 
-/*! @brief Opaque iterator for meta sequence containers. */
+/*! @brief Opaque iterator for sequence containers. */
 class meta_sequence_container::meta_iterator {
-    /*! @brief A meta sequence container can access the underlying iterator. */
+    /*! @brief A sequence container can access the underlying iterator. */
     friend class meta_sequence_container;
 
     enum class operation { INCR, DEREF };
@@ -1758,20 +1749,18 @@ public:
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return True if the two meta iterators refer to the same element, false
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return True if the iterators refer to the same element, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
         return handle == other.handle;
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return False if the two meta iterators refer to the same element, true
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return False if the iterators refer to the same element, true otherwise.
      */
     [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
@@ -1779,7 +1768,7 @@ public:
 
     /**
      * @brief Indirection operator.
-     * @return The element to which the meta pointer points.
+     * @return The element to which the iterator points.
      */
     [[nodiscard]] reference operator*() const {
         meta_any other;
@@ -1874,8 +1863,8 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
 
 /**
- * @brief Returns the value meta type of the wrapped container type.
- * @return The value meta type of the wrapped container type.
+ * @brief Returns the meta value type of a container.
+ * @return The meta value type of the container.
  */
 [[nodiscard]] inline meta_type meta_sequence_container::value_type() const ENTT_NOEXCEPT {
     return value_type_fn();
@@ -1883,8 +1872,8 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
 
 /**
- * @brief Returns the size of the wrapped container.
- * @return The size of the wrapped container.
+ * @brief Returns the size of a container.
+ * @return The size of the container.
  */
 [[nodiscard]] inline meta_sequence_container::size_type meta_sequence_container::size() const ENTT_NOEXCEPT {
     return size_fn(storage);
@@ -1892,7 +1881,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
 
 /**
- * @brief Resizes the wrapped container to contain a given number of elements.
+ * @brief Resizes a container to contain a given number of elements.
  * @param sz The new size of the container.
  * @return True in case of success, false otherwise.
  */
@@ -1902,7 +1891,7 @@ inline bool meta_sequence_container::resize(size_type sz) {
 
 
 /**
- * @brief Clears the content of the wrapped container.
+ * @brief Clears the content of a container.
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
@@ -1911,8 +1900,8 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Returns a meta iterator to the first element of the wrapped container.
- * @return A meta iterator to the first element of the wrapped container.
+ * @brief Returns an iterator to the first element of a container.
+ * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
     return begin_fn(storage);
@@ -1920,10 +1909,8 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Returns a meta iterator that is past the last element of the wrapped
- * container.
- * @return A meta iterator that is past the last element of the wrapped
- * container.
+ * @brief Returns an iterator that is past the last element of a container.
+ * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
     return end_fn(storage);
@@ -1931,11 +1918,11 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Inserts an element at a specified location of the wrapped container.
- * @param it Meta iterator before which the element will be inserted.
+ * @brief Inserts an element at a specified location of a container.
+ * @param it Iterator before which the element will be inserted.
  * @param value Element value to insert.
- * @return A pair consisting of a meta iterator to the inserted element (in
- * case of success) and a bool denoting whether the insertion took place.
+ * @return A pair consisting of an iterator to the inserted element (in case of
+ * success) and a bool denoting whether the insertion took place.
  */
 inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::insert(iterator it, meta_any value) {
     return insert_fn(storage, it, value);
@@ -1943,11 +1930,10 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 
 /**
- * @brief Removes the specified element from the wrapped container.
- * @param it Meta iterator to the element to remove.
- * @return A pair consisting of a meta iterator following the last removed
- * element (in case of success) and a bool denoting whether the insertion
- * took place.
+ * @brief Removes a given element from a container.
+ * @param it Iterator to the element to remove.
+ * @return A pair consisting of an iterator following the last removed element
+ * (in case of success) and a bool denoting whether the insertion took place.
  */
 inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::erase(iterator it) {
     return erase_fn(storage, it);
@@ -1955,8 +1941,8 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 
 /**
- * @brief Returns a reference to the element at a specified location of the
- * wrapped container (no bounds checking is performed).
+ * @brief Returns a reference to the element at a given location of a container
+ * (no bounds checking is performed).
  * @param pos The position of the element to return.
  * @return A reference to the requested element properly wrapped.
  */
@@ -1974,7 +1960,7 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 }
 
 
-/*! @brief Opaque iterator for meta associative containers. */
+/*! @brief Opaque iterator for associative containers. */
 class meta_associative_container::meta_iterator {
     enum operation { INCR, DEREF };
 
@@ -2012,9 +1998,8 @@ public:
     meta_iterator() ENTT_NOEXCEPT = default;
 
     /**
-     * @brief Constructs a meta iterator from a given iterator.
-     * @tparam KeyOnly True if the associative container is also key-only, false
-     * otherwise.
+     * @brief Constructs an meta iterator from a given iterator.
+     * @tparam KeyOnly True if the container is also key-only, false otherwise.
      * @tparam It Type of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
@@ -2036,20 +2021,18 @@ public:
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return True if the two meta iterators refer to the same element, false
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return True if the iterators refer to the same element, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
         return handle == other.handle;
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return False if the two meta iterators refer to the same element, true
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return False if the iterators refer to the same element, true otherwise.
      */
     [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
@@ -2057,7 +2040,7 @@ public:
 
     /**
      * @brief Indirection operator.
-     * @return The element to which the meta pointer points.
+     * @return The element to which the iterator points.
      */
     [[nodiscard]] reference operator*() const {
         reference other;
@@ -2164,8 +2147,7 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns true if the associative container is also key-only, false
- * otherwise.
+ * @brief Returns true if a container is also key-only, false otherwise.
  * @return True if the associative container is also key-only, false otherwise.
  */
 [[nodiscard]] inline bool meta_associative_container::key_only() const ENTT_NOEXCEPT {
@@ -2174,8 +2156,8 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns the key meta type of the wrapped container type.
- * @return The key meta type of the wrapped container type.
+ * @brief Returns the meta key type of a container.
+ * @return The meta key type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::key_type() const ENTT_NOEXCEPT {
     return key_type_fn();
@@ -2183,8 +2165,8 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns the mapped meta type of the wrapped container type.
- * @return The mapped meta type of the wrapped container type.
+ * @brief Returns the meta mapped type of a container.
+ * @return The meta mapped type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::mapped_type() const ENTT_NOEXCEPT {
     return mapped_type_fn();
@@ -2222,7 +2204,7 @@ inline bool meta_associative_container::clear() {
 
 
 /**
- * @brief Inserts an element (a key/value pair) into the wrapped container.
+ * @brief Inserts an element (a key/value pair) into a container.
  * @param key The key of the element to insert.
  * @param value The value of the element to insert.
  * @return A bool denoting whether the insertion took place.
@@ -2233,7 +2215,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
 
 
 /**
- * @brief Removes the specified element from the wrapped container.
+ * @brief Removes the specified element from a container.
  * @param key The key of the element to remove.
  * @return A bool denoting whether the removal took place.
  */
@@ -2243,8 +2225,7 @@ inline bool meta_associative_container::erase(meta_any key) {
 
 
 /**
- * @brief Returns an iterator to the element with key equivalent to a given
- * one, if any.
+ * @brief Returns an iterator to the element with a given key, if any.
  * @param key The key of the element to search.
  * @return An iterator to the element with the given key, if any.
  */
