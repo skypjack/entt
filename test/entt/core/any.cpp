@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <memory>
 #include <gtest/gtest.h>
 #include <entt/core/any.hpp>
 
@@ -288,7 +289,6 @@ TEST(Any, NoSBOMoveConstruction) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(other);
-    ASSERT_FALSE(any.type());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
@@ -303,7 +303,6 @@ TEST(Any, NoSBOMoveAssignment) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(other);
-    ASSERT_FALSE(any.type());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
@@ -774,4 +773,17 @@ TEST(Any, AnyCast) {
     ASSERT_EQ(entt::any_cast<int &>(any), 42);
     ASSERT_EQ(entt::any_cast<const int &>(cany), 42);
     ASSERT_EQ(entt::any_cast<int>(42), 42);
+}
+
+TEST(Any, NonCopyableType) {
+    entt::any any{std::in_place_type<std::unique_ptr<int>>, new int{42}};
+    entt::any copy{any};
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(copy);
+
+    copy = any;
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(copy);
 }
