@@ -12,6 +12,7 @@
   * [Enjoy the runtime](#enjoy-the-runtime)
   * [Container support](#container-support)
   * [Pointer-like types](#pointer-like-types)
+  * [Implicitly generated default constructor](#implicitly-generated-default-constructor)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
   * [Properties and meta objects](#properties-and-meta-objects)
@@ -660,6 +661,39 @@ In general, _dereferencing_ a pointer-like type boils down to a `*ptr`. However,
 
 In all other cases, that is, when dereferencing a pointer works as expected and
 regardless of the pointed type, no user intervention is required.
+
+## Implicitly generated default constructor
+
+In many cases, it's useful to be able to create objects of default constructible
+types through the reflection system, while not having to explicitly register the
+meta type or the default constructor.<br/>
+For example, in the case of primitive types like `int` or `char`, but not just
+them.
+
+For this reason and only for default constructible types, a default constructor
+is automatically defined and associated with their meta types, whether they are
+explicitly or implicitly generated.<br/>
+Therefore, it won't be necessary to do this in order to construct an integer
+from its meta type:
+
+```cpp
+entt::meta<int>().ctor<>();
+```
+
+Instead, just do this:
+
+```cpp
+entt::resolve<int>().construct();
+```
+
+Where the meta type can be for example the one returned from a meta container,
+useful for building keys without knowing or having to register the actual types.
+
+In all cases, when users register custom defaul constructors, they are preferred
+both during searches and when the `construct` member function is invoked.<br/>
+However, the implicitly generated default constructor will always be returned,
+either if one is not explicitly specified or if all constructors are iterated
+for some reason (in this case, it will always be the last element).
 
 ## Policies: the more, the less
 

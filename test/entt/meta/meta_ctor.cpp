@@ -30,11 +30,13 @@ struct clazz_t {
     char c{};
 };
 
+double double_factory() { return 42.; }
+
 struct MetaCtor: ::testing::Test {
     static void SetUpTestCase() {
         using namespace entt::literals;
 
-        entt::meta<double>().conv<int>();
+        entt::meta<double>().conv<int>().ctor<&double_factory>();
         entt::meta<derived_t>().base<base_t>();
 
         entt::meta<clazz_t>().type("clazz"_hs)
@@ -206,4 +208,55 @@ TEST_F(MetaCtor, ExternalMemberFunction) {
     ASSERT_TRUE(registry.has<clazz_t>(entity));
     ASSERT_EQ(registry.get<clazz_t>(entity).i, 3);
     ASSERT_EQ(registry.get<clazz_t>(entity).c, 'c');
+}
+
+TEST_F(MetaCtor, ImplicitlyGeneratedDefaultConstructor) {
+    auto type = entt::resolve<int>();
+    int counter{};
+
+    for([[maybe_unused]] auto curr: type.ctor()) {
+        ++counter;
+    }
+
+    // default constructor is implicitly generated
+    ASSERT_EQ(counter, 1);
+    ASSERT_TRUE(type.ctor<>());
+
+    auto any = type.ctor<>().invoke();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+    ASSERT_EQ(any.cast<int>(), 0);
+}
+
+TEST_F(MetaCtor, OverrideImplicitlyGeneratedDefaultConstructor) {
+    auto type = entt::resolve<double>();
+    int counter{};
+
+    for([[maybe_unused]] auto curr: type.ctor()) {
+        ++counter;
+    }
+
+    // default constructor is implicitly generated
+    ASSERT_EQ(counter, 2);
+    ASSERT_TRUE(type.ctor<>());
+
+    auto any = type.ctor<>().invoke();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<double>());
+    ASSERT_EQ(any.cast<double>(), 42.);
+}
+
+TEST_F(MetaCtor, NonDefaultConstructibleType) {
+    auto type = entt::resolve<clazz_t>();
+    int counter{};
+
+    for([[maybe_unused]] auto curr: type.ctor()) {
+        ++counter;
+    }
+
+    // the implicitly generated default constructor doesn't exist
+    ASSERT_EQ(counter, 5);
+    ASSERT_FALSE(type.ctor<>());
 }

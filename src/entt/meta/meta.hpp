@@ -4,13 +4,13 @@
 
 #include <array>
 #include <cstddef>
-#include <iterator>
 #include <functional>
+#include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/any.hpp"
-#include "../core/attribute.h"
 #include "../core/fwd.hpp"
 #include "../core/utility.hpp"
 #include "../core/type_info.hpp"
@@ -127,9 +127,9 @@ struct meta_type_node {
     size_type(* const extent)(size_type);
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
+    meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
-    meta_ctor_node *ctor{nullptr};
     meta_data_node *data{nullptr};
     meta_func_node *func{nullptr};
     void(* dtor)(void *){nullptr};
@@ -158,6 +158,10 @@ auto meta_visit(const Op &op, const Node *node)
 
 
 template<typename Type>
+meta_ctor_node * meta_default_constructor(meta_type_node *);
+
+
+template<typename Type>
 class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
@@ -169,7 +173,7 @@ class ENTT_API meta_node {
     }
 
 public:
-    [[nodiscard]] static meta_type_node * resolve() ENTT_NOEXCEPT {
+    [[nodiscard]] static internal::meta_type_node *  resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
             type_id<Type>(),
             {},
@@ -191,11 +195,10 @@ public:
             has_meta_sequence_container_traits_v<Type>,
             has_meta_associative_container_traits_v<Type>,
             std::rank_v<Type>,
-            [](meta_type_node::size_type dim) {
-                return extent(dim, std::make_index_sequence<std::rank_v<Type>>{});
-            },
+            [](meta_type_node::size_type dim) { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
             &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
-            &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve
+            &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve,
+            meta_default_constructor<Type>(&node)
         };
 
         return &node;
@@ -354,8 +357,10 @@ class meta_any {
         case operation::DEREF:
         case operation::CDEREF:
             if constexpr(is_meta_pointer_like_v<Type>) {
-                auto &&obj = adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from));
-                *static_cast<meta_any *>(to) = op == operation::DEREF ? meta_any{std::reference_wrapper{obj}} : meta_any{std::cref(obj)};
+                if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
+                    auto &&obj = adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from));
+                    *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::reference_wrapper{obj}} : meta_any{std::cref(obj)});
+                }
             }
             break;
         case operation::SEQ:
@@ -515,7 +520,7 @@ public:
     template<typename Type>
     [[nodiscard]] const Type * try_cast() const {
         if(node) {
-            if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
+            if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
             } else if(const auto *base = internal::meta_visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
                 return static_cast<const Type *>(base->cast(storage.data()));
@@ -529,7 +534,7 @@ public:
     template<typename Type>
     [[nodiscard]] Type * try_cast() {
         if(node) {
-            if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
+            if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
             } else if(const auto *base = internal::meta_visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
                 return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
@@ -577,7 +582,7 @@ public:
         if(try_cast<std::remove_reference_t<Type>>() != nullptr) {
             return as_ref(*this);
         } else if(node) {
-            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) { return curr->type()->info == info; }, node); conv) {
+            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = type_id<Type>()](const auto *curr) { return curr->type()->info == info; }, node); conv) {
                 return conv->conv(storage.data());
             }
         }
@@ -595,7 +600,7 @@ public:
         if(try_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>() != nullptr) {
             return true;
         } else if(node) {
-            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) { return curr->type()->info == info; }, node); conv) {
+            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = type_id<Type>()](const auto *curr) { return curr->type()->info == info; }, node); conv) {
                 *this = conv->conv(std::as_const(storage).data());
                 return true;
             }
@@ -2249,6 +2254,31 @@ inline bool meta_associative_container::erase(meta_any key) {
  */
 [[nodiscard]] inline meta_associative_container::operator bool() const ENTT_NOEXCEPT {
     return static_cast<bool>(storage);
+}
+
+
+namespace internal {
+
+
+template<typename Type>
+meta_ctor_node * meta_default_constructor(meta_type_node *type) {
+    if constexpr(std::is_default_constructible_v<Type>) {
+        static internal::meta_ctor_node node{
+            type,
+            nullptr,
+            nullptr,
+            0u,
+            [](typename meta_ctor::size_type) ENTT_NOEXCEPT -> meta_type_node * { return nullptr; },
+            [](meta_any * const) { return meta_any{std::in_place_type<Type>}; }
+        };
+
+        return &node;
+    } else {
+        return nullptr;
+    }
+}
+
+
 }
 
 

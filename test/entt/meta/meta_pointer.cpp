@@ -202,7 +202,7 @@ TEST(MetaPointerLike, AsConstRef) {
     ASSERT_EQ(value, 42);
 }
 
-TEST(MetaPointerLike, DereferenceMetaPointerLikeOverload) {
+TEST(MetaPointerLike, DereferenceOverload) {
     auto test = [](entt::meta_any any) {
         ASSERT_FALSE(any.type().is_pointer());
         ASSERT_TRUE(any.type().is_pointer_like());
@@ -222,7 +222,7 @@ TEST(MetaPointerLike, DereferenceMetaPointerLikeOverload) {
     test(spec_wrapped_shared_ptr<int>{42});
 }
 
-TEST(MetaPointerLike, DereferenceMetaPointerToConstLikeOverload) {
+TEST(MetaPointerLike, DereferencePointerToConstOverload) {
     auto test = [](entt::meta_any any) {
         ASSERT_FALSE(any.type().is_pointer());
         ASSERT_TRUE(any.type().is_pointer_like());
@@ -240,4 +240,34 @@ TEST(MetaPointerLike, DereferenceMetaPointerToConstLikeOverload) {
 
     test(adl_wrapped_shared_ptr<const int>{42});
     test(spec_wrapped_shared_ptr<const int>{42});
+}
+
+TEST(MetaPointerLike, PointerToVoidSupport) {
+    auto test = [](entt::meta_any any) {
+        ASSERT_TRUE(any.type().is_pointer());
+        ASSERT_TRUE(any.type().is_pointer_like());
+        ASSERT_EQ(any.type().remove_pointer(), entt::resolve<void>());
+
+        auto deref = *any;
+
+        ASSERT_FALSE(deref);
+    };
+
+    test(static_cast<void *>(nullptr));
+    test(static_cast<const void *>(nullptr));
+}
+
+TEST(MetaPointerLike, SmartPointerToVoidSupport) {
+    auto test = [](entt::meta_any any) {
+        ASSERT_TRUE(any.type().is_class());
+        ASSERT_FALSE(any.type().is_pointer());
+        ASSERT_TRUE(any.type().is_pointer_like());
+
+        auto deref = *any;
+
+        ASSERT_FALSE(deref);
+    };
+
+    test(std::shared_ptr<void>{});
+    test(std::unique_ptr<void, void(*)(void *)>{nullptr, nullptr});
 }

@@ -125,7 +125,7 @@ struct MetaType: ::testing::Test {
         entt::meta<clazz_t>()
             .type("clazz"_hs)
                 .prop(property_t::value, 42)
-            .ctor().ctor<const base_t &, int>()
+            .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
             .func<&clazz_t::func>("func"_hs);
@@ -259,10 +259,17 @@ TEST_F(MetaType, Ctor) {
         ++counter;
     }
 
+    // we only register a constructor, the default one is implicitly generated for us
     ASSERT_EQ(counter, 2);
     ASSERT_TRUE((type.ctor<>()));
     ASSERT_TRUE((type.ctor<const base_t &, int>()));
     ASSERT_TRUE((type.ctor<const derived_t &, double>()));
+
+    // use the implicitly generated default constructor
+    auto any = type.construct();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<clazz_t>());
 }
 
 TEST_F(MetaType, Data) {
