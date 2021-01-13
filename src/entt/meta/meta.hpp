@@ -357,7 +357,11 @@ class meta_any {
         case operation::DEREF:
         case operation::CDEREF:
             if constexpr(is_meta_pointer_like_v<Type>) {
-                if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
+                using element_type = std::remove_const_t<typename std::pointer_traits<Type>::element_type>;
+
+                if constexpr(std::is_function_v<element_type>) {
+                    *static_cast<meta_any *>(to) = any_cast<const Type>(from);
+                } else if constexpr(!std::is_same_v<element_type, void>) {
                     auto &&obj = adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from));
                     *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::reference_wrapper{obj}} : meta_any{std::cref(obj)});
                 }

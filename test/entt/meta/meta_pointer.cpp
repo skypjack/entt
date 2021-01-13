@@ -40,6 +40,8 @@ struct entt::adl_meta_pointer_like<spec_wrapped_shared_ptr<Type>> {
     }
 };
 
+void test_function() {}
+
 struct not_copyable_t {
     not_copyable_t() = default;
     not_copyable_t(const not_copyable_t &) = delete;
@@ -242,7 +244,7 @@ TEST(MetaPointerLike, DereferencePointerToConstOverload) {
     test(spec_wrapped_shared_ptr<const int>{42});
 }
 
-TEST(MetaPointerLike, PointerToVoidSupport) {
+TEST(MetaPointerLike, DereferencePointerToVoid) {
     auto test = [](entt::meta_any any) {
         ASSERT_TRUE(any.type().is_pointer());
         ASSERT_TRUE(any.type().is_pointer_like());
@@ -257,7 +259,7 @@ TEST(MetaPointerLike, PointerToVoidSupport) {
     test(static_cast<const void *>(nullptr));
 }
 
-TEST(MetaPointerLike, SmartPointerToVoidSupport) {
+TEST(MetaPointerLike, DereferenceSmartPointerToVoid) {
     auto test = [](entt::meta_any any) {
         ASSERT_TRUE(any.type().is_class());
         ASSERT_FALSE(any.type().is_pointer());
@@ -270,4 +272,18 @@ TEST(MetaPointerLike, SmartPointerToVoidSupport) {
 
     test(std::shared_ptr<void>{});
     test(std::unique_ptr<void, void(*)(void *)>{nullptr, nullptr});
+}
+
+TEST(MetaPointerLike, DereferencePointerToFunction) {
+    entt::meta_any any{&test_function};
+
+    ASSERT_TRUE(any.type().is_pointer());
+    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_EQ(any.type().remove_pointer(), entt::resolve<void()>());
+
+    auto deref = *any;
+
+    ASSERT_TRUE(deref.type().is_pointer());
+    ASSERT_TRUE(deref.type().is_pointer_like());
+    ASSERT_EQ(deref.type().remove_pointer(), entt::resolve<void()>());
 }
