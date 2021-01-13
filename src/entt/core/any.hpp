@@ -115,7 +115,11 @@ class any {
                     as<any>(to).instance = from.instance;
                     break;
                 case operation::DTOR:
-                    delete static_cast<const Type *>(from.instance);
+                    if constexpr(std::is_array_v<Type>) {
+                        delete[] static_cast<const Type *>(from.instance);
+                    } else {
+                        delete static_cast<const Type *>(from.instance);
+                    }
                     break;
                 case operation::COMP:
                     return compare<Type>(from.instance, to) ? to : nullptr;
