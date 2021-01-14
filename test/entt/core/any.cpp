@@ -1,5 +1,7 @@
 #include <algorithm>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/any.hpp>
 
@@ -736,15 +738,21 @@ TEST(Any, Comparable) {
 }
 
 TEST(Any, NotComparable) {
-    entt::any any{not_comparable{}};
+    auto test = [](const auto &instance) {
+        entt::any any{std::cref(instance)};
 
-    ASSERT_EQ(any, any);
-    ASSERT_NE(any, entt::any{not_comparable{}});
-    ASSERT_NE(entt::any{}, any);
+        ASSERT_EQ(any, any);
+        ASSERT_NE(any, entt::any{instance});
+        ASSERT_NE(entt::any{}, any);
 
-    ASSERT_TRUE(any == any);
-    ASSERT_FALSE(any == entt::any{not_comparable{}});
-    ASSERT_TRUE(entt::any{} != any);
+        ASSERT_TRUE(any == any);
+        ASSERT_FALSE(any == entt::any{instance});
+        ASSERT_TRUE(entt::any{} != any);
+    };
+
+    test(not_comparable{});
+    test(std::unordered_map<int, not_comparable>{});
+    test(std::vector<not_comparable>{});
 }
 
 TEST(Any, CompareVoid) {

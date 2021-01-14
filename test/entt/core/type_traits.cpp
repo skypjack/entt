@@ -1,9 +1,15 @@
 #include <tuple>
 #include <type_traits>
+#include <unordered_map>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
+
+struct not_comparable {
+    bool operator==(const not_comparable &) const = delete;
+};
 
 TEST(TypeTraits, SizeOf) {
     static_assert(entt::size_of_v<void> == 0u);
@@ -79,6 +85,13 @@ TEST(TypeTraits, ValueList) {
 
 TEST(TypeTraits, IsEqualityComparable) {
     static_assert(entt::is_equality_comparable_v<int>);
+    static_assert(entt::is_equality_comparable_v<std::vector<int>>);
+    static_assert(entt::is_equality_comparable_v<std::unordered_map<int, int>>);
+
+    static_assert(!entt::is_equality_comparable_v<not_comparable>);
+    static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>);
+
     static_assert(!entt::is_equality_comparable_v<void>);
 }
 

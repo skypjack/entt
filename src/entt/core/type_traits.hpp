@@ -13,6 +13,32 @@ namespace entt {
 
 
 /**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+        // Unfortunately, doxygen cannot parse such a construct.
+        /*! @cond TURN_OFF_DOXYGEN */
+        : choice_t<N-1>
+        /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
+
+
+/**
  * @brief Identity type trait.
  *
  * Useful to establish non-deduced contexts in template argument deduction
@@ -91,32 +117,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -397,19 +397,62 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename Type>
+constexpr auto is_equality_comparable()
+-> decltype(is_equality_comparable<Type>(choice<2>));
+
+
+template<typename Type>
+constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(
+    std::declval<typename Type::mapped_type>(),
+    std::declval<Type>() == std::declval<Type>(),
+    std::conjunction<decltype(is_equality_comparable<typename Type::key_type>()), decltype(is_equality_comparable<typename Type::mapped_type>())>{}
+);
+
+
+template<typename Type>
+constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(
+    std::declval<typename Type::value_type>(),
+    std::declval<Type>() == std::declval<Type>(),
+    is_equality_comparable<typename Type::value_type>()
+);
+
+
+template<typename Type>
+constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>(), std::true_type{});
+
+
+template<typename>
+constexpr std::false_type is_equality_comparable(...);
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: decltype(internal::is_equality_comparable<Type>()) {};
 
 
 /**
