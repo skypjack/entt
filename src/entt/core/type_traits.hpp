@@ -430,36 +430,27 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 namespace internal {
 
 
-template<typename Type>
-constexpr auto is_equality_comparable()
--> decltype(is_equality_comparable<Type>(choice<2>));
-
-
-template<typename Type>
-constexpr auto is_equality_comparable(choice_t<2>)
--> decltype(
-    std::declval<typename Type::mapped_type>(),
-    std::declval<Type>() == std::declval<Type>(),
-    std::conjunction<decltype(is_equality_comparable<typename Type::key_type>()), decltype(is_equality_comparable<typename Type::mapped_type>())>{}
-);
-
-
-template<typename Type>
-constexpr auto is_equality_comparable(choice_t<1>)
--> decltype(
-    std::declval<typename Type::value_type>(),
-    std::declval<Type>() == std::declval<Type>(),
-    is_equality_comparable<typename Type::value_type>()
-);
-
-
-template<typename Type>
-constexpr auto is_equality_comparable(choice_t<0>)
--> decltype(std::declval<Type>() == std::declval<Type>(), std::true_type{});
-
-
 template<typename>
-constexpr std::false_type is_equality_comparable(...);
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
 
 
 }
@@ -477,7 +468,7 @@ constexpr std::false_type is_equality_comparable(...);
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: decltype(internal::is_equality_comparable<Type>()) {};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**

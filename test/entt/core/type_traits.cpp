@@ -92,11 +92,15 @@ TEST(TypeTraits, ValueList) {
 TEST(TypeTraits, IsEqualityComparable) {
     static_assert(entt::is_equality_comparable_v<int>);
     static_assert(entt::is_equality_comparable_v<std::vector<int>>);
+    static_assert(entt::is_equality_comparable_v<std::vector<std::vector<int>>>);
     static_assert(entt::is_equality_comparable_v<std::unordered_map<int, int>>);
+    static_assert(entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, char>>>);
 
     static_assert(!entt::is_equality_comparable_v<not_comparable>);
     static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::vector<std::vector<not_comparable>>>);
     static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>);
 
     static_assert(!entt::is_equality_comparable_v<void>);
 }
