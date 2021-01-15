@@ -251,6 +251,22 @@ TEST_F(MetaType, RemoveExtent) {
     ASSERT_EQ(entt::resolve<derived_t>().remove_extent(), entt::resolve<derived_t>());
 }
 
+TEST_F(MetaType, Base) {
+    using namespace entt::literals;
+
+    auto type = entt::resolve<derived_t>();
+    bool iterate = false;
+
+    for(auto curr: type.base()) {
+        ASSERT_EQ(curr, entt::resolve<base_t>());
+        iterate = true;
+    }
+
+    ASSERT_TRUE(iterate);
+    ASSERT_EQ(type.base("base"_hs), entt::resolve<base_t>());
+    ASSERT_FALSE(type.base("esabe"_hs));
+}
+
 TEST_F(MetaType, Ctor) {
     auto type = entt::resolve<clazz_t>();
     int counter{};

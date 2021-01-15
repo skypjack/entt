@@ -309,11 +309,8 @@ The meta objects that compose a meta type are accessed in the following ways:
   auto base = entt::resolve<derived_type>().base("base"_hs);
   ```
 
-  The returned type is `meta_base` and may be invalid if there is no meta base
-  object associated with the given identifier.<br/>
-  Meta bases aren't meant to be used directly, even though they are freely
-  accessible. They expose only a few methods to use to know the meta type of the
-  base class and to convert a raw pointer between types.
+  The returned type is `meta_type` and may be invalid if there is no meta base
+  object associated with the given identifier.
 
 All the objects thus obtained as well as the meta types can be explicitly
 converted to a boolean value to check if they are valid:
@@ -325,7 +322,7 @@ if(auto func = entt::resolve<my_type>().func("member"_hs); func) {
 ```
 
 Furthermore, all them are also returned by specific overloads that provide the
-caller with iterable objects. As an example:
+caller with iterable ranges of top-level elements. As an example:
 
 ```cpp
 for(auto data = entt::resolve<my_type>().data()) {
@@ -345,11 +342,8 @@ member function in its API. Destructors are invoked implicitly by `meta_any`
 behind the scenes and users have not to deal with them explicitly. Furthermore,
 they have no name, cannot be searched and wouldn't have member functions to
 expose anyway.<br/>
-Similarly, conversion functions and base types aren't directly accessible. They
-are used internally by `meta_any` and the meta objects when needed.<br/>
-It wouldn't make sense to give direct access to these elements and to open the
-doors to the possibility of making mistakes. On the other side, the library
-already offers enough ways to use them correctly.
+Similarly, conversion functions aren't directly accessible. They are used
+internally by `meta_any` and the meta objects when needed.
 
 Meta types and meta objects in general contain much more than what is said: a
 plethora of functions in addition to those listed whose purposes and uses go

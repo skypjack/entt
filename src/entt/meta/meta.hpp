@@ -1180,12 +1180,22 @@ class meta_type {
 public:
     /*! @brief Node type. */
     using node_type = internal::meta_type_node;
+    /*! @brief Node type. */
+    using base_node_type = internal::meta_base_node;
     /*! @brief Unsigned integer type. */
     using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
     meta_type(node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
+    {}
+
+    /**
+     * @brief Constructs an instance from a given base node.
+     * @param curr The base node with which to construct the instance.
+     */
+    meta_type(base_node_type *curr) ENTT_NOEXCEPT
+        : node{curr ? curr->type() : nullptr}
     {}
 
     /**
@@ -1364,6 +1374,23 @@ public:
      */
     [[nodiscard]] meta_type remove_extent() const ENTT_NOEXCEPT {
         return node->remove_extent();
+    }
+
+    /**
+     * @brief Returns a range to use to visit top-level base meta types.
+     * @return An iterable range to use to visit top-level base meta types.
+     */
+    [[nodiscard]] meta_range<meta_type, internal::meta_base_node> base() const ENTT_NOEXCEPT {
+        return node->base;
+    }
+
+    /**
+     * @brief Returns the base meta type associated with a given identifier.
+     * @param id Unique identifier.
+     * @return The base meta type associated with the given identifier, if any.
+     */
+    [[nodiscard]] meta_type base(const id_type id) const {
+        return internal::meta_visit<&node_type::base>([id](const auto *curr) { return curr->type()->id == id; }, node);
     }
 
     /**

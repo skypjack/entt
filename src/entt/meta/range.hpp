@@ -11,9 +11,10 @@ namespace entt {
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
- * @tparam Type Type of meta objects iterated.
+ * @tparam Type Type of meta objects returned.
+ * @tparam Node Type of meta nodes iterated.
  */
-template<typename Type>
+template<typename Type, typename Node = typename Type::node_type>
 class meta_range {
     struct range_iterator {
         using difference_type = std::ptrdiff_t;
@@ -21,7 +22,7 @@ class meta_range {
         using pointer = void;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
-        using node_type = typename Type::node_type;
+        using node_type = Node;
 
         range_iterator() ENTT_NOEXCEPT = default;
 
@@ -56,7 +57,7 @@ class meta_range {
 
 public:
     /*! @brief Node type. */
-    using node_type = typename Type::node_type;
+    using node_type = Node;
     /*! @brief Input iterator type. */
     using iterator = range_iterator;
 
