@@ -64,6 +64,12 @@ TEST(TypeTraits, TypeList) {
     static_assert(std::is_same_v<entt::type_list_element_t<0u, type>, int>);
     static_assert(std::is_same_v<entt::type_list_element_t<1u, type>, char>);
     static_assert(std::is_same_v<entt::type_list_element_t<0u, other>, double>);
+
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<float, bool>>, entt::type_list<int, char, double>>);
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<int, char, double>>, entt::type_list<>>);
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<int, char>>, entt::type_list<double>>);
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<char, double>>, entt::type_list<int>>);
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<char>>, entt::type_list<int, double>>);
 }
 
 TEST(TypeTraits, ValueList) {
