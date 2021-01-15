@@ -37,6 +37,8 @@ struct Defined: entt::type_list<
 };
 
 struct impl {
+    impl() = default;
+    impl(int v): value{v} {}
     void incr() { ++value; }
     void set(int v) { value = v; }
     int get() const { return value; }

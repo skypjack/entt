@@ -167,9 +167,9 @@ public:
                 ENTT_ASSERT(((args != nullptr) && ...));
                 instance = (args, ...);
             } else if constexpr(in_situ<Type>) {
-                new (&storage) Type{std::forward<Args>(args)...};
+                new (&storage) Type(std::forward<Args>(args)...);
             } else {
-                instance = new Type{std::forward<Args>(args)...};
+                instance = new Type(std::forward<Args>(args)...);
             }
         }
     }
