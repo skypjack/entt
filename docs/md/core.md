@@ -24,6 +24,7 @@
     * [Member class type](#member-class-type)
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
+    * [Type list and value list](#type-list-and-value-list)
 * [Utilities](#utilities)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -570,6 +571,29 @@ registry.emplace<entt::tag<"enemy"_hs>>(entity);
 
 However, this isn't the only permitted use. Literally any value convertible to
 `id_type` is a good candidate, such as the named constants of an unscoped enum.
+
+### Type list and value list
+
+There is no respectable library where the much desired _type list_ can be
+missing.<br/>
+`EnTT` is no exception and provides (making extensive use of it internally) the
+`type_list` type, in addition to its `value_list` counterpart dedicated to
+non-type template parameters.
+
+Here is a (possibly incomplete) list of the functionalities that come with a
+type list:
+
+* `type_list_element[_t]` to get the N-th element of a type list.
+* `type_list_cast[_t]` and a handy `operator+` to concatenate type lists.
+* `type_list_unique[_t]` to remove duplicate types from a type list.
+* `type_list_contains[_v]` to know if a type list contains a given type.
+* `type_list_diff[_t]` to remove types from type lists.
+
+I'm also pretty sure that more and more utilities will be added over time as
+needs become apparent.<br/>
+Many of these functionalities also exist in their version dedicated to value
+lists. We therefore have `value_list_element[_v]` as well as
+`value_list_cat[_t]`and so on.
 
 # Utilities
 
