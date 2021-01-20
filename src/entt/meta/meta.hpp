@@ -169,7 +169,7 @@ class ENTT_API meta_node {
         return ext;
     }
 
-    [[nodiscard]] static meta_ctor_node * meta_default_constructor(meta_type_node *type) {
+    [[nodiscard]] static meta_ctor_node * meta_default_constructor([[maybe_unused]] meta_type_node *type) {
         if constexpr(std::is_default_constructible_v<Type>) {
             static internal::meta_ctor_node node{
                 type,
