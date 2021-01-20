@@ -625,7 +625,8 @@ query the meta type or verify that the returned object is valid. For example,
 invalid instances are returned when the wrapped object isn't a pointer-like
 type.<br/>
 Note that dereferencing a pointer-like object returns an instance of `meta_any`
-which refers to the pointed object and allows users to modify it directly.
+which refers to the pointed object and allows users to modify it directly
+(unless the returned element is const, of course).
 
 In general, _dereferencing_ a pointer-like type boils down to a `*ptr`. However,
 `EnTT` also supports classes that don't offer an `operator*`. In particular:
@@ -641,8 +642,8 @@ In general, _dereferencing_ a pointer-like type boils down to a `*ptr`. However,
   ```
 
 * When not in control of the type's namespace, it's possible to inject into the
-  `entt` namespace a specialization of `adl_meta_pointer_like` class template to
-  bypass the adl lookup as a whole:
+  `entt` namespace a specialization of the `adl_meta_pointer_like` class
+  template to bypass the adl lookup as a whole:
 
   ```cpp
   template<typename Type>
