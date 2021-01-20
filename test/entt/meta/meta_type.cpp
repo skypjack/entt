@@ -438,6 +438,12 @@ TEST_F(MetaType, Reset) {
     using namespace entt::literals;
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
+    ASSERT_EQ(entt::resolve<clazz_t>().id(), "clazz"_hs);
+    ASSERT_TRUE(entt::resolve<clazz_t>().prop(property_t::value));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("value"_hs));
+    ASSERT_TRUE((entt::resolve<clazz_t>().ctor<const base_t &, int>()));
+    // implicitly generated default constructor
+    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 
     entt::resolve("clazz"_hs).reset();
 
@@ -445,10 +451,15 @@ TEST_F(MetaType, Reset) {
     ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
+    ASSERT_FALSE((entt::resolve<clazz_t>().ctor<const base_t &, int>()));
+    // the implicitly generated default constructor is there after a reset
+    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 
     entt::meta<clazz_t>().type("clazz"_hs);
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
+    // the implicitly generated default constructor must be there in any case
+    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 }
 
 TEST_F(MetaType, AbstractClass) {
@@ -566,7 +577,8 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
 
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
-    ASSERT_FALSE(entt::resolve<clazz_t>().ctor<>());
+    // the implicitly generated default constructor is there after a reset
+    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_FALSE(entt::resolve<clazz_t>().func("member"_hs));
 

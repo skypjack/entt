@@ -127,6 +127,7 @@ struct meta_type_node {
     size_type(* const extent)(size_type);
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
+    meta_ctor_node *def_ctor{nullptr};
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
@@ -158,10 +159,6 @@ auto meta_visit(const Op &op, const Node *node)
 
 
 template<typename Type>
-meta_ctor_node * meta_default_constructor(meta_type_node *);
-
-
-template<typename Type>
 class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
@@ -172,8 +169,25 @@ class ENTT_API meta_node {
         return ext;
     }
 
+    [[nodiscard]] static meta_ctor_node * meta_default_constructor(meta_type_node *type) {
+        if constexpr(std::is_default_constructible_v<Type>) {
+            static internal::meta_ctor_node node{
+                type,
+                nullptr,
+                nullptr,
+                0u,
+                [](typename meta_ctor_node::size_type) ENTT_NOEXCEPT -> meta_type_node * { return nullptr; },
+                [](meta_any * const) { return meta_any{std::in_place_type<Type>}; }
+            };
+
+            return &node;
+        } else {
+            return nullptr;
+        }
+    }
+
 public:
-    [[nodiscard]] static internal::meta_type_node *  resolve() ENTT_NOEXCEPT {
+    [[nodiscard]] static internal::meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
             type_id<Type>(),
             {},
@@ -198,7 +212,8 @@ public:
             [](meta_type_node::size_type dim) { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
             &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
             &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve,
-            meta_default_constructor<Type>(&node)
+            meta_default_constructor(&node),
+            meta_default_constructor(&node)
         };
 
         return &node;
@@ -1657,6 +1672,7 @@ public:
         unregister_all(&node->func, &internal::meta_func_node::prop);
 
         node->id = {};
+        node->ctor = node->def_ctor;
         node->dtor = nullptr;
     }
 
@@ -2285,31 +2301,6 @@ inline bool meta_associative_container::erase(meta_any key) {
  */
 [[nodiscard]] inline meta_associative_container::operator bool() const ENTT_NOEXCEPT {
     return static_cast<bool>(storage);
-}
-
-
-namespace internal {
-
-
-template<typename Type>
-meta_ctor_node * meta_default_constructor(meta_type_node *type) {
-    if constexpr(std::is_default_constructible_v<Type>) {
-        static internal::meta_ctor_node node{
-            type,
-            nullptr,
-            nullptr,
-            0u,
-            [](typename meta_ctor::size_type) ENTT_NOEXCEPT -> meta_type_node * { return nullptr; },
-            [](meta_any * const) { return meta_any{std::in_place_type<Type>}; }
-        };
-
-        return &node;
-    } else {
-        return nullptr;
-    }
-}
-
-
 }
 
 
