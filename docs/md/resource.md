@@ -126,7 +126,7 @@ identifier and the parameters used to construct the resource as arguments:
 // uses the identifier declared above
 cache.load<my_loader>(identifier, 0);
 
-// uses a const char * directly as an identifier
+// uses a hashed string directly
 cache.load<my_loader>("another/identifier"_hs, 42);
 ```
 
