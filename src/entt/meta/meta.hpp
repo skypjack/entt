@@ -1418,6 +1418,7 @@ public:
 
     /**
      * @brief Returns a constructor for a given list of types of arguments.
+     * @tparam Args Constructor arguments.
      * @return The requested constructor, if any.
      */
     template<typename... Args>

@@ -18,7 +18,7 @@
   - ...
 
 WIP:
-* HP: meta, type.func<Args...>(name)
+* HP: invalid view auto-refresh
 * HP: paginate pools
 * HP: headless (sparse set only) view
 * HP: pass the registry to pools, basic poly storage should have only component member
