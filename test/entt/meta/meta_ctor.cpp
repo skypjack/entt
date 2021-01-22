@@ -6,8 +6,8 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct base_t { char value{}; };
-struct derived_t: base_t {};
+struct base_t { base_t(): value{'c'} {} char value; };
+struct derived_t: base_t { derived_t(): base_t{} {} };
 
 struct clazz_t {
     clazz_t(const base_t &other, int iv)
@@ -131,7 +131,7 @@ TEST_F(MetaCtor, InvalidArgs) {
 }
 
 TEST_F(MetaCtor, CastAndConvert) {
-    auto any = entt::resolve<clazz_t>().ctor<const base_t &, int>().invoke(derived_t{{'c'}}, 42.);
+    auto any = entt::resolve<clazz_t>().ctor<const base_t &, int>().invoke(derived_t{}, 42.);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
@@ -163,7 +163,7 @@ TEST_F(MetaCtor, FuncInvalidArgs) {
 }
 
 TEST_F(MetaCtor, FuncCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().ctor<base_t, int, int>().invoke(derived_t{{'c'}}, 3., 3);
+    auto any = entt::resolve<clazz_t>().ctor<base_t, int, int>().invoke(derived_t{}, 3., 3);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 9);

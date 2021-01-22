@@ -19,16 +19,17 @@ Type get(Type &prop) {
     return prop;
 }
 
-struct base_t { char value{'c'}; };
-struct derived_t: base_t {};
+struct base_t { base_t(): value{'c'} {}; char value; };
+struct derived_t: base_t { derived_t(): base_t{} {} };
 
 struct abstract_t {
     virtual ~abstract_t() = default;
-    virtual void func(int) = 0;
+    virtual void func(int) {}
 };
 
 struct concrete_t: base_t, abstract_t {
     void func(int v) override {
+        abstract_t::func(v);
         value = v;
     }
 

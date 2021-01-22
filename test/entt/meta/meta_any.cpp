@@ -5,11 +5,13 @@
 #include <entt/meta/resolve.hpp>
 
 struct clazz_t {
+    clazz_t(): value{0} {}
+
     void member(int i) { value = i; }
     static void func() { c = 'd'; }
 
     static inline char c = 'c';
-    int value = 0;
+    int value;
 };
 
 struct empty_t {
@@ -22,18 +24,18 @@ struct empty_t {
 };
 
 struct fat_t: empty_t {
-    fat_t() = default;
+    fat_t(): foo{}, bar{}, gnam{} {}
 
     fat_t(int *value)
-        : foo{value}, bar{value}
+        : foo{value}, bar{value}, gnam{}
     {}
 
     bool operator==(const fat_t &other) const {
         return foo == other.foo && bar == other.bar;
     }
 
-    int *foo{nullptr};
-    int *bar{nullptr};
+    int *foo;
+    int *bar;
     double gnam[4];
 };
 

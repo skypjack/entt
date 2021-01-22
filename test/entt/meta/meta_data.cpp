@@ -25,6 +25,8 @@ struct clazz_t {
 };
 
 struct setter_getter_t {
+    setter_getter_t(): value{0} {}
+
     int setter(int val) {
         return value = val;
     }
@@ -49,7 +51,7 @@ struct setter_getter_t {
         return type.value;
     }
 
-    int value{};
+    int value;
 };
 
 struct array_t {
