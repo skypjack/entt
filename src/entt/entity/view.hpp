@@ -854,11 +854,7 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
-            if constexpr(std::is_same_v<typename storage_type::storage_category, empty_storage_tag>) {
-                return std::make_tuple();
-            } else {
-                return std::forward_as_tuple(pool->get(entt));
-            }
+            return get_as_tuple(*pool, entt);
         } else {
             static_assert(std::is_same_v<Comp..., Component>, "Invalid component type");
             return pool->get(entt);
