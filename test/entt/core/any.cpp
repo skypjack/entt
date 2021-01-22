@@ -28,7 +28,9 @@ template<auto Sz>
 struct not_copyable {
     not_copyable(): payload{} {}
     not_copyable(const not_copyable &) = delete;
+    not_copyable(not_copyable &&) = default;
     not_copyable & operator=(const not_copyable &) = delete;
+    not_copyable & operator=(not_copyable &&) = default;
     double payload[Sz];
 };
 
@@ -790,7 +792,7 @@ TEST(Any, AnyCast) {
     ASSERT_EQ(entt::any_cast<int>(42), 42);
 }
 
-TEST(Any, NonCopyableType) {
+TEST(Any, NotCopyableType) {
     auto test = [](entt::any any) {
         entt::any copy{any};
 
