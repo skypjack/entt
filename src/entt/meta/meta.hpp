@@ -176,7 +176,7 @@ class ENTT_API meta_node {
                 nullptr,
                 nullptr,
                 0u,
-                [](typename meta_ctor_node::size_type) ENTT_NOEXCEPT -> meta_type_node * { return nullptr; },
+                nullptr,
                 [](meta_any * const) { return meta_any{std::in_place_type<Type>}; }
             };
 

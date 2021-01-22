@@ -221,6 +221,7 @@ TEST_F(MetaCtor, ImplicitlyGeneratedDefaultConstructor) {
     // default constructor is implicitly generated
     ASSERT_EQ(counter, 1);
     ASSERT_TRUE(type.ctor<>());
+    ASSERT_EQ(type.ctor<>().arg(0), entt::meta_type{});
 
     auto any = type.ctor<>().invoke();
 
