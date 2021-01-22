@@ -135,6 +135,7 @@ struct MetaType: ::testing::Test {
 TEST_F(MetaType, Resolve) {
     using namespace entt::literals;
 
+    ASSERT_EQ(entt::resolve(entt::type_info{}), entt::meta_type{});
     ASSERT_EQ(entt::resolve<double>(), entt::resolve("double"_hs));
     ASSERT_EQ(entt::resolve<double>(), entt::resolve(entt::type_id<double>()));
 
