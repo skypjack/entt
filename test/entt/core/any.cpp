@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <memory>
 #include <unordered_map>
 #include <vector>
 #include <gtest/gtest.h>
@@ -23,6 +22,14 @@ struct empty {
 
 struct not_comparable {
     bool operator==(const not_comparable &) const = delete;
+};
+
+template<auto Sz>
+struct not_copyable {
+    not_copyable(): payload{} {}
+    not_copyable(const not_copyable &) = delete;
+    not_copyable & operator=(const not_copyable &) = delete;
+    double payload[Sz];
 };
 
 TEST(Any, SBO) {
@@ -784,14 +791,35 @@ TEST(Any, AnyCast) {
 }
 
 TEST(Any, NonCopyableType) {
-    entt::any any{std::in_place_type<std::unique_ptr<int>>, new int{42}};
+    auto test = [](entt::any any) {
+        entt::any copy{any};
+
+        ASSERT_TRUE(any);
+        ASSERT_FALSE(copy);
+
+        copy = any;
+
+        ASSERT_TRUE(any);
+        ASSERT_FALSE(copy);
+    };
+
+    test(entt::any{std::in_place_type<not_copyable<1>>});
+    test(entt::any{std::in_place_type<not_copyable<4>>});
+}
+
+TEST(Any, Array) {
+    entt::any any{std::in_place_type<int[1]>};
     entt::any copy{any};
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(copy);
 
-    copy = any;
+    ASSERT_EQ(any.type(), entt::type_id<int[1]>());
+    ASSERT_NE(entt::any_cast<int[1]>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<int[2]>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<int *>(&any), nullptr);
 
-    ASSERT_TRUE(any);
-    ASSERT_FALSE(copy);
+    entt::any_cast<int(&)[1]>(any)[0] = 42;
+
+    ASSERT_EQ(entt::any_cast<const int(&)[1]>(std::as_const(any))[0], 42);
 }
