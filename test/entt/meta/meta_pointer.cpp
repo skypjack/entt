@@ -40,7 +40,7 @@ struct entt::adl_meta_pointer_like<spec_wrapped_shared_ptr<Type>> {
     }
 };
 
-void test_function() {}
+int test_function() { return 42; }
 
 struct not_copyable_t {
     not_copyable_t() = default;
@@ -275,15 +275,15 @@ TEST(MetaPointerLike, DereferenceSmartPointerToVoid) {
 }
 
 TEST(MetaPointerLike, DereferencePointerToFunction) {
-    entt::meta_any any{&test_function};
+    auto test = [](entt::meta_any any) {
+        ASSERT_TRUE(any.type().is_pointer());
+        ASSERT_TRUE(any.type().is_pointer_like());
+        ASSERT_EQ(any.type().remove_pointer(), entt::resolve<int()>());
+        ASSERT_NE(any.try_cast<int(*)()>(), nullptr);
+        ASSERT_EQ(any.cast<int(*)()>()(), 42);
+    };
 
-    ASSERT_TRUE(any.type().is_pointer());
-    ASSERT_TRUE(any.type().is_pointer_like());
-    ASSERT_EQ(any.type().remove_pointer(), entt::resolve<void()>());
-
-    auto deref = *any;
-
-    ASSERT_TRUE(deref.type().is_pointer());
-    ASSERT_TRUE(deref.type().is_pointer_like());
-    ASSERT_EQ(deref.type().remove_pointer(), entt::resolve<void()>());
+    test(entt::meta_any{&test_function});
+    test(*entt::meta_any{&test_function});
+    test(**entt::meta_any{&test_function});
 }
