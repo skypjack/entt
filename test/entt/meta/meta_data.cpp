@@ -418,9 +418,15 @@ TEST_F(MetaData, ConstInstance) {
 
     clazz_t instance{};
 
+    ASSERT_NE(entt::resolve<clazz_t>().data("i"_hs).get(instance).try_cast<int>(), nullptr);
+    ASSERT_NE(entt::resolve<clazz_t>().data("i"_hs).get(instance).try_cast<const int>(), nullptr);
+    ASSERT_EQ(entt::resolve<clazz_t>().data("i"_hs).get(std::as_const(instance)).try_cast<int>(), nullptr);
+    // as_ref_t adapts to the constness of the passed object and returns const references in case
+    ASSERT_NE(entt::resolve<clazz_t>().data("i"_hs).get(std::as_const(instance)).try_cast<const int>(), nullptr);
+
     ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).get(instance));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(instance, 3));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).get(std::as_const(instance)));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).get(std::as_const(instance)));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).set(std::as_const(instance), 3));
 
     ASSERT_TRUE(entt::resolve<clazz_t>().data("ci"_hs).get(instance));

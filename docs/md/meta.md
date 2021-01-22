@@ -712,33 +712,30 @@ There are a few alternatives available at the moment:
 
 * The _as-void_ policy, associated with the type `entt::as_void_t`.<br/>
   Its purpose is to discard the return value of a meta object, whatever it is,
-  thus making it appear as if its type were `void`.<br/>
+  thus making it appear as if its type were `void`:
+  ```cpp
+  entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
+  ```
   If the use with functions is obvious, it must be said that it's also possible
   to use this policy with constructors and data members. In the first case, the
   constructor will be invoked but the returned wrapper will actually be empty.
   In the second case, instead, the property will not be accessible for reading.
-
-  As an example of use:
-
-  ```cpp
-  entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
-  ```
 
 * The _as-ref_ and _as-cref_ policies, associated with the types
   `entt::as_ref_t` and `entt::as_cref_t`.<br/>
   They allow to build wrappers that act as references to unmanaged objects.
   Accessing the object contained in the wrapper for which the _reference_ was
   requested will make it possible to directly access the instance used to
-  initialize the wrapper itself.<br/>
-  These policies work with constructors (for example, when objects are taken
-  from an external container rather than created on demand), data members and
-  functions in general (as long as their return types are lvalue references).
-
-  As an example of use:
-
+  initialize the wrapper itself:
   ```cpp
   entt::meta<my_type>().data<&my_type::data_member, entt::as_ref_t>("member"_hs);
   ```
+  These policies work with constructors (for example, when objects are taken
+  from an external container rather than created on demand), data members and
+  functions in general.<br/>
+  If on the one hand `as_cref_t` always forces the return type to be const,
+  `as_ref_t` _adapts_ to the constness of the passed object and to that of the
+  return type if any.
 
 Some uses are rather trivial, but it's useful to note that there are some less
 obvious corner cases that can in turn be solved with the use of policies.
@@ -763,8 +760,8 @@ Exporting constant values or elements from an enum is as simple as ever:
 
 ```cpp
 entt::meta<my_enum>()
-        .data<my_enum::a_value>("a_value"_hs)
-        .data<my_enum::another_value>("another_value"_hs);
+    .data<my_enum::a_value>("a_value"_hs)
+    .data<my_enum::another_value>("another_value"_hs);
 
 entt::meta<int>().data<2048>("max_int"_hs);
 ```

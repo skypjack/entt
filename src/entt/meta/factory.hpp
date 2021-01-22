@@ -123,7 +123,7 @@ template<typename Type, auto Data, typename Policy>
         if constexpr(std::is_same_v<Policy, as_void_t>) {
             return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
         } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-            return meta_any{std::ref(std::forward<decltype(value)>(value))};
+            return meta_any{std::reference_wrapper{std::forward<decltype(value)>(value)}};
         } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
             return meta_any{std::cref(std::forward<decltype(value)>(value))};
         } else {
@@ -139,8 +139,12 @@ template<typename Type, auto Data, typename Policy>
         if constexpr(std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
             return meta_any{};
         } else {
-            auto * const clazz = instance->try_cast<std::conditional_t<std::is_same_v<Policy, as_ref_t>, Type, const Type>>();
-            return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
+            if(auto * clazz = instance->try_cast<Type>(); clazz) {
+                return dispatch(std::invoke(Data, *clazz));
+            } else {
+                auto * fallback = instance->try_cast<const Type>();
+                return fallback ? dispatch(std::invoke(Data, *fallback)) : meta_any{};
+            }
         }
     } else if constexpr(std::is_pointer_v<std::decay_t<decltype(Data)>>) {
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
@@ -163,7 +167,7 @@ template<typename Type, auto Candidate, typename Policy, std::size_t... Index>
             std::invoke(Candidate, std::forward<decltype(params)>(params)...);
             return meta_any{std::in_place_type<void>};
         } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-            return meta_any{std::ref(std::invoke(Candidate, std::forward<decltype(params)>(params)...))};
+            return meta_any{std::reference_wrapper{std::invoke(Candidate, std::forward<decltype(params)>(params)...)}};
         } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
             return meta_any{std::cref(std::invoke(Candidate, std::forward<decltype(params)>(params)...))};
         } else {
