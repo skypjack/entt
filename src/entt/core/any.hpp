@@ -267,7 +267,7 @@ public:
 
     /*! @brief Destroys contained object */
     void reset() {
-       emplace<void>();
+        *this = any{};
     }
 
     /**
