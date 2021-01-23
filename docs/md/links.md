@@ -43,8 +43,8 @@ I hope this list can grow much more in the future:
   * [The Machine](https://github.com/Kerndog73/The-Machine): a box pushing
     puzzler with logic gates and other cool stuff.
     [Check it out](https://indi-kernick.itch.io/the-machine-web-version).
-  * [EnttPong 2.0](https://github.com/DomRe/EnttPong): a basic game made to
-    showcase different parts of EnTT and C++17.
+  * [EnTTPong](https://github.com/DomRe/EnttPong): a basic game made to showcase
+    different parts of EnTT and C++17.
   * [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
     playground.
   * [EnTT Tower Defense](https://github.com/Daivuk/tddod): a data oriented tower
@@ -64,6 +64,10 @@ I hope this list can grow much more in the future:
   * [DungeonSlayer](https://github.com/alohaeee/DungeonSlayer): 2D game made
     from scratch in C++.
   * [3DGame](https://github.com/kwarkGorny/3DGame): 2.5D top-down space shooter.
+  * [Pulcher](https://github.com/AODQ/pulcher): 2D cross-platform game inspired
+    by Quake.
+  * [Destroid](https://github.com/tyrannicaltoucan/destroid): _one-bazillionth_
+    arcade game about shooting dirty rocks in space, inspired by Asteroids.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
