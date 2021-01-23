@@ -280,6 +280,11 @@ public:
         vtable = poly_vtable<Concept>::template instance<Type>();
     }
 
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = poly{};
+    }
+
     /**
      * @brief Returns false if a poly is empty, true otherwise.
      * @return False if the poly is empty, true otherwise.
