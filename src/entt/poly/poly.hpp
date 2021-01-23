@@ -208,7 +208,7 @@ public:
      */
     template<typename Type>
     poly(std::reference_wrapper<Type> value)
-        : poly{std::in_place_type<Type &>, &value.get()}
+        : poly{std::in_place_type<Type &>, value.get()}
     {}
 
     /**

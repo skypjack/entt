@@ -425,7 +425,7 @@ public:
      */
     template<typename Type>
     meta_any(std::reference_wrapper<Type> value)
-        : meta_any{std::in_place_type<Type &>, &value.get()}
+        : meta_any{std::in_place_type<Type &>, value.get()}
     {}
 
     /**

@@ -163,9 +163,8 @@ public:
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                static_assert(sizeof...(Args) == 1u && (std::is_pointer_v<std::remove_reference_t<Args>> && ...));
-                ENTT_ASSERT(((args != nullptr) && ...));
-                instance = (args, ...);
+                static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...));
+                instance = (&args, ...);
             } else if constexpr(in_situ<Type>) {
                 new (&storage) Type(std::forward<Args>(args)...);
             } else {
@@ -181,7 +180,7 @@ public:
      */
     template<typename Type>
     any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : any{std::in_place_type<Type &>, &value.get()}
+        : any{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
