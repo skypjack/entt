@@ -462,6 +462,18 @@ TEST_F(MetaAny, EmplaceVoid) {
     ASSERT_EQ(any, (entt::meta_any{std::in_place_type<void>}));
 }
 
+TEST_F(MetaAny, Reset) {
+    entt::meta_any any{42};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+
+    any.reset();
+
+    ASSERT_FALSE(any);
+    ASSERT_EQ(any.type(), entt::meta_type{});
+}
+
 TEST_F(MetaAny, SBOSwap) {
     entt::meta_any lhs{'c'};
     entt::meta_any rhs{42};

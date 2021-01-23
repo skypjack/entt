@@ -639,6 +639,11 @@ public:
         *this = meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
     }
 
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = meta_any{};
+    }
+
     /**
      * @brief Returns a sequence container proxy.
      * @return A sequence container proxy for the underlying object.
