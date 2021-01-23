@@ -462,6 +462,18 @@ TEST(Any, EmplaceVoid) {
     ASSERT_FALSE(any.type());
  }
 
+TEST(Any, Reset) {
+    entt::any any{42};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::type_id<int>());
+
+    any.reset();
+
+    ASSERT_FALSE(any);
+    ASSERT_EQ(any.type(), entt::type_info{});
+}
+
 TEST(Any, SBOSwap) {
     entt::any lhs{'c'};
     entt::any rhs{42};

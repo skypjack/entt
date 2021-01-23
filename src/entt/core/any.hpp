@@ -266,6 +266,11 @@ public:
         *this = any{std::in_place_type<Type>, std::forward<Args>(args)...};
     }
 
+    /*! @brief Destroys contained object */
+    void reset() {
+       emplace<void>();
+    }
+
     /**
      * @brief Returns false if a wrapper is empty, true otherwise.
      * @return False if the wrapper is empty, true otherwise.
