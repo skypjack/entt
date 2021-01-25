@@ -86,7 +86,6 @@ TEST(SingleComponentView, RawData) {
     ASSERT_EQ(*view.data(), entity);
     ASSERT_EQ(*cview.data(), entity);
 
-    const auto other = registry.create();
     registry.destroy(entity);
 
     ASSERT_EQ(view.size(), 0u);
