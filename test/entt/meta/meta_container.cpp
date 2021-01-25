@@ -259,9 +259,9 @@ TEST_F(MetaContainer, StdSet) {
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
-    (*view.find(1)).first.cast<int &>() = 42;
-
-    ASSERT_EQ((*view.find(1)).first.cast<int>(), 1);
+    ASSERT_EQ((*view.find(1)).first.try_cast<int>(), nullptr);
+    ASSERT_NE((*view.find(1)).first.try_cast<const int>(), nullptr);
+    ASSERT_EQ((*view.find(1)).first.cast<const int &>(), 1);
 
     ASSERT_TRUE(view.erase(1.));
     ASSERT_TRUE(view.clear());
@@ -365,8 +365,9 @@ TEST_F(MetaContainer, ConstKeyOnlyAssociativeContainer) {
     ASSERT_EQ(view.size(), 1u);
     ASSERT_NE(view.begin(), view.end());
 
+    ASSERT_EQ((*view.find(2)).first.try_cast<int>(), nullptr);
+    ASSERT_NE((*view.find(2)).first.try_cast<const int>(), nullptr);
     ASSERT_EQ((*view.find(2)).first.cast<int>(), 2);
-    ASSERT_EQ((*view.find(2)).first.cast<int &>(), 2);
     ASSERT_EQ((*view.find(2)).first.cast<const int &>(), 2);
 
     ASSERT_FALSE(view.insert(0));
@@ -422,8 +423,10 @@ TEST_F(MetaContainer, KeyOnlyAssociativeContainerConstMetaAny) {
 
         ASSERT_TRUE(view);
         ASSERT_EQ(view.value_type(), (entt::resolve<int>()));
+
+        ASSERT_EQ((*view.find(2)).first.try_cast<int>(), nullptr);
+        ASSERT_NE((*view.find(2)).first.try_cast<const int>(), nullptr);
         ASSERT_EQ((*view.find(2)).first.cast<int>(), 2);
-        ASSERT_EQ((*view.find(2)).first.cast<int &>(), 2);
         ASSERT_EQ((*view.find(2)).first.cast<const int &>(), 2);
     };
 
