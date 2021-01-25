@@ -63,6 +63,36 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(SingleComponentView, RawData) {
+    entt::registry registry;
+    auto view = registry.view<int>();
+    auto cview = std::as_const(registry).view<const int>();
+
+    const auto entity = registry.create();
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(cview.size(), 0u);
+    ASSERT_EQ(view.raw(), nullptr);
+    ASSERT_EQ(cview.raw(), nullptr);
+    ASSERT_EQ(view.data(), nullptr);
+    ASSERT_EQ(cview.data(), nullptr);
+
+    registry.emplace<int>(entity, 42);
+
+    ASSERT_NE(view.size(), 0u);
+    ASSERT_NE(cview.size(), 0u);
+    ASSERT_EQ(*view.raw(), 42);
+    ASSERT_EQ(*cview.raw(), 42);
+    ASSERT_EQ(*view.data(), entity);
+    ASSERT_EQ(*cview.data(), entity);
+
+    const auto other = registry.create();
+    registry.destroy(entity);
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(cview.size(), 0u);
+}
+
 TEST(SingleComponentView, Invalid) {
     entt::registry registry{};
     auto eview = std::as_const(registry).view<const empty_type>();

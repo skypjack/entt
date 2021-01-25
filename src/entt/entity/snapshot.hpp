@@ -117,8 +117,14 @@ public:
      */
     template<typename... Component, typename Archive>
     const basic_snapshot & component(Archive &archive) const {
-        (component<Component>(archive, reg->template data<Component>(), reg->template data<Component>() + reg->template size<Component>()), ...);
-        return *this;
+        if constexpr(sizeof...(Component) == 1u) {
+            const auto view = reg->template view<const Component...>();
+            (component<Component>(archive, view.data(), view.data() + view.size()), ...);
+            return *this;
+        } else {
+            (component<Component>(archive), ...);
+            return *this;
+        }
     }
 
     /**
