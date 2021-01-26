@@ -240,10 +240,10 @@ To search for a reflected type there are a few options:
 auto by_type = entt::resolve<my_type>();
 
 // lookup of a reflected type by identifier
-auto by_id = entt::resolve_id("reflected_type"_hs);
+auto by_id = entt::resolve("reflected_type"_hs);
 
-// lookup of a reflected type by type id
-auto by_type_id = entt::resolve_type(entt::type_hash<my_type>::value());
+// lookup of a reflected type by type info
+auto by_type_id = entt::resolve(entt::type_id<my_type>());
 ```
 
 There exits also an overload of the `resolve` function to use to iterate all the
