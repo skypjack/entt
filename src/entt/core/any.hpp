@@ -18,7 +18,7 @@ namespace entt {
 class any {
     enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
 
-    using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
+    using storage_type = std::aligned_storage_t<sizeof(double[2])>;
     using vtable_type = const void *(const operation, const any &, const void *);
 
     template<typename Type>
@@ -188,9 +188,9 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, any>>>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, any>>>
     any(Type &&value)
-        : any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+        : any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)}
     {}
 
     /**
