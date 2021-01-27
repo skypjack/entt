@@ -39,10 +39,6 @@ struct meta_function_helper<Ret(Args...), Const, Static> {
 
     static constexpr auto is_static = Static;
     static constexpr auto is_const = Const;
-
-    [[nodiscard]] static auto arg(typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
-        return std::array<meta_type_node *, sizeof...(Args)>{{meta_info<Args>::resolve()...}}[index];
-    }
 };
 
 
@@ -69,6 +65,12 @@ template<typename Type, typename Candidate>
 using meta_function_helper_t = decltype(to_meta_function_helper<Type>(std::declval<Candidate>()));
 
 
+template<typename... Args>
+[[nodiscard]] static auto arg(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
+    return std::array<meta_type_node *, sizeof...(Args)>{{meta_info<Args>::resolve()...}}[index];
+}
+
+
 template<typename Type, typename... Args, std::size_t... Index>
 [[nodiscard]] meta_any construct(meta_any * const args, std::index_sequence<Index...>) {
     if(((args+Index)->allow_cast<Args>() && ...)) {
@@ -81,34 +83,36 @@ template<typename Type, typename... Args, std::size_t... Index>
 
 template<typename Type, auto Data>
 [[nodiscard]] bool setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
-    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
-        using helper_type = meta_function_helper_t<Type, decltype(Data)>;
-        using data_type = type_list_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
-
-        if(auto * const clazz = instance->try_cast<Type>(); clazz) {
-            if(value.allow_cast<data_type>()) {
-                std::invoke(Data, *clazz, value.cast<data_type>());
-                return true;
-            }
-        }
-    } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-        using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
-
-        if constexpr(!std::is_array_v<data_type>) {
+    if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
+        if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
+            using helper_type = meta_function_helper_t<Type, decltype(Data)>;
+            using data_type = type_list_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
+    
             if(auto * const clazz = instance->try_cast<Type>(); clazz) {
                 if(value.allow_cast<data_type>()) {
-                    std::invoke(Data, clazz) = value.cast<data_type>();
+                    std::invoke(Data, *clazz, value.cast<data_type>());
                     return true;
                 }
             }
-        }
-    } else {
-        using data_type = std::remove_cv_t<std::remove_reference_t<decltype(*Data)>>;
-
-        if constexpr(!std::is_array_v<data_type>) {
-            if(value.allow_cast<data_type>()) {
-                *Data = value.cast<data_type>();
-                return true;
+        } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+            using data_type = std::remove_reference_t<decltype(std::declval<Type>().*Data)>;
+    
+            if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+                if(auto * const clazz = instance->try_cast<Type>(); clazz) {
+                    if(value.allow_cast<data_type>()) {
+                        std::invoke(Data, clazz) = value.cast<data_type>();
+                        return true;
+                    }
+                }
+            }
+        } else {
+            using data_type = std::remove_reference_t<decltype(*Data)>;
+    
+            if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+                if(value.allow_cast<data_type>()) {
+                    *Data = value.cast<data_type>();
+                    return true;
+                }
             }
         }
     }
@@ -146,7 +150,7 @@ template<typename Type, auto Data, typename Policy>
                 return fallback ? dispatch(std::invoke(Data, *fallback)) : meta_any{};
             }
         }
-    } else if constexpr(std::is_pointer_v<std::decay_t<decltype(Data)>>) {
+    } else if constexpr(std::is_pointer_v<decltype(Data)>) {
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
             return meta_any{};
         } else {
@@ -482,7 +486,9 @@ public:
             nullptr,
             nullptr,
             helper_type::args_type::size,
-            &helper_type::arg,
+            [](const typename internal::meta_ctor_node::size_type index) ENTT_NOEXCEPT {
+                return internal::arg(typename helper_type::args_type{}, index);
+            },
             [](meta_any * const any) {
                 return internal::invoke<Type, Candidate, Policy>({}, any, std::make_index_sequence<helper_type::args_type::size>{});
             }
@@ -515,7 +521,9 @@ public:
             nullptr,
             nullptr,
             helper_type::args_type::size,
-            &helper_type::arg,
+            [](const typename internal::meta_ctor_node::size_type index) ENTT_NOEXCEPT {
+                return internal::arg(typename helper_type::args_type{}, index);
+            },
             [](meta_any * const any) {
                 return internal::construct<Type, Args...>(any, std::make_index_sequence<helper_type::args_type::size>{});
             }
@@ -578,7 +586,7 @@ public:
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             return data<Data, Data, Policy>(id);
         } else {
-            using data_type = std::remove_pointer_t<std::decay_t<decltype(Data)>>;
+            using data_type = std::remove_pointer_t<decltype(Data)>;
             auto * const type = internal::meta_info<Type>::resolve();
 
             static internal::meta_data_node node{
@@ -586,15 +594,10 @@ public:
                 type,
                 nullptr,
                 nullptr,
+                std::is_same_v<Type, data_type> || std::is_const_v<data_type>,
                 true,
                 &internal::meta_info<data_type>::resolve,
-                []() -> std::remove_cv_t<decltype(internal::meta_data_node::set)> {
-                    if constexpr(std::is_same_v<Type, data_type> || std::is_const_v<data_type>) {
-                        return nullptr;
-                    } else {
-                        return &internal::setter<Type, Data>;
-                    }
-                }(),
+                &internal::setter<Type, Data>,
                 &internal::getter<Type, Data, Policy>
             };
 
@@ -638,15 +641,10 @@ public:
             type,
             nullptr,
             nullptr,
+            std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>),
             false,
             &internal::meta_info<underlying_type>::resolve,
-            []() -> std::remove_cv_t<decltype(internal::meta_data_node::set)> {
-                if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) {
-                    return nullptr;
-                } else {
-                    return &internal::setter<Type, Setter>;
-                }
-            }(),
+            &internal::setter<Type, Setter>,
             &internal::getter<Type, Getter, Policy>
         };
 
@@ -686,7 +684,9 @@ public:
             helper_type::is_const,
             helper_type::is_static,
             &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
-            &helper_type::arg,
+            [](const typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
+                return internal::arg(typename helper_type::args_type{}, index);
+            },
             [](meta_handle instance, meta_any *args) {
                 return internal::invoke<Type, Candidate, Policy>(std::move(instance), args, std::make_index_sequence<helper_type::args_type::size>{});
             }

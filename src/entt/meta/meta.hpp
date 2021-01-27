@@ -70,7 +70,7 @@ struct meta_ctor_node {
     meta_ctor_node * next;
     meta_prop_node * prop;
     const size_type size;
-    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
+    meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_any * const);
 };
 
@@ -80,6 +80,7 @@ struct meta_data_node {
     meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
+    const bool is_const;
     const bool is_static;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
     bool(* const set)(meta_handle, meta_any);
@@ -97,7 +98,7 @@ struct meta_func_node {
     const bool is_const;
     const bool is_static;
     meta_type_node *(* const ret)() ENTT_NOEXCEPT;
-    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
+    meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any *);
 };
 
@@ -124,7 +125,7 @@ struct meta_type_node {
     const bool is_sequence_container;
     const bool is_associative_container;
     const size_type rank;
-    size_type(* const extent)(size_type);
+    size_type(* const extent)(const size_type);
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
     meta_ctor_node *def_ctor{nullptr};
@@ -163,7 +164,7 @@ class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
     template<std::size_t... Index>
-    [[nodiscard]] static auto extent(meta_type_node::size_type dim, std::index_sequence<Index...>) {
+    [[nodiscard]] static auto extent(const meta_type_node::size_type dim, std::index_sequence<Index...>) {
         meta_type_node::size_type ext{};
         ((ext = (dim == Index ? std::extent_v<Type, Index> : ext)), ...);
         return ext;
@@ -976,7 +977,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return (node->set == nullptr);
+        return node->is_const;
     }
 
     /**
