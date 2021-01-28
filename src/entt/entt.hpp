@@ -35,6 +35,7 @@
 #include "meta/range.hpp"
 #include "meta/resolve.hpp"
 #include "meta/type_traits.hpp"
+#include "meta/utility.hpp"
 #include "platform/android-ndk-r17.hpp"
 #include "poly/poly.hpp"
 #include "process/process.hpp"

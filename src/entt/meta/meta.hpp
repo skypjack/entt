@@ -70,7 +70,7 @@ struct meta_ctor_node {
     meta_ctor_node * next;
     meta_prop_node * prop;
     const size_type size;
-    meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_any * const);
 };
 
@@ -98,7 +98,7 @@ struct meta_func_node {
     const bool is_const;
     const bool is_static;
     meta_type_node *(* const ret)() ENTT_NOEXCEPT;
-    meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any *);
 };
 
@@ -1172,6 +1172,10 @@ private:
 /*! @brief Opaque wrapper for types. */
 class meta_type {
     static bool can_cast_or_convert(const internal::meta_type_node *type, const type_info info) ENTT_NOEXCEPT {
+        if(type->info == info) {
+            return true;
+        }
+
         for(const auto *curr = type->conv; curr; curr = curr->next) {
             if(curr->type()->info == info) {
                 return true;
@@ -1179,7 +1183,7 @@ class meta_type {
         }
 
         for(const auto *curr = type->base; curr; curr = curr->next) {
-            if(auto *target = curr->type(); target->info == info || can_cast_or_convert(target, info)) {
+            if(auto *target = curr->type(); can_cast_or_convert(target, info)) {
                 return true;
             }
         }
@@ -1190,7 +1194,7 @@ class meta_type {
     template<typename... Args, auto... Index>
     [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node *curr, std::index_sequence<Index...>) {
         for(; curr; curr = curr->next) {
-            if(curr->size == sizeof...(Args) && ([](auto *from, auto *to) { return from->info == to->info || can_cast_or_convert(from, to->info); }(internal::meta_info<Args>::resolve(), curr->arg(Index)) && ...)) {
+            if(curr->size == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index).info()) && ...)) {
                 return curr;
             }
         }
@@ -1506,7 +1510,7 @@ public:
     }
 
     /**
-     * @brief Invokes the function with the given identifier, if possible.
+     * @brief Invokes a function given an identifier, if possible.
      *
      * It must be possible to cast the instance to the parent type of the member
      * function. Otherwise, invoking the underlying function results in an
@@ -1531,7 +1535,7 @@ public:
 
             for(size_type next{}; next < sz && next == (direct + ext); ++next) {
                 const auto type = args[next].type();
-                const auto req = it->arg(next)->info;
+                const auto req = it->arg(next).info();
                 type.info() == req ? ++direct : (ext += can_cast_or_convert(type.node, req));
             }
 
@@ -1738,7 +1742,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index) : nullptr;
+    return index < size() ? node->arg(index) : meta_type{};
 }
 
 
@@ -1763,7 +1767,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index) : nullptr;
+    return index < size() ? node->arg(index) : meta_type{};
 }
 
 
