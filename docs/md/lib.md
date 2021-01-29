@@ -91,7 +91,7 @@ attached the new visible meta types, no matter where they are created.<br/>
 A context can also be reset and then associated again locally as:
 
 ```cpp
-entt::meta_ctx::bind{entt::meta_ctx{});
+entt::meta_ctx::bind(entt::meta_ctx{});
 ```
 
 This is allowed because local and global contexts are separated. Therefore, it's
