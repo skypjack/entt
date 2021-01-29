@@ -24,7 +24,10 @@ namespace entt {
  * @tparam Trait Traits associated with the underlying container.
  */
 template<typename Container, template<typename> class... Trait>
-struct meta_container_traits: public Trait<Container>... {};
+struct meta_container_traits: public Trait<Container>... {
+    /*! @brief Type of container. */
+    using type = Container;
+};
 
 
 /**
@@ -33,21 +36,12 @@ struct meta_container_traits: public Trait<Container>... {};
  */
 template<typename Container>
 struct basic_container {
-    /*! @brief Iterator type of the container. */
-    using iterator = typename Container::iterator;
-    /*! @brief Iterator type of the container. */
-    using const_iterator = typename Container::const_iterator;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename Container::size_type;
-    /*! @brief Value type of the container. */
-    using value_type = typename Container::value_type;
-
     /**
      * @brief Returns the size of the given container.
      * @param cont The container for which to return the size.
      * @return The size of the given container.
      */
-    [[nodiscard]] static size_type size(const Container &cont) ENTT_NOEXCEPT {
+    [[nodiscard]] static typename Container::size_type size(const Container &cont) ENTT_NOEXCEPT {
         return cont.size();
     }
 
@@ -56,7 +50,7 @@ struct basic_container {
      * @param cont The container for which to return the iterator.
      * @return An iterator to the first element of the given container.
      */
-    [[nodiscard]] static iterator begin(Container &cont) {
+    [[nodiscard]] static typename Container::iterator begin(Container &cont) {
         return cont.begin();
     }
 
@@ -65,7 +59,7 @@ struct basic_container {
      * @param cont The container for which to return the iterator.
      * @return An iterator to the first element of the given container.
      */
-    [[nodiscard]] static const_iterator cbegin(const Container &cont) {
+    [[nodiscard]] static typename Container::const_iterator cbegin(const Container &cont) {
         return cont.begin();
     }
 
@@ -74,7 +68,7 @@ struct basic_container {
      * @param cont The container for which to return the iterator.
      * @return An iterator past the last element of the given container.
      */
-    [[nodiscard]] static iterator end(Container &cont) {
+    [[nodiscard]] static typename Container::iterator end(Container &cont) {
         return cont.end();
     }
 
@@ -83,7 +77,7 @@ struct basic_container {
      * @param cont The container for which to return the iterator.
      * @return An iterator past the last element of the given container.
      */
-    [[nodiscard]] static const_iterator cend(const Container &cont) {
+    [[nodiscard]] static typename Container::const_iterator cend(const Container &cont) {
         return cont.end();
     }
 };
@@ -95,9 +89,6 @@ struct basic_container {
  */
 template<typename Container>
 struct basic_associative_container {
-    /*! @brief Key type of the sequence container. */
-    using key_type = typename Container::key_type;
-
     /**
      * @brief Returns an iterator to the element with key equivalent to the
      * given one, if any.
@@ -105,12 +96,12 @@ struct basic_associative_container {
      * @param key The key of the element to search.
      * @return An iterator to the element with the given key, if any.
      */
-    [[nodiscard]] static typename Container::iterator find(Container &cont, const key_type &key) {
+    [[nodiscard]] static typename Container::iterator find(Container &cont, const typename Container::key_type &key) {
         return cont.find(key);
     }
 
     /*! @copydoc find */
-    [[nodiscard]] static typename Container::const_iterator cfind(const Container &cont, const key_type &key) {
+    [[nodiscard]] static typename Container::const_iterator cfind(const Container &cont, const typename Container::key_type &key) {
         return cont.find(key);
     }
 };
@@ -165,12 +156,12 @@ struct basic_sequence_container {
      * @param pos The position of the element to return.
      * @return A reference to the requested element.
      */
-    [[nodiscard]] static typename Container::value_type & get(Container &cont, typename Container::size_type pos) {
+    [[nodiscard]] static typename Container::reference get(Container &cont, typename Container::size_type pos) {
         return cont[pos];
     }
 
     /*! @copydoc get */
-    [[nodiscard]] static const typename Container::value_type & cget(const Container &cont, typename Container::size_type pos) {
+    [[nodiscard]] static typename Container::const_reference cget(const Container &cont, typename Container::size_type pos) {
         return cont[pos];
     }
 };
@@ -349,10 +340,7 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>
               basic_dynamic_associative_container,
               dynamic_associative_key_value_container
           >
-{
-    /*! @brief Mapped type of the sequence container. */
-    using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
-};
+{};
 
 
 /**
@@ -372,10 +360,7 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
               basic_dynamic_associative_container,
               dynamic_associative_key_value_container
           >
-{
-    /*! @brief Mapped type of the sequence container. */
-    using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
-};
+{};
 
 
 /**

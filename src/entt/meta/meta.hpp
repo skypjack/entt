@@ -1787,7 +1787,11 @@ class meta_sequence_container::meta_iterator {
             ++any_cast<It &>(const_cast<any &>(from));
             break;
         case operation::DEREF:
-            *static_cast<meta_any *>(to) = std::reference_wrapper{*any_cast<const It &>(from)};
+            if constexpr(std::is_lvalue_reference_v<typename std::iterator_traits<It>::reference>) {
+                *static_cast<meta_any *>(to) = std::reference_wrapper{*any_cast<const It &>(from)};
+            } else {
+                *static_cast<meta_any *>(to) = *any_cast<const It &>(from);
+            }
             break;
         }
     }
@@ -1866,8 +1870,8 @@ public:
     }
 
 private:
-    vtable_type *vtable;
-    any handle;
+    vtable_type *vtable{};
+    any handle{};
 };
 
 
@@ -1876,7 +1880,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     using traits_type = meta_sequence_container_traits<Type>;
 
     [[nodiscard]] static meta_type value_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::value_type>::resolve();
+        return internal::meta_info<typename Type::value_type>::resolve();
     }
 
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
@@ -1910,9 +1914,13 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static std::pair<iterator, bool> insert(any &container, iterator it, meta_any &value) {
-        if(auto * const cont = any_cast<Type>(&container); cont && value.allow_cast<const typename traits_type::value_type &>()) {
-            auto ret = traits_type::insert(*cont, any_cast<const typename traits_type::iterator &>(it.handle), value.cast<const typename traits_type::value_type &>());
-            return { iterator{std::move(ret.first)}, ret.second };
+        if(auto * const cont = any_cast<Type>(&container); cont) {
+            // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
+            if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
+                const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                auto ret = traits_type::insert(*cont, any_cast<const typename Type::iterator &>(it.handle), element ? *element : value.cast<typename Type::value_type>());
+                return { iterator{std::move(ret.first)}, ret.second };
+            }
         }
 
         return {};
@@ -1920,7 +1928,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
     [[nodiscard]] static std::pair<iterator, bool> erase(any &container, iterator it) {
         if(auto * const cont = any_cast<Type>(&container); cont) {
-            auto ret = traits_type::erase(*cont, any_cast<const typename traits_type::iterator &>(it.handle));
+            auto ret = traits_type::erase(*cont, any_cast<const typename Type::iterator &>(it.handle));
             return { iterator{std::move(ret.first)}, ret.second };
         }
 
@@ -1929,10 +1937,18 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
     [[nodiscard]] static meta_any get(any &container, size_type pos) {
         if(auto * const cont = any_cast<Type>(&container); cont) {
-            return std::reference_wrapper{traits_type::get(*cont, pos)};
+            if constexpr(std::is_lvalue_reference_v<typename Type::reference>) {
+                return std::reference_wrapper{traits_type::get(*cont, pos)};
+            } else {
+                return traits_type::get(*cont, pos);
+            }
         }
 
-        return std::reference_wrapper{traits_type::cget(any_cast<const Type &>(container), pos)};
+        if constexpr(std::is_lvalue_reference_v<typename Type::const_reference>) {
+            return std::reference_wrapper{traits_type::cget(any_cast<const Type &>(container), pos)};
+        } else {
+            return traits_type::cget(any_cast<const Type &>(container), pos);
+        }
     }
 };
 
@@ -2132,8 +2148,8 @@ public:
     }
 
 private:
-    vtable_type *vtable;
-    any handle;
+    vtable_type *vtable{};
+    any handle{};
 };
 
 
@@ -2142,19 +2158,19 @@ struct meta_associative_container::meta_associative_container_proxy {
     using traits_type = meta_associative_container_traits<Type>;
 
     [[nodiscard]] static meta_type key_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::key_type>::resolve();
+        return internal::meta_info<typename Type::key_type>::resolve();
     }
 
     [[nodiscard]] static meta_type mapped_type() ENTT_NOEXCEPT {
         if constexpr(is_key_only_meta_associative_container_v<Type>) {
             return meta_type{};
         } else {
-            return internal::meta_info<typename traits_type::mapped_type>::resolve();
+            return internal::meta_info<typename Type::mapped_type>::resolve();
         }
     }
 
     [[nodiscard]] static meta_type value_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::value_type>::resolve();
+        return internal::meta_info<typename Type::value_type>::resolve();
     }
 
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
@@ -2183,12 +2199,12 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, meta_any &value) {
-        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
+        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
             if constexpr(is_key_only_meta_associative_container_v<Type>) {
-                return traits_type::insert(*cont, key.cast<const typename traits_type::key_type &>());
+                return traits_type::insert(*cont, key.cast<const typename Type::key_type &>());
             } else {
-                if(value.allow_cast<const typename traits_type::mapped_type &>()) {
-                    return traits_type::insert(*cont, key.cast<const typename traits_type::key_type &>(), value.cast<const typename traits_type::mapped_type &>());
+                if(value.allow_cast<const typename Type::mapped_type &>()) {
+                    return traits_type::insert(*cont, key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>());
                 }
             }
         }
@@ -2197,20 +2213,20 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool erase(any &container, meta_any &key) {
-        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
-            return traits_type::erase(*cont, key.cast<const typename traits_type::key_type &>());
+        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
+            return traits_type::erase(*cont, key.cast<const typename Type::key_type &>());
         }
 
         return false;
     }
 
     [[nodiscard]] static iterator find(any &container, meta_any &key) {
-        if(key.allow_cast<const typename traits_type::key_type &>()) {
+        if(key.allow_cast<const typename Type::key_type &>()) {
             if(auto * const cont = any_cast<Type>(&container); cont) {
-                return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*cont, key.cast<const typename traits_type::key_type &>())};
+                return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*cont, key.cast<const typename Type::key_type &>())};
             }
 
-            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cfind(any_cast<const Type &>(container), key.cast<const typename traits_type::key_type &>())};
+            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cfind(any_cast<const Type &>(container), key.cast<const typename Type::key_type &>())};
         }
 
         return {};
