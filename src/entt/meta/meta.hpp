@@ -378,7 +378,7 @@ class meta_any {
                 if constexpr(std::is_function_v<element_type>) {
                     *static_cast<meta_any *>(to) = any_cast<const Type>(from);
                 } else if constexpr(!std::is_same_v<element_type, void>) {
-                    auto &&obj = adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from));
+                    auto &&obj = adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from));
                     *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::reference_wrapper{obj}} : meta_any{std::cref(obj)});
                 }
             }
