@@ -175,7 +175,6 @@ class basic_sparse_set {
 
     virtual void swap_at(const std::size_t, const std::size_t) {}
     virtual void swap_and_pop(const std::size_t) {}
-    virtual void clear_all() {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -443,13 +442,8 @@ public:
      */
     template<typename It>
     void remove(It first, It last) {
-        if(std::distance(first, last) == std::distance(packed.begin(), packed.end())) {
-            // no validity check, let it be misused
-            clear();
-        } else {
-            for(; first != last; ++first) {
-                remove(*first);
-            }
+        for(; first != last; ++first) {
+            remove(*first);
         }
     }
 
@@ -577,9 +571,7 @@ public:
 
     /*! @brief Clears a sparse set. */
     void clear() ENTT_NOEXCEPT {
-        sparse.clear();
-        packed.clear();
-        clear_all();
+        remove(rbegin(), rend());
     }
 
 private:

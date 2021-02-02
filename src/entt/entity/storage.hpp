@@ -174,10 +174,6 @@ class basic_storage: public basic_sparse_set<Entity> {
         instances.pop_back();
     }
 
-    void clear_all() ENTT_NOEXCEPT final {
-        instances.clear();
-    }
-
 public:
     /*! @brief Type of the objects associated with the entities. */
     using value_type = Type;
