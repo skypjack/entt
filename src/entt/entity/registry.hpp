@@ -461,7 +461,7 @@ public:
      * registry will continue to work properly in this case.
      *
      * @warning
-     * All pools must be empty for this to work properly.
+     * There must be no entities still alive.
      *
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
@@ -470,7 +470,7 @@ public:
      */
     template<typename It>
     void assign(It first, It last, const entity_type destroyed) {
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return !pdata.pool || pdata.pool->empty(); }));
+        ENTT_ASSERT(!alive());
         entities.assign(first, last);
         available = destroyed;
     }
