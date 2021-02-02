@@ -676,7 +676,7 @@ public:
     template<typename... Component>
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        static_assert(sizeof...(Component) > 0);
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
         (assure<Component>()->remove(*this, entity), ...);
     }
 
@@ -693,7 +693,7 @@ public:
     template<typename... Component, typename It>
     void remove(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        static_assert(sizeof...(Component) > 0);
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
         (assure<Component>()->remove(*this, first, last), ...);
     }
 
