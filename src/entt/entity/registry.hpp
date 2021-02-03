@@ -220,9 +220,8 @@ public:
      */
     [[nodiscard]] size_type alive() const {
         auto sz = entities.size();
-        auto curr = available;
 
-        for(; curr != null; --sz) {
+        for(auto curr = available; curr != null; --sz) {
             curr = entities[to_integral(curr) & traits_type::entity_mask];
         }
 
