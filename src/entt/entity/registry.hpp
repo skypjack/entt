@@ -889,15 +889,9 @@ public:
     template<typename... Component>
     void clear() {
         if constexpr(sizeof...(Component) == 0) {
-            for(auto pos = pools.size(); pos; --pos) {
-                if(auto &pdata = pools[pos-1]; pdata.pool) {
-                    pdata.poly->remove(*this, pdata.pool->rbegin(), pdata.pool->rend());
-                }
-            }
-
             for(auto pos = entities.size(); pos; --pos) {
                 if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
-                    release_entity(entt, version(entt) + 1u);
+                    destroy(entt);
                 }
             }
         } else {

@@ -152,7 +152,7 @@ TEST(SparseSet, Remove) {
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
-    set.remove(set.rbegin(), set.rend());
+    set.remove(set.begin(), set.end());
 
     ASSERT_TRUE(set.empty());
 
@@ -169,6 +169,20 @@ TEST(SparseSet, Remove) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(*set.begin(), entt::entity{42});
+}
+
+TEST(SparseSet, Clear) {
+    entt::sparse_set set;
+
+    set.emplace(entt::entity{3});
+    set.emplace(entt::entity{42});
+    set.emplace(entt::entity{9});
+
+    ASSERT_FALSE(set.empty());
+
+    set.clear();
+
+    ASSERT_TRUE(set.empty());
 }
 
 TEST(SparseSet, Iterator) {

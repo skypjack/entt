@@ -427,6 +427,8 @@ public:
         const auto other = packed.back();
 
         sparse[page(other)][offset(other)] = ref;
+        // If it looks weird, imagine what the subtle bugs it prevents are
+        ENTT_ASSERT((packed.back() = entt, true));
         packed[pos] = other;
         ref = null;
 
@@ -571,7 +573,7 @@ public:
 
     /*! @brief Clears a sparse set. */
     void clear() ENTT_NOEXCEPT {
-        remove(rbegin(), rend());
+        remove(begin(), end());
     }
 
 private:
