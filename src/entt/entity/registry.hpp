@@ -460,7 +460,7 @@ public:
      * registry will continue to work properly in this case.
      *
      * @warning
-     * There must be no entities still alive.
+     * There must be no entities still alive for this to work properly.
      *
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
