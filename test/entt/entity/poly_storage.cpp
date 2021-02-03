@@ -13,10 +13,7 @@ struct PolyStorage: entt::type_list_cat_t<
     entt::type_list<
         void(entt::basic_registry<Entity> &, const Entity, const void *),
         const void *(const Entity) const,
-        const Entity *() const,
-        const void *() const,
-        std::size_t() const,
-        void(entt::basic_registry<Entity> &, const Entity *, const void *, const std::size_t)
+        void(entt::basic_registry<Entity> &, entt::basic_registry<Entity> &)
     >
 > {
     using entity_type = Entity;
@@ -34,20 +31,8 @@ struct PolyStorage: entt::type_list_cat_t<
             return entt::poly_call<base + 1>(*this, entity);
         }
 
-        const entity_type * data() const {
-            return entt::poly_call<base + 2>(*this);
-        }
-
-        const void * raw() const {
-            return entt::poly_call<base + 3>(*this);
-        }
-
-        size_type size() const {
-            return entt::poly_call<base + 4>(*this);
-        }
-
-        void insert(entt::basic_registry<Entity> &owner, const Entity *entity, const void *instance, const std::size_t length) {
-            entt::poly_call<base + 5>(*this, owner, entity, instance, length);
+        void copy(entt::basic_registry<Entity> &owner, entt::basic_registry<Entity> &other) {
+            entt::poly_call<base + 2>(*this, owner, other);
         }
     };
 
@@ -61,9 +46,8 @@ struct PolyStorage: entt::type_list_cat_t<
             return &self.get(entity);
         }
 
-        static void insert(Type &self, entt::basic_registry<entity_type> &owner, const entity_type *entity, const void *instance, const size_type length) {
-            const auto *value = static_cast<const typename Type::value_type *>(instance);
-            self.insert(owner, entity, entity + length, value, value + length);
+        static void copy(Type &self, entt::basic_registry<entity_type> &owner, entt::basic_registry<entity_type> &other) {
+            other.template insert<typename Type::value_type>(self.data(), self.data() + self.size(), self.raw(), self.raw() + self.size());
         }
     };
 
@@ -73,10 +57,7 @@ struct PolyStorage: entt::type_list_cat_t<
         entt::value_list<
             &members<Type>::emplace,
             &members<Type>::get,
-            &Type::data,
-            entt::overload<const typename Type::value_type *() const ENTT_NOEXCEPT>(&Type::raw),
-            &Type::size,
-            &members<Type>::insert
+            &members<Type>::copy
         >
     >;
 };
@@ -118,20 +99,19 @@ TEST(PolyStorage, CopyRegistry) {
     registry.insert<int>(std::begin(entities), std::end(entities), 42);
     registry.insert<char>(std::begin(entities), std::end(entities), 'c');
 
-    other.prepare<int>();
-    other.prepare<char>();
-
     ASSERT_EQ(registry.size(), 10u);
     ASSERT_EQ(other.size(), 0u);
 
     other.assign(registry.data(), registry.data() + registry.size(), registry.destroyed());
-
-    registry.visit([&](const auto info) {
-        auto storage = registry.storage(info);
-        other.storage(info)->insert(other, storage->data(), storage->raw(), storage->size());
-    });
+    registry.visit([&](const auto info) { registry.storage(info)->copy(registry, other); });
 
     ASSERT_EQ(registry.size(), other.size());
+    ASSERT_EQ((registry.view<int, char>().size_hint()), (other.view<int, char>().size_hint()));
+    ASSERT_NE((other.view<int, char>().size_hint()), 0u);
+
+    for(const auto entity: registry.view<int, char>()) {
+        ASSERT_EQ((registry.get<int, char>(entity)), (other.get<int, char>(entity)));
+    }
 }
 
 TEST(PolyStorage, Constness) {

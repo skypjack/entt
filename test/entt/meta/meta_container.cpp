@@ -436,3 +436,51 @@ TEST_F(MetaContainer, KeyOnlyAssociativeContainerConstMetaAny) {
     test(std::ref(set));
     test(std::cref(set));
 }
+
+TEST_F(MetaContainer, StdVectorBool) {
+    using proxy_type = typename std::vector<bool>::reference;
+    using const_proxy_type = typename std::vector<bool>::const_reference;
+
+    std::vector<bool> vec{};
+    entt::meta_any any{std::ref(vec)};
+    auto cany = as_ref(std::as_const(any));
+
+    auto view = any.as_sequence_container();
+    auto cview = cany.as_sequence_container();
+
+    ASSERT_TRUE(view);
+    ASSERT_EQ(view.value_type(), entt::resolve<bool>());
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.resize(3u));
+    ASSERT_EQ(view.size(), 3u);
+    ASSERT_NE(view.begin(), view.end());
+
+    view[0].cast<proxy_type>() = true;
+    view[1].cast<proxy_type>() = true;
+    view[2].cast<proxy_type>() = false;
+
+    ASSERT_EQ(cview[1u].cast<const_proxy_type>(), true);
+
+    auto it = view.begin();
+    auto ret = view.insert(it, true);
+
+    ASSERT_TRUE(ret.second);
+    ASSERT_FALSE(view.insert(ret.first, 'c').second);
+    ASSERT_TRUE(view.insert(++ret.first, false).second);
+
+    ASSERT_EQ(view.size(), 5u);
+    ASSERT_EQ((*view.begin()).cast<proxy_type>(), true);
+    ASSERT_EQ((*++cview.begin()).cast<const_proxy_type>(), false);
+
+    it = view.begin();
+    ret = view.erase(it);
+
+    ASSERT_TRUE(ret.second);
+    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ((*ret.first).cast<proxy_type>(), false);
+
+    ASSERT_TRUE(view.clear());
+    ASSERT_EQ(cview.size(), 0u);
+}

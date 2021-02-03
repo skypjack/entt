@@ -35,7 +35,7 @@ struct has_meta_sequence_container_traits: std::false_type {};
 
 /*! @copydoc has_meta_sequence_container_traits */
 template<typename Type>
-struct has_meta_sequence_container_traits<Type, std::void_t<typename meta_sequence_container_traits<Type>::value_type>>
+struct has_meta_sequence_container_traits<Type, std::void_t<typename meta_sequence_container_traits<Type>::type::value_type>>
         : std::true_type
 {};
 
@@ -59,7 +59,7 @@ struct has_meta_associative_container_traits: std::false_type {};
 
 /*! @copydoc has_meta_associative_container_traits */
 template<typename Type>
-struct has_meta_associative_container_traits<Type, std::void_t<typename meta_associative_container_traits<Type>::key_type>>
+struct has_meta_associative_container_traits<Type, std::void_t<typename meta_associative_container_traits<Type>::type::key_type>>
         : std::true_type
 {};
 
@@ -83,7 +83,7 @@ struct is_key_only_meta_associative_container: std::true_type {};
 
 /*! @copydoc is_key_only_meta_associative_container */
 template<typename Type>
-struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_associative_container_traits<Type>::mapped_type>>
+struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_associative_container_traits<Type>::type::mapped_type>>
         : std::false_type
 {};
 
