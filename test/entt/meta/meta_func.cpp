@@ -415,9 +415,9 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    ASSERT_FALSE(registry.has<func_t>(entity));
+    ASSERT_FALSE(registry.all_of<func_t>(entity));
 
     func.invoke({}, std::ref(registry), entity);
 
-    ASSERT_TRUE(registry.has<func_t>(entity));
+    ASSERT_TRUE(registry.all_of<func_t>(entity));
 }

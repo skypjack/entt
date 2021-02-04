@@ -75,7 +75,7 @@ TEST(PolyStorage, CopyEntity) {
     registry.emplace<int>(entity, 42);
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_TRUE((registry.has<int, char>(entity)));
+    ASSERT_TRUE((registry.all_of<int, char>(entity)));
     ASSERT_FALSE((registry.any<int, char>(other)));
 
     registry.visit(entity, [&](const auto info) {
@@ -83,8 +83,8 @@ TEST(PolyStorage, CopyEntity) {
         storage->emplace(registry, other, storage->get(entity));
     });
 
-    ASSERT_TRUE((registry.has<int, char>(entity)));
-    ASSERT_TRUE((registry.has<int, char>(other)));
+    ASSERT_TRUE((registry.all_of<int, char>(entity)));
+    ASSERT_TRUE((registry.all_of<int, char>(other)));
 
     ASSERT_EQ(registry.get<int>(entity), registry.get<int>(other));
     ASSERT_EQ(registry.get<char>(entity), registry.get<char>(other));
@@ -125,10 +125,10 @@ TEST(PolyStorage, Constness) {
     auto cstorage = cregistry.storage(entt::type_id<int>());
 
     ASSERT_DEATH(cstorage->remove(registry, std::begin(entity), std::end(entity)), ".*");
-    ASSERT_TRUE(registry.has<int>(entity[0]));
+    ASSERT_TRUE(registry.all_of<int>(entity[0]));
 
     auto storage = registry.storage(entt::type_id<int>());
     storage->remove(registry, std::begin(entity), std::end(entity));
 
-    ASSERT_FALSE(registry.has<int>(entity[0]));
+    ASSERT_FALSE(registry.all_of<int>(entity[0]));
 }

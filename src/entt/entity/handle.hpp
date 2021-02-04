@@ -220,13 +220,13 @@ struct basic_handle {
 
     /**
      * @brief Checks if a handle has all the given components.
-     * @sa basic_registry::has
+     * @sa basic_registry::all_of
      * @tparam Component Components for which to perform the check.
      * @return True if the handle has all the components, false otherwise.
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) has() const {
-        return reg->template has<Component...>(entt);
+        return reg->template all_of<Component...>(entt);
     }
 
     /**

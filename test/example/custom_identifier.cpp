@@ -37,7 +37,7 @@ TEST(Example, CustomIdentifier) {
     ASSERT_TRUE(registry.valid(entity));
     ASSERT_TRUE(entity != entt::null);
 
-    ASSERT_FALSE((registry.has<int, char>(entity)));
+    ASSERT_FALSE((registry.all_of<int, char>(entity)));
     ASSERT_EQ(registry.try_get<int>(entity), nullptr);
 
     registry.emplace<int>(entity, 42);

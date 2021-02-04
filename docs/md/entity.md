@@ -284,12 +284,12 @@ if(registry.has<velocity>(entity)) {
 }
 ```
 
-The `has` and `any` member functions may also be useful if in doubt about
+The `all_of` and `any` member functions may also be useful if in doubt about
 whether or not an entity has all the components in a set or any of them:
 
 ```cpp
 // true if entity has all the given components
-bool all = registry.has<position, velocity>(entity);
+bool all = registry.all_of<position, velocity>(entity);
 
 // true if entity has at least one of the given components
 bool any = registry.any<position, velocity>(entity);

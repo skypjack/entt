@@ -144,7 +144,7 @@ TEST(Snapshot, Dump) {
     ASSERT_EQ(registry.current(e1), v1);
     ASSERT_EQ(registry.get<int>(e2), 3);
     ASSERT_EQ(registry.get<char>(e3), '0');
-    ASSERT_TRUE(registry.has<a_component>(e3));
+    ASSERT_TRUE(registry.all_of<a_component>(e3));
 
     ASSERT_TRUE(registry.empty<another_component>());
 }
@@ -199,7 +199,7 @@ TEST(Snapshot, Partial) {
 
     ASSERT_EQ(registry.get<int>(e0), 42);
     ASSERT_EQ(registry.get<char>(e0), 'c');
-    ASSERT_FALSE(registry.has<double>(e0));
+    ASSERT_FALSE(registry.all_of<double>(e0));
     ASSERT_EQ(registry.current(e1), v1);
     ASSERT_EQ(registry.get<int>(e2), 3);
     ASSERT_EQ(registry.get<char>(e3), '0');
@@ -342,7 +342,7 @@ TEST(Snapshot, Continuous) {
     decltype(dst.size()) noncopyable_component_cnt{};
 
     dst.each([&dst, &a_component_cnt](auto entt) {
-        ASSERT_TRUE(dst.has<a_component>(entt));
+        ASSERT_TRUE(dst.all_of<a_component>(entt));
         ++a_component_cnt;
     });
 
@@ -582,8 +582,8 @@ TEST(Snapshot, SyncDataMembers) {
     ASSERT_FALSE(dst.valid(parent));
     ASSERT_FALSE(dst.valid(child));
 
-    ASSERT_TRUE(dst.has<what_a_component>(loader.map(parent)));
-    ASSERT_TRUE(dst.has<what_a_component>(loader.map(child)));
+    ASSERT_TRUE(dst.all_of<what_a_component>(loader.map(parent)));
+    ASSERT_TRUE(dst.all_of<what_a_component>(loader.map(child)));
 
     ASSERT_EQ(dst.get<what_a_component>(loader.map(parent)).bar, static_cast<entt::entity>(entt::null));
 
