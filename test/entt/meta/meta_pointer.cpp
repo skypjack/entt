@@ -9,7 +9,6 @@
 template<typename Type>
 struct wrapped_shared_ptr {
     wrapped_shared_ptr(Type init): ptr{new Type {init}} {}
-
     Type & deref() const { return *ptr; }
 
 private:
@@ -18,8 +17,9 @@ private:
 
 struct self {
     using element_type = int;
+    self(int v): value{v} {}
     const self & operator*() const { return *this; }
-    int value{};
+    int value;
 };
 
 template<typename Type>
