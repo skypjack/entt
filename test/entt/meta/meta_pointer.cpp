@@ -164,9 +164,9 @@ TEST(MetaPointerLike, PointerToConstMoveOnlyType) {
     ASSERT_TRUE(any);
     ASSERT_TRUE(deref);
 
-    ASSERT_DEATH(deref.cast<not_copyable_t &>() = {}, ".*");
     ASSERT_EQ(deref.try_cast<not_copyable_t>(), nullptr);
     ASSERT_NE(deref.try_cast<const not_copyable_t>(), nullptr);
+    ASSERT_EQ(&deref.cast<const not_copyable_t &>(), &instance);
 }
 
 TEST(MetaPointerLike, AsRef) {

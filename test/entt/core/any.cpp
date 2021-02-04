@@ -697,7 +697,7 @@ TEST(Any, AsRef) {
     ASSERT_EQ(entt::any_cast<const int &>(any), 42);
     ASSERT_EQ(entt::any_cast<int &>(ref), 42);
     ASSERT_EQ(entt::any_cast<const int &>(ref), 42);
-    ASSERT_DEATH(entt::any_cast<int &>(cref), ".*");
+    ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
     ASSERT_EQ(entt::any_cast<const int &>(cref), 42);
 
     entt::any_cast<int &>(any) = 3;
@@ -719,8 +719,8 @@ TEST(Any, AsRef) {
     ASSERT_EQ(entt::any_cast<const int>(&ref), any.data());
     ASSERT_EQ(entt::any_cast<const int>(&cref), any.data());
 
-    ASSERT_DEATH(entt::any_cast<int &>(ref), ".*");
-    ASSERT_DEATH(entt::any_cast<int &>(cref), ".*");
+    ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
 
     ASSERT_EQ(entt::any_cast<const int &>(ref), 3);
     ASSERT_EQ(entt::any_cast<const int &>(cref), 3);
