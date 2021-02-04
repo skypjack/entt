@@ -772,7 +772,7 @@ public:
      * false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] bool any(const entity_type entity) const {
+    [[nodiscard]] bool any_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
         return (all_of<Component>(entity) || ...);
     }
@@ -1481,7 +1481,7 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
-        vars.push_back(entt::any{std::in_place_type<Type>, std::forward<Args>(args)...});
+        vars.push_back(any{std::in_place_type<Type>, std::forward<Args>(args)...});
         return any_cast<Type &>(vars.back());
     }
 
@@ -1582,7 +1582,7 @@ public:
     }
 
 private:
-    std::vector<entt::any> vars{};
+    std::vector<any> vars{};
     std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};

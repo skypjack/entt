@@ -231,14 +231,14 @@ struct basic_handle {
 
     /**
      * @brief Checks if a handle has at least one of the given components.
-     * @sa basic_registry::any
+     * @sa basic_registry::any_of
      * @tparam Component Components for which to perform the check.
      * @return True if the handle has at least one of the given components,
      * false otherwise.
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) any() const {
-        return reg->template any<Component...>(entt);
+        return reg->template any_of<Component...>(entt);
     }
 
     /**

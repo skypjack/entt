@@ -76,7 +76,7 @@ TEST(PolyStorage, CopyEntity) {
     registry.emplace<char>(entity, 'c');
 
     ASSERT_TRUE((registry.all_of<int, char>(entity)));
-    ASSERT_FALSE((registry.any<int, char>(other)));
+    ASSERT_FALSE((registry.any_of<int, char>(other)));
 
     registry.visit(entity, [&](const auto info) {
         auto storage = registry.storage(info);

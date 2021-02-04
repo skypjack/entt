@@ -179,7 +179,7 @@ class basic_observer {
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, AnyOf>> {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, basic_registry<Entity> &reg, const Entity entt) {
-            if(reg.template all_of<Require...>(entt) && !reg.template any<Reject...>(entt)) {
+            if(reg.template all_of<Require...>(entt) && !reg.template any_of<Reject...>(entt)) {
                 if(!obs.view.contains(entt)) {
                     obs.view.emplace(entt);
                 }
@@ -217,9 +217,9 @@ class basic_observer {
         static void maybe_valid_if(basic_observer &obs, basic_registry<Entity> &reg, const Entity entt) {
             if([&reg, entt]() {
                 if constexpr(sizeof...(Ignore) == 0) {
-                    return reg.template all_of<AllOf..., Require...>(entt) && !reg.template any<NoneOf..., Reject...>(entt);
+                    return reg.template all_of<AllOf..., Require...>(entt) && !reg.template any_of<NoneOf..., Reject...>(entt);
                 } else {
-                    return reg.template all_of<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !reg.template any<NoneOf>(entt)) && ...) && !reg.template any<Reject...>(entt);
+                    return reg.template all_of<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !reg.template any_of<NoneOf>(entt)) && ...) && !reg.template any_of<Reject...>(entt);
                 }
             }())
             {

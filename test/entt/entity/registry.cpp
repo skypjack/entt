@@ -123,7 +123,7 @@ TEST(Registry, Functionalities) {
     registry.emplace<char>(e1);
 
     ASSERT_TRUE(registry.all_of<>(e0));
-    ASSERT_FALSE(registry.any<>(e1));
+    ASSERT_FALSE(registry.any_of<>(e1));
 
     ASSERT_EQ(registry.size<int>(), 1u);
     ASSERT_EQ(registry.size<char>(), 1u);
@@ -134,8 +134,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_FALSE((registry.all_of<int, char>(e0)));
     ASSERT_TRUE((registry.all_of<int, char>(e1)));
-    ASSERT_FALSE((registry.any<int, double>(e0)));
-    ASSERT_TRUE((registry.any<int, double>(e1)));
+    ASSERT_FALSE((registry.any_of<int, double>(e0)));
+    ASSERT_TRUE((registry.any_of<int, double>(e1)));
 
     ASSERT_EQ(registry.try_get<int>(e0), nullptr);
     ASSERT_NE(registry.try_get<int>(e1), nullptr);
@@ -151,8 +151,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_TRUE((registry.all_of<int, char>(e0)));
     ASSERT_FALSE((registry.all_of<int, char>(e1)));
-    ASSERT_TRUE((registry.any<int, double>(e0)));
-    ASSERT_FALSE((registry.any<int, double>(e1)));
+    ASSERT_TRUE((registry.any_of<int, double>(e0)));
+    ASSERT_FALSE((registry.any_of<int, double>(e1)));
 
     const auto e2 = registry.create();
 
@@ -1373,13 +1373,13 @@ TEST(Registry, Dependencies) {
 
     registry.remove<int>(entity);
 
-    ASSERT_FALSE((registry.any<int, double>(entity)));
+    ASSERT_FALSE((registry.any_of<int, double>(entity)));
 
     registry.on_construct<int>().disconnect<emplace_or_replace>();
     registry.on_destroy<int>().disconnect<remove>();
     registry.emplace<int>(entity);
 
-    ASSERT_TRUE((registry.any<int, double>(entity)));
+    ASSERT_TRUE((registry.any_of<int, double>(entity)));
     ASSERT_FALSE(registry.all_of<double>(entity));
 }
 

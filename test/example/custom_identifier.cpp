@@ -42,7 +42,7 @@ TEST(Example, CustomIdentifier) {
 
     registry.emplace<int>(entity, 42);
 
-    ASSERT_TRUE((registry.any<int, char>(entity)));
+    ASSERT_TRUE((registry.any_of<int, char>(entity)));
     ASSERT_EQ(registry.get<int>(entity), 42);
 
     registry.destroy(entity);
