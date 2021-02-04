@@ -151,8 +151,10 @@ I hope this list can grow much more in the future:
   * [Creating Minecraft in One Week with C++ and Vulkan](https://vazgriz.com/189/creating-minecraft-in-one-week-with-c-and-vulkan/):
     a crack at recreating Minecraft in one week using a custom C++ engine and
     Vulkan ([code included](https://github.com/vazgriz/VoxelGame)).
-  * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect).
+  * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
+  * [EnTT Entity Component System Gaming Library](https://gamefromscratch.com/entt-entity-component-system-gaming-library/):
+    `EnTT` on GameFromScratch.com.
 
 * Any Other Business:
   * [ArcGIS Runtime SDKs](https://developers.arcgis.com/arcgis-runtime/) by
