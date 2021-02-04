@@ -225,7 +225,7 @@ struct basic_handle {
      * @return True if the handle has all the components, false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] decltype(auto) has() const {
+    [[nodiscard]] decltype(auto) all_of() const {
         return reg->template all_of<Component...>(entt);
     }
 
@@ -237,7 +237,7 @@ struct basic_handle {
      * false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] decltype(auto) any() const {
+    [[nodiscard]] decltype(auto) any_of() const {
         return reg->template any_of<Component...>(entt);
     }
 

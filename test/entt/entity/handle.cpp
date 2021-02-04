@@ -157,7 +157,7 @@ TEST(BasicHandle, Component) {
 
     ASSERT_EQ(42, patched);
     ASSERT_EQ('a', handle.replace<char>('a'));
-    ASSERT_TRUE((handle.has<int, char, double>()));
+    ASSERT_TRUE((handle.all_of<int, char, double>()));
     ASSERT_EQ((std::make_tuple(42, 'a', .3)), (handle.get<int, char, double>()));
 
     handle.remove<char, double>();
@@ -165,10 +165,10 @@ TEST(BasicHandle, Component) {
     ASSERT_TRUE((registry.empty<char, double>()));
     ASSERT_EQ(0u, (handle.remove_if_exists<char, double>()));
 
-    handle.visit([](auto info) { ASSERT_EQ(entt::type_hash<int>::value(), info.hash()); });
+    handle.visit([](auto info) { ASSERT_EQ(entt::type_id<int>(), info); });
 
-    ASSERT_TRUE((handle.any<int, char, double>()));
-    ASSERT_FALSE((handle.has<int, char, double>()));
+    ASSERT_TRUE((handle.any_of<int, char, double>()));
+    ASSERT_FALSE((handle.all_of<int, char, double>()));
     ASSERT_FALSE(handle.orphan());
 
     handle.remove<int>();
@@ -192,11 +192,11 @@ TEST(BasicHandle, RemoveAll) {
 
     ASSERT_EQ(3, handle.emplace<int>(3));
     ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
-    ASSERT_TRUE((handle.has<int, char>()));
+    ASSERT_TRUE((handle.all_of<int, char>()));
 
     handle.remove_all();
 
-    ASSERT_FALSE((handle.any<int, char>()));
+    ASSERT_FALSE((handle.any_of<int, char>()));
 }
 
 TEST(BasicHandle, FromEntity) {
@@ -210,7 +210,7 @@ TEST(BasicHandle, FromEntity) {
 
     ASSERT_TRUE(handle);
     ASSERT_EQ(entity, handle.entity());
-    ASSERT_TRUE((handle.has<int, char>()));
+    ASSERT_TRUE((handle.all_of<int, char>()));
     ASSERT_EQ(handle.get<int>(), 42);
     ASSERT_EQ(handle.get<char>(), 'c');
 }
