@@ -13,6 +13,7 @@
 #include <vector>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/any.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
@@ -101,11 +102,6 @@ class basic_registry {
         bool (* owned)(const id_type) ENTT_NOEXCEPT;
         bool (* get)(const id_type) ENTT_NOEXCEPT;
         bool (* exclude)(const id_type) ENTT_NOEXCEPT;
-    };
-
-    struct variable_data {
-        type_info info;
-        std::unique_ptr<void, void(*)(void *)> value;
     };
 
     template<typename Component>
@@ -1485,8 +1481,8 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
-        vars.push_back(variable_data{type_id<Type>(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
-        return *static_cast<Type *>(vars.back().value.get());
+        vars.push_back(entt::any{std::in_place_type<Type>, std::forward<Args>(args)...});
+        return any_cast<Type &>(vars.back());
     }
 
     /**
@@ -1495,9 +1491,7 @@ public:
      */
     template<typename Type>
     void unset() {
-        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&var) {
-            return var.info.hash() == type_hash<Type>::value();
-        }), vars.end());
+        vars.erase(std::remove_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; }), vars.end());
     }
 
     /**
@@ -1525,14 +1519,15 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.info.hash() == type_hash<Type>::value(); });
-        return it == vars.cend() ? nullptr : static_cast<const Type *>(it->value.get());
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        return it == vars.cend() ? nullptr : any_cast<const Type>(&*it);
     }
 
     /*! @copydoc try_ctx */
     template<typename Type>
     [[nodiscard]] Type * try_ctx() {
-        return const_cast<Type *>(std::as_const(*this).template try_ctx<Type>());
+        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        return it == vars.end() ? nullptr : any_cast<Type>(&*it);
     }
 
     /**
@@ -1547,15 +1542,15 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type & ctx() const {
-        const auto *instance = try_ctx<Type>();
-        ENTT_ASSERT(instance);
-        return *instance;
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        return (ENTT_ASSERT(it != vars.cend()), any_cast<const Type &>(*it));
     }
 
     /*! @copydoc ctx */
     template<typename Type>
     [[nodiscard]] Type & ctx() {
-        return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
+        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        return (ENTT_ASSERT(it != vars.end()), any_cast<Type &>(*it));
     }
 
     /**
@@ -1582,15 +1577,15 @@ public:
     template<typename Func>
     void ctx(Func func) const {
         for(auto pos = vars.size(); pos; --pos) {
-            func(vars[pos-1].info);
+            func(vars[pos-1].type());
         }
     }
 
 private:
+    std::vector<entt::any> vars{};
     std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
-    std::vector<variable_data> vars{};
     entity_type available{null};
 };
 
