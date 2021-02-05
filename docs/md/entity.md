@@ -1878,10 +1878,10 @@ mentioning.
 
 When an empty type is detected, it's not instantiated in any case. Therefore,
 only the entities to which it's assigned are made available.<br/>
-There doesn't exist a way to _iterate_ empty types. Views and groups will never
-return instances of empty types (for example, during a call to `each`) and some
-functions such as `try_get` or the raw access to the list of components aren't
-available for them. Finally, the `sort` functionality accepts only callbacks
+There doesn't exist a way to _get_ empty types from a registry, views and groups
+will never return instances for them (for example, during a call to `each`) and
+some functions such as `try_get` or the raw access to the list of components
+won't be available. Finally, the `sort` functionality will onlyaccepts callbacks
 that require to return entities rather than components:
 
 ```cpp
