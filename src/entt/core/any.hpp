@@ -320,7 +320,7 @@ public:
 
 private:
     vtable_type *vtable;
-    union { const void *instance; storage_type storage; };
+    union { const void *instance = nullptr; storage_type storage; };
 };
 
 
