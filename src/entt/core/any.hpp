@@ -46,8 +46,9 @@ class any {
 
                 switch(op) {
                 case operation::COPY:
+                    as<any>(to).vtable = from.vtable;
                 case operation::MOVE:
-                    return (as<any>(to).instance = from.instance);
+                    as<any>(to).instance = from.instance;
                 case operation::DTOR:
                     break;
                 case operation::COMP:
@@ -78,7 +79,8 @@ class any {
                 switch(op) {
                 case operation::COPY:
                     if constexpr(std::is_copy_constructible_v<Type>) {
-                        return new (&as<any>(to).storage) Type{std::as_const(*instance)};
+                        as<any>(to).vtable = from.vtable;
+                        new (&as<any>(to).storage) Type{std::as_const(*instance)};
                     }
                     break;
                 case operation::MOVE:
@@ -108,7 +110,8 @@ class any {
                 switch(op) {
                 case operation::COPY:
                     if constexpr(std::is_copy_constructible_v<Type>) {
-                        return (as<any>(to).instance = new Type{*static_cast<const Type *>(from.instance)});
+                        as<any>(to).vtable = from.vtable;
+                        as<any>(to).instance = new Type{*static_cast<const Type *>(from.instance)};
                     }
                     break;
                 case operation::MOVE:
@@ -200,9 +203,7 @@ public:
     any(const any &other)
         : any{}
     {
-        if(other.vtable(operation::COPY, other, this)) {
-            vtable = other.vtable;
-        }
+        other.vtable(operation::COPY, other, this);
     }
 
     /**
