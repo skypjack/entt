@@ -26,12 +26,12 @@ TEST_F(MetaHandle, Functionalities) {
     clazz_t instance{};
     entt::meta_handle handle{};
 
-    ASSERT_FALSE(*handle);
+    ASSERT_FALSE(handle);
 
     handle = entt::meta_handle{instance};
 
-    ASSERT_TRUE(*handle);
-    ASSERT_TRUE((*handle).invoke("incr"_hs));
+    ASSERT_TRUE(handle);
+    ASSERT_TRUE(handle->invoke("incr"_hs));
     ASSERT_EQ(instance.value, 1);
 
     entt::meta_any any{std::ref(instance)};

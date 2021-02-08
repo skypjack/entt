@@ -792,11 +792,11 @@ struct meta_handle {
     }
 
     /**
-     * @brief Dereference operator for accessing the contained opaque object.
-     * @return A meta any that shares a reference to an unmanaged object.
+     * @brief Returns false if a handle is invalid, true otherwise.
+     * @return False if the handle is invalid, true otherwise.
      */
-    [[nodiscard]] meta_any operator*() const {
-        return any;
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(any);
     }
 
     /**
@@ -1550,7 +1550,7 @@ public:
             }
         }
 
-        return (candidate && !ambiguous) ? candidate->invoke(instance, args) : meta_any{};
+        return (candidate && !ambiguous) ? candidate->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**

@@ -746,7 +746,7 @@ TEST_F(MetaAny, ConstConvert) {
 TEST_F(MetaAny, UnmanageableType) {
     unmanageable_t instance;
     entt::meta_any any{std::ref(instance)};
-    entt::meta_any other = any;
+    entt::meta_any other = as_ref(any);
 
     std::swap(any, other);
 
