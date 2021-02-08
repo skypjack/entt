@@ -181,14 +181,15 @@ public:
      * @return A valid poly storage if a pool for the given type exists, an
      * empty and thus invalid element otherwise.
      */
-    poly_storage storage(const type_info info) {
-        return info.seq() < pools.size() ? pools[info.seq()].poly : poly_storage{};
+    poly_storage & storage(const type_info info) {
+        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly);
+        return pools[info.seq()].poly;
     }
 
     /*! @copydoc storage */
-    poly_storage storage(const type_info info) const {
-        // as_ref forces a constness conversion for the underlying pool
-        return info.seq() < pools.size() ? as_ref(pools[info.seq()].poly) : poly_storage{};
+    const poly_storage & storage(const type_info info) const {
+        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly);
+        return pools[info.seq()].poly;
     }
 
     /**

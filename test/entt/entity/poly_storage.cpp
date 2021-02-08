@@ -13,7 +13,7 @@ struct PolyStorage: entt::type_list_cat_t<
     entt::type_list<
         void(entt::basic_registry<Entity> &, const Entity, const void *),
         const void *(const Entity) const,
-        void(entt::basic_registry<Entity> &, entt::basic_registry<Entity> &)
+        void(const entt::basic_registry<Entity> &, entt::basic_registry<Entity> &) const
     >
 > {
     using entity_type = Entity;
@@ -31,7 +31,7 @@ struct PolyStorage: entt::type_list_cat_t<
             return entt::poly_call<base + 1>(*this, entity);
         }
 
-        void copy(entt::basic_registry<Entity> &owner, entt::basic_registry<Entity> &other) {
+        void copy(const entt::basic_registry<Entity> &owner, entt::basic_registry<Entity> &other) const {
             entt::poly_call<base + 2>(*this, owner, other);
         }
     };
@@ -46,7 +46,7 @@ struct PolyStorage: entt::type_list_cat_t<
             return &self.get(entity);
         }
 
-        static void copy(Type &self, entt::basic_registry<entity_type> &owner, entt::basic_registry<entity_type> &other) {
+        static void copy(const Type &self, const entt::basic_registry<entity_type> &owner, entt::basic_registry<entity_type> &other) {
             other.template insert<typename Type::value_type>(self.data(), self.data() + self.size(), self.raw(), self.raw() + self.size());
         }
     };
@@ -79,7 +79,7 @@ TEST(PolyStorage, CopyEntity) {
     ASSERT_FALSE((registry.any_of<int, char>(other)));
 
     registry.visit(entity, [&](const auto info) {
-        auto storage = registry.storage(info);
+        auto &&storage = registry.storage(info);
         storage->emplace(registry, other, storage->get(entity));
     });
 
@@ -103,7 +103,7 @@ TEST(PolyStorage, CopyRegistry) {
     ASSERT_EQ(other.size(), 0u);
 
     other.assign(registry.data(), registry.data() + registry.size(), registry.destroyed());
-    registry.visit([&](const auto info) { registry.storage(info)->copy(registry, other); });
+    registry.visit([&](const auto info) { std::as_const(registry).storage(info)->copy(registry, other); });
 
     ASSERT_EQ(registry.size(), other.size());
     ASSERT_EQ((registry.view<int, char>().size_hint()), (other.view<int, char>().size_hint()));
@@ -122,12 +122,13 @@ TEST(PolyStorage, Constness) {
     entity[0] = registry.create();
     registry.emplace<int>(entity[0], 42);
 
+    // cannot invoke remove on a const storage, let's copy the returned value
     auto cstorage = cregistry.storage(entt::type_id<int>());
 
     ASSERT_DEATH(cstorage->remove(registry, std::begin(entity), std::end(entity)), ".*");
     ASSERT_TRUE(registry.all_of<int>(entity[0]));
 
-    auto storage = registry.storage(entt::type_id<int>());
+    auto &&storage = registry.storage(entt::type_id<int>());
     storage->remove(registry, std::begin(entity), std::end(entity));
 
     ASSERT_FALSE(registry.all_of<int>(entity[0]));

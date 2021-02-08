@@ -837,3 +837,35 @@ TEST(Any, Array) {
 
     ASSERT_EQ(entt::any_cast<const int(&)[1]>(std::as_const(any))[0], 42);
 }
+
+TEST(Any, CopyMoveReference) {
+    auto test = [](int &value, auto ref) {
+        value = 3;
+
+        entt::any any{ref};
+        entt::any move = std::move(any);
+        entt::any copy = move;
+
+        ASSERT_FALSE(any);
+        ASSERT_TRUE(move);
+        ASSERT_TRUE(copy);
+
+        ASSERT_EQ(move.type(), entt::type_id<int>());
+        ASSERT_EQ(copy.type(), entt::type_id<int>());
+
+        ASSERT_EQ(std::as_const(move).data(), &value);
+        ASSERT_NE(std::as_const(copy).data(), &value);
+
+        ASSERT_EQ(entt::any_cast<int>(move), 3);
+        ASSERT_EQ(entt::any_cast<int>(copy), 3);
+
+        value = 42;
+
+        ASSERT_EQ(entt::any_cast<const int &>(move), 42);
+        ASSERT_EQ(entt::any_cast<const int &>(copy), 3);
+    };
+
+    int value{};
+    test(value, std::ref(value));
+    test(value, std::cref(value));
+}
