@@ -6,6 +6,7 @@
 #include "../core/type_info.hpp"
 #include "ctx.hpp"
 #include "meta.hpp"
+#include "node.hpp"
 #include "range.hpp"
 
 

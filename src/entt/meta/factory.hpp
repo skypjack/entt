@@ -11,6 +11,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "meta.hpp"
+#include "node.hpp"
 #include "policy.hpp"
 #include "utility.hpp"
 
