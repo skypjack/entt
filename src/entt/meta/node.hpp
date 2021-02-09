@@ -203,7 +203,7 @@ class ENTT_API meta_node {
             sizeof...(Args),
             &meta_node<meta_class_template_tag<Clazz>>::resolve,
             [](const std::size_t index) ENTT_NOEXCEPT {
-                return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_info<Args>::resolve()...}}[index];
+                return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_node<std::remove_cv_t<std::remove_reference_t<Args>>>::resolve()...}}[index];
             }
         };
     }
