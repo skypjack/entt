@@ -15,11 +15,18 @@ private:
     std::shared_ptr<Type> ptr;
 };
 
-struct self {
-    using element_type = int;
-    self(int v): value{v} {}
-    const self & operator*() const { return *this; }
+struct self_ptr {
+    using element_type = self_ptr;
+    self_ptr(int v): value{v} {}
+    const self_ptr & operator*() const { return *this; }
     int value;
+};
+
+struct proxy_ptr {
+    using element_type = proxy_ptr;
+    proxy_ptr(int &v): value{&v} {}
+    proxy_ptr operator*() const { return *this; }
+    int *value;
 };
 
 template<typename Type>
@@ -35,7 +42,10 @@ template<typename Type>
 struct entt::is_meta_pointer_like<spec_wrapped_shared_ptr<Type>>: std::true_type {};
 
 template<>
-struct entt::is_meta_pointer_like<self>: std::true_type {};
+struct entt::is_meta_pointer_like<self_ptr>: std::true_type {};
+
+template<>
+struct entt::is_meta_pointer_like<proxy_ptr>: std::true_type {};
 
 template<typename Type>
 struct entt::adl_meta_pointer_like<spec_wrapped_shared_ptr<Type>> {
@@ -298,12 +308,28 @@ TEST(MetaPointerLike, DereferencePointerToFunction) {
 }
 
 TEST(MetaPointerLike, DereferenceSelfPointer) {
-    self obj{42};
+    self_ptr obj{42};
     entt::meta_any any{std::ref(obj)};
     entt::meta_any deref = *any;
 
     ASSERT_TRUE(deref);
     ASSERT_TRUE(any.type().is_pointer_like());
-    ASSERT_FALSE(deref.try_cast<self>());
-    ASSERT_EQ(deref.cast<const self &>().value, obj.value);
+    ASSERT_EQ(deref.cast<const self_ptr &>().value, obj.value);
+    ASSERT_FALSE(deref.try_cast<self_ptr>());
+}
+
+TEST(MetaPointerLike, DereferenceProxyPointer) {
+    int value = 3;
+    proxy_ptr obj{value};
+    entt::meta_any any{obj};
+    entt::meta_any deref = *any;
+
+    ASSERT_TRUE(deref);
+    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_EQ(*deref.cast<const proxy_ptr &>().value, value);
+    ASSERT_TRUE(deref.try_cast<proxy_ptr>());
+
+    *deref.cast<proxy_ptr &>().value = 42;
+
+    ASSERT_EQ(value, 42);
 }
