@@ -92,8 +92,6 @@ I hope this list can grow much more in the future:
     [Wisp](https://teamwisp.github.io/product/) by
     [Team Wisp](https://teamwisp.github.io/): an advanced real-time ray tracing
     renderer built for the demands of video game artists.
-  * [Apparently](https://github.com/JosiahWI/qub3d-libdeps)
-    [Qub3d](https://qub3d.org/): because blocks should be open source.
   * [shiva](https://github.com/Milerius/shiva): modern C++ engine with
     modularity.
   * [ImGui/EnTT editor](https://github.com/Green-Sky/imgui_entt_entity_editor):
