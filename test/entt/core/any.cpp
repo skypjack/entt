@@ -839,7 +839,9 @@ TEST(Any, Array) {
 }
 
 TEST(Any, CopyMoveReference) {
-    auto test = [](int &value, auto ref) {
+    int value{};
+
+    auto test = [&](auto ref) {
         value = 3;
 
         entt::any any{ref};
@@ -865,7 +867,6 @@ TEST(Any, CopyMoveReference) {
         ASSERT_EQ(entt::any_cast<const int &>(copy), 3);
     };
 
-    int value{};
-    test(value, std::ref(value));
-    test(value, std::cref(value));
+    test(std::ref(value));
+    test(std::cref(value));
 }
