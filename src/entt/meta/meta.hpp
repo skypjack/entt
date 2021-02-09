@@ -688,8 +688,8 @@ struct meta_ctor {
 
     /**
      * @brief Returns the type of the i-th argument of a constructor.
-     * @param index The index of the argument of which to return the type.
-     * @return The type of the i-th argument of a constructor, if any.
+     * @param index Index of the argument of which to return the type.
+     * @return The type of the i-th argument of a constructor.
      */
     [[nodiscard]] meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
@@ -900,8 +900,8 @@ struct meta_func {
 
     /**
      * @brief Returns the type of the i-th argument of a member function.
-     * @param index The index of the argument of which to return the type.
-     * @return The type of the i-th argument of a member function, if any.
+     * @param index Index of the argument of which to return the type.
+     * @return The type of the i-th argument of a member function.
      */
     [[nodiscard]] inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
@@ -1161,6 +1161,44 @@ public:
      */
     [[nodiscard]] bool is_associative_container() const ENTT_NOEXCEPT {
         return node->is_associative_container;
+    }
+
+    /**
+     * @brief Checks whether a type refers to a recognized class template
+     * specialization or not.
+     * @return True if the type is a recognized class template specialization,
+     * false otherwise.
+     */
+    [[nodiscard]] bool is_template_specialization() const ENTT_NOEXCEPT {
+        return node->template_info.is_template_specialization;
+    }
+
+    /**
+     * @brief Returns the number of template arguments, if any.
+     * @return The number of template arguments, if any.
+     */
+    [[nodiscard]] size_type template_arity() const ENTT_NOEXCEPT {
+        return node->template_info.template_arity;
+    }
+
+    /**
+     * @brief Returns a tag for the class template of the underlying type.
+     *
+     * @sa meta_class_template_tag
+     *
+     * @return The tag for the class template of the underlying type.
+     */
+    [[nodiscard]] inline meta_type template_type() const ENTT_NOEXCEPT {
+        return is_template_specialization() ?  node->template_info.template_type() : meta_type{};
+    }
+
+    /**
+     * @brief Returns the type of the i-th template argument of a type.
+     * @param index Index of the template argument of which to return the type.
+     * @return The type of the i-th template argument of a type.
+     */
+    [[nodiscard]] inline meta_type template_arg(size_type index) const ENTT_NOEXCEPT {
+        return index < template_arity() ? node->template_info.template_arg(index) : meta_type{};
     }
 
     /**

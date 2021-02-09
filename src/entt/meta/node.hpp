@@ -2,6 +2,7 @@
 #define ENTT_META_NODE_HPP
 
 
+#include <array>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -15,6 +16,11 @@
 
 
 namespace entt {
+
+
+/*! @brief Utility class to disambiguate class templates. */
+template<template<typename...> typename>
+struct meta_class_template_tag {};
 
 
 class meta_any;
@@ -96,6 +102,15 @@ struct meta_func_node {
 };
 
 
+struct meta_template_info {
+    using size_type = std::size_t;
+    const bool is_template_specialization;
+    const size_type template_arity;
+    meta_type_node *(* const template_type)() ENTT_NOEXCEPT;
+    meta_type_node *(* const template_arg)(const size_type) ENTT_NOEXCEPT;
+};
+
+
 struct meta_type_node {
     using size_type = std::size_t;
     const type_info info;
@@ -117,8 +132,9 @@ struct meta_type_node {
     const bool is_pointer_like;
     const bool is_sequence_container;
     const bool is_associative_container;
+    meta_template_info template_info;
     const size_type rank;
-    size_type(* const extent)(const size_type);
+    size_type(* const extent)(const size_type) ENTT_NOEXCEPT ;
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
     meta_ctor_node *def_ctor{nullptr};
@@ -157,15 +173,15 @@ class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
     template<std::size_t... Index>
-    [[nodiscard]] static auto extent(const meta_type_node::size_type dim, std::index_sequence<Index...>) {
+    [[nodiscard]] static auto extent(const meta_type_node::size_type dim, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         meta_type_node::size_type ext{};
         ((ext = (dim == Index ? std::extent_v<Type, Index> : ext)), ...);
         return ext;
     }
 
-    [[nodiscard]] static meta_ctor_node * meta_default_constructor([[maybe_unused]] meta_type_node *type) {
+    [[nodiscard]] static meta_ctor_node * meta_default_constructor([[maybe_unused]] meta_type_node *type) ENTT_NOEXCEPT {
         if constexpr(std::is_default_constructible_v<Type>) {
-            static internal::meta_ctor_node node{
+            static meta_ctor_node node{
                 type,
                 nullptr,
                 nullptr,
@@ -180,8 +196,24 @@ class ENTT_API meta_node {
         }
     }
 
+    template<template<typename...> typename Clazz, typename... Args>
+    [[nodiscard]] static meta_template_info template_info(type_identity<Clazz<Args...>>) ENTT_NOEXCEPT {
+        return {
+            true,
+            sizeof...(Args),
+            &meta_node<meta_class_template_tag<Clazz>>::resolve,
+            [](const std::size_t index) ENTT_NOEXCEPT {
+                return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_info<Args>::resolve()...}}[index];
+            }
+        };
+    }
+
+    [[nodiscard]] static meta_template_info template_info(...) ENTT_NOEXCEPT {
+        return { false, 0u, nullptr, nullptr };
+    }
+
 public:
-    [[nodiscard]] static internal::meta_type_node * resolve() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
             type_id<Type>(),
             {},
@@ -202,10 +234,11 @@ public:
             is_meta_pointer_like_v<Type>,
             has_meta_sequence_container_traits_v<Type>,
             has_meta_associative_container_traits_v<Type>,
+            template_info(type_identity<Type>{}),
             std::rank_v<Type>,
-            [](meta_type_node::size_type dim) { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
+            [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
             &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
-            &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve,
+            &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_extent_t<Type>>>>::resolve,
             meta_default_constructor(&node),
             meta_default_constructor(&node)
         };
