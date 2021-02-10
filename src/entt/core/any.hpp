@@ -73,7 +73,7 @@ class any {
                     break;
                 }
             } else if constexpr(in_situ<Type>) {
-                #if __cpp_lib_launder >= 201606L
+                #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
                 auto *instance = const_cast<Type *>(std::launder(reinterpret_cast<const Type *>(&from.storage)));
                 #else
                 auto *instance = const_cast<Type *>(reinterpret_cast<const Type *>(&from.storage));
