@@ -132,12 +132,12 @@ struct meta_type_node {
     const bool is_pointer_like;
     const bool is_sequence_container;
     const bool is_associative_container;
-    meta_template_info template_info;
+    const meta_template_info template_info;
     const size_type rank;
     size_type(* const extent)(const size_type) ENTT_NOEXCEPT ;
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
-    meta_ctor_node *def_ctor{nullptr};
+    meta_ctor_node * const def_ctor;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};

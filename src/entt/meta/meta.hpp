@@ -509,7 +509,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const meta_any &other) const {
-        return (node == other.node) && (storage == other.storage);
+        return (!node && !other.node) || (node && other.node && node->info == other.node->info && storage == other.storage);
     }
 
     /**
