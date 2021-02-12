@@ -511,11 +511,14 @@ public:
             auto next = index(packed[curr]);
 
             while(curr != next) {
-                swap_at(next, index(packed[next]));
-                sparse[page(packed[curr])][offset(packed[curr])] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
+                const auto idx = index(packed[next]);
+                const auto entt = packed[curr];
+
+                swap_at(next, idx);
+                sparse[page(entt)][offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
 
                 curr = next;
-                next = index(packed[curr]);
+                next = idx;
             }
         }
     }
