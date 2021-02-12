@@ -55,7 +55,7 @@ TEST_F(MetaCtor, Functionalities) {
 
     ASSERT_TRUE(ctor);
     ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
-    ASSERT_EQ(ctor.size(), 2u);
+    ASSERT_EQ(ctor.arity(), 2u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<int>());
     ASSERT_EQ(ctor.arg(1u), entt::resolve<char>());
     ASSERT_FALSE(ctor.arg(2u));
@@ -90,7 +90,7 @@ TEST_F(MetaCtor, Func) {
 
     ASSERT_TRUE(ctor);
     ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
-    ASSERT_EQ(ctor.size(), 1u);
+    ASSERT_EQ(ctor.arity(), 1u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(ctor.arg(1u));
 
@@ -190,7 +190,7 @@ TEST_F(MetaCtor, ExternalMemberFunction) {
 
     ASSERT_TRUE(ctor);
     ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
-    ASSERT_EQ(ctor.size(), 4u);
+    ASSERT_EQ(ctor.arity(), 4u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<entt::registry>());
     ASSERT_EQ(ctor.arg(1u), entt::resolve<entt::entity>());
     ASSERT_EQ(ctor.arg(2u), entt::resolve<int>());
@@ -221,7 +221,7 @@ TEST_F(MetaCtor, ImplicitlyGeneratedDefaultConstructor) {
     // default constructor is implicitly generated
     ASSERT_EQ(counter, 1);
     ASSERT_TRUE(type.ctor<>());
-    ASSERT_EQ(type.ctor<>().size(), 0u);
+    ASSERT_EQ(type.ctor<>().arity(), 0u);
     ASSERT_EQ(type.ctor<>().arg(0), entt::meta_type{});
 
     auto any = type.ctor<>().invoke();

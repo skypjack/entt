@@ -682,8 +682,8 @@ struct meta_ctor {
      * @brief Returns the number of arguments accepted by a constructor.
      * @return The number of arguments accepted by the constructor.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return node->size;
+    [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
+        return node->arity;
     }
 
     /**
@@ -704,7 +704,7 @@ struct meta_ctor {
      * @return A meta any containing the new instance, if any.
      */
     [[nodiscard]] meta_any invoke(meta_any * const args, const size_type sz) const {
-        return sz == size() ? node->invoke(args) : meta_any{};
+        return sz == arity() ? node->invoke(args) : meta_any{};
     }
 
     /**
@@ -872,8 +872,8 @@ struct meta_func {
      * @brief Returns the number of arguments accepted by a member function.
      * @return The number of arguments accepted by the member function.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return node->size;
+    [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
+        return node->arity;
     }
 
     /**
@@ -921,7 +921,7 @@ struct meta_func {
      * @return A meta any containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any * const args, const size_type sz) const {
-        return sz == size() ? node->invoke(std::move(instance), args) : meta_any{};
+        return sz == arity() ? node->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**
@@ -992,7 +992,7 @@ class meta_type {
     template<typename... Args, auto... Index>
     [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node *curr, std::index_sequence<Index...>) {
         for(; curr; curr = curr->next) {
-            if(curr->size == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index).info()) && ...)) {
+            if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index).info()) && ...)) {
                 return curr;
             }
         }
@@ -1178,7 +1178,7 @@ public:
      * @return The number of template arguments, if any.
      */
     [[nodiscard]] size_type template_arity() const ENTT_NOEXCEPT {
-        return node->template_info.template_arity;
+        return node->template_info.arity;
     }
 
     /**
@@ -1189,7 +1189,7 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const ENTT_NOEXCEPT {
-        return is_template_specialization() ?  node->template_info.template_type() : meta_type{};
+        return is_template_specialization() ?  node->template_info.type() : meta_type{};
     }
 
     /**
@@ -1198,7 +1198,7 @@ public:
      * @return The type of the i-th template argument of a type.
      */
     [[nodiscard]] inline meta_type template_arg(size_type index) const ENTT_NOEXCEPT {
-        return index < template_arity() ? node->template_info.template_arg(index) : meta_type{};
+        return index < template_arity() ? node->template_info.arg(index) : meta_type{};
     }
 
     /**
@@ -1326,7 +1326,7 @@ public:
      */
     [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
         meta_any any{};
-        internal::meta_visit<&node_type::ctor>([args, sz, &any](const auto *curr) { return (curr->size == sz) && (any = curr->invoke(args)); }, node);
+        internal::meta_visit<&node_type::ctor>([args, sz, &any](const auto *curr) { return (curr->arity == sz) && (any = curr->invoke(args)); }, node);
         return any;
     }
 
@@ -1365,7 +1365,7 @@ public:
         size_type extent{sz + 1u};
         bool ambiguous{};
 
-        for(auto *it = internal::meta_visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->size == sz; }, node); it && it->id == id && it->size == sz; it = it->next) {
+        for(auto *it = internal::meta_visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->arity == sz; }, node); it && it->id == id && it->arity == sz; it = it->next) {
             size_type direct{};
             size_type ext{};
 
@@ -1578,7 +1578,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index) : meta_type{};
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 
@@ -1603,7 +1603,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index) : meta_type{};
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 

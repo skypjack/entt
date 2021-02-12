@@ -94,7 +94,7 @@ TEST_F(MetaFunc, Functionalities) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "f2"_hs);
-    ASSERT_EQ(func.size(), 2u);
+    ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<int>());
@@ -135,7 +135,7 @@ TEST_F(MetaFunc, Const) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "f1"_hs);
-    ASSERT_EQ(func.size(), 1u);
+    ASSERT_EQ(func.arity(), 1u);
     ASSERT_TRUE(func.is_const());
     ASSERT_FALSE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<int>());
@@ -174,7 +174,7 @@ TEST_F(MetaFunc, RetVoid) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "g"_hs);
-    ASSERT_EQ(func.size(), 1u);
+    ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<void>());
@@ -211,7 +211,7 @@ TEST_F(MetaFunc, Static) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "h"_hs);
-    ASSERT_EQ(func.size(), 1u);
+    ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<int>());
@@ -249,7 +249,7 @@ TEST_F(MetaFunc, StaticRetVoid) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "k"_hs);
-    ASSERT_EQ(func.size(), 1u);
+    ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<void>());
@@ -404,7 +404,7 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "emplace"_hs);
-    ASSERT_EQ(func.size(), 2u);
+    ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<void>());

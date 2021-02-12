@@ -18,7 +18,6 @@
   - ...
 
 WIP:
-* HP: meta func/ctor size -> arity
 * HP: as_ref should be a qualified function, not a global one (no breaking change, ADL makes it work anyway)
 * HP: merge view and view pack
 * HP: invalid view auto-refresh

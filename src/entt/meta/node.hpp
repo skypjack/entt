@@ -68,7 +68,7 @@ struct meta_ctor_node {
     meta_type_node * const parent;
     meta_ctor_node * next;
     meta_prop_node * prop;
-    const size_type size;
+    const size_type arity;
     meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_any * const);
 };
@@ -93,7 +93,7 @@ struct meta_func_node {
     meta_type_node * const parent;
     meta_func_node * next;
     meta_prop_node * prop;
-    const size_type size;
+    const size_type arity;
     const bool is_const;
     const bool is_static;
     meta_type_node *(* const ret)() ENTT_NOEXCEPT;
@@ -105,9 +105,9 @@ struct meta_func_node {
 struct meta_template_info {
     using size_type = std::size_t;
     const bool is_template_specialization;
-    const size_type template_arity;
-    meta_type_node *(* const template_type)() ENTT_NOEXCEPT;
-    meta_type_node *(* const template_arg)(const size_type) ENTT_NOEXCEPT;
+    const size_type arity;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
 };
 
 
