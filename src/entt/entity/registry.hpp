@@ -156,6 +156,24 @@ public:
     /*! @brief Poly storage type. */
     using poly_storage = typename poly_storage_traits<Entity>::storage_type;
 
+    /**
+     * @brief Returns the entity identifier without the version.
+     * @param entity An entity identifier, either valid or not.
+     * @return The entity identifier without the version.
+     */
+    [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
+        return entity_type{to_integral(entity) & traits_type::entity_mask};
+    }
+
+    /**
+     * @brief Returns the version stored along with an entity identifier.
+     * @param entity An entity identifier, either valid or not.
+     * @return The version stored along with the given entity identifier.
+     */
+    [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
+        return version_type(to_integral(entity) >> traits_type::entity_shift);
+    }
+
     /*! @brief Default constructor. */
     basic_registry() = default;
 
@@ -341,24 +359,6 @@ public:
     [[nodiscard]] bool valid(const entity_type entity) const {
         const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
         return (pos < entities.size() && entities[pos] == entity);
-    }
-
-    /**
-     * @brief Returns the entity identifier without the version.
-     * @param entity An entity identifier, either valid or not.
-     * @return The entity identifier without the version.
-     */
-    [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return entity_type{to_integral(entity) & traits_type::entity_mask};
-    }
-
-    /**
-     * @brief Returns the version stored along with an entity identifier.
-     * @param entity An entity identifier, either valid or not.
-     * @return The version stored along with the given entity identifier.
-     */
-    [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
-        return version_type(to_integral(entity) >> traits_type::entity_shift);
     }
 
     /**
