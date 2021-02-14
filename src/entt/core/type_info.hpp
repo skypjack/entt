@@ -236,7 +236,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
