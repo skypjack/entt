@@ -42,6 +42,14 @@ struct listener {
     int counter{0};
 };
 
+struct owner {
+    void receive(const entt::registry &ref) {
+        parent = &ref;
+    }
+
+    const entt::registry *parent{nullptr};
+};
+
 TEST(Registry, Context) {
     entt::registry registry;
 
@@ -256,6 +264,39 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.capacity<int>(), 0u);
     ASSERT_EQ(registry.capacity<char>(), 0u);
+}
+
+TEST(Registry, Move) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    owner test{};
+
+    registry.on_construct<int>().connect<&owner::receive>(test);
+    registry.on_destroy<int>().connect<&owner::receive>(test);
+
+    ASSERT_EQ(test.parent, nullptr);
+
+    registry.emplace<int>(entity);
+
+    ASSERT_EQ(test.parent, &registry);
+
+    entt::registry other{std::move(registry)};
+    other.remove<int>(entity);
+    registry.emplace<int>(registry.create(entity));
+
+    ASSERT_EQ(test.parent, &other);
+
+    registry = std::move(other);
+    registry.emplace<int>(entity);
+    registry.emplace<int>(registry.create(entity));
+
+    ASSERT_EQ(test.parent, &registry);
+
+    test.parent = nullptr;
+    registry = std::move(registry);
+    registry.remove<int>(entity);
+
+    ASSERT_EQ(test.parent, &registry);
 }
 
 TEST(Registry, ReplaceAggregate) {

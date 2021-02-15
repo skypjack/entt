@@ -115,6 +115,7 @@ class basic_registry {
         if(auto &&pdata = pools[index]; !pdata.pool) {
             pdata.pool.reset(new storage_type<Component>());
             pdata.poly = std::ref(*static_cast<storage_type<Component> *>(pdata.pool.get()));
+            pdata.pool->payload(this);
         }
 
         return static_cast<storage_type<Component> *>(pools[index].pool.get());
@@ -144,6 +145,14 @@ class basic_registry {
         const auto entt = to_integral(entity) & traits_type::entity_mask;
         entities[entt] = entity_type{to_integral(available) | (typename traits_type::entity_type{version} << traits_type::entity_shift)};
         available = entity_type{entt};
+    }
+
+    void rebind_pools() ENTT_NOEXCEPT {
+        for(auto &&pdata: pools) {
+            if(pdata.pool) {
+                pdata.pool->payload(this);
+            }
+        }
     }
 
 public:
@@ -177,11 +186,38 @@ public:
     /*! @brief Default constructor. */
     basic_registry() = default;
 
-    /*! @brief Default move constructor. */
-    basic_registry(basic_registry &&) = default;
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    basic_registry(basic_registry &&other) ENTT_NOEXCEPT
+        : vars{std::move(other.vars)},
+          pools{std::move(other.pools)},
+          groups{std::move(other.groups)},
+          entities{std::move(other.entities)},
+          available{other.available}
+    {
+        rebind_pools();
+    }
 
-    /*! @brief Default move assignment operator. @return This registry. */
-    basic_registry & operator=(basic_registry &&) = default;
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to assign from.
+     * @return This registry.
+     */
+    basic_registry & operator=(basic_registry &&other) ENTT_NOEXCEPT {
+        if(this != &other) {
+            vars = std::move(other.vars);
+            pools = std::move(other.pools);
+            groups = std::move(other.groups);
+            entities = std::move(other.entities);
+            available = other.available;
+
+            rebind_pools();
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Prepares a pool for the given type if required.
