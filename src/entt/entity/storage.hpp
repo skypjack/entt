@@ -164,11 +164,12 @@ class basic_storage: public basic_sparse_set<Entity> {
         index_type index;
     };
 
-    void swap_at(const std::size_t lhs, const std::size_t rhs) final {
+protected:
+    void swap_at(const std::size_t lhs, const std::size_t rhs) {
         std::swap(instances[lhs], instances[rhs]);
     }
 
-    void swap_and_pop(const std::size_t pos) final {
+    void swap_and_pop(const std::size_t pos) {
         auto other = std::move(instances.back());
         instances[pos] = std::move(other);
         instances.pop_back();

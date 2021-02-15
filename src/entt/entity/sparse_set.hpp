@@ -173,6 +173,7 @@ class basic_sparse_set {
         return sparse[pos];
     }
 
+protected:
     virtual void swap_at(const std::size_t, const std::size_t) {}
     virtual void swap_and_pop(const std::size_t) {}
 
