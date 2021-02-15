@@ -588,9 +588,27 @@ public:
         remove(begin(), end());
     }
 
+    /**
+     * @brief Returns the opaque payload associated with the sparse set, if any.
+     * @return The opaque payload associated with the sparse set, if any.
+     */
+    void * payload() const ENTT_NOEXCEPT {
+        return user_data;
+    }
+
+    /**
+     * @brief Set an opaque payload, typically used to attach information that
+     * are useful to storage mixins.
+     * @param ud Opaque payload, a sparse set won't use this data in any case.
+     */
+    void payload(void *ud) ENTT_NOEXCEPT {
+        user_data = ud;
+    }
+
 private:
     std::vector<page_type> sparse;
     std::vector<entity_type> packed;
+    void *user_data{};
 };
 
 

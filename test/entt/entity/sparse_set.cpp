@@ -14,6 +14,12 @@ struct boxed_int { int value; };
 TEST(SparseSet, Functionalities) {
     entt::sparse_set set;
 
+    ASSERT_EQ(set.payload(), nullptr);
+
+    set.payload(&set);
+
+    ASSERT_EQ(set.payload(), &set);
+
     set.reserve(42);
 
     ASSERT_EQ(set.capacity(), 42u);
@@ -78,6 +84,8 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(other.begin(), other.end());
     ASSERT_FALSE(other.contains(entt::entity{0}));
     ASSERT_FALSE(other.contains(entt::entity{42}));
+
+    ASSERT_EQ(set.payload(), &set);
 }
 
 TEST(SparseSet, Pagination) {
