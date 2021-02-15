@@ -375,6 +375,15 @@ public:
     }
 
     /**
+     * @brief Returns the entity that occupies a given position in the storage.
+     * @param pos The position for which to return the entity.
+     * @return The entity that occupies the given position in the storage.
+     */
+    [[nodiscard]] entity_type at(const size_type pos) const {
+        return pos < packed.size() ? packed[pos] : null;
+    }
+
+    /**
      * @brief Assigns an entity to a sparse set.
      *
      * @warning

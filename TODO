@@ -18,6 +18,9 @@
   - ...
 
 WIP:
+* HP: remove non-const registry::storage function?
+* HP: weak reference wrapper example with custom storage.
+* HP: review ENTT_PAGE_SIZE, seems "wrong" (see sparse_set)
 * HP: as_ref should be a qualified function, not a global one (no breaking change, ADL makes it work anyway)
 * HP: merge view and view pack
 * HP: invalid view auto-refresh

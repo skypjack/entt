@@ -26,8 +26,6 @@ TEST(SparseSet, Functionalities) {
 
     set.emplace(entt::entity{42});
 
-    ASSERT_EQ(set.index(entt::entity{42}), 0u);
-
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
     ASSERT_NE(std::as_const(set).begin(), std::as_const(set).end());
@@ -35,6 +33,8 @@ TEST(SparseSet, Functionalities) {
     ASSERT_FALSE(set.contains(entt::entity{0}));
     ASSERT_TRUE(set.contains(entt::entity{42}));
     ASSERT_EQ(set.index(entt::entity{42}), 0u);
+    ASSERT_EQ(set.at(0u), entt::entity{42});
+    ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
 
     set.remove(entt::entity{42});
 
@@ -44,11 +44,15 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.contains(entt::entity{0}));
     ASSERT_FALSE(set.contains(entt::entity{42}));
+    ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
 
     set.emplace(entt::entity{42});
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.index(entt::entity{42}), 0u);
+    ASSERT_EQ(set.at(0u), entt::entity{42});
+    ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
 
     ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
     ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
@@ -59,8 +63,12 @@ TEST(SparseSet, Functionalities) {
     other = std::move(set);
 
     ASSERT_TRUE(set.empty());
+    ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
+
     ASSERT_FALSE(other.empty());
     ASSERT_EQ(other.index(entt::entity{42}), 0u);
+    ASSERT_EQ(other.at(0u), entt::entity{42});
+    ASSERT_EQ(other.at(1u), static_cast<entt::entity>(entt::null));
 
     other.clear();
 
