@@ -922,8 +922,13 @@ public:
     template<typename... Component>
     void clear() {
         if constexpr(sizeof...(Component) == 0) {
-            // useless this-> used to suppress a warning with clang
-            each([this](const auto entity) { this->destroy(entity); });
+            for(auto pos = pools.size(); pos; --pos) {
+                if(auto &pdata = pools[pos-1]; pdata.pool) {
+                    pdata.pool->clear();
+                }
+            }
+
+            each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
         } else {
             ([this](auto *cpool) {
                 cpool->remove(cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end());
@@ -956,8 +961,8 @@ public:
             }
         } else {
             for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
-                    func(entt);
+                if(const auto entity = entities[pos - 1]; (to_integral(entity) & traits_type::entity_mask) == (pos - 1)) {
+                    func(entity);
                 }
             }
         }
