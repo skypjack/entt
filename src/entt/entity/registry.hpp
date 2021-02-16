@@ -191,7 +191,7 @@ public:
      * @param other The instance to move from.
      */
     basic_registry(basic_registry &&other) ENTT_NOEXCEPT
-        : vars{std::move(other.vars)},
+        : vars(std::move(other.vars)), // we can't use {} here, thanks to GCC
           pools{std::move(other.pools)},
           groups{std::move(other.groups)},
           entities{std::move(other.entities)},
