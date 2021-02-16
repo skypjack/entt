@@ -291,12 +291,6 @@ TEST(Registry, Move) {
     registry.emplace<int>(registry.create(entity));
 
     ASSERT_EQ(test.parent, &registry);
-
-    test.parent = nullptr;
-    registry = std::move(registry);
-    registry.remove<int>(entity);
-
-    ASSERT_EQ(test.parent, &registry);
 }
 
 TEST(Registry, ReplaceAggregate) {

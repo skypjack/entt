@@ -751,7 +751,7 @@ public:
     size_type remove_if_exists(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
 
-        return ([this, entity](auto *cpool) {
+        return ([entity](auto *cpool) {
             return cpool->contains(entity) ? (cpool->remove(entity), true) : false;
         }(assure<Component>()) + ... + size_type{});
     }
@@ -930,7 +930,7 @@ public:
 
             each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
         } else {
-            ([this](auto *cpool) {
+            ([](auto *cpool) {
                 cpool->remove(cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end());
             }(assure<Component>()), ...);
         }

@@ -394,8 +394,9 @@ public:
      */
     template<typename... Func>
     decltype(auto) patch(const entity_type entity, [[maybe_unused]] Func &&... func) {
-        (std::forward<Func>(func)(instances[index(entity)]), ...);
-        return instances[index(entity)];
+        auto &&instance = instances[this->index(entity)];
+        (std::forward<Func>(func)(instance), ...);
+        return instance;
     }
 
     /**
@@ -531,7 +532,7 @@ public:
      * @param entt A valid entity identifier.
      */
     void get([[maybe_unused]] const entity_type entt) const {
-        ENTT_ASSERT(contains(entt));
+        ENTT_ASSERT(this->contains(entt));
     }
 
     /**
@@ -559,7 +560,7 @@ public:
     */
     template<typename... Func>
     void patch([[maybe_unused]] const entity_type entity, [[maybe_unused]] Func &&... func) {
-        ENTT_ASSERT(contains(entity));
+        ENTT_ASSERT(this->contains(entity));
         (std::forward<Func>(func)(), ...);
     }
 
@@ -589,13 +590,13 @@ public:
 template<typename Type, typename Owner>
 class sigh_storage_mixin: public Type {
     Owner & owner() ENTT_NOEXCEPT {
-        return *static_cast<Owner *>(payload());
+        return *static_cast<Owner *>(this->payload());
     }
 
 protected:
     /*! @copydoc basic_storage::swap_and_pop */
     void swap_and_pop(const std::size_t pos) {
-        destruction.publish(owner(), data()[pos]);
+        destruction.publish(owner(), this->data()[pos]);
         Type::swap_and_pop(pos);
     }
 
@@ -683,7 +684,7 @@ public:
     decltype(auto) emplace(const entity_type entity, Args &&... args) {
         Type::emplace(entity, std::forward<Args>(args)...);
         construction.publish(owner(), entity);
-        return get(entity);
+        return this->get(entity);
     }
 
     /**
@@ -718,7 +719,7 @@ public:
     decltype(auto) patch(const entity_type entity, [[maybe_unused]] Func &&... func) {
         Type::patch(entity, std::forward<Func>(func)...);
         update.publish(owner(), entity);
-        return get(entity);
+        return this->get(entity);
     }
 
 private:
