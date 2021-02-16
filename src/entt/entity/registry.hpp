@@ -573,7 +573,7 @@ public:
     template<typename Component, typename... Args>
     decltype(auto) emplace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>()->emplace(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>()->emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -590,7 +590,7 @@ public:
     template<typename Component, typename It>
     void insert(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>()->insert(*this, first, last, value);
+        assure<Component>()->insert(first, last, value);
     }
 
     /**
@@ -610,7 +610,7 @@ public:
     void insert(EIt first, EIt last, CIt from, CIt to) {
         static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>, "Invalid value type");
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>()->insert(*this, first, last, from, to);
+        assure<Component>()->insert(first, last, from, to);
     }
 
     /**
@@ -639,8 +639,8 @@ public:
         auto *cpool = assure<Component>();
 
         return cpool->contains(entity)
-            ? cpool->patch(*this, entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; })
-            : cpool->emplace(*this, entity, std::forward<Args>(args)...);
+            ? cpool->patch(entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; })
+            : cpool->emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -670,7 +670,7 @@ public:
     template<typename Component, typename... Func>
     decltype(auto) patch(const entity_type entity, Func &&... func) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>()->patch(*this, entity, std::forward<Func>(func)...);
+        return assure<Component>()->patch(entity, std::forward<Func>(func)...);
     }
 
     /**
@@ -692,7 +692,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&... args) {
-        return assure<Component>()->patch(*this, entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; });
+        return assure<Component>()->patch(entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; });
     }
 
     /**
@@ -709,7 +709,7 @@ public:
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>()->remove(*this, entity), ...);
+        (assure<Component>()->remove(entity), ...);
     }
 
     /**
@@ -726,7 +726,7 @@ public:
     void remove(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>()->remove(*this, first, last), ...);
+        (assure<Component>()->remove(first, last), ...);
     }
 
     /**
@@ -752,7 +752,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         return ([this, entity](auto *cpool) {
-            return cpool->contains(entity) ? (cpool->remove(*this, entity), true) : false;
+            return cpool->contains(entity) ? (cpool->remove(entity), true) : false;
         }(assure<Component>()) + ... + size_type{});
     }
 
@@ -776,7 +776,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.poly->remove(*this, std::begin(wrap), std::end(wrap));
+                pdata.poly->remove(std::begin(wrap), std::end(wrap));
             }
         }
     }
@@ -874,7 +874,7 @@ public:
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
-        return cpool->contains(entity) ? cpool->get(entity) : cpool->emplace(*this, entity, std::forward<Args>(args)...);
+        return cpool->contains(entity) ? cpool->get(entity) : cpool->emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -926,7 +926,7 @@ public:
             each([this](const auto entity) { this->destroy(entity); });
         } else {
             ([this](auto *cpool) {
-                cpool->remove(*this, cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end());
+                cpool->remove(cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end());
             }(assure<Component>()), ...);
         }
     }

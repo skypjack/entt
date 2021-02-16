@@ -20,7 +20,7 @@ namespace entt {
 template<typename Entity>
 struct Storage: type_list<
     type_info() const ENTT_NOEXCEPT,
-    void(basic_registry<Entity> &, const Entity *, const Entity *)
+    void(const Entity *, const Entity *)
 > {
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -43,14 +43,13 @@ struct Storage: type_list<
 
         /**
          * @brief Removes entities from a storage.
-         * @param owner The registry that issued the request.
          * @param first An iterator to the first element of the range of
          * entities.
          * @param last An iterator past the last element of the range of
          * entities.
          */
-        void remove(basic_registry<entity_type> &owner, const entity_type *first, const entity_type *last) {
-            poly_call<1>(*this, owner, first, last);
+        void remove(const entity_type *first, const entity_type *last) {
+            poly_call<1>(*this, first, last);
         }
     };
 
