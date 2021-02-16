@@ -174,7 +174,10 @@ class basic_sparse_set {
     }
 
 protected:
+    /*! @brief Swaps two entities in the internal packed array. */
     virtual void swap_at(const std::size_t, const std::size_t) {}
+
+    /*! @brief Attempts to remove an entity from the internal packed array. */
     virtual void swap_and_pop(const std::size_t) {}
 
 public:
@@ -461,7 +464,7 @@ public:
     }
 
     /**
-     * @brief Swaps two entities in the internal packed array.
+     * @copybrief swap_at
      *
      * For what it's worth, this function affects both the internal sparse array
      * and the internal packed array. Users should not care of that anyway.

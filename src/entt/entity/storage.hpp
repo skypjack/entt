@@ -165,10 +165,19 @@ class basic_storage: public basic_sparse_set<Entity> {
     };
 
 protected:
+    /**
+     * @copybrief basic_sparse_set::swap_at
+     * @param lhs A valid position of an entity within storage.
+     * @param rhs A valid position of an entity within storage.
+     */
     void swap_at(const std::size_t lhs, const std::size_t rhs) {
         std::swap(instances[lhs], instances[rhs]);
     }
 
+    /**
+     * @copybrief basic_sparse_set::swap_and_pop
+     * @param pos A valid position of an entity within storage.
+     */
     void swap_and_pop(const std::size_t pos) {
         auto other = std::move(instances.back());
         instances[pos] = std::move(other);
@@ -584,6 +593,7 @@ class sigh_storage_mixin: public Type {
     }
 
 protected:
+    /*! @copydoc basic_storage::swap_and_pop */
     void swap_and_pop(const std::size_t pos) {
         destruction.publish(owner(), data()[pos]);
         Type::swap_and_pop(pos);
@@ -663,7 +673,7 @@ public:
     }
 
     /**
-     * @copybrief storage_adapter_mixin::emplace
+     * @brief Assigns entities to a storage.
      * @tparam Args Types of arguments to use to construct the object.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the object.
@@ -677,7 +687,7 @@ public:
     }
 
     /**
-     * @copybrief storage_adapter_mixin::insert
+     * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the objects
      * associated with the entities.
@@ -698,7 +708,7 @@ public:
     }
 
     /**
-     * @copybrief storage_adapter_mixin::patch
+     * @brief Patches the given instance for an entity.
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.
      * @param func Valid function objects.
