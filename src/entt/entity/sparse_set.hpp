@@ -433,17 +433,18 @@ public:
     void remove(const entity_type entt) {
         ENTT_ASSERT(contains(entt));
         auto &ref = sparse[page(entt)][offset(entt)];
-        const auto pos = size_type{to_integral(ref)};
-        const auto other = packed.back();
 
+        // last chance to use the entity for derived classes and mixins, if any
+        swap_and_pop(size_type{to_integral(ref)});
+
+        const auto other = packed.back();
         sparse[page(other)][offset(other)] = ref;
-        // If it looks weird, imagine what the subtle bugs it prevents are
+        // if it looks weird, imagine what the subtle bugs it prevents are
         ENTT_ASSERT((packed.back() = entt, true));
-        packed[pos] = other;
+        packed[size_type{to_integral(ref)}] = other;
         ref = null;
 
         packed.pop_back();
-        swap_and_pop(pos);
     }
 
     /**

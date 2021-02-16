@@ -18,15 +18,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-struct Storage: type_list<
-    type_info() const ENTT_NOEXCEPT,
-    void(const Entity *, const Entity *)
-> {
-    /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
-    /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
-
+struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
     /**
      * @brief Concept definition.
      * @tparam Base Opaque base class from which to inherit.
@@ -40,17 +32,6 @@ struct Storage: type_list<
         type_info value_type() const ENTT_NOEXCEPT {
             return poly_call<0>(*this);
         }
-
-        /**
-         * @brief Removes entities from a storage.
-         * @param first An iterator to the first element of the range of
-         * entities.
-         * @param last An iterator past the last element of the range of
-         * entities.
-         */
-        void remove(const entity_type *first, const entity_type *last) {
-            poly_call<1>(*this, first, last);
-        }
     };
 
     /**
@@ -58,10 +39,7 @@ struct Storage: type_list<
      * @tparam Type Type for which to generate an implementation.
      */
     template<typename Type>
-    using impl = value_list<
-        &type_id<typename Type::value_type>,
-        &Type::template remove<const entity_type *>
-    >;
+    using impl = value_list<&type_id<typename Type::value_type>>;
 };
 
 

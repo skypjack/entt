@@ -513,6 +513,19 @@ public:
     using storage_category = empty_storage_tag;
 
     /**
+     * @brief Fake get function.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.
+     *
+     * @param entt A valid entity identifier.
+     */
+    void get([[maybe_unused]] const entity_type entt) const {
+        ENTT_ASSERT(contains(entt));
+    }
+
+    /**
      * @brief Assigns an entity to a storage and constructs its object.
      *
      * @warning
@@ -568,6 +581,12 @@ template<typename Type, typename Owner>
 class sigh_storage_mixin: public Type {
     Owner & owner() ENTT_NOEXCEPT {
         return *static_cast<Owner *>(payload());
+    }
+
+protected:
+    void swap_and_pop(const std::size_t pos) {
+        destruction.publish(owner(), data()[pos]);
+        Type::swap_and_pop(pos);
     }
 
 public:
@@ -654,10 +673,7 @@ public:
     decltype(auto) emplace(const entity_type entity, Args &&... args) {
         Type::emplace(entity, std::forward<Args>(args)...);
         construction.publish(owner(), entity);
-
-        if constexpr(!std::is_same_v<storage_category, empty_storage_tag>) {
-            return this->get(entity);
-        }
+        return get(entity);
     }
 
     /**
@@ -682,32 +698,6 @@ public:
     }
 
     /**
-     * @copybrief storage_adapter_mixin::remove
-     * @param entity A valid entity identifier.
-     */
-    void remove(const entity_type entity) {
-        destruction.publish(owner(), entity);
-        Type::remove(entity);
-    }
-
-    /**
-     * @copybrief storage_adapter_mixin::remove
-     * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename It>
-    void remove(It first, It last) {
-        if(!destruction.empty()) {
-            for(auto it = first; it != last; ++it) {
-                destruction.publish(owner(), *it);
-            }
-        }
-
-        Type::remove(first, last);
-    }
-
-    /**
      * @copybrief storage_adapter_mixin::patch
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.
@@ -716,13 +706,9 @@ public:
      */
     template<typename... Func>
     decltype(auto) patch(const entity_type entity, [[maybe_unused]] Func &&... func) {
-        if constexpr(std::is_same_v<storage_category, empty_storage_tag>) {
-            update.publish(owner(), entity);
-        } else {
-            Type::patch(entity, std::forward<Func>(func)...);
-            update.publish(owner(), entity);
-            return this->get(entity);
-        }
+        Type::patch(entity, std::forward<Func>(func)...);
+        update.publish(owner(), entity);
+        return get(entity);
     }
 
 private:

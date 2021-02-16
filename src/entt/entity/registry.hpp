@@ -639,7 +639,7 @@ public:
         auto *cpool = assure<Component>();
 
         return cpool->contains(entity)
-            ? cpool->patch(entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; })
+            ? cpool->patch(entity, [&args...](auto &... curr) { ((curr = Component{std::forward<Args>(args)...}), ...); })
             : cpool->emplace(entity, std::forward<Args>(args)...);
     }
 
@@ -692,7 +692,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&... args) {
-        return assure<Component>()->patch(entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; });
+        return assure<Component>()->patch(entity, [&args...](auto &... curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
     }
 
     /**
@@ -776,7 +776,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.poly->remove(std::begin(wrap), std::end(wrap));
+                pdata.pool->remove(std::begin(wrap), std::end(wrap));
             }
         }
     }

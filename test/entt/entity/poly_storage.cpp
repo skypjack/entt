@@ -11,6 +11,7 @@ template<typename Entity>
 struct PolyStorage: entt::type_list_cat_t<
     decltype(as_type_list(std::declval<entt::Storage<Entity>>())),
     entt::type_list<
+        void(const Entity *, const Entity *),
         void(const Entity, const void *),
         const void *(const Entity) const,
         void(entt::basic_registry<Entity> &) const
@@ -23,16 +24,20 @@ struct PolyStorage: entt::type_list_cat_t<
     struct type: entt::Storage<Entity>::template type<Base> {
         static constexpr auto base = std::tuple_size_v<typename entt::poly_vtable<entt::Storage<Entity>>::type>;
 
+        void remove(const entity_type *first, const entity_type *last) {
+            entt::poly_call<base + 0>(*this, first, last);
+        }
+
         void emplace(const entity_type entity, const void *instance) {
-            entt::poly_call<base + 0>(*this, entity, instance);
+            entt::poly_call<base + 1>(*this, entity, instance);
         }
 
         const void * get(const entity_type entity) const {
-            return entt::poly_call<base + 1>(*this, entity);
+            return entt::poly_call<base + 2>(*this, entity);
         }
 
         void copy_to(entt::basic_registry<Entity> &other) const {
-            entt::poly_call<base + 2>(*this, other);
+            entt::poly_call<base + 3>(*this, other);
         }
     };
 
@@ -55,6 +60,7 @@ struct PolyStorage: entt::type_list_cat_t<
     using impl = entt::value_list_cat_t<
         typename entt::Storage<Entity>::template impl<Type>,
         entt::value_list<
+            &Type::template remove<const entity_type *>,
             &members<Type>::emplace,
             &members<Type>::get,
             &members<Type>::copy_to
