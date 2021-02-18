@@ -7,7 +7,7 @@
 struct clazz_t {
     void incr() { ++value; }
     void decr() { --value; }
-    int value;
+    int value{};
 };
 
 struct MetaHandle: ::testing::Test {
