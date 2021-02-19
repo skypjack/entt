@@ -14,6 +14,7 @@
   * [Conflicts](#conflicts)
 * [Monostate](#monostate)
 * [Any as in any type](#any-as-in-any-type)
+  * [Small buffer optimization](#small-buffer-optimization)
 * [Type support](#type-support)
   * [Type info](#type-info)
     * [Almost unique identifiers](#almost-unique-identifiers)
@@ -311,6 +312,25 @@ functions in all respects similar to their most famous counterparts.<br/>
 The only difference is that, in the case of `EnTT`, these won't raise exceptions
 but will only trigger an assert in debug mode, otherwise resulting in undefined
 behavior in case of misuse in release mode.
+
+## Small buffer optimization
+
+The `any` class uses a technique called _small buffer optimization_ to reduce
+the number of allocations where possible.<br/>
+The default reserved size for an instance of `any` is `sizeof(double[2])`.
+However, this is also configurable if needed. In fact, `any` is defined as an
+alias for `basic_any<Len>`, where `Len` is just the size above.<br/>
+Users can easily use a custom size or define their own alias:
+
+```cpp
+using my_any = entt::basic_any<sizeof(double[4])>;
+```
+
+This feature, in addition to allowing the choice of a size that best suits the
+needs of an application, also reserves the possibility of forcing dynamic
+creation of objects during construction.<br/>
+In fact, if the size is 0, `any` will avoid the use of any optimization, in fact
+always dynamically allocating objects (except for aliasing cases).
 
 # Type support
 

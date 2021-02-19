@@ -870,3 +870,17 @@ TEST(Any, CopyMoveReference) {
     test(std::ref(value));
     test(std::cref(value));
 }
+
+TEST(Any, SBOVsForcedDynamic) {
+    entt::any sbo{42};
+    const auto sbo_ptr = sbo.data();
+    entt::any sbo_copy = std::move(sbo);
+
+    ASSERT_NE(sbo_ptr, sbo_copy.data());
+
+    entt::basic_any<0u> dyn{42};
+    const auto dyn_ptr = dyn.data();
+    entt::any dyn_copy = std::move(dyn);
+
+    ASSERT_NE(dyn_ptr, dyn_copy.data());
+}
