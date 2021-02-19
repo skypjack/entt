@@ -28,7 +28,7 @@ class basic_any {
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
-    static constexpr auto in_situ = (Len != 0u) && (sizeof(Type) <= sizeof(storage_type)) && std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ = Len && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
