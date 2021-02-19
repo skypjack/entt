@@ -28,11 +28,12 @@ WIP:
 * HP: paginate pools
 * HP: headless (sparse set only) view
 * HP: write documentation for custom storages and views!!
-* HP: any/poly: configurable sbo size, compile-time policies like sbo-required.
+* HP: meta_any/poly: configurable sbo size.
 * HP: registry: use a poly object for pools, no more pool_data type.
 * HP: make runtime views use opaque storage and therefore return also elements.
 * HP: add exclude-only views to combine with packs
 * HP: entity-aware observer, add observer functions aside observer class
+* HP: any and the like: remove constructor that accepts reference wrapper, allow only in-place T&?
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
 * snapshot: support for range-based archives

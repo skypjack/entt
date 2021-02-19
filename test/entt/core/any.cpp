@@ -801,7 +801,7 @@ TEST(Any, AnyCast) {
     ASSERT_EQ(*entt::any_cast<int>(&cany), 42);
     ASSERT_EQ(entt::any_cast<int &>(any), 42);
     ASSERT_EQ(entt::any_cast<const int &>(cany), 42);
-    ASSERT_EQ(entt::any_cast<int>(42), 42);
+    ASSERT_EQ(entt::any_cast<int>(entt::any{42}), 42);
 }
 
 TEST(Any, NotCopyableType) {

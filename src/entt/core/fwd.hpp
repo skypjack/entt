@@ -8,8 +8,16 @@
 namespace entt {
 
 
+template<std::size_t = sizeof(double[2])>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<>;
 
 
 }
