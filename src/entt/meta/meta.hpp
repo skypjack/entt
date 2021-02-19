@@ -483,16 +483,16 @@ public:
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
     [[nodiscard]] meta_any operator*() ENTT_NOEXCEPT {
-        meta_any any{};
-        vtable(operation::DEREF, storage, &any);
-        return any;
+        meta_any ret{};
+        vtable(operation::DEREF, storage, &ret);
+        return ret;
     }
 
     /*! @copydoc operator* */
     [[nodiscard]] meta_any operator*() const ENTT_NOEXCEPT {
-        meta_any any{};
-        vtable(operation::CDEREF, storage, &any);
-        return any;
+        meta_any ret{};
+        vtable(operation::CDEREF, storage, &ret);
+        return ret;
     }
 
     /**
@@ -1343,9 +1343,9 @@ public:
      * @return A meta any containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
-        meta_any any{};
-        internal::meta_visit<&node_type::ctor>([args, sz, &any](const auto *curr) { return (curr->arity == sz) && (any = curr->invoke(args)); }, node);
-        return any;
+        meta_any ret{};
+        internal::meta_visit<&node_type::ctor>([args, sz, &ret](const auto *curr) { return (curr->arity == sz) && (ret = curr->invoke(args)); }, node);
+        return ret;
     }
 
     /**

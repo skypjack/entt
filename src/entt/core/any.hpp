@@ -53,7 +53,7 @@ class basic_any {
                 switch(op) {
                 case operation::COPY:
                     if constexpr(std::is_copy_constructible_v<base_type>) {
-                        as<basic_any>(to).emplace<base_type>(*static_cast<const base_type *>(from.instance));
+                        as<basic_any>(to).template emplace<base_type>(*static_cast<const base_type *>(from.instance));
                     }
                     break;
                 case operation::MOVE:

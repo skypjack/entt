@@ -301,8 +301,8 @@ public:
             [](const typename internal::meta_ctor_node::size_type index) ENTT_NOEXCEPT {
                 return meta_arg(typename descriptor::args_type{}, index);
             },
-            [](meta_any * const any) {
-                return meta_invoke<Type, Candidate, Policy>({}, any, std::make_index_sequence<descriptor::args_type::size>{});
+            [](meta_any * const args) {
+                return meta_invoke<Type, Candidate, Policy>({}, args, std::make_index_sequence<descriptor::args_type::size>{});
             }
         };
 
@@ -336,8 +336,8 @@ public:
             [](const typename internal::meta_ctor_node::size_type index) ENTT_NOEXCEPT {
                 return meta_arg(typename descriptor::args_type{}, index);
             },
-            [](meta_any * const any) {
-                return meta_construct<Type, Args...>(any, std::make_index_sequence<descriptor::args_type::size>{});
+            [](meta_any * const args) {
+                return meta_construct<Type, Args...>(args, std::make_index_sequence<descriptor::args_type::size>{});
             }
         };
 
