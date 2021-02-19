@@ -302,11 +302,11 @@ struct square {
 
 // ...
 
-drawable d{circle{}};
-d->draw();
+drawable instance{circle{}};
+instance->draw();
 
-d = square{};
-d->draw();
+instance = square{};
+instance->draw();
 ```
 
 The `poly` class template offers a wide range of constructors, from the default
@@ -316,23 +316,23 @@ Among others, there is a constructor that allows users to wrap unmanaged objects
 in a `poly` instance (either const or non-const ones):
 
 ```cpp
-circle c;
-drawable d{std::ref(c)};
+circle shape;
+drawable instance{std::ref(shape)};
 ```
 
 Similarly, it's possible to create non-owning copies of `poly` from an existing
 object:
 
 ```cpp
-drawable other = as_ref(d);
+drawable other = instance.as_ref();
 ```
 
 In both cases, although the interface of the `poly` object doesn't change, it
 won't construct any element or take care of destroying the referenced objects.
 
 Note also how the underlying concept is accessed via a call to `operator->` and
-not directly as `d.draw()`.<br/>
+not directly as `instance.draw()`.<br/>
 This allows users to decouple the API of the wrapper from that of the concept.
-Therefore, where `d.data()` will invoke the `data` member function of the poly
-object, `d->data()` will map directly to the functionality exposed by the
-underlying concept.
+Therefore, where `instance.data()` will invoke the `data` member function of the
+poly object, `instance->data()` will map directly to the functionality exposed
+by the underlying concept.

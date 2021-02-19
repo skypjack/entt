@@ -316,7 +316,7 @@ TEST_F(MetaFunc, ArgsByRef) {
     int value = 4;
 
     ASSERT_EQ(func.invoke({}, std::ref(value)).cast<int>(), 8);
-    ASSERT_EQ(func.invoke({}, as_ref(any)).cast<int>(), 6);
+    ASSERT_EQ(func.invoke({}, any.as_ref()).cast<int>(), 6);
     ASSERT_EQ(any.cast<int>(), 6);
     ASSERT_EQ(value, 8);
 }
@@ -332,7 +332,7 @@ TEST_F(MetaFunc, ArgsByConstRef) {
     ASSERT_TRUE(func.invoke(instance, std::cref(value)));
     ASSERT_EQ(func_t::value, 9);
 
-    ASSERT_TRUE(func.invoke(instance, as_ref(std::as_const(any))));
+    ASSERT_TRUE(func.invoke(instance, std::as_const(any).as_ref()));
     ASSERT_EQ(func_t::value, 4);
 }
 

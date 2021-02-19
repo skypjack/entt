@@ -70,7 +70,7 @@ TEST(Any, SBOInPlaceTypeConstruction) {
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<int>(any), 42);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -97,7 +97,7 @@ TEST(Any, SBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &value);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -124,7 +124,7 @@ TEST(Any, SBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -203,7 +203,7 @@ TEST(Any, NoSBOInPlaceTypeConstruction) {
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -230,7 +230,7 @@ TEST(Any, NoSBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &instance);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -257,7 +257,7 @@ TEST(Any, NoSBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -674,8 +674,8 @@ TEST(Any, NoSBOWithVoidSwap) {
 
 TEST(Any, AsRef) {
     entt::any any{42};
-    auto ref = as_ref(any);
-    auto cref = as_ref(std::as_const(any));
+    auto ref = any.as_ref();
+    auto cref = std::as_const(any).as_ref();
 
     ASSERT_EQ(entt::any_cast<int>(&any), any.data());
     ASSERT_EQ(entt::any_cast<int>(&ref), any.data());
@@ -711,8 +711,8 @@ TEST(Any, AsRef) {
     ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
     ASSERT_EQ(entt::any_cast<int>(&cref), any.data());
 
-    ref = as_ref(ref);
-    cref = as_ref(std::as_const(cref));
+    ref = ref.as_ref();
+    cref = std::as_const(cref).as_ref();
 
     ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
     ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);

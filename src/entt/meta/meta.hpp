@@ -184,13 +184,13 @@ class meta_any {
         case operation::SEQ:
         case operation::CSEQ:
             if constexpr(has_meta_sequence_container_traits_v<Type>) {
-                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, (op == operation::SEQ ? as_ref(const_cast<any &>(from)) : as_ref(from)) };
+                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
             }
             break;
         case operation::ASSOC:
         case operation::CASSOC:
             if constexpr(has_meta_associative_container_traits_v<Type>) {
-                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, (op == operation::ASSOC ? as_ref(const_cast<any &>(from)) : as_ref(from)) };
+                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
             }
             break;
         }
@@ -398,7 +398,7 @@ public:
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         if(try_cast<std::remove_reference_t<Type>>() != nullptr) {
-            return as_ref(*this);
+            return as_ref();
         } else if(node) {
             if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = type_id<Type>()](const auto *curr) { return curr->type()->info == info; }, node); conv) {
                 return conv->conv(storage.data());
@@ -526,21 +526,20 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return A meta any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend meta_any as_ref(meta_any &other) ENTT_NOEXCEPT {
-        meta_any ref = as_ref(std::as_const(other));
-        ref.storage = as_ref(other.storage);
+    [[nodiscard]] meta_any as_ref() ENTT_NOEXCEPT {
+        auto ref = std::as_const(*this).as_ref();
+        ref.storage = storage.as_ref();
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend meta_any as_ref(const meta_any &other) ENTT_NOEXCEPT {
+    [[nodiscard]] meta_any as_ref() const ENTT_NOEXCEPT {
         meta_any ref{};
-        ref.node = other.node;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+        ref.storage = storage.as_ref();
+        ref.vtable = vtable;
+        ref.node = node;
         return ref;
     }
 
@@ -602,7 +601,7 @@ struct meta_handle {
         : meta_handle{}
     {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
-            any = as_ref(value);
+            any = value.as_ref();
         } else {
             any = std::reference_wrapper{value};
         }

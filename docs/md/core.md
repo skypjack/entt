@@ -289,7 +289,7 @@ object:
 
 ```cpp
 // aliasing constructor
-entt::any ref = as_ref(other);
+entt::any ref = other.as_ref();
 ```
 
 In this case, it doesn't matter if the original container actually holds an

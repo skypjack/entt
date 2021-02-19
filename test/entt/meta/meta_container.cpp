@@ -443,7 +443,7 @@ TEST_F(MetaContainer, StdVectorBool) {
 
     std::vector<bool> vec{};
     entt::meta_any any{std::ref(vec)};
-    auto cany = as_ref(std::as_const(any));
+    auto cany = std::as_const(any).as_ref();
 
     auto view = any.as_sequence_container();
     auto cview = cany.as_sequence_container();

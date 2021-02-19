@@ -306,19 +306,18 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return An any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend any as_ref(any &other) ENTT_NOEXCEPT {
+    [[nodiscard]] any as_ref() ENTT_NOEXCEPT {
         any ref{};
-        other.vtable(operation::REF, other, &ref);
+        vtable(operation::REF, *this, &ref);
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend any as_ref(const any &other) ENTT_NOEXCEPT {
+    [[nodiscard]] any as_ref() const ENTT_NOEXCEPT {
         any ref{};
-        other.vtable(operation::CREF, other, &ref);
+        vtable(operation::CREF, *this, &ref);
         return ref;
     }
 

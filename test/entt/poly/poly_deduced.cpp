@@ -75,7 +75,7 @@ TEST(PolyDeduced, Functionalities) {
     ASSERT_TRUE(empty);
     ASSERT_EQ(empty->get(), 3);
 
-    entt::poly<Deduced> ref = as_ref(in_place);
+    entt::poly<Deduced> ref = in_place.as_ref();
 
     ASSERT_TRUE(ref);
     ASSERT_NE(ref.data(), nullptr);
@@ -180,8 +180,8 @@ TEST(PolyDeduced, ConstReference) {
 
 TEST(PolyDeduced, AsRef) {
     entt::poly<Deduced> poly{impl{}};
-    auto ref = as_ref(poly);
-    auto cref = as_ref(std::as_const(poly));
+    auto ref = poly.as_ref();
+    auto cref = std::as_const(poly).as_ref();
 
     ASSERT_NE(poly.data(), nullptr);
     ASSERT_NE(ref.data(), nullptr);
@@ -194,8 +194,8 @@ TEST(PolyDeduced, AsRef) {
     ASSERT_NE(std::as_const(ref).data(), nullptr);
     ASSERT_NE(cref.data(), nullptr);
 
-    ref = as_ref(ref);
-    cref = as_ref(std::as_const(cref));
+    ref = ref.as_ref();
+    cref = std::as_const(cref).as_ref();
 
     ASSERT_EQ(ref.data(), nullptr);
     ASSERT_NE(std::as_const(ref).data(), nullptr);

@@ -319,21 +319,19 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return A poly that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend poly as_ref(poly &other) ENTT_NOEXCEPT {
-        poly ref;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+    [[nodiscard]] poly as_ref() ENTT_NOEXCEPT {
+        poly ref = std::as_const(*this).as_ref();
+        ref.storage = storage.as_ref();
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend poly as_ref(const poly &other) ENTT_NOEXCEPT {
-        poly ref;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+    [[nodiscard]] poly as_ref() const ENTT_NOEXCEPT {
+        poly ref{};
+        ref.storage = storage.as_ref();
+        ref.vtable = vtable;
         return ref;
     }
 

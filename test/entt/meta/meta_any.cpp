@@ -576,8 +576,8 @@ TEST_F(MetaAny, NoSBOWithVoidSwap) {
 
 TEST_F(MetaAny, AsRef) {
     entt::meta_any any{42};
-    auto ref = as_ref(any);
-    auto cref = as_ref(std::as_const(any));
+    auto ref = any.as_ref();
+    auto cref = std::as_const(any).as_ref();
 
     ASSERT_EQ(any.try_cast<int>(), any.data());
     ASSERT_EQ(ref.try_cast<int>(), any.data());
@@ -613,8 +613,8 @@ TEST_F(MetaAny, AsRef) {
     ASSERT_EQ(ref.try_cast<int>(), nullptr);
     ASSERT_EQ(cref.try_cast<int>(), any.data());
 
-    ref = as_ref(ref);
-    cref = as_ref(std::as_const(cref));
+    ref = ref.as_ref();
+    cref = std::as_const(cref).as_ref();
 
     ASSERT_EQ(ref.try_cast<int>(), nullptr);
     ASSERT_EQ(cref.try_cast<int>(), nullptr);
@@ -746,7 +746,7 @@ TEST_F(MetaAny, ConstConvert) {
 TEST_F(MetaAny, UnmanageableType) {
     unmanageable_t instance;
     entt::meta_any any{std::ref(instance)};
-    entt::meta_any other = as_ref(any);
+    entt::meta_any other = any.as_ref();
 
     std::swap(any, other);
 
@@ -774,7 +774,7 @@ TEST_F(MetaAny, Invoke) {
     ASSERT_TRUE(any.invoke("func"_hs));
     ASSERT_TRUE(any.invoke("member"_hs, 42));
     ASSERT_FALSE(std::as_const(any).invoke("member"_hs, 42));
-    ASSERT_FALSE(as_ref(std::as_const(any)).invoke("member"_hs, 42));
+    ASSERT_FALSE(std::as_const(any).as_ref().invoke("member"_hs, 42));
     ASSERT_FALSE(any.invoke("non_existent"_hs, 42));
 
     ASSERT_EQ(clazz_t::c, 'd');
@@ -793,7 +793,7 @@ TEST_F(MetaAny, SetGet) {
 
     ASSERT_TRUE(value);
     ASSERT_EQ(value, any.get("value"_hs));
-    ASSERT_EQ(value, as_ref(std::as_const(any)).get("value"_hs));
+    ASSERT_EQ(value, std::as_const(any).as_ref().get("value"_hs));
     ASSERT_NE(value.try_cast<int>(), nullptr);
     ASSERT_EQ(value.cast<int>(), 42);
     ASSERT_EQ(instance.value, 42);

@@ -292,7 +292,7 @@ TEST_F(MetaData, SetByRef) {
     value = 3;
     entt::meta_any wrapper{std::ref(value)};
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, as_ref(wrapper)));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, wrapper.as_ref()));
     ASSERT_EQ(any.cast<clazz_t>().i, 3);
 }
 
@@ -309,7 +309,7 @@ TEST_F(MetaData, SetByConstRef) {
     value = 3;
     entt::meta_any wrapper{std::cref(value)};
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, as_ref(wrapper)));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, wrapper.as_ref()));
     ASSERT_EQ(any.cast<clazz_t>().i, 3);
 }
 
