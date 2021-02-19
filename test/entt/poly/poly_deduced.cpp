@@ -208,3 +208,17 @@ TEST(PolyDeduced, AsRef) {
     ASSERT_NE(ref.data(), nullptr);
     ASSERT_NE(cref.data(), nullptr);
 }
+
+TEST(PolyDeduced, SBOVsZeroedSBOSize) {
+    entt::poly<Deduced> sbo{impl{}};
+    const auto broken = sbo.data();
+    entt::poly<Deduced> other = std::move(sbo);
+
+    ASSERT_NE(broken, other.data());
+
+    entt::poly<Deduced, 0u> dyn{impl{}};
+    const auto valid = dyn.data();
+    entt::poly<Deduced, 0u> same = std::move(dyn);
+
+    ASSERT_EQ(valid, same.data());
+}

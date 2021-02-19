@@ -214,3 +214,17 @@ TEST(PolyDefined, AsRef) {
     ASSERT_NE(ref.data(), nullptr);
     ASSERT_NE(cref.data(), nullptr);
 }
+
+TEST(PolyDefined, SBOVsZeroedSBOSize) {
+    entt::poly<Defined> sbo{impl{}};
+    const auto broken = sbo.data();
+    entt::poly<Defined> other = std::move(sbo);
+
+    ASSERT_NE(broken, other.data());
+
+    entt::poly<Defined, 0u> dyn{impl{}};
+    const auto valid = dyn.data();
+    entt::poly<Defined, 0u> same = std::move(dyn);
+
+    ASSERT_EQ(valid, same.data());
+}

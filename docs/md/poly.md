@@ -13,6 +13,7 @@
   * [Fullfill a concept](#fullfill-a-concept)
 * [Inheritance](#inheritance)
 * [Static polymorphism in the wild](#static-polymorphism-in-the-wild)
+* [Configurable storage size](#configurable-storage-size)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -236,7 +237,7 @@ For a deduced concept, inheritance is achieved in a few steps:
 ```cpp
 struct DrawableAndErasable: entt::type_list<> {
     template<typename Base>
-    struct type: typename Drawable::type<Base> {
+    struct type: typename Drawable::template type<Base> {
         static constexpr auto base = std::tuple_size_v<typename entt::poly_vtable<Drawable>::type>;
         void erase() { entt::poly_call<base + 0>(*this); }
     };
@@ -336,3 +337,22 @@ This allows users to decouple the API of the wrapper from that of the concept.
 Therefore, where `instance.data()` will invoke the `data` member function of the
 poly object, `instance->data()` will map directly to the functionality exposed
 by the underlying concept.
+
+# Configurable storage size
+
+Under the hood, the `poly` class template makes use of `entt::any`. Therefore,
+it can take advantage of the possibility of defining at compile-time the size of
+the storage suitable for the small buffer optimization.<br/>
+To do this, it will be sufficient to provide the desired size as a second
+template parameter:
+
+```cpp
+entt::poly<Drawable, sizeof(double[4])>
+```
+
+The default value is `sizeof(double[2])`, which seems like a good compromise
+between a buffer that is too large and one unable to hold anything larger than
+an integer.<br/>
+It's worth noting that providing a size of 0 (which is an accepted value in all
+respects) will force the system to dynamically allocate the contained objects in
+all cases.

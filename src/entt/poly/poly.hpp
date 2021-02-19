@@ -171,17 +171,18 @@ decltype(auto) poly_call(Poly &&self, Args &&... args) {
  * Moreover, the `poly` class template also works with unmanaged objects.
  *
  * @tparam Concept Concept descriptor.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
  */
-template<typename Concept>
-class poly: private Concept::template type<poly_base<poly<Concept>>> {
+template<typename Concept, std::size_t Len = sizeof(double[2])>
+class poly: private Concept::template type<poly_base<poly<Concept, Len>>> {
     /*! @brief A poly base is allowed to snoop into a poly object. */
-    friend struct poly_base<poly<Concept>>;
+    friend struct poly_base<poly>;
 
     using vtable_type = typename poly_vtable<Concept>::type;
 
 public:
     /*! @brief Concept type. */
-    using concept_type = typename Concept::template type<poly_base<poly<Concept>>>;
+    using concept_type = typename Concept::template type<poly_base<poly>>;
 
     /*! @brief Default constructor. */
     poly() ENTT_NOEXCEPT
@@ -336,7 +337,7 @@ public:
     }
 
 private:
-    any storage;
+    basic_any<Len> storage;
     const vtable_type *vtable;
 };
 
