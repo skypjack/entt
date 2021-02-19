@@ -64,7 +64,7 @@ default type if necessary.
 As is known, the ECS module of `EnTT` is based on _sparse sets_. What is less
 known perhaps is that these are paged to reduce memory consumption in some
 corner cases.<br/>
-The default size of a page is 32kB but users can adjust it if appropriate. In
+The default size of a page is 16kB but users can adjust it if appropriate. In
 all case, the chosen value **must** be a power of 2.
 
 ## ENTT_ASSERT

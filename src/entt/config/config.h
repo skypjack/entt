@@ -22,7 +22,7 @@
 
 
 #ifndef ENTT_PAGE_SIZE
-#   define ENTT_PAGE_SIZE 4096
+#   define ENTT_PAGE_SIZE 16384
 #endif
 
 
