@@ -871,16 +871,16 @@ TEST(Any, CopyMoveReference) {
     test(std::cref(value));
 }
 
-TEST(Any, SBOVsForcedDynamic) {
+TEST(Any, SBOVsZeroedSBOSize) {
     entt::any sbo{42};
-    const auto sbo_ptr = sbo.data();
-    entt::any sbo_copy = std::move(sbo);
+    const auto *broken = sbo.data();
+    entt::any other = std::move(sbo);
 
-    ASSERT_NE(sbo_ptr, sbo_copy.data());
+    ASSERT_NE(broken, other.data());
 
     entt::basic_any<0u> dyn{42};
-    const auto dyn_ptr = dyn.data();
-    entt::any dyn_copy = std::move(dyn);
+    const auto *valid = dyn.data();
+    entt::basic_any<0u> same = std::move(dyn);
 
-    ASSERT_NE(dyn_ptr, dyn_copy.data());
+    ASSERT_EQ(valid, same.data());
 }
