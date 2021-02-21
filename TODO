@@ -27,7 +27,6 @@ WIP:
 * HP: paginate pools
 * HP: headless (sparse set only) view
 * HP: write documentation for custom storages and views!!
-* HP: meta_any/poly: configurable sbo size.
 * HP: registry: use a poly object for pools, no more pool_data type.
 * HP: make runtime views use opaque storage and therefore return also elements.
 * HP: add exclude-only views to combine with packs

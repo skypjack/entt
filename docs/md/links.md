@@ -68,6 +68,8 @@ I hope this list can grow much more in the future:
     by Quake.
   * [Destroid](https://github.com/tyrannicaltoucan/destroid): _one-bazillionth_
     arcade game about shooting dirty rocks in space, inspired by Asteroids.
+  * [Wanderer](https://github.com/albin-johansson/wanderer): a 2D exploration
+    based indie game.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
