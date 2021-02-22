@@ -891,8 +891,8 @@ public:
                     func();
                 }
             } else {
-                for(auto &&component: *this) {
-                    func(component);
+                for(auto entity: *this) {
+                    func(entity);
                 }
             }
         } else {
