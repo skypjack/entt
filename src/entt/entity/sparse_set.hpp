@@ -178,7 +178,7 @@ protected:
     virtual void swap_at(const std::size_t, const std::size_t) {}
 
     /*! @brief Attempts to remove an entity from the internal packed array. */
-    virtual void swap_and_pop(const std::size_t) {}
+    virtual void swap_and_pop(const std::size_t, void *) {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -432,13 +432,14 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid entity identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void remove(const entity_type entt) {
+    void remove(const entity_type entt, void *ud = nullptr) {
         ENTT_ASSERT(contains(entt));
         auto &ref = sparse[page(entt)][offset(entt)];
 
         // last chance to use the entity for derived classes and mixins, if any
-        swap_and_pop(size_type{to_integral(ref)});
+        swap_and_pop(size_type{to_integral(ref)}, ud);
 
         const auto other = packed.back();
         sparse[page(other)][offset(other)] = ref;
@@ -455,11 +456,12 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     template<typename It>
-    void remove(It first, It last) {
+    void remove(It first, It last, void *ud = nullptr) {
         for(; first != last; ++first) {
-            remove(*first);
+            remove(*first, ud);
         }
     }
 
@@ -588,32 +590,17 @@ public:
         }
     }
 
-    /*! @brief Clears a sparse set. */
-    void clear() ENTT_NOEXCEPT {
-        remove(begin(), end());
-    }
-
     /**
-     * @brief Returns the opaque payload associated with the sparse set, if any.
-     * @return The opaque payload associated with the sparse set, if any.
+     * @brief Clears a sparse set.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void * payload() const ENTT_NOEXCEPT {
-        return user_data;
-    }
-
-    /**
-     * @brief Set an opaque payload, typically used to attach information that
-     * are useful to storage mixins.
-     * @param ud Opaque payload, a sparse set won't use this data in any case.
-     */
-    void payload(void *ud) ENTT_NOEXCEPT {
-        user_data = ud;
+    void clear(void *ud = nullptr) ENTT_NOEXCEPT {
+        remove(begin(), end(), ud);
     }
 
 private:
     std::vector<page_type> sparse;
     std::vector<entity_type> packed;
-    void *user_data{};
 };
 
 

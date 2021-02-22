@@ -11,8 +11,8 @@ template<typename Entity>
 struct PolyStorage: entt::type_list_cat_t<
     decltype(as_type_list(std::declval<entt::Storage<Entity>>())),
     entt::type_list<
-        void(const Entity *, const Entity *),
-        void(const Entity, const void *),
+        void(const Entity *, const Entity *, void *),
+        void(entt::basic_registry<Entity> &, const Entity, const void *),
         const void *(const Entity) const,
         void(entt::basic_registry<Entity> &) const
     >
@@ -24,12 +24,12 @@ struct PolyStorage: entt::type_list_cat_t<
     struct type: entt::Storage<Entity>::template type<Base> {
         static constexpr auto base = std::tuple_size_v<typename entt::poly_vtable<entt::Storage<Entity>>::type>;
 
-        void remove(const entity_type *first, const entity_type *last) {
-            entt::poly_call<base + 0>(*this, first, last);
+        void remove(entt::basic_registry<Entity> &owner, const entity_type *first, const entity_type *last) {
+            entt::poly_call<base + 0>(*this, first, last, &owner);
         }
 
-        void emplace(const entity_type entity, const void *instance) {
-            entt::poly_call<base + 1>(*this, entity, instance);
+        void emplace(entt::basic_registry<Entity> &owner, const entity_type entity, const void *instance) {
+            entt::poly_call<base + 1>(*this, owner, entity, instance);
         }
 
         const void * get(const entity_type entity) const {
@@ -43,8 +43,8 @@ struct PolyStorage: entt::type_list_cat_t<
 
     template<typename Type>
     struct members {
-        static void emplace(Type &self, const entity_type entity, const void *instance) {
-            self.emplace(entity, *static_cast<const typename Type::value_type *>(instance));
+        static void emplace(Type &self, entt::basic_registry<Entity> &owner, const entity_type entity, const void *instance) {
+            self.emplace(owner, entity, *static_cast<const typename Type::value_type *>(instance));
         }
 
         static const typename Type::value_type * get(const Type &self, const entity_type entity) {
@@ -86,7 +86,7 @@ TEST(PolyStorage, CopyEntity) {
 
     registry.visit(entity, [&](const auto info) {
         auto &&storage = registry.storage(info);
-        storage->emplace(other, storage->get(entity));
+        storage->emplace(registry, other, storage->get(entity));
     });
 
     ASSERT_TRUE((registry.all_of<int, char>(entity)));
@@ -131,11 +131,11 @@ TEST(PolyStorage, Constness) {
     // cannot invoke remove on a const storage, let's copy the returned value
     auto cstorage = cregistry.storage(entt::type_id<int>());
 
-    ASSERT_DEATH(cstorage->remove(std::begin(entity), std::end(entity)), ".*");
+    ASSERT_DEATH(cstorage->remove(registry, std::begin(entity), std::end(entity)), ".*");
     ASSERT_TRUE(registry.all_of<int>(entity[0]));
 
     auto &&storage = registry.storage(entt::type_id<int>());
-    storage->remove(std::begin(entity), std::end(entity));
+    storage->remove(registry, std::begin(entity), std::end(entity));
 
     ASSERT_FALSE(registry.all_of<int>(entity[0]));
 }

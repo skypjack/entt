@@ -97,6 +97,7 @@ endif()
 
 if(ENTT_BUILD_EXAMPLE)
     SETUP_BASIC_TEST(custom_identifier example/custom_identifier.cpp)
+    SETUP_BASIC_TEST(signal_less example/signal_less.cpp)
 endif()
 
 # Test lib

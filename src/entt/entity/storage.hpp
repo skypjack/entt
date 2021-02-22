@@ -178,7 +178,7 @@ protected:
      * @copybrief basic_sparse_set::swap_and_pop
      * @param pos A valid position of an entity within storage.
      */
-    void swap_and_pop(const std::size_t pos) {
+    void swap_and_pop(const std::size_t pos, void *) {
         auto other = std::move(instances.back());
         instances[pos] = std::move(other);
         instances.pop_back();
@@ -393,7 +393,7 @@ public:
      * @return A reference to the updated instance.
      */
     template<typename... Func>
-    decltype(auto) patch(const entity_type entity, [[maybe_unused]] Func &&... func) {
+    decltype(auto) patch(const entity_type entity, Func &&... func) {
         auto &&instance = instances[this->index(entity)];
         (std::forward<Func>(func)(instance), ...);
         return instance;
@@ -559,7 +559,7 @@ public:
     * @param func Valid function objects.
     */
     template<typename... Func>
-    void patch([[maybe_unused]] const entity_type entity, [[maybe_unused]] Func &&... func) {
+    void patch([[maybe_unused]] const entity_type entity, Func &&... func) {
         ENTT_ASSERT(this->contains(entity));
         (std::forward<Func>(func)(), ...);
     }
@@ -583,21 +583,76 @@ public:
 
 
 /**
- * @brief Mixin type to use to add signal support to storage types.
+ * @brief Mixin type to use to wrap basic storage classes.
  * @tparam Type The type of the underlying storage.
- * @tparam Owner Expected owner type.
  */
-template<typename Type, typename Owner>
-class sigh_storage_mixin: public Type {
-    Owner & owner() ENTT_NOEXCEPT {
-        return *static_cast<Owner *>(this->payload());
+template<typename Type>
+struct storage_adapter_mixin: Type {
+    static_assert(std::is_same_v<typename Type::value_type, std::decay_t<typename Type::value_type>>, "Invalid object type");
+
+    /*! @brief Type of the objects associated with the entities. */
+    using value_type = typename Type::value_type;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = typename Type::entity_type;
+    /*! @brief Storage category. */
+    using storage_category = typename Type::storage_category;
+
+    /**
+     * @brief Assigns entities to a storage.
+     * @tparam Args Types of arguments to use to construct the object.
+     * @param entity A valid entity identifier.
+     * @param args Parameters to use to initialize the object.
+     * @return A reference to the newly created object.
+     */
+    template<typename... Args>
+    decltype(auto) emplace(basic_registry<entity_type> &, const entity_type entity, Args &&... args) {
+        return Type::emplace(entity, std::forward<Args>(args)...);
     }
 
-protected:
-    /*! @copydoc basic_storage::swap_and_pop */
-    void swap_and_pop(const std::size_t pos) {
-        destruction.publish(owner(), this->data()[pos]);
-        Type::swap_and_pop(pos);
+    /**
+     * @brief Assigns entities to a storage.
+     * @tparam It Type of input iterator.
+     * @tparam Args Types of arguments to use to construct the objects
+     * associated with the entities.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param args Parameters to use to initialize the objects associated with
+     * the entities.
+     */
+    template<typename It, typename... Args>
+    void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
+        Type::insert(first, last, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Patches the given instance for an entity.
+     * @tparam Func Types of the function objects to invoke.
+     * @param entity A valid entity identifier.
+     * @param func Valid function objects.
+     * @return A reference to the patched instance.
+     */
+    template<typename... Func>
+    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entity, Func &&... func) {
+        return Type::patch(entity, std::forward<Func>(func)...);
+    }
+};
+
+
+/**
+ * @brief Mixin type to use to add signal support to storage types.
+ * @tparam Type The type of the underlying storage.
+ */
+template<typename Type>
+class sigh_storage_mixin final: public Type {
+    /**
+     * @copybrief basic_sparse_set::swap_and_pop
+     * @param pos A valid position of an entity within storage.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    void swap_and_pop(const std::size_t pos, void *ud) final {
+        ENTT_ASSERT(ud != nullptr);
+        destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), this->data()[pos]);
+        Type::swap_and_pop(pos, ud);
     }
 
 public:
@@ -676,14 +731,15 @@ public:
     /**
      * @brief Assigns entities to a storage.
      * @tparam Args Types of arguments to use to construct the object.
+     * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the object.
      * @return A reference to the newly created object.
      */
     template<typename... Args>
-    decltype(auto) emplace(const entity_type entity, Args &&... args) {
+    decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
         Type::emplace(entity, std::forward<Args>(args)...);
-        construction.publish(owner(), entity);
+        construction.publish(owner, entity);
         return this->get(entity);
     }
 
@@ -692,18 +748,19 @@ public:
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the objects
      * associated with the entities.
+     * @param owner The registry that issued the request.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param args Parameters to use to initialize the objects associated with
      * the entities.
      */
     template<typename It, typename... Args>
-    void insert(It first, It last, Args &&... args) {
+    void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
         Type::insert(first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
             for(; first != last; ++first) {
-                construction.publish(owner(), *first);
+                construction.publish(owner, *first);
             }
         }
     }
@@ -711,14 +768,15 @@ public:
     /**
      * @brief Patches the given instance for an entity.
      * @tparam Func Types of the function objects to invoke.
+     * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
      * @param func Valid function objects.
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(const entity_type entity, [[maybe_unused]] Func &&... func) {
+    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, Func &&... func) {
         Type::patch(entity, std::forward<Func>(func)...);
-        update.publish(owner(), entity);
+        update.publish(owner, entity);
         return this->get(entity);
     }
 
@@ -745,7 +803,7 @@ private:
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
     /*! @brief Resulting type after component-to-storage conversion. */
-    using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>, entt::basic_registry<Entity>>;
+    using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
 
 
