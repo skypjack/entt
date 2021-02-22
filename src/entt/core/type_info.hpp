@@ -97,6 +97,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @brief Conversion operator to the underlying type. */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -118,6 +121,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @brief Conversion operator to the underlying type. */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -134,6 +140,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @brief Conversion operator to the underlying type. */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
