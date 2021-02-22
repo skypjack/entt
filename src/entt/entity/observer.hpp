@@ -180,18 +180,18 @@ class basic_observer {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template all_of<Require...>(entt) && !reg.template any_of<Reject...>(entt)) {
-                if(!obs.view.contains(entt)) {
-                    obs.view.emplace(entt);
+                if(!obs.storage.contains(entt)) {
+                    obs.storage.emplace(entt);
                 }
 
-                obs.view.get(entt) |= (1 << Index);
+                obs.storage.get(entt) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, basic_registry<Entity> &, const Entity entt) {
-            if(obs.view.contains(entt) && !(obs.view.get(entt) &= (~(1 << Index)))) {
-                obs.view.remove(entt);
+            if(obs.storage.contains(entt) && !(obs.storage.get(entt) &= (~(1 << Index)))) {
+                obs.storage.remove(entt);
             }
         }
 
@@ -223,18 +223,18 @@ class basic_observer {
                 }
             }())
             {
-                if(!obs.view.contains(entt)) {
-                    obs.view.emplace(entt);
+                if(!obs.storage.contains(entt)) {
+                    obs.storage.emplace(entt);
                 }
 
-                obs.view.get(entt) |= (1 << Index);
+                obs.storage.get(entt) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, basic_registry<Entity> &, const Entity entt) {
-            if(obs.view.contains(entt) && !(obs.view.get(entt) &= (~(1 << Index)))) {
-                obs.view.remove(entt);
+            if(obs.storage.contains(entt) && !(obs.storage.get(entt) &= (~(1 << Index)))) {
+                obs.storage.remove(entt);
             }
         }
 
@@ -281,7 +281,7 @@ public:
     /*! @brief Default constructor. */
     basic_observer()
         : release{},
-          view{}
+          storage{}
     {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
@@ -325,7 +325,7 @@ public:
     void connect(basic_registry<entity_type> &reg, basic_collector<Matcher...>) {
         disconnect();
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
-        view.clear();
+        storage.clear();
     }
 
     /*! @brief Disconnects an observer from the registry it keeps track of. */
@@ -341,7 +341,7 @@ public:
      * @return Number of elements.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return view.size();
+        return storage.size();
     }
 
     /**
@@ -349,7 +349,7 @@ public:
      * @return True if the observer is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        return view.empty();
+        return storage.empty();
     }
 
     /**
@@ -365,7 +365,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
-        return view.data();
+        return storage.data();
     }
 
     /**
@@ -377,7 +377,7 @@ public:
      * @return An iterator to the first entity of the observer.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return view.basic_sparse_set<entity_type>::begin();
+        return storage.basic_sparse_set<entity_type>::begin();
     }
 
     /**
@@ -391,12 +391,12 @@ public:
      * observer.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return view.basic_sparse_set<entity_type>::end();
+        return storage.basic_sparse_set<entity_type>::end();
     }
 
     /*! @brief Clears the underlying container. */
     void clear() ENTT_NOEXCEPT {
-        view.clear();
+        storage.clear();
     }
 
     /**
@@ -436,7 +436,7 @@ public:
 
 private:
     delegate<void(basic_observer &)> release;
-    basic_storage<entity_type, payload_type> view;
+    basic_storage<entity_type, payload_type> storage;
 };
 
 
