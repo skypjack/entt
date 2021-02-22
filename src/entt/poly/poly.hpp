@@ -277,7 +277,7 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        storage.emplace<Type>(std::forward<Args>(args)...);
+        storage.template emplace<Type>(std::forward<Args>(args)...);
         vtable = poly_vtable<Concept>::template instance<Type>();
     }
 

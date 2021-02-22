@@ -6,20 +6,10 @@
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
 * update documentation for meta, it contains less than half of the actual feature
-
-* custom pools example:
-  - lockless fully concurrent ro/rw pool with free lists
-  - multi instance
-  - tables
-  - enable/disable component
-  - spatial query
-  - runtime types pool
-  - off-line/off-memory/remote
-  - ...
+* custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
 * HP: remove storage category and get_as_tuple, make storage classes return tuple (+ view generator detect shared storage in future)?
-* HP: remove non-const registry::storage function?
 * HP: review registry::get, registry::try_get
 * HP: weak reference wrapper example with custom storage.
 * HP: merge view and view pack
