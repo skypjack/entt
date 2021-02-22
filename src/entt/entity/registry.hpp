@@ -105,7 +105,7 @@ class basic_registry {
     };
 
     template<typename Component>
-    [[nodiscard]] storage_type<Component> * assure() {
+    [[nodiscard]] storage_type<Component> * assure() const {
         const auto index = type_seq<Component>::value();
 
         if(!(index < pools.size())) {
@@ -121,7 +121,7 @@ class basic_registry {
     }
 
     template<typename Component>
-    [[nodiscard]] const storage_type<Component> * assure() const {
+    [[nodiscard]] const storage_type<Component> * pool_if_exists() const {
         const auto index = type_seq<Component>::value();
         return (!(index < pools.size()) || !pools[index].pool) ? nullptr : static_cast<const storage_type<Component> *>(pools[index].pool.get());
     }
@@ -225,7 +225,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type size() const {
-        const auto *cpool = assure<Component>();
+        const auto *cpool = pool_if_exists<Component>();
         return cpool ? cpool->size() : size_type{};
     }
 
@@ -288,7 +288,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type capacity() const {
-        const auto *cpool = assure<Component>();
+        const auto *cpool = pool_if_exists<Component>();
         return cpool ? cpool->capacity() : size_type{};
     }
 
@@ -327,7 +327,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return !alive();
         } else {
-            return [](auto *... cpool) { return ((!cpool || cpool->empty()) && ...); }(assure<Component>()...);
+            return [](auto *... cpool) { return ((!cpool || cpool->empty()) && ...); }(pool_if_exists<Component>()...);
         }
     }
 
@@ -766,7 +766,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool all_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return [entity](auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(assure<Component>()...);
+        return [entity](auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
     /**
@@ -802,9 +802,9 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (assure<Component>()->get(entity), ...);
+            return (pool_if_exists<Component>()->get(entity), ...);
         } else {
-            return std::forward_as_tuple(assure<Component>()->get(entity)...);
+            return std::forward_as_tuple(pool_if_exists<Component>()->get(entity)...);
         }
     }
 
@@ -867,7 +867,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            auto *cpool = assure<Component...>();
+            auto *cpool = pool_if_exists<Component...>();
             return (cpool && cpool->contains(entity)) ? &cpool->get(entity) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
@@ -1083,8 +1083,8 @@ public:
     template<typename... Component, typename... Exclude>
     [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        using view_type = basic_view<Entity, exclude_t<Exclude...>, Component...>;
-        return [](auto *... cpools) { return (cpools && ...) ? view_type{*cpools...} : view_type{}; }(assure<std::decay_t<Component>>()..., assure<Exclude>()...);
+        static_assert((std::is_const_v<Component> && ...), "Invalid non-const type");
+        return { *assure<std::decay_t<Component>>()..., *assure<Exclude>()... };
     }
 
     /*! @copydoc view */
@@ -1271,7 +1271,7 @@ public:
             return {};
         } else {
             using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
-            return { static_cast<handler_type *>(it->group.get())->current, *assure<std::decay_t<Owned>>()... , *assure<std::decay_t<Get>>()... };
+            return { static_cast<handler_type *>(it->group.get())->current, *pool_if_exists<std::decay_t<Owned>>()... , *pool_if_exists<std::decay_t<Get>>()... };
         }
     }
 
@@ -1594,7 +1594,7 @@ public:
 
 private:
     std::vector<basic_any<0u>> vars{};
-    std::vector<pool_data> pools{};
+    mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
     entity_type available{null};

@@ -92,7 +92,7 @@ TEST(SingleComponentView, RawData) {
     ASSERT_EQ(cview.size(), 0u);
 }
 
-TEST(SingleComponentView, Invalid) {
+TEST(SingleComponentView, LazyTypeFromConstRegistry) {
     entt::registry registry{};
     auto eview = std::as_const(registry).view<const empty_type>();
     auto cview = std::as_const(registry).view<const int>();
@@ -101,34 +101,21 @@ TEST(SingleComponentView, Invalid) {
     registry.emplace<empty_type>(entity);
     registry.emplace<int>(entity);
 
-    ASSERT_FALSE(cview);
-    ASSERT_FALSE(eview);
+    ASSERT_TRUE(cview);
+    ASSERT_TRUE(eview);
 
-    ASSERT_TRUE(cview.empty());
-    ASSERT_EQ(eview.size(), 0u);
+    ASSERT_NE(cview.raw(), nullptr);
+    ASSERT_NE(eview.data(), nullptr);
 
-    ASSERT_EQ(cview.raw(), nullptr);
-    ASSERT_EQ(eview.data(), nullptr);
+    ASSERT_FALSE(cview.empty());
+    ASSERT_EQ(eview.size(), 1u);
+    ASSERT_TRUE(cview.contains(entity));
 
-    ASSERT_EQ(cview.begin(), cview.end());
-    ASSERT_EQ(eview.rbegin(), eview.rend());
-
-    ASSERT_FALSE(cview.contains(entity));
-    ASSERT_EQ(eview.find(entity), eview.end());
-    ASSERT_EQ(cview.front(), entt::entity{entt::null});
-    ASSERT_EQ(eview.back(), entt::entity{entt::null});
-
-    cview.each([](const auto, const auto &) { FAIL(); });
-    cview.each([](const auto &) { FAIL(); });
-
-    eview.each([](const auto) { FAIL(); });
-    eview.each([]() { FAIL(); });
-
-    for([[maybe_unused]] auto all: cview.each()) { FAIL(); }
-    for(auto first = cview.each().rbegin(), last = cview.each().rend(); first != last; ++first) { FAIL(); }
-
-    for([[maybe_unused]] auto entt: eview.each()) { FAIL(); }
-    for(auto first = eview.each().rbegin(), last = eview.each().rend(); first != last; ++first) { FAIL(); }
+    ASSERT_NE(cview.begin(), cview.end());
+    ASSERT_NE(eview.rbegin(), eview.rend());
+    ASSERT_NE(eview.find(entity), eview.end());
+    ASSERT_EQ(cview.front(), entity);
+    ASSERT_EQ(eview.back(), entity);
 }
 
 TEST(SingleComponentView, ElementAccess) {
@@ -431,7 +418,7 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
-TEST(MultiComponentView, Invalid) {
+TEST(MultiComponentView, LazyTypesFromConstRegistry) {
     entt::registry registry{};
     auto view = std::as_const(registry).view<const empty_type, const int>();
 
@@ -439,22 +426,34 @@ TEST(MultiComponentView, Invalid) {
     registry.emplace<empty_type>(entity);
     registry.emplace<int>(entity);
 
-    ASSERT_FALSE(view);
+    ASSERT_TRUE(view);
 
-    ASSERT_EQ(view.size_hint(), 0u);
+    ASSERT_EQ(view.size_hint(), 1u);
+    ASSERT_TRUE(view.contains(entity));
 
-    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_NE(view.begin(), view.end());
+    ASSERT_NE(view.find(entity), view.end());
+    ASSERT_EQ(view.front(), entity);
+    ASSERT_EQ(view.back(), entity);
+}
 
-    ASSERT_FALSE(view.contains(entity));
-    ASSERT_EQ(view.find(entity), view.end());
-    ASSERT_EQ(view.front(), entt::entity{entt::null});
-    ASSERT_EQ(view.back(), entt::entity{entt::null});
+TEST(MultiComponentView, LazyExcludedTypeFromConstRegistry) {
+    entt::registry registry;
 
-    view.each([](const auto, const auto &) { FAIL(); });
-    view.each([](const auto &) { FAIL(); });
+    auto entity = registry.create();
+    registry.emplace<int>(entity);
 
-    for([[maybe_unused]] auto all: view.each()) { FAIL(); }
-    for(auto first = view.each().rbegin(), last = view.each().rend(); first != last; ++first) { FAIL(); }
+    auto view = std::as_const(registry).view<const int>(entt::exclude<char>);
+
+    ASSERT_TRUE(view);
+
+    ASSERT_EQ(view.size_hint(), 1u);
+    ASSERT_TRUE(view.contains(entity));
+
+    ASSERT_NE(view.begin(), view.end());
+    ASSERT_NE(view.find(entity), view.end());
+    ASSERT_EQ(view.front(), entity);
+    ASSERT_EQ(view.back(), entity);
 }
 
 TEST(MultiComponentView, Iterator) {
