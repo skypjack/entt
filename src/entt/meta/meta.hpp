@@ -174,7 +174,7 @@ class meta_any {
                 } else if constexpr(!std::is_same_v<element_type, void>) {
                     if constexpr(std::is_reference_v<decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()))>) {
                         auto &&obj = adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from));
-                        *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::reference_wrapper{obj}} : meta_any{std::cref(obj)});
+                        *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::ref(obj)} : meta_any{std::cref(obj)});
                     } else {
                         *static_cast<meta_any *>(to) = adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from));
                     }
@@ -603,7 +603,7 @@ struct meta_handle {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
             any = value.as_ref();
         } else {
-            any = std::reference_wrapper{value};
+            any = std::ref(value);
         }
     }
 
@@ -1642,7 +1642,7 @@ class meta_sequence_container::meta_iterator {
             break;
         case operation::DEREF:
             if constexpr(std::is_lvalue_reference_v<typename std::iterator_traits<It>::reference>) {
-                *static_cast<meta_any *>(to) = std::reference_wrapper{*any_cast<const It &>(from)};
+                *static_cast<meta_any *>(to) = std::ref(*any_cast<const It &>(from));
             } else {
                 *static_cast<meta_any *>(to) = *any_cast<const It &>(from);
             }
@@ -1792,14 +1792,14 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     [[nodiscard]] static meta_any get(any &container, size_type pos) {
         if(auto * const cont = any_cast<Type>(&container); cont) {
             if constexpr(std::is_lvalue_reference_v<typename Type::reference>) {
-                return std::reference_wrapper{traits_type::get(*cont, pos)};
+                return std::ref(traits_type::get(*cont, pos));
             } else {
                 return traits_type::get(*cont, pos);
             }
         }
 
         if constexpr(std::is_lvalue_reference_v<typename Type::const_reference>) {
-            return std::reference_wrapper{traits_type::cget(any_cast<const Type &>(container), pos)};
+            return std::ref(traits_type::cget(any_cast<const Type &>(container), pos));
         } else {
             return traits_type::cget(any_cast<const Type &>(container), pos);
         }
@@ -1921,7 +1921,7 @@ class meta_associative_container::meta_iterator {
             if constexpr(KeyOnly) {
                 static_cast<std::pair<meta_any, meta_any> *>(to)->first = std::cref(*any_cast<const It &>(from));
             } else {
-                *static_cast<std::pair<meta_any, meta_any> *>(to) = std::make_pair<meta_any, meta_any>(std::cref(any_cast<const It &>(from)->first), std::reference_wrapper{any_cast<const It &>(from)->second});
+                *static_cast<std::pair<meta_any, meta_any> *>(to) = std::make_pair<meta_any, meta_any>(std::cref(any_cast<const It &>(from)->first), std::ref(any_cast<const It &>(from)->second));
             }
             break;
         }
