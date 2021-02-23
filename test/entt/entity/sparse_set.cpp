@@ -35,6 +35,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.index(entt::entity{42}), 0u);
     ASSERT_EQ(set.at(0u), entt::entity{42});
     ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(set[0u], entt::entity{42});
 
     set.remove(entt::entity{42});
 
@@ -53,6 +54,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.index(entt::entity{42}), 0u);
     ASSERT_EQ(set.at(0u), entt::entity{42});
     ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(set[0u], entt::entity{42});
 
     ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
     ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
@@ -69,6 +71,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(other.index(entt::entity{42}), 0u);
     ASSERT_EQ(other.at(0u), entt::entity{42});
     ASSERT_EQ(other.at(1u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other[0u], entt::entity{42});
 
     other.clear();
 

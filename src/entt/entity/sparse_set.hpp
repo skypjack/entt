@@ -379,12 +379,22 @@ public:
     }
 
     /**
-     * @brief Returns the entity that occupies a given position in the storage.
+     * @brief Returns the entity at specified location, with bounds checking.
      * @param pos The position for which to return the entity.
-     * @return The entity that occupies the given position in the storage.
+     * @return The entity at specified location if any, a null entity otherwise.
      */
     [[nodiscard]] entity_type at(const size_type pos) const {
         return pos < packed.size() ? packed[pos] : null;
+    }
+
+    /**
+     * @brief Returns the entity at specified location, without bounds checking.
+     * @param pos The position for which to return the entity.
+     * @return The entity at specified location.
+     */
+    [[nodiscard]] entity_type operator[](const size_type pos) const {
+        ENTT_ASSERT(pos < packed.size());
+        return packed[pos];
     }
 
     /**

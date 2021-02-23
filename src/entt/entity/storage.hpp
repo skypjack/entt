@@ -651,7 +651,8 @@ class sigh_storage_mixin final: public Type {
      */
     void swap_and_pop(const std::size_t pos, void *ud) final {
         ENTT_ASSERT(ud != nullptr);
-        destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), this->data()[pos]);
+        const auto entity = basic_sparse_set<typename Type::entity_type>::operator[](pos);
+        destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entity);
         Type::swap_and_pop(pos, ud);
     }
 
