@@ -21,8 +21,10 @@
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
-#   define ENTT_PAGE_SIZE 16384
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
+#   define ENTT_PAGE_SIZE 4096
 #endif
 
 

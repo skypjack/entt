@@ -85,34 +85,34 @@ TEST(SparseSet, Functionalities) {
 
 TEST(SparseSet, Pagination) {
     entt::sparse_set set;
-    constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(entt::entity);
+    constexpr auto page_size = ENTT_PAGE_SIZE;
 
     ASSERT_EQ(set.extent(), 0u);
 
-    set.emplace(entt::entity{entt_per_page-1});
+    set.emplace(entt::entity{page_size-1});
 
-    ASSERT_EQ(set.extent(), entt_per_page);
-    ASSERT_TRUE(set.contains(entt::entity{entt_per_page-1}));
+    ASSERT_EQ(set.extent(), page_size);
+    ASSERT_TRUE(set.contains(entt::entity{page_size-1}));
 
-    set.emplace(entt::entity{entt_per_page});
+    set.emplace(entt::entity{page_size});
 
-    ASSERT_EQ(set.extent(), 2 * entt_per_page);
-    ASSERT_TRUE(set.contains(entt::entity{entt_per_page-1}));
-    ASSERT_TRUE(set.contains(entt::entity{entt_per_page}));
-    ASSERT_FALSE(set.contains(entt::entity{entt_per_page+1}));
+    ASSERT_EQ(set.extent(), 2 * page_size);
+    ASSERT_TRUE(set.contains(entt::entity{page_size-1}));
+    ASSERT_TRUE(set.contains(entt::entity{page_size}));
+    ASSERT_FALSE(set.contains(entt::entity{page_size+1}));
 
-    set.remove(entt::entity{entt_per_page-1});
+    set.remove(entt::entity{page_size-1});
 
-    ASSERT_EQ(set.extent(), 2 * entt_per_page);
-    ASSERT_FALSE(set.contains(entt::entity{entt_per_page-1}));
-    ASSERT_TRUE(set.contains(entt::entity{entt_per_page}));
+    ASSERT_EQ(set.extent(), 2 * page_size);
+    ASSERT_FALSE(set.contains(entt::entity{page_size-1}));
+    ASSERT_TRUE(set.contains(entt::entity{page_size}));
 
     set.shrink_to_fit();
-    set.remove(entt::entity{entt_per_page});
+    set.remove(entt::entity{page_size});
 
-    ASSERT_EQ(set.extent(), 2 * entt_per_page);
-    ASSERT_FALSE(set.contains(entt::entity{entt_per_page-1}));
-    ASSERT_FALSE(set.contains(entt::entity{entt_per_page}));
+    ASSERT_EQ(set.extent(), 2 * page_size);
+    ASSERT_FALSE(set.contains(entt::entity{page_size-1}));
+    ASSERT_FALSE(set.contains(entt::entity{page_size}));
 
     set.shrink_to_fit();
 

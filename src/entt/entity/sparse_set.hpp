@@ -41,8 +41,7 @@ namespace entt {
  */
 template<typename Entity>
 class basic_sparse_set {
-    static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
-    static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(Entity);
+    static constexpr auto page_size = ENTT_PAGE_SIZE;
 
     using traits_type = entt_traits<Entity>;
     using page_type = std::unique_ptr<Entity[]>;
@@ -150,11 +149,11 @@ class basic_sparse_set {
     };
 
     [[nodiscard]] auto page(const Entity entt) const ENTT_NOEXCEPT {
-        return size_type{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
+        return size_type{(to_integral(entt) & traits_type::entity_mask) / page_size};
     }
 
     [[nodiscard]] auto offset(const Entity entt) const ENTT_NOEXCEPT {
-        return size_type{to_integral(entt) & (entt_per_page - 1)};
+        return size_type{to_integral(entt) & (page_size - 1)};
     }
 
     [[nodiscard]] page_type & assure(const std::size_t pos) {
@@ -163,9 +162,9 @@ class basic_sparse_set {
         }
 
         if(!sparse[pos]) {
-            sparse[pos].reset(new entity_type[entt_per_page]);
+            sparse[pos].reset(new entity_type[page_size]);
             // null is safe in all cases for our purposes
-            for(auto *first = sparse[pos].get(), *last = first + entt_per_page; first != last; ++first) {
+            for(auto *first = sparse[pos].get(), *last = first + page_size; first != last; ++first) {
                 *first = null;
             }
         }
@@ -245,7 +244,7 @@ public:
      * @return Extent of the sparse set.
      */
     [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
-        return sparse.size() * entt_per_page;
+        return sparse.size() * page_size;
     }
 
     /**
