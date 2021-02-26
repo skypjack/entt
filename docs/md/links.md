@@ -108,6 +108,8 @@ I hope this list can grow much more in the future:
     Box Generator.
   * [Lina Engine](https://github.com/inanevin/LinaEngine): an open-source,
     modular, tiny and fast C++ game engine, aimed to develop 3D desktop games.
+  * [Spike](https://github.com/FahimFuad/Spike): a powerful game engine which
+    can run on a toaster.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
