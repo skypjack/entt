@@ -22,7 +22,7 @@ struct PolyStorage: entt::type_list_cat_t<
 
     template<typename Base>
     struct type: entt::Storage<Entity>::template type<Base> {
-        static constexpr auto base = std::tuple_size_v<typename entt::poly_vtable<entt::Storage<Entity>>::type>;
+        static constexpr auto base = decltype(as_type_list(std::declval<entt::Storage<Entity>>()))::size;
 
         void remove(entt::basic_registry<Entity> &owner, const entity_type *first, const entity_type *last) {
             entt::poly_call<base + 0>(*this, first, last, &owner);

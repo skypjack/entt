@@ -44,25 +44,26 @@ struct poly_inspector {
 /**
  * @brief Static virtual table factory.
  * @tparam Concept Concept descriptor.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
  */
-template<typename Concept>
+template<typename Concept, std::size_t Len>
 class poly_vtable {
     using inspector = typename Concept::template type<poly_inspector>;
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(inspector &, Args...)) -> Ret(*)(any &, Args...);
+    static auto vtable_entry(Ret(*)(inspector &, Args...)) -> Ret(*)(basic_any<Len> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(const inspector &, Args...)) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(*)(const inspector &, Args...)) -> Ret(*)(const basic_any<Len> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(Args...)) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(*)(Args...)) -> Ret(*)(const basic_any<Len> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(inspector:: *)(Args...)) -> Ret(*)(any &, Args...);
+    static auto vtable_entry(Ret(inspector:: *)(Args...)) -> Ret(*)(basic_any<Len> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(inspector:: *)(Args...) const) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(inspector:: *)(Args...) const) -> Ret(*)(const basic_any<Len> &, Args...);
 
     template<auto... Candidate>
     static auto make_vtable(value_list<Candidate...>)
@@ -178,7 +179,7 @@ class poly: private Concept::template type<poly_base<poly<Concept, Len>>> {
     /*! @brief A poly base is allowed to snoop into a poly object. */
     friend struct poly_base<poly>;
 
-    using vtable_type = typename poly_vtable<Concept>::type;
+    using vtable_type = typename poly_vtable<Concept, Len>::type;
 
 public:
     /*! @brief Concept type. */
@@ -199,7 +200,7 @@ public:
     template<typename Type, typename... Args>
     explicit poly(std::in_place_type_t<Type>, Args &&... args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
+          vtable{poly_vtable<Concept, Len>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
     {}
 
     /**
@@ -278,7 +279,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
         storage.template emplace<Type>(std::forward<Args>(args)...);
-        vtable = poly_vtable<Concept>::template instance<Type>();
+        vtable = poly_vtable<Concept, Len>::template instance<Type>();
     }
 
     /*! @brief Destroys contained object */

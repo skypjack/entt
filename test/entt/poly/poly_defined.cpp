@@ -227,4 +227,9 @@ TEST(PolyDefined, SBOVsZeroedSBOSize) {
     entt::poly<Defined, 0u> same = std::move(dyn);
 
     ASSERT_EQ(valid, same.data());
+
+    // everything works as expected
+    same->incr();
+
+    ASSERT_EQ(same->get(), 1);
 }
