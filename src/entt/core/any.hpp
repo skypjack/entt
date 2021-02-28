@@ -348,8 +348,8 @@ template<std::size_t Len>
 
 /**
  * @brief Performs type-safe access to the contained object.
- * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Type Type to which conversion is required.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @param data Target any object.
  * @return The element converted to the requested type.
  */
