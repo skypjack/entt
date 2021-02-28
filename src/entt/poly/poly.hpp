@@ -11,6 +11,7 @@
 #include "../core/any.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {
@@ -174,7 +175,7 @@ decltype(auto) poly_call(Poly &&self, Args &&... args) {
  * @tparam Concept Concept descriptor.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  */
-template<typename Concept, std::size_t Len = sizeof(double[2])>
+template<typename Concept, std::size_t Len>
 class poly: private Concept::template type<poly_base<poly<Concept, Len>>> {
     /*! @brief A poly base is allowed to snoop into a poly object. */
     friend struct poly_base<poly>;
