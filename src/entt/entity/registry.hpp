@@ -146,14 +146,6 @@ class basic_registry {
         available = entity_type{entt};
     }
 
-    void rebind_pools() ENTT_NOEXCEPT {
-        for(auto &&pdata: pools) {
-            if(pdata.pool) {
-                pdata.pool->payload(this);
-            }
-        }
-    }
-
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
