@@ -582,10 +582,6 @@ class basic_view<Entity, exclude_t<>, Component> final {
         class iterable_view_iterator {
             friend class iterable_view;
 
-            iterable_view_iterator() ENTT_NOEXCEPT
-                : iterable_view_iterator{It{}...}
-            {}
-
             template<typename... Discard>
             iterable_view_iterator(It... from, Discard...) ENTT_NOEXCEPT
                 : it{from...}
@@ -623,8 +619,8 @@ class basic_view<Entity, exclude_t<>, Component> final {
             std::tuple<It...> it;
         };
 
-        iterable_view(storage_type * const ref)
-            : pool{ref}
+        iterable_view(storage_type &ref)
+            : pool{&ref}
         {}
 
     public:
@@ -640,19 +636,19 @@ class basic_view<Entity, exclude_t<>, Component> final {
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return pool ? iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()} : iterator{};
+            return iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()};
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return pool ? iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()} : iterator{};
+            return iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()};
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return pool ? reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()} : reverse_iterator{};
+            return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()};
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return pool ? reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()} : reverse_iterator{};
+            return reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()};
         }
 
     private:
@@ -921,7 +917,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        return iterable_view{pool};
+        return iterable_view{*pool};
     }
 
 private:
