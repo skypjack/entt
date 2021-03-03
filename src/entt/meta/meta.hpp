@@ -623,10 +623,7 @@ struct meta_handle {
         return &any;
     }
 
-    /**
-     * @brief Access operator for accessing the contained opaque object.
-     * @return A meta any that shares a reference to an unmanaged object.
-     */
+    /*! @copydoc operator-> */
     [[nodiscard]] const meta_any * operator->() const {
         return &any;
     }
