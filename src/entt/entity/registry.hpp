@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <functional>
 #include <iterator>
 #include <memory>
 #include <tuple>
@@ -114,7 +113,7 @@ class basic_registry {
 
         if(auto &&pdata = pools[index]; !pdata.pool) {
             pdata.pool.reset(new storage_type<Component>());
-            pdata.poly = std::ref(*static_cast<storage_type<Component> *>(pdata.pool.get()));
+            pdata.poly.emplace<storage_type<Component> &>(*static_cast<storage_type<Component> *>(pdata.pool.get()));
         }
 
         return static_cast<storage_type<Component> *>(pools[index].pool.get());
