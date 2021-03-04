@@ -1536,6 +1536,7 @@ public:
         node->id = {};
         node->ctor = node->def_ctor;
         node->dtor = nullptr;
+        node->next = nullptr;
     }
 
 private:

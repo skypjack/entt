@@ -11,7 +11,6 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
-#include "adl_pointer.hpp"
 #include "type_traits.hpp"
 
 
@@ -248,8 +247,8 @@ public:
 };
 
 
-template<typename... Type>
-struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> {};
+template<typename Type>
+struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>> {};
 
 
 }
