@@ -160,8 +160,8 @@ class meta_factory<Type> {
     }
 
     template<typename Node>
-    bool exists(const id_type id, const Node *node) ENTT_NOEXCEPT {
-        return node && (node->id == id || exists(id, node->next));
+    Node * find(const id_type id, Node *node) ENTT_NOEXCEPT {
+        return (!node || node->id == id) ? node : find(id, node->next);
     }
 
 public:
@@ -173,7 +173,7 @@ public:
     auto type(const id_type id = type_hash<Type>::value()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!exists(id, *internal::meta_context::global()));
+        ENTT_ASSERT(!find(id, *internal::meta_context::global()));
         ENTT_ASSERT(!exists(node, *internal::meta_context::global()));
         node->id = id;
         node->next = *internal::meta_context::global();
@@ -204,9 +204,10 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->base));
-        node.next = type->base;
-        type->base = &node;
+        if(!exists(&node, type->base)) {
+            node.next = type->base;
+            type->base = &node;
+        }
 
         return meta_factory<Type>{};
     }
@@ -234,9 +235,10 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->conv));
-        node.next = type->conv;
-        type->conv = &node;
+        if(!exists(&node, type->conv)) {
+            node.next = type->conv;
+            type->conv = &node;
+        }
 
         return meta_factory<Type>{};
     }
@@ -267,9 +269,10 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->conv));
-        node.next = type->conv;
-        type->conv = &node;
+        if(!exists(&node, type->conv)) {
+            node.next = type->conv;
+            type->conv = &node;
+        }
 
         return meta_factory<Type>{};
     }
@@ -306,9 +309,10 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->ctor));
-        node.next = type->ctor;
-        type->ctor = &node;
+        if(!exists(&node, type->ctor)) {
+            node.next = type->ctor;
+            type->ctor = &node;
+        }
 
         return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
@@ -341,9 +345,10 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->ctor));
-        node.next = type->ctor;
-        type->ctor = &node;
+        if(!exists(&node, type->ctor)) {
+            node.next = type->ctor;
+            type->ctor = &node;
+        }
 
         return meta_factory<Type, Type(Args...)>{&node.prop};
     }
@@ -413,7 +418,7 @@ public:
                 &meta_getter<Type, Data, Policy>
             };
 
-            ENTT_ASSERT(!exists(id, type->data));
+            ENTT_ASSERT(!find(id, type->data));
             ENTT_ASSERT(!exists(&node, type->data));
             node.id = id;
             node.next = type->data;
@@ -460,7 +465,7 @@ public:
             &meta_getter<Type, Getter, Policy>
         };
 
-        ENTT_ASSERT(!exists(id, type->data));
+        ENTT_ASSERT(!find(id, type->data));
         ENTT_ASSERT(!exists(&node, type->data));
         node.id = id;
         node.next = type->data;
