@@ -1520,9 +1520,9 @@ public:
      * registry, a null pointer otherwise.
      */
     template<typename Type>
-    [[nodiscard]] const Type * try_ctx() const {
+    [[nodiscard]] Type * try_ctx() const {
         auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        return it == vars.cend() ? nullptr : any_cast<const Type>(&*it);
+        return it == vars.cend() ? nullptr : any_cast<Type>(&*it);
     }
 
     /*! @copydoc try_ctx */
@@ -1543,9 +1543,9 @@ public:
      * @return A valid reference to the object in the context of the registry.
      */
     template<typename Type>
-    [[nodiscard]] const Type & ctx() const {
+    [[nodiscard]] Type & ctx() const {
         auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        return (ENTT_ASSERT(it != vars.cend()), any_cast<const Type &>(*it));
+        return (ENTT_ASSERT(it != vars.cend()), any_cast<Type &>(*it));
     }
 
     /*! @copydoc ctx */
