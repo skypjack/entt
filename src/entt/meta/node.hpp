@@ -1,24 +1,30 @@
-#ifndef ENTT_META_INTERNAL_HPP
-#define ENTT_META_INTERNAL_HPP
+#ifndef ENTT_META_NODE_HPP
+#define ENTT_META_NODE_HPP
 
 
+#include <array>
 #include <cstddef>
-#include <functional>
-#include <iterator>
 #include <type_traits>
 #include <utility>
-#include "../core/attribute.h"
 #include "../config/config.h"
+#include "../core/attribute.h"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "adl_pointer.hpp"
 #include "type_traits.hpp"
 
 
 namespace entt {
 
 
+/*! @brief Utility class to disambiguate class templates. */
+template<template<typename...> typename>
+struct meta_class_template_tag {};
+
+
 class meta_any;
+class meta_type;
 struct meta_handle;
 
 
@@ -62,8 +68,8 @@ struct meta_ctor_node {
     meta_type_node * const parent;
     meta_ctor_node * next;
     meta_prop_node * prop;
-    const size_type size;
-    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
+    const size_type arity;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_any * const);
 };
 
@@ -73,6 +79,7 @@ struct meta_data_node {
     meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
+    const bool is_const;
     const bool is_static;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
     bool(* const set)(meta_handle, meta_any);
@@ -86,12 +93,21 @@ struct meta_func_node {
     meta_type_node * const parent;
     meta_func_node * next;
     meta_prop_node * prop;
-    const size_type size;
+    const size_type arity;
     const bool is_const;
     const bool is_static;
     meta_type_node *(* const ret)() ENTT_NOEXCEPT;
-    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any *);
+};
+
+
+struct meta_template_info {
+    using size_type = std::size_t;
+    const bool is_template_specialization;
+    const size_type arity;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
 };
 
 
@@ -116,97 +132,35 @@ struct meta_type_node {
     const bool is_pointer_like;
     const bool is_sequence_container;
     const bool is_associative_container;
+    const meta_template_info template_info;
     const size_type rank;
-    size_type(* const extent)(size_type);
+    size_type(* const extent)(const size_type) ENTT_NOEXCEPT ;
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
+    meta_ctor_node * const def_ctor;
+    meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
-    meta_ctor_node *ctor{nullptr};
     meta_data_node *data{nullptr};
     meta_func_node *func{nullptr};
     void(* dtor)(void *){nullptr};
 };
 
 
-template<typename Node>
-class meta_range {
-    struct range_iterator {
-        using difference_type = std::ptrdiff_t;
-        using value_type = Node;
-        using pointer = value_type *;
-        using reference = value_type &;
-        using iterator_category = std::forward_iterator_tag;
-
-        range_iterator() ENTT_NOEXCEPT = default;
-
-        range_iterator(Node *head) ENTT_NOEXCEPT
-            : node{head}
-        {}
-
-        range_iterator & operator++() ENTT_NOEXCEPT {
-            return node = node->next, *this;
-        }
-
-        range_iterator operator++(int) ENTT_NOEXCEPT {
-            range_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
-            return other.node == node;
-        }
-
-        [[nodiscard]] bool operator!=(const range_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            return node;
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return *operator->();
-        }
-
-    private:
-        Node *node{nullptr};
-    };
-
-public:
-    using iterator = range_iterator;
-
-    meta_range() ENTT_NOEXCEPT = default;
-
-    meta_range(Node *head)
-        : node{head}
-    {}
-
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{node};
-    }
-
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{};
-    }
-
-private:
-    Node *node{nullptr};
-};
-
-
-template<auto Member, typename Op>
-auto find_if(const Op &op, const meta_type_node *node)
+template<auto Member, typename Op, typename Node>
+auto meta_visit(const Op &op, const Node *node)
 -> std::decay_t<decltype(node->*Member)> {
-    for(auto &&curr: meta_range{node->*Member}) {
-        if(op(&curr)) {
-            return &curr;
+    for(auto *curr = node->*Member; curr; curr = curr->next) {
+        if(op(curr)) {
+            return curr;
         }
     }
 
-    for(auto &&curr: meta_range{node->base}) {
-        if(auto *ret = find_if<Member>(op, curr.type()); ret) {
-            return ret;
+    if constexpr(std::is_same_v<Node, meta_type_node>) {
+        for(auto *curr = node->base; curr; curr = curr->next) {
+            if(auto *ret = meta_visit<Member>(op, curr->type()); ret) {
+                return ret;
+            }
         }
     }
 
@@ -219,10 +173,43 @@ class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
     template<std::size_t... Index>
-    [[nodiscard]] static auto extent(meta_type_node::size_type dim, std::index_sequence<Index...>) {
+    [[nodiscard]] static auto extent(const meta_type_node::size_type dim, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         meta_type_node::size_type ext{};
         ((ext = (dim == Index ? std::extent_v<Type, Index> : ext)), ...);
         return ext;
+    }
+
+    [[nodiscard]] static meta_ctor_node * meta_default_constructor([[maybe_unused]] meta_type_node *type) ENTT_NOEXCEPT {
+        if constexpr(std::is_default_constructible_v<Type>) {
+            static meta_ctor_node node{
+                type,
+                nullptr,
+                nullptr,
+                0u,
+                nullptr,
+                [](meta_any * const) { return meta_any{std::in_place_type<Type>}; }
+            };
+
+            return &node;
+        } else {
+            return nullptr;
+        }
+    }
+
+    template<template<typename...> typename Clazz, typename... Args>
+    [[nodiscard]] static meta_template_info template_info(type_identity<Clazz<Args...>>) ENTT_NOEXCEPT {
+        return {
+            true,
+            sizeof...(Args),
+            &meta_node<meta_class_template_tag<Clazz>>::resolve,
+            [](const std::size_t index) ENTT_NOEXCEPT {
+                return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_node<std::remove_cv_t<std::remove_reference_t<Args>>>::resolve()...}}[index];
+            }
+        };
+    }
+
+    [[nodiscard]] static meta_template_info template_info(...) ENTT_NOEXCEPT {
+        return { false, 0u, nullptr, nullptr };
     }
 
 public:
@@ -247,12 +234,13 @@ public:
             is_meta_pointer_like_v<Type>,
             has_meta_sequence_container_traits_v<Type>,
             has_meta_associative_container_traits_v<Type>,
+            template_info(type_identity<Type>{}),
             std::rank_v<Type>,
-            [](meta_type_node::size_type dim) {
-                return extent(dim, std::make_index_sequence<std::rank_v<Type>>{});
-            },
+            [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
             &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
-            &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve
+            &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_extent_t<Type>>>>::resolve,
+            meta_default_constructor(&node),
+            meta_default_constructor(&node)
         };
 
         return &node;

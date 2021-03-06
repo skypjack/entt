@@ -10,12 +10,14 @@ TEST(TypeSeq, Functionalities) {
     ASSERT_NE(entt::type_seq<int>::value(), entt::type_seq<char>::value());
     ASSERT_NE(entt::type_seq<int>::value(), entt::type_seq<int &&>::value());
     ASSERT_NE(entt::type_seq<int &>::value(), entt::type_seq<const int &>::value());
+    ASSERT_EQ(static_cast<entt::id_type>(entt::type_seq<int>{}), entt::type_seq<int>::value());
 }
 
 TEST(TypeHash, Functionalities) {
     ASSERT_NE(entt::type_hash<int>::value(), entt::type_hash<const int>::value());
     ASSERT_NE(entt::type_hash<int>::value(), entt::type_hash<char>::value());
     ASSERT_EQ(entt::type_hash<int>::value(), entt::type_hash<int>::value());
+    ASSERT_EQ(static_cast<entt::id_type>(entt::type_hash<int>{}), entt::type_hash<int>::value());
 }
 
 TEST(TypeName, Functionalities) {
@@ -27,6 +29,8 @@ TEST(TypeName, Functionalities) {
 
     ASSERT_TRUE(((entt::type_name<entt::type_list<entt::type_list<int, char>, double>>::value()) == std::string_view{"entt::type_list<entt::type_list<int, char>, double>"})
         || ((entt::type_name<entt::type_list<entt::type_list<int, char>, double>>::value()) == std::string_view{"struct entt::type_list<struct entt::type_list<int,char>,double>"}));
+
+    ASSERT_EQ(static_cast<std::string_view>(entt::type_name<int>{}), entt::type_name<int>::value());
 }
 
 TEST(TypeInfo, Functionalities) {

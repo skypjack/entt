@@ -1,9 +1,15 @@
 #include <tuple>
 #include <type_traits>
+#include <unordered_map>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
+
+struct not_comparable {
+    bool operator==(const not_comparable &) const = delete;
+};
 
 TEST(TypeTraits, SizeOf) {
     static_assert(entt::size_of_v<void> == 0u);
@@ -58,6 +64,12 @@ TEST(TypeTraits, TypeList) {
     static_assert(std::is_same_v<entt::type_list_element_t<0u, type>, int>);
     static_assert(std::is_same_v<entt::type_list_element_t<1u, type>, char>);
     static_assert(std::is_same_v<entt::type_list_element_t<0u, other>, double>);
+
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<float, bool>>, entt::type_list<int, char, double>>);
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<int, char, double>>, entt::type_list<>>);
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<int, char>>, entt::type_list<double>>);
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<char, double>>, entt::type_list<int>>);
+    static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<char>>, entt::type_list<int, double>>);
 }
 
 TEST(TypeTraits, ValueList) {
@@ -79,6 +91,17 @@ TEST(TypeTraits, ValueList) {
 
 TEST(TypeTraits, IsEqualityComparable) {
     static_assert(entt::is_equality_comparable_v<int>);
+    static_assert(entt::is_equality_comparable_v<std::vector<int>>);
+    static_assert(entt::is_equality_comparable_v<std::vector<std::vector<int>>>);
+    static_assert(entt::is_equality_comparable_v<std::unordered_map<int, int>>);
+    static_assert(entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, char>>>);
+
+    static_assert(!entt::is_equality_comparable_v<not_comparable>);
+    static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::vector<std::vector<not_comparable>>>);
+    static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>);
+
     static_assert(!entt::is_equality_comparable_v<void>);
 }
 
@@ -94,6 +117,11 @@ TEST(TypeTraits, IsApplicable) {
 TEST(TypeTraits, IsComplete) {
     static_assert(entt::is_complete_v<int>);
     static_assert(!entt::is_complete_v<void>);
+}
+
+TEST(TypeTraits, IsStdHashable) {
+    static_assert(entt::is_std_hashable_v<int>);
+    static_assert(!entt::is_std_hashable_v<not_comparable>);
 }
 
 TEST(TypeTraits, ConstnessAs) {

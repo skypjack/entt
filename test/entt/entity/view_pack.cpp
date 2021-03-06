@@ -290,7 +290,7 @@ TEST(ViewPack, ShortestPool) {
 
         for(const auto entt: pack) {
             ASSERT_EQ(entt::to_integral(entt), ++next);
-            ASSERT_TRUE((registry.has<int, char>(entt)));
+            ASSERT_TRUE((registry.all_of<int, char>(entt)));
         }
     }
 
@@ -355,7 +355,7 @@ TEST(ViewPack, LongestPool) {
 
         for(const auto entt: pack) {
             ASSERT_EQ(entt::to_integral(entt), next--);
-            ASSERT_TRUE((registry.has<int, char>(entt)));
+            ASSERT_TRUE((registry.all_of<int, char>(entt)));
         }
     }
 

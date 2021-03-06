@@ -26,8 +26,6 @@ TEST(SparseSet, Functionalities) {
 
     set.emplace(entt::entity{42});
 
-    ASSERT_EQ(set.index(entt::entity{42}), 0u);
-
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
     ASSERT_NE(std::as_const(set).begin(), std::as_const(set).end());
@@ -35,6 +33,9 @@ TEST(SparseSet, Functionalities) {
     ASSERT_FALSE(set.contains(entt::entity{0}));
     ASSERT_TRUE(set.contains(entt::entity{42}));
     ASSERT_EQ(set.index(entt::entity{42}), 0u);
+    ASSERT_EQ(set.at(0u), entt::entity{42});
+    ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(set[0u], entt::entity{42});
 
     set.remove(entt::entity{42});
 
@@ -44,11 +45,16 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.contains(entt::entity{0}));
     ASSERT_FALSE(set.contains(entt::entity{42}));
+    ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
 
     set.emplace(entt::entity{42});
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.index(entt::entity{42}), 0u);
+    ASSERT_EQ(set.at(0u), entt::entity{42});
+    ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(set[0u], entt::entity{42});
 
     ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
     ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
@@ -59,8 +65,13 @@ TEST(SparseSet, Functionalities) {
     other = std::move(set);
 
     ASSERT_TRUE(set.empty());
+    ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
+
     ASSERT_FALSE(other.empty());
     ASSERT_EQ(other.index(entt::entity{42}), 0u);
+    ASSERT_EQ(other.at(0u), entt::entity{42});
+    ASSERT_EQ(other.at(1u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other[0u], entt::entity{42});
 
     other.clear();
 
@@ -74,34 +85,34 @@ TEST(SparseSet, Functionalities) {
 
 TEST(SparseSet, Pagination) {
     entt::sparse_set set;
-    constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(entt::entity);
+    constexpr auto page_size = ENTT_PAGE_SIZE;
 
     ASSERT_EQ(set.extent(), 0u);
 
-    set.emplace(entt::entity{entt_per_page-1});
+    set.emplace(entt::entity{page_size-1});
 
-    ASSERT_EQ(set.extent(), entt_per_page);
-    ASSERT_TRUE(set.contains(entt::entity{entt_per_page-1}));
+    ASSERT_EQ(set.extent(), page_size);
+    ASSERT_TRUE(set.contains(entt::entity{page_size-1}));
 
-    set.emplace(entt::entity{entt_per_page});
+    set.emplace(entt::entity{page_size});
 
-    ASSERT_EQ(set.extent(), 2 * entt_per_page);
-    ASSERT_TRUE(set.contains(entt::entity{entt_per_page-1}));
-    ASSERT_TRUE(set.contains(entt::entity{entt_per_page}));
-    ASSERT_FALSE(set.contains(entt::entity{entt_per_page+1}));
+    ASSERT_EQ(set.extent(), 2 * page_size);
+    ASSERT_TRUE(set.contains(entt::entity{page_size-1}));
+    ASSERT_TRUE(set.contains(entt::entity{page_size}));
+    ASSERT_FALSE(set.contains(entt::entity{page_size+1}));
 
-    set.remove(entt::entity{entt_per_page-1});
+    set.remove(entt::entity{page_size-1});
 
-    ASSERT_EQ(set.extent(), 2 * entt_per_page);
-    ASSERT_FALSE(set.contains(entt::entity{entt_per_page-1}));
-    ASSERT_TRUE(set.contains(entt::entity{entt_per_page}));
+    ASSERT_EQ(set.extent(), 2 * page_size);
+    ASSERT_FALSE(set.contains(entt::entity{page_size-1}));
+    ASSERT_TRUE(set.contains(entt::entity{page_size}));
 
     set.shrink_to_fit();
-    set.remove(entt::entity{entt_per_page});
+    set.remove(entt::entity{page_size});
 
-    ASSERT_EQ(set.extent(), 2 * entt_per_page);
-    ASSERT_FALSE(set.contains(entt::entity{entt_per_page-1}));
-    ASSERT_FALSE(set.contains(entt::entity{entt_per_page}));
+    ASSERT_EQ(set.extent(), 2 * page_size);
+    ASSERT_FALSE(set.contains(entt::entity{page_size-1}));
+    ASSERT_FALSE(set.contains(entt::entity{page_size}));
 
     set.shrink_to_fit();
 
@@ -152,7 +163,7 @@ TEST(SparseSet, Remove) {
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
-    set.remove(set.rbegin(), set.rend());
+    set.remove(set.begin(), set.end());
 
     ASSERT_TRUE(set.empty());
 
@@ -169,6 +180,20 @@ TEST(SparseSet, Remove) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(*set.begin(), entt::entity{42});
+}
+
+TEST(SparseSet, Clear) {
+    entt::sparse_set set;
+
+    set.emplace(entt::entity{3});
+    set.emplace(entt::entity{42});
+    set.emplace(entt::entity{9});
+
+    ASSERT_FALSE(set.empty());
+
+    set.clear();
+
+    ASSERT_TRUE(set.empty());
 }
 
 TEST(SparseSet, Iterator) {

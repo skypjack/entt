@@ -94,7 +94,7 @@ TEST_F(MetaFunc, Functionalities) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "f2"_hs);
-    ASSERT_EQ(func.size(), 2u);
+    ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<int>());
@@ -135,7 +135,7 @@ TEST_F(MetaFunc, Const) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "f1"_hs);
-    ASSERT_EQ(func.size(), 1u);
+    ASSERT_EQ(func.arity(), 1u);
     ASSERT_TRUE(func.is_const());
     ASSERT_FALSE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<int>());
@@ -174,7 +174,7 @@ TEST_F(MetaFunc, RetVoid) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "g"_hs);
-    ASSERT_EQ(func.size(), 1u);
+    ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<void>());
@@ -211,7 +211,7 @@ TEST_F(MetaFunc, Static) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "h"_hs);
-    ASSERT_EQ(func.size(), 1u);
+    ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<int>());
@@ -249,7 +249,7 @@ TEST_F(MetaFunc, StaticRetVoid) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "k"_hs);
-    ASSERT_EQ(func.size(), 1u);
+    ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<void>());
@@ -316,7 +316,7 @@ TEST_F(MetaFunc, ArgsByRef) {
     int value = 4;
 
     ASSERT_EQ(func.invoke({}, std::ref(value)).cast<int>(), 8);
-    ASSERT_EQ(func.invoke({}, as_ref(any)).cast<int>(), 6);
+    ASSERT_EQ(func.invoke({}, any.as_ref()).cast<int>(), 6);
     ASSERT_EQ(any.cast<int>(), 6);
     ASSERT_EQ(value, 8);
 }
@@ -332,7 +332,7 @@ TEST_F(MetaFunc, ArgsByConstRef) {
     ASSERT_TRUE(func.invoke(instance, std::cref(value)));
     ASSERT_EQ(func_t::value, 9);
 
-    ASSERT_TRUE(func.invoke(instance, as_ref(std::as_const(any))));
+    ASSERT_TRUE(func.invoke(instance, std::as_const(any).as_ref()));
     ASSERT_EQ(func_t::value, 4);
 }
 
@@ -404,7 +404,7 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "emplace"_hs);
-    ASSERT_EQ(func.size(), 2u);
+    ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<void>());
@@ -415,9 +415,9 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    ASSERT_FALSE(registry.has<func_t>(entity));
+    ASSERT_FALSE(registry.all_of<func_t>(entity));
 
     func.invoke({}, std::ref(registry), entity);
 
-    ASSERT_TRUE(registry.has<func_t>(entity));
+    ASSERT_TRUE(registry.all_of<func_t>(entity));
 }

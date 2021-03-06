@@ -6,35 +6,27 @@
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
 * update documentation for meta, it contains less than half of the actual feature
-
-* custom pools example:
-  - lockless fully concurrent ro/rw pool with free lists
-  - multi instance
-  - tables
-  - enable/disable component
-  - spatial query
-  - runtime types pool
-  - off-line/off-memory/remote
-  - ...
+* custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
-* HP: test, enable warnings for unused variables
+* HP: any_vector for context variables
+* HP: make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
+* HP: remove storage category and get_as_tuple, make storage classes return tuple (+ view generator detect shared storage in future)?
+* HP: review registry::get, registry::try_get
+* HP: weak reference wrapper example with custom storage
+* HP: merge view and view pack
+* HP: invalid view auto-refresh
+* HP: paginate pools
 * HP: headless (sparse set only) view
-* HP: pass the registry to pools, basic poly storage should have only component member
-* HP: make view pack work also with groups, make packs input iterator only, add view adapter for external sources
 * HP: write documentation for custom storages and views!!
-* HP: any/poly: configurable sbo size, compile-time policies like sbo-required.
 * HP: registry: use a poly object for pools, no more pool_data type.
 * HP: make runtime views use opaque storage and therefore return also elements.
-* HP: poly: support for data members
-* add exclude-only views to combine with packs
+* HP: add exclude-only views to combine with packs
+* HP: entity-aware observer, add observer functions aside observer class
+* HP: any and the like: remove constructor that accepts reference wrapper, allow only in-place T&?
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
-* view pack: plain function as an alias for operator|, reverse iterators, rbegin and rend
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
-* add observer functions aside observer class
 * snapshot: support for range-based archives
-* update snapshot documentation to describe alternatives
 * page size 0 -> page less mode
 * add example: 64 bit ids with 32 bits reserved for users' purposes
 * add meta dynamic cast (search base for T in parent, we have the meta type already)
-* make meta base/conv node work with storage/any and deprecate/remove meta_base, meta_conv, ...

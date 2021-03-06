@@ -71,23 +71,23 @@ TEST(Snapshot, Full) {
     entt::snapshot_loader{destination}.entities(input).component<position, timer, relationship, entt::tag<"empty"_hs>>(input);
 
     ASSERT_TRUE(destination.valid(e0));
-    ASSERT_TRUE(destination.has<position>(e0));
+    ASSERT_TRUE(destination.all_of<position>(e0));
     ASSERT_EQ(destination.get<position>(e0).x, 16.f);
     ASSERT_EQ(destination.get<position>(e0).y, 16.f);
 
     ASSERT_TRUE(destination.valid(e1));
-    ASSERT_TRUE(destination.has<position>(e1));
+    ASSERT_TRUE(destination.all_of<position>(e1));
     ASSERT_EQ(destination.get<position>(e1).x, .8f);
     ASSERT_EQ(destination.get<position>(e1).y, .0f);
-    ASSERT_TRUE(destination.has<relationship>(e1));
+    ASSERT_TRUE(destination.all_of<relationship>(e1));
     ASSERT_EQ(destination.get<relationship>(e1).parent, e0);
 
     ASSERT_FALSE(destination.valid(e2));
     ASSERT_EQ(destination.current(e2), v2);
 
     ASSERT_TRUE(destination.valid(e3));
-    ASSERT_TRUE(destination.has<timer>(e3));
-    ASSERT_TRUE(destination.has<entt::tag<"empty"_hs>>(e3));
+    ASSERT_TRUE(destination.all_of<timer>(e3));
+    ASSERT_TRUE(destination.all_of<entt::tag<"empty"_hs>>(e3));
     ASSERT_EQ(destination.get<timer>(e3).duration, 1000);
     ASSERT_EQ(destination.get<timer>(e3).elapsed, 0);
 }
@@ -144,10 +144,10 @@ TEST(Snapshot, Continuous) {
     auto l0 = loader.map(e0);
 
     ASSERT_TRUE(destination.valid(l0));
-    ASSERT_TRUE(destination.has<position>(l0));
+    ASSERT_TRUE(destination.all_of<position>(l0));
     ASSERT_EQ(destination.get<position>(l0).x, 0.f);
     ASSERT_EQ(destination.get<position>(l0).y, 0.f);
-    ASSERT_TRUE(destination.has<relationship>(l0));
+    ASSERT_TRUE(destination.all_of<relationship>(l0));
     ASSERT_EQ(destination.get<relationship>(l0).parent, l0);
 
     ASSERT_FALSE(destination.valid(e1));
@@ -156,10 +156,10 @@ TEST(Snapshot, Continuous) {
     auto l1 = loader.map(e1);
 
     ASSERT_TRUE(destination.valid(l1));
-    ASSERT_TRUE(destination.has<position>(l1));
+    ASSERT_TRUE(destination.all_of<position>(l1));
     ASSERT_EQ(destination.get<position>(l1).x, 1.f);
     ASSERT_EQ(destination.get<position>(l1).y, 1.f);
-    ASSERT_TRUE(destination.has<relationship>(l1));
+    ASSERT_TRUE(destination.all_of<relationship>(l1));
     ASSERT_EQ(destination.get<relationship>(l1).parent, l0);
 
     ASSERT_FALSE(destination.valid(e2));
@@ -168,10 +168,10 @@ TEST(Snapshot, Continuous) {
     auto l2 = loader.map(e2);
 
     ASSERT_TRUE(destination.valid(l2));
-    ASSERT_TRUE(destination.has<position>(l2));
+    ASSERT_TRUE(destination.all_of<position>(l2));
     ASSERT_EQ(destination.get<position>(l2).x, .2f);
     ASSERT_EQ(destination.get<position>(l2).y, .2f);
-    ASSERT_TRUE(destination.has<relationship>(l2));
+    ASSERT_TRUE(destination.all_of<relationship>(l2));
     ASSERT_EQ(destination.get<relationship>(l2).parent, l0);
 
     ASSERT_FALSE(destination.valid(e3));
@@ -180,10 +180,10 @@ TEST(Snapshot, Continuous) {
     auto l3 = loader.map(e3);
 
     ASSERT_TRUE(destination.valid(l3));
-    ASSERT_TRUE(destination.has<timer>(l3));
+    ASSERT_TRUE(destination.all_of<timer>(l3));
     ASSERT_EQ(destination.get<timer>(l3).duration, 1000);
     ASSERT_EQ(destination.get<timer>(l3).elapsed, 0);
-    ASSERT_TRUE(destination.has<relationship>(l3));
+    ASSERT_TRUE(destination.all_of<relationship>(l3));
     ASSERT_EQ(destination.get<relationship>(l3).parent, l2);
-    ASSERT_TRUE(destination.has<entt::tag<"empty"_hs>>(l3));
+    ASSERT_TRUE(destination.all_of<entt::tag<"empty"_hs>>(l3));
 }

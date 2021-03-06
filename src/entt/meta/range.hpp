@@ -4,7 +4,6 @@
 
 #include <cstddef>
 #include <iterator>
-#include "internal.hpp"
 
 
 namespace entt {
@@ -12,9 +11,10 @@ namespace entt {
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
- * @tparam Type Type of meta objects iterated.
+ * @tparam Type Type of meta objects returned.
+ * @tparam Node Type of meta nodes iterated.
  */
-template<typename Type>
+template<typename Type, typename Node = typename Type::node_type>
 class meta_range {
     struct range_iterator {
         using difference_type = std::ptrdiff_t;
@@ -22,7 +22,7 @@ class meta_range {
         using pointer = void;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
-        using node_type = typename Type::node_type;
+        using node_type = Node;
 
         range_iterator() ENTT_NOEXCEPT = default;
 
@@ -31,16 +31,16 @@ class meta_range {
         {}
 
         range_iterator & operator++() ENTT_NOEXCEPT {
-            return ++it, *this;
+            return (it = it->next), *this;
         }
 
         range_iterator operator++(int) ENTT_NOEXCEPT {
             range_iterator orig = *this;
-            return it++, orig;
+            return ++(*this), orig;
         }
 
         [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return it.operator->();
+            return it;
         }
 
         [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
@@ -52,12 +52,12 @@ class meta_range {
         }
 
     private:
-        typename internal::meta_range<node_type>::iterator it{};
+        node_type *it{};
     };
 
 public:
     /*! @brief Node type. */
-    using node_type = typename Type::node_type;
+    using node_type = Node;
     /*! @brief Input iterator type. */
     using iterator = range_iterator;
 

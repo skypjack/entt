@@ -25,7 +25,7 @@ add_custom_target(
         md/locator.md
         md/meta.md
         md/process.md
-        md/references.md
+        md/reference.md
         md/resource.md
         md/signal.md
         md/unreal.md

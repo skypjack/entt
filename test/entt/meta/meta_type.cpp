@@ -19,16 +19,17 @@ Type get(Type &prop) {
     return prop;
 }
 
-struct base_t { char value{'c'}; };
-struct derived_t: base_t {};
+struct base_t { base_t(): value{'c'} {}; char value; };
+struct derived_t: base_t { derived_t(): base_t{} {} };
 
 struct abstract_t {
     virtual ~abstract_t() = default;
-    virtual void func(int) = 0;
+    virtual void func(int) {}
 };
 
 struct concrete_t: base_t, abstract_t {
     void func(int v) override {
+        abstract_t::func(v);
         value = v;
     }
 
@@ -68,7 +69,7 @@ struct overloaded_func_t {
 
     float f(int a, float b) {
         value = a;
-        return e(b);
+        return static_cast<float>(e(static_cast<int>(b)));
     }
 
     int g(int v) const {
@@ -125,7 +126,7 @@ struct MetaType: ::testing::Test {
         entt::meta<clazz_t>()
             .type("clazz"_hs)
                 .prop(property_t::value, 42)
-            .ctor().ctor<const base_t &, int>()
+            .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
             .func<&clazz_t::func>("func"_hs);
@@ -135,6 +136,7 @@ struct MetaType: ::testing::Test {
 TEST_F(MetaType, Resolve) {
     using namespace entt::literals;
 
+    ASSERT_EQ(entt::resolve(entt::type_info{}), entt::meta_type{});
     ASSERT_EQ(entt::resolve<double>(), entt::resolve("double"_hs));
     ASSERT_EQ(entt::resolve<double>(), entt::resolve(entt::type_id<double>()));
 
@@ -258,29 +260,13 @@ TEST_F(MetaType, Base) {
     bool iterate = false;
 
     for(auto curr: type.base()) {
-        ASSERT_EQ(curr.type(), entt::resolve<base_t>());
+        ASSERT_EQ(curr, entt::resolve<base_t>());
         iterate = true;
     }
 
     ASSERT_TRUE(iterate);
-    ASSERT_EQ(type.base("base"_hs).type(), entt::resolve<base_t>());
-}
-
-TEST_F(MetaType, Conv) {
-    auto type = entt::resolve<double>();
-    bool iterate = false;
-
-    for(auto curr: type.conv()) {
-        ASSERT_EQ(curr.type(), entt::resolve<int>());
-        iterate = true;
-    }
-
-    ASSERT_TRUE(iterate);
-
-    auto conv = type.conv<int>();
-
-    ASSERT_EQ(conv.type(), entt::resolve<int>());
-    ASSERT_FALSE(type.conv<char>());
+    ASSERT_EQ(type.base("base"_hs), entt::resolve<base_t>());
+    ASSERT_FALSE(type.base("esabe"_hs));
 }
 
 TEST_F(MetaType, Ctor) {
@@ -291,10 +277,17 @@ TEST_F(MetaType, Ctor) {
         ++counter;
     }
 
+    // we only register a constructor, the default one is implicitly generated for us
     ASSERT_EQ(counter, 2);
     ASSERT_TRUE((type.ctor<>()));
     ASSERT_TRUE((type.ctor<const base_t &, int>()));
     ASSERT_TRUE((type.ctor<const derived_t &, double>()));
+
+    // use the implicitly generated default constructor
+    auto any = type.construct();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<clazz_t>());
 }
 
 TEST_F(MetaType, Data) {
@@ -447,6 +440,12 @@ TEST_F(MetaType, Reset) {
     using namespace entt::literals;
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
+    ASSERT_EQ(entt::resolve<clazz_t>().id(), "clazz"_hs);
+    ASSERT_TRUE(entt::resolve<clazz_t>().prop(property_t::value));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("value"_hs));
+    ASSERT_TRUE((entt::resolve<clazz_t>().ctor<const base_t &, int>()));
+    // implicitly generated default constructor
+    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 
     entt::resolve("clazz"_hs).reset();
 
@@ -454,10 +453,15 @@ TEST_F(MetaType, Reset) {
     ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
+    ASSERT_FALSE((entt::resolve<clazz_t>().ctor<const base_t &, int>()));
+    // the implicitly generated default constructor is there after a reset
+    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 
     entt::meta<clazz_t>().type("clazz"_hs);
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
+    // the implicitly generated default constructor must be there in any case
+    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 }
 
 TEST_F(MetaType, AbstractClass) {
@@ -575,7 +579,8 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
 
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
-    ASSERT_FALSE(entt::resolve<clazz_t>().ctor<>());
+    // the implicitly generated default constructor is there after a reset
+    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_FALSE(entt::resolve<clazz_t>().func("member"_hs));
 
@@ -593,4 +598,17 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::value));
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::random));
+}
+
+TEST_F(MetaType, ClassTemplate) {
+    ASSERT_FALSE(entt::resolve<int>().is_template_specialization());
+    ASSERT_EQ(entt::resolve<int>().template_arity(), 0u);
+    ASSERT_EQ(entt::resolve<int>().template_type(), entt::meta_type{});
+    ASSERT_EQ(entt::resolve<int>().template_arg(0u), entt::meta_type{});
+
+    ASSERT_TRUE(entt::resolve<std::shared_ptr<int>>().is_template_specialization());
+    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arity(), 1u);
+    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_type(), entt::resolve<entt::meta_class_template_tag<std::shared_ptr>>());
+    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(0u), entt::resolve<int>());
+    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(1u), entt::meta_type{});
 }

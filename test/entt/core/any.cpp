@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <unordered_map>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/any.hpp>
 
@@ -23,6 +25,16 @@ struct not_comparable {
 };
 
 struct not_hashable {};
+
+template<auto Sz>
+struct not_copyable {
+    not_copyable(): payload{} {}
+    not_copyable(const not_copyable &) = delete;
+    not_copyable(not_copyable &&) = default;
+    not_copyable & operator=(const not_copyable &) = delete;
+    not_copyable & operator=(not_copyable &&) = default;
+    double payload[Sz];
+};
 
 TEST(Any, SBO) {
     entt::any any{'c'};
@@ -60,7 +72,7 @@ TEST(Any, SBOInPlaceTypeConstruction) {
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<int>(any), 42);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -87,7 +99,7 @@ TEST(Any, SBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &value);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -114,7 +126,7 @@ TEST(Any, SBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -193,7 +205,7 @@ TEST(Any, NoSBOInPlaceTypeConstruction) {
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -220,7 +232,7 @@ TEST(Any, NoSBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &instance);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -247,7 +259,7 @@ TEST(Any, NoSBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    auto other = as_ref(any);
+    auto other = any.as_ref();
 
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -290,7 +302,6 @@ TEST(Any, NoSBOMoveConstruction) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(other);
-    ASSERT_FALSE(any.type());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
@@ -305,7 +316,6 @@ TEST(Any, NoSBOMoveAssignment) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(other);
-    ASSERT_FALSE(any.type());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
@@ -453,6 +463,18 @@ TEST(Any, EmplaceVoid) {
     ASSERT_FALSE(any);
     ASSERT_FALSE(any.type());
  }
+
+TEST(Any, Reset) {
+    entt::any any{42};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::type_id<int>());
+
+    any.reset();
+
+    ASSERT_FALSE(any);
+    ASSERT_EQ(any.type(), entt::type_info{});
+}
 
 TEST(Any, SBOSwap) {
     entt::any lhs{'c'};
@@ -654,8 +676,8 @@ TEST(Any, NoSBOWithVoidSwap) {
 
 TEST(Any, AsRef) {
     entt::any any{42};
-    auto ref = as_ref(any);
-    auto cref = as_ref(std::as_const(any));
+    auto ref = any.as_ref();
+    auto cref = std::as_const(any).as_ref();
 
     ASSERT_EQ(entt::any_cast<int>(&any), any.data());
     ASSERT_EQ(entt::any_cast<int>(&ref), any.data());
@@ -677,7 +699,7 @@ TEST(Any, AsRef) {
     ASSERT_EQ(entt::any_cast<const int &>(any), 42);
     ASSERT_EQ(entt::any_cast<int &>(ref), 42);
     ASSERT_EQ(entt::any_cast<const int &>(ref), 42);
-    ASSERT_DEATH(entt::any_cast<int &>(cref), ".*");
+    ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
     ASSERT_EQ(entt::any_cast<const int &>(cref), 42);
 
     entt::any_cast<int &>(any) = 3;
@@ -691,16 +713,16 @@ TEST(Any, AsRef) {
     ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
     ASSERT_EQ(entt::any_cast<int>(&cref), any.data());
 
-    ref = as_ref(ref);
-    cref = as_ref(std::as_const(cref));
+    ref = ref.as_ref();
+    cref = std::as_const(cref).as_ref();
 
     ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
     ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
     ASSERT_EQ(entt::any_cast<const int>(&ref), any.data());
     ASSERT_EQ(entt::any_cast<const int>(&cref), any.data());
 
-    ASSERT_DEATH(entt::any_cast<int &>(ref), ".*");
-    ASSERT_DEATH(entt::any_cast<int &>(cref), ".*");
+    ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
 
     ASSERT_EQ(entt::any_cast<const int &>(ref), 3);
     ASSERT_EQ(entt::any_cast<const int &>(cref), 3);
@@ -739,15 +761,21 @@ TEST(Any, Comparable) {
 }
 
 TEST(Any, NotComparable) {
-    entt::any any{not_comparable{}};
+    auto test = [](const auto &instance) {
+        entt::any any{std::cref(instance)};
 
-    ASSERT_EQ(any, any);
-    ASSERT_NE(any, entt::any{not_comparable{}});
-    ASSERT_NE(entt::any{}, any);
+        ASSERT_EQ(any, any);
+        ASSERT_NE(any, entt::any{instance});
+        ASSERT_NE(entt::any{}, any);
 
-    ASSERT_TRUE(any == any);
-    ASSERT_FALSE(any == entt::any{not_comparable{}});
-    ASSERT_TRUE(entt::any{} != any);
+        ASSERT_TRUE(any == any);
+        ASSERT_FALSE(any == entt::any{instance});
+        ASSERT_TRUE(entt::any{} != any);
+    };
+
+    test(not_comparable{});
+    test(std::unordered_map<int, not_comparable>{});
+    test(std::vector<not_comparable>{});
 }
 
 TEST(Any, CompareVoid) {
@@ -805,5 +833,86 @@ TEST(Any, AnyCast) {
     ASSERT_EQ(*entt::any_cast<int>(&cany), 42);
     ASSERT_EQ(entt::any_cast<int &>(any), 42);
     ASSERT_EQ(entt::any_cast<const int &>(cany), 42);
-    ASSERT_EQ(entt::any_cast<int>(42), 42);
+    ASSERT_EQ(entt::any_cast<int>(entt::any{42}), 42);
+}
+
+TEST(Any, NotCopyableType) {
+    auto test = [](entt::any any) {
+        entt::any copy{any};
+
+        ASSERT_TRUE(any);
+        ASSERT_FALSE(copy);
+
+        copy = any;
+
+        ASSERT_TRUE(any);
+        ASSERT_FALSE(copy);
+    };
+
+    test(entt::any{std::in_place_type<not_copyable<1>>});
+    test(entt::any{std::in_place_type<not_copyable<4>>});
+}
+
+TEST(Any, Array) {
+    entt::any any{std::in_place_type<int[1]>};
+    entt::any copy{any};
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(copy);
+
+    ASSERT_EQ(any.type(), entt::type_id<int[1]>());
+    ASSERT_NE(entt::any_cast<int[1]>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<int[2]>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<int *>(&any), nullptr);
+
+    entt::any_cast<int(&)[1]>(any)[0] = 42;
+
+    ASSERT_EQ(entt::any_cast<const int(&)[1]>(std::as_const(any))[0], 42);
+}
+
+TEST(Any, CopyMoveReference) {
+    int value{};
+
+    auto test = [&](auto ref) {
+        value = 3;
+
+        entt::any any{ref};
+        entt::any move = std::move(any);
+        entt::any copy = move;
+
+        ASSERT_FALSE(any);
+        ASSERT_TRUE(move);
+        ASSERT_TRUE(copy);
+
+        ASSERT_EQ(move.type(), entt::type_id<int>());
+        ASSERT_EQ(copy.type(), entt::type_id<int>());
+
+        ASSERT_EQ(std::as_const(move).data(), &value);
+        ASSERT_NE(std::as_const(copy).data(), &value);
+
+        ASSERT_EQ(entt::any_cast<int>(move), 3);
+        ASSERT_EQ(entt::any_cast<int>(copy), 3);
+
+        value = 42;
+
+        ASSERT_EQ(entt::any_cast<const int &>(move), 42);
+        ASSERT_EQ(entt::any_cast<const int &>(copy), 3);
+    };
+
+    test(std::ref(value));
+    test(std::cref(value));
+}
+
+TEST(Any, SBOVsZeroedSBOSize) {
+    entt::any sbo{42};
+    const auto *broken = sbo.data();
+    entt::any other = std::move(sbo);
+
+    ASSERT_NE(broken, other.data());
+
+    entt::basic_any<0u> dyn{42};
+    const auto *valid = dyn.data();
+    entt::basic_any<0u> same = std::move(dyn);
+
+    ASSERT_EQ(valid, same.data());
 }

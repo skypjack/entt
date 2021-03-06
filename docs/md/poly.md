@@ -13,6 +13,7 @@
   * [Fullfill a concept](#fullfill-a-concept)
 * [Inheritance](#inheritance)
 * [Static polymorphism in the wild](#static-polymorphism-in-the-wild)
+* [Configurable storage size](#configurable-storage-size)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -236,7 +237,7 @@ For a deduced concept, inheritance is achieved in a few steps:
 ```cpp
 struct DrawableAndErasable: entt::type_list<> {
     template<typename Base>
-    struct type: typename Drawable::type<Base> {
+    struct type: typename Drawable::template type<Base> {
         static constexpr auto base = std::tuple_size_v<typename entt::poly_vtable<Drawable>::type>;
         void erase() { entt::poly_call<base + 0>(*this); }
     };
@@ -302,11 +303,11 @@ struct square {
 
 // ...
 
-drawable d{circle{}};
-d->draw();
+drawable instance{circle{}};
+instance->draw();
 
-d = square{};
-d->draw();
+instance = square{};
+instance->draw();
 ```
 
 The `poly` class template offers a wide range of constructors, from the default
@@ -316,23 +317,42 @@ Among others, there is a constructor that allows users to wrap unmanaged objects
 in a `poly` instance (either const or non-const ones):
 
 ```cpp
-circle c;
-drawable d{std::ref(c)};
+circle shape;
+drawable instance{std::ref(shape)};
 ```
 
 Similarly, it's possible to create non-owning copies of `poly` from an existing
 object:
 
 ```cpp
-drawable other = as_ref(d);
+drawable other = instance.as_ref();
 ```
 
 In both cases, although the interface of the `poly` object doesn't change, it
 won't construct any element or take care of destroying the referenced objects.
 
 Note also how the underlying concept is accessed via a call to `operator->` and
-not directly as `d.draw()`.<br/>
+not directly as `instance.draw()`.<br/>
 This allows users to decouple the API of the wrapper from that of the concept.
-Therefore, where `d.data()` will invoke the `data` member function of the poly
-object, `d->data()` will map directly to the functionality exposed by the
-underlying concept.
+Therefore, where `instance.data()` will invoke the `data` member function of the
+poly object, `instance->data()` will map directly to the functionality exposed
+by the underlying concept.
+
+# Configurable storage size
+
+Under the hood, the `poly` class template makes use of `entt::any`. Therefore,
+it can take advantage of the possibility of defining at compile-time the size of
+the storage suitable for the small buffer optimization.<br/>
+To do this, it will be sufficient to provide the desired size as a second
+template parameter:
+
+```cpp
+entt::poly<Drawable, sizeof(double[4])>
+```
+
+The default value is `sizeof(double[2])`, which seems like a good compromise
+between a buffer that is too large and one unable to hold anything larger than
+an integer.<br/>
+It's worth noting that providing a size of 0 (which is an accepted value in all
+respects) will force the system to dynamically allocate the contained objects in
+all cases.

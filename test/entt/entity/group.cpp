@@ -16,7 +16,7 @@ bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
 TEST(NonOwningGroup, Functionalities) {
     entt::registry registry;
     auto group = registry.group(entt::get<int, char>);
-    auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
+    auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
 
     ASSERT_TRUE(group.empty());
 
@@ -79,7 +79,7 @@ TEST(NonOwningGroup, Functionalities) {
 
 TEST(NonOwningGroup, Invalid) {
     entt::registry registry{};
-    auto group = std::as_const(registry).group(entt::get<const empty_type, const int>);
+    auto group = std::as_const(registry).group_if_exists(entt::get<const empty_type, const int>);
 
     const auto entity = registry.create();
     registry.emplace<empty_type>(entity);
@@ -115,7 +115,7 @@ TEST(NonOwningGroup, Invalid) {
 TEST(NonOwningGroup, ElementAccess) {
     entt::registry registry;
     auto group = registry.group(entt::get<int, char>);
-    auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
+    auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
 
     const auto e0 = registry.create();
     registry.emplace<int>(e0);
@@ -177,7 +177,7 @@ TEST(NonOwningGroup, Each) {
     registry.emplace<int>(e1, 1);
     registry.emplace<char>(e1);
 
-    auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
+    auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
     std::size_t cnt = 0;
 
     for(auto first = cgroup.each().rbegin(), last = cgroup.each().rend(); first != last; ++first) {
@@ -487,7 +487,7 @@ TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
 TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
     entt::registry registry;
     const auto group = registry.group(entt::get<int>, entt::exclude<char>);
-    const auto cgroup = std::as_const(registry).group(entt::get<const int>, entt::exclude<char>);
+    const auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int>, entt::exclude<char>);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity);
@@ -591,7 +591,7 @@ TEST(NonOwningGroup, ExtendedGet) {
 TEST(OwningGroup, Functionalities) {
     entt::registry registry;
     auto group = registry.group<int>(entt::get<char>);
-    auto cgroup = std::as_const(registry).group<const int>(entt::get<const char>);
+    auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
 
     ASSERT_TRUE(group.empty());
 
@@ -652,7 +652,7 @@ TEST(OwningGroup, Functionalities) {
 
 TEST(OwningGroup, Invalid) {
     entt::registry registry{};
-    auto group = std::as_const(registry).group<const int>(entt::get<const empty_type>);
+    auto group = std::as_const(registry).group_if_exists<const int>(entt::get<const empty_type>);
 
     const auto entity = registry.create();
     registry.emplace<empty_type>(entity);
@@ -684,7 +684,7 @@ TEST(OwningGroup, Invalid) {
 TEST(OwningGroup, ElementAccess) {
     entt::registry registry;
     auto group = registry.group<int>(entt::get<char>);
-    auto cgroup = std::as_const(registry).group<const int>(entt::get<const char>);
+    auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
 
     const auto e0 = registry.create();
     registry.emplace<int>(e0);
@@ -746,7 +746,7 @@ TEST(OwningGroup, Each) {
     registry.emplace<int>(e1, 1);
     registry.emplace<char>(e1);
 
-    auto cgroup = std::as_const(registry).group<const int>(entt::get<const char>);
+    auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
     std::size_t cnt = 0;
 
     for(auto first = cgroup.each().rbegin(), last = cgroup.each().rend(); first != last; ++first) {
@@ -1160,7 +1160,7 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
 TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
     entt::registry registry;
     const auto group = registry.group<int>(entt::exclude<char>);
-    const auto cgroup = std::as_const(registry).group<const int>(entt::exclude<char>);
+    const auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::exclude<char>);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity);

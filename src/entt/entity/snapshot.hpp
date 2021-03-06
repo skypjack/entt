@@ -42,7 +42,7 @@ class basic_snapshot {
         while(first != last) {
             const auto entt = *(first++);
 
-            if(reg->template has<Component>(entt)) {
+            if(reg->template all_of<Component>(entt)) {
                 std::apply(archive, std::tuple_cat(std::make_tuple(entt), view.get(entt)));
             }
         }
@@ -55,7 +55,7 @@ class basic_snapshot {
 
         while(begin != last) {
             const auto entt = *(begin++);
-            ((reg->template has<Component>(entt) ? ++size[Index] : size[Index]), ...);
+            ((reg->template all_of<Component>(entt) ? ++size[Index] : size[Index]), ...);
         }
 
         (get<Component>(archive, size[Index], first, last), ...);
@@ -117,8 +117,14 @@ public:
      */
     template<typename... Component, typename Archive>
     const basic_snapshot & component(Archive &archive) const {
-        (component<Component>(archive, reg->template data<Component>(), reg->template data<Component>() + reg->template size<Component>()), ...);
-        return *this;
+        if constexpr(sizeof...(Component) == 1u) {
+            const auto view = reg->template view<const Component...>();
+            (component<Component>(archive, view.data(), view.data() + view.size()), ...);
+            return *this;
+        } else {
+            (component<Component>(archive), ...);
+            return *this;
+        }
     }
 
     /**

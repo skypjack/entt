@@ -97,6 +97,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -118,6 +121,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -134,6 +140,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -236,7 +245,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),

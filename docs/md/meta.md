@@ -12,6 +12,7 @@
   * [Enjoy the runtime](#enjoy-the-runtime)
   * [Container support](#container-support)
   * [Pointer-like types](#pointer-like-types)
+  * [Implicitly generated default constructor](#implicitly-generated-default-constructor)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
   * [Properties and meta objects](#properties-and-meta-objects)
@@ -239,10 +240,10 @@ To search for a reflected type there are a few options:
 auto by_type = entt::resolve<my_type>();
 
 // lookup of a reflected type by identifier
-auto by_id = entt::resolve_id("reflected_type"_hs);
+auto by_id = entt::resolve("reflected_type"_hs);
 
-// lookup of a reflected type by type id
-auto by_type_id = entt::resolve_type(entt::type_hash<my_type>::value());
+// lookup of a reflected type by type info
+auto by_type_id = entt::resolve(entt::type_id<my_type>());
 ```
 
 There exits also an overload of the `resolve` function to use to iterate all the
@@ -308,24 +309,8 @@ The meta objects that compose a meta type are accessed in the following ways:
   auto base = entt::resolve<derived_type>().base("base"_hs);
   ```
 
-  The returned type is `meta_base` and may be invalid if there is no meta base
-  object associated with the given identifier.<br/>
-  Meta bases aren't meant to be used directly, even though they are freely
-  accessible. They expose only a few methods to use to know the meta type of the
-  base class and to convert a raw pointer between types.
-
-* _Meta conversion functions_. They are accessed by type:
-
-  ```cpp
-  auto conv = entt::resolve<double>().conv<int>();
-  ```
-
-  The returned type is `meta_conv` and may be invalid if there is no meta
-  conversion function associated with the given type.<br/>
-  The meta conversion functions are as thin as the meta bases and with a very
-  similar interface. The sole difference is that they return a newly created
-  instance wrapped in a `meta_any` object when they convert between different
-  types.
+  The returned type is `meta_type` and may be invalid if there is no meta base
+  object associated with the given identifier.
 
 All the objects thus obtained as well as the meta types can be explicitly
 converted to a boolean value to check if they are valid:
@@ -337,7 +322,7 @@ if(auto func = entt::resolve<my_type>().func("member"_hs); func) {
 ```
 
 Furthermore, all them are also returned by specific overloads that provide the
-caller with iterable objects. As an example:
+caller with iterable ranges of top-level elements. As an example:
 
 ```cpp
 for(auto data = entt::resolve<my_type>().data()) {
@@ -353,12 +338,12 @@ or may not be initialized, depending on whether a suitable constructor has been
 found or not.
 
 There is no object that wraps the destructor of a meta type nor a `destroy`
-member function in its API. The reason is quickly explained: destructors are
-invoked implicitly by `meta_any` behind the scenes and users have not to deal
-with them explicitly. Furthermore, they have no name, cannot be searched and
-wouldn't have member functions to expose anyway.<br/>
-Therefore, exposing destructors would be pointless and would add nothing to the
-library itself.
+member function in its API. Destructors are invoked implicitly by `meta_any`
+behind the scenes and users have not to deal with them explicitly. Furthermore,
+they have no name, cannot be searched and wouldn't have member functions to
+expose anyway.<br/>
+Similarly, conversion functions aren't directly accessible. They are used
+internally by `meta_any` and the meta objects when needed.
 
 Meta types and meta objects in general contain much more than what is said: a
 plethora of functions in addition to those listed whose purposes and uses go
@@ -640,7 +625,8 @@ query the meta type or verify that the returned object is valid. For example,
 invalid instances are returned when the wrapped object isn't a pointer-like
 type.<br/>
 Note that dereferencing a pointer-like object returns an instance of `meta_any`
-which refers to the pointed object and allows users to modify it directly.
+which refers to the pointed object and allows users to modify it directly
+(unless the returned element is const, of course).
 
 In general, _dereferencing_ a pointer-like type boils down to a `*ptr`. However,
 `EnTT` also supports classes that don't offer an `operator*`. In particular:
@@ -656,8 +642,8 @@ In general, _dereferencing_ a pointer-like type boils down to a `*ptr`. However,
   ```
 
 * When not in control of the type's namespace, it's possible to inject into the
-  `entt` namespace a specialization of `adl_meta_pointer_like` class template to
-  bypass the adl lookup as a whole:
+  `entt` namespace a specialization of the `adl_meta_pointer_like` class
+  template to bypass the adl lookup as a whole:
 
   ```cpp
   template<typename Type>
@@ -670,6 +656,39 @@ In general, _dereferencing_ a pointer-like type boils down to a `*ptr`. However,
 
 In all other cases, that is, when dereferencing a pointer works as expected and
 regardless of the pointed type, no user intervention is required.
+
+## Implicitly generated default constructor
+
+In many cases, it's useful to be able to create objects of default constructible
+types through the reflection system, while not having to explicitly register the
+meta type or the default constructor.<br/>
+For example, in the case of primitive types like `int` or `char`, but not just
+them.
+
+For this reason and only for default constructible types, a default constructor
+is automatically defined and associated with their meta types, whether they are
+explicitly or implicitly generated.<br/>
+Therefore, it won't be necessary to do this in order to construct an integer
+from its meta type:
+
+```cpp
+entt::meta<int>().ctor<>();
+```
+
+Instead, just do this:
+
+```cpp
+entt::resolve<int>().construct();
+```
+
+Where the meta type can be for example the one returned from a meta container,
+useful for building keys without knowing or having to register the actual types.
+
+In all cases, when users register custom defaul constructors, they are preferred
+both during searches and when the `construct` member function is invoked.<br/>
+However, the implicitly generated default constructor will always be returned,
+either if one is not explicitly specified or if all constructors are iterated
+for some reason (in this case, it will always be the last element).
 
 ## Policies: the more, the less
 
@@ -693,33 +712,30 @@ There are a few alternatives available at the moment:
 
 * The _as-void_ policy, associated with the type `entt::as_void_t`.<br/>
   Its purpose is to discard the return value of a meta object, whatever it is,
-  thus making it appear as if its type were `void`.<br/>
+  thus making it appear as if its type were `void`:
+  ```cpp
+  entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
+  ```
   If the use with functions is obvious, it must be said that it's also possible
   to use this policy with constructors and data members. In the first case, the
   constructor will be invoked but the returned wrapper will actually be empty.
   In the second case, instead, the property will not be accessible for reading.
-
-  As an example of use:
-
-  ```cpp
-  entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
-  ```
 
 * The _as-ref_ and _as-cref_ policies, associated with the types
   `entt::as_ref_t` and `entt::as_cref_t`.<br/>
   They allow to build wrappers that act as references to unmanaged objects.
   Accessing the object contained in the wrapper for which the _reference_ was
   requested will make it possible to directly access the instance used to
-  initialize the wrapper itself.<br/>
-  These policies work with constructors (for example, when objects are taken
-  from an external container rather than created on demand), data members and
-  functions in general (as long as their return types are lvalue references).
-
-  As an example of use:
-
+  initialize the wrapper itself:
   ```cpp
   entt::meta<my_type>().data<&my_type::data_member, entt::as_ref_t>("member"_hs);
   ```
+  These policies work with constructors (for example, when objects are taken
+  from an external container rather than created on demand), data members and
+  functions in general.<br/>
+  If on the one hand `as_cref_t` always forces the return type to be const,
+  `as_ref_t` _adapts_ to the constness of the passed object and to that of the
+  return type if any.
 
 Some uses are rather trivial, but it's useful to note that there are some less
 obvious corner cases that can in turn be solved with the use of policies.
@@ -744,8 +760,8 @@ Exporting constant values or elements from an enum is as simple as ever:
 
 ```cpp
 entt::meta<my_enum>()
-        .data<my_enum::a_value>("a_value"_hs)
-        .data<my_enum::another_value>("another_value"_hs);
+    .data<my_enum::a_value>("a_value"_hs)
+    .data<my_enum::another_value>("another_value"_hs);
 
 entt::meta<int>().data<2048>("max_int"_hs);
 ```

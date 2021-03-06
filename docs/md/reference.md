@@ -28,10 +28,14 @@ I hope this list can grow much more in the future:
     ECS that uses sparse sets to keep track of entities in systems.
   * [EntityX](https://github.com/alecthomas/entityx): a bitset based ECS that
     uses a single large matrix of components indexed with entities.
+  * [Polypropylene](https://github.com/pmbittner/Polypropylene): a hybrid
+    solution between an ECS and dynamic mixins.
 
 * C#
   * [Entitas](https://github.com/sschmid/Entitas-CSharp): the ECS framework for
     C# and Unity, where _reactive systems_ were invented.
+  * [LeoECS](https://github.com/Leopotam/ecs): simple lightweight C# Entity
+    Component System framework.
   * [Svelto.ECS](https://github.com/sebas77/Svelto.ECS): a very interesting
     platform agnostic and table based ECS framework.
 

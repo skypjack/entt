@@ -13,6 +13,32 @@ namespace entt {
 
 
 /**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
+
+
+/**
  * @brief Identity type trait.
  *
  * Useful to establish non-deduced contexts in template argument deduction
@@ -91,32 +117,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -290,6 +290,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -397,19 +422,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -418,30 +477,6 @@ struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() ==
  */
 template<class Type>
 inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is
- * hashable, false otherwise.
- * @tparam Type Potentially hashable type.
- */
-template <typename Type, typename = void>
-struct is_std_hashable: std::false_type {};
-
-
-/*! @copydoc is_std_hashable */
-template <typename Type>
-struct is_std_hashable<Type, std::void_t<decltype(std::declval<std::hash<Type>>()(std::declval<Type>()))>>
-        : std::true_type
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially hashable type.
- */
-template <typename Type>
-inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
 
 
 /*! @brief Same as std::is_invocable, but with tuples. */
@@ -528,6 +563,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -551,7 +610,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -559,7 +618,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 

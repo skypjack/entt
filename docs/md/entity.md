@@ -40,7 +40,6 @@
     * [Partial-owning groups](#partial-owning-groups)
     * [Non-owning groups](#non-owning-groups)
     * [Nested groups](#nested-groups)
-  * [Invalid views and groups](#invalid-views-and-groups)
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
   * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
@@ -48,6 +47,7 @@
 * [Empty type optimization](#empty-type-optimization)
 * [Multithreading](#multithreading)
   * [Iterators](#iterators)
+  * [Const registry](#const-registry)
 * [Beyond this document](#beyond-this-document)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -284,15 +284,15 @@ if(registry.has<velocity>(entity)) {
 }
 ```
 
-The `has` and `any` member functions may also be useful if in doubt about
+The `all_of` and `any_of` member functions may also be useful if in doubt about
 whether or not an entity has all the components in a set or any of them:
 
 ```cpp
 // true if entity has all the given components
-bool all = registry.has<position, velocity>(entity);
+bool all = registry.all_of<position, velocity>(entity);
 
 // true if entity has at least one of the given components
-bool any = registry.any<position, velocity>(entity);
+bool any = registry.any_of<position, velocity>(entity);
 ```
 
 If the goal is to delete a component from an entity that owns it, the `remove`
@@ -1666,32 +1666,6 @@ restrictive of them. To prevent users from having to remember which of their
 groups is the most restrictive, the registry class offers the `sortable` member
 function to know if a group can be sorted or not.
 
-## Invalid views and groups
-
-Views and groups as returned by a registry are generally valid. However, there
-are some exceptions where an invalid object might be returned.<br/>
-In these cases, they should be renewed as soon as possible. In fact, an invalid
-view or group contains a broken reference to one or more pools and this will
-never be fixed. The view or the group will continue to return no data, even if
-the pool for the pending reference is created in the registry in the meantime.
-
-There is only one case in which an invalid object can be returned, that is when
-the view or the group is created from a constant reference to a registry in
-which the required pools haven't yet been created.<br/>
-Pools are typically created whenever any method is used on a non-const registry.
-This also means that creating views and groups from a non-const registry can
-never result in an invalid object.
-
-It's also perfectly fine to use an invalid view or group, to invoke `each` on
-them or to iterate them like any other object. The only difference from a valid
-view or group is that the invalid ones will always appear as _empty_.<br/>
-In general, when views and groups are created on the fly and used at the same
-time, then discarded immediately afterwards, it doesn't matter whether or not
-they may be invalid. Therefore, this remains the recommended approach.
-
-To know if a view or a group is properly initialized, both can be converted to
-bool explicitly and used in a guard.
-
 ## Types: const, non-const and all in between
 
 The `registry` class offers two overloads when it comes to constructing views
@@ -1878,10 +1852,10 @@ mentioning.
 
 When an empty type is detected, it's not instantiated in any case. Therefore,
 only the entities to which it's assigned are made available.<br/>
-There doesn't exist a way to _iterate_ empty types. Views and groups will never
-return instances of empty types (for example, during a call to `each`) and some
-functions such as `try_get` or the raw access to the list of components aren't
-available for them. Finally, the `sort` functionality accepts only callbacks
+There doesn't exist a way to _get_ empty types from a registry, views and groups
+will never return instances for them (for example, during a call to `each`) and
+some functions such as `try_get` or the raw access to the list of components
+won't be available. Finally, the `sort` functionality will onlyaccepts callbacks
 that require to return entities rather than components:
 
 ```cpp
@@ -1974,6 +1948,28 @@ This may change in the future and the iterators will almost certainly return
 both the entities and a list of references to their components by default sooner
 or later. Multi-pass guarantee won't break in any case and the performance
 should even benefit from it further.
+
+## Const registry
+
+Contrary to what the standard library containers offer, a const registry is
+generally but not completely thread safe.<br/>
+In particular, one (and only one) of its const member functions isn't fully
+thread safe. That is the `view` method.
+
+The reason for this is easy to explain. To avoid requiring types to be
+_announced_ in advance, the registry lazily initializes the storage objects for
+the different components.<br/>
+In most cases, this isn't even necessary. The absence of a storage is itself the
+required information. However, when building a view, all pools must necessarily
+exist. This makes the `view` member function not thread safe even in its const
+overload, unless all pools already exist.
+
+Fortunately, there is also a way to instantiate storage classes early when in
+doubt or when there are special requirements.<br/>
+Calling the `prepare` method is equivalent to _announcing_ the existence of a
+particular storage, to avoid running into problems. For those interested, there
+are also alternative approaches, such as a single threaded tick for the registry
+warm-up, but these are not always applicable.
 
 # Beyond this document
 

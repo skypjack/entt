@@ -41,8 +41,7 @@ namespace entt {
  */
 template<typename Entity>
 class basic_sparse_set {
-    static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
-    static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(Entity);
+    static constexpr auto page_size = ENTT_PAGE_SIZE;
 
     using traits_type = entt_traits<Entity>;
     using page_type = std::unique_ptr<Entity[]>;
@@ -150,11 +149,11 @@ class basic_sparse_set {
     };
 
     [[nodiscard]] auto page(const Entity entt) const ENTT_NOEXCEPT {
-        return size_type{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
+        return size_type{(to_integral(entt) & traits_type::entity_mask) / page_size};
     }
 
     [[nodiscard]] auto offset(const Entity entt) const ENTT_NOEXCEPT {
-        return size_type{to_integral(entt) & (entt_per_page - 1)};
+        return size_type{to_integral(entt) & (page_size - 1)};
     }
 
     [[nodiscard]] page_type & assure(const std::size_t pos) {
@@ -163,9 +162,9 @@ class basic_sparse_set {
         }
 
         if(!sparse[pos]) {
-            sparse[pos].reset(new entity_type[entt_per_page]);
+            sparse[pos].reset(new entity_type[page_size]);
             // null is safe in all cases for our purposes
-            for(auto *first = sparse[pos].get(), *last = first + entt_per_page; first != last; ++first) {
+            for(auto *first = sparse[pos].get(), *last = first + page_size; first != last; ++first) {
                 *first = null;
             }
         }
@@ -173,9 +172,12 @@ class basic_sparse_set {
         return sparse[pos];
     }
 
+protected:
+    /*! @brief Swaps two entities in the internal packed array. */
     virtual void swap_at(const std::size_t, const std::size_t) {}
-    virtual void swap_and_pop(const std::size_t) {}
-    virtual void clear_all() {}
+
+    /*! @brief Attempts to remove an entity from the internal packed array. */
+    virtual void swap_and_pop(const std::size_t, void *) {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -242,7 +244,7 @@ public:
      * @return Extent of the sparse set.
      */
     [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
-        return sparse.size() * entt_per_page;
+        return sparse.size() * page_size;
     }
 
     /**
@@ -376,6 +378,25 @@ public:
     }
 
     /**
+     * @brief Returns the entity at specified location, with bounds checking.
+     * @param pos The position for which to return the entity.
+     * @return The entity at specified location if any, a null entity otherwise.
+     */
+    [[nodiscard]] entity_type at(const size_type pos) const {
+        return pos < packed.size() ? packed[pos] : null;
+    }
+
+    /**
+     * @brief Returns the entity at specified location, without bounds checking.
+     * @param pos The position for which to return the entity.
+     * @return The entity at specified location.
+     */
+    [[nodiscard]] entity_type operator[](const size_type pos) const {
+        ENTT_ASSERT(pos < packed.size());
+        return packed[pos];
+    }
+
+    /**
      * @brief Assigns an entity to a sparse set.
      *
      * @warning
@@ -420,19 +441,23 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid entity identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void remove(const entity_type entt) {
+    void remove(const entity_type entt, void *ud = nullptr) {
         ENTT_ASSERT(contains(entt));
         auto &ref = sparse[page(entt)][offset(entt)];
-        const auto pos = size_type{to_integral(ref)};
-        const auto other = packed.back();
 
+        // last chance to use the entity for derived classes and mixins, if any
+        swap_and_pop(size_type{to_integral(ref)}, ud);
+
+        const auto other = packed.back();
         sparse[page(other)][offset(other)] = ref;
-        packed[pos] = other;
+        // if it looks weird, imagine what the subtle bugs it prevents are
+        ENTT_ASSERT((packed.back() = entt, true));
+        packed[size_type{to_integral(ref)}] = other;
         ref = null;
 
         packed.pop_back();
-        swap_and_pop(pos);
     }
 
     /**
@@ -440,21 +465,17 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     template<typename It>
-    void remove(It first, It last) {
-        if(std::distance(first, last) == std::distance(packed.begin(), packed.end())) {
-            // no validity check, let it be misused
-            clear();
-        } else {
-            for(; first != last; ++first) {
-                remove(*first);
-            }
+    void remove(It first, It last, void *ud = nullptr) {
+        for(; first != last; ++first) {
+            remove(*first, ud);
         }
     }
 
     /**
-     * @brief Swaps two entities in the internal packed array.
+     * @copybrief swap_at
      *
      * For what it's worth, this function affects both the internal sparse array
      * and the internal packed array. Users should not care of that anyway.
@@ -515,11 +536,14 @@ public:
             auto next = index(packed[curr]);
 
             while(curr != next) {
-                swap_at(next, index(packed[next]));
-                sparse[page(packed[curr])][offset(packed[curr])] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
+                const auto idx = index(packed[next]);
+                const auto entt = packed[curr];
+
+                swap_at(next, idx);
+                sparse[page(entt)][offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
 
                 curr = next;
-                next = index(packed[curr]);
+                next = idx;
             }
         }
     }
@@ -575,11 +599,12 @@ public:
         }
     }
 
-    /*! @brief Clears a sparse set. */
-    void clear() ENTT_NOEXCEPT {
-        sparse.clear();
-        packed.clear();
-        clear_all();
+    /**
+     * @brief Clears a sparse set.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    void clear(void *ud = nullptr) ENTT_NOEXCEPT {
+        remove(begin(), end(), ud);
     }
 
 private:

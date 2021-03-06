@@ -14,6 +14,7 @@
   * [Conflicts](#conflicts)
 * [Monostate](#monostate)
 * [Any as in any type](#any-as-in-any-type)
+  * [Small buffer optimization](#small-buffer-optimization)
 * [Type support](#type-support)
   * [Type info](#type-info)
     * [Almost unique identifiers](#almost-unique-identifiers)
@@ -24,6 +25,7 @@
     * [Member class type](#member-class-type)
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
+    * [Type list and value list](#type-list-and-value-list)
 * [Utilities](#utilities)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -174,7 +176,7 @@ In this case, the user defined literal to use to create hashed strings on the
 fly is `_hws`:
 
 ```cpp
-constexpr auto str = "text"_hws;
+constexpr auto str = L"text"_hws;
 ```
 
 Note that the hash type of the `hashed_wstring` is the same of its counterpart.
@@ -288,7 +290,7 @@ object:
 
 ```cpp
 // aliasing constructor
-entt::any ref = as_ref(other);
+entt::any ref = other.as_ref();
 ```
 
 In this case, it doesn't matter if the original container actually holds an
@@ -310,6 +312,25 @@ functions in all respects similar to their most famous counterparts.<br/>
 The only difference is that, in the case of `EnTT`, these won't raise exceptions
 but will only trigger an assert in debug mode, otherwise resulting in undefined
 behavior in case of misuse in release mode.
+
+## Small buffer optimization
+
+The `any` class uses a technique called _small buffer optimization_ to reduce
+the number of allocations where possible.<br/>
+The default reserved size for an instance of `any` is `sizeof(double[2])`.
+However, this is also configurable if needed. In fact, `any` is defined as an
+alias for `basic_any<Len>`, where `Len` is just the size above.<br/>
+Users can easily use a custom size or define their own alias:
+
+```cpp
+using my_any = entt::basic_any<sizeof(double[4])>;
+```
+
+This feature, in addition to allowing the choice of a size that best suits the
+needs of an application, also reserves the possibility of forcing dynamic
+creation of objects during construction.<br/>
+In fact, if the size is 0, `any` will avoid the use of any optimization, in fact
+always dynamically allocating objects (except for aliasing cases).
 
 # Type support
 
@@ -570,6 +591,29 @@ registry.emplace<entt::tag<"enemy"_hs>>(entity);
 
 However, this isn't the only permitted use. Literally any value convertible to
 `id_type` is a good candidate, such as the named constants of an unscoped enum.
+
+### Type list and value list
+
+There is no respectable library where the much desired _type list_ can be
+missing.<br/>
+`EnTT` is no exception and provides (making extensive use of it internally) the
+`type_list` type, in addition to its `value_list` counterpart dedicated to
+non-type template parameters.
+
+Here is a (possibly incomplete) list of the functionalities that come with a
+type list:
+
+* `type_list_element[_t]` to get the N-th element of a type list.
+* `type_list_cast[_t]` and a handy `operator+` to concatenate type lists.
+* `type_list_unique[_t]` to remove duplicate types from a type list.
+* `type_list_contains[_v]` to know if a type list contains a given type.
+* `type_list_diff[_t]` to remove types from type lists.
+
+I'm also pretty sure that more and more utilities will be added over time as
+needs become apparent.<br/>
+Many of these functionalities also exist in their version dedicated to value
+lists. We therefore have `value_list_element[_v]` as well as
+`value_list_cat[_t]`and so on.
 
 # Utilities
 

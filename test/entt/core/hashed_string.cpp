@@ -34,6 +34,16 @@ TEST(HashedString, Functionalities) {
 
     ASSERT_EQ(foo_hs, "foo"_hs);
     ASSERT_NE(bar_hs, "foo"_hs);
+
+    entt::hashed_string empty_hs{};
+
+    ASSERT_EQ(empty_hs, entt::hashed_string{});
+    ASSERT_NE(empty_hs, foo_hs);
+
+    empty_hs = foo_hs;
+
+    ASSERT_NE(empty_hs, entt::hashed_string{});
+    ASSERT_EQ(empty_hs, foo_hs);
 }
 
 TEST(HashedString, Empty) {

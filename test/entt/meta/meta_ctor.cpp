@@ -6,8 +6,8 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct base_t { char value{}; };
-struct derived_t: base_t {};
+struct base_t { base_t(): value{'c'} {} char value; };
+struct derived_t: base_t { derived_t(): base_t{} {} };
 
 struct clazz_t {
     clazz_t(const base_t &other, int iv)
@@ -30,11 +30,13 @@ struct clazz_t {
     char c{};
 };
 
+double double_factory() { return 42.; }
+
 struct MetaCtor: ::testing::Test {
     static void SetUpTestCase() {
         using namespace entt::literals;
 
-        entt::meta<double>().conv<int>();
+        entt::meta<double>().conv<int>().ctor<&double_factory>();
         entt::meta<derived_t>().base<base_t>();
 
         entt::meta<clazz_t>().type("clazz"_hs)
@@ -53,7 +55,7 @@ TEST_F(MetaCtor, Functionalities) {
 
     ASSERT_TRUE(ctor);
     ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
-    ASSERT_EQ(ctor.size(), 2u);
+    ASSERT_EQ(ctor.arity(), 2u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<int>());
     ASSERT_EQ(ctor.arg(1u), entt::resolve<char>());
     ASSERT_FALSE(ctor.arg(2u));
@@ -88,7 +90,7 @@ TEST_F(MetaCtor, Func) {
 
     ASSERT_TRUE(ctor);
     ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
-    ASSERT_EQ(ctor.size(), 1u);
+    ASSERT_EQ(ctor.arity(), 1u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(ctor.arg(1u));
 
@@ -129,7 +131,7 @@ TEST_F(MetaCtor, InvalidArgs) {
 }
 
 TEST_F(MetaCtor, CastAndConvert) {
-    auto any = entt::resolve<clazz_t>().ctor<const base_t &, int>().invoke(derived_t{{'c'}}, 42.);
+    auto any = entt::resolve<clazz_t>().ctor<const base_t &, int>().invoke(derived_t{}, 42.);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
@@ -161,7 +163,7 @@ TEST_F(MetaCtor, FuncInvalidArgs) {
 }
 
 TEST_F(MetaCtor, FuncCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().ctor<base_t, int, int>().invoke(derived_t{{'c'}}, 3., 3);
+    auto any = entt::resolve<clazz_t>().ctor<base_t, int, int>().invoke(derived_t{}, 3., 3);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 9);
@@ -188,7 +190,7 @@ TEST_F(MetaCtor, ExternalMemberFunction) {
 
     ASSERT_TRUE(ctor);
     ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
-    ASSERT_EQ(ctor.size(), 4u);
+    ASSERT_EQ(ctor.arity(), 4u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<entt::registry>());
     ASSERT_EQ(ctor.arg(1u), entt::resolve<entt::entity>());
     ASSERT_EQ(ctor.arg(2u), entt::resolve<int>());
@@ -198,12 +200,65 @@ TEST_F(MetaCtor, ExternalMemberFunction) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    ASSERT_FALSE(registry.has<clazz_t>(entity));
+    ASSERT_FALSE(registry.all_of<clazz_t>(entity));
 
     const auto any = ctor.invoke(std::ref(registry), entity, 3, 'c');
 
     ASSERT_TRUE(any);
-    ASSERT_TRUE(registry.has<clazz_t>(entity));
+    ASSERT_TRUE(registry.all_of<clazz_t>(entity));
     ASSERT_EQ(registry.get<clazz_t>(entity).i, 3);
     ASSERT_EQ(registry.get<clazz_t>(entity).c, 'c');
+}
+
+TEST_F(MetaCtor, ImplicitlyGeneratedDefaultConstructor) {
+    auto type = entt::resolve<int>();
+    int counter{};
+
+    for([[maybe_unused]] auto curr: type.ctor()) {
+        ++counter;
+    }
+
+    // default constructor is implicitly generated
+    ASSERT_EQ(counter, 1);
+    ASSERT_TRUE(type.ctor<>());
+    ASSERT_EQ(type.ctor<>().arity(), 0u);
+    ASSERT_EQ(type.ctor<>().arg(0), entt::meta_type{});
+
+    auto any = type.ctor<>().invoke();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+    ASSERT_EQ(any.cast<int>(), 0);
+}
+
+TEST_F(MetaCtor, OverrideImplicitlyGeneratedDefaultConstructor) {
+    auto type = entt::resolve<double>();
+    int counter{};
+
+    for([[maybe_unused]] auto curr: type.ctor()) {
+        ++counter;
+    }
+
+    // default constructor is implicitly generated
+    ASSERT_EQ(counter, 2);
+    ASSERT_TRUE(type.ctor<>());
+
+    auto any = type.ctor<>().invoke();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<double>());
+    ASSERT_EQ(any.cast<double>(), 42.);
+}
+
+TEST_F(MetaCtor, NonDefaultConstructibleType) {
+    auto type = entt::resolve<clazz_t>();
+    int counter{};
+
+    for([[maybe_unused]] auto curr: type.ctor()) {
+        ++counter;
+    }
+
+    // the implicitly generated default constructor doesn't exist
+    ASSERT_EQ(counter, 5);
+    ASSERT_FALSE(type.ctor<>());
 }
