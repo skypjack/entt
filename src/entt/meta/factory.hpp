@@ -80,7 +80,7 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
         static internal::meta_prop_node node{
             nullptr,
             []() -> meta_any {
-                return std::get<0>(property);
+                return meta_any{std::in_place_type<const Key &>, std::get<0>(property)};
             },
             []() -> meta_any {
                 if constexpr(sizeof...(Value) == 0) {
