@@ -174,10 +174,12 @@ public:
         auto * const node = internal::meta_info<Type>::resolve();
 
         ENTT_ASSERT(!find(id, *internal::meta_context::global()));
-        ENTT_ASSERT(!exists(node, *internal::meta_context::global()));
         node->id = id;
-        node->next = *internal::meta_context::global();
-        *internal::meta_context::global() = node;
+
+        if(!exists(node, *internal::meta_context::global())) {
+            node->next = *internal::meta_context::global();
+            *internal::meta_context::global() = node;
+        }
 
         return meta_factory<Type, Type>{&node->prop};
     }
@@ -419,10 +421,12 @@ public:
             };
 
             ENTT_ASSERT(!find(id, type->data));
-            ENTT_ASSERT(!exists(&node, type->data));
             node.id = id;
-            node.next = type->data;
-            type->data = &node;
+
+            if(!exists(&node, type->data)) {
+                node.next = type->data;
+                type->data = &node;
+            }
 
             return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&node.prop};
         }
@@ -466,10 +470,12 @@ public:
         };
 
         ENTT_ASSERT(!find(id, type->data));
-        ENTT_ASSERT(!exists(&node, type->data));
         node.id = id;
-        node.next = type->data;
-        type->data = &node;
+
+        if(!exists(&node, type->data)) {
+            node.next = type->data;
+            type->data = &node;
+        }
 
         return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
     }
