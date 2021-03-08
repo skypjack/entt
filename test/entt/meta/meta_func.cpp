@@ -60,14 +60,25 @@ struct func_t {
 };
 
 struct MetaFunc: ::testing::Test {
-    static void SetUpTestCase() {
+    void StaticSetUp() {
         using namespace entt::literals;
 
-        entt::meta<double>().conv<int>();
-        entt::meta<base_t>().dtor<&base_t::destroy>().func<&base_t::func>("func"_hs);
-        entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
+        entt::meta<double>()
+            .type("double"_hs)
+            .conv<int>();
 
-        entt::meta<func_t>().type("func"_hs)
+        entt::meta<base_t>()
+            .type("base"_hs)
+            .dtor<&base_t::destroy>()
+            .func<&base_t::func>("func"_hs);
+
+        entt::meta<derived_t>()
+            .type("derived"_hs)
+            .base<base_t>()
+            .dtor<&derived_t::destroy>();
+
+        entt::meta<func_t>()
+            .type("func"_hs)
             .func<&entt::registry::emplace_or_replace<func_t>, entt::as_ref_t>("emplace"_hs)
             .func<entt::overload<int(const base_t &, int, int)>(&func_t::f)>("f3"_hs)
             .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs).prop(true, false)
@@ -78,10 +89,18 @@ struct MetaFunc: ::testing::Test {
             .func<&func_t::v, entt::as_void_t>("v"_hs)
             .func<&func_t::a, entt::as_ref_t>("a"_hs)
             .func<&func_t::a, entt::as_cref_t>("ca"_hs);
+
+        base_t::counter = 0;
     }
 
     void SetUp() override {
-        base_t::counter = 0;
+        StaticSetUp();
+    }
+
+    void TearDown() override {
+        for(auto type: entt::resolve()) {
+            type.reset();
+        }
     }
 };
 
@@ -420,4 +439,13 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     func.invoke({}, std::ref(registry), entity);
 
     ASSERT_TRUE(registry.all_of<func_t>(entity));
+}
+
+TEST_F(MetaFunc, ReRegistration) {
+    MetaFunc::StaticSetUp();
+
+    auto *node = entt::internal::meta_info<base_t>::resolve();
+
+    ASSERT_NE(node->func, nullptr);
+    ASSERT_EQ(node->func->next, nullptr);
 }

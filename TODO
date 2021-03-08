@@ -15,7 +15,6 @@ WIP:
 * HP: review registry::get, registry::try_get
 * HP: weak reference wrapper example with custom storage
 * HP: merge view and view pack
-* HP: invalid view auto-refresh
 * HP: paginate pools
 * HP: headless (sparse set only) view
 * HP: write documentation for custom storages and views!!

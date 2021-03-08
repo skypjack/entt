@@ -9,12 +9,31 @@ struct base_2_t {};
 struct derived_t: base_1_t, base_2_t {};
 
 struct MetaProp: ::testing::Test {
-    static void SetUpTestCase() {
+    void StaticSetUp() {
         using namespace entt::literals;
 
-        entt::meta<base_1_t>().prop("int"_hs, 42);
-        entt::meta<base_2_t>().prop("bool"_hs, false);
-        entt::meta<derived_t>().base<base_1_t>().base<base_2_t>();
+        entt::meta<base_1_t>()
+            .type("base_1"_hs)
+            .prop("int"_hs, 42);
+
+        entt::meta<base_2_t>()
+            .type("base_2"_hs)
+            .prop("bool"_hs, false);
+
+        entt::meta<derived_t>()
+            .type("derived"_hs)
+            .base<base_1_t>()
+            .base<base_2_t>();
+    }
+
+    void SetUp() override {
+        StaticSetUp();
+    }
+
+    void TearDown() override {
+        for(auto type: entt::resolve()) {
+            type.reset();
+        }
     }
 };
 
@@ -40,4 +59,13 @@ TEST_F(MetaProp, FromBase) {
 
     ASSERT_FALSE(prop_bool.value().cast<bool>());
     ASSERT_EQ(prop_int.value().cast<int>(), 42);
+}
+
+TEST_F(MetaProp, ReRegistration) {
+    MetaProp::StaticSetUp();
+
+    auto *node = entt::internal::meta_info<base_2_t>::resolve();
+
+    ASSERT_NE(node->prop, nullptr);
+    ASSERT_EQ(node->prop->next, nullptr);
 }

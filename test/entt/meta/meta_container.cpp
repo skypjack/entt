@@ -6,9 +6,22 @@
 #include <entt/meta/resolve.hpp>
 
 struct MetaContainer: ::testing::Test {
-    static void SetUpTestCase() {
-        entt::meta<double>().conv<int>();
-        entt::meta<int>().conv<char>();
+    void SetUp() override {
+        using namespace entt::literals;
+
+        entt::meta<double>()
+            .type("double"_hs)
+            .conv<int>();
+
+        entt::meta<int>()
+            .type("int"_hs)
+            .conv<char>();
+    }
+
+    void TearDown() override {
+        for(auto type: entt::resolve()) {
+            type.reset();
+        }
     }
 };
 

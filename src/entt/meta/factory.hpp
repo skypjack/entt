@@ -91,9 +91,10 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
             }
         };
 
-        ENTT_ASSERT(!exists(node.key(), *curr));
-        node.next = *curr;
-        *curr = &node;
+        if(!exists(node.key(), *curr)) {
+            node.next = *curr;
+            *curr = &node;
+        }
     }
 
 public:
@@ -160,8 +161,8 @@ class meta_factory<Type> {
     }
 
     template<typename Node>
-    Node * find(const id_type id, Node *node) ENTT_NOEXCEPT {
-        return (!node || node->id == id) ? node : find(id, node->next);
+    Node * find(const id_type id, Node *node, const Node *owner) ENTT_NOEXCEPT {
+        return (!node || (node->id == id && node != owner)) ? node : find(id, node->next, owner);
     }
 
 public:
@@ -173,10 +174,9 @@ public:
     auto type(const id_type id = type_hash<Type>::value()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!find(id, *internal::meta_context::global()));
-        node->id = id;
-
         if(!exists(node, *internal::meta_context::global())) {
+            ENTT_ASSERT(!find(id, *internal::meta_context::global(), node));
+            node->id = id;
             node->next = *internal::meta_context::global();
             *internal::meta_context::global() = node;
         }
@@ -376,8 +376,6 @@ public:
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto * const type = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!type->dtor);
-
         type->dtor = [](void *instance) {
             if(instance) {
                 std::invoke(Func, *static_cast<Type *>(instance));
@@ -420,10 +418,9 @@ public:
                 &meta_getter<Type, Data, Policy>
             };
 
-            ENTT_ASSERT(!find(id, type->data));
-            node.id = id;
-
             if(!exists(&node, type->data)) {
+                ENTT_ASSERT(!find(id, type->data, &node));
+                node.id = id;
                 node.next = type->data;
                 type->data = &node;
             }
@@ -469,10 +466,9 @@ public:
             &meta_getter<Type, Getter, Policy>
         };
 
-        ENTT_ASSERT(!find(id, type->data));
-        node.id = id;
-
         if(!exists(&node, type->data)) {
+            ENTT_ASSERT(!find(id, type->data, &node));
+            node.id = id;
             node.next = type->data;
             type->data = &node;
         }
@@ -515,15 +511,15 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->func));
+        if(!exists(&node, type->func)) {
+            internal::meta_func_node **it = &type->func;
+            for(; *it && (*it)->id != id; it = &(*it)->next);
+            for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
 
-        internal::meta_func_node **it = &type->func;
-        for(; *it && (*it)->id != id; it = &(*it)->next);
-        for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
-
-        node.id = id;
-        node.next = *it;
-        *it = &node;
+            node.id = id;
+            node.next = *it;
+            *it = &node;
+        }
 
         return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }

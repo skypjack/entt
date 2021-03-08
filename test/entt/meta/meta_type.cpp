@@ -92,17 +92,38 @@ union union_t {
 };
 
 struct MetaType: ::testing::Test {
-    static void SetUpTestCase() {
+    void StaticSetUp() {
         using namespace entt::literals;
 
-        entt::meta<double>().type("double"_hs).conv<int>().data<&set<double>, &get<double>>("var"_hs);
-        entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
-        entt::meta<base_t>().type("base"_hs).data<&base_t::value>("value"_hs);
-        entt::meta<derived_t>().type("derived"_hs).base<base_t>();
-        entt::meta<abstract_t>().func<&abstract_t::func>("func"_hs);
-        entt::meta<concrete_t>().base<base_t>().base<abstract_t>();
+        entt::meta<double>()
+            .type("double"_hs)
+            .conv<int>()
+            .data<&set<double>, &get<double>>("var"_hs);
 
-        entt::meta<overloaded_func_t>().type("overloaded_func"_hs)
+        entt::meta<unsigned int>()
+            .type("unsigned int"_hs)
+            .data<0u>("min"_hs)
+            .data<100u>("max"_hs);
+
+        entt::meta<base_t>()
+            .type("base"_hs)
+            .data<&base_t::value>("value"_hs);
+
+        entt::meta<derived_t>()
+            .type("derived"_hs)
+            .base<base_t>();
+
+        entt::meta<abstract_t>()
+            .type("abstract"_hs)
+            .func<&abstract_t::func>("func"_hs);
+
+        entt::meta<concrete_t>()
+            .type("concrete"_hs)
+            .base<base_t>()
+            .base<abstract_t>();
+
+        entt::meta<overloaded_func_t>()
+            .type("overloaded_func"_hs)
             .func<&overloaded_func_t::e> ("e"_hs)
             .func<entt::overload<int(const base_t &, int, int)>(&overloaded_func_t::f)>("f"_hs)
             .func<entt::overload<int(int, int)>(&overloaded_func_t::f)>("f"_hs)
@@ -111,6 +132,7 @@ struct MetaType: ::testing::Test {
             .func<&overloaded_func_t::g> ("g"_hs);
 
         entt::meta<property_t>()
+            .type("property"_hs)
             .data<property_t::random>("random"_hs)
                 .prop(property_t::random, 0)
                 .prop(property_t::value, 3)
@@ -130,6 +152,16 @@ struct MetaType: ::testing::Test {
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
             .func<&clazz_t::func>("func"_hs);
+    }
+
+    void SetUp() override {
+        StaticSetUp();
+    }
+
+    void TearDown() override {
+        for(auto type: entt::resolve()) {
+            type.reset();
+        }
     }
 };
 
@@ -464,6 +496,28 @@ TEST_F(MetaType, Reset) {
     ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 }
 
+TEST_F(MetaType, ResetAll) {
+    using namespace entt::literals;
+
+    ASSERT_NE(entt::resolve().begin(), entt::resolve().end());
+
+    ASSERT_TRUE(entt::resolve("clazz"_hs));
+    ASSERT_TRUE(entt::resolve("overloaded_func"_hs));
+    ASSERT_TRUE(entt::resolve("double"_hs));
+
+    for(auto type: entt::resolve()) {
+        // we exploit the fact that the iterators aren't invalidated
+        // because EnTT leaves a dangling ::next in the underlying node
+        type.reset();
+    }
+
+    ASSERT_FALSE(entt::resolve("clazz"_hs));
+    ASSERT_FALSE(entt::resolve("overloaded_func"_hs));
+    ASSERT_FALSE(entt::resolve("double"_hs));
+
+    ASSERT_EQ(entt::resolve().begin(), entt::resolve().end());
+}
+
 TEST_F(MetaType, AbstractClass) {
     using namespace entt::literals;
 
@@ -594,7 +648,11 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve("derived"_hs));
     ASSERT_TRUE(entt::resolve("double"_hs));
 
-    entt::meta<property_t>().data<property_t::random>("rand"_hs).prop(property_t::value, 42).prop(property_t::random, 3);
+    entt::meta<property_t>()
+        .type("property"_hs)
+        .data<property_t::random>("rand"_hs)
+        .prop(property_t::value, 42)
+        .prop(property_t::random, 3);
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::value));
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::random));
@@ -611,4 +669,20 @@ TEST_F(MetaType, ClassTemplate) {
     ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_type(), entt::resolve<entt::meta_class_template_tag<std::shared_ptr>>());
     ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(0u), entt::resolve<int>());
     ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(1u), entt::meta_type{});
+}
+
+TEST_F(MetaType, ReRegistration) {
+    int count = 0;
+
+    for(auto type: entt::resolve()) {
+        ++count;
+    }
+
+    MetaType::StaticSetUp();
+
+    for(auto type: entt::resolve()) {
+        --count;
+    }
+
+    ASSERT_EQ(count, 0);
 }

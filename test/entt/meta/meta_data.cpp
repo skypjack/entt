@@ -65,14 +65,25 @@ enum class property_t {
 };
 
 struct MetaData: ::testing::Test {
-    static void SetUpTestCase() {
+    static void StaticSetUp() {
         using namespace entt::literals;
 
-        entt::meta<double>().conv<int>();
-        entt::meta<base_t>().dtor<&base_t::destroy>().data<&base_t::value>("value"_hs);
-        entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
+        entt::meta<double>()
+            .type("double"_hs)
+            .conv<int>();
 
-        entt::meta<clazz_t>().type("clazz"_hs)
+        entt::meta<base_t>()
+            .type("base"_hs)
+            .dtor<&base_t::destroy>()
+            .data<&base_t::value>("value"_hs);
+
+        entt::meta<derived_t>()
+            .type("derived"_hs)
+            .base<base_t>()
+            .dtor<&derived_t::destroy>();
+
+        entt::meta<clazz_t>()
+            .type("clazz"_hs)
             .data<&clazz_t::i, entt::as_ref_t>("i"_hs).prop(3, 0)
             .data<&clazz_t::i, entt::as_cref_t>("ci"_hs)
             .data<&clazz_t::j>("j"_hs).prop(true, 1)
@@ -94,10 +105,18 @@ struct MetaData: ::testing::Test {
             .type("array"_hs)
             .data<&array_t::global>("global"_hs)
             .data<&array_t::local>("local"_hs);
+
+        base_t::counter = 0;
     }
 
     void SetUp() override {
-        base_t::counter = 0;
+        StaticSetUp();
+    }
+
+    void TearDown() override {
+        for(auto type: entt::resolve()) {
+            type.reset();
+        }
     }
 };
 
@@ -525,4 +544,13 @@ TEST_F(MetaData, FromBase) {
     ASSERT_EQ(instance.value, 3);
     ASSERT_TRUE(type.data("value"_hs).set(instance, 42));
     ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(MetaData, ReRegistration) {
+    MetaData::StaticSetUp();
+
+    auto *node = entt::internal::meta_info<base_t>::resolve();
+
+    ASSERT_NE(node->data, nullptr);
+    ASSERT_EQ(node->data->next, nullptr);
 }

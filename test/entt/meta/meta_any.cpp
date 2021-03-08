@@ -52,22 +52,35 @@ struct unmanageable_t {
 };
 
 struct MetaAny: ::testing::Test {
-    static void SetUpTestCase() {
+    void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<double>().conv<int>();
-        entt::meta<empty_t>().dtor<&empty_t::destroy>();
-        entt::meta<fat_t>().base<empty_t>().dtor<&fat_t::destroy>();
+        entt::meta<double>()
+            .type("double"_hs)
+            .conv<int>();
+
+        entt::meta<empty_t>()
+            .type("empty"_hs)
+            .dtor<&empty_t::destroy>();
+
+        entt::meta<fat_t>()
+            .type("fat"_hs)
+            .base<empty_t>()
+            .dtor<&fat_t::destroy>();
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
             .func<&clazz_t::func>("func"_hs);
+
+        empty_t::counter = 0;
     }
 
-    void SetUp() override {
-        empty_t::counter = 0;
+    void TearDown() override {
+        for(auto type: entt::resolve()) {
+            type.reset();
+        }
     }
 };
 

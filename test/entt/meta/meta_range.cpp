@@ -6,11 +6,17 @@
 #include <entt/meta/resolve.hpp>
 
 struct MetaRange: ::testing::Test {
-    static void SetUpTestCase() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<int>().type("int"_hs);
         entt::meta<double>().type("double"_hs);
+    }
+
+    void TearDown() override {
+        for(auto type: entt::resolve()) {
+            type.reset();
+        }
     }
 };
 
