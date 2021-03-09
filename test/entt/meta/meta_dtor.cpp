@@ -9,8 +9,12 @@ struct clazz_t {
         ++counter;
     }
 
-    static void destroy(clazz_t &) {
+    static void destroy_decr(clazz_t &) {
         --counter;
+    }
+
+    static void destroy_incr(clazz_t &) {
+        ++counter;
     }
 
     inline static int counter = 0;
@@ -22,7 +26,9 @@ struct MetaDtor: ::testing::Test {
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
-            .dtor<&clazz_t::destroy>();
+            .dtor<&clazz_t::destroy_decr>();
+
+        clazz_t::counter = 0;
     }
 
     void SetUp() override {
@@ -54,4 +60,9 @@ TEST_F(MetaDtor, ReRegistration) {
     auto *node = entt::internal::meta_info<clazz_t>::resolve();
 
     ASSERT_NE(node->dtor, nullptr);
+
+    entt::meta<clazz_t>().dtor<&clazz_t::destroy_incr>();
+    entt::resolve<clazz_t>().construct().reset();
+
+    ASSERT_EQ(clazz_t::counter, 2);
 }

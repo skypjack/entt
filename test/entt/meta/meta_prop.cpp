@@ -9,7 +9,7 @@ struct base_2_t {};
 struct derived_t: base_1_t, base_2_t {};
 
 struct MetaProp: ::testing::Test {
-    void StaticSetUp() {
+    static void StaticSetUp() {
         using namespace entt::literals;
 
         entt::meta<base_1_t>()

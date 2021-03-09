@@ -60,7 +60,7 @@ struct func_t {
 };
 
 struct MetaFunc: ::testing::Test {
-    void StaticSetUp() {
+    static void StaticSetUp() {
         using namespace entt::literals;
 
         entt::meta<double>()
@@ -442,22 +442,47 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
 }
 
 TEST_F(MetaFunc, ReRegistration) {
-    int count = 0;
+    using namespace entt::literals;
 
-    for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
-        ++count;
-    }
+    auto reset_and_check = []() {
+        int count = 0;
 
-    MetaFunc::StaticSetUp();
+        for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
+            ++count;
+        }
 
-    for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
-        --count;
-    }
+        MetaFunc::StaticSetUp();
 
-    ASSERT_EQ(count, 0);
+        for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
+            --count;
+        }
 
-    auto *node = entt::internal::meta_info<base_t>::resolve();
+        ASSERT_EQ(count, 0);
+    };
 
-    ASSERT_NE(node->func, nullptr);
-    ASSERT_EQ(node->func->next, nullptr);
+    reset_and_check();
+
+    func_t instance{};
+    auto type = entt::resolve<func_t>();
+
+    ASSERT_TRUE(type.func("f2"_hs));
+    ASSERT_FALSE(type.invoke("f2"_hs, instance, 0));
+    ASSERT_TRUE(type.invoke("f2"_hs, instance, 0, 0));
+
+    ASSERT_TRUE(type.func("f1"_hs));
+    ASSERT_TRUE(type.invoke("f1"_hs, instance, 0));
+    ASSERT_FALSE(type.invoke("f1"_hs, instance, 0, 0));
+
+    entt::meta<func_t>()
+        .func<entt::overload<int(int, int)>(&func_t::f)>("f"_hs)
+        .func<entt::overload<int(int) const>(&func_t::f)>("f"_hs);
+
+    ASSERT_FALSE(type.func("f1"_hs));
+    ASSERT_FALSE(type.func("f2"_hs));
+    ASSERT_TRUE(type.func("f"_hs));
+
+    ASSERT_TRUE(type.invoke("f"_hs, instance, 0));
+    ASSERT_TRUE(type.invoke("f"_hs, instance, 0, 0));
+
+    reset_and_check();
 }

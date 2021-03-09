@@ -92,7 +92,7 @@ union union_t {
 };
 
 struct MetaType: ::testing::Test {
-    void StaticSetUp() {
+    static void StaticSetUp() {
         using namespace entt::literals;
 
         entt::meta<double>()
@@ -672,6 +672,8 @@ TEST_F(MetaType, ClassTemplate) {
 }
 
 TEST_F(MetaType, ReRegistration) {
+    using namespace entt::literals;
+
     int count = 0;
 
     for([[maybe_unnused]] auto type: entt::resolve()) {
@@ -685,4 +687,11 @@ TEST_F(MetaType, ReRegistration) {
     }
 
     ASSERT_EQ(count, 0);
+    ASSERT_TRUE(entt::resolve("double"_hs));
+
+    entt::meta<double>().type("real"_hs);
+
+    ASSERT_FALSE(entt::resolve("double"_hs));
+    ASSERT_TRUE(entt::resolve("real"_hs));
+    ASSERT_TRUE(entt::resolve("real"_hs).data("var"_hs));
 }
