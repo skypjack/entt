@@ -23,11 +23,11 @@
 
 # Introduction
 
-Reflection (or rather, its lack) is a trending topic in the C++ world and, in
-the specific case of `EnTT`, a tool that can unlock a lot of other features. I
+Reflection (or rather, its lack) is a trending topic in the C++ world and a tool
+that can unlock a lot of interesting feature in the specific case of `EnTT`. I
 looked for a third-party library that met my needs on the subject, but I always
 came across some details that I didn't like: macros, being intrusive, too many
-allocations. In one word: unsatisfactory.<br/>
+allocations, and so on.<br/>
 I finally decided to write a built-in, non-intrusive and macro-free runtime
 reflection system for `EnTT`. Maybe I didn't do better than others or maybe yes,
 time will tell me, but at least I can model this tool around the library to
@@ -45,7 +45,7 @@ compile-time or with custom functions.
 
 That being said, the examples in the following sections are all based on the
 `hashed_string` class as provided by this library. Therefore, where an
-identifier is required, it's likely that a user defined literal is used as
+identifier is required, it's likely that an user defined literal is used as
 follows:
 
 ```cpp
@@ -94,8 +94,8 @@ features to a reflected type so that the reflection system can use it correctly
 under the hood, but they don't want to also make the type _searchable_. In this
 case, it's sufficient not to invoke `type`.
 
-A factory is such that all its member functions returns the factory itself or
-a decorated version of it. This object can be used to add the following:
+A factory is such that all its member functions return the factory itself or a
+decorated version of it. This object can be used to add the following:
 
 * _Constructors_. Actual constructors can be assigned to a reflected type by
   specifying their list of arguments. Free functions (namely, factories) can be
@@ -136,7 +136,7 @@ a decorated version of it. This object can be used to add the following:
   The function requires as an argument the identifier to give to the meta data
   once created. Users can then access meta data at runtime by searching for them
   by _name_.<br/>
-  Data members can also be defined by means of a _setter_ and _getter_. Setters
+  Data members can also be defined by means of a setter and getter pair. Setters
   and getters can be either free functions, class members or a mix of them, as
   long as they respect the required signatures. This approach is also convenient
   to create a read-only variable from a non-const data member:
@@ -162,7 +162,9 @@ a decorated version of it. This object can be used to add the following:
 
   The function requires as an argument the identifier to give to the meta
   function once created. Users can then access meta functions at runtime by
-  searching for them by _name_.
+  searching for them by _name_.<br/>
+  Overloading of meta functions is supported. Overloaded functions are resolved
+  at runtime by the reflection system according to the types of the arguments.
 
 * _Base classes_. A base class is such that the underlying type is actually
   derived from it. In this case, the reflection system tracks the relationship
@@ -216,10 +218,9 @@ entt::meta_any empty{};
 entt::meta_any other{std::in_place_type<void>};
 ```
 
-While `any` treats both objects as empty, `meta_any` treats objects initialized
-with `void` as if they were _valid_ ones. This allows to differentiate between
-failed function calls and function calls that are successful but return
-nothing.<br/>
+While `any` considers both as empty, `meta_any` treats objects initialized with
+`void` as if they were _valid_ ones. This allows to differentiate between failed
+function calls and function calls that are successful but return nothing.<br/>
 Finally, the member functions `try_cast`, `cast` and `allow_cast` are used to
 cast the underlying object to a given type (either a reference or a value type)
 or to _convert_ a `meta_any` in such a way that a cast becomes viable for the
@@ -229,9 +230,9 @@ resulting object. There is in fact no `any_cast` equivalent for `meta_any`.
 
 Once the web of reflected types has been constructed, it's a matter of using it
 at runtime where required.<br/>
-All this has the great merit that, unlike the vast majority of the things
-present in this library and closely linked to the compile-time, the reflection
-system stands in fact as a non-intrusive tool for the runtime.
+All this has the great merit that the reflection system stands in fact as a
+non-intrusive tool for the runtime, unlike the vast majority of the things
+offered by this library and closely linked to the compile-time.
 
 To search for a reflected type there are a few options:
 
@@ -239,10 +240,10 @@ To search for a reflected type there are a few options:
 // direct access to a reflected type
 auto by_type = entt::resolve<my_type>();
 
-// lookup of a reflected type by identifier
+// look up a reflected type by identifier
 auto by_id = entt::resolve("reflected_type"_hs);
 
-// lookup of a reflected type by type info
+// look up a reflected type by type info
 auto by_type_id = entt::resolve(entt::type_id<my_type>());
 ```
 
@@ -353,14 +354,14 @@ read the inline documentation to get the best out of this powerful tool.
 
 ## Container support
 
-The meta module supports containers of all types out of the box.<br/>
+The runtime reflection system also supports containers of all types.<br/>
 Moreover, _containers_ doesn't necessarily mean those offered by the C++
 standard library. In fact, user defined data structures can also work with the
 meta system in many cases.
 
-To make a container be recognized by the meta module, users are required to
-provide specializations for either the `meta_sequence_container_traits` class or
-the `meta_associative_container_traits` class, according with the actual _type_
+To make a container be recognized as such by the meta system, users are required
+to provide specializations for either the `meta_sequence_container_traits` class
+or the `meta_associative_container_traits` class, according with the actual type
 of the container.<br/>
 `EnTT` already exports the specializations for some common classes. In
 particular:
@@ -582,15 +583,14 @@ differences in behavior in the case of key-only containers. In particular:
   elements. Modifying the returned object will then directly modify the element
   inside the container.
 
-Container support is deliberately minimal but theoretically sufficient to
-satisfy all needs.
+Container support is minimal but likely sufficient to satisfy all needs.
 
 ## Pointer-like types
 
 As with containers, it's also possible to communicate to the meta system which
 types to consider _pointers_. This will allow to dereference instances of
-`meta_any`, obtaining light _references_ to the pointed objects that are also
-correctly associated with their meta types.<br/>
+`meta_any`, thus obtaining light _references_ to the pointed objects that are
+also correctly associated with their meta types.<br/>
 To make the meta system recognize a type as _pointer-like_, users can specialize
 the `is_meta_pointer_like` class. `EnTT` already exports the specializations for
 some common classes. In particular:
@@ -601,7 +601,7 @@ some common classes. In particular:
 It's important to include the header file `pointer.hpp` to make these
 specializations available to the compiler when needed.<br/>
 The same file also contains many examples for the users that are interested in
-making their own containers available to the meta system.
+making their own pointer-like types available to the meta system.
 
 When a type is recognized as a pointer-like one by the meta system, it's
 possible to dereference the instances of `meta_any` that contain these objects.
@@ -665,8 +665,8 @@ meta type or the default constructor.<br/>
 For example, in the case of primitive types like `int` or `char`, but not just
 them.
 
-For this reason and only for default constructible types, a default constructor
-is automatically defined and associated with their meta types, whether they are
+For this reason and only for default constructible types, default constructors
+are automatically defined and associated with their meta types, whether they are
 explicitly or implicitly generated.<br/>
 Therefore, it won't be necessary to do this in order to construct an integer
 from its meta type:
@@ -875,10 +875,10 @@ the key and the value contained in the form of `meta_any` objects, respectively.
 
 A type registered with the reflection system can also be unregistered. This
 means unregistering all its data members, member functions, conversion functions
-and so on. However, the base classes won't be unregistered, since they don't
+and so on. However, base classes aren't unregistered as well, since they don't
 necessarily depend on it. Similarly, implicitly generated types (as an example,
-the meta types implicitly generated for function parameters when needed) won't
-be unregistered.<br/>
+the meta types implicitly generated for function parameters when needed) aren't
+unregistered.<br/>
 Roughly speaking, unregistering a type means disconnecting all associated meta
 objects from it and making its identifier no longer visible. The underlying node
 will remain available though, as if it were implicitly generated:
