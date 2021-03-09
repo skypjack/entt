@@ -443,14 +443,14 @@ TEST_F(MetaFunc, ReRegistration) {
     auto reset_and_check = [this]() {
         int count = 0;
 
-        for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
-            ++count;
+        for(auto func: entt::resolve<func_t>().func()) {
+            count += static_cast<bool>(func);
         }
 
         SetUp();
 
-        for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
-            --count;
+        for(auto func: entt::resolve<func_t>().func()) {
+            count -= static_cast<bool>(func);
         }
 
         ASSERT_EQ(count, 0);

@@ -672,14 +672,14 @@ TEST_F(MetaType, ReRegistration) {
 
     int count = 0;
 
-    for([[maybe_unnused]] auto type: entt::resolve()) {
-        ++count;
+    for(auto type: entt::resolve()) {
+        count += static_cast<bool>(type);
     }
 
     SetUp();
 
     for(auto type: entt::resolve()) {
-        --count;
+        count -= static_cast<bool>(type);
     }
 
     ASSERT_EQ(count, 0);
