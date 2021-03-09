@@ -1,0 +1,8 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: EnTT
+Description: Fast and reliable entity component system (ECS)
+Url: https://github.com/skypjack/entt
+Version: @EnTT_VERSION@
+Cflags: -I${includedir}
