@@ -104,23 +104,20 @@ private:
     template<std::size_t>
     void unroll(choice_t<0>) {}
 
-    template<std::size_t = 0, typename Key, typename... Value>
-    void assign(Key &&key, Value &&... value) {
-        static meta_any property[1u + sizeof...(Value)]{};
+    template<std::size_t = 0, typename Key>
+    void assign(Key &&key, meta_any value = {}) {
+        static meta_any property[2u]{};
 
         static internal::meta_prop_node node{
             nullptr,
             property,
-            sizeof...(Value) ? property + 1u : nullptr
+            property + 1u
         };
 
         entt::meta_any instance{std::forward<Key>(key)};
         ENTT_ASSERT(!internal::find_if_not(&instance, *curr, &node));
         property[0u] = std::move(instance);
-
-        if constexpr(sizeof...(Value) > 0) {
-            property[1u] = (std::forward<Value>(value), ...);
-        }
+        property[1u] = std::move(value);
 
         if(!internal::find_if(&node, *curr)) {
             node.next = *curr;

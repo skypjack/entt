@@ -62,10 +62,25 @@ TEST_F(MetaProp, FromBase) {
 }
 
 TEST_F(MetaProp, ReRegistration) {
+    using namespace entt::literals;
+
     MetaProp::StaticSetUp();
 
-    auto *node = entt::internal::meta_info<base_2_t>::resolve();
+    auto *node = entt::internal::meta_info<base_1_t>::resolve();
+    auto type = entt::resolve<base_1_t>();
 
     ASSERT_NE(node->prop, nullptr);
     ASSERT_EQ(node->prop->next, nullptr);
+
+    ASSERT_TRUE(type.prop("int"_hs));
+    ASSERT_EQ(type.prop("int"_hs).value().cast<int>(), 42);
+
+    entt::meta<base_1_t>().prop("double"_hs, 3.);
+
+    ASSERT_NE(node->prop, nullptr);
+    ASSERT_EQ(node->prop->next, nullptr);
+
+    ASSERT_FALSE(type.prop("int"_hs));
+    ASSERT_TRUE(type.prop("double"_hs));
+    ASSERT_EQ(type.prop("double"_hs).value().cast<double>(), 3.);
 }

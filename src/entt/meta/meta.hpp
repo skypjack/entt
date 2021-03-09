@@ -659,7 +659,7 @@ struct meta_prop {
      * @return A meta any containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node->value ? *node->value : meta_any{};
+        return *node->value;
     }
 
     /**
