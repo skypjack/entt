@@ -395,9 +395,7 @@ struct meta_factory<Type> {
         auto * const type = internal::meta_info<Type>::resolve();
 
         type->dtor = [](void *instance) {
-            if(instance) {
-                std::invoke(Func, *static_cast<Type *>(instance));
-            }
+            std::invoke(Func, *static_cast<Type *>(instance));
         };
 
         return meta_factory<Type>{};
