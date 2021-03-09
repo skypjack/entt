@@ -651,8 +651,8 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::meta<property_t>()
         .type("property"_hs)
         .data<property_t::random>("rand"_hs)
-        .prop(property_t::value, 42)
-        .prop(property_t::random, 3);
+            .prop(property_t::value, 42)
+            .prop(property_t::random, 3);
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::value));
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::random));

@@ -20,6 +20,40 @@ namespace entt {
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename Node>
+[[nodiscard]] bool find_if(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
+    return node && (node == candidate || find_if(candidate, node->next));
+}
+
+
+template<typename Id, typename Node>
+[[nodiscard]] bool find_if_not(const Id id, Node *node, const Node *owner) ENTT_NOEXCEPT {
+    if constexpr(std::is_pointer_v<Id>) {
+        return node && ((*node->id == *id && node != owner) || find_if_not(id, node->next, owner));
+    } else {
+        return node && ((node->id == id && node != owner) || find_if_not(id, node->next, owner));
+    }
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Meta factory to be used for reflection purposes.
  *
  * The meta factory is an utility class used to reflect types, data members and
@@ -28,7 +62,7 @@ namespace entt {
  * there are no subtle errors at runtime.
  */
 template<typename...>
-class meta_factory;
+struct meta_factory;
 
 
 /**
@@ -37,11 +71,8 @@ class meta_factory;
  * @tparam Spec Property specialization pack used to disambiguate overloads.
  */
 template<typename Type, typename... Spec>
-class meta_factory<Type, Spec...>: public meta_factory<Type> {
-    [[nodiscard]] bool exists(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
-        return node && (node->key() == key || exists(key, node->next));
-    }
-
+struct meta_factory<Type, Spec...>: public meta_factory<Type> {
+private:
     template<std::size_t Step = 0, std::size_t... Index, typename... Property, typename... Other>
     void unpack(std::index_sequence<Index...>, std::tuple<Property...> property, Other &&... other) {
         unroll<Step>(choice<3>, std::move(std::get<Index>(property))..., std::forward<Other>(other)...);
@@ -75,23 +106,23 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
 
     template<std::size_t = 0, typename Key, typename... Value>
     void assign(Key &&key, Value &&... value) {
-        static const auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
+        static meta_any property[1u + sizeof...(Value)]{};
 
         static internal::meta_prop_node node{
             nullptr,
-            []() -> meta_any {
-                return meta_any{std::in_place_type<const Key &>, std::get<0>(property)};
-            },
-            []() -> meta_any {
-                if constexpr(sizeof...(Value) == 0) {
-                    return {};
-                } else {
-                    return std::get<1>(property);
-                }
-            }
+            property,
+            sizeof...(Value) ? property + 1u : nullptr
         };
 
-        if(!exists(node.key(), *curr)) {
+        entt::meta_any instance{std::forward<Key>(key)};
+        ENTT_ASSERT(!internal::find_if_not(&instance, *curr, &node));
+        property[0u] = std::move(instance);
+
+        if constexpr(sizeof...(Value) > 0) {
+            property[1u] = (std::forward<Value>(value), ...);
+        }
+
+        if(!internal::find_if(&node, *curr)) {
             node.next = *curr;
             *curr = &node;
         }
@@ -154,18 +185,7 @@ private:
  * @tparam Type Reflected type for which the factory was created.
  */
 template<typename Type>
-class meta_factory<Type> {
-    template<typename Node>
-    bool exists(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
-        return node && (node == candidate || exists(candidate, node->next));
-    }
-
-    template<typename Node>
-    Node * find(const id_type id, Node *node, const Node *owner) ENTT_NOEXCEPT {
-        return (!node || (node->id == id && node != owner)) ? node : find(id, node->next, owner);
-    }
-
-public:
+struct meta_factory<Type> {
     /**
      * @brief Makes a meta type _searchable_.
      * @param id Optional unique identifier.
@@ -174,9 +194,10 @@ public:
     auto type(const id_type id = type_hash<Type>::value()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        if(!exists(node, *internal::meta_context::global())) {
-            ENTT_ASSERT(!find(id, *internal::meta_context::global(), node));
-            node->id = id;
+        ENTT_ASSERT(!internal::find_if_not(id, *internal::meta_context::global(), node));
+        node->id = id;
+
+        if(!internal::find_if(node, *internal::meta_context::global())) {
             node->next = *internal::meta_context::global();
             *internal::meta_context::global() = node;
         }
@@ -206,7 +227,7 @@ public:
             }
         };
 
-        if(!exists(&node, type->base)) {
+        if(!internal::find_if(&node, type->base)) {
             node.next = type->base;
             type->base = &node;
         }
@@ -237,7 +258,7 @@ public:
             }
         };
 
-        if(!exists(&node, type->conv)) {
+        if(!internal::find_if(&node, type->conv)) {
             node.next = type->conv;
             type->conv = &node;
         }
@@ -271,7 +292,7 @@ public:
             }
         };
 
-        if(!exists(&node, type->conv)) {
+        if(!internal::find_if(&node, type->conv)) {
             node.next = type->conv;
             type->conv = &node;
         }
@@ -311,7 +332,7 @@ public:
             }
         };
 
-        if(!exists(&node, type->ctor)) {
+        if(!internal::find_if(&node, type->ctor)) {
             node.next = type->ctor;
             type->ctor = &node;
         }
@@ -347,7 +368,7 @@ public:
             }
         };
 
-        if(!exists(&node, type->ctor)) {
+        if(!internal::find_if(&node, type->ctor)) {
             node.next = type->ctor;
             type->ctor = &node;
         }
@@ -418,9 +439,10 @@ public:
                 &meta_getter<Type, Data, Policy>
             };
 
-            if(!exists(&node, type->data)) {
-                ENTT_ASSERT(!find(id, type->data, &node));
-                node.id = id;
+            ENTT_ASSERT(!internal::find_if_not(id, type->data, &node));
+            node.id = id;
+
+            if(!internal::find_if(&node, type->data)) {
                 node.next = type->data;
                 type->data = &node;
             }
@@ -466,9 +488,10 @@ public:
             &meta_getter<Type, Getter, Policy>
         };
 
-        if(!exists(&node, type->data)) {
-            ENTT_ASSERT(!find(id, type->data, &node));
-            node.id = id;
+        ENTT_ASSERT(!internal::find_if_not(id, type->data, &node));
+        node.id = id;
+
+        if(!internal::find_if(&node, type->data)) {
             node.next = type->data;
             type->data = &node;
         }
@@ -511,15 +534,20 @@ public:
             }
         };
 
-        if(!exists(&node, type->func)) {
-            internal::meta_func_node **it = &type->func;
-            for(; *it && (*it)->id != id; it = &(*it)->next);
-            for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
-
-            node.id = id;
-            node.next = *it;
-            *it = &node;
+        for(auto *it = &type->func; *it; it = &(*it)->next) {
+            if(*it == &node) {
+                *it = node.next;
+                break;
+            }
         }
+
+        internal::meta_func_node **it = &type->func;
+        for(; *it && (*it)->id != id; it = &(*it)->next);
+        for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
+        
+        node.id = id;
+        node.next = *it;
+        *it = &node;
 
         return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }

@@ -647,19 +647,19 @@ struct meta_prop {
     {}
 
     /**
-     * @brief Returns the stored key.
+     * @brief Returns the stored key as a const reference.
      * @return A meta any containing the key stored with the property.
      */
     [[nodiscard]] meta_any key() const {
-        return node->key();
+        return node->id->as_ref();
     }
 
     /**
-     * @brief Returns the stored value.
+     * @brief Returns the stored value by copy.
      * @return A meta any containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node->value();
+        return node->value ? *node->value : meta_any{};
     }
 
     /**
@@ -751,7 +751,7 @@ struct meta_ctor {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->key() == key; }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
@@ -847,7 +847,7 @@ struct meta_data {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->key() == key; }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
@@ -966,7 +966,7 @@ struct meta_func {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->key() == key; }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
@@ -1474,7 +1474,7 @@ public:
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->key() == key; }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
