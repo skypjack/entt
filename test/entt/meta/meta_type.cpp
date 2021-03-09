@@ -674,7 +674,7 @@ TEST_F(MetaType, ClassTemplate) {
 TEST_F(MetaType, ReRegistration) {
     int count = 0;
 
-    for(auto type: entt::resolve()) {
+    for([[maybe_unnused]] auto type: entt::resolve()) {
         ++count;
     }
 

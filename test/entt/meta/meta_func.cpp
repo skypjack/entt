@@ -442,7 +442,19 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
 }
 
 TEST_F(MetaFunc, ReRegistration) {
+    int count = 0;
+
+    for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
+        ++count;
+    }
+
     MetaFunc::StaticSetUp();
+
+    for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
+        --count;
+    }
+
+    ASSERT_EQ(count, 0);
 
     auto *node = entt::internal::meta_info<base_t>::resolve();
 
