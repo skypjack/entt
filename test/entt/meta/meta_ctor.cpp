@@ -33,7 +33,7 @@ struct clazz_t {
 double double_factory() { return 42.; }
 
 struct MetaCtor: ::testing::Test {
-    static void StaticSetUp() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<double>()
@@ -52,10 +52,6 @@ struct MetaCtor: ::testing::Test {
             .ctor<const int &, char>().prop(3, false)
             .ctor<entt::overload<clazz_t(int)>(&clazz_t::factory)>().prop('c', 42)
             .ctor<entt::overload<clazz_t(base_t, int, int)>(&clazz_t::factory)>();
-    }
-
-    void SetUp() override {
-        StaticSetUp();
     }
 
     void TearDown() override {
@@ -281,7 +277,7 @@ TEST_F(MetaCtor, NonDefaultConstructibleType) {
 }
 
 TEST_F(MetaCtor, ReRegistration) {
-    MetaCtor::StaticSetUp();
+    SetUp();
 
     auto *node = entt::internal::meta_info<double>::resolve();
 

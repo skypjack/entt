@@ -92,7 +92,7 @@ union union_t {
 };
 
 struct MetaType: ::testing::Test {
-    static void StaticSetUp() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<double>()
@@ -152,10 +152,6 @@ struct MetaType: ::testing::Test {
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
             .func<&clazz_t::func>("func"_hs);
-    }
-
-    void SetUp() override {
-        StaticSetUp();
     }
 
     void TearDown() override {
@@ -680,7 +676,7 @@ TEST_F(MetaType, ReRegistration) {
         ++count;
     }
 
-    MetaType::StaticSetUp();
+    SetUp();
 
     for(auto type: entt::resolve()) {
         --count;

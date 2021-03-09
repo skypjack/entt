@@ -65,7 +65,7 @@ enum class property_t {
 };
 
 struct MetaData: ::testing::Test {
-    static void StaticSetUp() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<double>()
@@ -107,10 +107,6 @@ struct MetaData: ::testing::Test {
             .data<&array_t::local>("local"_hs);
 
         base_t::counter = 0;
-    }
-
-    void SetUp() override {
-        StaticSetUp();
     }
 
     void TearDown() override {
@@ -549,7 +545,7 @@ TEST_F(MetaData, FromBase) {
 TEST_F(MetaData, ReRegistration) {
     using namespace entt::literals;
 
-    MetaData::StaticSetUp();
+    SetUp();
 
     auto *node = entt::internal::meta_info<base_t>::resolve();
     auto type = entt::resolve<base_t>();

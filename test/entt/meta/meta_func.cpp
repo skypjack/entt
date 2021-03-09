@@ -60,7 +60,7 @@ struct func_t {
 };
 
 struct MetaFunc: ::testing::Test {
-    static void StaticSetUp() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<double>()
@@ -91,10 +91,6 @@ struct MetaFunc: ::testing::Test {
             .func<&func_t::a, entt::as_cref_t>("ca"_hs);
 
         base_t::counter = 0;
-    }
-
-    void SetUp() override {
-        StaticSetUp();
     }
 
     void TearDown() override {
@@ -444,14 +440,14 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
 TEST_F(MetaFunc, ReRegistration) {
     using namespace entt::literals;
 
-    auto reset_and_check = []() {
+    auto reset_and_check = [this]() {
         int count = 0;
 
         for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
             ++count;
         }
 
-        MetaFunc::StaticSetUp();
+        SetUp();
 
         for([[maybe_unnused]] auto func: entt::resolve<func_t>().func()) {
             --count;

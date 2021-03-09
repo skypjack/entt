@@ -16,17 +16,13 @@ double conv_to_double(const clazz_t &instance) {
 }
 
 struct MetaConv: ::testing::Test {
-    static void StaticSetUp() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
             .conv<int>()
             .conv<&conv_to_double>();
-    }
-
-    void SetUp() override {
-        StaticSetUp();
     }
 
     void TearDown() override {
@@ -53,7 +49,7 @@ TEST_F(MetaConv, Functionalities) {
 }
 
 TEST_F(MetaConv, ReRegistration) {
-    MetaConv::StaticSetUp();
+    SetUp();
 
     auto *node = entt::internal::meta_info<clazz_t>::resolve();
 

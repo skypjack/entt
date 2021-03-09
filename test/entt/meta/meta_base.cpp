@@ -14,16 +14,12 @@ struct derived_t: base_t {
 };
 
 struct MetaBase: ::testing::Test {
-    static void StaticSetUp() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<derived_t>()
             .type("derived"_hs)
             .base<base_t>();
-    }
-
-    void SetUp() override {
-        StaticSetUp();
     }
 
     void TearDown() override {
@@ -52,7 +48,7 @@ TEST_F(MetaBase, Functionalities) {
 }
 
 TEST_F(MetaBase, ReRegistration) {
-    MetaBase::StaticSetUp();
+    SetUp();
 
     auto *node = entt::internal::meta_info<derived_t>::resolve();
 

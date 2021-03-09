@@ -21,7 +21,7 @@ struct clazz_t {
 };
 
 struct MetaDtor: ::testing::Test {
-    static void StaticSetUp() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<clazz_t>()
@@ -29,10 +29,6 @@ struct MetaDtor: ::testing::Test {
             .dtor<&clazz_t::destroy_decr>();
 
         clazz_t::counter = 0;
-    }
-
-    void SetUp() override {
-        StaticSetUp();
     }
 
     void TearDown() override {
@@ -55,7 +51,7 @@ TEST_F(MetaDtor, Functionalities) {
 }
 
 TEST_F(MetaDtor, ReRegistration) {
-    MetaDtor::StaticSetUp();
+    SetUp();
 
     auto *node = entt::internal::meta_info<clazz_t>::resolve();
 

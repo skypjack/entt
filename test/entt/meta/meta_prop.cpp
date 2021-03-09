@@ -9,7 +9,7 @@ struct base_2_t {};
 struct derived_t: base_1_t, base_2_t {};
 
 struct MetaProp: ::testing::Test {
-    static void StaticSetUp() {
+    void SetUp() override {
         using namespace entt::literals;
 
         entt::meta<base_1_t>()
@@ -24,10 +24,6 @@ struct MetaProp: ::testing::Test {
             .type("derived"_hs)
             .base<base_1_t>()
             .base<base_2_t>();
-    }
-
-    void SetUp() override {
-        StaticSetUp();
     }
 
     void TearDown() override {
@@ -64,7 +60,7 @@ TEST_F(MetaProp, FromBase) {
 TEST_F(MetaProp, ReRegistration) {
     using namespace entt::literals;
 
-    MetaProp::StaticSetUp();
+    SetUp();
 
     auto *node = entt::internal::meta_info<base_1_t>::resolve();
     auto type = entt::resolve<base_1_t>();
