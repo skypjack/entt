@@ -653,7 +653,8 @@ class sigh_storage_mixin final: public Type {
         ENTT_ASSERT(ud != nullptr);
         const auto entity = basic_sparse_set<typename Type::entity_type>::operator[](pos);
         destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entity);
-        Type::swap_and_pop(pos, ud);
+        // the position may have changed due to the actions of a listener
+        Type::swap_and_pop(this->index(entity), ud);
     }
 
 public:

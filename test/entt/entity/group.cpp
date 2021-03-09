@@ -1284,6 +1284,24 @@ TEST(OwningGroup, PreventEarlyOptOut) {
     });
 }
 
+TEST(OwningGroup, SwappingValuesIsAllowed) {
+    entt::registry registry;
+    const auto group = registry.group<boxed_int>(entt::get<empty_type>);
+
+    for(std::size_t i{}; i < 2u; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<boxed_int>(entity, static_cast<int>(i));
+        registry.emplace<empty_type>(entity);
+    }
+
+    registry.destroy(group.back());
+
+    // thanks to @andranik3949 for pointing out this missing test
+    registry.view<const boxed_int>().each([](const auto entity, const auto &value) {
+        ASSERT_EQ(entt::to_integral(entity), value.value);
+    });
+}
+
 TEST(OwningGroup, ExtendedGet) {
     using type = decltype(std::declval<entt::registry>().group<int, empty_type>(entt::get<char>).get({}));
     static_assert(std::tuple_size_v<type> == 2u);

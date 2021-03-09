@@ -1524,3 +1524,20 @@ TEST(Registry, Visit) {
 
     hasType[1] = false;
 }
+
+TEST(Registry, ScramblingPoolsIsAllowed) {
+    entt::registry registry;
+    registry.on_destroy<int>().connect<&listener::sort<int>>();
+
+    for(std::size_t i{}; i < 2u; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<int>(entity, static_cast<int>(i));
+    }
+
+    registry.destroy(registry.view<int>().back());
+
+    // thanks to @andranik3949 for pointing out this missing test
+    registry.view<const int>().each([](const auto entity, const auto &value) {
+        ASSERT_EQ(entt::to_integral(entity), value);
+    });
+}
