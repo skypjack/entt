@@ -101,6 +101,15 @@ class dispatcher {
     }
 
 public:
+    /*! @brief Default constructor. */
+    dispatcher() = default;
+
+    /*! @brief Default move constructor. */
+    dispatcher(dispatcher &&) = default;
+
+    /*! @brief Default move assignment operator. @return This dispatcher. */
+    dispatcher & operator=(dispatcher &&) = default;
+
     /**
      * @brief Returns a sink object for the given event.
      *
