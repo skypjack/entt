@@ -58,6 +58,7 @@ class basic_any {
                     break;
                 case operation::MOVE:
                     as<basic_any>(to).instance = from.instance;
+                    [[fallthrough]];
                 case operation::DTOR:
                     break;
                 case operation::COMP:
