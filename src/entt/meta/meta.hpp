@@ -183,13 +183,13 @@ class meta_any {
             break;
         case operation::SEQ:
         case operation::CSEQ:
-            if constexpr(has_meta_sequence_container_traits_v<Type>) {
+            if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
                 *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
             }
             break;
         case operation::ASSOC:
         case operation::CASSOC:
-            if constexpr(has_meta_associative_container_traits_v<Type>) {
+            if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
                 *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
             }
             break;
