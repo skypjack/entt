@@ -10,6 +10,14 @@ namespace entt {
 
 /**
  * @brief Traits class template to be specialized to enable support for meta
+ * template information.
+ */
+template<typename>
+struct meta_template_traits;
+
+
+/**
+ * @brief Traits class template to be specialized to enable support for meta
  * sequence containers.
  */
 template<typename>

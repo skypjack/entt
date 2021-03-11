@@ -126,7 +126,7 @@ using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::t
  */
 template<typename... Args>
 [[nodiscard]] static meta_type meta_arg(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
-    return std::array<meta_type, sizeof...(Args)>{{internal::meta_info<Args>::resolve()...}}[index];
+    return internal::meta_arg_node(type_list<Args...>{}, index);
 }
 
 

@@ -12,6 +12,7 @@
   * [Enjoy the runtime](#enjoy-the-runtime)
   * [Container support](#container-support)
   * [Pointer-like types](#pointer-like-types)
+  * [Template information](#template-information)
   * [Implicitly generated default constructor](#implicitly-generated-default-constructor)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
@@ -656,6 +657,62 @@ In general, _dereferencing_ a pointer-like type boils down to a `*ptr`. However,
 
 In all other cases, that is, when dereferencing a pointer works as expected and
 regardless of the pointed type, no user intervention is required.
+
+## Template information
+
+Meta types also provide a minimal set of information about the nature of the
+original type in case it's a class template.<br/>
+By default, this works out of the box and requires no user action. However, it's
+important to include the header file `template.hpp` to make these information
+available to the compiler when needed.
+
+Meta template information are easily found:
+
+```cpp
+// this method returns true if the type is recognized as a class template specialization
+if(auto type = entt::resolve<std::shared_ptr<my_type>>(); type.is_template_specialization()) {
+    // meta type of the class template conveniently wrapped by entt::meta_class_template_tag
+    auto class_type = type.template_type();
+
+    // number of template arguments
+    std::size_t arity = type.template_arity();
+
+    // meta type of the i-th argument
+    auto arg_type = type.template_arg(0u);
+}
+```
+
+Typically, when template information for a type are required, what the library
+provides is sufficient. However, there are some cases where a user may want more
+details or a different set of information.<br/>
+Consider the case of a class template that is meant to wrap function types:
+
+```cpp
+template<typename>
+struct function_type;
+
+template<typename Ret, typename... Args>
+struct function_type<Ret(Args...)> {};
+```
+
+In this case, rather than the function type, the user might want the return type
+and unpacked arguments as if they were different template parameters for the
+original class template.<br/>
+To achieve this, users must enter the library internals and provide their own
+specialization for the class template `entt::meta_template_traits`, such as:
+
+```cpp
+template<typename Ret, typename... Args>
+struct entt::meta_template_traits<function_type<Ret(Args...)>> {
+    using class_type = meta_class_template_tag<function_type>;
+    using args_type = type_list<Ret, Args...>;
+};
+```
+
+The reflection system doesn't verify the accuracy of the information nor infer a
+correspondence between real types and meta types.<br/>
+Therefore, the specialization will be used as is and the information it contains
+will be associated with the appropriate type when required.
 
 ## Implicitly generated default constructor
 

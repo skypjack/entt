@@ -8,6 +8,7 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/pointer.hpp>
 #include <entt/meta/resolve.hpp>
+#include <entt/meta/template.hpp>
 
 template<typename Type>
 void set(Type &prop, Type value) {
@@ -267,6 +268,19 @@ TEST_F(MetaType, Traits) {
     ASSERT_EQ(entt::resolve<int[5][3]>().extent(), 5u);
     ASSERT_EQ(entt::resolve<int[5][3]>().extent(1u), 3u);
     ASSERT_EQ(entt::resolve<int[5][3]>().extent(2u), 0u);
+}
+
+TEST_F(MetaType, TemplateInfo) {
+    ASSERT_FALSE(entt::resolve<int>().is_template_specialization());
+    ASSERT_EQ(entt::resolve<int>().template_arity(), 0u);
+    ASSERT_EQ(entt::resolve<int>().template_type(), entt::meta_type{});
+    ASSERT_EQ(entt::resolve<int>().template_arg(0u), entt::meta_type{});
+
+    ASSERT_TRUE(entt::resolve<std::shared_ptr<int>>().is_template_specialization());
+    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arity(), 1u);
+    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_type(), entt::resolve<entt::meta_class_template_tag<std::shared_ptr>>());
+    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(0u), entt::resolve<int>());
+    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(1u), entt::meta_type{});
 }
 
 TEST_F(MetaType, RemovePointer) {
@@ -652,19 +666,6 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::value));
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::random));
-}
-
-TEST_F(MetaType, ClassTemplate) {
-    ASSERT_FALSE(entt::resolve<int>().is_template_specialization());
-    ASSERT_EQ(entt::resolve<int>().template_arity(), 0u);
-    ASSERT_EQ(entt::resolve<int>().template_type(), entt::meta_type{});
-    ASSERT_EQ(entt::resolve<int>().template_arg(0u), entt::meta_type{});
-
-    ASSERT_TRUE(entt::resolve<std::shared_ptr<int>>().is_template_specialization());
-    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arity(), 1u);
-    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_type(), entt::resolve<entt::meta_class_template_tag<std::shared_ptr>>());
-    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(0u), entt::resolve<int>());
-    ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(1u), entt::meta_type{});
 }
 
 TEST_F(MetaType, ReRegistration) {

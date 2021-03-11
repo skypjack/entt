@@ -4,8 +4,6 @@
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * allow to replace std:: with custom implementations
 * add examples (and credits) from @alanjfs :)
-* static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
-* update documentation for meta, it contains less than half of the actual feature
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
@@ -28,4 +26,3 @@ WIP:
 * snapshot: support for range-based archives
 * page size 0 -> page less mode
 * add example: 64 bit ids with 32 bits reserved for users' purposes
-* add meta dynamic cast (search base for T in parent, we have the meta type already)
