@@ -171,8 +171,8 @@ public:
      */
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : vtable{&basic_vtable<Type>},
-          instance{}
+        : instance{},
+          vtable{&basic_vtable<Type>}
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
@@ -329,8 +329,8 @@ public:
     }
 
 private:
+    union { const void *instance; storage_type storage; };
     vtable_type *vtable;
-    union { const void *instance; storage_type storage{}; };
 };
 
 
