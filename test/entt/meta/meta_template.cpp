@@ -37,7 +37,7 @@ TEST(MetaTemplate, Valid) {
 }
 
 TEST(MetaTemplate, CustomTraits) {
-    const auto type = entt::resolve<function_type<void(int, char)>>();
+    const auto type = entt::resolve<function_type<void(int, const char &)>>();
 
     ASSERT_TRUE(type.is_template_specialization());
     ASSERT_EQ(type.template_arity(), 3u);
