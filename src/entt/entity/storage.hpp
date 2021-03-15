@@ -185,7 +185,7 @@ protected:
     }
 
 public:
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -338,14 +338,14 @@ public:
     }
 
     /**
-     * @brief Returns the object associated with an entity.
+     * @brief Returns the object assigned to an entity.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the storage results in
      * undefined behavior.
      *
      * @param entt A valid entity identifier.
-     * @return The object associated with the entity.
+     * @return The object assigned to the entity.
      */
     [[nodiscard]] const value_type & get(const entity_type entt) const {
         return instances[underlying_type::index(entt)];
@@ -386,7 +386,7 @@ public:
     }
 
     /**
-     * @brief Updates the instance associated with a given entity in-place.
+     * @brief Updates the instance assigned to a given entity in-place.
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.
      * @param func Valid function objects.
@@ -513,7 +513,7 @@ class basic_storage<Entity, Type, std::enable_if_t<is_empty_v<Type>>>: public ba
     using underlying_type = basic_sparse_set<Entity>;
 
 public:
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -553,7 +553,7 @@ public:
     }
 
     /**
-    * @brief Updates the instance associated with a given entity in-place.
+    * @brief Updates the instance assigned to a given entity in-place.
     * @tparam Func Types of the function objects to invoke.
     * @param entity A valid entity identifier.
     * @param func Valid function objects.
@@ -590,7 +590,7 @@ template<typename Type>
 struct storage_adapter_mixin: Type {
     static_assert(std::is_same_v<typename Type::value_type, std::decay_t<typename Type::value_type>>, "Invalid object type");
 
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
@@ -612,12 +612,12 @@ struct storage_adapter_mixin: Type {
     /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the objects
-     * associated with the entities.
+     * @tparam Args Types of arguments to use to construct the objects assigned
+     * to the entities.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the objects associated with
-     * the entities.
+     * @param args Parameters to use to initialize the objects assigned to the
+     * entities.
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
@@ -748,13 +748,13 @@ public:
     /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the objects
-     * associated with the entities.
+     * @tparam Args Types of arguments to use to construct the objects assigned
+     * to the entities.
      * @param owner The registry that issued the request.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the objects associated with
-     * the entities.
+     * @param args Parameters to use to initialize the objects assigned to the
+     * entities.
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
@@ -810,7 +810,7 @@ struct storage_traits {
 
 
 /**
- * @brief Gets the element associated with an entity from a storage, if any.
+ * @brief Gets the element assigned to an entity from a storage, if any.
  * @tparam Type Storage type.
  * @param container A valid instance of a storage class.
  * @param entity A valid entity identifier.
