@@ -199,8 +199,6 @@ public:
     using reverse_iterator = Type *;
     /*! @brief Constant reverse iterator type. */
     using const_reverse_iterator = const Type *;
-    /*! @brief Storage category. */
-    using storage_category = dense_storage_tag;
 
     /**
      * @brief Increases the capacity of a storage.
@@ -519,8 +517,6 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Storage category. */
-    using storage_category = empty_storage_tag;
 
     /**
      * @brief Fake get function.
@@ -594,8 +590,6 @@ struct storage_adapter_mixin: Type {
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
-    /*! @brief Storage category. */
-    using storage_category = typename Type::storage_category;
 
     /**
      * @brief Assigns entities to a storage.
@@ -662,8 +656,6 @@ public:
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
-    /*! @brief Storage category. */
-    using storage_category = typename Type::storage_category;
 
     /**
      * @brief Returns a sink object.
@@ -820,11 +812,10 @@ template<typename Type>
 [[nodiscard]] auto get_as_tuple([[maybe_unused]] Type &container, [[maybe_unused]] const typename Type::entity_type entity) {
     static_assert(std::is_same_v<std::remove_const_t<Type>, typename storage_traits<typename Type::entity_type, typename Type::value_type>::storage_type>);
 
-    if constexpr(std::is_base_of_v<dense_storage_tag, typename Type::storage_category>) {
-        return std::forward_as_tuple(container.get(entity));
-    } else {
-        static_assert(std::is_base_of_v<empty_storage_tag, typename Type::storage_category>, "Unknown storage category");
+    if constexpr(std::is_void_v<decltype(container.get({}))>) {
         return std::make_tuple();
+    } else {
+        return std::forward_as_tuple(container.get(entity));
     }
 }
 

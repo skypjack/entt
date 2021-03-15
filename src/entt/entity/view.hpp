@@ -245,7 +245,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
     template<typename Comp, typename Func>
     void traverse(Func func) const {
-        if constexpr(std::is_same_v<typename storage_type<Comp>::storage_category, empty_storage_tag>) {
+        if constexpr(std::is_void_v<decltype(std::get<storage_type<Comp> *>(pools)->get({}))>) {
             for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
                 if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
                     && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
@@ -625,12 +625,12 @@ class basic_view<Entity, exclude_t<>, Component> final {
 
     public:
         using iterator = std::conditional_t<
-            std::is_same_v<typename storage_type::storage_category, empty_storage_tag>,
+            std::is_void_v<decltype(std::declval<storage_type>().get({}))>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<storage_type>().begin())>
         >;
         using reverse_iterator = std::conditional_t<
-            std::is_same_v<typename storage_type::storage_category, empty_storage_tag>,
+            std::is_void_v<decltype(std::declval<storage_type>().get({}))>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator, decltype(std::declval<storage_type>().rbegin())>
         >;
@@ -880,7 +880,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(std::is_same_v<typename storage_type::storage_category, empty_storage_tag>) {
+        if constexpr(std::is_void_v<decltype(pool->get({}))>) {
             if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = size(); pos; --pos) {
                     func();
