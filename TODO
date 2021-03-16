@@ -9,7 +9,6 @@
 WIP:
 * HP: any_vector for context variables
 * HP: make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
-* HP: remove storage category and get_as_tuple, make storage classes return tuple (+ view generator detect shared storage in future)?
 * HP: review registry::get, registry::try_get
 * HP: weak reference wrapper example with custom storage
 * HP: merge view and view pack
