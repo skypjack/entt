@@ -141,7 +141,7 @@ TEST(ViewPack, Each) {
     cpack.each([&cnt](const int &, const char &) { --cnt; });
     cpack.each([&cnt](auto, const int &, const char &) { --cnt; });
 
-    for(auto &&[entt, iv, cv]: pack.each()) {
+    for(auto [entt, iv, cv]: pack.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -198,7 +198,7 @@ TEST(ViewPack, ConstNonConstAndAllInBetween) {
         static_assert(std::is_same_v<decltype(c), const char &>);
     });
 
-    for(auto &&[entt, iv, cv]: pack.each()) {
+    for(auto [entt, iv, cv]: pack.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), const char &>);

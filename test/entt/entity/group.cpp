@@ -193,7 +193,7 @@ TEST(NonOwningGroup, Each) {
     cgroup.each([&cnt](const int &, const char &) { --cnt; });
     cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
 
-    for(auto &&[entt, iv, cv]: group.each()) {
+    for(auto [entt, iv, cv]: group.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -353,7 +353,7 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
         static_assert(std::is_same_v<decltype(c), const char &>);
     });
 
-    for(auto &&[entt, iv, cv]: group.each()) {
+    for(auto [entt, iv, cv]: group.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), const char &>);
@@ -475,7 +475,7 @@ TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     });
 
-    for(auto &&[entt, iv]: group.each()) {
+    for(auto [entt, iv]: group.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         ASSERT_TRUE(entt == e0 || entt == e1);
@@ -514,7 +514,7 @@ TEST(NonOwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto &&[entt, iv, cv]: registry.group(entt::get<int, char, empty_type>).each()) {
+    for(auto [entt, iv, cv]: registry.group(entt::get<int, char, empty_type>).each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -526,7 +526,7 @@ TEST(NonOwningGroup, EmptyTypes) {
         check = false;
     });
 
-    for(auto &&[entt, iv, cv]: registry.group(entt::get<int, empty_type, char>).each()) {
+    for(auto [entt, iv, cv]: registry.group(entt::get<int, empty_type, char>).each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -537,7 +537,7 @@ TEST(NonOwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto &&[entt, iv, cv]: registry.group(entt::get<empty_type, int, char>).each()) {
+    for(auto [entt, iv, cv]: registry.group(entt::get<empty_type, int, char>).each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -762,7 +762,7 @@ TEST(OwningGroup, Each) {
     cgroup.each([&cnt](const int &, const char &) { --cnt; });
     cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
 
-    for(auto &&[entt, iv, cv]: group.each()) {
+    for(auto [entt, iv, cv]: group.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -1024,7 +1024,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
         static_assert(std::is_same_v<decltype(f), const float &>);
     });
 
-    for(auto &&[entt, iv, cv, dv, fv]: group.each()) {
+    for(auto [entt, iv, cv, dv, fv]: group.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), const char &>);
@@ -1148,7 +1148,7 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     });
 
-    for(auto &&[entt, iv]: group.each()) {
+    for(auto [entt, iv]: group.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         ASSERT_TRUE(entt == e0 || entt == e1);
@@ -1187,7 +1187,7 @@ TEST(OwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto &&[entt, iv, cv]: registry.group<int>(entt::get<char, empty_type>).each()) {
+    for(auto [entt, iv, cv]: registry.group<int>(entt::get<char, empty_type>).each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -1199,7 +1199,7 @@ TEST(OwningGroup, EmptyTypes) {
         check = false;
     });
 
-    for(auto &&[entt, cv, iv]: registry.group<char>(entt::get<empty_type, int>).each()) {
+    for(auto [entt, cv, iv]: registry.group<char>(entt::get<empty_type, int>).each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(cv), char &>);
         static_assert(std::is_same_v<decltype(iv), int &>);
@@ -1210,7 +1210,7 @@ TEST(OwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto &&[entt, iv, cv]: registry.group<empty_type>(entt::get<int, char>).each()) {
+    for(auto [entt, iv, cv]: registry.group<empty_type>(entt::get<int, char>).each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
