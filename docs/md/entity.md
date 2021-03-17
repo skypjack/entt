@@ -1344,14 +1344,12 @@ registry during iterations to get the types iterated by the view itself.
 
 ### View pack
 
-The view pack allows users to combine multiple views into a single _view-like_
-iterable object, while also giving them full control over which view should lead
-the iteration.<br/>
-This object returns all and only the entities present in all views. Its intended
-primary use is for custom storage and views, but it can also be very convenient
-in everyday use.
+Views can be combined with each other to create new and more specific
+objects.<br/>
+The type returned when combining multiple views together is itself a view, more
+in general a multi component one.
 
-The creation of a view pack tries to mimic C++20 ranges:
+Combining different views tries to mimic C++20 ranges:
 
 ```cpp
 auto view = registry.view<position>();
@@ -1360,47 +1358,11 @@ auto other = registry.view<velocity>();
 auto pack = view | other;
 ```
 
-The return type is a specialization of the class template `entt::view_pack`.
-This is nothing more than a _view-like_ iterable object that combines two or
-more views into a single instance.<br/>
-The first view used to create a pack will also be the same that will lead the
-iteration.
-
-A view pack offers functionalities similar to those of a multi component view,
-especially with regard to the possibilities of iteration. In particular, it only
-returns entities if iterated directly:
-
-```cpp
-for(auto entt: pack) {
-    // ...
-}
-```
-
-On the other hand, both the (optional) entity and the components are returned
-when the `each` member function is used, be it with callback or to get an
-extended iterable object:
-
-```cpp
-// with a callback
-pack.each([](const auto entt, auto &pos, auto &vel) { /* ... */ });
-
-// with an extended iterable object
-for(auto [entt, pos, vel]: pack.each()) {
-    // ...
-}
-```
-
-Furthermore, the constness of the types returned by a view pack is directly
-inherited by the views that compose it:
-
-```
-(registry.view<position>() | registry.view<const velocity>()).each([](auto &pos, const auto &vel) {
-    // ...
-});
-```
-
-Read also the dedicated section to know how a view pack is involved in the
-creation and use of custom storage and pools.
+The constness of the types is preserved and their order depends on the order in
+which the views are combined. Therefore, the pack in the example above will
+return an instance of `position` first and then one of `velocity`.<br/>
+Since combining views generates views, a chain can be of arbitrary length and
+the above type order rules apply sequentially.
 
 ### Runtime views
 

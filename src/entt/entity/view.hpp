@@ -533,6 +533,9 @@ public:
         return iterable_view{*this};
     }
 
+    template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+    friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
+
 private:
     const std::tuple<storage_type<Component> *...> pools;
     const std::tuple<const storage_type<Exclude> *...> filter;
@@ -920,6 +923,9 @@ public:
         return iterable_view{*std::get<0>(pools)};
     }
 
+    template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+    friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
+
 private:
     const std::tuple<storage_type *> pools;
     const std::tuple<> filter;
@@ -934,6 +940,24 @@ private:
 template<typename... Storage>
 basic_view(Storage &... storage) ENTT_NOEXCEPT
 -> basic_view<std::common_type_t<typename Storage::entity_type...>, entt::exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
+
+
+/**
+ * @brief Combines two views in a _more specific_ one.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam ELhs Filter list of the first view.
+ * @tparam CLhs Component list of the first view.
+ * @tparam ERhs Filter list of the second view.
+ * @tparam CRhs Component list of the second view.
+ * @param lhs A valid reference to the first view.
+ * @param rhs A valid reference to the second view.
+ * @return A more specific and correctly initialized view.
+ */
+template<typename Entity, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+[[nodiscard]] auto operator|(const basic_view<Entity, exclude_t<ELhs...>, CLhs...> &lhs, const basic_view<Entity, exclude_t<ERhs...>, CRhs...> &rhs) {
+    using view_type = basic_view<Entity, exclude_t<ELhs..., ERhs...>, CLhs..., CRhs...>;
+    return std::apply([](auto *... storage) { return view_type{*storage...}; }, std::tuple_cat(lhs.pools, rhs.pools, lhs.filter, rhs.filter));
+}
 
 
 }

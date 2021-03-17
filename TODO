@@ -11,7 +11,6 @@ WIP:
 * HP: make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
 * HP: review registry::get, registry::try_get
 * HP: weak reference wrapper example with custom storage
-* HP: merge view and view pack
 * HP: paginate pools
 * HP: headless (sparse set only) view
 * HP: write documentation for custom storages and views!!

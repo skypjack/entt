@@ -23,7 +23,6 @@
 #include "entity/storage.hpp"
 #include "entity/utility.hpp"
 #include "entity/view.hpp"
-#include "entity/view_pack.hpp"
 #include "locator/locator.hpp"
 #include "meta/adl_pointer.hpp"
 #include "meta/container.hpp"
