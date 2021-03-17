@@ -790,15 +790,15 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) const {
-        ENTT_ASSERT(valid(entity) && ... && pool_if_exists<Component>());
-        return view<std::add_const_t<Component>...>().get<std::add_const_t<Component>...>(entity);
+        ENTT_ASSERT((valid(entity) && ... && pool_if_exists<Component>()));
+        return view<std::add_const_t<Component>...>().template get<std::add_const_t<Component>...>(entity);
     }
 
     /*! @copydoc get */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        return view<Component...>().get<Component...>(entity);
+        return view<Component...>().template get<Component...>(entity);
     }
 
     /**
