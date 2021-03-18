@@ -97,6 +97,12 @@ endif()
 target_compile_features(EnTT INTERFACE cxx_std_17)
 
 #
+# Set pkg-config variables
+#
+set(EnTT_PKGCONFIG ${PROJECT_BINARY_DIR}/entt.pc)
+set(EnTT_PKGCONFIG_DESTDIR ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+#
 # Install EnTT
 #
 
@@ -112,6 +118,12 @@ write_basic_package_version_file(
     EnTTConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
+)
+
+configure_file(
+  "${EnTT_SOURCE_DIR}/cmake/in/entt.pc.in"
+  "${EnTT_PKGCONFIG}"
+  @ONLY
 )
 
 configure_package_config_file(
@@ -141,6 +153,8 @@ install(
 )
 
 install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(FILES "${EnTT_PKGCONFIG}" DESTINATION "${EnTT_PKGCONFIG_DESTDIR}")
 
 export(PACKAGE EnTT)
 
