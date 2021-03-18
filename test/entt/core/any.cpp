@@ -34,6 +34,8 @@ struct not_copyable {
     double payload[Sz];
 };
 
+struct alignas(64u) over_aligned {};
+
 TEST(Any, SBO) {
     entt::any any{'c'};
 
@@ -883,4 +885,11 @@ TEST(Any, SBOVsZeroedSBOSize) {
     entt::basic_any<0u> same = std::move(dyn);
 
     ASSERT_EQ(valid, same.data());
+}
+
+TEST(Any, Alignment) {
+    static constexpr auto alignment = alignof(over_aligned);
+    entt::basic_any<alignment> target[2] = { over_aligned{}, over_aligned{} };
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[0u])) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[1u])) % alignment) == 0u);
 }
