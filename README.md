@@ -46,12 +46,13 @@ Many thanks to [these people](https://skypjack.github.io/sponsorship/) and
   * [Code Example](#code-example)
   * [Motivation](#motivation)
   * [Performance](#performance)
-* [Build Instructions](#build-instructions)
+* [Integration](#integration)
   * [Requirements](#requirements)
-  * [Library](#library)
-  * [Documentation](#documentation)
-  * [Tests](#tests)
-* [Packaging Tools](#packaging-tools)
+  * [CMake](#cmake)
+  * [Packaging Tools](#packaging-tools)
+  * [pkg-config](#pkg-config)
+* [Documentation](#documentation)
+* [Tests](#tests)
 * [EnTT in Action](#entt-in-action)
 * [Contributors](#contributors)
 * [License](#license)
@@ -198,26 +199,7 @@ new features, mainly for fun.<br/>
 If you want to contribute and/or have suggestions, feel free to make a PR or
 open an issue to discuss your idea.
 
-# Build Instructions
-
-## Requirements
-
-To be able to use `EnTT`, users must provide a full-featured compiler that
-supports at least C++17.<br/>
-The requirements below are mandatory to compile the tests and to extract the
-documentation:
-
-* `CMake` version 3.7 or later.
-* `Doxygen` version 1.8 or later.
-
-Alternatively, [Bazel](https://bazel.build) is also supported as a build system
-(credits to [zaucy](https://github.com/zaucy) who offered to maintain it).<br/>
-In the documentation below I'll still refer to `CMake`, this being the official
-build system of the library.
-
-If you are looking for a C++14 version of `EnTT`, check out the git tag `cpp14`.
-
-## Library
+# Integration
 
 `EnTT` is a header-only library. This means that including the `entt.hpp` header
 is enough to include the library as a whole and use it. For those who are
@@ -238,51 +220,33 @@ Use the line below to include only the entity-component system instead:
 Then pass the proper `-I` argument to the compiler to add the `src` directory to
 the include paths.
 
-## Documentation
+## Requirements
 
-The documentation is based on [doxygen](http://www.doxygen.nl/).
-To build it:
+To be able to use `EnTT`, users must provide a full-featured compiler that
+supports at least C++17.<br/>
+The requirements below are mandatory to compile the tests and to extract the
+documentation:
 
-    $ cd build
-    $ cmake .. -DENTT_BUILD_DOCS=ON
-    $ make
+* `CMake` version 3.7 or later.
+* `Doxygen` version 1.8 or later.
 
-The API reference will be created in HTML format within the directory
-`build/docs/html`. To navigate it with your favorite browser:
+Alternatively, [Bazel](https://bazel.build) is also supported as a build system
+(credits to [zaucy](https://github.com/zaucy) who offered to maintain it).<br/>
+In the documentation below I'll still refer to `CMake`, this being the official
+build system of the library.
 
-    $ cd build
-    $ your_favorite_browser docs/html/index.html
+## CMake
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
-The same version is also available [online](https://skypjack.github.io/entt/)
-for the latest release, that is the last stable tag. If you are looking for
-something more pleasing to the eye, consider reading the nice-looking version
-available on [docsforge](https://entt.docsforge.com/): same documentation, much
-more pleasant to read.<br/>
-Moreover, there exists a [wiki](https://github.com/skypjack/entt/wiki) dedicated
-to the project where users can find all related documentation pages.
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
+To use `EnTT` from a `CMake` project, just link an existing target to the
+`EnTT::EnTT` alias.<br/>
+The library offers everything you need for locating (as in `find_package`),
+embedding (as in `add_subdirectory`), fetching (as in `FetchContent`) or using
+it in many of the ways that you can think of and that involve `CMake`.<br/>
+Covering all possible cases would require a treaty and not a simple README file,
+but I'm confident that anyone reading this section also knows what it's about
+and can use `EnTT` from a `CMake` project without problems.
 
-## Tests
-
-To compile and run the tests, `EnTT` requires *googletest*.<br/>
-`cmake` will download and compile the library before compiling anything else.
-In order to build the tests, set the CMake option `ENTT_BUILD_TESTING` to `ON`.
-
-To build the most basic set of tests:
-
-* `$ cd build`
-* `$ cmake -DENTT_BUILD_TESTING=ON ..`
-* `$ make`
-* `$ make test`
-
-Note that benchmarks are not part of this set.
-
-# Packaging Tools
+## Packaging Tools
 
 `EnTT` is available for some of the most known packaging tools. In particular:
 
@@ -341,7 +305,58 @@ Note that benchmarks are not part of this set.
   [documentation](https://build2.org/build2-toolchain/doc/build2-toolchain-intro.xhtml#guide-repositories)
   for more details.
 
-Consider this list a work in progress and help me to make it longer.
+Consider this list a work in progress and help me to make it longer if you like.
+
+## pkg-config
+
+`EnTT` also supports `pkg-config` (for some definition of _supports_ at least).
+A suitable file called `entt.pc` is generated and installed in a proper
+directory when running `CMake`.<br/>
+This should also make it easier to use with tools such as `Meson` or similar.
+
+# Documentation
+
+The documentation is based on [doxygen](http://www.doxygen.nl/). To build it:
+
+    $ cd build
+    $ cmake .. -DENTT_BUILD_DOCS=ON
+    $ make
+
+The API reference will be created in HTML format within the directory
+`build/docs/html`. To navigate it with your favorite browser:
+
+    $ cd build
+    $ your_favorite_browser docs/html/index.html
+
+<!--
+@cond TURN_OFF_DOXYGEN
+-->
+The same version is also available [online](https://skypjack.github.io/entt/)
+for the latest release, that is the last stable tag. If you are looking for
+something more pleasing to the eye, consider reading the nice-looking version
+available on [docsforge](https://entt.docsforge.com/): same documentation, much
+more pleasant to read.<br/>
+Moreover, there exists a [wiki](https://github.com/skypjack/entt/wiki) dedicated
+to the project where users can find all related documentation pages.
+<!--
+@endcond TURN_OFF_DOXYGEN
+-->
+
+# Tests
+
+To compile and run the tests, `EnTT` requires *googletest*.<br/>
+`cmake` will download and compile the library before compiling anything else.
+In order to build the tests, set the `CMake` option `ENTT_BUILD_TESTING` to
+`ON`.
+
+To build the most basic set of tests:
+
+* `$ cd build`
+* `$ cmake -DENTT_BUILD_TESTING=ON ..`
+* `$ make`
+* `$ make test`
+
+Note that benchmarks are not part of this set.
 
 <!--
 @cond TURN_OFF_DOXYGEN

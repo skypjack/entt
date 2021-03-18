@@ -2,7 +2,7 @@ prefix=@CMAKE_INSTALL_PREFIX@
 includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: EnTT
-Description: Fast and reliable entity component system (ECS)
+Description: Gaming meets modern C++
 Url: https://github.com/skypjack/entt
-Version: @EnTT_VERSION@
+Version: @ENTT_VERSION@
 Cflags: -I${includedir}
