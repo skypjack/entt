@@ -21,12 +21,6 @@
 namespace entt {
 
 
-/*! @brief Empty storage category tag. */
-struct empty_storage_tag {};
-/*! @brief Dense storage category tag. */
-struct dense_storage_tag: empty_storage_tag {};
-
-
 /**
  * @brief Basic storage implementation.
  *
