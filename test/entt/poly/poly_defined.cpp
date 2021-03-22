@@ -47,6 +47,8 @@ struct impl {
     int value{};
 };
 
+struct alignas(64u) over_aligned: impl {};
+
 TEST(PolyDefined, Functionalities) {
     impl instance{};
 
@@ -232,4 +234,28 @@ TEST(PolyDefined, SBOVsZeroedSBOSize) {
     same->incr();
 
     ASSERT_EQ(same->get(), 1);
+}
+
+TEST(PolyDefined, Alignment) {
+    static constexpr auto alignment = alignof(over_aligned);
+
+    auto test = [](auto *target, auto cb) {
+        const auto *data = target[0].data();
+
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[0u].data()) % alignment) == 0u);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[1u].data()) % alignment) == 0u);
+
+        std::swap(target[0], target[1]);
+
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[0u].data()) % alignment) == 0u);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[1u].data()) % alignment) == 0u);
+
+        cb(data, target[1].data());
+    };
+
+    entt::basic_poly<Defined, alignment> nosbo[2] = { over_aligned{}, over_aligned{} };
+    test(nosbo, [](auto *pre, auto *post) { ASSERT_EQ(pre, post); });
+
+    entt::basic_poly<Defined, alignment, alignment> sbo[2] = { over_aligned{}, over_aligned{} };
+    test(sbo, [](auto *pre, auto *post) { ASSERT_NE(pre, post); });
 }

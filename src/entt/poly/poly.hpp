@@ -46,25 +46,26 @@ struct poly_inspector {
  * @brief Static virtual table factory.
  * @tparam Concept Concept descriptor.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
  */
-template<typename Concept, std::size_t Len>
+template<typename Concept, std::size_t Len, std::size_t... Align>
 class poly_vtable {
     using inspector = typename Concept::template type<poly_inspector>;
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(inspector &, Args...)) -> Ret(*)(basic_any<Len> &, Args...);
+    static auto vtable_entry(Ret(*)(inspector &, Args...)) -> Ret(*)(basic_any<Len, Align...> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(const inspector &, Args...)) -> Ret(*)(const basic_any<Len> &, Args...);
+    static auto vtable_entry(Ret(*)(const inspector &, Args...)) -> Ret(*)(const basic_any<Len, Align...> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(Args...)) -> Ret(*)(const basic_any<Len> &, Args...);
+    static auto vtable_entry(Ret(*)(Args...)) -> Ret(*)(const basic_any<Len, Align...> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(inspector:: *)(Args...)) -> Ret(*)(basic_any<Len> &, Args...);
+    static auto vtable_entry(Ret(inspector:: *)(Args...)) -> Ret(*)(basic_any<Len, Align...> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(inspector:: *)(Args...) const) -> Ret(*)(const basic_any<Len> &, Args...);
+    static auto vtable_entry(Ret(inspector:: *)(Args...) const) -> Ret(*)(const basic_any<Len, Align...> &, Args...);
 
     template<auto... Candidate>
     static auto make_vtable(value_list<Candidate...>)
@@ -174,13 +175,14 @@ decltype(auto) poly_call(Poly &&self, Args &&... args) {
  *
  * @tparam Concept Concept descriptor.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
  */
-template<typename Concept, std::size_t Len>
-class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, Len>>> {
+template<typename Concept, std::size_t Len, std::size_t... Align>
+class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, Len, Align...>>> {
     /*! @brief A poly base is allowed to snoop into a poly object. */
     friend struct poly_base<basic_poly>;
 
-    using vtable_type = typename poly_vtable<Concept, Len>::type;
+    using vtable_type = typename poly_vtable<Concept, Len, Align...>::type;
 
 public:
     /*! @brief Concept type. */
@@ -201,7 +203,7 @@ public:
     template<typename Type, typename... Args>
     explicit basic_poly(std::in_place_type_t<Type>, Args &&... args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept, Len>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
+          vtable{poly_vtable<Concept, Len, Align...>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
     {}
 
     /**
@@ -338,7 +340,7 @@ public:
     }
 
 private:
-    basic_any<Len> storage;
+    basic_any<Len, Align...> storage;
     const vtable_type *vtable;
 };
 

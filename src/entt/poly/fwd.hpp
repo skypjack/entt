@@ -5,7 +5,7 @@
 namespace entt {
 
 
-template<typename, std::size_t>
+template<typename, std::size_t, std::size_t...>
 class basic_poly;
 
 
