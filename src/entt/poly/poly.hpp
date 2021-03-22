@@ -176,18 +176,18 @@ decltype(auto) poly_call(Poly &&self, Args &&... args) {
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  */
 template<typename Concept, std::size_t Len>
-class poly: private Concept::template type<poly_base<poly<Concept, Len>>> {
+class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, Len>>> {
     /*! @brief A poly base is allowed to snoop into a poly object. */
-    friend struct poly_base<poly>;
+    friend struct poly_base<basic_poly>;
 
     using vtable_type = typename poly_vtable<Concept, Len>::type;
 
 public:
     /*! @brief Concept type. */
-    using concept_type = typename Concept::template type<poly_base<poly>>;
+    using concept_type = typename Concept::template type<poly_base<basic_poly>>;
 
     /*! @brief Default constructor. */
-    poly() ENTT_NOEXCEPT
+    basic_poly() ENTT_NOEXCEPT
         : storage{},
           vtable{}
     {}
@@ -199,7 +199,7 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit poly(std::in_place_type_t<Type>, Args &&... args)
+    explicit basic_poly(std::in_place_type_t<Type>, Args &&... args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
           vtable{poly_vtable<Concept, Len>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
     {}
@@ -210,8 +210,8 @@ public:
      * @param value An instance of an object to use to initialize the poly.
      */
     template<typename Type>
-    poly(std::reference_wrapper<Type> value)
-        : poly{std::in_place_type<Type &>, value.get()}
+    basic_poly(std::reference_wrapper<Type> value)
+        : basic_poly{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -219,23 +219,23 @@ public:
      * @tparam Type Type of object to use to initialize the poly.
      * @param value An instance of an object to use to initialize the poly.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, poly>>>
-    poly(Type &&value) ENTT_NOEXCEPT
-        : poly{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, basic_poly>>>
+    basic_poly(Type &&value) ENTT_NOEXCEPT
+        : basic_poly{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
     {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    poly(const poly &other) = default;
+    basic_poly(const basic_poly &other) = default;
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    poly(poly &&other) ENTT_NOEXCEPT
-        : poly{}
+    basic_poly(basic_poly &&other) ENTT_NOEXCEPT
+        : basic_poly{}
     {
         swap(*this, other);
     }
@@ -245,7 +245,7 @@ public:
      * @param other The instance to assign from.
      * @return This poly object.
      */
-    poly & operator=(poly other) {
+    basic_poly & operator=(basic_poly other) {
         swap(other, *this);
         return *this;
     }
@@ -279,12 +279,12 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        *this = poly{std::in_place_type<Type>, std::forward<Args>(args)...};
+        *this = basic_poly{std::in_place_type<Type>, std::forward<Args>(args)...};
     }
 
     /*! @brief Destroys contained object */
     void reset() {
-        *this = poly{};
+        *this = basic_poly{};
     }
 
     /**
@@ -313,7 +313,7 @@ public:
      * @param lhs A valid poly object.
      * @param rhs A valid poly object.
      */
-    friend void swap(poly &lhs, poly &rhs) {
+    friend void swap(basic_poly &lhs, basic_poly &rhs) {
         using std::swap;
         swap(lhs.storage, rhs.storage);
         swap(lhs.vtable, rhs.vtable);
@@ -323,15 +323,15 @@ public:
      * @brief Aliasing constructor.
      * @return A poly that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] poly as_ref() ENTT_NOEXCEPT {
-        poly ref = std::as_const(*this).as_ref();
+    [[nodiscard]] basic_poly as_ref() ENTT_NOEXCEPT {
+        basic_poly ref = std::as_const(*this).as_ref();
         ref.storage = storage.as_ref();
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] poly as_ref() const ENTT_NOEXCEPT {
-        poly ref{};
+    [[nodiscard]] basic_poly as_ref() const ENTT_NOEXCEPT {
+        basic_poly ref{};
         ref.storage = storage.as_ref();
         ref.vtable = vtable;
         return ref;

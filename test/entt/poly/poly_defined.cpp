@@ -222,9 +222,9 @@ TEST(PolyDefined, SBOVsZeroedSBOSize) {
 
     ASSERT_NE(broken, other.data());
 
-    entt::poly<Defined, 0u> dyn{impl{}};
+    entt::basic_poly<Defined, 0u> dyn{impl{}};
     const auto valid = dyn.data();
-    entt::poly<Defined, 0u> same = std::move(dyn);
+    entt::basic_poly<Defined, 0u> same = std::move(dyn);
 
     ASSERT_EQ(valid, same.data());
 

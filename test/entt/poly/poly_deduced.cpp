@@ -216,9 +216,9 @@ TEST(PolyDeduced, SBOVsZeroedSBOSize) {
 
     ASSERT_NE(broken, other.data());
 
-    entt::poly<Deduced, 0u> dyn{impl{}};
+    entt::basic_poly<Deduced, 0u> dyn{impl{}};
     const auto valid = dyn.data();
-    entt::poly<Deduced, 0u> same = std::move(dyn);
+    entt::basic_poly<Deduced, 0u> same = std::move(dyn);
 
     ASSERT_EQ(valid, same.data());
 
