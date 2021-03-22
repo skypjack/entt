@@ -893,13 +893,13 @@ TEST(Any, Alignment) {
     auto test = [](auto *target, auto cb) {
         const auto *data = target[0].data();
 
-        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[0u])) % alignment) == 0u);
-        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[1u])) % alignment) == 0u);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[0u].data()) % alignment) == 0u);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[1u].data()) % alignment) == 0u);
 
         std::swap(target[0], target[1]);
 
-        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[0u])) % alignment) == 0u);
-        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[1u])) % alignment) == 0u);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[0u].data()) % alignment) == 0u);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[1u].data()) % alignment) == 0u);
 
         cb(data, target[1].data());
     };
