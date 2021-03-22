@@ -58,7 +58,14 @@ function(SETUP_TARGET TARGET_NAME)
         )
     endif()
 
-    target_compile_definitions(${TARGET_NAME} PRIVATE ENTT_STANDALONE ${ARGN})
+    target_compile_definitions(
+        ${TARGET_NAME}
+        PRIVATE
+            _ENABLE_EXTENDED_ALIGNED_STORAGE
+            ENTT_STANDALONE
+            NOMINMAX
+            ${ARGN}
+    )
 endfunction()
 
 add_library(odr OBJECT odr.cpp)
@@ -80,8 +87,8 @@ endfunction()
 
 function(SETUP_PLUGIN_TEST TEST_NAME)
     add_library(_${TEST_NAME} MODULE $<TARGET_OBJECTS:odr> lib/${TEST_NAME}/plugin.cpp)
-    SETUP_TARGET(_${TEST_NAME} NOMINMAX ${ARGVN})
-    SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp NOMINMAX PLUGIN="$<TARGET_FILE:_${TEST_NAME}>" ${ARGVN})
+    SETUP_TARGET(_${TEST_NAME} ${ARGVN})
+    SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp PLUGIN="$<TARGET_FILE:_${TEST_NAME}>" ${ARGVN})
     target_include_directories(_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_include_directories(lib_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_link_libraries(lib_${TEST_NAME} PRIVATE ${CMAKE_DL_LIBS})

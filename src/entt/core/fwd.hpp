@@ -8,7 +8,7 @@
 namespace entt {
 
 
-template<std::size_t = sizeof(double[2])>
+template<std::size_t, std::size_t...>
 class basic_any;
 
 
@@ -17,7 +17,7 @@ using id_type = ENTT_ID_TYPE;
 
 
 /*! @brief Alias declaration for the most common use case. */
-using any = basic_any<>;
+using any = basic_any<sizeof(double[2])>;
 
 
 }

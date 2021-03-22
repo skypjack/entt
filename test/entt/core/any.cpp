@@ -887,17 +887,26 @@ TEST(Any, SBOVsZeroedSBOSize) {
     ASSERT_EQ(valid, same.data());
 }
 
-TEST(Any, NoSBOAlignment) {
+TEST(Any, Alignment) {
     static constexpr auto alignment = alignof(over_aligned);
-    entt::basic_any<alignment> target[2] = { over_aligned{}, over_aligned{} };
-    const auto *data = target[0].data();
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[0u])) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[1u])) % alignment) == 0u);
+    auto test = [](auto *target, auto cb) {
+        const auto *data = target[0].data();
 
-    std::swap(target[0], target[1]);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[0u])) % alignment) == 0u);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[1u])) % alignment) == 0u);
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[0u])) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[1u])) % alignment) == 0u);
-    ASSERT_EQ(data, target[1].data());
+        std::swap(target[0], target[1]);
+
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[0u])) % alignment) == 0u);
+        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(entt::any_cast<over_aligned>(&target[1u])) % alignment) == 0u);
+
+        cb(data, target[1].data());
+    };
+
+    entt::basic_any<alignment> nosbo[2] = { over_aligned{}, over_aligned{} };
+    test(nosbo, [](auto *pre, auto *post) { ASSERT_EQ(pre, post); });
+
+    entt::basic_any<alignment, alignment> sbo[2] = { over_aligned{}, over_aligned{} };
+    test(sbo, [](auto *pre, auto *post) { ASSERT_NE(pre, post); });
 }
