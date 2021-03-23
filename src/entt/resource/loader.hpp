@@ -2,8 +2,8 @@
 #define ENTT_RESOURCE_LOADER_HPP
 
 
-#include <memory>
 #include "fwd.hpp"
+#include "handle.hpp"
 
 
 namespace entt {
@@ -15,14 +15,14 @@ namespace entt {
  * Resource loaders must inherit from this class and stay true to the CRTP
  * idiom. Moreover, a resource loader must expose a public, const member
  * function named `load` that accepts a variable number of arguments and returns
- * a shared pointer to the resource just created.<br/>
+ * a handle to the resource just created.<br/>
  * As an example:
  *
  * @code{.cpp}
  * struct my_resource {};
  *
  * struct my_loader: entt::resource_loader<my_loader, my_resource> {
- *     std::shared_ptr<my_resource> load(int) const {
+ *     resource_handle<my_resource> load(int value) const {
  *         // use the integer value somehow
  *         return std::make_shared<my_resource>();
  *     }
@@ -53,7 +53,7 @@ class resource_loader {
      * @return The resource just loaded or an empty pointer in case of errors.
      */
     template<typename... Args>
-    [[nodiscard]] std::shared_ptr<Resource> get(Args &&... args) const {
+    [[nodiscard]] resource_handle<Resource> get(Args &&... args) const {
         return static_cast<const Loader *>(this)->load(std::forward<Args>(args)...);
     }
 };

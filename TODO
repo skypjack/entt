@@ -7,6 +7,7 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
+* HP: resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * HP: any_vector for context variables
 * HP: make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
 * HP: review registry::get, registry::try_get
