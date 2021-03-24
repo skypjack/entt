@@ -69,7 +69,7 @@ class poly_vtable {
 
     template<auto... Candidate>
     static auto make_vtable(value_list<Candidate...>)
-    -> std::tuple<decltype(vtable_entry(Candidate))...>;
+    -> decltype(std::make_tuple(vtable_entry(Candidate)...));
 
     template<typename... Func>
     [[nodiscard]] static constexpr auto make_vtable(type_list<Func...>)  {
