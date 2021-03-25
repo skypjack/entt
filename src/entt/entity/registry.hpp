@@ -1535,14 +1535,16 @@ public:
     template<typename Type>
     [[nodiscard]] Type & ctx() const {
         auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        return (ENTT_ASSERT(it != vars.cend()), any_cast<Type &>(*it));
+        ENTT_ASSERT(it != vars.cend());
+        return any_cast<Type &>(*it);
     }
 
     /*! @copydoc ctx */
     template<typename Type>
     [[nodiscard]] Type & ctx() {
         auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        return (ENTT_ASSERT(it != vars.end()), any_cast<Type &>(*it));
+        ENTT_ASSERT(it != vars.end());
+        return any_cast<Type &>(*it);
     }
 
     /**
