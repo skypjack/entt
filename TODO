@@ -7,10 +7,11 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
+* HP: make non-const try_get thread safe, add user data to type_info
+* HP: make pools available (registry/view/group), review operator| for views
 * HP: resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * HP: any_vector for context variables
 * HP: make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
-* HP: review registry::get, registry::try_get
 * HP: weak reference wrapper example with custom storage
 * HP: paginate pools
 * HP: headless (sparse set only) view

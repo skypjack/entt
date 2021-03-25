@@ -533,6 +533,15 @@ public:
         return iterable_view{*this};
     }
 
+    /**
+     * @brief Combines two views in a _more specific_ one (friend function).
+     * @tparam Id A valid entity type (see entt_traits for more details).
+     * @tparam ELhs Filter list of the first view.
+     * @tparam CLhs Component list of the first view.
+     * @tparam ERhs Filter list of the second view.
+     * @tparam CRhs Component list of the second view.
+     * @return A more specific view.
+     */
     template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
     friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
 
@@ -923,6 +932,15 @@ public:
         return iterable_view{*std::get<0>(pools)};
     }
 
+    /**
+     * @brief Combines two views in a _more specific_ one (friend function).
+     * @tparam Id A valid entity type (see entt_traits for more details).
+     * @tparam ELhs Filter list of the first view.
+     * @tparam CLhs Component list of the first view.
+     * @tparam ERhs Filter list of the second view.
+     * @tparam CRhs Component list of the second view.
+     * @return A more specific view.
+     */
     template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
     friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
 
@@ -951,7 +969,7 @@ basic_view(Storage &... storage) ENTT_NOEXCEPT
  * @tparam CRhs Component list of the second view.
  * @param lhs A valid reference to the first view.
  * @param rhs A valid reference to the second view.
- * @return A more specific and correctly initialized view.
+ * @return A more specific view.
  */
 template<typename Entity, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
 [[nodiscard]] auto operator|(const basic_view<Entity, exclude_t<ELhs...>, CLhs...> &lhs, const basic_view<Entity, exclude_t<ERhs...>, CRhs...> &rhs) {
