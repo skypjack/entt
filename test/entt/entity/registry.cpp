@@ -1400,16 +1400,16 @@ TEST(Registry, Constness) {
     ASSERT_TRUE((std::is_same_v<decltype(registry.emplace<empty_type>({})), void>));
 
     ASSERT_TRUE((std::is_same_v<decltype(registry.get<int>({})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(registry.get<int, char>({})), std::tuple<int &, char &>>));
+    ASSERT_TRUE((std::is_same_v<decltype(registry.get<int, const char>({})), std::tuple<int &, const char &>>));
 
     ASSERT_TRUE((std::is_same_v<decltype(registry.try_get<int>({})), int *>));
-    ASSERT_TRUE((std::is_same_v<decltype(registry.try_get<int, char>({})), std::tuple<int *, char *>>));
+    ASSERT_TRUE((std::is_same_v<decltype(registry.try_get<int, const char>({})), std::tuple<int *, const char *>>));
 
     ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).get<int>({})), const int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).get<int, char>({})), std::tuple<const int &, const char &>>));
+    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).get<int, const char>({})), std::tuple<const int &, const char &>>));
 
     ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
-    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int, char>({})), std::tuple<const int *, const char *>>));
+    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int, const char>({})), std::tuple<const int *, const char *>>));
 }
 
 TEST(Registry, MoveOnlyComponent) {
