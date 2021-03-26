@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         compiler: [
-            g++-8, g++-9, g++,
+            g++-7, g++-8, g++-9, g++,
             clang++-8, clang++-9, clang++
         ]
 

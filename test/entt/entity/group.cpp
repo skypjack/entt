@@ -201,6 +201,12 @@ TEST(NonOwningGroup, Each) {
     }
 
     ASSERT_EQ(cnt, std::size_t{0});
+
+    auto it = group.each().begin();
+    auto rit = group.each().rbegin();
+
+    ASSERT_EQ((it++, ++it), group.each().end());
+    ASSERT_EQ((rit++, ++rit), group.each().rend());
 }
 
 TEST(NonOwningGroup, Sort) {
@@ -246,6 +252,22 @@ TEST(NonOwningGroup, Sort) {
     ASSERT_EQ(*(group.data() + 0u), e0);
     ASSERT_EQ(*(group.data() + 1u), e1);
     ASSERT_EQ(*(group.data() + 2u), e2);
+
+    ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
+    ASSERT_EQ((group.get<const int, unsigned int>(e1)), (std::make_tuple(1, 1u)));
+    ASSERT_EQ((group.get<const int, unsigned int>(e2)), (std::make_tuple(2, 2u)));
+
+    ASSERT_FALSE(group.contains(e3));
+
+    group.sort<const int, unsigned int>([](const auto lhs, const auto rhs) {
+        static_assert(std::is_same_v<decltype(std::get<0>(lhs)), const int &>);
+        static_assert(std::is_same_v<decltype(std::get<1>(rhs)), unsigned int &>);
+        return std::get<0>(lhs) < std::get<0>(rhs);
+    });
+
+    ASSERT_EQ(*(group.data() + 0u), e2);
+    ASSERT_EQ(*(group.data() + 1u), e1);
+    ASSERT_EQ(*(group.data() + 2u), e0);
 
     ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
     ASSERT_EQ((group.get<const int, unsigned int>(e1)), (std::make_tuple(1, 1u)));
@@ -583,9 +605,21 @@ TEST(NonOwningGroup, SignalRace) {
 
 TEST(NonOwningGroup, ExtendedGet) {
     using type = decltype(std::declval<entt::registry>().group(entt::get<int, empty_type, char>).get({}));
+
     static_assert(std::tuple_size_v<type> == 2u);
     static_assert(std::is_same_v<std::tuple_element_t<0, type>, int &>);
     static_assert(std::is_same_v<std::tuple_element_t<1, type>, char &>);
+
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity, 42);
+    registry.emplace<char>(entity, 'c');
+
+    const auto tup = registry.group(entt::get<int, char>).get(entity);
+
+    ASSERT_EQ(std::get<0>(tup), 42);
+    ASSERT_EQ(std::get<1>(tup), 'c');
 }
 
 TEST(OwningGroup, Functionalities) {
@@ -770,6 +804,12 @@ TEST(OwningGroup, Each) {
     }
 
     ASSERT_EQ(cnt, std::size_t{0});
+
+    auto it = group.each().begin();
+    auto rit = group.each().rbegin();
+
+    ASSERT_EQ((it++, ++it), group.each().end());
+    ASSERT_EQ((rit++, ++rit), group.each().rend());
 }
 
 TEST(OwningGroup, SortOrdered) {
@@ -891,8 +931,10 @@ TEST(OwningGroup, SortUnordered) {
     registry.emplace<boxed_int>(entities[5], 4);
     registry.emplace<boxed_int>(entities[6], 5);
 
-    group.sort<char>([](const auto lhs, const auto rhs) {
-        return lhs < rhs;
+    group.sort<boxed_int, char>([](const auto lhs, const auto rhs) {
+        static_assert(std::is_same_v<decltype(std::get<0>(lhs)), boxed_int &>);
+        static_assert(std::is_same_v<decltype(std::get<1>(rhs)), char &>);
+        return std::get<1>(lhs) < std::get<1>(rhs);
     });
 
     ASSERT_EQ(*(group.data() + 0u), entities[4]);
@@ -1304,7 +1346,19 @@ TEST(OwningGroup, SwappingValuesIsAllowed) {
 
 TEST(OwningGroup, ExtendedGet) {
     using type = decltype(std::declval<entt::registry>().group<int, empty_type>(entt::get<char>).get({}));
+
     static_assert(std::tuple_size_v<type> == 2u);
     static_assert(std::is_same_v<std::tuple_element_t<0, type>, int &>);
     static_assert(std::is_same_v<std::tuple_element_t<1, type>, char &>);
+
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity, 42);
+    registry.emplace<char>(entity, 'c');
+
+    const auto tup = registry.group<int>(entt::get<char>).get(entity);
+
+    ASSERT_EQ(std::get<0>(tup), 42);
+    ASSERT_EQ(std::get<1>(tup), 'c');
 }

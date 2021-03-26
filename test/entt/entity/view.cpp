@@ -199,6 +199,12 @@ TEST(SingleComponentView, Each) {
     }
 
     ASSERT_EQ(cnt, std::size_t{0});
+
+    auto it = view.each().begin();
+    auto rit = view.each().rbegin();
+
+    ASSERT_EQ((it++, ++it), view.each().end());
+    ASSERT_EQ((rit++, ++rit), view.each().rend());
 }
 
 TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
@@ -586,6 +592,12 @@ TEST(MultiComponentView, Each) {
     }
 
     ASSERT_EQ(cnt, std::size_t{0});
+
+    auto it = view.each().begin();
+    auto rit = view.each().rbegin();
+
+    ASSERT_EQ((it++, ++it), view.each().end());
+    ASSERT_EQ((rit++, ++rit), view.each().rend());
 }
 
 TEST(MultiComponentView, EachWithSuggestedType) {
