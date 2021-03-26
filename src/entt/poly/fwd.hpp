@@ -2,10 +2,13 @@
 #define ENTT_POLY_FWD_HPP
 
 
+#include <type_traits>
+
+
 namespace entt {
 
 
-template<typename, std::size_t, std::size_t...>
+template<typename, std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_poly;
 
 

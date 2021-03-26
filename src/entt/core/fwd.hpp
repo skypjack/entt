@@ -2,13 +2,14 @@
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 #include "../config/config.h"
 
 
 namespace entt {
 
 
-template<std::size_t, std::size_t...>
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
 
