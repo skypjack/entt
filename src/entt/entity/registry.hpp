@@ -861,8 +861,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            auto *cpool = assure<Component...>();
-            return cpool->contains(entity) ? &cpool->get(entity) : nullptr;
+            return (const_cast<Component *>(std::as_const(*this).template try_get<Component>(entity)), ...);
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
         }
