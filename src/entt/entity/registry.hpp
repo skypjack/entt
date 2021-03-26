@@ -318,7 +318,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return !alive();
         } else {
-            return [](auto *... cpool) { return ((!cpool || cpool->empty()) && ...); }(pool_if_exists<Component>()...);
+            return [](const auto *... cpool) { return ((!cpool || cpool->empty()) && ...); }(pool_if_exists<Component>()...);
         }
     }
 
@@ -757,7 +757,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool all_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return [entity](auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
+        return [entity](const auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
     /**
@@ -790,15 +790,27 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) const {
-        ENTT_ASSERT((valid(entity) && ... && pool_if_exists<Component>()));
-        return view<std::add_const_t<Component>...>().template get<std::add_const_t<Component>...>(entity);
+        ENTT_ASSERT(valid(entity));
+
+        if constexpr(sizeof...(Component) == 1) {
+            const auto *cpool = pool_if_exists<Component...>();
+            ENTT_ASSERT(cpool);
+            return cpool->get(entity);
+        } else {
+            return std::forward_as_tuple(get<Component>(entity)...);
+        }
     }
 
     /*! @copydoc get */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        return view<Component...>().template get<Component...>(entity);
+
+        if constexpr(sizeof...(Component) == 1) {
+            return (static_cast<Component &>(assure<Component>()->get(entity)), ...);
+        } else {
+            return std::forward_as_tuple(get<Component>(entity)...);
+        }
     }
 
     /**
@@ -848,7 +860,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            auto *cpool = pool_if_exists<Component...>();
+            const auto *cpool = pool_if_exists<Component...>();
             return (cpool && cpool->contains(entity)) ? &cpool->get(entity) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
