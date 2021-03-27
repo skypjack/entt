@@ -156,7 +156,7 @@ TEST_F(MetaAny, SBOAsConstRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(any.try_cast<std::size_t>());
-    ASSERT_DEATH(any.cast<int &>() = 3, ".*");
+    ASSERT_DEATH(any.cast<int &>() = 3, "");
     ASSERT_EQ(any.cast<const int &>(), 3);
     ASSERT_EQ(any.cast<int>(), 3);
     ASSERT_EQ(any.data(), nullptr);
@@ -267,7 +267,7 @@ TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(any.try_cast<std::size_t>());
-    ASSERT_DEATH(any.cast<fat_t &>() = {}, ".*");
+    ASSERT_DEATH(any.cast<fat_t &>() = {}, "");
     ASSERT_EQ(any.cast<const fat_t &>(), instance);
     ASSERT_EQ(any.cast<fat_t>(), instance);
     ASSERT_EQ(any.data(), nullptr);
@@ -612,7 +612,7 @@ TEST_F(MetaAny, AsRef) {
     ASSERT_EQ(any.cast<const int &>(), 42);
     ASSERT_EQ(ref.cast<int &>(), 42);
     ASSERT_EQ(ref.cast<const int &>(), 42);
-    ASSERT_DEATH(cref.cast<int &>() = 3, ".*");
+    ASSERT_DEATH(cref.cast<int &>() = 3, "");
     ASSERT_EQ(cref.cast<const int &>(), 42);
 
     any.cast<int &>() = 3;
@@ -634,8 +634,8 @@ TEST_F(MetaAny, AsRef) {
     ASSERT_EQ(ref.try_cast<const int>(), any.data());
     ASSERT_EQ(cref.try_cast<const int>(), any.data());
 
-    ASSERT_DEATH(ref.cast<int &>() = 3, ".*");
-    ASSERT_DEATH(cref.cast<int &>() = 3, ".*");
+    ASSERT_DEATH(ref.cast<int &>() = 3, "");
+    ASSERT_DEATH(cref.cast<int &>() = 3, "");
 
     ASSERT_EQ(ref.cast<const int &>(), 3);
     ASSERT_EQ(cref.cast<const int &>(), 3);

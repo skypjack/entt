@@ -172,14 +172,14 @@ TEST(PolyDefined, ConstReference) {
     ASSERT_EQ(instance.value, 0);
     ASSERT_EQ(poly->get(), 0);
 
-    ASSERT_DEATH(poly->set(1), ".*");
-    ASSERT_DEATH(poly->incr(), ".*");
+    ASSERT_DEATH(poly->set(1), "");
+    ASSERT_DEATH(poly->incr(), "");
 
     ASSERT_EQ(instance.value, 0);
     ASSERT_EQ(poly->get(), 0);
     ASSERT_EQ(poly->mul(3), 0);
 
-    ASSERT_DEATH(poly->decr(), ".*");
+    ASSERT_DEATH(poly->decr(), "");
 
     ASSERT_EQ(instance.value, 0);
     ASSERT_EQ(poly->get(), 0);

@@ -531,7 +531,7 @@ TEST_F(MetaData, AsConstRef) {
 
     ASSERT_EQ(instance.i, 0);
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_DEATH(data.get(instance).cast<int &>() = 3, ".*");
+    ASSERT_DEATH(data.get(instance).cast<int &>() = 3, "");
     ASSERT_EQ(data.get(instance).cast<const int &>(), 0);
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
     ASSERT_EQ(instance.i, 0);

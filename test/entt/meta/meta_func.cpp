@@ -392,7 +392,7 @@ TEST_F(MetaFunc, AsConstRef) {
     func_t instance{};
     auto func = entt::resolve<func_t>().func("ca"_hs);
 
-    ASSERT_DEATH((func.invoke(instance).cast<int &>() = 3), ".*");
+    ASSERT_DEATH((func.invoke(instance).cast<int &>() = 3), "");
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_EQ(func.invoke(instance).cast<const int &>(), 3);
     ASSERT_EQ(func.invoke(instance).cast<int>(), 3);

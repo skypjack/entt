@@ -301,7 +301,7 @@ TEST_F(MetaContainer, ConstSequenceContainer) {
     ASSERT_EQ(view.size(), 1u);
     ASSERT_NE(view.begin(), view.end());
 
-    ASSERT_DEATH(view[0].cast<int &>() = 2, ".*");
+    ASSERT_DEATH(view[0].cast<int &>() = 2, "");
     ASSERT_EQ(view[0].cast<const int &>(), 42);
 
     auto it = view.begin();
@@ -342,7 +342,7 @@ TEST_F(MetaContainer, ConstKeyValueAssociativeContainer) {
     ASSERT_EQ(view.size(), 1u);
     ASSERT_NE(view.begin(), view.end());
 
-    ASSERT_DEATH((*view.find(2)).second.cast<char &>() = 'a', ".*");
+    ASSERT_DEATH((*view.find(2)).second.cast<char &>() = 'a', "");
     ASSERT_EQ((*view.find(2)).second.cast<const char &>(), 'c');
 
     ASSERT_FALSE(view.insert(0, 'a'));
@@ -402,7 +402,7 @@ TEST_F(MetaContainer, SequenceContainerConstMetaAny) {
 
         ASSERT_TRUE(view);
         ASSERT_EQ(view.value_type(), entt::resolve<int>());
-        ASSERT_DEATH(view[0].cast<int &>() = 2, ".*");
+        ASSERT_DEATH(view[0].cast<int &>() = 2, "");
         ASSERT_EQ(view[0].cast<const int &>(), 42);
     };
 
@@ -419,7 +419,7 @@ TEST_F(MetaContainer, KeyValueAssociativeContainerConstMetaAny) {
 
         ASSERT_TRUE(view);
         ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
-        ASSERT_DEATH((*view.find(2)).second.cast<char &>() = 'a', ".*");
+        ASSERT_DEATH((*view.find(2)).second.cast<char &>() = 'a', "");
         ASSERT_EQ((*view.find(2)).second.cast<const char &>(), 'c');
     };
 
