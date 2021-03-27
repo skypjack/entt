@@ -20,7 +20,9 @@ struct base_t {
     int value{3};
 };
 
-struct derived_t: base_t {};
+struct derived_t: base_t {
+    derived_t() {}
+};
 
 struct func_t {
     int f(const base_t &, int a, int b) {
@@ -400,7 +402,7 @@ TEST_F(MetaFunc, FromBase) {
     using namespace entt::literals;
 
     auto type = entt::resolve<derived_t>();
-    derived_t instance;
+    derived_t instance{};
 
     ASSERT_TRUE(type.func("func"_hs));
     ASSERT_EQ(type.func("func"_hs).parent(), entt::resolve<base_t>());

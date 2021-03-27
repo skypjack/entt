@@ -14,9 +14,17 @@ struct base_t {
     int value{3};
 };
 
-struct derived_t: base_t {};
+struct derived_t: base_t {
+    derived_t() {}
+};
 
 struct clazz_t {
+    clazz_t()
+        : i{0},
+          j{1},
+          base{}
+    {}
+
     int i{0};
     const int j{1};
     base_t base{};
@@ -533,7 +541,7 @@ TEST_F(MetaData, FromBase) {
     using namespace entt::literals;
 
     auto type = entt::resolve<derived_t>();
-    derived_t instance;
+    derived_t instance{};
 
     ASSERT_TRUE(type.data("value"_hs));
 

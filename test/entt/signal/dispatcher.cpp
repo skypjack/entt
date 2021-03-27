@@ -5,7 +5,8 @@
 
 struct an_event {};
 struct another_event {};
-struct one_more_event {};
+// makes the type non-aggregate
+struct one_more_event { one_more_event(int) {} };
 
 struct receiver {
     static void forward(entt::dispatcher &dispatcher, an_event &event) {
@@ -21,8 +22,8 @@ TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher;
     receiver receiver;
 
-    dispatcher.trigger<one_more_event>();
-    dispatcher.enqueue<one_more_event>();
+    dispatcher.trigger<one_more_event>(42);
+    dispatcher.enqueue<one_more_event>(42);
     dispatcher.update<one_more_event>();
 
     dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
