@@ -85,11 +85,15 @@ TEST(Scheduler, Then) {
         .then<succeeded_process>()
         .then<failed_process>();
 
+    // non-failing process
+    scheduler.attach<succeeded_process>()
+        .then<succeeded_process>();
+
     for(auto i = 0; i < 8; ++i) {
         scheduler.update(0);
     }
 
-    ASSERT_EQ(succeeded_process::invoked, 4u);
+    ASSERT_EQ(succeeded_process::invoked, 6u);
     ASSERT_TRUE(scheduler.empty());
 }
 
