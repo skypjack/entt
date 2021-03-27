@@ -51,6 +51,9 @@ TEST(Delegate, Functionalities) {
     entt::delegate<int(int)> lf_del;
     delegate_functor functor;
 
+    ASSERT_DEATH(ff_del(42), "");
+    ASSERT_DEATH(mf_del(42), "");
+
     ASSERT_FALSE(ff_del);
     ASSERT_FALSE(mf_del);
     ASSERT_EQ(ff_del, mf_del);
@@ -369,21 +372,6 @@ TEST(Delegate, VoidVsNonVoidReturnType) {
     ASSERT_TRUE(cmember);
 }
 
-TEST(Delegate, TheLessTheBetter) {
-    entt::delegate<int(int, char)> delegate;
-    delegate_functor functor;
-
-    // int delegate_function(const int &);
-    delegate.connect<&delegate_function>();
-
-    ASSERT_EQ(delegate(3, 'c'), 9);
-
-    // int delegate_functor::operator()(int);
-    delegate.connect<&delegate_functor::operator()>(functor);
-
-    ASSERT_EQ(delegate(3, 'c'), 6);
-}
-
 TEST(Delegate, UnboundDataMember) {
     entt::delegate<int(const delegate_functor &)> delegate;
     delegate.connect<&delegate_functor::data_member>();
@@ -398,4 +386,30 @@ TEST(Delegate, UnboundMemberFunction) {
     delegate_functor functor;
 
     ASSERT_EQ(delegate(&functor, 3), 6);
+}
+
+TEST(Delegate, TheLessTheBetter) {
+    entt::delegate<int(int, char)> bound;
+    entt::delegate<int(delegate_functor &, int, char)> unbound;
+    delegate_functor functor;
+
+    // int delegate_function(const int &);
+    bound.connect<&delegate_function>();
+
+    ASSERT_EQ(bound(3, 'c'), 9);
+
+    // int delegate_functor::operator()(int);
+    bound.connect<&delegate_functor::operator()>(functor);
+
+    ASSERT_EQ(bound(3, 'c'), 6);
+
+    // int delegate_functor::operator()(int);
+    bound.connect<&delegate_functor::identity>(&functor);
+
+    ASSERT_EQ(bound(3, 'c'), 3);
+
+    // int delegate_functor::operator()(int);
+    unbound.connect<&delegate_functor::operator()>();
+
+    ASSERT_EQ(unbound(functor, 3, 'c'), 6);
 }

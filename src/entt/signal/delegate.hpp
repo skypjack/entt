@@ -141,7 +141,9 @@ public:
      * @tparam Candidate Function or member to connect to the delegate.
      */
     template<auto Candidate>
-    delegate(connect_arg_t<Candidate>) ENTT_NOEXCEPT {
+    delegate(connect_arg_t<Candidate>) ENTT_NOEXCEPT
+        : delegate{}
+    {
         connect<Candidate>();
     }
 
@@ -153,7 +155,9 @@ public:
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
-    delegate(connect_arg_t<Candidate>, Type &&value_or_instance) ENTT_NOEXCEPT {
+    delegate(connect_arg_t<Candidate>, Type &&value_or_instance) ENTT_NOEXCEPT
+        : delegate{}
+    {
         connect<Candidate>(std::forward<Type>(value_or_instance));
     }
 
@@ -163,7 +167,9 @@ public:
      * @param function Function to connect to the delegate.
      * @param payload User defined arbitrary data.
      */
-    delegate(function_type *function, const void *payload = nullptr) ENTT_NOEXCEPT {
+    delegate(function_type *function, const void *payload = nullptr) ENTT_NOEXCEPT
+        : delegate{}
+    {
         connect(function, payload);
     }
 
@@ -288,7 +294,7 @@ public:
      * @return The value returned by the underlying function.
      */
     Ret operator()(Args... args) const {
-        ENTT_ASSERT(fn);
+        ENTT_ASSERT(static_cast<bool>(*this));
         return fn(data, std::forward<Args>(args)...);
     }
 
