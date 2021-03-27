@@ -15,6 +15,7 @@ WIP:
 * HP: weak reference wrapper example with custom storage
 * HP: paginate pools
 * HP: headless (sparse set only) view
+* HP: scheduler, use any instead of unique_ptr
 * HP: write documentation for custom storages and views!!
 * HP: registry: use a poly object for pools, no more pool_data type.
 * HP: make runtime views use opaque storage and therefore return also elements.

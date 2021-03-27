@@ -90,6 +90,7 @@ TEST(Scheduler, Then) {
     }
 
     ASSERT_EQ(succeeded_process::invoked, 4u);
+    ASSERT_TRUE(scheduler.empty());
 }
 
 TEST(Scheduler, Functor) {
@@ -114,4 +115,5 @@ TEST(Scheduler, Functor) {
 
     ASSERT_TRUE(first_functor);
     ASSERT_TRUE(second_functor);
+    ASSERT_TRUE(scheduler.empty());
 }
