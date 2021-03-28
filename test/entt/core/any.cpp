@@ -806,8 +806,11 @@ TEST(Any, AnyCast) {
     ASSERT_EQ(*entt::any_cast<int>(&any), 42);
     ASSERT_EQ(*entt::any_cast<int>(&cany), 42);
     ASSERT_EQ(entt::any_cast<int &>(any), 42);
+    ASSERT_DEATH(entt::any_cast<double &>(any), "");
     ASSERT_EQ(entt::any_cast<const int &>(cany), 42);
+    ASSERT_DEATH(entt::any_cast<const double &>(cany), "");
     ASSERT_EQ(entt::any_cast<int>(entt::any{42}), 42);
+    ASSERT_DEATH(entt::any_cast<double>(entt::any{42}), "");
 }
 
 TEST(Any, NotCopyableType) {

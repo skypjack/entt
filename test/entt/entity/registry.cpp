@@ -148,9 +148,9 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.size(), 0u);
     ASSERT_EQ(registry.alive(), 0u);
-    ASSERT_NO_THROW((registry.reserve<int, char>(8)));
-    ASSERT_NO_THROW(registry.reserve_pools(16));
-    ASSERT_NO_THROW(registry.reserve(42));
+    ASSERT_NO_FATAL_FAILURE((registry.reserve<int, char>(8)));
+    ASSERT_NO_FATAL_FAILURE(registry.reserve_pools(16));
+    ASSERT_NO_FATAL_FAILURE(registry.reserve(42));
     ASSERT_TRUE(registry.empty());
 
     ASSERT_EQ(registry.capacity(), 42u);
@@ -192,8 +192,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.emplace<int>(e0, 42), 42);
     ASSERT_EQ(registry.emplace<char>(e0, 'c'), 'c');
-    ASSERT_NO_THROW(registry.remove<int>(e1));
-    ASSERT_NO_THROW(registry.remove<char>(e1));
+    ASSERT_NO_FATAL_FAILURE(registry.remove<int>(e1));
+    ASSERT_NO_FATAL_FAILURE(registry.remove<char>(e1));
 
     ASSERT_TRUE((registry.all_of<int, char>(e0)));
     ASSERT_FALSE((registry.all_of<int, char>(e1)));
@@ -228,8 +228,8 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.patch<int>(e0, [](auto &instance) { instance = 2; }), 2);
     ASSERT_EQ(registry.replace<int>(e0, 3), 3);
 
-    ASSERT_NO_THROW(registry.emplace_or_replace<int>(e0, 1));
-    ASSERT_NO_THROW(registry.emplace_or_replace<int>(e1, 1));
+    ASSERT_NO_FATAL_FAILURE(registry.emplace_or_replace<int>(e0, 1));
+    ASSERT_NO_FATAL_FAILURE(registry.emplace_or_replace<int>(e1, 1));
     ASSERT_EQ(static_cast<const entt::registry &>(registry).get<int>(e0), 1);
     ASSERT_EQ(static_cast<const entt::registry &>(registry).get<int>(e1), 1);
 
@@ -239,7 +239,7 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 0u);
-    ASSERT_NO_THROW(registry.destroy(e2));
+    ASSERT_NO_FATAL_FAILURE(registry.destroy(e2));
     ASSERT_EQ(registry.version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 1u);
 
@@ -251,7 +251,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.alive(), 2u);
     ASSERT_FALSE(registry.empty());
 
-    ASSERT_NO_THROW(registry.clear());
+    ASSERT_NO_FATAL_FAILURE(registry.clear());
 
     ASSERT_EQ(registry.size(), 3u);
     ASSERT_EQ(registry.alive(), 0u);
@@ -270,14 +270,14 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.get<int>(e3), 3);
     ASSERT_EQ(registry.get<char>(e3), 'c');
 
-    ASSERT_NO_THROW(registry.clear<int>());
+    ASSERT_NO_FATAL_FAILURE(registry.clear<int>());
 
     ASSERT_EQ(registry.size<int>(), 0u);
     ASSERT_EQ(registry.size<char>(), 1u);
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
 
-    ASSERT_NO_THROW(registry.clear());
+    ASSERT_NO_FATAL_FAILURE(registry.clear());
 
     ASSERT_EQ(registry.size<int>(), 0u);
     ASSERT_EQ(registry.size<char>(), 0u);

@@ -259,7 +259,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
             }
         } else {
             auto it = std::get<storage_type<Comp> *>(pools)->begin();
-        
+
             for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
                 if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
                     && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
@@ -270,7 +270,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
                         std::apply(func, std::tuple_cat(dispatch_get<Component>(it, entt)...));
                     }
                 }
-        
+
                 ++it;
             }
         }

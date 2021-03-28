@@ -28,10 +28,10 @@ TEST(NonOwningGroup, Functionalities) {
     registry.emplace<char>(e1, '2');
 
     ASSERT_FALSE(group.empty());
-    ASSERT_NO_THROW(group.begin()++);
-    ASSERT_NO_THROW(++cgroup.begin());
-    ASSERT_NO_THROW([](auto it) { return it++; }(group.rbegin()));
-    ASSERT_NO_THROW([](auto it) { return ++it; }(cgroup.rbegin()));
+    ASSERT_NO_FATAL_FAILURE(group.begin()++);
+    ASSERT_NO_FATAL_FAILURE(++cgroup.begin());
+    ASSERT_NO_FATAL_FAILURE([](auto it) { return it++; }(group.rbegin()));
+    ASSERT_NO_FATAL_FAILURE([](auto it) { return ++it; }(cgroup.rbegin()));
 
     ASSERT_NE(group.begin(), group.end());
     ASSERT_NE(cgroup.begin(), cgroup.end());
@@ -90,7 +90,7 @@ TEST(NonOwningGroup, Invalid) {
     ASSERT_TRUE(group.empty());
     ASSERT_EQ(group.size(), 0u);
     ASSERT_EQ(group.capacity(), 0u);
-    ASSERT_NO_THROW(group.shrink_to_fit());
+    ASSERT_NO_FATAL_FAILURE(group.shrink_to_fit());
 
     ASSERT_EQ(group.data(), nullptr);
 
@@ -108,8 +108,8 @@ TEST(NonOwningGroup, Invalid) {
     for([[maybe_unused]] auto all: group.each()) { FAIL(); }
     for(auto first = group.each().rbegin(), last = group.each().rend(); first != last; ++first) { FAIL(); }
 
-    ASSERT_NO_THROW(group.sort([](const auto, const auto) { FAIL(), true; }));
-    ASSERT_NO_THROW(group.sort<const empty_type>());
+    ASSERT_NO_FATAL_FAILURE(group.sort([](const auto, const auto) { FAIL(), true; }));
+    ASSERT_NO_FATAL_FAILURE(group.sort<const empty_type>());
 }
 
 TEST(NonOwningGroup, ElementAccess) {
@@ -637,10 +637,10 @@ TEST(OwningGroup, Functionalities) {
     registry.emplace<char>(e1, '2');
 
     ASSERT_FALSE(group.empty());
-    ASSERT_NO_THROW(group.begin()++);
-    ASSERT_NO_THROW(++cgroup.begin());
-    ASSERT_NO_THROW([](auto it) { return it++; }(group.rbegin()));
-    ASSERT_NO_THROW([](auto it) { return ++it; }(cgroup.rbegin()));
+    ASSERT_NO_FATAL_FAILURE(group.begin()++);
+    ASSERT_NO_FATAL_FAILURE(++cgroup.begin());
+    ASSERT_NO_FATAL_FAILURE([](auto it) { return it++; }(group.rbegin()));
+    ASSERT_NO_FATAL_FAILURE([](auto it) { return ++it; }(cgroup.rbegin()));
 
     ASSERT_NE(group.begin(), group.end());
     ASSERT_NE(cgroup.begin(), cgroup.end());

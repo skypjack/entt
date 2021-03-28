@@ -27,11 +27,11 @@ TEST(Utility, Overload) {
 
     functions instance;
 
-    ASSERT_NO_THROW(entt::overload<void(int)>(&functions::foo)(0));
-    ASSERT_NO_THROW(entt::overload<void()>(&functions::foo)());
+    ASSERT_NO_FATAL_FAILURE(entt::overload<void(int)>(&functions::foo)(0));
+    ASSERT_NO_FATAL_FAILURE(entt::overload<void()>(&functions::foo)());
 
-    ASSERT_NO_THROW((instance.*entt::overload<void(int)>(&functions::bar))(0));
-    ASSERT_NO_THROW((instance.*entt::overload<void()>(&functions::bar))());
+    ASSERT_NO_FATAL_FAILURE((instance.*entt::overload<void(int)>(&functions::bar))(0));
+    ASSERT_NO_FATAL_FAILURE((instance.*entt::overload<void()>(&functions::bar))());
 }
 
 TEST(Utility, Overloaded) {

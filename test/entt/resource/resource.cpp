@@ -55,14 +55,14 @@ TEST(Resource, Functionalities) {
     ASSERT_EQ((*cache.handle(hs1)).value, 42);
     ASSERT_EQ(cache.handle(hs2)->value, 42);
 
-    ASSERT_NO_THROW(cache.discard(hs1));
+    ASSERT_NO_FATAL_FAILURE(cache.discard(hs1));
 
     ASSERT_FALSE(cache.contains(hs1));
     ASSERT_TRUE(cache.contains(hs2));
     ASSERT_EQ(cache.handle(hs2)->value, 42);
 
     ASSERT_TRUE(cache.load<loader>(hs1, 42));
-    ASSERT_NO_THROW(cache.clear());
+    ASSERT_NO_FATAL_FAILURE(cache.clear());
 
     ASSERT_EQ(cache.size(), 0u);
     ASSERT_TRUE(cache.empty());
@@ -78,7 +78,7 @@ TEST(Resource, Functionalities) {
 
     ASSERT_TRUE(cache.handle(hs1));
     ASSERT_EQ(&cache.handle(hs1).get(), &static_cast<const resource &>(cache.handle(hs1)));
-    ASSERT_NO_THROW(cache.clear());
+    ASSERT_NO_FATAL_FAILURE(cache.clear());
 
     ASSERT_EQ(cache.size(), 0u);
     ASSERT_TRUE(cache.empty());
