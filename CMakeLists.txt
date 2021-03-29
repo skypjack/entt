@@ -43,7 +43,7 @@ message(VERBOSE "* Copyright (c) 2017-2021 Michele Caini <michele.caini@gmail.co
 message(VERBOSE "*")
 
 option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." ON)
-option(ENTT_USE_ASAN "Use address sanitizer by adding -fsanitize=address -fno-omit-frame-pointer flags" OFF)
+option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags" OFF)
 
 #
 # Compiler stuff
@@ -85,9 +85,9 @@ target_include_directories(
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-if(ENTT_USE_ASAN)
-    target_compile_options(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer>)
-    target_link_libraries(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer>)
+if(ENTT_USE_SANITIZER)
+    target_compile_options(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+    target_link_libraries(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
 endif()
 
 if(ENTT_HAS_LIBCPP)
