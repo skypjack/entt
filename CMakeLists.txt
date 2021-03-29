@@ -203,6 +203,7 @@ add_custom_target(
         .github/workflows/build.yml
         .github/workflows/coverage.yml
         .github/workflows/deploy.yml
+        .github/workflows/sanitizer.yml
         .github/FUNDING.yml
         AUTHORS
         CONTRIBUTING.md
