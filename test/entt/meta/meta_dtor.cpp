@@ -1,3 +1,4 @@
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
@@ -42,12 +43,60 @@ TEST_F(MetaDtor, Functionalities) {
     ASSERT_EQ(clazz_t::counter, 0);
 
     auto any = entt::resolve<clazz_t>().construct();
+    auto cref = std::as_const(any).as_ref();
+    auto ref = any.as_ref();
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(cref);
+    ASSERT_TRUE(ref);
+
+    ASSERT_EQ(clazz_t::counter, 1);
+
+    cref.reset();
+    ref.reset();
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(cref);
+    ASSERT_FALSE(ref);
 
     ASSERT_EQ(clazz_t::counter, 1);
 
     any.reset();
 
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(cref);
+    ASSERT_FALSE(ref);
+
     ASSERT_EQ(clazz_t::counter, 0);
+}
+
+TEST_F(MetaDtor, AsRefConstruction) {
+    ASSERT_EQ(clazz_t::counter, 0);
+
+    clazz_t instance{};
+    entt::meta_any any{std::ref(instance)};
+    entt::meta_any cany{std::cref(instance)};
+    auto cref = cany.as_ref();
+    auto ref = any.as_ref();
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(cany);
+    ASSERT_TRUE(cref);
+    ASSERT_TRUE(ref);
+
+    ASSERT_EQ(clazz_t::counter, 1);
+
+    any.reset();
+    cany.reset();
+    cref.reset();
+    ref.reset();
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(cany);
+    ASSERT_FALSE(cref);
+    ASSERT_FALSE(ref);
+
+    ASSERT_EQ(clazz_t::counter, 1);
 }
 
 TEST_F(MetaDtor, ReRegistration) {
