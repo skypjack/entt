@@ -9,25 +9,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Compile tests
-      working-directory: build
-      env:
-        CXXFLAGS: "--coverage -fno-inline"
-        CXX: g++
-      run: |
-        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
-        make -j4
-    - name: Run tests
-      working-directory: build
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 5 -C Debug -j4
-    - name: Upload coverage to Codecov
-      working-directory: build
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      run: |
-        wget https://codecov.io/bash -O codecov
-        chmod +x codecov
-        ./codecov -t $CODECOV_TOKEN -B $GITHUB_REF -s .
+      - uses: actions/checkout@v2
+      - name: Compile tests
+        working-directory: build
+        env:
+          CXXFLAGS: "--coverage -fno-inline"
+          CXX: g++
+        run: |
+          cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
+          make -j4
+      - name: Run tests
+        working-directory: build
+        env:
+          CTEST_OUTPUT_ON_FAILURE: 1
+        run: ctest --timeout 5 -C Debug -j4
+      - name: Collect data
+        working-directory: build
+        run: |
+          sudo apt install lcov
+          lcov -c -d . -o coverage.info
+          lcov -l coverage.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: build/coverage.info
+          name: EnTT
+          fail_ci_if_error: true
