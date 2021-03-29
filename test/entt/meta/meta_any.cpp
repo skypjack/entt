@@ -651,6 +651,14 @@ TEST_F(MetaAny, AsRef) {
     ASSERT_EQ(cref.cast<const int &>(), 42);
     ASSERT_NE(ref.try_cast<int>(), any.data());
     ASSERT_NE(cref.try_cast<int>(), any.data());
+
+    any.emplace<void>();
+    ref = any.as_ref();
+    cref = std::as_const(any).as_ref();
+
+    ASSERT_TRUE(ref);
+    ASSERT_EQ(ref.type(), cref.type());
+    ASSERT_EQ(ref.type(), entt::resolve<void>());
 }
 
 TEST_F(MetaAny, Comparable) {
