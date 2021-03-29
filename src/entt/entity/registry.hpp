@@ -776,7 +776,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool any_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return [entity](const auto *... cpool) { return ((cpool && cpool->contains(entity)) || ...); }(pool_if_exists<Component>()...);
+        return [entity](const auto *... cpool) { return !((!cpool || !cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
     /**
