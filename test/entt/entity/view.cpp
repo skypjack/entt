@@ -883,18 +883,6 @@ TEST(MultiComponentView, EmptyTypes) {
         static_assert(std::is_same_v<decltype(cv), char &>);
         ASSERT_EQ(entity, entt);
     }
-
-    registry.view<int, char, double>(entt::exclude<empty_type>).each([other](const auto entt, int, char, double) {
-        ASSERT_EQ(other, entt);
-    });
-
-    for(auto [entt, iv, cv, dv]: registry.view<int, char, double>(entt::exclude<empty_type>).each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
-        static_assert(std::is_same_v<decltype(dv), double &>);
-        ASSERT_EQ(other, entt);
-    }
 }
 
 TEST(MultiComponentView, FrontBack) {
