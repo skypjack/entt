@@ -62,7 +62,6 @@ function(SETUP_TARGET TARGET_NAME)
         ${TARGET_NAME}
         PRIVATE
             _ENABLE_EXTENDED_ALIGNED_STORAGE
-            ENTT_STANDALONE
             NOMINMAX
             ${ARGN}
     )
