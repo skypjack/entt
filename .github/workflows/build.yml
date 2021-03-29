@@ -29,7 +29,7 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 5 -C Debug -j4
+      run: ctest --timeout 10 -C Debug -j4
 
   windows:
     timeout-minutes: 10
@@ -62,7 +62,7 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 5 -C Debug -j4
+      run: ctest --timeout 10 -C Debug -j4
 
   macos:
     timeout-minutes: 10
@@ -79,4 +79,4 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 5 -C Debug -j4
+      run: ctest --timeout 10 -C Debug -j4
