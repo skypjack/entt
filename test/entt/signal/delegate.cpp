@@ -62,7 +62,7 @@ TEST(Delegate, Functionalities) {
     mf_del.connect<&delegate_functor::operator()>(functor);
     lf_del.connect([](const void *ptr, int value) {
         return static_cast<const delegate_functor *>(ptr)->identity(value);
-    });
+    }, &functor);
 
     ASSERT_TRUE(ff_del);
     ASSERT_TRUE(mf_del);
