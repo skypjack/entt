@@ -99,7 +99,7 @@ TEST(MetaPointerLike, DereferenceOperatorConstType) {
 
     ASSERT_EQ(deref.try_cast<int>(), nullptr);
     ASSERT_EQ(deref.try_cast<const int>(), &value);
-    ASSERT_DEATH(deref.cast<int &>() = 0, ".*");
+    ASSERT_DEATH(deref.cast<int &>() = 0, "");
     ASSERT_EQ(deref.cast<const int &>(), 42);
 }
 
@@ -114,7 +114,7 @@ TEST(MetaPointerLike, DereferenceOperatorConstAny) {
 
         ASSERT_EQ(deref.try_cast<int>(), nullptr);
         ASSERT_NE(deref.try_cast<const int>(), nullptr);
-        ASSERT_DEATH(deref.cast<int &>() = 0, ".*");
+        ASSERT_DEATH(deref.cast<int &>() = 0, "");
         ASSERT_EQ(deref.cast<const int &>(), 42);
     };
 
@@ -255,7 +255,7 @@ TEST(MetaPointerLike, DereferencePointerToConstOverload) {
         ASSERT_FALSE(deref.type().is_pointer_like());
         ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-        ASSERT_DEATH(deref.cast<int &>() = 42, ".*");
+        ASSERT_DEATH(deref.cast<int &>() = 42, "");
         ASSERT_EQ(deref.cast<const int &>(), 42);
     };
 

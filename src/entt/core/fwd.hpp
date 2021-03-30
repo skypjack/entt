@@ -2,13 +2,14 @@
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 #include "../config/config.h"
 
 
 namespace entt {
 
 
-template<std::size_t = sizeof(double[2])>
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
 
@@ -17,7 +18,7 @@ using id_type = ENTT_ID_TYPE;
 
 
 /*! @brief Alias declaration for the most common use case. */
-using any = basic_any<>;
+using any = basic_any<sizeof(double[2])>;
 
 
 }

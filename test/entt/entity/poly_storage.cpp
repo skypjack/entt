@@ -131,7 +131,7 @@ TEST(PolyStorage, Constness) {
     // cannot invoke remove on a const storage, let's copy the returned value
     auto cstorage = cregistry.storage(entt::type_id<int>());
 
-    ASSERT_DEATH(cstorage->remove(registry, std::begin(entity), std::end(entity)), ".*");
+    ASSERT_DEATH(cstorage->remove(registry, std::begin(entity), std::end(entity)), "");
     ASSERT_TRUE(registry.all_of<int>(entity[0]));
 
     auto &&storage = registry.storage(entt::type_id<int>());

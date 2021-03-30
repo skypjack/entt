@@ -38,7 +38,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -185,7 +185,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**

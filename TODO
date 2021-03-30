@@ -4,20 +4,18 @@
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * allow to replace std:: with custom implementations
 * add examples (and credits) from @alanjfs :)
-* static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
-* update documentation for meta, it contains less than half of the actual feature
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
+* HP: add user data to type_info
+* HP: make pools available (registry/view/group), review operator| for views
+* HP: resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * HP: any_vector for context variables
 * HP: make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
-* HP: remove storage category and get_as_tuple, make storage classes return tuple (+ view generator detect shared storage in future)?
-* HP: review registry::get, registry::try_get
 * HP: weak reference wrapper example with custom storage
-* HP: merge view and view pack
-* HP: invalid view auto-refresh
 * HP: paginate pools
 * HP: headless (sparse set only) view
+* HP: scheduler, use any instead of unique_ptr
 * HP: write documentation for custom storages and views!!
 * HP: registry: use a poly object for pools, no more pool_data type.
 * HP: make runtime views use opaque storage and therefore return also elements.
@@ -29,4 +27,3 @@ WIP:
 * snapshot: support for range-based archives
 * page size 0 -> page less mode
 * add example: 64 bit ids with 32 bits reserved for users' purposes
-* add meta dynamic cast (search base for T in parent, we have the meta type already)

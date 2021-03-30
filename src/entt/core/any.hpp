@@ -19,16 +19,17 @@ namespace entt {
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
  */
-template<std::size_t Len>
+template<std::size_t Len, std::size_t Align>
 class basic_any {
     enum class operation { COPY, MOVE, DTOR, COMP, HASH, ADDR, CADDR, REF, CREF, TYPE };
 
-    using storage_type = std::aligned_storage_t<Len == 0u ? 1u : Len>;
+    using storage_type = std::aligned_storage_t<Len + !Len, Align>;
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
-    static constexpr bool in_situ = Len && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
@@ -68,6 +69,7 @@ class basic_any {
                     break;
                 case operation::MOVE:
                     as<basic_any>(to).instance = from.instance;
+                    [[fallthrough]];
                 case operation::DTOR:
                     break;
                 case operation::COMP:
@@ -186,8 +188,8 @@ public:
      */
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : vtable{&basic_vtable<Type>},
-          instance{}
+        : instance{},
+          vtable{&basic_vtable<Type>}
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
@@ -352,20 +354,21 @@ public:
     }
 
 private:
+    union { const void *instance; storage_type storage; };
     vtable_type *vtable;
-    union { const void *instance; storage_type storage{}; };
 };
 
 
 /**
  * @brief Checks if two wrappers differ in their content.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param lhs A wrapper, either empty or not.
  * @param rhs A wrapper, either empty or not.
  * @return True if the two wrappers differ in their content, false otherwise.
  */
-template<std::size_t Len>
-[[nodiscard]] inline bool operator!=(const basic_any<Len> &lhs, const basic_any<Len> &rhs) ENTT_NOEXCEPT {
+template<std::size_t Len, std::size_t Align>
+[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -374,11 +377,12 @@ template<std::size_t Len>
  * @brief Performs type-safe access to the contained object.
  * @tparam Type Type to which conversion is required.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param data Target any object.
  * @return The element converted to the requested type.
  */
-template<typename Type, std::size_t Len>
-Type any_cast(const basic_any<Len> &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     const auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
@@ -386,8 +390,8 @@ Type any_cast(const basic_any<Len> &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type, std::size_t Len>
-Type any_cast(basic_any<Len> &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -396,8 +400,8 @@ Type any_cast(basic_any<Len> &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type, std::size_t Len>
-Type any_cast(basic_any<Len> &&data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -406,17 +410,17 @@ Type any_cast(basic_any<Len> &&data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type, std::size_t Len>
-const Type * any_cast(const basic_any<Len> *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
 }
 
 
 /*! @copydoc any_cast */
-template<typename Type, std::size_t Len>
-Type * any_cast(basic_any<Len> *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     // last attempt to make wrappers for const references return their values
-    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len>, Type> *>(data)->data()) : nullptr);
+    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
 }
 
 

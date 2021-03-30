@@ -24,6 +24,7 @@ add_custom_target(
         md/links.md
         md/locator.md
         md/meta.md
+        md/poly.md
         md/process.md
         md/reference.md
         md/resource.md

@@ -2,7 +2,6 @@
 #define ENTT_RESOURCE_CACHE_HPP
 
 
-#include <memory>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -93,18 +92,16 @@ struct resource_cache {
     template<typename Loader, typename... Args>
     resource_handle<Resource> load(const id_type id, Args &&... args) {
         static_assert(std::is_base_of_v<resource_loader<Loader, Resource>, Loader>, "Invalid loader type");
-        resource_handle<Resource> resource{};
 
         if(auto it = resources.find(id); it == resources.cend()) {
-            if(auto instance = Loader{}.get(std::forward<Args>(args)...); instance) {
-                resources[id] = instance;
-                resource = std::move(instance);
+            if(auto handle = temp<Loader>(std::forward<Args>(args)...); handle) {
+                return (resources[id] = std::move(handle));
             }
         } else {
-            resource = it->second;
+            return it->second;
         }
 
-        return resource;
+        return {};
     }
 
     /**
@@ -149,7 +146,7 @@ struct resource_cache {
      */
     template<typename Loader, typename... Args>
     [[nodiscard]] resource_handle<Resource> temp(Args &&... args) const {
-        return { Loader{}.get(std::forward<Args>(args)...) };
+        return Loader{}.get(std::forward<Args>(args)...);
     }
 
     /**
@@ -166,8 +163,11 @@ struct resource_cache {
      * @return A handle for the given resource.
      */
     [[nodiscard]] resource_handle<Resource> handle(const id_type id) const {
-        auto it = resources.find(id);
-        return { it == resources.end() ? nullptr : it->second };
+        if(auto it = resources.find(id); it != resources.cend()) {
+            return it->second;
+        }
+
+        return {};
     }
 
     /**
@@ -221,15 +221,15 @@ struct resource_cache {
             if constexpr(std::is_invocable_v<Func, id_type>) {
                 func(curr->first);
             } else if constexpr(std::is_invocable_v<Func, resource_handle<Resource>>) {
-                func(resource_handle{ curr->second });
+                func(curr->second);
             } else {
-                func(curr->first, resource_handle{ curr->second });
+                func(curr->first, curr->second);
             }
         }
     }
 
 private:
-    std::unordered_map<id_type, std::shared_ptr<Resource>> resources;
+    std::unordered_map<id_type, resource_handle<Resource>> resources;
 };
 
 

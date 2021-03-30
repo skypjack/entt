@@ -14,9 +14,17 @@ struct base_t {
     int value{3};
 };
 
-struct derived_t: base_t {};
+struct derived_t: base_t {
+    derived_t() {}
+};
 
 struct clazz_t {
+    clazz_t()
+        : i{0},
+          j{1},
+          base{}
+    {}
+
     int i{0};
     const int j{1};
     base_t base{};
@@ -65,14 +73,25 @@ enum class property_t {
 };
 
 struct MetaData: ::testing::Test {
-    static void SetUpTestCase() {
+    void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<double>().conv<int>();
-        entt::meta<base_t>().dtor<&base_t::destroy>().data<&base_t::value>("value"_hs);
-        entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
+        entt::meta<double>()
+            .type("double"_hs)
+            .conv<int>();
 
-        entt::meta<clazz_t>().type("clazz"_hs)
+        entt::meta<base_t>()
+            .type("base"_hs)
+            .dtor<&base_t::destroy>()
+            .data<&base_t::value>("value"_hs);
+
+        entt::meta<derived_t>()
+            .type("derived"_hs)
+            .base<base_t>()
+            .dtor<&derived_t::destroy>();
+
+        entt::meta<clazz_t>()
+            .type("clazz"_hs)
             .data<&clazz_t::i, entt::as_ref_t>("i"_hs).prop(3, 0)
             .data<&clazz_t::i, entt::as_cref_t>("ci"_hs)
             .data<&clazz_t::j>("j"_hs).prop(true, 1)
@@ -94,10 +113,14 @@ struct MetaData: ::testing::Test {
             .type("array"_hs)
             .data<&array_t::global>("global"_hs)
             .data<&array_t::local>("local"_hs);
+
+        base_t::counter = 0;
     }
 
-    void SetUp() override {
-        base_t::counter = 0;
+    void TearDown() override {
+        for(auto type: entt::resolve()) {
+            type.reset();
+        }
     }
 };
 
@@ -508,7 +531,7 @@ TEST_F(MetaData, AsConstRef) {
 
     ASSERT_EQ(instance.i, 0);
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_DEATH(data.get(instance).cast<int &>() = 3, ".*");
+    ASSERT_DEATH(data.get(instance).cast<int &>() = 3, "");
     ASSERT_EQ(data.get(instance).cast<const int &>(), 0);
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
     ASSERT_EQ(instance.i, 0);
@@ -518,11 +541,31 @@ TEST_F(MetaData, FromBase) {
     using namespace entt::literals;
 
     auto type = entt::resolve<derived_t>();
-    derived_t instance;
+    derived_t instance{};
 
     ASSERT_TRUE(type.data("value"_hs));
 
     ASSERT_EQ(instance.value, 3);
     ASSERT_TRUE(type.data("value"_hs).set(instance, 42));
     ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(MetaData, ReRegistration) {
+    using namespace entt::literals;
+
+    SetUp();
+
+    auto *node = entt::internal::meta_info<base_t>::resolve();
+    auto type = entt::resolve<base_t>();
+
+    ASSERT_NE(node->data, nullptr);
+    ASSERT_EQ(node->data->next, nullptr);
+    ASSERT_TRUE(type.data("value"_hs));
+
+    entt::meta<base_t>().data<&base_t::value>("field"_hs);
+
+    ASSERT_NE(node->data, nullptr);
+    ASSERT_EQ(node->data->next, nullptr);
+    ASSERT_FALSE(type.data("value"_hs));
+    ASSERT_TRUE(type.data("field"_hs));
 }

@@ -600,11 +600,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     public:
         using iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::iterator,
-            type_list_cat_t<std::conditional_t<std::is_same_v<typename storage_type<Owned>::storage_category, empty_storage_tag>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
+            type_list_cat_t<std::conditional_t<std::is_void_v<decltype(std::declval<storage_type<Owned>>().get({}))>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
         >;
         using reverse_iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::reverse_iterator,
-            type_list_cat_t<std::conditional_t<std::is_same_v<typename storage_type<Owned>::storage_category, empty_storage_tag>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
+            type_list_cat_t<std::conditional_t<std::is_void_v<decltype(std::declval<storage_type<Owned>>().get({}))>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {

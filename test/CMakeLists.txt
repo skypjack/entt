@@ -58,7 +58,13 @@ function(SETUP_TARGET TARGET_NAME)
         )
     endif()
 
-    target_compile_definitions(${TARGET_NAME} PRIVATE ENTT_STANDALONE ${ARGN})
+    target_compile_definitions(
+        ${TARGET_NAME}
+        PRIVATE
+            _ENABLE_EXTENDED_ALIGNED_STORAGE
+            NOMINMAX
+            ${ARGN}
+    )
 endfunction()
 
 add_library(odr OBJECT odr.cpp)
@@ -80,8 +86,8 @@ endfunction()
 
 function(SETUP_PLUGIN_TEST TEST_NAME)
     add_library(_${TEST_NAME} MODULE $<TARGET_OBJECTS:odr> lib/${TEST_NAME}/plugin.cpp)
-    SETUP_TARGET(_${TEST_NAME} NOMINMAX ${ARGVN})
-    SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp NOMINMAX PLUGIN="$<TARGET_FILE:_${TEST_NAME}>" ${ARGVN})
+    SETUP_TARGET(_${TEST_NAME} ${ARGVN})
+    SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp PLUGIN="$<TARGET_FILE:_${TEST_NAME}>" ${ARGVN})
     target_include_directories(_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_include_directories(lib_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_link_libraries(lib_${TEST_NAME} PRIVATE ${CMAKE_DL_LIBS})
@@ -179,7 +185,6 @@ SETUP_BASIC_TEST(snapshot entt/entity/snapshot.cpp)
 SETUP_BASIC_TEST(sparse_set entt/entity/sparse_set.cpp)
 SETUP_BASIC_TEST(storage entt/entity/storage.cpp)
 SETUP_BASIC_TEST(view entt/entity/view.cpp)
-SETUP_BASIC_TEST(view_pack entt/entity/view_pack.cpp)
 
 # Test locator
 
@@ -188,14 +193,18 @@ SETUP_BASIC_TEST(locator entt/locator/locator.cpp)
 # Test meta
 
 SETUP_BASIC_TEST(meta_any entt/meta/meta_any.cpp)
+SETUP_BASIC_TEST(meta_base entt/meta/meta_base.cpp)
 SETUP_BASIC_TEST(meta_container entt/meta/meta_container.cpp)
+SETUP_BASIC_TEST(meta_conv entt/meta/meta_conv.cpp)
 SETUP_BASIC_TEST(meta_ctor entt/meta/meta_ctor.cpp)
 SETUP_BASIC_TEST(meta_data entt/meta/meta_data.cpp)
+SETUP_BASIC_TEST(meta_dtor entt/meta/meta_dtor.cpp)
 SETUP_BASIC_TEST(meta_func entt/meta/meta_func.cpp)
 SETUP_BASIC_TEST(meta_handle entt/meta/meta_handle.cpp)
 SETUP_BASIC_TEST(meta_pointer entt/meta/meta_pointer.cpp)
 SETUP_BASIC_TEST(meta_prop entt/meta/meta_prop.cpp)
 SETUP_BASIC_TEST(meta_range entt/meta/meta_range.cpp)
+SETUP_BASIC_TEST(meta_template entt/meta/meta_template.cpp)
 SETUP_BASIC_TEST(meta_type entt/meta/meta_type.cpp)
 
 # Test poly

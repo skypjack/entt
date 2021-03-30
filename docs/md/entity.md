@@ -23,8 +23,9 @@
     * [Dependencies](#dependencies)
     * [Invoke](#invoke)
     * [Handle](#handle)
-    * [Context variables](#context-variables)
     * [Organizer](#organizer)
+  * [Context variables](#context-variables)
+    * [Aliased properties](#aliased-properties)
   * [Meet the runtime](#meet-the-runtime)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
@@ -713,39 +714,6 @@ This class is intended to simplify function signatures. In case of functions
 that take a registry and an entity and do most of their work on that entity,
 users might want to consider using handles, either const or non-const.
 
-### Context variables
-
-It is often convenient to assign context variables to a registry, so as to make
-it the only _source of truth_ of an application.<br/>
-This is possible by means of a member function named `set` to use to create a
-context variable from a given type. Either `ctx` or `try_ctx` can be used to
-retrieve the newly created instance, while `unset` is meant to clear the
-variable if needed.
-
-Example of use:
-
-```cpp
-// creates a new context variable initialized with the given values
-registry.set<my_type>(42, 'c');
-
-// gets the context variable
-const auto &var = registry.ctx<my_type>();
-
-// if in doubts, probe the registry to avoid assertions in case of errors
-if(auto *ptr = registry.try_ctx<my_type>(); ptr) {
-    // uses the context variable associated with the registry, if any
-}
-
-// unsets the context variable
-registry.unset<my_type>();
-```
-
-The type of a context variable must be such that it's default constructible and
-can be moved. The `set` member function either creates a new instance of the
-context variable or overwrites an already existing one if any. The `try_ctx`
-member function returns a pointer to the context variable if it exists,
-otherwise it returns a null pointer.
-
 ### Organizer
 
 The `organizer` class template offers minimal support (but sufficient in many
@@ -879,6 +847,74 @@ for(auto &&node: graph) {
 
 The actual scheduling of the tasks is the responsibility of the user, who can
 use the preferred tool.
+
+## Context variables
+
+It is often convenient to assign context variables to a registry, so as to make
+it the only _source of truth_ of an application.<br/>
+This is possible by means of a member function named `set` to use to create a
+context variable from a given type. Either `ctx` or `try_ctx` can be used to
+retrieve the newly created instance, while `unset` is meant to clear the
+variable if needed:
+
+```cpp
+// creates a new context variable initialized with the given values
+registry.set<my_type>(42, 'c');
+
+// gets the context variable as a non-const reference from a non-const registry
+auto &var = registry.ctx<my_type>();
+
+// gets the context variable as a const reference from either a const or a non-const registry
+const auto &cvar = registry.ctx<const my_type>();
+
+// unsets the context variable
+registry.unset<my_type>();
+```
+
+The type of a context variable must be such that it's default constructible and
+can be moved. The `set` member function either creates a new instance of the
+context variable or overwrites an already existing one if any.<br/>
+The `try_ctx` member function returns a pointer to the context variable if it
+exists, otherwise it returns a null pointer. As `ctx`, it supports both const
+and non-const types and requires a const one when used on a const registry:
+
+```cpp
+if(auto *cptr = registry.try_ctx<const my_type>(); cptr) {
+    // uses the context variable associated with the registry, if any
+}
+```
+
+### Aliased properties
+
+Context variables can also be used to create aliases for existing variables that
+aren't directly managed by the registry. In this case, it's also possible to
+make them read-only.<br/>
+To do that, the type used upon construction must be a reference type and an
+lvalue is necessarily provided as an argument:
+
+```cpp
+time clock;
+registry.set<my_type &>(clock);
+```
+
+Read-only aliased properties are created using const types instead:
+
+```cpp
+registry.set<const my_type &>(clock);
+```
+
+From the point of view of the user, there are no differences between a variable
+that is managed by the registry and an aliased property. However, read-only
+variables aren't accesible as non-const references:
+
+```cpp
+// read-only variables only support const access
+const my_type *ptr = registry.try_ctx<const my_type>();
+const my_type &var = registry.ctx<const my_type>();
+```
+
+Aliased properties can be unset and are overwritten when `set` is invoked, as it
+happens with standard variables.
 
 ## Meet the runtime
 
@@ -1308,14 +1344,12 @@ registry during iterations to get the types iterated by the view itself.
 
 ### View pack
 
-The view pack allows users to combine multiple views into a single _view-like_
-iterable object, while also giving them full control over which view should lead
-the iteration.<br/>
-This object returns all and only the entities present in all views. Its intended
-primary use is for custom storage and views, but it can also be very convenient
-in everyday use.
+Views can be combined with each other to create new and more specific
+objects.<br/>
+The type returned when combining multiple views together is itself a view, more
+in general a multi component one.
 
-The creation of a view pack tries to mimic C++20 ranges:
+Combining different views tries to mimic C++20 ranges:
 
 ```cpp
 auto view = registry.view<position>();
@@ -1324,47 +1358,11 @@ auto other = registry.view<velocity>();
 auto pack = view | other;
 ```
 
-The return type is a specialization of the class template `entt::view_pack`.
-This is nothing more than a _view-like_ iterable object that combines two or
-more views into a single instance.<br/>
-The first view used to create a pack will also be the same that will lead the
-iteration.
-
-A view pack offers functionalities similar to those of a multi component view,
-especially with regard to the possibilities of iteration. In particular, it only
-returns entities if iterated directly:
-
-```cpp
-for(auto entt: pack) {
-    // ...
-}
-```
-
-On the other hand, both the (optional) entity and the components are returned
-when the `each` member function is used, be it with callback or to get an
-extended iterable object:
-
-```cpp
-// with a callback
-pack.each([](const auto entt, auto &pos, auto &vel) { /* ... */ });
-
-// with an extended iterable object
-for(auto [entt, pos, vel]: pack.each()) {
-    // ...
-}
-```
-
-Furthermore, the constness of the types returned by a view pack is directly
-inherited by the views that compose it:
-
-```
-(registry.view<position>() | registry.view<const velocity>()).each([](auto &pos, const auto &vel) {
-    // ...
-});
-```
-
-Read also the dedicated section to know how a view pack is involved in the
-creation and use of custom storage and pools.
+The constness of the types is preserved and their order depends on the order in
+which the views are combined. Therefore, the pack in the example above will
+return an instance of `position` first and then one of `velocity`.<br/>
+Since combining views generates views, a chain can be of arbitrary length and
+the above type order rules apply sequentially.
 
 ### Runtime views
 

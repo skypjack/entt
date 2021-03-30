@@ -11,16 +11,10 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
-#include "adl_pointer.hpp"
 #include "type_traits.hpp"
 
 
 namespace entt {
-
-
-/*! @brief Utility class to disambiguate class templates. */
-template<template<typename...> typename>
-struct meta_class_template_tag {};
 
 
 class meta_any;
@@ -42,8 +36,8 @@ struct meta_type_node;
 
 struct meta_prop_node {
     meta_prop_node * next;
-    meta_any(* const key)();
-    meta_any(* const value)();
+    const meta_any * const id;
+    meta_any * const value;
 };
 
 
@@ -168,6 +162,10 @@ auto meta_visit(const Op &op, const Node *node)
 }
 
 
+template<typename... Args>
+meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT;
+
+
 template<typename Type>
 class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
@@ -196,20 +194,19 @@ class ENTT_API meta_node {
         }
     }
 
-    template<template<typename...> typename Clazz, typename... Args>
-    [[nodiscard]] static meta_template_info template_info(type_identity<Clazz<Args...>>) ENTT_NOEXCEPT {
-        return {
-            true,
-            sizeof...(Args),
-            &meta_node<meta_class_template_tag<Clazz>>::resolve,
-            [](const std::size_t index) ENTT_NOEXCEPT {
-                return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_node<std::remove_cv_t<std::remove_reference_t<Args>>>::resolve()...}}[index];
-            }
-        };
-    }
-
-    [[nodiscard]] static meta_template_info template_info(...) ENTT_NOEXCEPT {
-        return { false, 0u, nullptr, nullptr };
+    [[nodiscard]] static meta_template_info meta_template_descriptor() ENTT_NOEXCEPT {
+        if constexpr(is_complete_v<meta_template_traits<Type>>) {
+            return {
+                true,
+                meta_template_traits<Type>::args_type::size,
+                &meta_node<typename meta_template_traits<Type>::class_type>::resolve,
+                [](const std::size_t index) ENTT_NOEXCEPT {
+                    return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index);
+                }
+            };
+        } else {
+            return { false, 0u, nullptr, nullptr };
+        }
     }
 
 public:
@@ -232,9 +229,9 @@ public:
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
             is_meta_pointer_like_v<Type>,
-            has_meta_sequence_container_traits_v<Type>,
-            has_meta_associative_container_traits_v<Type>,
-            template_info(type_identity<Type>{}),
+            is_complete_v<meta_sequence_container_traits<Type>>,
+            is_complete_v<meta_associative_container_traits<Type>>,
+            meta_template_descriptor(),
             std::rank_v<Type>,
             [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
             &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
@@ -248,8 +245,14 @@ public:
 };
 
 
-template<typename... Type>
-struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> {};
+template<typename Type>
+struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>> {};
+
+
+template<typename... Args>
+meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
+    return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_info<Args>::resolve()...}}[index];
+}
 
 
 }

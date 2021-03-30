@@ -49,8 +49,8 @@ TEST(Scheduler, Functionalities) {
     ASSERT_TRUE(scheduler.empty());
 
     scheduler.attach<foo_process>(
-                [&updated](){ updated = true; },
-                [&aborted](){ aborted = true; }
+        [&updated](){ updated = true; },
+        [&aborted](){ aborted = true; }
     );
 
     ASSERT_NE(scheduler.size(), 0u);
@@ -74,16 +74,27 @@ TEST(Scheduler, Functionalities) {
 TEST(Scheduler, Then) {
     entt::scheduler<int> scheduler;
 
+    // failing process with successor
     scheduler.attach<succeeded_process>()
-            .then<succeeded_process>()
-            .then<failed_process>()
-            .then<succeeded_process>();
+        .then<succeeded_process>()
+        .then<failed_process>()
+        .then<succeeded_process>();
+
+    // failing process without successor
+    scheduler.attach<succeeded_process>()
+        .then<succeeded_process>()
+        .then<failed_process>();
+
+    // non-failing process
+    scheduler.attach<succeeded_process>()
+        .then<succeeded_process>();
 
     for(auto i = 0; i < 8; ++i) {
         scheduler.update(0);
     }
 
-    ASSERT_EQ(succeeded_process::invoked, 2u);
+    ASSERT_EQ(succeeded_process::invoked, 6u);
+    ASSERT_TRUE(scheduler.empty());
 }
 
 TEST(Scheduler, Functor) {
@@ -108,4 +119,5 @@ TEST(Scheduler, Functor) {
 
     ASSERT_TRUE(first_functor);
     ASSERT_TRUE(second_functor);
+    ASSERT_TRUE(scheduler.empty());
 }

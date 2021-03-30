@@ -43,16 +43,16 @@ struct const_nonconst_noexcept {
 TEST_F(SigH, Lifetime) {
     using signal = entt::sigh<void(void)>;
 
-    ASSERT_NO_THROW(signal{});
+    ASSERT_NO_FATAL_FAILURE(signal{});
 
     signal src{}, other{};
 
-    ASSERT_NO_THROW(signal{src});
-    ASSERT_NO_THROW(signal{std::move(other)});
-    ASSERT_NO_THROW(src = other);
-    ASSERT_NO_THROW(src = std::move(other));
+    ASSERT_NO_FATAL_FAILURE(signal{src});
+    ASSERT_NO_FATAL_FAILURE(signal{std::move(other)});
+    ASSERT_NO_FATAL_FAILURE(src = other);
+    ASSERT_NO_FATAL_FAILURE(src = std::move(other));
 
-    ASSERT_NO_THROW(delete new signal{});
+    ASSERT_NO_FATAL_FAILURE(delete new signal{});
 }
 
 TEST_F(SigH, Clear) {

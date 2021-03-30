@@ -288,7 +288,7 @@ public:
      * @return The value returned by the underlying function.
      */
     Ret operator()(Args... args) const {
-        ENTT_ASSERT(fn);
+        ENTT_ASSERT(static_cast<bool>(*this));
         return fn(data, std::forward<Args>(args)...);
     }
 

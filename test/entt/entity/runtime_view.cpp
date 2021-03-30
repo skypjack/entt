@@ -32,8 +32,8 @@ TEST(RuntimeView, Functionalities) {
     ASSERT_EQ(*it, e1);
     ASSERT_EQ(++it, (view.end()));
 
-    ASSERT_NO_THROW((view.begin()++));
-    ASSERT_NO_THROW((++view.begin()));
+    ASSERT_NO_FATAL_FAILURE((view.begin()++));
+    ASSERT_NO_FATAL_FAILURE((++view.begin()));
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size_hint(), 1u);

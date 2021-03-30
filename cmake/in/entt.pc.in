@@ -1,0 +1,8 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: EnTT
+Description: Gaming meets modern C++
+Url: https://github.com/skypjack/entt
+Version: @ENTT_VERSION@
+Cflags: -I${includedir}
