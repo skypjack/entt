@@ -163,57 +163,55 @@ class meta_any {
 
     template<typename Type>
     static void basic_vtable(const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] void *to) {
-        using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
+        if constexpr(!std::is_void_v<Type>) {
+            using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
-        switch(op) {
-        case operation::DTOR:
-            if constexpr(!std::is_lvalue_reference_v<Type>) {
-                if(auto *curr = static_cast<internal::meta_type_node *>(to); curr->dtor) {
-                    curr->dtor(const_cast<any &>(from).data());
-                }
-            }
-        break;
-        case operation::REF:
-        case operation::CREF:
-            if constexpr(std::is_void_v<Type>) {
-                static_cast<meta_any *>(to)->emplace<void>();
-            } else {
-                *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const base_type &>(from))});
-            }
-            break;
-        case operation::DEREF:
-        case operation::CDEREF:
-            if constexpr(is_meta_pointer_like_v<base_type>) {
-                // for some reason vs2017 doesn't compile when using alias declarations with pointer_traits to get the element type
-                using element_type = std::remove_const_t<typename std::pointer_traits<std::remove_const_t<std::remove_reference_t<Type>>>::element_type>;
-
-                if constexpr(std::is_function_v<element_type>) {
-                    *static_cast<meta_any *>(to) = any_cast<base_type>(from);
-                } else if constexpr(!std::is_same_v<element_type, void>) {
-                    // for some reason vs2017 doesn't compile when using alias declarations with adl_meta_pointer_like
-                    using adl_meta_pointer_like_type = adl_meta_pointer_like<std::remove_const_t<std::remove_reference_t<Type>>>;
-
-                    if constexpr(std::is_lvalue_reference_v<decltype(adl_meta_pointer_like_type::dereference(std::declval<const base_type &>()))>) {
-                        auto &&obj = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
-                        *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::ref(obj)} : meta_any{std::cref(obj)});
-                    } else {
-                        *static_cast<meta_any *>(to) = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+            switch(op) {
+            case operation::DTOR:
+                if constexpr(!std::is_lvalue_reference_v<Type>) {
+                    if(auto *curr = static_cast<internal::meta_type_node *>(to); curr->dtor) {
+                        curr->dtor(const_cast<any &>(from).data());
                     }
                 }
-            }
             break;
-        case operation::SEQ:
-        case operation::CSEQ:
-            if constexpr(is_complete_v<meta_sequence_container_traits<base_type>>) {
-                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<base_type>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+            case operation::REF:
+            case operation::CREF:
+                *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const base_type &>(from))});
+                break;
+            case operation::DEREF:
+            case operation::CDEREF:
+                if constexpr(is_meta_pointer_like_v<base_type>) {
+                    // for some reason vs2017 doesn't compile when using alias declarations with pointer_traits to get the element type
+                    using element_type = std::remove_const_t<typename std::pointer_traits<std::remove_const_t<std::remove_reference_t<Type>>>::element_type>;
+
+                    if constexpr(std::is_function_v<element_type>) {
+                        *static_cast<meta_any *>(to) = any_cast<base_type>(from);
+                    } else if constexpr(!std::is_same_v<element_type, void>) {
+                        // for some reason vs2017 doesn't compile when using alias declarations with adl_meta_pointer_like
+                        using adl_meta_pointer_like_type = adl_meta_pointer_like<std::remove_const_t<std::remove_reference_t<Type>>>;
+
+                        if constexpr(std::is_lvalue_reference_v<decltype(adl_meta_pointer_like_type::dereference(std::declval<const base_type &>()))>) {
+                            auto &&obj = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+                            *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::ref(obj)} : meta_any{std::cref(obj)});
+                        } else {
+                            *static_cast<meta_any *>(to) = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+                        }
+                    }
+                }
+                break;
+            case operation::SEQ:
+            case operation::CSEQ:
+                if constexpr(is_complete_v<meta_sequence_container_traits<base_type>>) {
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<base_type>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                }
+                break;
+            case operation::ASSOC:
+            case operation::CASSOC:
+                if constexpr(is_complete_v<meta_associative_container_traits<base_type>>) {
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<base_type>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                }
+                break;
             }
-            break;
-        case operation::ASSOC:
-        case operation::CASSOC:
-            if constexpr(is_complete_v<meta_associative_container_traits<base_type>>) {
-                *static_cast<meta_associative_container *>(to) = { std::in_place_type<base_type>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
-            }
-            break;
         }
     }
 
@@ -222,7 +220,7 @@ public:
     meta_any() ENTT_NOEXCEPT
         : storage{},
           node{},
-          vtable{}
+          vtable{&basic_vtable<void>}
     {}
 
     /**

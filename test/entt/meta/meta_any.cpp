@@ -117,6 +117,14 @@ TEST_F(MetaAny, Empty) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(any, entt::meta_any{});
     ASSERT_NE(entt::meta_any{'c'}, any);
+
+    ASSERT_FALSE(any.as_ref());
+    ASSERT_FALSE(any.as_sequence_container());
+    ASSERT_FALSE(any.as_associative_container());
+
+    ASSERT_FALSE(std::as_const(any).as_ref());
+    ASSERT_FALSE(std::as_const(any).as_sequence_container());
+    ASSERT_FALSE(std::as_const(any).as_associative_container());
 }
 
 TEST_F(MetaAny, SBOInPlaceTypeConstruction) {
@@ -656,9 +664,9 @@ TEST_F(MetaAny, AsRef) {
     ref = any.as_ref();
     cref = std::as_const(any).as_ref();
 
-    ASSERT_TRUE(ref);
-    ASSERT_EQ(ref.type(), cref.type());
-    ASSERT_EQ(ref.type(), entt::resolve<void>());
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(ref);
+    ASSERT_FALSE(cref);
 }
 
 TEST_F(MetaAny, Comparable) {
