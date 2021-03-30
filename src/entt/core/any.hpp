@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <new>
 #include <type_traits>
 #include <utility>
@@ -178,7 +179,7 @@ public:
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...));
-                instance = (&args, ...);
+                instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<Type>) {
                 new (&storage) Type(std::forward<Args>(args)...);
             } else {

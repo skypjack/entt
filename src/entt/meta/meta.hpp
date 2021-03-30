@@ -178,11 +178,7 @@ class meta_any {
             if constexpr(std::is_void_v<Type>) {
                 static_cast<meta_any *>(to)->emplace<void>();
             } else {
-                static_cast<meta_any *>(to)->storage = (op == operation::REF ? const_cast<any &>(from).as_ref() : from.as_ref());
-                static_cast<meta_any *>(to)->node = internal::meta_info<Type>::resolve();
-                static_cast<meta_any *>(to)->vtable = (op == operation::REF ? &basic_vtable<Type &> : &basic_vtable<const base_type &>);
-                // can't do this because apple clang overrides __bit_reference<...>::operator& to return a __bit_iterator by copy (https://opensource.apple.com/source/libcpp/libcpp-31/include/__bit_reference.auto.html)
-                // *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const base_type &>(from))});
+                *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const base_type &>(from))});
             }
             break;
         case operation::DEREF:
