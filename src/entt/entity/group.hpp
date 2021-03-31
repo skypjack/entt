@@ -695,7 +695,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
-        static_assert((std::is_same_v<Component, Owned> || ...));
+        static_assert((std::is_same_v<Component, Owned> || ...), "Non-owned type");
         auto *cpool = std::get<storage_type<Component> *>(pools);
         return cpool ? cpool->raw() : nullptr;
     }
