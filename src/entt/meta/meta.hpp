@@ -668,7 +668,7 @@ struct meta_prop {
      * @return A meta any containing the key stored with the property.
      */
     [[nodiscard]] meta_any key() const {
-        return node->id->as_ref();
+        return node->id.as_ref();
     }
 
     /**
@@ -676,7 +676,7 @@ struct meta_prop {
      * @return A meta any containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return *node->value;
+        return node->value;
     }
 
     /**
@@ -768,7 +768,7 @@ struct meta_ctor {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->id == key; }, node);
     }
 
     /**
@@ -864,7 +864,7 @@ struct meta_data {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->id == key; }, node);
     }
 
     /**
@@ -983,7 +983,7 @@ struct meta_func {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->id == key; }, node);
     }
 
     /**
@@ -1491,7 +1491,7 @@ public:
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->id == key; }, node);
     }
 
     /**

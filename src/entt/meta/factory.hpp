@@ -110,8 +110,8 @@ private:
 
         static internal::meta_prop_node node{
             nullptr,
-            property,
-            property + 1u
+            property[0u],
+            property[1u]
         };
 
         entt::meta_any instance{std::forward<Key>(key)};

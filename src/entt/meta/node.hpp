@@ -36,8 +36,8 @@ struct meta_type_node;
 
 struct meta_prop_node {
     meta_prop_node * next;
-    const meta_any * const id;
-    meta_any * const value;
+    const meta_any &id;
+    meta_any &value;
 };
 
 
