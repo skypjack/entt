@@ -46,7 +46,7 @@ TEST(Process, Basics) {
     fake_process<int> process{};
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
@@ -57,42 +57,42 @@ TEST(Process, Basics) {
     process.unpause();
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.tick(0);
 
     ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.pause();
 
     ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_TRUE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.unpause();
 
     ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.fail();
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.tick(0);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 }
@@ -106,7 +106,7 @@ TEST(Process, Succeeded) {
     process.tick({});
 
     ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
+    ASSERT_TRUE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
@@ -126,7 +126,7 @@ TEST(Process, Fail) {
     process.tick(0);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 
@@ -147,7 +147,7 @@ TEST(Process, Data) {
     process.tick({}, &value);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
+    ASSERT_TRUE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
@@ -167,7 +167,7 @@ TEST(Process, AbortNextTick) {
     process.tick(0);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 
@@ -185,7 +185,7 @@ TEST(Process, AbortImmediately) {
     process.abort(true);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 
@@ -209,7 +209,7 @@ TEST(ProcessAdaptor, Resolved) {
     process.tick(0);
     process.tick(0);
 
-    ASSERT_TRUE(process.dead());
+    ASSERT_TRUE(process.finished());
     ASSERT_TRUE(updated);
 }
 
@@ -243,6 +243,6 @@ TEST(ProcessAdaptor, Data) {
     process.tick(0);
     process.tick(0, &value);
 
-    ASSERT_TRUE(process.dead());
+    ASSERT_TRUE(process.finished());
     ASSERT_EQ(value, 42);
 }

@@ -202,7 +202,7 @@ public:
      * @brief Returns true if a process is already terminated.
      * @return True if the process is terminated, false otherwise.
      */
-    [[nodiscard]] bool dead() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool finished() const ENTT_NOEXCEPT {
         return current == state::FINISHED;
     }
 
