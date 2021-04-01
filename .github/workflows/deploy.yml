@@ -20,8 +20,7 @@ jobs:
       working-directory: build
       env:
         PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      run: |
-        git clone https://$GITHUB_ACTOR:$PERSONAL_ACCESS_TOKEN@github.com/$GITHUB_ACTOR/$GH_REPO.git
+      run: git clone https://$GITHUB_ACTOR:$PERSONAL_ACCESS_TOKEN@github.com/$GITHUB_ACTOR/$GH_REPO.git
     - name: Prepare formula
       working-directory: build
       run: |

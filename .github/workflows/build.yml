@@ -18,6 +18,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install g++-7
+      if: ${{ matrix.compiler == 'g++-7' }}
+      run: sudo apt install g++-7
+    - name: Install g++-8
+      if: ${{ matrix.compiler == 'g++-8' }}
+      run: sudo apt install g++-8
+    - name: Install clang-8
+      if: ${{ matrix.compiler == 'clang++-8' }}
+      run: sudo apt install clang-8
     - name: Compile tests
       working-directory: build
       env:
