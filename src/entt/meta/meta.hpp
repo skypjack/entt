@@ -426,9 +426,9 @@ public:
      */
     template<typename Type>
     [[nodiscard]] Type cast() const {
-        auto * const actual = try_cast<std::remove_reference_t<Type>>();
-        ENTT_ASSERT(actual);
-        return static_cast<Type>(*actual);
+        auto * const instance = try_cast<std::remove_reference_t<Type>>();
+        ENTT_ASSERT(instance, "Invalid instance");
+        return static_cast<Type>(*instance);
     }
 
     /*! @copydoc cast */
@@ -436,7 +436,7 @@ public:
     [[nodiscard]] Type cast() {
         // forces const on non-reference types to make them work also with wrappers for const references
         auto * const instance = try_cast<std::remove_reference_t<const Type>>();
-        ENTT_ASSERT(instance);
+        ENTT_ASSERT(instance, "Invalid instance");
         return static_cast<Type>(*instance);
     }
 

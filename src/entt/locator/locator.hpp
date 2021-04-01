@@ -87,7 +87,7 @@ struct service_locator {
      * @param ptr Service to use to replace the current one.
      */
     static void set(std::shared_ptr<Service> ptr) {
-        ENTT_ASSERT(static_cast<bool>(ptr));
+        ENTT_ASSERT(static_cast<bool>(ptr), "Null service not allowed");
         service = std::move(ptr);
     }
 

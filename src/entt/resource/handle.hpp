@@ -45,7 +45,7 @@ struct resource_handle {
      * @return A reference to the managed resource.
      */
     [[nodiscard]] const Resource & get() const ENTT_NOEXCEPT {
-        ENTT_ASSERT(static_cast<bool>(resource));
+        ENTT_ASSERT(static_cast<bool>(resource), "Invalid resource");
         return *resource;
     }
 
@@ -84,7 +84,6 @@ struct resource_handle {
      * contains no resource at all.
      */
     [[nodiscard]] const Resource * operator->() const ENTT_NOEXCEPT {
-        ENTT_ASSERT(static_cast<bool>(resource));
         return resource.get();
     }
 

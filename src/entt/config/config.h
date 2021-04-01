@@ -33,7 +33,7 @@ static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), 
 #   define ENTT_ASSERT(...) (void(0))
 #elif !defined ENTT_ASSERT
 #   include <cassert>
-#   define ENTT_ASSERT(condition) assert(condition)
+#   define ENTT_ASSERT(condition, ...) assert(condition)
 #endif
 
 

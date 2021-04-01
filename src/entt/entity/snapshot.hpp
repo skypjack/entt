@@ -177,7 +177,7 @@ class basic_snapshot_loader {
             while(length--) {
                 archive(entt);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
-                ENTT_ASSERT(entity == entt);
+                ENTT_ASSERT(entity == entt, "Entity not available for use");
                 reg->template emplace<Type>(entity);
             }
         } else {
@@ -186,7 +186,7 @@ class basic_snapshot_loader {
             while(length--) {
                 archive(entt, instance);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
-                ENTT_ASSERT(entity == entt);
+                ENTT_ASSERT(entity == entt, "Entity not available for use");
                 reg->template emplace<Type>(entity, std::move(instance));
             }
         }
@@ -204,7 +204,7 @@ public:
         : reg{&source}
     {
         // restoring a snapshot as a whole requires a clean registry
-        ENTT_ASSERT(reg->empty());
+        ENTT_ASSERT(reg->empty(), "Registry must be empty");
     }
 
     /*! @brief Default move constructor. */

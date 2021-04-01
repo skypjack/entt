@@ -129,12 +129,12 @@ class basic_registry {
 
     Entity generate_identifier() {
         // traits_type::entity_mask is reserved to allow for null identifiers
-        ENTT_ASSERT(static_cast<typename traits_type::entity_type>(entities.size()) < traits_type::entity_mask);
+        ENTT_ASSERT(static_cast<typename traits_type::entity_type>(entities.size()) < traits_type::entity_mask, "No entities available");
         return entities.emplace_back(entity_type{static_cast<typename traits_type::entity_type>(entities.size())});
     }
 
     Entity recycle_identifier() {
-        ENTT_ASSERT(available != null);
+        ENTT_ASSERT(available != null, "No entities available");
         const auto curr = to_integral(available);
         const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
         available = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
@@ -201,13 +201,13 @@ public:
      * empty and thus invalid element otherwise.
      */
     poly_storage & storage(const type_info info) {
-        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly);
+        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly, "Storage not available");
         return pools[info.seq()].poly;
     }
 
     /*! @copydoc storage */
     const poly_storage & storage(const type_info info) const {
-        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly);
+        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly, "Storage not available");
         return pools[info.seq()].poly;
     }
 
@@ -375,7 +375,7 @@ public:
      */
     [[nodiscard]] version_type current(const entity_type entity) const {
         const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
-        ENTT_ASSERT(pos < entities.size());
+        ENTT_ASSERT(pos < entities.size(), "Entity does not exist");
         return version(entities[pos]);
     }
 
@@ -405,7 +405,7 @@ public:
      * @return A valid entity identifier.
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
-        ENTT_ASSERT(hint != null);
+        ENTT_ASSERT(hint != null, "Null entity not available");
         entity_type entt;
 
         if(const auto req = (to_integral(hint) & traits_type::entity_mask); !(req < entities.size())) {
@@ -467,7 +467,7 @@ public:
      */
     template<typename It>
     void assign(It first, It last, const entity_type destroyed) {
-        ENTT_ASSERT(!alive());
+        ENTT_ASSERT(!alive(), "Entities still alive");
         entities.assign(first, last);
         available = destroyed;
     }
@@ -537,7 +537,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) emplace(const entity_type entity, Args &&... args) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         return assure<Component>()->emplace(*this, entity, std::forward<Args>(args)...);
     }
 
@@ -554,7 +554,7 @@ public:
      */
     template<typename Component, typename It>
     void insert(It first, It last, const Component &value = {}) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
         assure<Component>()->insert(*this, first, last, value);
     }
 
@@ -574,7 +574,7 @@ public:
     template<typename Component, typename EIt, typename CIt>
     void insert(EIt first, EIt last, CIt from, CIt to) {
         static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>, "Invalid value type");
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
         assure<Component>()->insert(*this, first, last, from, to);
     }
 
@@ -600,7 +600,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) emplace_or_replace(const entity_type entity, Args &&... args) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         auto *cpool = assure<Component>();
 
         return cpool->contains(entity)
@@ -634,7 +634,7 @@ public:
      */
     template<typename Component, typename... Func>
     decltype(auto) patch(const entity_type entity, Func &&... func) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         return assure<Component>()->patch(*this, entity, std::forward<Func>(func)...);
     }
 
@@ -672,7 +672,7 @@ public:
      */
     template<typename... Component>
     void remove(const entity_type entity) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
         (assure<Component>()->remove(entity, this), ...);
     }
@@ -689,7 +689,7 @@ public:
      */
     template<typename... Component, typename It>
     void remove(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
         (assure<Component>()->remove(first, last, this), ...);
     }
@@ -714,7 +714,7 @@ public:
      */
     template<typename... Component>
     size_type remove_if_exists(const entity_type entity) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
 
         return ([this, entity](auto *cpool) {
             return cpool->contains(entity) ? (cpool->remove(entity, this), true) : false;
@@ -736,7 +736,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void remove_all(const entity_type entity) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         entity_type wrap[1u]{entity};
 
         for(auto pos = pools.size(); pos; --pos) {
@@ -758,7 +758,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] bool all_of(const entity_type entity) const {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         return [entity](const auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
@@ -775,7 +775,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] bool any_of(const entity_type entity) const {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         return [entity](const auto *... cpool) { return !((!cpool || !cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
@@ -792,11 +792,11 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) const {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
             const auto *cpool = pool_if_exists<std::remove_const_t<Component>...>();
-            ENTT_ASSERT(cpool);
+            ENTT_ASSERT(cpool, "Storage not available");
             return cpool->get(entity);
         } else {
             return std::forward_as_tuple(get<Component>(entity)...);
@@ -806,7 +806,7 @@ public:
     /*! @copydoc get */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
             return (const_cast<Component &>(assure<std::remove_const_t<Component>>()->get(entity)), ...);
@@ -839,7 +839,7 @@ public:
      */
     template<typename Component, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entity, Args &&... args) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         auto *cpool = assure<Component>();
         return cpool->contains(entity) ? cpool->get(entity) : cpool->emplace(*this, entity, std::forward<Args>(args)...);
     }
@@ -859,7 +859,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entity) const {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
             const auto *cpool = pool_if_exists<std::remove_const_t<Component>...>();
@@ -872,7 +872,7 @@ public:
     /*! @copydoc try_get */
     template<typename... Component>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entity) {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
             return (const_cast<Component *>(std::as_const(*this).template try_get<Component>(entity)), ...);
@@ -940,7 +940,7 @@ public:
      * @return True if the entity has no components assigned, false otherwise.
      */
     [[nodiscard]] bool orphan(const entity_type entity) const {
-        ENTT_ASSERT(valid(entity));
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.pool && pdata.pool->contains(entity); });
     }
 
@@ -1203,7 +1203,7 @@ public:
                     const auto overlapping = (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
                     const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<Exclude>::value()));
                     return !overlapping || ((sz == size) || (sz == gdata.size));
-                }));
+                }), "Conflicting groups");
 
                 const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
                     return !(0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) || (size > gdata.size);
@@ -1370,7 +1370,7 @@ public:
      */
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
-        ENTT_ASSERT(sortable<Component>());
+        ENTT_ASSERT(sortable<Component>(), "Cannot sort owned storage");
         assure<Component>()->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
@@ -1409,7 +1409,7 @@ public:
      */
     template<typename To, typename From>
     void sort() {
-        ENTT_ASSERT(sortable<To>());
+        ENTT_ASSERT(sortable<To>(), "Cannot sort owned storage");
         assure<To>()->respect(*assure<From>());
     }
 
@@ -1548,7 +1548,7 @@ public:
     template<typename Type>
     [[nodiscard]] Type & ctx() const {
         auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        ENTT_ASSERT(it != vars.cend());
+        ENTT_ASSERT(it != vars.cend(), "Invalid instance");
         return any_cast<Type &>(*it);
     }
 
@@ -1556,7 +1556,7 @@ public:
     template<typename Type>
     [[nodiscard]] Type & ctx() {
         auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        ENTT_ASSERT(it != vars.end());
+        ENTT_ASSERT(it != vars.end(), "Invalid instance");
         return any_cast<Type &>(*it);
     }
 

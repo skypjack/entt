@@ -115,7 +115,7 @@ private:
         };
 
         entt::meta_any instance{std::forward<Key>(key)};
-        ENTT_ASSERT(!internal::find_if_not(&instance, *curr, &node));
+        ENTT_ASSERT(!internal::find_if_not(&instance, *curr, &node), "Duplicate key");
         property[0u] = std::move(instance);
         property[1u] = std::move(value);
 
@@ -191,7 +191,7 @@ struct meta_factory<Type> {
     auto type(const id_type id = type_hash<Type>::value()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!internal::find_if_not(id, *internal::meta_context::global(), node));
+        ENTT_ASSERT(!internal::find_if_not(id, *internal::meta_context::global(), node), "Duplicate identifier");
         node->id = id;
 
         if(!internal::find_if(node, *internal::meta_context::global())) {
@@ -434,7 +434,7 @@ struct meta_factory<Type> {
                 &meta_getter<Type, Data, Policy>
             };
 
-            ENTT_ASSERT(!internal::find_if_not(id, type->data, &node));
+            ENTT_ASSERT(!internal::find_if_not(id, type->data, &node), "Duplicate identifier");
             node.id = id;
 
             if(!internal::find_if(&node, type->data)) {
@@ -483,7 +483,7 @@ struct meta_factory<Type> {
             &meta_getter<Type, Getter, Policy>
         };
 
-        ENTT_ASSERT(!internal::find_if_not(id, type->data, &node));
+        ENTT_ASSERT(!internal::find_if_not(id, type->data, &node), "Duplicate identifier");
         node.id = id;
 
         if(!internal::find_if(&node, type->data)) {

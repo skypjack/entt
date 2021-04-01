@@ -57,9 +57,7 @@ class scheduler {
     struct continuation {
         continuation(process_handler *ref)
             : handler{ref}
-        {
-            ENTT_ASSERT(handler);
-        }
+        {}
 
         template<typename Proc, typename... Args>
         continuation then(Args &&... args) {

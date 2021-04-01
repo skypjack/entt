@@ -436,7 +436,7 @@ public:
      */
     template<typename... Comp>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
-        ENTT_ASSERT(contains(entt));
+        ENTT_ASSERT(contains(entt), "View does not contain entity");
 
         if constexpr(sizeof...(Comp) == 0) {
             return std::tuple_cat(get_as_tuple(*std::get<storage_type<Component> *>(pools), entt)...);
@@ -860,7 +860,7 @@ public:
      */
     template<typename... Comp>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        ENTT_ASSERT(contains(entt));
+        ENTT_ASSERT(contains(entt), "View does not contain entity");
 
         if constexpr(sizeof...(Comp) == 0) {
             return get_as_tuple(*std::get<0>(pools), entt);

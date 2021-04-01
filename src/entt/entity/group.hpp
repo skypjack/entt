@@ -339,7 +339,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        ENTT_ASSERT(contains(entt));
+        ENTT_ASSERT(contains(entt), "Group does not contain entity");
 
         if constexpr(sizeof...(Component) == 0) {
             return std::tuple_cat(get_as_tuple(*std::get<storage_type<Get> *>(pools), entt)...);
@@ -839,7 +839,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        ENTT_ASSERT(contains(entt));
+        ENTT_ASSERT(contains(entt), "Group does not contain entity");
 
         if constexpr(sizeof...(Component) == 0) {
             return std::tuple_cat(get_as_tuple(*std::get<storage_type<Owned> *>(pools), entt)..., get_as_tuple(*std::get<storage_type<Get> *>(pools), entt)...);

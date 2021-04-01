@@ -522,7 +522,7 @@ public:
      * @param entt A valid entity identifier.
      */
     void get([[maybe_unused]] const entity_type entt) const {
-        ENTT_ASSERT(this->contains(entt));
+        ENTT_ASSERT(this->contains(entt), "Storage does not contain entity");
     }
 
     /**
@@ -550,7 +550,7 @@ public:
     */
     template<typename... Func>
     void patch([[maybe_unused]] const entity_type entity, Func &&... func) {
-        ENTT_ASSERT(this->contains(entity));
+        ENTT_ASSERT(this->contains(entity), "Storage does not contain entity");
         (std::forward<Func>(func)(), ...);
     }
 
@@ -638,7 +638,7 @@ class sigh_storage_mixin final: public Type {
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void swap_and_pop(const std::size_t pos, void *ud) final {
-        ENTT_ASSERT(ud != nullptr);
+        ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
         const auto entity = basic_sparse_set<typename Type::entity_type>::operator[](pos);
         destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entity);
         // the position may have changed due to the actions of a listener

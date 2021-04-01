@@ -373,7 +373,7 @@ public:
      * @return The position of the entity in the sparse set.
      */
     [[nodiscard]] size_type index(const entity_type entt) const {
-        ENTT_ASSERT(contains(entt));
+        ENTT_ASSERT(contains(entt), "Set does not contain entity");
         return size_type{to_integral(sparse[page(entt)][offset(entt)])};
     }
 
@@ -392,7 +392,7 @@ public:
      * @return The entity at specified location.
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
-        ENTT_ASSERT(pos < packed.size());
+        ENTT_ASSERT(pos < packed.size(), "Position is out of bounds");
         return packed[pos];
     }
 
@@ -406,7 +406,7 @@ public:
      * @param entt A valid entity identifier.
      */
     void emplace(const entity_type entt) {
-        ENTT_ASSERT(!contains(entt));
+        ENTT_ASSERT(!contains(entt), "Set already contains entity");
         assure(page(entt))[offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(packed.size())};
         packed.push_back(entt);
     }
@@ -428,7 +428,7 @@ public:
         packed.insert(packed.end(), first, last);
 
         for(; first != last; ++first) {
-            ENTT_ASSERT(!contains(*first));
+            ENTT_ASSERT(!contains(*first), "Set already contains entity");
             assure(page(*first))[offset(*first)] = entity_type{next++};
         }
     }
@@ -444,7 +444,7 @@ public:
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void remove(const entity_type entt, void *ud = nullptr) {
-        ENTT_ASSERT(contains(entt));
+        ENTT_ASSERT(contains(entt), "Set does not contain entity");
         auto &ref = sparse[page(entt)][offset(entt)];
 
         // last chance to use the entity for derived classes and mixins, if any
@@ -453,7 +453,7 @@ public:
         const auto other = packed.back();
         sparse[page(other)][offset(other)] = ref;
         // if it looks weird, imagine what the subtle bugs it prevents are
-        ENTT_ASSERT((packed.back() = entt, true));
+        ENTT_ASSERT((packed.back() = entt, true), "");
         packed[size_type{to_integral(ref)}] = other;
         ref = null;
 
@@ -527,11 +527,9 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort_n(const size_type count, Compare compare, Sort algo = Sort{}, Args &&... args) {
-        ENTT_ASSERT(!(count > size()));
-
         algo(packed.rend() - count, packed.rend(), std::move(compare), std::forward<Args>(args)...);
 
-        for(size_type pos{}; pos < count; ++pos) {
+        for(size_type pos{}, last = (size() < count ? size() : count); pos < last; ++pos) {
             auto curr = pos;
             auto next = index(packed[curr]);
 
