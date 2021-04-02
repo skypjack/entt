@@ -3,8 +3,8 @@
 
 
 #define ENTT_VERSION_MAJOR 3
-#define ENTT_VERSION_MINOR 7
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_MINOR 8
+#define ENTT_VERSION_PATCH 0
 
 
 #endif
