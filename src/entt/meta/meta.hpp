@@ -231,7 +231,7 @@ public:
      */
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&... args)
-        : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
+        : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
           node{internal::meta_info<Type>::resolve()},
           vtable{&basic_vtable<Type>}
     {}
