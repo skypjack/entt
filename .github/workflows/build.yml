@@ -20,13 +20,19 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install g++-7
       if: ${{ matrix.compiler == 'g++-7' }}
-      run: sudo apt install g++-7
+      run: |
+        sudo apt-get update
+        sudo apt-get install g++-7 -y
     - name: Install g++-8
       if: ${{ matrix.compiler == 'g++-8' }}
-      run: sudo apt install g++-8
+      run: |
+        sudo apt-get update
+        sudo apt-get install g++-8 -y
     - name: Install clang-8
       if: ${{ matrix.compiler == 'clang++-8' }}
-      run: sudo apt install clang-8
+      run: |
+        sudo apt-get update
+        sudo apt-get install clang-8 -y
     - name: Compile tests
       working-directory: build
       env:
