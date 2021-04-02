@@ -4,7 +4,7 @@
 
 
 #define ENTT_VERSION_MAJOR 3
-#define ENTT_VERSION_MINOR 6
+#define ENTT_VERSION_MINOR 7
 #define ENTT_VERSION_PATCH 0
 
 
@@ -50,7 +50,9 @@
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -328,11 +330,43 @@ struct radix_sort {
 #define ENTT_CORE_ANY_HPP
 
 
+#include <cstddef>
 #include <functional>
+#include <memory>
 #include <new>
 #include <type_traits>
 #include <utility>
 // #include "../config/config.h"
+
+// #include "fwd.hpp"
+#ifndef ENTT_CORE_FWD_HPP
+#define ENTT_CORE_FWD_HPP
+
+
+#include <type_traits>
+// #include "../config/config.h"
+
+
+
+namespace entt {
+
+
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
+/*! @brief Alias declaration for type identifiers. */
+using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
+
+
+}
+
+
+#endif
 
 // #include "type_info.hpp"
 #ifndef ENTT_CORE_TYPE_INFO_HPP
@@ -388,25 +422,6 @@ struct radix_sort {
 // #include "../config/config.h"
 
 // #include "fwd.hpp"
-#ifndef ENTT_CORE_FWD_HPP
-#define ENTT_CORE_FWD_HPP
-
-
-// #include "../config/config.h"
-
-
-
-namespace entt {
-
-
-/*! @brief Alias declaration for type identifiers. */
-using id_type = ENTT_ID_TYPE;
-
-
-}
-
-
-#endif
 
 
 
@@ -702,7 +717,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -761,6 +776,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -782,6 +800,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -798,6 +819,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -840,7 +864,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -900,7 +924,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -929,6 +953,32 @@ type_info type_id() ENTT_NOEXCEPT {
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -1010,32 +1060,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -1209,6 +1233,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -1316,19 +1365,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -1423,6 +1506,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -1446,7 +1553,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -1454,7 +1561,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -1509,15 +1616,20 @@ using member_class_t = typename member_class<Member>::type;
 namespace entt {
 
 
-/*! @brief A SBO friendly, type-safe container for single values of any type. */
-class any {
+/**
+ * @brief A SBO friendly, type-safe container for single values of any type.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
+ */
+template<std::size_t Len, std::size_t Align>
+class basic_any {
     enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
 
-    using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
-    using vtable_type = const void *(const operation, const any &, const void *);
+    using storage_type = std::aligned_storage_t<Len + !Len, Align>;
+    using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
-    static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
@@ -1528,43 +1640,48 @@ class any {
         }
     }
 
-    static type_info & as_type_info(const void *data) {
-        return *const_cast<type_info *>(static_cast<const type_info *>(data));
-    }
-
-    static any & as_any(const void *data) {
-        return *const_cast<any *>(static_cast<const any *>(data));
+    template<typename Type>
+    static Type & as(const void *to) {
+        return *const_cast<Type *>(static_cast<const Type *>(to));
     }
 
     template<typename Type>
-    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] const void *to) {
+    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] const void *to) {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                using base_type = std::remove_reference_t<Type>;
+                using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
                 switch(op) {
-                case operation::REF:
-                case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type> : basic_vtable<const base_type &>;
-                    [[fallthrough]];
                 case operation::COPY:
+                    if constexpr(std::is_copy_constructible_v<base_type>) {
+                        as<basic_any>(to).template emplace<base_type>(*static_cast<const base_type *>(from.instance));
+                    }
+                    break;
                 case operation::MOVE:
-                    as_any(to).instance = from.instance;
+                    as<basic_any>(to).instance = from.instance;
                     [[fallthrough]];
                 case operation::DTOR:
                     break;
                 case operation::COMP:
-                    return compare<std::remove_const_t<base_type>>(from.instance, to) ? to : nullptr;
+                    return compare<base_type>(from.instance, to) ? to : nullptr;
                 case operation::ADDR:
-                    return std::is_const_v<base_type> ? nullptr : from.instance;
+                    return std::is_const_v<std::remove_reference_t<Type>> ? nullptr : from.instance;
                 case operation::CADDR:
                     return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const base_type &>;
+                    break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<std::remove_const_t<base_type>>();
+                    as<type_info>(to) = type_id<base_type>();
                     break;
                 }
             } else if constexpr(in_situ<Type>) {
-                #if __cpp_lib_launder >= 201606L
+                #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
                 auto *instance = const_cast<Type *>(std::launder(reinterpret_cast<const Type *>(&from.storage)));
                 #else
                 auto *instance = const_cast<Type *>(reinterpret_cast<const Type *>(&from.storage));
@@ -1572,10 +1689,13 @@ class any {
 
                 switch(op) {
                 case operation::COPY:
-                    new (&as_any(to).storage) Type{std::as_const(*instance)};
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        new (&as<basic_any>(to).storage) Type{std::as_const(*instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
                     break;
                 case operation::MOVE:
-                    new (&as_any(to).storage) Type{std::move(*instance)};
+                    new (&as<basic_any>(to).storage) Type{std::move(*instance)};
                     [[fallthrough]];
                 case operation::DTOR:
                     instance->~Type();
@@ -1586,36 +1706,50 @@ class any {
                 case operation::CADDR:
                     return instance;
                 case operation::REF:
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
                 case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
-                    as_any(to).instance = instance;
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
                     break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<Type>();
+                    as<type_info>(to) = type_id<Type>();
                     break;
                 }
             } else {
                 switch(op) {
                 case operation::COPY:
-                    as_any(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        as<basic_any>(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
                     break;
-                case operation::REF:
-                case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
-                    [[fallthrough]];
                 case operation::MOVE:
-                    as_any(to).instance = from.instance;
+                    as<basic_any>(to).instance = from.instance;
                     break;
                 case operation::DTOR:
-                    delete static_cast<const Type *>(from.instance);
+                    if constexpr(std::is_array_v<Type>) {
+                        delete[] static_cast<const Type *>(from.instance);
+                    } else {
+                        delete static_cast<const Type *>(from.instance);
+                    }
                     break;
                 case operation::COMP:
                     return compare<Type>(from.instance, to) ? to : nullptr;
                 case operation::ADDR:
                 case operation::CADDR:
                     return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
+                    break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<Type>();
+                    as<type_info>(to) = type_id<Type>();
                     break;
                 }
             }
@@ -1626,8 +1760,8 @@ class any {
 
 public:
     /*! @brief Default constructor. */
-    any() ENTT_NOEXCEPT
-        : any{std::in_place_type<void>}
+    basic_any() ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<void>}
     {}
 
     /**
@@ -1637,19 +1771,18 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : vtable{&basic_vtable<Type>},
-          instance{}
+    explicit basic_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
+        : instance{},
+          vtable{&basic_vtable<Type>}
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                static_assert(sizeof...(Args) == 1u && (std::is_pointer_v<std::remove_reference_t<Args>> && ...));
-                ENTT_ASSERT(((args != nullptr) && ...));
-                instance = (args, ...);
+                static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
+                instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<Type>) {
-                new (&storage) Type{std::forward<Args>(args)...};
+                new (&storage) Type(std::forward<Args>(args)...);
             } else {
-                instance = new Type{std::forward<Args>(args)...};
+                instance = new Type(std::forward<Args>(args)...);
             }
         }
     }
@@ -1660,8 +1793,8 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : any{std::in_place_type<Type &>, &value.get()}
+    basic_any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -1669,35 +1802,34 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, any>>>
-    any(Type &&value)
-        : any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
+    basic_any(Type &&value)
+        : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)}
     {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    any(const any &other)
-        : any{}
+    basic_any(const basic_any &other)
+        : basic_any{}
     {
-        vtable = other.vtable;
-        vtable(operation::COPY, other, this);
+        other.vtable(operation::COPY, other, this);
     }
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    any(any &&other) ENTT_NOEXCEPT
-        : any{}
+    basic_any(basic_any &&other) ENTT_NOEXCEPT
+        : basic_any{}
     {
+        other.vtable(operation::MOVE, other, this);
         vtable = std::exchange(other.vtable, &basic_vtable<void>);
-        vtable(operation::MOVE, other, this);
     }
 
     /*! @brief Frees the internal storage, whatever it means. */
-    ~any() {
+    ~basic_any() {
         vtable(operation::DTOR, *this, nullptr);
     }
 
@@ -1706,7 +1838,7 @@ public:
      * @param other The instance to assign from.
      * @return This any object.
      */
-    any & operator=(any other) {
+    basic_any & operator=(basic_any other) {
         swap(*this, other);
         return *this;
     }
@@ -1742,7 +1874,12 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        *this = any{std::in_place_type<Type>, std::forward<Args>(args)...};
+        *this = basic_any{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = basic_any{};
     }
 
     /**
@@ -1758,7 +1895,7 @@ public:
      * @param other Wrapper with which to compare.
      * @return False if the two objects differ in their content, true otherwise.
      */
-    bool operator==(const any &other) const ENTT_NOEXCEPT {
+    bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
         return type() == other.type() && (vtable(operation::COMP, *this, other.data()) == other.data());
     }
 
@@ -1767,8 +1904,8 @@ public:
      * @param lhs A valid any object.
      * @param rhs A valid any object.
      */
-    friend void swap(any &lhs, any &rhs) {
-        any tmp{};
+    friend void swap(basic_any &lhs, basic_any &rhs) {
+        basic_any tmp{};
         lhs.vtable(operation::MOVE, lhs, &tmp);
         rhs.vtable(operation::MOVE, rhs, &lhs);
         lhs.vtable(operation::MOVE, tmp, &rhs);
@@ -1777,35 +1914,37 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return An any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend any as_ref(any &other) ENTT_NOEXCEPT {
-        any ref{};
-        other.vtable(operation::REF, other, &ref);
+    [[nodiscard]] basic_any as_ref() ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::REF, *this, &ref);
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend any as_ref(const any &other) ENTT_NOEXCEPT {
-        any ref{};
-        other.vtable(operation::CREF, other, &ref);
+    [[nodiscard]] basic_any as_ref() const ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::CREF, *this, &ref);
         return ref;
     }
 
 private:
-    vtable_type *vtable;
     union { const void *instance; storage_type storage; };
+    vtable_type *vtable;
 };
 
 
 /**
  * @brief Checks if two wrappers differ in their content.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param lhs A wrapper, either empty or not.
  * @param rhs A wrapper, either empty or not.
  * @return True if the two wrappers differ in their content, false otherwise.
  */
-[[nodiscard]] inline bool operator!=(const any &lhs, const any &rhs) ENTT_NOEXCEPT {
+template<std::size_t Len, std::size_t Align>
+[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -1813,11 +1952,13 @@ private:
 /**
  * @brief Performs type-safe access to the contained object.
  * @tparam Type Type to which conversion is required.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param data Target any object.
  * @return The element converted to the requested type.
  */
-template<typename Type>
-Type any_cast(const any &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     const auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
@@ -1825,8 +1966,8 @@ Type any_cast(const any &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type any_cast(any &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -1835,8 +1976,8 @@ Type any_cast(any &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type any_cast(any &&data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -1845,17 +1986,17 @@ Type any_cast(any &&data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-const Type * any_cast(const any *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
 }
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type * any_cast(any *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     // last attempt to make wrappers for const references return their values
-    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<any, Type> *>(data)->data()) : nullptr);
+    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
 }
 
 
@@ -2393,7 +2534,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -2452,6 +2593,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -2473,6 +2617,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -2489,6 +2636,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -2531,7 +2681,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -2591,7 +2741,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -2620,6 +2770,32 @@ type_info type_id() ENTT_NOEXCEPT {
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -2701,32 +2877,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -2900,6 +3050,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -3007,19 +3182,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -3114,6 +3323,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -3137,7 +3370,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -3145,7 +3378,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -3335,7 +3568,9 @@ private:
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -3603,7 +3838,9 @@ inline constexpr null_t null{};
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -3646,6 +3883,7 @@ inline constexpr null_t null{};
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 // #include "../config/config.h"
 
 
@@ -3653,8 +3891,16 @@ inline constexpr null_t null{};
 namespace entt {
 
 
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
 
 
 }
@@ -3665,6 +3911,32 @@ using id_type = ENTT_ID_TYPE;
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -3746,32 +4018,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -3945,6 +4191,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -4052,19 +4323,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -4159,6 +4464,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -4182,7 +4511,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -4190,7 +4519,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -4448,6 +4777,7 @@ inline constexpr null_t null{};
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 // #include "../config/config.h"
 
 
@@ -4455,8 +4785,16 @@ inline constexpr null_t null{};
 namespace entt {
 
 
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
 
 
 }
@@ -4905,8 +5243,7 @@ namespace entt {
  */
 template<typename Entity>
 class basic_sparse_set {
-    static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
-    static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(Entity);
+    static constexpr auto page_size = ENTT_PAGE_SIZE;
 
     using traits_type = entt_traits<Entity>;
     using page_type = std::unique_ptr<Entity[]>;
@@ -5014,11 +5351,11 @@ class basic_sparse_set {
     };
 
     [[nodiscard]] auto page(const Entity entt) const ENTT_NOEXCEPT {
-        return size_type{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
+        return size_type{(to_integral(entt) & traits_type::entity_mask) / page_size};
     }
 
     [[nodiscard]] auto offset(const Entity entt) const ENTT_NOEXCEPT {
-        return size_type{to_integral(entt) & (entt_per_page - 1)};
+        return size_type{to_integral(entt) & (page_size - 1)};
     }
 
     [[nodiscard]] page_type & assure(const std::size_t pos) {
@@ -5027,9 +5364,9 @@ class basic_sparse_set {
         }
 
         if(!sparse[pos]) {
-            sparse[pos].reset(new entity_type[entt_per_page]);
+            sparse[pos].reset(new entity_type[page_size]);
             // null is safe in all cases for our purposes
-            for(auto *first = sparse[pos].get(), *last = first + entt_per_page; first != last; ++first) {
+            for(auto *first = sparse[pos].get(), *last = first + page_size; first != last; ++first) {
                 *first = null;
             }
         }
@@ -5037,9 +5374,12 @@ class basic_sparse_set {
         return sparse[pos];
     }
 
+protected:
+    /*! @brief Swaps two entities in the internal packed array. */
     virtual void swap_at(const std::size_t, const std::size_t) {}
-    virtual void swap_and_pop(const std::size_t) {}
-    virtual void clear_all() {}
+
+    /*! @brief Attempts to remove an entity from the internal packed array. */
+    virtual void swap_and_pop(const std::size_t, void *) {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -5106,7 +5446,7 @@ public:
      * @return Extent of the sparse set.
      */
     [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
-        return sparse.size() * entt_per_page;
+        return sparse.size() * page_size;
     }
 
     /**
@@ -5240,6 +5580,25 @@ public:
     }
 
     /**
+     * @brief Returns the entity at specified location, with bounds checking.
+     * @param pos The position for which to return the entity.
+     * @return The entity at specified location if any, a null entity otherwise.
+     */
+    [[nodiscard]] entity_type at(const size_type pos) const {
+        return pos < packed.size() ? packed[pos] : null;
+    }
+
+    /**
+     * @brief Returns the entity at specified location, without bounds checking.
+     * @param pos The position for which to return the entity.
+     * @return The entity at specified location.
+     */
+    [[nodiscard]] entity_type operator[](const size_type pos) const {
+        ENTT_ASSERT(pos < packed.size());
+        return packed[pos];
+    }
+
+    /**
      * @brief Assigns an entity to a sparse set.
      *
      * @warning
@@ -5284,19 +5643,23 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid entity identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void remove(const entity_type entt) {
+    void remove(const entity_type entt, void *ud = nullptr) {
         ENTT_ASSERT(contains(entt));
         auto &ref = sparse[page(entt)][offset(entt)];
-        const auto pos = size_type{to_integral(ref)};
-        const auto other = packed.back();
 
+        // last chance to use the entity for derived classes and mixins, if any
+        swap_and_pop(size_type{to_integral(ref)}, ud);
+
+        const auto other = packed.back();
         sparse[page(other)][offset(other)] = ref;
-        packed[pos] = other;
+        // if it looks weird, imagine what the subtle bugs it prevents are
+        ENTT_ASSERT((packed.back() = entt, true));
+        packed[size_type{to_integral(ref)}] = other;
         ref = null;
 
         packed.pop_back();
-        swap_and_pop(pos);
     }
 
     /**
@@ -5304,21 +5667,17 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     template<typename It>
-    void remove(It first, It last) {
-        if(std::distance(first, last) == std::distance(packed.begin(), packed.end())) {
-            // no validity check, let it be misused
-            clear();
-        } else {
-            for(; first != last; ++first) {
-                remove(*first);
-            }
+    void remove(It first, It last, void *ud = nullptr) {
+        for(; first != last; ++first) {
+            remove(*first, ud);
         }
     }
 
     /**
-     * @brief Swaps two entities in the internal packed array.
+     * @copybrief swap_at
      *
      * For what it's worth, this function affects both the internal sparse array
      * and the internal packed array. Users should not care of that anyway.
@@ -5379,11 +5738,14 @@ public:
             auto next = index(packed[curr]);
 
             while(curr != next) {
-                swap_at(next, index(packed[next]));
-                sparse[page(packed[curr])][offset(packed[curr])] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
+                const auto idx = index(packed[next]);
+                const auto entt = packed[curr];
+
+                swap_at(next, idx);
+                sparse[page(entt)][offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
 
                 curr = next;
-                next = index(packed[curr]);
+                next = idx;
             }
         }
     }
@@ -5439,11 +5801,12 @@ public:
         }
     }
 
-    /*! @brief Clears a sparse set. */
-    void clear() ENTT_NOEXCEPT {
-        sparse.clear();
-        packed.clear();
-        clear_all();
+    /**
+     * @brief Clears a sparse set.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    void clear(void *ud = nullptr) ENTT_NOEXCEPT {
+        remove(begin(), end(), ud);
     }
 
 private:
@@ -5510,7 +5873,9 @@ private:
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -5590,7 +5955,9 @@ private:
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -5633,6 +6000,7 @@ private:
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 // #include "../config/config.h"
 
 
@@ -5640,8 +6008,16 @@ private:
 namespace entt {
 
 
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
 
 
 }
@@ -5652,6 +6028,32 @@ using id_type = ENTT_ID_TYPE;
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -5733,32 +6135,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -5932,6 +6308,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -6039,19 +6440,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -6146,6 +6581,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -6169,7 +6628,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -6177,7 +6636,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -6508,7 +6967,7 @@ public:
      * @return The value returned by the underlying function.
      */
     Ret operator()(Args... args) const {
-        ENTT_ASSERT(fn);
+        ENTT_ASSERT(static_cast<bool>(*this));
         return fn(data, std::forward<Args>(args)...);
     }
 
@@ -7140,12 +7599,6 @@ sink(sigh<Ret(Args...)> &) ENTT_NOEXCEPT -> sink<Ret(Args...)>;
 namespace entt {
 
 
-/*! @brief Empty storage category tag. */
-struct empty_storage_tag {};
-/*! @brief Dense storage category tag. */
-struct dense_storage_tag: empty_storage_tag {};
-
-
 /**
  * @brief Basic storage implementation.
  *
@@ -7283,22 +7736,28 @@ class basic_storage: public basic_sparse_set<Entity> {
         index_type index;
     };
 
-    void swap_at(const std::size_t lhs, const std::size_t rhs) final {
+protected:
+    /**
+     * @copybrief basic_sparse_set::swap_at
+     * @param lhs A valid position of an entity within storage.
+     * @param rhs A valid position of an entity within storage.
+     */
+    void swap_at(const std::size_t lhs, const std::size_t rhs) {
         std::swap(instances[lhs], instances[rhs]);
     }
 
-    void swap_and_pop(const std::size_t pos) final {
+    /**
+     * @copybrief basic_sparse_set::swap_and_pop
+     * @param pos A valid position of an entity within storage.
+     */
+    void swap_and_pop(const std::size_t pos, void *) {
         auto other = std::move(instances.back());
         instances[pos] = std::move(other);
         instances.pop_back();
     }
 
-    void clear_all() ENTT_NOEXCEPT final {
-        instances.clear();
-    }
-
 public:
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -7312,8 +7771,6 @@ public:
     using reverse_iterator = Type *;
     /*! @brief Constant reverse iterator type. */
     using const_reverse_iterator = const Type *;
-    /*! @brief Storage category. */
-    using storage_category = dense_storage_tag;
 
     /**
      * @brief Increases the capacity of a storage.
@@ -7451,14 +7908,14 @@ public:
     }
 
     /**
-     * @brief Returns the object associated with an entity.
+     * @brief Returns the object assigned to an entity.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the storage results in
      * undefined behavior.
      *
      * @param entt A valid entity identifier.
-     * @return The object associated with the entity.
+     * @return The object assigned to the entity.
      */
     [[nodiscard]] const value_type & get(const entity_type entt) const {
         return instances[underlying_type::index(entt)];
@@ -7496,6 +7953,20 @@ public:
         // entity goes after component in case constructor throws
         underlying_type::emplace(entt);
         return instances.back();
+    }
+
+    /**
+     * @brief Updates the instance assigned to a given entity in-place.
+     * @tparam Func Types of the function objects to invoke.
+     * @param entity A valid entity identifier.
+     * @param func Valid function objects.
+     * @return A reference to the updated instance.
+     */
+    template<typename... Func>
+    decltype(auto) patch(const entity_type entity, Func &&... func) {
+        auto &&instance = instances[this->index(entity)];
+        (std::forward<Func>(func)(instance), ...);
+        return instance;
     }
 
     /**
@@ -7612,14 +8083,25 @@ class basic_storage<Entity, Type, std::enable_if_t<is_empty_v<Type>>>: public ba
     using underlying_type = basic_sparse_set<Entity>;
 
 public:
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Storage category. */
-    using storage_category = empty_storage_tag;
+
+    /**
+     * @brief Fake get function.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.
+     *
+     * @param entt A valid entity identifier.
+     */
+    void get([[maybe_unused]] const entity_type entt) const {
+        ENTT_ASSERT(this->contains(entt));
+    }
 
     /**
      * @brief Assigns an entity to a storage and constructs its object.
@@ -7636,6 +8118,18 @@ public:
     void emplace(const entity_type entt, Args &&... args) {
         [[maybe_unused]] value_type instance{std::forward<Args>(args)...};
         underlying_type::emplace(entt);
+    }
+
+    /**
+    * @brief Updates the instance assigned to a given entity in-place.
+    * @tparam Func Types of the function objects to invoke.
+    * @param entity A valid entity identifier.
+    * @param func Valid function objects.
+    */
+    template<typename... Func>
+    void patch([[maybe_unused]] const entity_type entity, Func &&... func) {
+        ENTT_ASSERT(this->contains(entity));
+        (std::forward<Func>(func)(), ...);
     }
 
     /**
@@ -7664,12 +8158,10 @@ template<typename Type>
 struct storage_adapter_mixin: Type {
     static_assert(std::is_same_v<typename Type::value_type, std::decay_t<typename Type::value_type>>, "Invalid object type");
 
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
-    /*! @brief Storage category. */
-    using storage_category = typename Type::storage_category;
 
     /**
      * @brief Assigns entities to a storage.
@@ -7686,35 +8178,16 @@ struct storage_adapter_mixin: Type {
     /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the objects
-     * associated with the entities.
+     * @tparam Args Types of arguments to use to construct the objects assigned
+     * to the entities.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the objects associated with
-     * the entities.
+     * @param args Parameters to use to initialize the objects assigned to the
+     * entities.
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
         Type::insert(first, last, std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Removes entities from a storage.
-     * @param entity A valid entity identifier.
-     */
-    void remove(basic_registry<entity_type> &, const entity_type entity) {
-        Type::remove(entity);
-    }
-
-    /**
-     * @copybrief remove
-     * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename It>
-    void remove(basic_registry<entity_type> &, It first, It last) {
-        Type::remove(first, last);
     }
 
     /**
@@ -7725,10 +8198,8 @@ struct storage_adapter_mixin: Type {
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entity, [[maybe_unused]] Func &&... func) {
-        auto &instance = this->get(entity);
-        (std::forward<Func>(func)(instance), ...);
-        return instance;
+    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entity, Func &&... func) {
+        return Type::patch(entity, std::forward<Func>(func)...);
     }
 };
 
@@ -7738,13 +8209,25 @@ struct storage_adapter_mixin: Type {
  * @tparam Type The type of the underlying storage.
  */
 template<typename Type>
-struct sigh_storage_mixin: Type {
+class sigh_storage_mixin final: public Type {
+    /**
+     * @copybrief basic_sparse_set::swap_and_pop
+     * @param pos A valid position of an entity within storage.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    void swap_and_pop(const std::size_t pos, void *ud) final {
+        ENTT_ASSERT(ud != nullptr);
+        const auto entity = basic_sparse_set<typename Type::entity_type>::operator[](pos);
+        destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entity);
+        // the position may have changed due to the actions of a listener
+        Type::swap_and_pop(this->index(entity), ud);
+    }
+
+public:
     /*! @brief Underlying value type. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
-    /*! @brief Storage category. */
-    using storage_category = typename Type::storage_category;
 
     /**
      * @brief Returns a sink object.
@@ -7812,7 +8295,7 @@ struct sigh_storage_mixin: Type {
     }
 
     /**
-     * @copybrief storage_adapter_mixin::emplace
+     * @brief Assigns entities to a storage.
      * @tparam Args Types of arguments to use to construct the object.
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
@@ -7821,28 +8304,25 @@ struct sigh_storage_mixin: Type {
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
-        Type::emplace(owner, entity, std::forward<Args>(args)...);
+        Type::emplace(entity, std::forward<Args>(args)...);
         construction.publish(owner, entity);
-
-        if constexpr(!std::is_same_v<storage_category, empty_storage_tag>) {
-            return this->get(entity);
-        }
+        return this->get(entity);
     }
 
     /**
-     * @copybrief storage_adapter_mixin::insert
+     * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the objects
-     * associated with the entities.
+     * @tparam Args Types of arguments to use to construct the objects assigned
+     * to the entities.
      * @param owner The registry that issued the request.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the objects associated with
-     * the entities.
+     * @param args Parameters to use to initialize the objects assigned to the
+     * entities.
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
-        Type::insert(owner, first, last, std::forward<Args>(args)...);
+        Type::insert(first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
             for(; first != last; ++first) {
@@ -7852,35 +8332,7 @@ struct sigh_storage_mixin: Type {
     }
 
     /**
-     * @copybrief storage_adapter_mixin::remove
-     * @param owner The registry that issued the request.
-     * @param entity A valid entity identifier.
-     */
-    void remove(basic_registry<entity_type> &owner, const entity_type entity) {
-        destruction.publish(owner, entity);
-        Type::remove(owner, entity);
-    }
-
-    /**
-     * @copybrief storage_adapter_mixin::remove
-     * @tparam It Type of input iterator.
-     * @param owner The registry that issued the request.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename It>
-    void remove(basic_registry<entity_type> &owner, It first, It last) {
-        if(!destruction.empty()) {
-            for(auto it = first; it != last; ++it) {
-                destruction.publish(owner, *it);
-            }
-        }
-
-        Type::remove(owner, first, last);
-    }
-
-    /**
-     * @copybrief storage_adapter_mixin::patch
+     * @brief Patches the given instance for an entity.
      * @tparam Func Types of the function objects to invoke.
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
@@ -7888,14 +8340,10 @@ struct sigh_storage_mixin: Type {
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, [[maybe_unused]] Func &&... func) {
-        if constexpr(std::is_same_v<storage_category, empty_storage_tag>) {
-            update.publish(owner, entity);
-        } else {
-            Type::patch(owner, entity, std::forward<Func>(func)...);
-            update.publish(owner, entity);
-            return this->get(entity);
-        }
+    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, Func &&... func) {
+        Type::patch(entity, std::forward<Func>(func)...);
+        update.publish(owner, entity);
+        return this->get(entity);
     }
 
 private:
@@ -7921,12 +8369,12 @@ private:
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
     /*! @brief Resulting type after component-to-storage conversion. */
-    using storage_type = sigh_storage_mixin<storage_adapter_mixin<basic_storage<Entity, Type>>>;
+    using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
 
 
 /**
- * @brief Gets the element associated with an entity from a storage, if any.
+ * @brief Gets the element assigned to an entity from a storage, if any.
  * @tparam Type Storage type.
  * @param container A valid instance of a storage class.
  * @param entity A valid entity identifier.
@@ -7934,13 +8382,12 @@ struct storage_traits {
  */
 template<typename Type>
 [[nodiscard]] auto get_as_tuple([[maybe_unused]] Type &container, [[maybe_unused]] const typename Type::entity_type entity) {
-    static_assert(std::is_same_v<std::remove_const_t<Type>, typename storage_traits<typename Type::entity_type, typename Type::value_type>::storage_type>);
+    static_assert(std::is_same_v<std::remove_const_t<Type>, typename storage_traits<typename Type::entity_type, typename Type::value_type>::storage_type>, "Invalid storage");
 
-    if constexpr(std::is_base_of_v<dense_storage_tag, typename Type::storage_category>) {
-        return std::forward_as_tuple(container.get(entity));
-    } else {
-        static_assert(std::is_base_of_v<empty_storage_tag, typename Type::storage_category>, "Unknown storage category");
+    if constexpr(std::is_void_v<decltype(container.get({}))>) {
         return std::make_tuple();
+    } else {
+        return std::forward_as_tuple(container.get(entity));
     }
 }
 
@@ -8587,11 +9034,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     public:
         using iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::iterator,
-            type_list_cat_t<std::conditional_t<std::is_same_v<typename storage_type<Owned>::storage_category, empty_storage_tag>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
+            type_list_cat_t<std::conditional_t<std::is_void_v<decltype(std::declval<storage_type<Owned>>().get({}))>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
         >;
         using reverse_iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::reverse_iterator,
-            type_list_cat_t<std::conditional_t<std::is_same_v<typename storage_type<Owned>::storage_category, empty_storage_tag>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
+            type_list_cat_t<std::conditional_t<std::is_void_v<decltype(std::declval<storage_type<Owned>>().get({}))>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -8682,7 +9129,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
-        static_assert((std::is_same_v<Component, Owned> || ...));
+        static_assert((std::is_same_v<Component, Owned> || ...), "Non-owned type");
         auto *cpool = std::get<storage_type<Component> *>(pools);
         return cpool ? cpool->raw() : nullptr;
     }
@@ -8982,7 +9429,6 @@ private:
 
 #include <algorithm>
 #include <cstddef>
-#include <functional>
 #include <iterator>
 #include <memory>
 #include <tuple>
@@ -8993,9 +9439,22 @@ private:
 
 // #include "../core/algorithm.hpp"
 
-// #include "../core/fwd.hpp"
+// #include "../core/any.hpp"
+#ifndef ENTT_CORE_ANY_HPP
+#define ENTT_CORE_ANY_HPP
 
-// #include "../core/type_info.hpp"
+
+#include <cstddef>
+#include <functional>
+#include <memory>
+#include <new>
+#include <type_traits>
+#include <utility>
+// #include "../config/config.h"
+
+// #include "fwd.hpp"
+
+// #include "type_info.hpp"
 #ifndef ENTT_CORE_TYPE_INFO_HPP
 #define ENTT_CORE_TYPE_INFO_HPP
 
@@ -9344,7 +9803,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -9403,6 +9862,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -9424,6 +9886,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -9440,6 +9905,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -9482,7 +9950,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -9542,7 +10010,1342 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
+    return type_info{
+        type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
+        type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
+        type_name<std::remove_cv_t<std::remove_reference_t<Type>>>::value()
+    };
+}
+
+
+}
+
+
+#endif
+
+// #include "type_traits.hpp"
+#ifndef ENTT_CORE_TYPE_TRAITS_HPP
+#define ENTT_CORE_TYPE_TRAITS_HPP
+
+
+#include <cstddef>
+#include <utility>
+#include <type_traits>
+// #include "../config/config.h"
+
+// #include "fwd.hpp"
+
+
+
+namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
+
+
+/**
+ * @brief Identity type trait.
+ *
+ * Useful to establish non-deduced contexts in template argument deduction
+ * (waiting for C++20) or to provide types through function arguments.
+ *
+ * @tparam Type A type.
+ */
+template<typename Type>
+struct type_identity {
+    /*! @brief Identity type. */
+    using type = Type;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Type A type.
+ */
+template<typename Type>
+using type_identity_t = typename type_identity<Type>::type;
+
+
+/**
+ * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
+ * @tparam Type The type of which to return the size.
+ * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
+ */
+template<typename Type, typename = void>
+struct size_of: std::integral_constant<std::size_t, 0u> {};
+
+
+/*! @copydoc size_of */
+template<typename Type>
+struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
+    : std::integral_constant<std::size_t, sizeof(Type)>
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type The type of which to return the size.
+ */
+template<class Type>
+inline constexpr auto size_of_v = size_of<Type>::value;
+
+
+/**
+ * @brief Using declaration to be used to _repeat_ the same type a number of
+ * times equal to the size of a given parameter pack.
+ * @tparam Type A type to repeat.
+ */
+template<typename Type, typename>
+using unpack_as_t = Type;
+
+
+/**
+ * @brief Helper variable template to be used to _repeat_ the same value a
+ * number of times equal to the size of a given parameter pack.
+ * @tparam Value A value to repeat.
+ */
+template<auto Value, typename>
+inline constexpr auto unpack_as_v = Value;
+
+
+/**
+ * @brief Wraps a static constant.
+ * @tparam Value A static constant.
+ */
+template<auto Value>
+using integral_constant = std::integral_constant<decltype(Value), Value>;
+
+
+/**
+ * @brief Alias template to facilitate the creation of named values.
+ * @tparam Value A constant value at least convertible to `id_type`.
+ */
+template<id_type Value>
+using tag = integral_constant<Value>;
+
+
+/**
+ * @brief A class to use to push around lists of types, nothing more.
+ * @tparam Type Types provided by the type list.
+ */
+template<typename... Type>
+struct type_list {
+    /*! @brief Type list type. */
+    using type = type_list;
+    /*! @brief Compile-time number of elements in the type list. */
+    static constexpr auto size = sizeof...(Type);
+};
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<std::size_t, typename>
+struct type_list_element;
+
+
+/**
+ * @brief Provides compile-time indexed access to the types of a type list.
+ * @tparam Index Index of the type to return.
+ * @tparam Type First type provided by the type list.
+ * @tparam Other Other types provided by the type list.
+ */
+template<std::size_t Index, typename Type, typename... Other>
+struct type_list_element<Index, type_list<Type, Other...>>
+    : type_list_element<Index - 1u, type_list<Other...>>
+{};
+
+
+/**
+ * @brief Provides compile-time indexed access to the types of a type list.
+ * @tparam Type First type provided by the type list.
+ * @tparam Other Other types provided by the type list.
+ */
+template<typename Type, typename... Other>
+struct type_list_element<0u, type_list<Type, Other...>> {
+    /*! @brief Searched type. */
+    using type = Type;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Index Index of the type to return.
+ * @tparam List Type list to search into.
+ */
+template<std::size_t Index, typename List>
+using type_list_element_t = typename type_list_element<Index, List>::type;
+
+
+/**
+ * @brief Concatenates multiple type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ * @return A type list composed by the types of both the type lists.
+ */
+template<typename... Type, typename... Other>
+constexpr type_list<Type..., Other...> operator+(type_list<Type...>, type_list<Other...>) { return {}; }
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_cat;
+
+
+/*! @brief Concatenates multiple type lists. */
+template<>
+struct type_list_cat<> {
+    /*! @brief A type list composed by the types of all the type lists. */
+    using type = type_list<>;
+};
+
+
+/**
+ * @brief Concatenates multiple type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ * @tparam List Other type lists, if any.
+ */
+template<typename... Type, typename... Other, typename... List>
+struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
+    /*! @brief A type list composed by the types of all the type lists. */
+    using type = typename type_list_cat<type_list<Type..., Other...>, List...>::type;
+};
+
+
+/**
+ * @brief Concatenates multiple type lists.
+ * @tparam Type Types provided by the type list.
+ */
+template<typename... Type>
+struct type_list_cat<type_list<Type...>> {
+    /*! @brief A type list composed by the types of all the type lists. */
+    using type = type_list<Type...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists to concatenate.
+ */
+template<typename... List>
+using type_list_cat_t = typename type_list_cat<List...>::type;
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename>
+struct type_list_unique;
+
+
+/**
+ * @brief Removes duplicates types from a type list.
+ * @tparam Type One of the types provided by the given type list.
+ * @tparam Other The other types provided by the given type list.
+ */
+template<typename Type, typename... Other>
+struct type_list_unique<type_list<Type, Other...>> {
+    /*! @brief A type list without duplicate types. */
+    using type = std::conditional_t<
+        std::disjunction_v<std::is_same<Type, Other>...>,
+        typename type_list_unique<type_list<Other...>>::type,
+        type_list_cat_t<type_list<Type>, typename type_list_unique<type_list<Other...>>::type>
+    >;
+};
+
+
+/*! @brief Removes duplicates types from a type list. */
+template<>
+struct type_list_unique<type_list<>> {
+    /*! @brief A type list without duplicate types. */
+    using type = type_list<>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Type A type list.
+ */
+template<typename Type>
+using type_list_unique_t = typename type_list_unique<Type>::type;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a type list contains a
+ * given type, false otherwise.
+ * @tparam List Type list.
+ * @tparam Type Type to look for.
+ */
+template<typename List, typename Type>
+struct type_list_contains;
+
+
+/**
+ * @copybrief type_list_contains
+ * @tparam Type Types provided by the type list.
+ * @tparam Other Type to look for.
+ */
+template<typename... Type, typename Other>
+struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam List Type list.
+ * @tparam Type Type to look for.
+ */
+template<class List, typename Type>
+inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
+/**
+ * @brief A class to use to push around lists of constant values, nothing more.
+ * @tparam Value Values provided by the value list.
+ */
+template<auto... Value>
+struct value_list {
+    /*! @brief Value list type. */
+    using type = value_list;
+    /*! @brief Compile-time number of elements in the value list. */
+    static constexpr auto size = sizeof...(Value);
+};
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<std::size_t, typename>
+struct value_list_element;
+
+
+/**
+ * @brief Provides compile-time indexed access to the values of a value list.
+ * @tparam Index Index of the value to return.
+ * @tparam Value First value provided by the value list.
+ * @tparam Other Other values provided by the value list.
+ */
+template<std::size_t Index, auto Value, auto... Other>
+struct value_list_element<Index, value_list<Value, Other...>>
+    : value_list_element<Index - 1u, value_list<Other...>>
+{};
+
+
+/**
+ * @brief Provides compile-time indexed access to the types of a type list.
+ * @tparam Value First value provided by the value list.
+ * @tparam Other Other values provided by the value list.
+ */
+template<auto Value, auto... Other>
+struct value_list_element<0u, value_list<Value, Other...>> {
+    /*! @brief Searched value. */
+    static constexpr auto value = Value;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Index Index of the value to return.
+ * @tparam List Value list to search into.
+ */
+template<std::size_t Index, typename List>
+inline constexpr auto value_list_element_v = value_list_element<Index, List>::value;
+
+
+/**
+ * @brief Concatenates multiple value lists.
+ * @tparam Value Values provided by the first value list.
+ * @tparam Other Values provided by the second value list.
+ * @return A value list composed by the values of both the value lists.
+ */
+template<auto... Value, auto... Other>
+constexpr value_list<Value..., Other...> operator+(value_list<Value...>, value_list<Other...>) { return {}; }
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct value_list_cat;
+
+
+/*! @brief Concatenates multiple value lists. */
+template<>
+struct value_list_cat<> {
+    /*! @brief A value list composed by the values of all the value lists. */
+    using type = value_list<>;
+};
+
+
+/**
+ * @brief Concatenates multiple value lists.
+ * @tparam Value Values provided by the first value list.
+ * @tparam Other Values provided by the second value list.
+ * @tparam List Other value lists, if any.
+ */
+template<auto... Value, auto... Other, typename... List>
+struct value_list_cat<value_list<Value...>, value_list<Other...>, List...> {
+    /*! @brief A value list composed by the values of all the value lists. */
+    using type = typename value_list_cat<value_list<Value..., Other...>, List...>::type;
+};
+
+
+/**
+ * @brief Concatenates multiple value lists.
+ * @tparam Value Values provided by the value list.
+ */
+template<auto... Value>
+struct value_list_cat<value_list<Value...>> {
+    /*! @brief A value list composed by the values of all the value lists. */
+    using type = value_list<Value...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Value lists to concatenate.
+ */
+template<typename... List>
+using value_list_cat_t = typename value_list_cat<List...>::type;
+
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * equality comparable, false otherwise.
+ * @tparam Type Potentially equality comparable type.
+ */
+template<typename Type, typename = void>
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially equality comparable type.
+ */
+template<class Type>
+inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
+
+
+/*! @brief Same as std::is_invocable, but with tuples. */
+template<typename, typename>
+struct is_applicable: std::false_type {};
+
+
+/**
+ * @copybrief is_applicable
+ * @tparam Func A valid function type.
+ * @tparam Tuple Tuple-like type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
+template<typename Func, template<typename...> class Tuple, typename... Args>
+struct is_applicable<Func, Tuple<Args...>>: std::is_invocable<Func, Args...> {};
+
+
+/**
+* @copybrief is_applicable
+* @tparam Func A valid function type.
+* @tparam Tuple Tuple-like type.
+* @tparam Args The list of arguments to use to probe the function type.
+*/
+template<typename Func, template<typename...> class Tuple, typename... Args>
+struct is_applicable<Func, const Tuple<Args...>>: std::is_invocable<Func, Args...> {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Func A valid function type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
+template<typename Func, typename Args>
+inline constexpr auto is_applicable_v = is_applicable<Func, Args>::value;
+
+
+/*! @brief Same as std::is_invocable_r, but with tuples for arguments. */
+template<typename, typename, typename>
+struct is_applicable_r: std::false_type {};
+
+
+/**
+ * @copybrief is_applicable_r
+ * @tparam Ret The type to which the return type of the function should be
+ * convertible.
+ * @tparam Func A valid function type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
+template<typename Ret, typename Func, typename... Args>
+struct is_applicable_r<Ret, Func, std::tuple<Args...>>: std::is_invocable_r<Ret, Func, Args...> {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Ret The type to which the return type of the function should be
+ * convertible.
+ * @tparam Func A valid function type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
+template<typename Ret, typename Func, typename Args>
+inline constexpr auto is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
+
+
+/**
+* @brief Provides the member constant `value` to true if a given type is
+* complete, false otherwise.
+* @tparam Type Potential complete type.
+*/
+template<typename Type, typename = void>
+struct is_complete: std::false_type {};
+
+
+/*! @copydoc is_complete */
+template<typename Type>
+struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {};
+
+
+/**
+* @brief Helper variable template.
+* @tparam Type Potential complete type.
+*/
+template<typename Type>
+inline constexpr auto is_complete_v = is_complete<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is empty
+ * and the empty type optimization is enabled, false otherwise.
+ * @tparam Type Potential empty type.
+ */
+template<typename Type, typename = void>
+struct is_empty: ENTT_IS_EMPTY(Type) {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potential empty type.
+ */
+template<typename Type>
+inline constexpr auto is_empty_v = is_empty<Type>::value;
+
+
+/**
+ * @brief Transcribes the constness of a type to another type.
+ * @tparam To The type to which to transcribe the constness.
+ * @tparam From The type from which to transcribe the constness.
+ */
+template<typename To, typename From>
+struct constness_as {
+    /*! @brief The type resulting from the transcription of the constness. */
+    using type = std::remove_const_t<To>;
+};
+
+
+/*! @copydoc constness_as */
+template<typename To, typename From>
+struct constness_as<To, const From> {
+    /*! @brief The type resulting from the transcription of the constness. */
+    using type = std::add_const_t<To>;
+};
+
+
+/**
+ * @brief Alias template to facilitate the transcription of the constness.
+ * @tparam To The type to which to transcribe the constness.
+ * @tparam From The type from which to transcribe the constness.
+ */
+template<typename To, typename From>
+using constness_as_t = typename constness_as<To, From>::type;
+
+
+/**
+ * @brief Extracts the class of a non-static member object or function.
+ * @tparam Member A pointer to a non-static member object or function.
+ */
+template<typename Member>
+class member_class {
+    static_assert(std::is_member_pointer_v<Member>, "Invalid pointer type to non-static member object or function");
+
+    template<typename Class, typename Ret, typename... Args>
+    static Class * clazz(Ret(Class:: *)(Args...));
+
+    template<typename Class, typename Ret, typename... Args>
+    static Class * clazz(Ret(Class:: *)(Args...) const);
+
+    template<typename Class, typename Type>
+    static Class * clazz(Type Class:: *);
+
+public:
+    /*! @brief The class of the given non-static member object or function. */
+    using type = std::remove_pointer_t<decltype(clazz(std::declval<Member>()))>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Member A pointer to a non-static member object or function.
+ */
+template<typename Member>
+using member_class_t = typename member_class<Member>::type;
+
+
+}
+
+
+#endif
+
+
+
+namespace entt {
+
+
+/**
+ * @brief A SBO friendly, type-safe container for single values of any type.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
+ */
+template<std::size_t Len, std::size_t Align>
+class basic_any {
+    enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
+
+    using storage_type = std::aligned_storage_t<Len + !Len, Align>;
+    using vtable_type = const void *(const operation, const basic_any &, const void *);
+
+    template<typename Type>
+    static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
+
+    template<typename Type>
+    [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
+        if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
+            return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
+        } else {
+            return lhs == rhs;
+        }
+    }
+
+    template<typename Type>
+    static Type & as(const void *to) {
+        return *const_cast<Type *>(static_cast<const Type *>(to));
+    }
+
+    template<typename Type>
+    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] const void *to) {
+        if constexpr(!std::is_void_v<Type>) {
+            if constexpr(std::is_lvalue_reference_v<Type>) {
+                using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
+
+                switch(op) {
+                case operation::COPY:
+                    if constexpr(std::is_copy_constructible_v<base_type>) {
+                        as<basic_any>(to).template emplace<base_type>(*static_cast<const base_type *>(from.instance));
+                    }
+                    break;
+                case operation::MOVE:
+                    as<basic_any>(to).instance = from.instance;
+                    [[fallthrough]];
+                case operation::DTOR:
+                    break;
+                case operation::COMP:
+                    return compare<base_type>(from.instance, to) ? to : nullptr;
+                case operation::ADDR:
+                    return std::is_const_v<std::remove_reference_t<Type>> ? nullptr : from.instance;
+                case operation::CADDR:
+                    return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const base_type &>;
+                    break;
+                case operation::TYPE:
+                    as<type_info>(to) = type_id<base_type>();
+                    break;
+                }
+            } else if constexpr(in_situ<Type>) {
+                #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
+                auto *instance = const_cast<Type *>(std::launder(reinterpret_cast<const Type *>(&from.storage)));
+                #else
+                auto *instance = const_cast<Type *>(reinterpret_cast<const Type *>(&from.storage));
+                #endif
+
+                switch(op) {
+                case operation::COPY:
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        new (&as<basic_any>(to).storage) Type{std::as_const(*instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
+                    break;
+                case operation::MOVE:
+                    new (&as<basic_any>(to).storage) Type{std::move(*instance)};
+                    [[fallthrough]];
+                case operation::DTOR:
+                    instance->~Type();
+                    break;
+                case operation::COMP:
+                    return compare<Type>(instance, to) ? to : nullptr;
+                case operation::ADDR:
+                case operation::CADDR:
+                    return instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
+                    break;
+                case operation::TYPE:
+                    as<type_info>(to) = type_id<Type>();
+                    break;
+                }
+            } else {
+                switch(op) {
+                case operation::COPY:
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        as<basic_any>(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
+                    break;
+                case operation::MOVE:
+                    as<basic_any>(to).instance = from.instance;
+                    break;
+                case operation::DTOR:
+                    if constexpr(std::is_array_v<Type>) {
+                        delete[] static_cast<const Type *>(from.instance);
+                    } else {
+                        delete static_cast<const Type *>(from.instance);
+                    }
+                    break;
+                case operation::COMP:
+                    return compare<Type>(from.instance, to) ? to : nullptr;
+                case operation::ADDR:
+                case operation::CADDR:
+                    return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
+                    break;
+                case operation::TYPE:
+                    as<type_info>(to) = type_id<Type>();
+                    break;
+                }
+            }
+        }
+
+        return nullptr;
+    }
+
+public:
+    /*! @brief Default constructor. */
+    basic_any() ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<void>}
+    {}
+
+    /**
+     * @brief Constructs an any by directly initializing the new object.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Args Types of arguments to use to construct the new instance.
+     * @param args Parameters to use to construct the instance.
+     */
+    template<typename Type, typename... Args>
+    explicit basic_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
+        : instance{},
+          vtable{&basic_vtable<Type>}
+    {
+        if constexpr(!std::is_void_v<Type>) {
+            if constexpr(std::is_lvalue_reference_v<Type>) {
+                static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
+                instance = (std::addressof(args), ...);
+            } else if constexpr(in_situ<Type>) {
+                new (&storage) Type(std::forward<Args>(args)...);
+            } else {
+                instance = new Type(std::forward<Args>(args)...);
+            }
+        }
+    }
+
+    /**
+     * @brief Constructs an any that holds an unmanaged object.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
+     */
+    template<typename Type>
+    basic_any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<Type &>, value.get()}
+    {}
+
+    /**
+     * @brief Constructs an any from a given value.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
+     */
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
+    basic_any(Type &&value)
+        : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)}
+    {}
+
+    /**
+     * @brief Copy constructor.
+     * @param other The instance to copy from.
+     */
+    basic_any(const basic_any &other)
+        : basic_any{}
+    {
+        other.vtable(operation::COPY, other, this);
+    }
+
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    basic_any(basic_any &&other) ENTT_NOEXCEPT
+        : basic_any{}
+    {
+        other.vtable(operation::MOVE, other, this);
+        vtable = std::exchange(other.vtable, &basic_vtable<void>);
+    }
+
+    /*! @brief Frees the internal storage, whatever it means. */
+    ~basic_any() {
+        vtable(operation::DTOR, *this, nullptr);
+    }
+
+    /**
+     * @brief Assignment operator.
+     * @param other The instance to assign from.
+     * @return This any object.
+     */
+    basic_any & operator=(basic_any other) {
+        swap(*this, other);
+        return *this;
+    }
+
+    /**
+     * @brief Returns the type of the contained object.
+     * @return The type of the contained object, if any.
+     */
+    [[nodiscard]] type_info type() const ENTT_NOEXCEPT {
+        type_info info;
+        vtable(operation::TYPE, *this, &info);
+        return info;
+    }
+
+    /**
+     * @brief Returns an opaque pointer to the contained instance.
+     * @return An opaque pointer the contained instance, if any.
+     */
+    [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
+        return vtable(operation::CADDR, *this, nullptr);
+    }
+
+    /*! @copydoc data */
+    [[nodiscard]] void * data() ENTT_NOEXCEPT {
+        return const_cast<void *>(vtable(operation::ADDR, *this, nullptr));
+    }
+
+    /**
+     * @brief Replaces the contained object by creating a new instance directly.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Args Types of arguments to use to construct the new instance.
+     * @param args Parameters to use to construct the instance.
+     */
+    template<typename Type, typename... Args>
+    void emplace(Args &&... args) {
+        *this = basic_any{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = basic_any{};
+    }
+
+    /**
+     * @brief Returns false if a wrapper is empty, true otherwise.
+     * @return False if the wrapper is empty, true otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return !(vtable(operation::CADDR, *this, nullptr) == nullptr);
+    }
+
+    /**
+     * @brief Checks if two wrappers differ in their content.
+     * @param other Wrapper with which to compare.
+     * @return False if the two objects differ in their content, true otherwise.
+     */
+    bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
+        return type() == other.type() && (vtable(operation::COMP, *this, other.data()) == other.data());
+    }
+
+    /**
+     * @brief Swaps two any objects.
+     * @param lhs A valid any object.
+     * @param rhs A valid any object.
+     */
+    friend void swap(basic_any &lhs, basic_any &rhs) {
+        basic_any tmp{};
+        lhs.vtable(operation::MOVE, lhs, &tmp);
+        rhs.vtable(operation::MOVE, rhs, &lhs);
+        lhs.vtable(operation::MOVE, tmp, &rhs);
+        std::swap(lhs.vtable, rhs.vtable);
+    }
+
+    /**
+     * @brief Aliasing constructor.
+     * @return An any that shares a reference to an unmanaged object.
+     */
+    [[nodiscard]] basic_any as_ref() ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::REF, *this, &ref);
+        return ref;
+    }
+
+    /*! @copydoc as_ref */
+    [[nodiscard]] basic_any as_ref() const ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::CREF, *this, &ref);
+        return ref;
+    }
+
+private:
+    union { const void *instance; storage_type storage; };
+    vtable_type *vtable;
+};
+
+
+/**
+ * @brief Checks if two wrappers differ in their content.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
+ * @param lhs A wrapper, either empty or not.
+ * @param rhs A wrapper, either empty or not.
+ * @return True if the two wrappers differ in their content, false otherwise.
+ */
+template<std::size_t Len, std::size_t Align>
+[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+
+/**
+ * @brief Performs type-safe access to the contained object.
+ * @tparam Type Type to which conversion is required.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
+ * @param data Target any object.
+ * @return The element converted to the requested type.
+ */
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
+    const auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
+    ENTT_ASSERT(instance);
+    return static_cast<Type>(*instance);
+}
+
+
+/*! @copydoc any_cast */
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
+    // forces const on non-reference types to make them work also with wrappers for const references
+    auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
+    ENTT_ASSERT(instance);
+    return static_cast<Type>(*instance);
+}
+
+
+/*! @copydoc any_cast */
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
+    // forces const on non-reference types to make them work also with wrappers for const references
+    auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
+    ENTT_ASSERT(instance);
+    return static_cast<Type>(std::move(*instance));
+}
+
+
+/*! @copydoc any_cast */
+template<typename Type, std::size_t Len, std::size_t Align>
+const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
+    return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
+}
+
+
+/*! @copydoc any_cast */
+template<typename Type, std::size_t Len, std::size_t Align>
+Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
+    // last attempt to make wrappers for const references return their values
+    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
+}
+
+
+}
+
+
+#endif
+
+// #include "../core/fwd.hpp"
+
+// #include "../core/type_info.hpp"
+#ifndef ENTT_CORE_TYPE_INFO_HPP
+#define ENTT_CORE_TYPE_INFO_HPP
+
+
+#include <string_view>
+#include <type_traits>
+// #include "../config/config.h"
+
+// #include "../core/attribute.h"
+
+// #include "hashed_string.hpp"
+
+// #include "fwd.hpp"
+
+
+
+namespace entt {
+
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+struct ENTT_API type_seq final {
+    [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
+        static ENTT_MAYBE_ATOMIC(id_type) value{};
+        return value++;
+    }
+};
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto stripped_type_name() ENTT_NOEXCEPT {
+#if defined ENTT_PRETTY_FUNCTION
+    std::string_view pretty_function{ENTT_PRETTY_FUNCTION};
+    auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX)+1);
+    auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
+    return value;
+#else
+    return std::string_view{""};
+#endif
+}
+
+
+template<typename Type, auto = stripped_type_name<Type>().find_first_of('.')>
+[[nodiscard]] static constexpr std::string_view type_name(int) ENTT_NOEXCEPT {
+    constexpr auto value = stripped_type_name<Type>();
+    return value;
+}
+
+
+template<typename Type>
+[[nodiscard]] static std::string_view type_name(char) ENTT_NOEXCEPT {
+    static const auto value = stripped_type_name<Type>();
+    return value;
+}
+
+
+template<typename Type, auto = stripped_type_name<Type>().find_first_of('.')>
+[[nodiscard]] static constexpr id_type type_hash(int) ENTT_NOEXCEPT {
+    constexpr auto stripped = stripped_type_name<Type>();
+    constexpr auto value = hashed_string::value(stripped.data(), stripped.size());
+    return value;
+}
+
+
+template<typename Type>
+[[nodiscard]] static id_type type_hash(char) ENTT_NOEXCEPT {
+    static const auto value = [](const auto stripped) {
+        return hashed_string::value(stripped.data(), stripped.size());
+    }(stripped_type_name<Type>());
+    return value;
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
+ * @brief Type sequential identifier.
+ * @tparam Type Type for which to generate a sequential identifier.
+ */
+template<typename Type, typename = void>
+struct ENTT_API type_seq final {
+    /**
+     * @brief Returns the sequential identifier of a given type.
+     * @return The sequential identifier of a given type.
+     */
+    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_seq::next();
+        return value;
+    }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
+};
+
+
+/**
+ * @brief Type hash.
+ * @tparam Type Type for which to generate a hash value.
+ */
+template<typename Type, typename = void>
+struct type_hash final {
+    /**
+     * @brief Returns the numeric representation of a given type.
+     * @return The numeric representation of the given type.
+     */
+#if defined ENTT_PRETTY_FUNCTION
+    [[nodiscard]] static constexpr id_type value() ENTT_NOEXCEPT {
+        return internal::type_hash<Type>(0);
+#else
+    [[nodiscard]] static constexpr id_type value() ENTT_NOEXCEPT {
+        return type_seq<Type>::value();
+#endif
+    }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
+};
+
+
+/**
+ * @brief Type name.
+ * @tparam Type Type for which to generate a name.
+ */
+template<typename Type, typename = void>
+struct type_name final {
+    /**
+     * @brief Returns the name of a given type.
+     * @return The name of the given type.
+     */
+    [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
+        return internal::type_name<Type>(0);
+    }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
+};
+
+
+/*! @brief Implementation specific information about a type. */
+class type_info final {
+    template<typename>
+    friend type_info type_id() ENTT_NOEXCEPT;
+
+    type_info(id_type seq_v, id_type hash_v, std::string_view name_v) ENTT_NOEXCEPT
+        : seq_value{seq_v},
+          hash_value{hash_v},
+          name_value{name_v}
+    {}
+
+public:
+    /*! @brief Default constructor. */
+    type_info() ENTT_NOEXCEPT
+        : type_info({}, {}, {})
+    {}
+
+    /*! @brief Default copy constructor. */
+    type_info(const type_info &) ENTT_NOEXCEPT = default;
+    /*! @brief Default move constructor. */
+    type_info(type_info &&) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Default copy assignment operator.
+     * @return This type info object.
+     */
+    type_info & operator=(const type_info &) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This type info object.
+     */
+    type_info & operator=(type_info &&) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Checks if a type info object is properly initialized.
+     * @return True if the object is properly initialized, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return name_value.data() != nullptr;
+    }
+
+    /**
+     * @brief Type sequential identifier.
+     * @return Type sequential identifier.
+     */
+    [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
+        return seq_value;
+    }
+
+    /**
+     * @brief Type hash.
+     * @return Type hash.
+     */
+    [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
+        return hash_value;
+    }
+
+    /**
+     * @brief Type name.
+     * @return Type name.
+     */
+    [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
+        return name_value;
+    }
+
+    /**
+     * @brief Compares the contents of two type info objects.
+     * @param other Object with which to compare.
+     * @return False if the two contents differ, true otherwise.
+     */
+    [[nodiscard]] bool operator==(const type_info &other) const ENTT_NOEXCEPT {
+        return hash_value == other.hash_value;
+    }
+
+private:
+    id_type seq_value;
+    id_type hash_value;
+    std::string_view name_value;
+};
+
+
+/**
+ * @brief Compares the contents of two type info objects.
+ * @param lhs A type info object.
+ * @param rhs A type info object.
+ * @return True if the two contents differ, false otherwise.
+ */
+[[nodiscard]] inline bool operator!=(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+
+/**
+ * @brief Returns the type info object for a given type.
+ * @tparam Type Type for which to generate a type info object.
+ * @return The type info object for the given type.
+ */
+template<typename Type>
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -10172,11 +11975,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     public:
         using iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::iterator,
-            type_list_cat_t<std::conditional_t<std::is_same_v<typename storage_type<Owned>::storage_category, empty_storage_tag>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
+            type_list_cat_t<std::conditional_t<std::is_void_v<decltype(std::declval<storage_type<Owned>>().get({}))>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
         >;
         using reverse_iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::reverse_iterator,
-            type_list_cat_t<std::conditional_t<std::is_same_v<typename storage_type<Owned>::storage_category, empty_storage_tag>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
+            type_list_cat_t<std::conditional_t<std::is_void_v<decltype(std::declval<storage_type<Owned>>().get({}))>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -10267,7 +12070,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
-        static_assert((std::is_same_v<Component, Owned> || ...));
+        static_assert((std::is_same_v<Component, Owned> || ...), "Non-owned type");
         auto *cpool = std::get<storage_type<Component> *>(pools);
         return cpool ? cpool->raw() : nullptr;
     }
@@ -10591,7 +12394,9 @@ private:
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -10634,7 +12439,9 @@ private:
 #define ENTT_CORE_ANY_HPP
 
 
+#include <cstddef>
 #include <functional>
+#include <memory>
 #include <new>
 #include <type_traits>
 #include <utility>
@@ -10662,7 +12469,9 @@ private:
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -10696,6 +12505,36 @@ private:
 #       define ENTT_PRETTY_FUNCTION_SUFFIX '>'
 #   endif
 #endif
+
+
+#endif
+
+// #include "fwd.hpp"
+#ifndef ENTT_CORE_FWD_HPP
+#define ENTT_CORE_FWD_HPP
+
+
+#include <type_traits>
+// #include "../config/config.h"
+
+
+
+namespace entt {
+
+
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
+/*! @brief Alias declaration for type identifiers. */
+using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
+
+
+}
 
 
 #endif
@@ -10754,25 +12593,6 @@ private:
 // #include "../config/config.h"
 
 // #include "fwd.hpp"
-#ifndef ENTT_CORE_FWD_HPP
-#define ENTT_CORE_FWD_HPP
-
-
-// #include "../config/config.h"
-
-
-
-namespace entt {
-
-
-/*! @brief Alias declaration for type identifiers. */
-using id_type = ENTT_ID_TYPE;
-
-
-}
-
-
-#endif
 
 
 
@@ -11068,7 +12888,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -11127,6 +12947,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -11148,6 +12971,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -11164,6 +12990,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -11206,7 +13035,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -11266,7 +13095,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -11295,6 +13124,32 @@ type_info type_id() ENTT_NOEXCEPT {
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -11376,32 +13231,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -11575,6 +13404,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -11682,19 +13536,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -11789,6 +13677,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -11812,7 +13724,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -11820,7 +13732,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -11875,15 +13787,20 @@ using member_class_t = typename member_class<Member>::type;
 namespace entt {
 
 
-/*! @brief A SBO friendly, type-safe container for single values of any type. */
-class any {
+/**
+ * @brief A SBO friendly, type-safe container for single values of any type.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
+ */
+template<std::size_t Len, std::size_t Align>
+class basic_any {
     enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
 
-    using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
-    using vtable_type = const void *(const operation, const any &, const void *);
+    using storage_type = std::aligned_storage_t<Len + !Len, Align>;
+    using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
-    static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
@@ -11894,43 +13811,48 @@ class any {
         }
     }
 
-    static type_info & as_type_info(const void *data) {
-        return *const_cast<type_info *>(static_cast<const type_info *>(data));
-    }
-
-    static any & as_any(const void *data) {
-        return *const_cast<any *>(static_cast<const any *>(data));
+    template<typename Type>
+    static Type & as(const void *to) {
+        return *const_cast<Type *>(static_cast<const Type *>(to));
     }
 
     template<typename Type>
-    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] const void *to) {
+    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] const void *to) {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                using base_type = std::remove_reference_t<Type>;
+                using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
                 switch(op) {
-                case operation::REF:
-                case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type> : basic_vtable<const base_type &>;
-                    [[fallthrough]];
                 case operation::COPY:
+                    if constexpr(std::is_copy_constructible_v<base_type>) {
+                        as<basic_any>(to).template emplace<base_type>(*static_cast<const base_type *>(from.instance));
+                    }
+                    break;
                 case operation::MOVE:
-                    as_any(to).instance = from.instance;
+                    as<basic_any>(to).instance = from.instance;
                     [[fallthrough]];
                 case operation::DTOR:
                     break;
                 case operation::COMP:
-                    return compare<std::remove_const_t<base_type>>(from.instance, to) ? to : nullptr;
+                    return compare<base_type>(from.instance, to) ? to : nullptr;
                 case operation::ADDR:
-                    return std::is_const_v<base_type> ? nullptr : from.instance;
+                    return std::is_const_v<std::remove_reference_t<Type>> ? nullptr : from.instance;
                 case operation::CADDR:
                     return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const base_type &>;
+                    break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<std::remove_const_t<base_type>>();
+                    as<type_info>(to) = type_id<base_type>();
                     break;
                 }
             } else if constexpr(in_situ<Type>) {
-                #if __cpp_lib_launder >= 201606L
+                #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
                 auto *instance = const_cast<Type *>(std::launder(reinterpret_cast<const Type *>(&from.storage)));
                 #else
                 auto *instance = const_cast<Type *>(reinterpret_cast<const Type *>(&from.storage));
@@ -11938,10 +13860,13 @@ class any {
 
                 switch(op) {
                 case operation::COPY:
-                    new (&as_any(to).storage) Type{std::as_const(*instance)};
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        new (&as<basic_any>(to).storage) Type{std::as_const(*instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
                     break;
                 case operation::MOVE:
-                    new (&as_any(to).storage) Type{std::move(*instance)};
+                    new (&as<basic_any>(to).storage) Type{std::move(*instance)};
                     [[fallthrough]];
                 case operation::DTOR:
                     instance->~Type();
@@ -11952,36 +13877,50 @@ class any {
                 case operation::CADDR:
                     return instance;
                 case operation::REF:
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
                 case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
-                    as_any(to).instance = instance;
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
                     break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<Type>();
+                    as<type_info>(to) = type_id<Type>();
                     break;
                 }
             } else {
                 switch(op) {
                 case operation::COPY:
-                    as_any(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        as<basic_any>(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
                     break;
-                case operation::REF:
-                case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
-                    [[fallthrough]];
                 case operation::MOVE:
-                    as_any(to).instance = from.instance;
+                    as<basic_any>(to).instance = from.instance;
                     break;
                 case operation::DTOR:
-                    delete static_cast<const Type *>(from.instance);
+                    if constexpr(std::is_array_v<Type>) {
+                        delete[] static_cast<const Type *>(from.instance);
+                    } else {
+                        delete static_cast<const Type *>(from.instance);
+                    }
                     break;
                 case operation::COMP:
                     return compare<Type>(from.instance, to) ? to : nullptr;
                 case operation::ADDR:
                 case operation::CADDR:
                     return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
+                    break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<Type>();
+                    as<type_info>(to) = type_id<Type>();
                     break;
                 }
             }
@@ -11992,8 +13931,8 @@ class any {
 
 public:
     /*! @brief Default constructor. */
-    any() ENTT_NOEXCEPT
-        : any{std::in_place_type<void>}
+    basic_any() ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<void>}
     {}
 
     /**
@@ -12003,19 +13942,18 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : vtable{&basic_vtable<Type>},
-          instance{}
+    explicit basic_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
+        : instance{},
+          vtable{&basic_vtable<Type>}
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                static_assert(sizeof...(Args) == 1u && (std::is_pointer_v<std::remove_reference_t<Args>> && ...));
-                ENTT_ASSERT(((args != nullptr) && ...));
-                instance = (args, ...);
+                static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
+                instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<Type>) {
-                new (&storage) Type{std::forward<Args>(args)...};
+                new (&storage) Type(std::forward<Args>(args)...);
             } else {
-                instance = new Type{std::forward<Args>(args)...};
+                instance = new Type(std::forward<Args>(args)...);
             }
         }
     }
@@ -12026,8 +13964,8 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : any{std::in_place_type<Type &>, &value.get()}
+    basic_any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -12035,35 +13973,34 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, any>>>
-    any(Type &&value)
-        : any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
+    basic_any(Type &&value)
+        : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)}
     {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    any(const any &other)
-        : any{}
+    basic_any(const basic_any &other)
+        : basic_any{}
     {
-        vtable = other.vtable;
-        vtable(operation::COPY, other, this);
+        other.vtable(operation::COPY, other, this);
     }
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    any(any &&other) ENTT_NOEXCEPT
-        : any{}
+    basic_any(basic_any &&other) ENTT_NOEXCEPT
+        : basic_any{}
     {
+        other.vtable(operation::MOVE, other, this);
         vtable = std::exchange(other.vtable, &basic_vtable<void>);
-        vtable(operation::MOVE, other, this);
     }
 
     /*! @brief Frees the internal storage, whatever it means. */
-    ~any() {
+    ~basic_any() {
         vtable(operation::DTOR, *this, nullptr);
     }
 
@@ -12072,7 +14009,7 @@ public:
      * @param other The instance to assign from.
      * @return This any object.
      */
-    any & operator=(any other) {
+    basic_any & operator=(basic_any other) {
         swap(*this, other);
         return *this;
     }
@@ -12108,7 +14045,12 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        *this = any{std::in_place_type<Type>, std::forward<Args>(args)...};
+        *this = basic_any{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = basic_any{};
     }
 
     /**
@@ -12124,7 +14066,7 @@ public:
      * @param other Wrapper with which to compare.
      * @return False if the two objects differ in their content, true otherwise.
      */
-    bool operator==(const any &other) const ENTT_NOEXCEPT {
+    bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
         return type() == other.type() && (vtable(operation::COMP, *this, other.data()) == other.data());
     }
 
@@ -12133,8 +14075,8 @@ public:
      * @param lhs A valid any object.
      * @param rhs A valid any object.
      */
-    friend void swap(any &lhs, any &rhs) {
-        any tmp{};
+    friend void swap(basic_any &lhs, basic_any &rhs) {
+        basic_any tmp{};
         lhs.vtable(operation::MOVE, lhs, &tmp);
         rhs.vtable(operation::MOVE, rhs, &lhs);
         lhs.vtable(operation::MOVE, tmp, &rhs);
@@ -12143,35 +14085,37 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return An any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend any as_ref(any &other) ENTT_NOEXCEPT {
-        any ref{};
-        other.vtable(operation::REF, other, &ref);
+    [[nodiscard]] basic_any as_ref() ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::REF, *this, &ref);
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend any as_ref(const any &other) ENTT_NOEXCEPT {
-        any ref{};
-        other.vtable(operation::CREF, other, &ref);
+    [[nodiscard]] basic_any as_ref() const ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::CREF, *this, &ref);
         return ref;
     }
 
 private:
-    vtable_type *vtable;
     union { const void *instance; storage_type storage; };
+    vtable_type *vtable;
 };
 
 
 /**
  * @brief Checks if two wrappers differ in their content.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param lhs A wrapper, either empty or not.
  * @param rhs A wrapper, either empty or not.
  * @return True if the two wrappers differ in their content, false otherwise.
  */
-[[nodiscard]] inline bool operator!=(const any &lhs, const any &rhs) ENTT_NOEXCEPT {
+template<std::size_t Len, std::size_t Align>
+[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -12179,11 +14123,13 @@ private:
 /**
  * @brief Performs type-safe access to the contained object.
  * @tparam Type Type to which conversion is required.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param data Target any object.
  * @return The element converted to the requested type.
  */
-template<typename Type>
-Type any_cast(const any &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     const auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
@@ -12191,8 +14137,8 @@ Type any_cast(const any &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type any_cast(any &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -12201,8 +14147,8 @@ Type any_cast(any &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type any_cast(any &&data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -12211,17 +14157,17 @@ Type any_cast(any &&data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-const Type * any_cast(const any *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
 }
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type * any_cast(any *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     // last attempt to make wrappers for const references return their values
-    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<any, Type> *>(data)->data()) : nullptr);
+    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
 }
 
 
@@ -12275,7 +14221,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -12334,6 +14280,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -12355,6 +14304,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -12371,6 +14323,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -12413,7 +14368,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -12473,7 +14428,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -12502,6 +14457,32 @@ type_info type_id() ENTT_NOEXCEPT {
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -12583,32 +14564,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -12782,6 +14737,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -12889,19 +14869,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -12996,6 +15010,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -13019,7 +15057,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -13027,7 +15065,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -13077,6 +15115,34 @@ using member_class_t = typename member_class<Member>::type;
 
 #endif
 
+// #include "fwd.hpp"
+#ifndef ENTT_POLY_FWD_HPP
+#define ENTT_POLY_FWD_HPP
+
+
+#include <type_traits>
+
+
+namespace entt {
+
+
+template<typename, std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_poly;
+
+
+/**
+ * @brief Alias declaration for the most common use case.
+ * @tparam Concept Concept descriptor.
+ */
+template<typename Concept>
+using poly = basic_poly<Concept, sizeof(double[2])>;
+
+
+}
+
+
+#endif
+
 
 
 namespace entt {
@@ -13110,29 +15176,31 @@ struct poly_inspector {
 /**
  * @brief Static virtual table factory.
  * @tparam Concept Concept descriptor.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  */
-template<typename Concept>
+template<typename Concept, std::size_t Len, std::size_t Align>
 class poly_vtable {
     using inspector = typename Concept::template type<poly_inspector>;
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(inspector &, Args...)) -> Ret(*)(any &, Args...);
+    static auto vtable_entry(Ret(*)(inspector &, Args...)) -> Ret(*)(basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(const inspector &, Args...)) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(*)(const inspector &, Args...)) -> Ret(*)(const basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(Args...)) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(*)(Args...)) -> Ret(*)(const basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(inspector:: *)(Args...)) -> Ret(*)(any &, Args...);
+    static auto vtable_entry(Ret(inspector:: *)(Args...)) -> Ret(*)(basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(inspector:: *)(Args...) const) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(inspector:: *)(Args...) const) -> Ret(*)(const basic_any<Len, Align> &, Args...);
 
     template<auto... Candidate>
     static auto make_vtable(value_list<Candidate...>)
-    -> std::tuple<decltype(vtable_entry(Candidate))...>;
+    -> decltype(std::make_tuple(vtable_entry(Candidate)...));
 
     template<typename... Func>
     [[nodiscard]] static constexpr auto make_vtable(type_list<Func...>)  {
@@ -13150,8 +15218,8 @@ class poly_vtable {
                 return std::invoke(Candidate, std::forward<Args>(args)...);
             };
         } else {
-            entry = +[](Any &any, Args... args) -> Ret {
-                return static_cast<Ret>(std::invoke(Candidate, any_cast<constness_as_t<Type, Any> &>(any), std::forward<Args>(args)...));
+            entry = +[](Any &instance, Args... args) -> Ret {
+                return static_cast<Ret>(std::invoke(Candidate, any_cast<constness_as_t<Type, Any> &>(instance), std::forward<Args>(args)...));
             };
         }
     }
@@ -13237,20 +15305,22 @@ decltype(auto) poly_call(Poly &&self, Args &&... args) {
  * Moreover, the `poly` class template also works with unmanaged objects.
  *
  * @tparam Concept Concept descriptor.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
  */
-template<typename Concept>
-class poly: private Concept::template type<poly_base<poly<Concept>>> {
+template<typename Concept, std::size_t Len, std::size_t Align>
+class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, Len, Align>>> {
     /*! @brief A poly base is allowed to snoop into a poly object. */
-    friend struct poly_base<poly<Concept>>;
+    friend struct poly_base<basic_poly>;
 
-    using vtable_type = typename poly_vtable<Concept>::type;
+    using vtable_type = typename poly_vtable<Concept, Len, Align>::type;
 
 public:
     /*! @brief Concept type. */
-    using concept_type = typename Concept::template type<poly_base<poly<Concept>>>;
+    using concept_type = typename Concept::template type<poly_base<basic_poly>>;
 
     /*! @brief Default constructor. */
-    poly() ENTT_NOEXCEPT
+    basic_poly() ENTT_NOEXCEPT
         : storage{},
           vtable{}
     {}
@@ -13262,9 +15332,9 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit poly(std::in_place_type_t<Type>, Args &&... args)
+    explicit basic_poly(std::in_place_type_t<Type>, Args &&... args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
+          vtable{poly_vtable<Concept, Len, Align>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
     {}
 
     /**
@@ -13273,8 +15343,8 @@ public:
      * @param value An instance of an object to use to initialize the poly.
      */
     template<typename Type>
-    poly(std::reference_wrapper<Type> value)
-        : poly{std::in_place_type<Type &>, &value.get()}
+    basic_poly(std::reference_wrapper<Type> value)
+        : basic_poly{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -13282,23 +15352,23 @@ public:
      * @tparam Type Type of object to use to initialize the poly.
      * @param value An instance of an object to use to initialize the poly.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, poly>>>
-    poly(Type &&value) ENTT_NOEXCEPT
-        : poly{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, basic_poly>>>
+    basic_poly(Type &&value) ENTT_NOEXCEPT
+        : basic_poly{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
     {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    poly(const poly &other) = default;
+    basic_poly(const basic_poly &other) = default;
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    poly(poly &&other) ENTT_NOEXCEPT
-        : poly{}
+    basic_poly(basic_poly &&other) ENTT_NOEXCEPT
+        : basic_poly{}
     {
         swap(*this, other);
     }
@@ -13308,7 +15378,7 @@ public:
      * @param other The instance to assign from.
      * @return This poly object.
      */
-    poly & operator=(poly other) {
+    basic_poly & operator=(basic_poly other) {
         swap(other, *this);
         return *this;
     }
@@ -13342,8 +15412,12 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        storage.emplace<Type>(std::forward<Args>(args)...);
-        vtable = poly_vtable<Concept>::template instance<Type>();
+        *this = basic_poly{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = basic_poly{};
     }
 
     /**
@@ -13372,7 +15446,7 @@ public:
      * @param lhs A valid poly object.
      * @param rhs A valid poly object.
      */
-    friend void swap(poly &lhs, poly &rhs) {
+    friend void swap(basic_poly &lhs, basic_poly &rhs) {
         using std::swap;
         swap(lhs.storage, rhs.storage);
         swap(lhs.vtable, rhs.vtable);
@@ -13380,26 +15454,24 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return A poly that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend poly as_ref(poly &other) ENTT_NOEXCEPT {
-        poly ref;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+    [[nodiscard]] basic_poly as_ref() ENTT_NOEXCEPT {
+        basic_poly ref = std::as_const(*this).as_ref();
+        ref.storage = storage.as_ref();
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend poly as_ref(const poly &other) ENTT_NOEXCEPT {
-        poly ref;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+    [[nodiscard]] basic_poly as_ref() const ENTT_NOEXCEPT {
+        basic_poly ref{};
+        ref.storage = storage.as_ref();
+        ref.vtable = vtable;
         return ref;
     }
 
 private:
-    any storage;
+    basic_any<Len, Align> storage;
     const vtable_type *vtable;
 };
 
@@ -13421,15 +15493,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-struct Storage: type_list<
-    type_info() const ENTT_NOEXCEPT,
-    void(basic_registry<Entity> &, const Entity *, const Entity *)
-> {
-    /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
-    /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
-
+struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
     /**
      * @brief Concept definition.
      * @tparam Base Opaque base class from which to inherit.
@@ -13443,18 +15507,6 @@ struct Storage: type_list<
         type_info value_type() const ENTT_NOEXCEPT {
             return poly_call<0>(*this);
         }
-
-        /**
-         * @brief Removes entities from a storage.
-         * @param owner The registry that issued the request.
-         * @param first An iterator to the first element of the range of
-         * entities.
-         * @param last An iterator past the last element of the range of
-         * entities.
-         */
-        void remove(basic_registry<entity_type> &owner, const entity_type *first, const entity_type *last) {
-            poly_call<1>(*this, owner, first, last);
-        }
     };
 
     /**
@@ -13462,10 +15514,7 @@ struct Storage: type_list<
      * @tparam Type Type for which to generate an implementation.
      */
     template<typename Type>
-    using impl = value_list<
-        &type_id<typename Type::value_type>,
-        &Type::template remove<const entity_type *>
-    >;
+    using impl = value_list<&type_id<typename Type::value_type>>;
 };
 
 
@@ -13993,35 +16042,33 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
     template<typename Comp, typename Func>
     void traverse(Func func) const {
-        if(*this) {
-            if constexpr(std::is_same_v<typename storage_type<Comp>::storage_category, empty_storage_tag>) {
-                for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
-                    if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
-                        && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
-                    {
-                        if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
-                            std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
-                        } else {
-                            std::apply(func, get(entt));
-                        }
+        if constexpr(std::is_void_v<decltype(std::get<storage_type<Comp> *>(pools)->get({}))>) {
+            for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
+                if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
+                    && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
+                {
+                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+                        std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
+                    } else {
+                        std::apply(func, get(entt));
                     }
                 }
-            } else {
-                auto it = std::get<storage_type<Comp> *>(pools)->begin();
+            }
+        } else {
+            auto it = std::get<storage_type<Comp> *>(pools)->begin();
 
-                for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
-                    if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
-                        && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
-                    {
-                        if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
-                            std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Component>(it, entt)...));
-                        } else {
-                            std::apply(func, std::tuple_cat(dispatch_get<Component>(it, entt)...));
-                        }
+            for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
+                if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
+                    && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
+                {
+                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+                        std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Component>(it, entt)...));
+                    } else {
+                        std::apply(func, std::tuple_cat(dispatch_get<Component>(it, entt)...));
                     }
-
-                    ++it;
                 }
+
+                ++it;
             }
         }
     }
@@ -14058,7 +16105,7 @@ public:
      */
     template<typename Comp>
     void use() const ENTT_NOEXCEPT {
-        view = *this ? std::get<storage_type<Comp> *>(pools) : nullptr;
+        view = std::get<storage_type<Comp> *>(pools);
     }
 
     /**
@@ -14066,7 +16113,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const ENTT_NOEXCEPT {
-        return *this ? view->size() : size_type{};
+        return view->size();
     }
 
     /**
@@ -14078,7 +16125,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
-        return *this ? iterator{view->begin(), view->end(), view->begin(), unchecked(view), filter} : iterator{};
+        return iterator{view->begin(), view->end(), view->begin(), unchecked(view), filter};
     }
 
     /**
@@ -14091,7 +16138,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
-        return *this ? iterator{view->begin(), view->end(), view->end(), unchecked(view), filter} : iterator{};
+        return iterator{view->begin(), view->end(), view->end(), unchecked(view), filter};
     }
 
     /**
@@ -14103,7 +16150,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const {
-        return *this ? reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), unchecked(view), filter} : reverse_iterator{};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), unchecked(view), filter};
     }
 
     /**
@@ -14118,7 +16165,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const {
-        return *this ? reverse_iterator{view->rbegin(), view->rend(), view->rend(), unchecked(view), filter} : reverse_iterator{};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), unchecked(view), filter};
     }
 
     /**
@@ -14148,7 +16195,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = *this ? iterator{view->begin(), view->end(), view->find(entt), unchecked(view), filter} : end();
+        const auto it = iterator{view->begin(), view->end(), view->find(entt), unchecked(view), filter};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -14166,7 +16213,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return *this && (std::get<storage_type<Component> *>(pools)->contains(entt) && ...) && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...);
+        return (std::get<storage_type<Component> *>(pools)->contains(entt) && ...) && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...);
     }
 
     /**
@@ -14193,7 +16240,8 @@ public:
         } else if constexpr(sizeof...(Comp) == 1) {
             return (std::get<storage_type<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Comp> *>(pools), entt)...);        }
+            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Comp> *>(pools), entt)...);
+        }
     }
 
     /**
@@ -14282,6 +16330,18 @@ public:
         return iterable_view{*this};
     }
 
+    /**
+     * @brief Combines two views in a _more specific_ one (friend function).
+     * @tparam Id A valid entity type (see entt_traits for more details).
+     * @tparam ELhs Filter list of the first view.
+     * @tparam CLhs Component list of the first view.
+     * @tparam ERhs Filter list of the second view.
+     * @tparam CRhs Component list of the second view.
+     * @return A more specific view.
+     */
+    template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+    friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
+
 private:
     const std::tuple<storage_type<Component> *...> pools;
     const std::tuple<const storage_type<Exclude> *...> filter;
@@ -14331,10 +16391,6 @@ class basic_view<Entity, exclude_t<>, Component> final {
         class iterable_view_iterator {
             friend class iterable_view;
 
-            iterable_view_iterator() ENTT_NOEXCEPT
-                : iterable_view_iterator{It{}...}
-            {}
-
             template<typename... Discard>
             iterable_view_iterator(It... from, Discard...) ENTT_NOEXCEPT
                 : it{from...}
@@ -14372,36 +16428,36 @@ class basic_view<Entity, exclude_t<>, Component> final {
             std::tuple<It...> it;
         };
 
-        iterable_view(storage_type * const ref)
-            : pool{ref}
+        iterable_view(storage_type &ref)
+            : pool{&ref}
         {}
 
     public:
         using iterator = std::conditional_t<
-            std::is_same_v<typename storage_type::storage_category, empty_storage_tag>,
+            std::is_void_v<decltype(std::declval<storage_type>().get({}))>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<storage_type>().begin())>
         >;
         using reverse_iterator = std::conditional_t<
-            std::is_same_v<typename storage_type::storage_category, empty_storage_tag>,
+            std::is_void_v<decltype(std::declval<storage_type>().get({}))>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator, decltype(std::declval<storage_type>().rbegin())>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return pool ? iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()} : iterator{};
+            return iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()};
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return pool ? iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()} : iterator{};
+            return iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()};
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return pool ? reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()} : reverse_iterator{};
+            return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()};
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return pool ? reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()} : reverse_iterator{};
+            return reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()};
         }
 
     private:
@@ -14422,7 +16478,7 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
-        : pool{}
+        : pools{}
     {}
 
     /**
@@ -14430,7 +16486,7 @@ public:
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : pool{&ref}
+        : pools{&ref}
     {}
 
     /**
@@ -14438,7 +16494,7 @@ public:
      * @return Number of entities that have the given component.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return *this ? pool->size() : size_type{};
+        return std::get<0>(pools)->size();
     }
 
     /**
@@ -14446,7 +16502,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        return !*this || pool->empty();
+        return std::get<0>(pools)->empty();
     }
 
     /**
@@ -14458,7 +16514,7 @@ public:
      * @return A pointer to the array of components.
      */
     [[nodiscard]] raw_type * raw() const ENTT_NOEXCEPT {
-        return *this ? pool->raw() : nullptr;
+        return std::get<0>(pools)->raw();
     }
 
     /**
@@ -14470,7 +16526,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
-        return *this ? pool->data() : nullptr;
+        return std::get<0>(pools)->data();
     }
 
     /**
@@ -14482,7 +16538,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return *this ? pool->basic_sparse_set<entity_type>::begin() : iterator{};
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::begin();
     }
 
     /**
@@ -14495,7 +16551,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return *this ? pool->basic_sparse_set<entity_type>::end() : iterator{};
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::end();
     }
 
     /**
@@ -14507,7 +16563,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return *this ? pool->basic_sparse_set<entity_type>::rbegin() : reverse_iterator{};
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::rbegin();
     }
 
     /**
@@ -14522,7 +16578,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return *this ? pool->basic_sparse_set<entity_type>::rend() : reverse_iterator{};
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::rend();
     }
 
     /**
@@ -14552,7 +16608,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = *this ? pool->find(entt) : end();
+        const auto it = std::get<0>(pools)->find(entt);
         return it != end() && *it == entt ? it : end();
     }
 
@@ -14570,7 +16626,7 @@ public:
      * @return True if the view is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return pool != nullptr;
+        return std::get<0>(pools) != nullptr;
     }
 
     /**
@@ -14579,7 +16635,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return *this && pool->contains(entt);
+        return std::get<0>(pools)->contains(entt);
     }
 
     /**
@@ -14602,14 +16658,10 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
-            if constexpr(std::is_same_v<typename storage_type::storage_category, empty_storage_tag>) {
-                return std::make_tuple();
-            } else {
-                return std::forward_as_tuple(pool->get(entt));
-            }
+            return get_as_tuple(*std::get<0>(pools), entt);
         } else {
             static_assert(std::is_same_v<Comp..., Component>, "Invalid component type");
-            return pool->get(entt);
+            return std::get<0>(pools)->get(entt);
         }
     }
 
@@ -14637,14 +16689,14 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(std::is_same_v<typename storage_type::storage_category, empty_storage_tag>) {
+        if constexpr(std::is_void_v<decltype(std::get<0>(pools)->get({}))>) {
             if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = size(); pos; --pos) {
                     func();
                 }
             } else {
-                for(auto &&component: *this) {
-                    func(component);
+                for(auto entity: *this) {
+                    func(entity);
                 }
             }
         } else {
@@ -14653,10 +16705,8 @@ public:
                     std::apply(func, pack);
                 }
             } else {
-                if(*this) {
-                    for(auto &&component: *pool) {
-                        func(component);
-                    }
+                for(auto &&component: *std::get<0>(pools)) {
+                    func(component);
                 }
             }
         }
@@ -14676,11 +16726,24 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        return iterable_view{pool};
+        return iterable_view{*std::get<0>(pools)};
     }
 
+    /**
+     * @brief Combines two views in a _more specific_ one (friend function).
+     * @tparam Id A valid entity type (see entt_traits for more details).
+     * @tparam ELhs Filter list of the first view.
+     * @tparam CLhs Component list of the first view.
+     * @tparam ERhs Filter list of the second view.
+     * @tparam CRhs Component list of the second view.
+     * @return A more specific view.
+     */
+    template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+    friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
+
 private:
-    storage_type * const pool;
+    const std::tuple<storage_type *> pools;
+    const std::tuple<> filter;
 };
 
 
@@ -14692,6 +16755,24 @@ private:
 template<typename... Storage>
 basic_view(Storage &... storage) ENTT_NOEXCEPT
 -> basic_view<std::common_type_t<typename Storage::entity_type...>, entt::exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
+
+
+/**
+ * @brief Combines two views in a _more specific_ one.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam ELhs Filter list of the first view.
+ * @tparam CLhs Component list of the first view.
+ * @tparam ERhs Filter list of the second view.
+ * @tparam CRhs Component list of the second view.
+ * @param lhs A valid reference to the first view.
+ * @param rhs A valid reference to the second view.
+ * @return A more specific view.
+ */
+template<typename Entity, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+[[nodiscard]] auto operator|(const basic_view<Entity, exclude_t<ELhs...>, CLhs...> &lhs, const basic_view<Entity, exclude_t<ERhs...>, CRhs...> &rhs) {
+    using view_type = basic_view<Entity, exclude_t<ELhs..., ERhs...>, CLhs..., CRhs...>;
+    return std::apply([](auto *... storage) { return view_type{*storage...}; }, std::tuple_cat(lhs.pools, rhs.pools, lhs.filter, rhs.filter));
+}
 
 
 }
@@ -14732,7 +16813,7 @@ class basic_registry {
 
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
-        static_assert(std::conjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>, "One or more component types are invalid");
+        static_assert(std::conjunction_v<std::is_same<Owned, std::remove_const_t<Owned>>..., std::is_same<Get, std::remove_const_t<Get>>..., std::is_same<Exclude, std::remove_const_t<Exclude>>...>, "One or more component types are invalid");
         std::conditional_t<sizeof...(Owned) == 0, basic_sparse_set<Entity>, std::size_t> current{};
 
         template<typename Component>
@@ -14777,13 +16858,9 @@ class basic_registry {
         bool (* exclude)(const id_type) ENTT_NOEXCEPT;
     };
 
-    struct variable_data {
-        type_info info;
-        std::unique_ptr<void, void(*)(void *)> value;
-    };
-
     template<typename Component>
-    [[nodiscard]] storage_type<Component> * assure() {
+    [[nodiscard]] storage_type<Component> * assure() const {
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
         const auto index = type_seq<Component>::value();
 
         if(!(index < pools.size())) {
@@ -14792,14 +16869,15 @@ class basic_registry {
 
         if(auto &&pdata = pools[index]; !pdata.pool) {
             pdata.pool.reset(new storage_type<Component>());
-            pdata.poly = std::ref(*static_cast<storage_type<Component> *>(pdata.pool.get()));
+            pdata.poly.template emplace<storage_type<Component> &>(*static_cast<storage_type<Component> *>(pdata.pool.get()));
         }
 
         return static_cast<storage_type<Component> *>(pools[index].pool.get());
     }
 
     template<typename Component>
-    [[nodiscard]] const storage_type<Component> * assure() const {
+    [[nodiscard]] const storage_type<Component> * pool_if_exists() const {
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
         const auto index = type_seq<Component>::value();
         return (!(index < pools.size()) || !pools[index].pool) ? nullptr : static_cast<const storage_type<Component> *>(pools[index].pool.get());
     }
@@ -14834,6 +16912,24 @@ public:
     /*! @brief Poly storage type. */
     using poly_storage = typename poly_storage_traits<Entity>::storage_type;
 
+    /**
+     * @brief Returns the entity identifier without the version.
+     * @param entity An entity identifier, either valid or not.
+     * @return The entity identifier without the version.
+     */
+    [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
+        return entity_type{to_integral(entity) & traits_type::entity_mask};
+    }
+
+    /**
+     * @brief Returns the version stored along with an entity identifier.
+     * @param entity An entity identifier, either valid or not.
+     * @return The version stored along with the given entity identifier.
+     */
+    [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
+        return version_type(to_integral(entity) >> traits_type::entity_shift);
+    }
+
     /*! @brief Default constructor. */
     basic_registry() = default;
 
@@ -14859,14 +16955,15 @@ public:
      * @return A valid poly storage if a pool for the given type exists, an
      * empty and thus invalid element otherwise.
      */
-    poly_storage storage(const type_info info) {
-        return info.seq() < pools.size() ? pools[info.seq()].poly : poly_storage{};
+    poly_storage & storage(const type_info info) {
+        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly);
+        return pools[info.seq()].poly;
     }
 
     /*! @copydoc storage */
-    poly_storage storage(const type_info info) const {
-        // as_ref forces a constness conversion for the underlying pool
-        return info.seq() < pools.size() ? as_ref(pools[info.seq()].poly) : poly_storage{};
+    const poly_storage & storage(const type_info info) const {
+        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly);
+        return pools[info.seq()].poly;
     }
 
     /**
@@ -14876,7 +16973,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type size() const {
-        const auto *cpool = assure<Component>();
+        const auto *cpool = pool_if_exists<Component>();
         return cpool ? cpool->size() : size_type{};
     }
 
@@ -14894,9 +16991,8 @@ public:
      */
     [[nodiscard]] size_type alive() const {
         auto sz = entities.size();
-        auto curr = available;
 
-        for(; curr != null; --sz) {
+        for(auto curr = available; curr != null; --sz) {
             curr = entities[to_integral(curr) & traits_type::entity_mask];
         }
 
@@ -14940,7 +17036,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type capacity() const {
-        const auto *cpool = assure<Component>();
+        const auto *cpool = pool_if_exists<Component>();
         return cpool ? cpool->capacity() : size_type{};
     }
 
@@ -14979,56 +17075,8 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return !alive();
         } else {
-            return [](auto *... cpool) { return ((!cpool || cpool->empty()) && ...); }(assure<Component>()...);
+            return [](const auto *... cpool) { return ((!cpool || cpool->empty()) && ...); }(pool_if_exists<Component>()...);
         }
-    }
-
-    /**
-     * @brief Direct access to the list of components of a given pool.
-     *
-     * The returned pointer is such that range
-     * `[raw<Component>(), raw<Component>() + size<Component>())` is always a
-     * valid range, even if the container is empty.
-     *
-     * Components are in the reverse order as imposed by the sorting
-     * functionalities.
-     *
-     * @note
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * isn't available for them. A compilation error will occur if invoked.
-     *
-     * @tparam Component Type of component in which one is interested.
-     * @return A pointer to the array of components of the given type.
-     */
-    template<typename Component>
-    [[nodiscard]] const Component * raw() const {
-        const auto *cpool = assure<Component>();
-        return cpool ? cpool->raw() : nullptr;
-    }
-
-    /*! @copydoc raw */
-    template<typename Component>
-    [[nodiscard]] Component * raw() {
-        return assure<Component>()->raw();
-    }
-
-    /**
-     * @brief Direct access to the list of entities of a given pool.
-     *
-     * The returned pointer is such that range
-     * `[data<Component>(), data<Component>() + size<Component>())` is always a
-     * valid range, even if the container is empty.
-     *
-     * Entities are in the reverse order as imposed by the sorting
-     * functionalities.
-     *
-     * @tparam Component Type of component in which one is interested.
-     * @return A pointer to the array of entities.
-     */
-    template<typename Component>
-    [[nodiscard]] const entity_type * data() const {
-        const auto *cpool = assure<Component>();
-        return cpool ? cpool->data() : nullptr;
     }
 
     /**
@@ -15067,24 +17115,6 @@ public:
     [[nodiscard]] bool valid(const entity_type entity) const {
         const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
         return (pos < entities.size() && entities[pos] == entity);
-    }
-
-    /**
-     * @brief Returns the entity identifier without the version.
-     * @param entity An entity identifier, either valid or not.
-     * @return The entity identifier without the version.
-     */
-    [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return entity_type{to_integral(entity) & traits_type::entity_mask};
-    }
-
-    /**
-     * @brief Returns the version stored along with an entity identifier.
-     * @param entity An entity identifier, either valid or not.
-     * @return The version stored along with the given entity identifier.
-     */
-    [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
-        return version_type(to_integral(entity) >> traits_type::entity_shift);
     }
 
     /**
@@ -15176,14 +17206,14 @@ public:
     /**
      * @brief Assigns entities to an empty registry.
      *
-     * This function is intended for use in conjunction with `raw` and
-     * `assign`.<br/>
+     * This function is intended for use in conjunction with `data`, `size` and
+     * `destroyed`.<br/>
      * Don't try to inject ranges of randomly generated entities nor the _wrong_
      * head for the list of destroyed entities. There is no guarantee that a
      * registry will continue to work properly in this case.
      *
      * @warning
-     * All pools must be empty for this to work properly.
+     * There must be no entities still alive for this to work properly.
      *
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
@@ -15192,7 +17222,7 @@ public:
      */
     template<typename It>
     void assign(It first, It last, const entity_type destroyed) {
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return !pdata.pool || pdata.pool->empty(); }));
+        ENTT_ASSERT(!alive());
         entities.assign(first, last);
         available = destroyed;
     }
@@ -15309,7 +17339,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.emplace<Component>(entity, args...);
+     * auto &component = registry.all_of<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.emplace<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -15329,7 +17359,7 @@ public:
         auto *cpool = assure<Component>();
 
         return cpool->contains(entity)
-            ? cpool->patch(*this, entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; })
+            ? cpool->patch(*this, entity, [&args...](auto &... curr) { ((curr = Component{std::forward<Args>(args)...}), ...); })
             : cpool->emplace(*this, entity, std::forward<Args>(args)...);
     }
 
@@ -15382,7 +17412,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&... args) {
-        return assure<Component>()->patch(*this, entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; });
+        return assure<Component>()->patch(*this, entity, [&args...](auto &... curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
     }
 
     /**
@@ -15398,8 +17428,8 @@ public:
     template<typename... Component>
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        static_assert(sizeof...(Component) > 0);
-        (assure<Component>()->remove(*this, entity), ...);
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
+        (assure<Component>()->remove(entity, this), ...);
     }
 
     /**
@@ -15415,8 +17445,8 @@ public:
     template<typename... Component, typename It>
     void remove(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        static_assert(sizeof...(Component) > 0);
-        (assure<Component>()->remove(*this, first, last), ...);
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
+        (assure<Component>()->remove(first, last, this), ...);
     }
 
     /**
@@ -15425,7 +17455,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * if(registry.has<Component>(entity)) { registry.remove<Component>(entity) }
+     * if(registry.all_of<Component>(entity)) { registry.remove<Component>(entity) }
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -15442,7 +17472,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         return ([this, entity](auto *cpool) {
-            return cpool->contains(entity) ? (cpool->remove(*this, entity), true) : false;
+            return cpool->contains(entity) ? (cpool->remove(entity, this), true) : false;
         }(assure<Component>()) + ... + size_type{});
     }
 
@@ -15466,7 +17496,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.poly->remove(*this, std::begin(wrap), std::end(wrap));
+                pdata.pool->remove(std::begin(wrap), std::end(wrap), this);
             }
         }
     }
@@ -15482,9 +17512,9 @@ public:
      * @return True if the entity has all the components, false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] bool has(const entity_type entity) const {
+    [[nodiscard]] bool all_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return [entity](auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(assure<Component>()...);
+        return [entity](const auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
     /**
@@ -15499,9 +17529,9 @@ public:
      * false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] bool any(const entity_type entity) const {
+    [[nodiscard]] bool any_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return (has<Component>(entity) || ...);
+        return [entity](const auto *... cpool) { return !((!cpool || !cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
     /**
@@ -15520,9 +17550,11 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (assure<Component>()->get(entity), ...);
+            const auto *cpool = pool_if_exists<std::remove_const_t<Component>...>();
+            ENTT_ASSERT(cpool);
+            return cpool->get(entity);
         } else {
-            return std::forward_as_tuple(assure<Component>()->get(entity)...);
+            return std::forward_as_tuple(get<Component>(entity)...);
         }
     }
 
@@ -15532,9 +17564,9 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (assure<Component>()->get(entity), ...);
+            return (const_cast<Component &>(assure<std::remove_const_t<Component>>()->get(entity)), ...);
         } else {
-            return std::forward_as_tuple(assure<Component>()->get(entity)...);
+            return std::forward_as_tuple(get<Component>(entity)...);
         }
     }
 
@@ -15546,7 +17578,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.emplace<Component>(entity, args...);
+     * auto &component = registry.all_of<Component>(entity) ? registry.get<Component>(entity) : registry.emplace<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -15585,7 +17617,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            auto *cpool = assure<Component...>();
+            const auto *cpool = pool_if_exists<std::remove_const_t<Component>...>();
             return (cpool && cpool->contains(entity)) ? &cpool->get(entity) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
@@ -15598,8 +17630,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            auto *cpool = assure<Component...>();
-            return cpool->contains(entity) ? &cpool->get(entity) : nullptr;
+            return (const_cast<Component *>(std::as_const(*this).template try_get<Component>(entity)), ...);
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
         }
@@ -15614,18 +17645,14 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             for(auto pos = pools.size(); pos; --pos) {
                 if(auto &pdata = pools[pos-1]; pdata.pool) {
-                    pdata.poly->remove(*this, pdata.pool->rbegin(), pdata.pool->rend());
+                    pdata.pool->clear(this);
                 }
             }
 
-            for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
-                    release_entity(entt, version(entt) + 1u);
-                }
-            }
+            each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
         } else {
             ([this](auto *cpool) {
-                cpool->remove(*this, cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end());
+                cpool->remove(cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end(), this);
             }(assure<Component>()), ...);
         }
     }
@@ -15655,8 +17682,8 @@ public:
             }
         } else {
             for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
-                    func(entt);
+                if(const auto entity = entities[pos - 1]; (to_integral(entity) & traits_type::entity_mask) == (pos - 1)) {
+                    func(entity);
                 }
             }
         }
@@ -15805,15 +17832,15 @@ public:
     template<typename... Component, typename... Exclude>
     [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        using view_type = basic_view<Entity, exclude_t<Exclude...>, Component...>;
-        return [](auto *... cpools) { return (cpools && ...) ? view_type{*cpools...} : view_type{}; }(assure<std::decay_t<Component>>()..., assure<Exclude>()...);
+        static_assert((std::is_const_v<Component> && ...), "Invalid non-const type");
+        return { *assure<std::remove_const_t<Component>>()..., *assure<Exclude>()... };
     }
 
     /*! @copydoc view */
     template<typename... Component, typename... Exclude>
     [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        return { *assure<std::decay_t<Component>>()..., *assure<Exclude>()... };
+        return { *assure<std::remove_const_t<Component>>()..., *assure<Exclude>()... };
     }
 
     /**
@@ -15894,16 +17921,16 @@ public:
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only groups are not supported");
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
 
-        using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
+        using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
 
-        const auto cpools = std::make_tuple(assure<std::decay_t<Owned>>()..., assure<std::decay_t<Get>>()...);
+        const auto cpools = std::make_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...);
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
             return gdata.size == size
-                && (gdata.owned(type_hash<std::decay_t<Owned>>::value()) && ...)
-                && (gdata.get(type_hash<std::decay_t<Get>>::value()) && ...)
+                && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
+                && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
                 && (gdata.exclude(type_hash<Exclude>::value()) && ...);
         }); it != groups.cend())
         {
@@ -15914,8 +17941,8 @@ public:
             group_data candidate = {
                 size,
                 { new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::decay_t<Owned>>::value()) || ...); },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::decay_t<Get>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<Exclude>::value()) || ...); },
             };
 
@@ -15928,17 +17955,17 @@ public:
                 groups.push_back(std::move(candidate));
             } else {
                 ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-                    const auto overlapping = (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value()));
-                    const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::decay_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<Exclude>::value()));
+                    const auto overlapping = (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
+                    const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<Exclude>::value()));
                     return !overlapping || ((sz == size) || (sz == gdata.size));
                 }));
 
                 const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-                    return !(0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value())) || (size > gdata.size);
+                    return !(0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) || (size > gdata.size);
                 });
 
                 const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &gdata) {
-                    return (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value()));
+                    return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
                 });
 
                 maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
@@ -15946,12 +17973,12 @@ public:
                 groups.insert(next, std::move(candidate));
             }
 
-            (on_construct<std::decay_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::decay_t<Owned>>>(*handler), ...);
-            (on_construct<std::decay_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::decay_t<Get>>>(*handler), ...);
+            (on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Owned>>>(*handler), ...);
+            (on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler), ...);
             (on_destroy<Exclude>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Exclude>>(*handler), ...);
 
-            (on_destroy<std::decay_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
-            (on_destroy<std::decay_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_destroy<std::remove_const_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_destroy<std::remove_const_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
             (on_construct<Exclude>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
 
             if constexpr(sizeof...(Owned) == 0) {
@@ -15961,12 +17988,12 @@ public:
             } else {
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
                 for(auto *first = std::get<0>(cpools)->data(), *last = first + std::get<0>(cpools)->size(); first != last; ++first) {
-                    handler->template maybe_valid_if<type_list_element_t<0, type_list<std::decay_t<Owned>...>>>(*this, *first);
+                    handler->template maybe_valid_if<type_list_element_t<0, type_list<std::remove_const_t<Owned>...>>>(*this, *first);
                 }
             }
         }
 
-        return { handler->current, *std::get<storage_type<std::decay_t<Owned>> *>(cpools)..., *std::get<storage_type<std::decay_t<Get>> *>(cpools)... };
+        return { handler->current, *std::get<storage_type<std::remove_const_t<Owned>> *>(cpools)..., *std::get<storage_type<std::remove_const_t<Get>> *>(cpools)... };
     }
 
     /**
@@ -15985,15 +18012,15 @@ public:
 
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
             return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))
-                && (gdata.owned(type_hash<std::decay_t<Owned>>::value()) && ...)
-                && (gdata.get(type_hash<std::decay_t<Get>>::value()) && ...)
+                && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
+                && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
                 && (gdata.exclude(type_hash<Exclude>::value()) && ...);
             }); it == groups.cend())
         {
             return {};
         } else {
-            using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
-            return { static_cast<handler_type *>(it->group.get())->current, *assure<std::decay_t<Owned>>()... , *assure<std::decay_t<Get>>()... };
+            using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
+            return { static_cast<handler_type *>(it->group.get())->current, *pool_if_exists<std::remove_const_t<Owned>>()... , *pool_if_exists<std::remove_const_t<Get>>()... };
         }
     }
 
@@ -16033,7 +18060,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] bool sortable() const {
-        return std::none_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::decay_t<Component>>::value()) || ...); });
+        return std::none_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::remove_const_t<Component>>::value()) || ...); });
     }
 
     /**
@@ -16047,7 +18074,7 @@ public:
     [[nodiscard]] bool sortable(const basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> &) ENTT_NOEXCEPT {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         return std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-            return (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value())) && (size < gdata.size);
+            return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) && (size < gdata.size);
         }) == groups.cend();
     }
 
@@ -16214,8 +18241,8 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
-        vars.push_back(variable_data{type_id<Type>(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
-        return *static_cast<Type *>(vars.back().value.get());
+        vars.emplace_back(std::in_place_type<Type>, std::forward<Args>(args)...);
+        return any_cast<Type &>(vars.back());
     }
 
     /**
@@ -16224,9 +18251,7 @@ public:
      */
     template<typename Type>
     void unset() {
-        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&var) {
-            return var.info.hash() == type_hash<Type>::value();
-        }), vars.end());
+        vars.erase(std::remove_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; }), vars.end());
     }
 
     /**
@@ -16253,15 +18278,16 @@ public:
      * registry, a null pointer otherwise.
      */
     template<typename Type>
-    [[nodiscard]] const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.info.hash() == type_hash<Type>::value(); });
-        return it == vars.cend() ? nullptr : static_cast<const Type *>(it->value.get());
+    [[nodiscard]] Type * try_ctx() const {
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        return it == vars.cend() ? nullptr : any_cast<Type>(&*it);
     }
 
     /*! @copydoc try_ctx */
     template<typename Type>
     [[nodiscard]] Type * try_ctx() {
-        return const_cast<Type *>(std::as_const(*this).template try_ctx<Type>());
+        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        return it == vars.end() ? nullptr : any_cast<Type>(&*it);
     }
 
     /**
@@ -16275,16 +18301,18 @@ public:
      * @return A valid reference to the object in the context of the registry.
      */
     template<typename Type>
-    [[nodiscard]] const Type & ctx() const {
-        const auto *instance = try_ctx<Type>();
-        ENTT_ASSERT(instance);
-        return *instance;
+    [[nodiscard]] Type & ctx() const {
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        ENTT_ASSERT(it != vars.cend());
+        return any_cast<Type &>(*it);
     }
 
     /*! @copydoc ctx */
     template<typename Type>
     [[nodiscard]] Type & ctx() {
-        return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
+        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        ENTT_ASSERT(it != vars.end());
+        return any_cast<Type &>(*it);
     }
 
     /**
@@ -16311,15 +18339,15 @@ public:
     template<typename Func>
     void ctx(Func func) const {
         for(auto pos = vars.size(); pos; --pos) {
-            func(vars[pos-1].info);
+            func(vars[pos-1].type());
         }
     }
 
 private:
-    std::vector<pool_data> pools{};
+    std::vector<basic_any<0u>> vars{};
+    mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
-    std::vector<variable_data> vars{};
     entity_type available{null};
 };
 
@@ -16540,25 +18568,25 @@ struct basic_handle {
 
     /**
      * @brief Checks if a handle has all the given components.
-     * @sa basic_registry::has
+     * @sa basic_registry::all_of
      * @tparam Component Components for which to perform the check.
      * @return True if the handle has all the components, false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] decltype(auto) has() const {
-        return reg->template has<Component...>(entt);
+    [[nodiscard]] decltype(auto) all_of() const {
+        return reg->template all_of<Component...>(entt);
     }
 
     /**
      * @brief Checks if a handle has at least one of the given components.
-     * @sa basic_registry::any
+     * @sa basic_registry::any_of
      * @tparam Component Components for which to perform the check.
      * @return True if the handle has at least one of the given components,
      * false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] decltype(auto) any() const {
-        return reg->template any<Component...>(entt);
+    [[nodiscard]] decltype(auto) any_of() const {
+        return reg->template any_of<Component...>(entt);
     }
 
     /**
@@ -16963,7 +18991,7 @@ public:
      * @return The value returned by the underlying function.
      */
     Ret operator()(Args... args) const {
-        ENTT_ASSERT(fn);
+        ENTT_ASSERT(static_cast<bool>(*this));
         return fn(data, std::forward<Args>(args)...);
     }
 
@@ -17180,7 +19208,8 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
  */
 template<typename Entity, typename Component>
 Entity to_entity(const basic_registry<Entity> &reg, const Component &component) {
-    return *(reg.template data<Component>() + (&component - reg.template raw<Component>()));
+    const auto view = reg.template view<const Component>();
+    return *(view.data() + (&component - view.raw()));
 }
 
 
@@ -17379,19 +19408,19 @@ class basic_observer {
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, AnyOf>> {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, basic_registry<Entity> &reg, const Entity entt) {
-            if(reg.template has<Require...>(entt) && !reg.template any<Reject...>(entt)) {
-                if(!obs.view.contains(entt)) {
-                    obs.view.emplace(entt);
+            if(reg.template all_of<Require...>(entt) && !reg.template any_of<Reject...>(entt)) {
+                if(!obs.storage.contains(entt)) {
+                    obs.storage.emplace(entt);
                 }
 
-                obs.view.get(entt) |= (1 << Index);
+                obs.storage.get(entt) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, basic_registry<Entity> &, const Entity entt) {
-            if(obs.view.contains(entt) && !(obs.view.get(entt) &= (~(1 << Index)))) {
-                obs.view.remove(entt);
+            if(obs.storage.contains(entt) && !(obs.storage.get(entt) &= (~(1 << Index)))) {
+                obs.storage.remove(entt);
             }
         }
 
@@ -17417,24 +19446,24 @@ class basic_observer {
         static void maybe_valid_if(basic_observer &obs, basic_registry<Entity> &reg, const Entity entt) {
             if([&reg, entt]() {
                 if constexpr(sizeof...(Ignore) == 0) {
-                    return reg.template has<AllOf..., Require...>(entt) && !reg.template any<NoneOf..., Reject...>(entt);
+                    return reg.template all_of<AllOf..., Require...>(entt) && !reg.template any_of<NoneOf..., Reject...>(entt);
                 } else {
-                    return reg.template has<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !reg.template any<NoneOf>(entt)) && ...) && !reg.template any<Reject...>(entt);
+                    return reg.template all_of<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !reg.template any_of<NoneOf>(entt)) && ...) && !reg.template any_of<Reject...>(entt);
                 }
             }())
             {
-                if(!obs.view.contains(entt)) {
-                    obs.view.emplace(entt);
+                if(!obs.storage.contains(entt)) {
+                    obs.storage.emplace(entt);
                 }
 
-                obs.view.get(entt) |= (1 << Index);
+                obs.storage.get(entt) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, basic_registry<Entity> &, const Entity entt) {
-            if(obs.view.contains(entt) && !(obs.view.get(entt) &= (~(1 << Index)))) {
-                obs.view.remove(entt);
+            if(obs.storage.contains(entt) && !(obs.storage.get(entt) &= (~(1 << Index)))) {
+                obs.storage.remove(entt);
             }
         }
 
@@ -17481,7 +19510,7 @@ public:
     /*! @brief Default constructor. */
     basic_observer()
         : release{},
-          view{}
+          storage{}
     {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
@@ -17525,7 +19554,7 @@ public:
     void connect(basic_registry<entity_type> &reg, basic_collector<Matcher...>) {
         disconnect();
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
-        view.clear();
+        storage.clear();
     }
 
     /*! @brief Disconnects an observer from the registry it keeps track of. */
@@ -17541,7 +19570,7 @@ public:
      * @return Number of elements.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return view.size();
+        return storage.size();
     }
 
     /**
@@ -17549,7 +19578,7 @@ public:
      * @return True if the observer is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        return view.empty();
+        return storage.empty();
     }
 
     /**
@@ -17565,7 +19594,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
-        return view.data();
+        return storage.data();
     }
 
     /**
@@ -17577,7 +19606,7 @@ public:
      * @return An iterator to the first entity of the observer.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return view.basic_sparse_set<entity_type>::begin();
+        return storage.basic_sparse_set<entity_type>::begin();
     }
 
     /**
@@ -17591,12 +19620,12 @@ public:
      * observer.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return view.basic_sparse_set<entity_type>::end();
+        return storage.basic_sparse_set<entity_type>::end();
     }
 
     /*! @brief Clears the underlying container. */
     void clear() ENTT_NOEXCEPT {
-        view.clear();
+        storage.clear();
     }
 
     /**
@@ -17636,7 +19665,7 @@ public:
 
 private:
     delegate<void(basic_observer &)> release;
-    basic_storage<entity_type, payload_type> view;
+    basic_storage<entity_type, payload_type> storage;
 };
 
 
@@ -17815,7 +19844,8 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
  */
 template<typename Entity, typename Component>
 Entity to_entity(const basic_registry<Entity> &reg, const Component &component) {
-    return *(reg.template data<Component>() + (&component - reg.template raw<Component>()));
+    const auto view = reg.template view<const Component>();
+    return *(view.data() + (&component - view.raw()));
 }
 
 
@@ -18345,15 +20375,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-struct Storage: type_list<
-    type_info() const ENTT_NOEXCEPT,
-    void(basic_registry<Entity> &, const Entity *, const Entity *)
-> {
-    /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
-    /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
-
+struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
     /**
      * @brief Concept definition.
      * @tparam Base Opaque base class from which to inherit.
@@ -18367,18 +20389,6 @@ struct Storage: type_list<
         type_info value_type() const ENTT_NOEXCEPT {
             return poly_call<0>(*this);
         }
-
-        /**
-         * @brief Removes entities from a storage.
-         * @param owner The registry that issued the request.
-         * @param first An iterator to the first element of the range of
-         * entities.
-         * @param last An iterator past the last element of the range of
-         * entities.
-         */
-        void remove(basic_registry<entity_type> &owner, const entity_type *first, const entity_type *last) {
-            poly_call<1>(*this, owner, first, last);
-        }
     };
 
     /**
@@ -18386,10 +20396,7 @@ struct Storage: type_list<
      * @tparam Type Type for which to generate an implementation.
      */
     template<typename Type>
-    using impl = value_list<
-        &type_id<typename Type::value_type>,
-        &Type::template remove<const entity_type *>
-    >;
+    using impl = value_list<&type_id<typename Type::value_type>>;
 };
 
 
@@ -18416,7 +20423,6 @@ struct poly_storage_traits {
 
 #include <algorithm>
 #include <cstddef>
-#include <functional>
 #include <iterator>
 #include <memory>
 #include <tuple>
@@ -18426,6 +20432,8 @@ struct poly_storage_traits {
 // #include "../config/config.h"
 
 // #include "../core/algorithm.hpp"
+
+// #include "../core/any.hpp"
 
 // #include "../core/fwd.hpp"
 
@@ -18484,7 +20492,7 @@ class basic_registry {
 
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
-        static_assert(std::conjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>, "One or more component types are invalid");
+        static_assert(std::conjunction_v<std::is_same<Owned, std::remove_const_t<Owned>>..., std::is_same<Get, std::remove_const_t<Get>>..., std::is_same<Exclude, std::remove_const_t<Exclude>>...>, "One or more component types are invalid");
         std::conditional_t<sizeof...(Owned) == 0, basic_sparse_set<Entity>, std::size_t> current{};
 
         template<typename Component>
@@ -18529,13 +20537,9 @@ class basic_registry {
         bool (* exclude)(const id_type) ENTT_NOEXCEPT;
     };
 
-    struct variable_data {
-        type_info info;
-        std::unique_ptr<void, void(*)(void *)> value;
-    };
-
     template<typename Component>
-    [[nodiscard]] storage_type<Component> * assure() {
+    [[nodiscard]] storage_type<Component> * assure() const {
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
         const auto index = type_seq<Component>::value();
 
         if(!(index < pools.size())) {
@@ -18544,14 +20548,15 @@ class basic_registry {
 
         if(auto &&pdata = pools[index]; !pdata.pool) {
             pdata.pool.reset(new storage_type<Component>());
-            pdata.poly = std::ref(*static_cast<storage_type<Component> *>(pdata.pool.get()));
+            pdata.poly.template emplace<storage_type<Component> &>(*static_cast<storage_type<Component> *>(pdata.pool.get()));
         }
 
         return static_cast<storage_type<Component> *>(pools[index].pool.get());
     }
 
     template<typename Component>
-    [[nodiscard]] const storage_type<Component> * assure() const {
+    [[nodiscard]] const storage_type<Component> * pool_if_exists() const {
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
         const auto index = type_seq<Component>::value();
         return (!(index < pools.size()) || !pools[index].pool) ? nullptr : static_cast<const storage_type<Component> *>(pools[index].pool.get());
     }
@@ -18586,6 +20591,24 @@ public:
     /*! @brief Poly storage type. */
     using poly_storage = typename poly_storage_traits<Entity>::storage_type;
 
+    /**
+     * @brief Returns the entity identifier without the version.
+     * @param entity An entity identifier, either valid or not.
+     * @return The entity identifier without the version.
+     */
+    [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
+        return entity_type{to_integral(entity) & traits_type::entity_mask};
+    }
+
+    /**
+     * @brief Returns the version stored along with an entity identifier.
+     * @param entity An entity identifier, either valid or not.
+     * @return The version stored along with the given entity identifier.
+     */
+    [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
+        return version_type(to_integral(entity) >> traits_type::entity_shift);
+    }
+
     /*! @brief Default constructor. */
     basic_registry() = default;
 
@@ -18611,14 +20634,15 @@ public:
      * @return A valid poly storage if a pool for the given type exists, an
      * empty and thus invalid element otherwise.
      */
-    poly_storage storage(const type_info info) {
-        return info.seq() < pools.size() ? pools[info.seq()].poly : poly_storage{};
+    poly_storage & storage(const type_info info) {
+        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly);
+        return pools[info.seq()].poly;
     }
 
     /*! @copydoc storage */
-    poly_storage storage(const type_info info) const {
-        // as_ref forces a constness conversion for the underlying pool
-        return info.seq() < pools.size() ? as_ref(pools[info.seq()].poly) : poly_storage{};
+    const poly_storage & storage(const type_info info) const {
+        ENTT_ASSERT(info.seq() < pools.size() && pools[info.seq()].poly);
+        return pools[info.seq()].poly;
     }
 
     /**
@@ -18628,7 +20652,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type size() const {
-        const auto *cpool = assure<Component>();
+        const auto *cpool = pool_if_exists<Component>();
         return cpool ? cpool->size() : size_type{};
     }
 
@@ -18646,9 +20670,8 @@ public:
      */
     [[nodiscard]] size_type alive() const {
         auto sz = entities.size();
-        auto curr = available;
 
-        for(; curr != null; --sz) {
+        for(auto curr = available; curr != null; --sz) {
             curr = entities[to_integral(curr) & traits_type::entity_mask];
         }
 
@@ -18692,7 +20715,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type capacity() const {
-        const auto *cpool = assure<Component>();
+        const auto *cpool = pool_if_exists<Component>();
         return cpool ? cpool->capacity() : size_type{};
     }
 
@@ -18731,56 +20754,8 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return !alive();
         } else {
-            return [](auto *... cpool) { return ((!cpool || cpool->empty()) && ...); }(assure<Component>()...);
+            return [](const auto *... cpool) { return ((!cpool || cpool->empty()) && ...); }(pool_if_exists<Component>()...);
         }
-    }
-
-    /**
-     * @brief Direct access to the list of components of a given pool.
-     *
-     * The returned pointer is such that range
-     * `[raw<Component>(), raw<Component>() + size<Component>())` is always a
-     * valid range, even if the container is empty.
-     *
-     * Components are in the reverse order as imposed by the sorting
-     * functionalities.
-     *
-     * @note
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * isn't available for them. A compilation error will occur if invoked.
-     *
-     * @tparam Component Type of component in which one is interested.
-     * @return A pointer to the array of components of the given type.
-     */
-    template<typename Component>
-    [[nodiscard]] const Component * raw() const {
-        const auto *cpool = assure<Component>();
-        return cpool ? cpool->raw() : nullptr;
-    }
-
-    /*! @copydoc raw */
-    template<typename Component>
-    [[nodiscard]] Component * raw() {
-        return assure<Component>()->raw();
-    }
-
-    /**
-     * @brief Direct access to the list of entities of a given pool.
-     *
-     * The returned pointer is such that range
-     * `[data<Component>(), data<Component>() + size<Component>())` is always a
-     * valid range, even if the container is empty.
-     *
-     * Entities are in the reverse order as imposed by the sorting
-     * functionalities.
-     *
-     * @tparam Component Type of component in which one is interested.
-     * @return A pointer to the array of entities.
-     */
-    template<typename Component>
-    [[nodiscard]] const entity_type * data() const {
-        const auto *cpool = assure<Component>();
-        return cpool ? cpool->data() : nullptr;
     }
 
     /**
@@ -18819,24 +20794,6 @@ public:
     [[nodiscard]] bool valid(const entity_type entity) const {
         const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
         return (pos < entities.size() && entities[pos] == entity);
-    }
-
-    /**
-     * @brief Returns the entity identifier without the version.
-     * @param entity An entity identifier, either valid or not.
-     * @return The entity identifier without the version.
-     */
-    [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return entity_type{to_integral(entity) & traits_type::entity_mask};
-    }
-
-    /**
-     * @brief Returns the version stored along with an entity identifier.
-     * @param entity An entity identifier, either valid or not.
-     * @return The version stored along with the given entity identifier.
-     */
-    [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
-        return version_type(to_integral(entity) >> traits_type::entity_shift);
     }
 
     /**
@@ -18928,14 +20885,14 @@ public:
     /**
      * @brief Assigns entities to an empty registry.
      *
-     * This function is intended for use in conjunction with `raw` and
-     * `assign`.<br/>
+     * This function is intended for use in conjunction with `data`, `size` and
+     * `destroyed`.<br/>
      * Don't try to inject ranges of randomly generated entities nor the _wrong_
      * head for the list of destroyed entities. There is no guarantee that a
      * registry will continue to work properly in this case.
      *
      * @warning
-     * All pools must be empty for this to work properly.
+     * There must be no entities still alive for this to work properly.
      *
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
@@ -18944,7 +20901,7 @@ public:
      */
     template<typename It>
     void assign(It first, It last, const entity_type destroyed) {
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return !pdata.pool || pdata.pool->empty(); }));
+        ENTT_ASSERT(!alive());
         entities.assign(first, last);
         available = destroyed;
     }
@@ -19061,7 +21018,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.emplace<Component>(entity, args...);
+     * auto &component = registry.all_of<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.emplace<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -19081,7 +21038,7 @@ public:
         auto *cpool = assure<Component>();
 
         return cpool->contains(entity)
-            ? cpool->patch(*this, entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; })
+            ? cpool->patch(*this, entity, [&args...](auto &... curr) { ((curr = Component{std::forward<Args>(args)...}), ...); })
             : cpool->emplace(*this, entity, std::forward<Args>(args)...);
     }
 
@@ -19134,7 +21091,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&... args) {
-        return assure<Component>()->patch(*this, entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; });
+        return assure<Component>()->patch(*this, entity, [&args...](auto &... curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
     }
 
     /**
@@ -19150,8 +21107,8 @@ public:
     template<typename... Component>
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        static_assert(sizeof...(Component) > 0);
-        (assure<Component>()->remove(*this, entity), ...);
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
+        (assure<Component>()->remove(entity, this), ...);
     }
 
     /**
@@ -19167,8 +21124,8 @@ public:
     template<typename... Component, typename It>
     void remove(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        static_assert(sizeof...(Component) > 0);
-        (assure<Component>()->remove(*this, first, last), ...);
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
+        (assure<Component>()->remove(first, last, this), ...);
     }
 
     /**
@@ -19177,7 +21134,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * if(registry.has<Component>(entity)) { registry.remove<Component>(entity) }
+     * if(registry.all_of<Component>(entity)) { registry.remove<Component>(entity) }
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -19194,7 +21151,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         return ([this, entity](auto *cpool) {
-            return cpool->contains(entity) ? (cpool->remove(*this, entity), true) : false;
+            return cpool->contains(entity) ? (cpool->remove(entity, this), true) : false;
         }(assure<Component>()) + ... + size_type{});
     }
 
@@ -19218,7 +21175,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.poly->remove(*this, std::begin(wrap), std::end(wrap));
+                pdata.pool->remove(std::begin(wrap), std::end(wrap), this);
             }
         }
     }
@@ -19234,9 +21191,9 @@ public:
      * @return True if the entity has all the components, false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] bool has(const entity_type entity) const {
+    [[nodiscard]] bool all_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return [entity](auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(assure<Component>()...);
+        return [entity](const auto *... cpool) { return ((cpool && cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
     /**
@@ -19251,9 +21208,9 @@ public:
      * false otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] bool any(const entity_type entity) const {
+    [[nodiscard]] bool any_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return (has<Component>(entity) || ...);
+        return [entity](const auto *... cpool) { return !((!cpool || !cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
     }
 
     /**
@@ -19272,9 +21229,11 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (assure<Component>()->get(entity), ...);
+            const auto *cpool = pool_if_exists<std::remove_const_t<Component>...>();
+            ENTT_ASSERT(cpool);
+            return cpool->get(entity);
         } else {
-            return std::forward_as_tuple(assure<Component>()->get(entity)...);
+            return std::forward_as_tuple(get<Component>(entity)...);
         }
     }
 
@@ -19284,9 +21243,9 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (assure<Component>()->get(entity), ...);
+            return (const_cast<Component &>(assure<std::remove_const_t<Component>>()->get(entity)), ...);
         } else {
-            return std::forward_as_tuple(assure<Component>()->get(entity)...);
+            return std::forward_as_tuple(get<Component>(entity)...);
         }
     }
 
@@ -19298,7 +21257,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.emplace<Component>(entity, args...);
+     * auto &component = registry.all_of<Component>(entity) ? registry.get<Component>(entity) : registry.emplace<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -19337,7 +21296,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            auto *cpool = assure<Component...>();
+            const auto *cpool = pool_if_exists<std::remove_const_t<Component>...>();
             return (cpool && cpool->contains(entity)) ? &cpool->get(entity) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
@@ -19350,8 +21309,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            auto *cpool = assure<Component...>();
-            return cpool->contains(entity) ? &cpool->get(entity) : nullptr;
+            return (const_cast<Component *>(std::as_const(*this).template try_get<Component>(entity)), ...);
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
         }
@@ -19366,18 +21324,14 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             for(auto pos = pools.size(); pos; --pos) {
                 if(auto &pdata = pools[pos-1]; pdata.pool) {
-                    pdata.poly->remove(*this, pdata.pool->rbegin(), pdata.pool->rend());
+                    pdata.pool->clear(this);
                 }
             }
 
-            for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
-                    release_entity(entt, version(entt) + 1u);
-                }
-            }
+            each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
         } else {
             ([this](auto *cpool) {
-                cpool->remove(*this, cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end());
+                cpool->remove(cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end(), this);
             }(assure<Component>()), ...);
         }
     }
@@ -19407,8 +21361,8 @@ public:
             }
         } else {
             for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
-                    func(entt);
+                if(const auto entity = entities[pos - 1]; (to_integral(entity) & traits_type::entity_mask) == (pos - 1)) {
+                    func(entity);
                 }
             }
         }
@@ -19557,15 +21511,15 @@ public:
     template<typename... Component, typename... Exclude>
     [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        using view_type = basic_view<Entity, exclude_t<Exclude...>, Component...>;
-        return [](auto *... cpools) { return (cpools && ...) ? view_type{*cpools...} : view_type{}; }(assure<std::decay_t<Component>>()..., assure<Exclude>()...);
+        static_assert((std::is_const_v<Component> && ...), "Invalid non-const type");
+        return { *assure<std::remove_const_t<Component>>()..., *assure<Exclude>()... };
     }
 
     /*! @copydoc view */
     template<typename... Component, typename... Exclude>
     [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        return { *assure<std::decay_t<Component>>()..., *assure<Exclude>()... };
+        return { *assure<std::remove_const_t<Component>>()..., *assure<Exclude>()... };
     }
 
     /**
@@ -19646,16 +21600,16 @@ public:
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only groups are not supported");
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
 
-        using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
+        using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
 
-        const auto cpools = std::make_tuple(assure<std::decay_t<Owned>>()..., assure<std::decay_t<Get>>()...);
+        const auto cpools = std::make_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...);
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
             return gdata.size == size
-                && (gdata.owned(type_hash<std::decay_t<Owned>>::value()) && ...)
-                && (gdata.get(type_hash<std::decay_t<Get>>::value()) && ...)
+                && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
+                && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
                 && (gdata.exclude(type_hash<Exclude>::value()) && ...);
         }); it != groups.cend())
         {
@@ -19666,8 +21620,8 @@ public:
             group_data candidate = {
                 size,
                 { new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::decay_t<Owned>>::value()) || ...); },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::decay_t<Get>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<Exclude>::value()) || ...); },
             };
 
@@ -19680,17 +21634,17 @@ public:
                 groups.push_back(std::move(candidate));
             } else {
                 ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-                    const auto overlapping = (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value()));
-                    const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::decay_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<Exclude>::value()));
+                    const auto overlapping = (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
+                    const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<Exclude>::value()));
                     return !overlapping || ((sz == size) || (sz == gdata.size));
                 }));
 
                 const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-                    return !(0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value())) || (size > gdata.size);
+                    return !(0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) || (size > gdata.size);
                 });
 
                 const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &gdata) {
-                    return (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value()));
+                    return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
                 });
 
                 maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
@@ -19698,12 +21652,12 @@ public:
                 groups.insert(next, std::move(candidate));
             }
 
-            (on_construct<std::decay_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::decay_t<Owned>>>(*handler), ...);
-            (on_construct<std::decay_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::decay_t<Get>>>(*handler), ...);
+            (on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Owned>>>(*handler), ...);
+            (on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler), ...);
             (on_destroy<Exclude>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Exclude>>(*handler), ...);
 
-            (on_destroy<std::decay_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
-            (on_destroy<std::decay_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_destroy<std::remove_const_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_destroy<std::remove_const_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
             (on_construct<Exclude>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
 
             if constexpr(sizeof...(Owned) == 0) {
@@ -19713,12 +21667,12 @@ public:
             } else {
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
                 for(auto *first = std::get<0>(cpools)->data(), *last = first + std::get<0>(cpools)->size(); first != last; ++first) {
-                    handler->template maybe_valid_if<type_list_element_t<0, type_list<std::decay_t<Owned>...>>>(*this, *first);
+                    handler->template maybe_valid_if<type_list_element_t<0, type_list<std::remove_const_t<Owned>...>>>(*this, *first);
                 }
             }
         }
 
-        return { handler->current, *std::get<storage_type<std::decay_t<Owned>> *>(cpools)..., *std::get<storage_type<std::decay_t<Get>> *>(cpools)... };
+        return { handler->current, *std::get<storage_type<std::remove_const_t<Owned>> *>(cpools)..., *std::get<storage_type<std::remove_const_t<Get>> *>(cpools)... };
     }
 
     /**
@@ -19737,15 +21691,15 @@ public:
 
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
             return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))
-                && (gdata.owned(type_hash<std::decay_t<Owned>>::value()) && ...)
-                && (gdata.get(type_hash<std::decay_t<Get>>::value()) && ...)
+                && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
+                && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
                 && (gdata.exclude(type_hash<Exclude>::value()) && ...);
             }); it == groups.cend())
         {
             return {};
         } else {
-            using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
-            return { static_cast<handler_type *>(it->group.get())->current, *assure<std::decay_t<Owned>>()... , *assure<std::decay_t<Get>>()... };
+            using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
+            return { static_cast<handler_type *>(it->group.get())->current, *pool_if_exists<std::remove_const_t<Owned>>()... , *pool_if_exists<std::remove_const_t<Get>>()... };
         }
     }
 
@@ -19785,7 +21739,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] bool sortable() const {
-        return std::none_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::decay_t<Component>>::value()) || ...); });
+        return std::none_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::remove_const_t<Component>>::value()) || ...); });
     }
 
     /**
@@ -19799,7 +21753,7 @@ public:
     [[nodiscard]] bool sortable(const basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> &) ENTT_NOEXCEPT {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         return std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-            return (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value())) && (size < gdata.size);
+            return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) && (size < gdata.size);
         }) == groups.cend();
     }
 
@@ -19966,8 +21920,8 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
-        vars.push_back(variable_data{type_id<Type>(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
-        return *static_cast<Type *>(vars.back().value.get());
+        vars.emplace_back(std::in_place_type<Type>, std::forward<Args>(args)...);
+        return any_cast<Type &>(vars.back());
     }
 
     /**
@@ -19976,9 +21930,7 @@ public:
      */
     template<typename Type>
     void unset() {
-        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&var) {
-            return var.info.hash() == type_hash<Type>::value();
-        }), vars.end());
+        vars.erase(std::remove_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; }), vars.end());
     }
 
     /**
@@ -20005,15 +21957,16 @@ public:
      * registry, a null pointer otherwise.
      */
     template<typename Type>
-    [[nodiscard]] const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.info.hash() == type_hash<Type>::value(); });
-        return it == vars.cend() ? nullptr : static_cast<const Type *>(it->value.get());
+    [[nodiscard]] Type * try_ctx() const {
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        return it == vars.cend() ? nullptr : any_cast<Type>(&*it);
     }
 
     /*! @copydoc try_ctx */
     template<typename Type>
     [[nodiscard]] Type * try_ctx() {
-        return const_cast<Type *>(std::as_const(*this).template try_ctx<Type>());
+        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        return it == vars.end() ? nullptr : any_cast<Type>(&*it);
     }
 
     /**
@@ -20027,16 +21980,18 @@ public:
      * @return A valid reference to the object in the context of the registry.
      */
     template<typename Type>
-    [[nodiscard]] const Type & ctx() const {
-        const auto *instance = try_ctx<Type>();
-        ENTT_ASSERT(instance);
-        return *instance;
+    [[nodiscard]] Type & ctx() const {
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        ENTT_ASSERT(it != vars.cend());
+        return any_cast<Type &>(*it);
     }
 
     /*! @copydoc ctx */
     template<typename Type>
     [[nodiscard]] Type & ctx() {
-        return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
+        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        ENTT_ASSERT(it != vars.end());
+        return any_cast<Type &>(*it);
     }
 
     /**
@@ -20063,15 +22018,15 @@ public:
     template<typename Func>
     void ctx(Func func) const {
         for(auto pos = vars.size(); pos; --pos) {
-            func(vars[pos-1].info);
+            func(vars[pos-1].type());
         }
     }
 
 private:
-    std::vector<pool_data> pools{};
+    std::vector<basic_any<0u>> vars{};
+    mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
-    std::vector<variable_data> vars{};
     entity_type available{null};
 };
 
@@ -20378,7 +22333,7 @@ class basic_snapshot {
         while(first != last) {
             const auto entt = *(first++);
 
-            if(reg->template has<Component>(entt)) {
+            if(reg->template all_of<Component>(entt)) {
                 std::apply(archive, std::tuple_cat(std::make_tuple(entt), view.get(entt)));
             }
         }
@@ -20391,7 +22346,7 @@ class basic_snapshot {
 
         while(begin != last) {
             const auto entt = *(begin++);
-            ((reg->template has<Component>(entt) ? ++size[Index] : size[Index]), ...);
+            ((reg->template all_of<Component>(entt) ? ++size[Index] : size[Index]), ...);
         }
 
         (get<Component>(archive, size[Index], first, last), ...);
@@ -20453,8 +22408,14 @@ public:
      */
     template<typename... Component, typename Archive>
     const basic_snapshot & component(Archive &archive) const {
-        (component<Component>(archive, reg->template data<Component>(), reg->template data<Component>() + reg->template size<Component>()), ...);
-        return *this;
+        if constexpr(sizeof...(Component) == 1u) {
+            const auto view = reg->template view<const Component...>();
+            (component<Component>(archive, view.data(), view.data() + view.size()), ...);
+            return *this;
+        } else {
+            (component<Component>(archive), ...);
+            return *this;
+        }
     }
 
     /**
@@ -20949,8 +22910,7 @@ namespace entt {
  */
 template<typename Entity>
 class basic_sparse_set {
-    static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
-    static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(Entity);
+    static constexpr auto page_size = ENTT_PAGE_SIZE;
 
     using traits_type = entt_traits<Entity>;
     using page_type = std::unique_ptr<Entity[]>;
@@ -21058,11 +23018,11 @@ class basic_sparse_set {
     };
 
     [[nodiscard]] auto page(const Entity entt) const ENTT_NOEXCEPT {
-        return size_type{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
+        return size_type{(to_integral(entt) & traits_type::entity_mask) / page_size};
     }
 
     [[nodiscard]] auto offset(const Entity entt) const ENTT_NOEXCEPT {
-        return size_type{to_integral(entt) & (entt_per_page - 1)};
+        return size_type{to_integral(entt) & (page_size - 1)};
     }
 
     [[nodiscard]] page_type & assure(const std::size_t pos) {
@@ -21071,9 +23031,9 @@ class basic_sparse_set {
         }
 
         if(!sparse[pos]) {
-            sparse[pos].reset(new entity_type[entt_per_page]);
+            sparse[pos].reset(new entity_type[page_size]);
             // null is safe in all cases for our purposes
-            for(auto *first = sparse[pos].get(), *last = first + entt_per_page; first != last; ++first) {
+            for(auto *first = sparse[pos].get(), *last = first + page_size; first != last; ++first) {
                 *first = null;
             }
         }
@@ -21081,9 +23041,12 @@ class basic_sparse_set {
         return sparse[pos];
     }
 
+protected:
+    /*! @brief Swaps two entities in the internal packed array. */
     virtual void swap_at(const std::size_t, const std::size_t) {}
-    virtual void swap_and_pop(const std::size_t) {}
-    virtual void clear_all() {}
+
+    /*! @brief Attempts to remove an entity from the internal packed array. */
+    virtual void swap_and_pop(const std::size_t, void *) {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -21150,7 +23113,7 @@ public:
      * @return Extent of the sparse set.
      */
     [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
-        return sparse.size() * entt_per_page;
+        return sparse.size() * page_size;
     }
 
     /**
@@ -21284,6 +23247,25 @@ public:
     }
 
     /**
+     * @brief Returns the entity at specified location, with bounds checking.
+     * @param pos The position for which to return the entity.
+     * @return The entity at specified location if any, a null entity otherwise.
+     */
+    [[nodiscard]] entity_type at(const size_type pos) const {
+        return pos < packed.size() ? packed[pos] : null;
+    }
+
+    /**
+     * @brief Returns the entity at specified location, without bounds checking.
+     * @param pos The position for which to return the entity.
+     * @return The entity at specified location.
+     */
+    [[nodiscard]] entity_type operator[](const size_type pos) const {
+        ENTT_ASSERT(pos < packed.size());
+        return packed[pos];
+    }
+
+    /**
      * @brief Assigns an entity to a sparse set.
      *
      * @warning
@@ -21328,19 +23310,23 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid entity identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void remove(const entity_type entt) {
+    void remove(const entity_type entt, void *ud = nullptr) {
         ENTT_ASSERT(contains(entt));
         auto &ref = sparse[page(entt)][offset(entt)];
-        const auto pos = size_type{to_integral(ref)};
-        const auto other = packed.back();
 
+        // last chance to use the entity for derived classes and mixins, if any
+        swap_and_pop(size_type{to_integral(ref)}, ud);
+
+        const auto other = packed.back();
         sparse[page(other)][offset(other)] = ref;
-        packed[pos] = other;
+        // if it looks weird, imagine what the subtle bugs it prevents are
+        ENTT_ASSERT((packed.back() = entt, true));
+        packed[size_type{to_integral(ref)}] = other;
         ref = null;
 
         packed.pop_back();
-        swap_and_pop(pos);
     }
 
     /**
@@ -21348,21 +23334,17 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     template<typename It>
-    void remove(It first, It last) {
-        if(std::distance(first, last) == std::distance(packed.begin(), packed.end())) {
-            // no validity check, let it be misused
-            clear();
-        } else {
-            for(; first != last; ++first) {
-                remove(*first);
-            }
+    void remove(It first, It last, void *ud = nullptr) {
+        for(; first != last; ++first) {
+            remove(*first, ud);
         }
     }
 
     /**
-     * @brief Swaps two entities in the internal packed array.
+     * @copybrief swap_at
      *
      * For what it's worth, this function affects both the internal sparse array
      * and the internal packed array. Users should not care of that anyway.
@@ -21423,11 +23405,14 @@ public:
             auto next = index(packed[curr]);
 
             while(curr != next) {
-                swap_at(next, index(packed[next]));
-                sparse[page(packed[curr])][offset(packed[curr])] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
+                const auto idx = index(packed[next]);
+                const auto entt = packed[curr];
+
+                swap_at(next, idx);
+                sparse[page(entt)][offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
 
                 curr = next;
-                next = index(packed[curr]);
+                next = idx;
             }
         }
     }
@@ -21483,11 +23468,12 @@ public:
         }
     }
 
-    /*! @brief Clears a sparse set. */
-    void clear() ENTT_NOEXCEPT {
-        sparse.clear();
-        packed.clear();
-        clear_all();
+    /**
+     * @brief Clears a sparse set.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    void clear(void *ud = nullptr) ENTT_NOEXCEPT {
+        remove(begin(), end(), ud);
     }
 
 private:
@@ -21530,12 +23516,6 @@ private:
 
 
 namespace entt {
-
-
-/*! @brief Empty storage category tag. */
-struct empty_storage_tag {};
-/*! @brief Dense storage category tag. */
-struct dense_storage_tag: empty_storage_tag {};
 
 
 /**
@@ -21675,22 +23655,28 @@ class basic_storage: public basic_sparse_set<Entity> {
         index_type index;
     };
 
-    void swap_at(const std::size_t lhs, const std::size_t rhs) final {
+protected:
+    /**
+     * @copybrief basic_sparse_set::swap_at
+     * @param lhs A valid position of an entity within storage.
+     * @param rhs A valid position of an entity within storage.
+     */
+    void swap_at(const std::size_t lhs, const std::size_t rhs) {
         std::swap(instances[lhs], instances[rhs]);
     }
 
-    void swap_and_pop(const std::size_t pos) final {
+    /**
+     * @copybrief basic_sparse_set::swap_and_pop
+     * @param pos A valid position of an entity within storage.
+     */
+    void swap_and_pop(const std::size_t pos, void *) {
         auto other = std::move(instances.back());
         instances[pos] = std::move(other);
         instances.pop_back();
     }
 
-    void clear_all() ENTT_NOEXCEPT final {
-        instances.clear();
-    }
-
 public:
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -21704,8 +23690,6 @@ public:
     using reverse_iterator = Type *;
     /*! @brief Constant reverse iterator type. */
     using const_reverse_iterator = const Type *;
-    /*! @brief Storage category. */
-    using storage_category = dense_storage_tag;
 
     /**
      * @brief Increases the capacity of a storage.
@@ -21843,14 +23827,14 @@ public:
     }
 
     /**
-     * @brief Returns the object associated with an entity.
+     * @brief Returns the object assigned to an entity.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the storage results in
      * undefined behavior.
      *
      * @param entt A valid entity identifier.
-     * @return The object associated with the entity.
+     * @return The object assigned to the entity.
      */
     [[nodiscard]] const value_type & get(const entity_type entt) const {
         return instances[underlying_type::index(entt)];
@@ -21888,6 +23872,20 @@ public:
         // entity goes after component in case constructor throws
         underlying_type::emplace(entt);
         return instances.back();
+    }
+
+    /**
+     * @brief Updates the instance assigned to a given entity in-place.
+     * @tparam Func Types of the function objects to invoke.
+     * @param entity A valid entity identifier.
+     * @param func Valid function objects.
+     * @return A reference to the updated instance.
+     */
+    template<typename... Func>
+    decltype(auto) patch(const entity_type entity, Func &&... func) {
+        auto &&instance = instances[this->index(entity)];
+        (std::forward<Func>(func)(instance), ...);
+        return instance;
     }
 
     /**
@@ -22004,14 +24002,25 @@ class basic_storage<Entity, Type, std::enable_if_t<is_empty_v<Type>>>: public ba
     using underlying_type = basic_sparse_set<Entity>;
 
 public:
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Storage category. */
-    using storage_category = empty_storage_tag;
+
+    /**
+     * @brief Fake get function.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.
+     *
+     * @param entt A valid entity identifier.
+     */
+    void get([[maybe_unused]] const entity_type entt) const {
+        ENTT_ASSERT(this->contains(entt));
+    }
 
     /**
      * @brief Assigns an entity to a storage and constructs its object.
@@ -22028,6 +24037,18 @@ public:
     void emplace(const entity_type entt, Args &&... args) {
         [[maybe_unused]] value_type instance{std::forward<Args>(args)...};
         underlying_type::emplace(entt);
+    }
+
+    /**
+    * @brief Updates the instance assigned to a given entity in-place.
+    * @tparam Func Types of the function objects to invoke.
+    * @param entity A valid entity identifier.
+    * @param func Valid function objects.
+    */
+    template<typename... Func>
+    void patch([[maybe_unused]] const entity_type entity, Func &&... func) {
+        ENTT_ASSERT(this->contains(entity));
+        (std::forward<Func>(func)(), ...);
     }
 
     /**
@@ -22056,12 +24077,10 @@ template<typename Type>
 struct storage_adapter_mixin: Type {
     static_assert(std::is_same_v<typename Type::value_type, std::decay_t<typename Type::value_type>>, "Invalid object type");
 
-    /*! @brief Type of the objects associated with the entities. */
+    /*! @brief Type of the objects assigned to entities. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
-    /*! @brief Storage category. */
-    using storage_category = typename Type::storage_category;
 
     /**
      * @brief Assigns entities to a storage.
@@ -22078,35 +24097,16 @@ struct storage_adapter_mixin: Type {
     /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the objects
-     * associated with the entities.
+     * @tparam Args Types of arguments to use to construct the objects assigned
+     * to the entities.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the objects associated with
-     * the entities.
+     * @param args Parameters to use to initialize the objects assigned to the
+     * entities.
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
         Type::insert(first, last, std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Removes entities from a storage.
-     * @param entity A valid entity identifier.
-     */
-    void remove(basic_registry<entity_type> &, const entity_type entity) {
-        Type::remove(entity);
-    }
-
-    /**
-     * @copybrief remove
-     * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename It>
-    void remove(basic_registry<entity_type> &, It first, It last) {
-        Type::remove(first, last);
     }
 
     /**
@@ -22117,10 +24117,8 @@ struct storage_adapter_mixin: Type {
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entity, [[maybe_unused]] Func &&... func) {
-        auto &instance = this->get(entity);
-        (std::forward<Func>(func)(instance), ...);
-        return instance;
+    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entity, Func &&... func) {
+        return Type::patch(entity, std::forward<Func>(func)...);
     }
 };
 
@@ -22130,13 +24128,25 @@ struct storage_adapter_mixin: Type {
  * @tparam Type The type of the underlying storage.
  */
 template<typename Type>
-struct sigh_storage_mixin: Type {
+class sigh_storage_mixin final: public Type {
+    /**
+     * @copybrief basic_sparse_set::swap_and_pop
+     * @param pos A valid position of an entity within storage.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    void swap_and_pop(const std::size_t pos, void *ud) final {
+        ENTT_ASSERT(ud != nullptr);
+        const auto entity = basic_sparse_set<typename Type::entity_type>::operator[](pos);
+        destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entity);
+        // the position may have changed due to the actions of a listener
+        Type::swap_and_pop(this->index(entity), ud);
+    }
+
+public:
     /*! @brief Underlying value type. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
-    /*! @brief Storage category. */
-    using storage_category = typename Type::storage_category;
 
     /**
      * @brief Returns a sink object.
@@ -22204,7 +24214,7 @@ struct sigh_storage_mixin: Type {
     }
 
     /**
-     * @copybrief storage_adapter_mixin::emplace
+     * @brief Assigns entities to a storage.
      * @tparam Args Types of arguments to use to construct the object.
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
@@ -22213,28 +24223,25 @@ struct sigh_storage_mixin: Type {
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
-        Type::emplace(owner, entity, std::forward<Args>(args)...);
+        Type::emplace(entity, std::forward<Args>(args)...);
         construction.publish(owner, entity);
-
-        if constexpr(!std::is_same_v<storage_category, empty_storage_tag>) {
-            return this->get(entity);
-        }
+        return this->get(entity);
     }
 
     /**
-     * @copybrief storage_adapter_mixin::insert
+     * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the objects
-     * associated with the entities.
+     * @tparam Args Types of arguments to use to construct the objects assigned
+     * to the entities.
      * @param owner The registry that issued the request.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the objects associated with
-     * the entities.
+     * @param args Parameters to use to initialize the objects assigned to the
+     * entities.
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
-        Type::insert(owner, first, last, std::forward<Args>(args)...);
+        Type::insert(first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
             for(; first != last; ++first) {
@@ -22244,35 +24251,7 @@ struct sigh_storage_mixin: Type {
     }
 
     /**
-     * @copybrief storage_adapter_mixin::remove
-     * @param owner The registry that issued the request.
-     * @param entity A valid entity identifier.
-     */
-    void remove(basic_registry<entity_type> &owner, const entity_type entity) {
-        destruction.publish(owner, entity);
-        Type::remove(owner, entity);
-    }
-
-    /**
-     * @copybrief storage_adapter_mixin::remove
-     * @tparam It Type of input iterator.
-     * @param owner The registry that issued the request.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename It>
-    void remove(basic_registry<entity_type> &owner, It first, It last) {
-        if(!destruction.empty()) {
-            for(auto it = first; it != last; ++it) {
-                destruction.publish(owner, *it);
-            }
-        }
-
-        Type::remove(owner, first, last);
-    }
-
-    /**
-     * @copybrief storage_adapter_mixin::patch
+     * @brief Patches the given instance for an entity.
      * @tparam Func Types of the function objects to invoke.
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
@@ -22280,14 +24259,10 @@ struct sigh_storage_mixin: Type {
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, [[maybe_unused]] Func &&... func) {
-        if constexpr(std::is_same_v<storage_category, empty_storage_tag>) {
-            update.publish(owner, entity);
-        } else {
-            Type::patch(owner, entity, std::forward<Func>(func)...);
-            update.publish(owner, entity);
-            return this->get(entity);
-        }
+    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, Func &&... func) {
+        Type::patch(entity, std::forward<Func>(func)...);
+        update.publish(owner, entity);
+        return this->get(entity);
     }
 
 private:
@@ -22313,12 +24288,12 @@ private:
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
     /*! @brief Resulting type after component-to-storage conversion. */
-    using storage_type = sigh_storage_mixin<storage_adapter_mixin<basic_storage<Entity, Type>>>;
+    using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
 
 
 /**
- * @brief Gets the element associated with an entity from a storage, if any.
+ * @brief Gets the element assigned to an entity from a storage, if any.
  * @tparam Type Storage type.
  * @param container A valid instance of a storage class.
  * @param entity A valid entity identifier.
@@ -22326,13 +24301,12 @@ struct storage_traits {
  */
 template<typename Type>
 [[nodiscard]] auto get_as_tuple([[maybe_unused]] Type &container, [[maybe_unused]] const typename Type::entity_type entity) {
-    static_assert(std::is_same_v<std::remove_const_t<Type>, typename storage_traits<typename Type::entity_type, typename Type::value_type>::storage_type>);
+    static_assert(std::is_same_v<std::remove_const_t<Type>, typename storage_traits<typename Type::entity_type, typename Type::value_type>::storage_type>, "Invalid storage");
 
-    if constexpr(std::is_base_of_v<dense_storage_tag, typename Type::storage_category>) {
-        return std::forward_as_tuple(container.get(entity));
-    } else {
-        static_assert(std::is_base_of_v<empty_storage_tag, typename Type::storage_category>, "Unknown storage category");
+    if constexpr(std::is_void_v<decltype(container.get({}))>) {
         return std::make_tuple();
+    } else {
+        return std::forward_as_tuple(container.get(entity));
     }
 }
 
@@ -22646,35 +24620,33 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
     template<typename Comp, typename Func>
     void traverse(Func func) const {
-        if(*this) {
-            if constexpr(std::is_same_v<typename storage_type<Comp>::storage_category, empty_storage_tag>) {
-                for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
-                    if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
-                        && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
-                    {
-                        if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
-                            std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
-                        } else {
-                            std::apply(func, get(entt));
-                        }
+        if constexpr(std::is_void_v<decltype(std::get<storage_type<Comp> *>(pools)->get({}))>) {
+            for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
+                if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
+                    && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
+                {
+                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+                        std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
+                    } else {
+                        std::apply(func, get(entt));
                     }
                 }
-            } else {
-                auto it = std::get<storage_type<Comp> *>(pools)->begin();
+            }
+        } else {
+            auto it = std::get<storage_type<Comp> *>(pools)->begin();
 
-                for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
-                    if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
-                        && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
-                    {
-                        if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
-                            std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Component>(it, entt)...));
-                        } else {
-                            std::apply(func, std::tuple_cat(dispatch_get<Component>(it, entt)...));
-                        }
+            for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
+                if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
+                    && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
+                {
+                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+                        std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Component>(it, entt)...));
+                    } else {
+                        std::apply(func, std::tuple_cat(dispatch_get<Component>(it, entt)...));
                     }
-
-                    ++it;
                 }
+
+                ++it;
             }
         }
     }
@@ -22711,7 +24683,7 @@ public:
      */
     template<typename Comp>
     void use() const ENTT_NOEXCEPT {
-        view = *this ? std::get<storage_type<Comp> *>(pools) : nullptr;
+        view = std::get<storage_type<Comp> *>(pools);
     }
 
     /**
@@ -22719,7 +24691,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const ENTT_NOEXCEPT {
-        return *this ? view->size() : size_type{};
+        return view->size();
     }
 
     /**
@@ -22731,7 +24703,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
-        return *this ? iterator{view->begin(), view->end(), view->begin(), unchecked(view), filter} : iterator{};
+        return iterator{view->begin(), view->end(), view->begin(), unchecked(view), filter};
     }
 
     /**
@@ -22744,7 +24716,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
-        return *this ? iterator{view->begin(), view->end(), view->end(), unchecked(view), filter} : iterator{};
+        return iterator{view->begin(), view->end(), view->end(), unchecked(view), filter};
     }
 
     /**
@@ -22756,7 +24728,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const {
-        return *this ? reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), unchecked(view), filter} : reverse_iterator{};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), unchecked(view), filter};
     }
 
     /**
@@ -22771,7 +24743,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const {
-        return *this ? reverse_iterator{view->rbegin(), view->rend(), view->rend(), unchecked(view), filter} : reverse_iterator{};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), unchecked(view), filter};
     }
 
     /**
@@ -22801,7 +24773,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = *this ? iterator{view->begin(), view->end(), view->find(entt), unchecked(view), filter} : end();
+        const auto it = iterator{view->begin(), view->end(), view->find(entt), unchecked(view), filter};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -22819,7 +24791,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return *this && (std::get<storage_type<Component> *>(pools)->contains(entt) && ...) && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...);
+        return (std::get<storage_type<Component> *>(pools)->contains(entt) && ...) && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...);
     }
 
     /**
@@ -22846,7 +24818,8 @@ public:
         } else if constexpr(sizeof...(Comp) == 1) {
             return (std::get<storage_type<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Comp> *>(pools), entt)...);        }
+            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Comp> *>(pools), entt)...);
+        }
     }
 
     /**
@@ -22935,6 +24908,18 @@ public:
         return iterable_view{*this};
     }
 
+    /**
+     * @brief Combines two views in a _more specific_ one (friend function).
+     * @tparam Id A valid entity type (see entt_traits for more details).
+     * @tparam ELhs Filter list of the first view.
+     * @tparam CLhs Component list of the first view.
+     * @tparam ERhs Filter list of the second view.
+     * @tparam CRhs Component list of the second view.
+     * @return A more specific view.
+     */
+    template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+    friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
+
 private:
     const std::tuple<storage_type<Component> *...> pools;
     const std::tuple<const storage_type<Exclude> *...> filter;
@@ -22984,10 +24969,6 @@ class basic_view<Entity, exclude_t<>, Component> final {
         class iterable_view_iterator {
             friend class iterable_view;
 
-            iterable_view_iterator() ENTT_NOEXCEPT
-                : iterable_view_iterator{It{}...}
-            {}
-
             template<typename... Discard>
             iterable_view_iterator(It... from, Discard...) ENTT_NOEXCEPT
                 : it{from...}
@@ -23025,36 +25006,36 @@ class basic_view<Entity, exclude_t<>, Component> final {
             std::tuple<It...> it;
         };
 
-        iterable_view(storage_type * const ref)
-            : pool{ref}
+        iterable_view(storage_type &ref)
+            : pool{&ref}
         {}
 
     public:
         using iterator = std::conditional_t<
-            std::is_same_v<typename storage_type::storage_category, empty_storage_tag>,
+            std::is_void_v<decltype(std::declval<storage_type>().get({}))>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<storage_type>().begin())>
         >;
         using reverse_iterator = std::conditional_t<
-            std::is_same_v<typename storage_type::storage_category, empty_storage_tag>,
+            std::is_void_v<decltype(std::declval<storage_type>().get({}))>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator, decltype(std::declval<storage_type>().rbegin())>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return pool ? iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()} : iterator{};
+            return iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()};
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return pool ? iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()} : iterator{};
+            return iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()};
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return pool ? reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()} : reverse_iterator{};
+            return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()};
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return pool ? reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()} : reverse_iterator{};
+            return reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()};
         }
 
     private:
@@ -23075,7 +25056,7 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
-        : pool{}
+        : pools{}
     {}
 
     /**
@@ -23083,7 +25064,7 @@ public:
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : pool{&ref}
+        : pools{&ref}
     {}
 
     /**
@@ -23091,7 +25072,7 @@ public:
      * @return Number of entities that have the given component.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return *this ? pool->size() : size_type{};
+        return std::get<0>(pools)->size();
     }
 
     /**
@@ -23099,7 +25080,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        return !*this || pool->empty();
+        return std::get<0>(pools)->empty();
     }
 
     /**
@@ -23111,7 +25092,7 @@ public:
      * @return A pointer to the array of components.
      */
     [[nodiscard]] raw_type * raw() const ENTT_NOEXCEPT {
-        return *this ? pool->raw() : nullptr;
+        return std::get<0>(pools)->raw();
     }
 
     /**
@@ -23123,7 +25104,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
-        return *this ? pool->data() : nullptr;
+        return std::get<0>(pools)->data();
     }
 
     /**
@@ -23135,7 +25116,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return *this ? pool->basic_sparse_set<entity_type>::begin() : iterator{};
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::begin();
     }
 
     /**
@@ -23148,7 +25129,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return *this ? pool->basic_sparse_set<entity_type>::end() : iterator{};
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::end();
     }
 
     /**
@@ -23160,7 +25141,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return *this ? pool->basic_sparse_set<entity_type>::rbegin() : reverse_iterator{};
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::rbegin();
     }
 
     /**
@@ -23175,7 +25156,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return *this ? pool->basic_sparse_set<entity_type>::rend() : reverse_iterator{};
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::rend();
     }
 
     /**
@@ -23205,7 +25186,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = *this ? pool->find(entt) : end();
+        const auto it = std::get<0>(pools)->find(entt);
         return it != end() && *it == entt ? it : end();
     }
 
@@ -23223,7 +25204,7 @@ public:
      * @return True if the view is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return pool != nullptr;
+        return std::get<0>(pools) != nullptr;
     }
 
     /**
@@ -23232,7 +25213,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return *this && pool->contains(entt);
+        return std::get<0>(pools)->contains(entt);
     }
 
     /**
@@ -23255,14 +25236,10 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
-            if constexpr(std::is_same_v<typename storage_type::storage_category, empty_storage_tag>) {
-                return std::make_tuple();
-            } else {
-                return std::forward_as_tuple(pool->get(entt));
-            }
+            return get_as_tuple(*std::get<0>(pools), entt);
         } else {
             static_assert(std::is_same_v<Comp..., Component>, "Invalid component type");
-            return pool->get(entt);
+            return std::get<0>(pools)->get(entt);
         }
     }
 
@@ -23290,14 +25267,14 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(std::is_same_v<typename storage_type::storage_category, empty_storage_tag>) {
+        if constexpr(std::is_void_v<decltype(std::get<0>(pools)->get({}))>) {
             if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = size(); pos; --pos) {
                     func();
                 }
             } else {
-                for(auto &&component: *this) {
-                    func(component);
+                for(auto entity: *this) {
+                    func(entity);
                 }
             }
         } else {
@@ -23306,10 +25283,8 @@ public:
                     std::apply(func, pack);
                 }
             } else {
-                if(*this) {
-                    for(auto &&component: *pool) {
-                        func(component);
-                    }
+                for(auto &&component: *std::get<0>(pools)) {
+                    func(component);
                 }
             }
         }
@@ -23329,11 +25304,24 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        return iterable_view{pool};
+        return iterable_view{*std::get<0>(pools)};
     }
 
+    /**
+     * @brief Combines two views in a _more specific_ one (friend function).
+     * @tparam Id A valid entity type (see entt_traits for more details).
+     * @tparam ELhs Filter list of the first view.
+     * @tparam CLhs Component list of the first view.
+     * @tparam ERhs Filter list of the second view.
+     * @tparam CRhs Component list of the second view.
+     * @return A more specific view.
+     */
+    template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+    friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
+
 private:
-    storage_type * const pool;
+    const std::tuple<storage_type *> pools;
+    const std::tuple<> filter;
 };
 
 
@@ -23347,443 +25335,21 @@ basic_view(Storage &... storage) ENTT_NOEXCEPT
 -> basic_view<std::common_type_t<typename Storage::entity_type...>, entt::exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
 
 
-}
-
-
-#endif
-
-// #include "entity/view_pack.hpp"
-#ifndef ENTT_ENTITY_VIEW_PACK_HPP
-#define ENTT_ENTITY_VIEW_PACK_HPP
-
-
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-// #include "../core/type_traits.hpp"
-
-// #include "fwd.hpp"
-
-// #include "utility.hpp"
-
-
-
-namespace entt {
-
-
 /**
- * @brief View pack.
- *
- * The view pack allows users to combine multiple views into a single iterable
- * object, while also giving them full control over which view should lead the
- * iteration.<br/>
- * This class returns all and only the entities present in all views. Its
- * intended primary use is for custom storage and views, but it can also be very
- * convenient in everyday use.
- *
- * @tparam Head Type of the leading view of the pack.
- * @tparam Tail Types of all other views of the pack.
+ * @brief Combines two views in a _more specific_ one.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam ELhs Filter list of the first view.
+ * @tparam CLhs Component list of the first view.
+ * @tparam ERhs Filter list of the second view.
+ * @tparam CRhs Component list of the second view.
+ * @param lhs A valid reference to the first view.
+ * @param rhs A valid reference to the second view.
+ * @return A more specific view.
  */
-template<typename Head, typename... Tail>
-class view_pack {
-    template<typename It>
-    class view_pack_iterator final {
-        friend class view_pack<Head, Tail...>;
-
-        view_pack_iterator(It from, It to, const std::tuple<Tail...> &other) ENTT_NOEXCEPT
-            : it{from},
-              last{to},
-              tail{other}
-        {
-            if(it != last && !valid()) {
-                ++(*this);
-            }
-        }
-
-        [[nodiscard]] bool valid() const {
-            return std::apply([entity = *it](auto &&... curr) { return (curr.contains(entity) && ...); }, tail);
-        }
-
-    public:
-        using difference_type = typename std::iterator_traits<It>::difference_type;
-        using value_type = typename std::iterator_traits<It>::value_type;
-        using pointer = typename std::iterator_traits<It>::pointer;
-        using reference = typename std::iterator_traits<It>::reference;
-        using iterator_category = std::input_iterator_tag;
-
-        view_pack_iterator & operator++() ENTT_NOEXCEPT {
-            while(++it != last && !valid());
-            return *this;
-        }
-
-        view_pack_iterator operator++(int) ENTT_NOEXCEPT {
-            view_pack_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] reference operator*() const {
-            return *it;
-        }
-
-        [[nodiscard]] bool operator==(const view_pack_iterator &other) const ENTT_NOEXCEPT {
-            return other.it == it;
-        }
-
-        [[nodiscard]] bool operator!=(const view_pack_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-    private:
-        It it;
-        const It last;
-        const std::tuple<Tail...> tail;
-    };
-
-    class iterable_view_pack final {
-        friend class view_pack<Head, Tail...>;
-
-        using iterable_view = decltype(std::declval<Head>().each());
-
-        template<typename It>
-        class iterable_view_pack_iterator final {
-            friend class iterable_view_pack;
-
-            iterable_view_pack_iterator(It from, It to, const std::tuple<Tail...> &other) ENTT_NOEXCEPT
-                : it{from},
-                  last{to},
-                  tail{other}
-            {
-                if(it != last && !valid()) {
-                    ++(*this);
-                }
-            }
-
-            [[nodiscard]] bool valid() const {
-                return std::apply([entity = std::get<0>(*it)](auto &&... curr) { return (curr.contains(entity) && ...); }, tail);
-            }
-
-        public:
-            using difference_type = typename std::iterator_traits<It>::difference_type;
-            using value_type = decltype(std::tuple_cat(*std::declval<It>(), std::declval<Tail>().get({})...));
-            using pointer = void;
-            using reference = value_type;
-            using iterator_category = std::input_iterator_tag;
-
-            iterable_view_pack_iterator & operator++() ENTT_NOEXCEPT {
-                while(++it != last && !valid());
-                return *this;
-            }
-
-            iterable_view_pack_iterator operator++(int) ENTT_NOEXCEPT {
-                iterable_view_pack_iterator orig = *this;
-                return ++(*this), orig;
-            }
-
-            [[nodiscard]] reference operator*() const {
-                return std::apply([value = *it](auto &&... curr) { return std::tuple_cat(value, curr.get(std::get<0>(value))...); }, tail);
-            }
-
-            [[nodiscard]] bool operator==(const iterable_view_pack_iterator &other) const ENTT_NOEXCEPT {
-                return other.it == it;
-            }
-
-            [[nodiscard]] bool operator!=(const iterable_view_pack_iterator &other) const ENTT_NOEXCEPT {
-                return !(*this == other);
-            }
-
-        private:
-            It it;
-            const It last;
-            const std::tuple<Tail...> tail;
-        };
-
-        iterable_view_pack(const Head &first, const std::tuple<Tail...> &last)
-            : iterable{first.each()},
-              tail{last}
-        {}
-
-    public:
-        using iterator = iterable_view_pack_iterator<typename iterable_view::iterator>;
-        using reverse_iterator = iterable_view_pack_iterator<typename iterable_view::reverse_iterator>;
-
-        [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return { iterable.begin(), iterable.end(), tail };
-        }
-
-        [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return { iterable.end(), iterable.end(), tail };
-        }
-
-        [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return { iterable.rbegin(), iterable.rend(), tail };
-        }
-
-        [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return { iterable.rend(), iterable.rend(), tail };
-        }
-
-    private:
-        iterable_view iterable;
-        std::tuple<Tail...> tail;
-    };
-
-public:
-    /*! @brief Underlying entity identifier. */
-    using entity_type = std::common_type_t<typename Head::entity_type, typename Tail::entity_type...>;
-    /*! @brief Underlying entity identifier. */
-    using size_type = std::common_type_t<typename Head::size_type, typename Tail::size_type...>;
-    /*! @brief Input iterator type. */
-    using iterator = view_pack_iterator<typename Head::iterator>;
-    /*! @brief Reversed iterator type. */
-    using reverse_iterator = view_pack_iterator<typename Head::reverse_iterator>;
-
-    /**
-     * @brief Constructs a pack from a bunch of views.
-     * @param first A reference to the leading view for the pack.
-     * @param last References to the other views to use to construct the pack.
-     */
-    view_pack(const Head &first, const Tail &... last)
-        : head{first},
-          tail{last...}
-    {}
-
-    /**
-     * @brief Returns an iterator to the first entity of the pack.
-     *
-     * The returned iterator points to the first entity of the pack. If the pack
-     * is empty, the returned iterator will be equal to `end()`.
-     *
-     * @return An iterator to the first entity of the pack.
-     */
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return { head.begin(), head.end(), tail };
-    }
-
-    /**
-     * @brief Returns an iterator that is past the last entity of the pack.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the pack. Attempting to dereference the returned iterator results in
-     * undefined behavior.
-     *
-     * @return An iterator to the entity following the last entity of the pack.
-     */
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return { head.end(), head.end(), tail };
-    }
-
-    /**
-     * @brief Returns an iterator to the first entity of the pack.
-     *
-     * The returned iterator points to the first entity of the reversed pack. If
-     * the pack is empty, the returned iterator will be equal to `rend()`.
-     *
-     * @return An iterator to the first entity of the pack.
-     */
-    [[nodiscard]] reverse_iterator rbegin() const {
-        return { head.rbegin(), head.rend(), tail };
-    }
-
-    /**
-     * @brief Returns an iterator that is past the last entity of the reversed
-     * pack.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the reversed pack. Attempting to dereference the returned iterator
-     * results in undefined behavior.
-     *
-     * @return An iterator to the entity following the last entity of the
-     * reversed pack.
-     */
-    [[nodiscard]] reverse_iterator rend() const {
-        return { head.rend(), head.rend(), tail };
-    }
-
-    /**
-     * @brief Returns the first entity of the pack, if any.
-     * @return The first entity of the pack if one exists, the null entity
-     * otherwise.
-     */
-    [[nodiscard]] entity_type front() const {
-        const auto it = begin();
-        return it != end() ? *it : null;
-    }
-
-    /**
-     * @brief Returns the last entity of the pack, if any.
-     * @return The last entity of the pack if one exists, the null entity
-     * otherwise.
-     */
-    [[nodiscard]] entity_type back() const {
-        const auto it = rbegin();
-        return it != rend() ? *it : null;
-    }
-
-    /**
-     * @brief Finds an entity.
-     * @param entt A valid entity identifier.
-     * @return An iterator to the given entity if it's found, past the end
-     * iterator otherwise.
-     */
-    [[nodiscard]] iterator find(const entity_type entt) const {
-        iterator it{head.find(entt), head.end(), tail};
-        return (it != end() && *it == entt) ? it : end();
-    }
-
-    /**
-     * @brief Checks if a pack contains an entity.
-     * @param entt A valid entity identifier.
-     * @return True if the pack contains the given entity, false otherwise.
-     */
-    [[nodiscard]] bool contains(const entity_type entt) const {
-        return head.contains(entt) && std::apply([entt](auto &&... curr) { return (curr.contains(entt) && ...); }, tail);
-    }
-
-    /**
-     * @brief Returns the components assigned to the given entity.
-     *
-     * Prefer this function instead of `registry::get` during iterations. It has
-     * far better performance than its counterpart.
-     *
-     * @warning
-     * Attempting to use an invalid component type results in a compilation
-     * error. Attempting to use an entity that doesn't belong to the pack
-     * results in undefined behavior.
-     *
-     * @tparam Comp Types of components to get.
-     * @param entt A valid entity identifier.
-     * @return The components assigned to the entity.
-     */
-    template<typename... Comp>
-    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
-        ENTT_ASSERT(contains(entt));
-        auto component = std::apply([this, entt](auto &&... curr) { return std::tuple_cat(head.get(entt), curr.get(entt)...); }, tail);
-
-        if constexpr(sizeof...(Comp) == 0) {
-            return component;
-        } else if constexpr(sizeof...(Comp) == 1) {
-            return (std::get<Comp &>(component), ...);
-        } else {
-            return std::forward_as_tuple(std::get<Comp &>(component)...);
-        }
-    }
-
-    /**
-     * @brief Iterates entities and components and applies the given function
-     * object to them.
-     *
-     * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of references to non-empty components. The
-     * _constness_ of the components is as requested.<br/>
-     * The signature of the function must be equivalent to one of the following
-     * forms:
-     *
-     * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
-     * @endcode
-     *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned during iterations.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void each(Func func) const {
-        for(auto &&value: head.each()) {
-            if(std::apply([&value](auto &&... curr) { return (curr.contains(std::get<0>(value)) && ...); }, tail)) {
-                auto args = std::apply([&value](auto &&... curr) { return std::tuple_cat(value, curr.get(std::get<0>(value))...); }, tail);
-
-                if constexpr(is_applicable_v<Func, decltype(args)>) {
-                    std::apply(func, args);
-                } else {
-                    std::apply([&func](const auto, auto &&... component) { func(std::forward<decltype(component)>(component)...); }, args);
-                }
-            }
-        }
-    }
-
-    /**
-     * @brief Returns an iterable object to use to _visit_ the pack.
-     *
-     * The iterable object returns tuples that contain the current entity and a
-     * set of references to its non-empty components. The _constness_ of the
-     * components is as requested.
-     *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned during iterations.
-     *
-     * @return An iterable object to use to _visit_ the pack.
-     */
-    [[nodiscard]] iterable_view_pack each() const ENTT_NOEXCEPT {
-        return { head, tail };
-    }
-
-    /**
-     * @brief Returns a copy of the views stored by the pack.
-     * @return A copy of the views stored by the pack.
-     */
-    std::tuple<Head, Tail...> pack() const ENTT_NOEXCEPT {
-        return std::apply([this](auto &&... curr) { return std::make_tuple(head, curr...); }, tail);
-    }
-
-    /**
-     * @brief Appends a view to a pack.
-     * @tparam Args View template arguments.
-     * @param other A reference to a view to append to the pack.
-     * @return The extended pack.
-     */
-    template<typename... Args>
-    [[nodiscard]] auto operator|(const basic_view<Args...> &other) const {
-        return std::make_from_tuple<view_pack<Head, Tail..., basic_view<Args...>>>(std::tuple_cat(std::make_tuple(head), tail, std::make_tuple(other)));
-    }
-
-    /**
-     * @brief Appends a pack and therefore all its views to another pack.
-     * @tparam Pack Types of views of the pack to append.
-     * @param other A reference to the pack to append.
-     * @return The extended pack.
-     */
-    template<typename... Pack>
-    [[nodiscard]] auto operator|(const view_pack<Pack...> &other) const {
-        return std::make_from_tuple<view_pack<Head, Tail..., Pack...>>(std::tuple_cat(std::make_tuple(head), tail, other.pack()));
-    }
-
-private:
-    Head head;
-    std::tuple<Tail...> tail;
-};
-
-
-/**
- * @brief Combines two views in a pack.
- * @tparam Args Template arguments of the first view.
- * @tparam Other Template arguments of the second view.
- * @param lhs A reference to the first view with which to create the pack.
- * @param rhs A reference to the second view with which to create the pack.
- * @return A pack that combines the two views in a single iterable object.
- */
-template<typename... Args, typename... Other>
-[[nodiscard]] auto operator|(const basic_view<Args...> &lhs, const basic_view<Other...> &rhs) {
-    return view_pack{lhs, rhs};
-}
-
-
-/**
- * @brief Combines a view with a pack.
- * @tparam Args View template arguments.
- * @tparam Pack Types of views of the pack.
- * @param view A reference to the view to combine with the pack.
- * @param pack A reference to the pack to combine with the view.
- * @return The extended pack.
- */
-template<typename... Args, typename... Pack>
-[[nodiscard]] auto operator|(const basic_view<Args...> &view, const view_pack<Pack...> &pack) {
-    return view_pack{view} | pack;
+template<typename Entity, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
+[[nodiscard]] auto operator|(const basic_view<Entity, exclude_t<ELhs...>, CLhs...> &lhs, const basic_view<Entity, exclude_t<ERhs...>, CRhs...> &rhs) {
+    using view_type = basic_view<Entity, exclude_t<ELhs..., ERhs...>, CLhs..., CRhs...>;
+    return std::apply([](auto *... storage) { return view_type{*storage...}; }, std::tuple_cat(lhs.pools, rhs.pools, lhs.filter, rhs.filter));
 }
 
 
@@ -23823,7 +25389,9 @@ template<typename... Args, typename... Pack>
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -24045,7 +25613,9 @@ struct adl_meta_pointer_like {
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -24115,7 +25685,9 @@ struct adl_meta_pointer_like {
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -24158,6 +25730,7 @@ struct adl_meta_pointer_like {
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 // #include "../config/config.h"
 
 
@@ -24165,8 +25738,16 @@ struct adl_meta_pointer_like {
 namespace entt {
 
 
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
 
 
 }
@@ -24177,6 +25758,32 @@ using id_type = ENTT_ID_TYPE;
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -24258,32 +25865,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -24457,6 +26038,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -24564,19 +26170,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -24671,6 +26311,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -24694,7 +26358,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -24702,7 +26366,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -24765,6 +26429,14 @@ namespace entt {
 
 /**
  * @brief Traits class template to be specialized to enable support for meta
+ * template information.
+ */
+template<typename>
+struct meta_template_traits;
+
+
+/**
+ * @brief Traits class template to be specialized to enable support for meta
  * sequence containers.
  */
 template<typename>
@@ -24780,54 +26452,6 @@ struct meta_associative_container_traits;
 
 
 /**
- * @brief Provides the member constant `value` to true if support for meta
- * sequence containers is enabled for the given type, false otherwise.
- * @tparam Type Potentially sequence container type.
- */
-template<typename Type, typename = void>
-struct has_meta_sequence_container_traits: std::false_type {};
-
-
-/*! @copydoc has_meta_sequence_container_traits */
-template<typename Type>
-struct has_meta_sequence_container_traits<Type, std::void_t<typename meta_sequence_container_traits<Type>::value_type>>
-        : std::true_type
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially sequence container type.
- */
-template<typename Type>
-inline constexpr auto has_meta_sequence_container_traits_v = has_meta_sequence_container_traits<Type>::value;
-
-
-/**
- * @brief Provides the member constant `value` to true if support for meta
- * associative containers is enabled for the given type, false otherwise.
- * @tparam Type Potentially associative container type.
- */
-template<typename, typename = void>
-struct has_meta_associative_container_traits: std::false_type {};
-
-
-/*! @copydoc has_meta_associative_container_traits */
-template<typename Type>
-struct has_meta_associative_container_traits<Type, std::void_t<typename meta_associative_container_traits<Type>::key_type>>
-        : std::true_type
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially associative container type.
- */
-template<typename Type>
-inline constexpr auto has_meta_associative_container_traits_v = has_meta_associative_container_traits<Type>::value;
-
-
-/**
  * @brief Provides the member constant `value` to true if a meta associative
  * container claims to wrap a key-only type, false otherwise.
  * @tparam Type Potentially key-only meta associative container type.
@@ -24838,8 +26462,8 @@ struct is_key_only_meta_associative_container: std::true_type {};
 
 /*! @copydoc is_key_only_meta_associative_container */
 template<typename Type>
-struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_associative_container_traits<Type>::mapped_type>>
-        : std::false_type
+struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_associative_container_traits<Type>::type::mapped_type>>
+    : std::false_type
 {};
 
 
@@ -24893,7 +26517,10 @@ namespace entt {
  * @tparam Trait Traits associated with the underlying container.
  */
 template<typename Container, template<typename> class... Trait>
-struct meta_container_traits: public Trait<Container>... {};
+struct meta_container_traits: public Trait<Container>... {
+    /*! @brief Type of container. */
+    using type = Container;
+};
 
 
 /**
@@ -24902,21 +26529,12 @@ struct meta_container_traits: public Trait<Container>... {};
  */
 template<typename Container>
 struct basic_container {
-    /*! @brief Iterator type of the container. */
-    using iterator = typename Container::iterator;
-    /*! @brief Iterator type of the container. */
-    using const_iterator = typename Container::const_iterator;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename Container::size_type;
-    /*! @brief Value type of the container. */
-    using value_type = typename Container::value_type;
-
     /**
      * @brief Returns the size of the given container.
      * @param cont The container for which to return the size.
      * @return The size of the given container.
      */
-    [[nodiscard]] static size_type size(const Container &cont) ENTT_NOEXCEPT {
+    [[nodiscard]] static typename Container::size_type size(const Container &cont) ENTT_NOEXCEPT {
         return cont.size();
     }
 
@@ -24925,7 +26543,7 @@ struct basic_container {
      * @param cont The container for which to return the iterator.
      * @return An iterator to the first element of the given container.
      */
-    [[nodiscard]] static iterator begin(Container &cont) {
+    [[nodiscard]] static typename Container::iterator begin(Container &cont) {
         return cont.begin();
     }
 
@@ -24934,7 +26552,7 @@ struct basic_container {
      * @param cont The container for which to return the iterator.
      * @return An iterator to the first element of the given container.
      */
-    [[nodiscard]] static const_iterator cbegin(const Container &cont) {
+    [[nodiscard]] static typename Container::const_iterator cbegin(const Container &cont) {
         return cont.begin();
     }
 
@@ -24943,7 +26561,7 @@ struct basic_container {
      * @param cont The container for which to return the iterator.
      * @return An iterator past the last element of the given container.
      */
-    [[nodiscard]] static iterator end(Container &cont) {
+    [[nodiscard]] static typename Container::iterator end(Container &cont) {
         return cont.end();
     }
 
@@ -24952,7 +26570,7 @@ struct basic_container {
      * @param cont The container for which to return the iterator.
      * @return An iterator past the last element of the given container.
      */
-    [[nodiscard]] static const_iterator cend(const Container &cont) {
+    [[nodiscard]] static typename Container::const_iterator cend(const Container &cont) {
         return cont.end();
     }
 };
@@ -24964,9 +26582,6 @@ struct basic_container {
  */
 template<typename Container>
 struct basic_associative_container {
-    /*! @brief Key type of the sequence container. */
-    using key_type = typename Container::key_type;
-
     /**
      * @brief Returns an iterator to the element with key equivalent to the
      * given one, if any.
@@ -24974,12 +26589,12 @@ struct basic_associative_container {
      * @param key The key of the element to search.
      * @return An iterator to the element with the given key, if any.
      */
-    [[nodiscard]] static typename Container::iterator find(Container &cont, const key_type &key) {
+    [[nodiscard]] static typename Container::iterator find(Container &cont, const typename Container::key_type &key) {
         return cont.find(key);
     }
 
     /*! @copydoc find */
-    [[nodiscard]] static typename Container::const_iterator cfind(const Container &cont, const key_type &key) {
+    [[nodiscard]] static typename Container::const_iterator cfind(const Container &cont, const typename Container::key_type &key) {
         return cont.find(key);
     }
 };
@@ -25034,12 +26649,12 @@ struct basic_sequence_container {
      * @param pos The position of the element to return.
      * @return A reference to the requested element.
      */
-    [[nodiscard]] static typename Container::value_type & get(Container &cont, typename Container::size_type pos) {
+    [[nodiscard]] static typename Container::reference get(Container &cont, typename Container::size_type pos) {
         return cont[pos];
     }
 
     /*! @copydoc get */
-    [[nodiscard]] static const typename Container::value_type & cget(const Container &cont, typename Container::size_type pos) {
+    [[nodiscard]] static typename Container::const_reference cget(const Container &cont, typename Container::size_type pos) {
         return cont[pos];
     }
 };
@@ -25218,10 +26833,7 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>
               basic_dynamic_associative_container,
               dynamic_associative_key_value_container
           >
-{
-    /*! @brief Mapped type of the sequence container. */
-    using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
-};
+{};
 
 
 /**
@@ -25241,10 +26853,7 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
               basic_dynamic_associative_container,
               dynamic_associative_key_value_container
           >
-{
-    /*! @brief Mapped type of the sequence container. */
-    using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
-};
+{};
 
 
 /**
@@ -25399,9 +27008,7 @@ private:
 #define ENTT_META_FACTORY_HPP
 
 
-#include <array>
 #include <cstddef>
-#include <functional>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -25412,6 +27019,7 @@ private:
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 // #include "../config/config.h"
 
 
@@ -25419,8 +27027,16 @@ private:
 namespace entt {
 
 
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
 
 
 }
@@ -25777,7 +27393,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -25836,6 +27452,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -25857,6 +27476,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -25873,6 +27495,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -25915,7 +27540,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -25975,7 +27600,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -25991,303 +27616,16 @@ type_info type_id() ENTT_NOEXCEPT {
 
 // #include "../core/type_traits.hpp"
 
-// #include "internal.hpp"
-#ifndef ENTT_META_INTERNAL_HPP
-#define ENTT_META_INTERNAL_HPP
-
-
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <type_traits>
-#include <utility>
-// #include "../core/attribute.h"
-
-// #include "../config/config.h"
-
-// #include "../core/fwd.hpp"
-
-// #include "../core/type_info.hpp"
-
-// #include "../core/type_traits.hpp"
-
-// #include "type_traits.hpp"
-
-
-
-namespace entt {
-
-
-class meta_any;
-struct meta_handle;
-
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-struct meta_type_node;
-
-
-struct meta_prop_node {
-    meta_prop_node * next;
-    meta_any(* const key)();
-    meta_any(* const value)();
-};
-
-
-struct meta_base_node {
-    meta_type_node * const parent;
-    meta_base_node * next;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    const void *(* const cast)(const void *) ENTT_NOEXCEPT;
-};
-
-
-struct meta_conv_node {
-    meta_type_node * const parent;
-    meta_conv_node * next;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    meta_any(* const conv)(const void *);
-};
-
-
-struct meta_ctor_node {
-    using size_type = std::size_t;
-    meta_type_node * const parent;
-    meta_ctor_node * next;
-    meta_prop_node * prop;
-    const size_type size;
-    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
-    meta_any(* const invoke)(meta_any * const);
-};
-
-
-struct meta_data_node {
-    id_type id;
-    meta_type_node * const parent;
-    meta_data_node * next;
-    meta_prop_node * prop;
-    const bool is_static;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    bool(* const set)(meta_handle, meta_any);
-    meta_any(* const get)(meta_handle);
-};
-
-
-struct meta_func_node {
-    using size_type = std::size_t;
-    id_type id;
-    meta_type_node * const parent;
-    meta_func_node * next;
-    meta_prop_node * prop;
-    const size_type size;
-    const bool is_const;
-    const bool is_static;
-    meta_type_node *(* const ret)() ENTT_NOEXCEPT;
-    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
-    meta_any(* const invoke)(meta_handle, meta_any *);
-};
-
-
-struct meta_type_node {
-    using size_type = std::size_t;
-    const type_info info;
-    id_type id;
-    meta_type_node * next;
-    meta_prop_node * prop;
-    const size_type size_of;
-    const bool is_void;
-    const bool is_integral;
-    const bool is_floating_point;
-    const bool is_array;
-    const bool is_enum;
-    const bool is_union;
-    const bool is_class;
-    const bool is_pointer;
-    const bool is_function_pointer;
-    const bool is_member_object_pointer;
-    const bool is_member_function_pointer;
-    const bool is_pointer_like;
-    const bool is_sequence_container;
-    const bool is_associative_container;
-    const size_type rank;
-    size_type(* const extent)(size_type);
-    meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
-    meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
-    meta_base_node *base{nullptr};
-    meta_conv_node *conv{nullptr};
-    meta_ctor_node *ctor{nullptr};
-    meta_data_node *data{nullptr};
-    meta_func_node *func{nullptr};
-    void(* dtor)(void *){nullptr};
-};
-
-
-template<typename Node>
-class meta_range {
-    struct range_iterator {
-        using difference_type = std::ptrdiff_t;
-        using value_type = Node;
-        using pointer = value_type *;
-        using reference = value_type &;
-        using iterator_category = std::forward_iterator_tag;
-
-        range_iterator() ENTT_NOEXCEPT = default;
-
-        range_iterator(Node *head) ENTT_NOEXCEPT
-            : node{head}
-        {}
-
-        range_iterator & operator++() ENTT_NOEXCEPT {
-            return node = node->next, *this;
-        }
-
-        range_iterator operator++(int) ENTT_NOEXCEPT {
-            range_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
-            return other.node == node;
-        }
-
-        [[nodiscard]] bool operator!=(const range_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            return node;
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return *operator->();
-        }
-
-    private:
-        Node *node{nullptr};
-    };
-
-public:
-    using iterator = range_iterator;
-
-    meta_range() ENTT_NOEXCEPT = default;
-
-    meta_range(Node *head)
-        : node{head}
-    {}
-
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{node};
-    }
-
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{};
-    }
-
-private:
-    Node *node{nullptr};
-};
-
-
-template<auto Member, typename Op>
-auto find_if(const Op &op, const meta_type_node *node)
--> std::decay_t<decltype(node->*Member)> {
-    for(auto &&curr: meta_range{node->*Member}) {
-        if(op(&curr)) {
-            return &curr;
-        }
-    }
-
-    for(auto &&curr: meta_range{node->base}) {
-        if(auto *ret = find_if<Member>(op, curr.type()); ret) {
-            return ret;
-        }
-    }
-
-    return nullptr;
-}
-
-
-template<typename Type>
-class ENTT_API meta_node {
-    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
-
-    template<std::size_t... Index>
-    [[nodiscard]] static auto extent(meta_type_node::size_type dim, std::index_sequence<Index...>) {
-        meta_type_node::size_type ext{};
-        ((ext = (dim == Index ? std::extent_v<Type, Index> : ext)), ...);
-        return ext;
-    }
-
-public:
-    [[nodiscard]] static meta_type_node * resolve() ENTT_NOEXCEPT {
-        static meta_type_node node{
-            type_id<Type>(),
-            {},
-            nullptr,
-            nullptr,
-            size_of_v<Type>,
-            std::is_void_v<Type>,
-            std::is_integral_v<Type>,
-            std::is_floating_point_v<Type>,
-            std::is_array_v<Type>,
-            std::is_enum_v<Type>,
-            std::is_union_v<Type>,
-            std::is_class_v<Type>,
-            std::is_pointer_v<Type>,
-            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
-            std::is_member_object_pointer_v<Type>,
-            std::is_member_function_pointer_v<Type>,
-            is_meta_pointer_like_v<Type>,
-            has_meta_sequence_container_traits_v<Type>,
-            has_meta_associative_container_traits_v<Type>,
-            std::rank_v<Type>,
-            [](meta_type_node::size_type dim) {
-                return extent(dim, std::make_index_sequence<std::rank_v<Type>>{});
-            },
-            &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
-            &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve
-        };
-
-        return &node;
-    }
-};
-
-
-template<typename... Type>
-struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> {};
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
-
-
-}
-
-
-#endif
-
 // #include "meta.hpp"
 #ifndef ENTT_META_META_HPP
 #define ENTT_META_META_HPP
 
 
-#include <algorithm>
 #include <array>
 #include <cstddef>
-#include <iterator>
 #include <functional>
+#include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 // #include "../config/config.h"
@@ -26297,11 +27635,15 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
 #define ENTT_CORE_ANY_HPP
 
 
+#include <cstddef>
 #include <functional>
+#include <memory>
 #include <new>
 #include <type_traits>
 #include <utility>
 // #include "../config/config.h"
+
+// #include "fwd.hpp"
 
 // #include "type_info.hpp"
 #ifndef ENTT_CORE_TYPE_INFO_HPP
@@ -26348,7 +27690,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -26407,6 +27749,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -26428,6 +27773,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -26444,6 +27792,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -26486,7 +27837,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -26546,7 +27897,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -26575,6 +27926,32 @@ type_info type_id() ENTT_NOEXCEPT {
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -26656,32 +28033,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -26855,6 +28206,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -26962,19 +28338,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -27069,6 +28479,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -27092,7 +28526,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -27100,7 +28534,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -27155,15 +28589,20 @@ using member_class_t = typename member_class<Member>::type;
 namespace entt {
 
 
-/*! @brief A SBO friendly, type-safe container for single values of any type. */
-class any {
+/**
+ * @brief A SBO friendly, type-safe container for single values of any type.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
+ */
+template<std::size_t Len, std::size_t Align>
+class basic_any {
     enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
 
-    using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
-    using vtable_type = const void *(const operation, const any &, const void *);
+    using storage_type = std::aligned_storage_t<Len + !Len, Align>;
+    using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
-    static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
@@ -27174,43 +28613,48 @@ class any {
         }
     }
 
-    static type_info & as_type_info(const void *data) {
-        return *const_cast<type_info *>(static_cast<const type_info *>(data));
-    }
-
-    static any & as_any(const void *data) {
-        return *const_cast<any *>(static_cast<const any *>(data));
+    template<typename Type>
+    static Type & as(const void *to) {
+        return *const_cast<Type *>(static_cast<const Type *>(to));
     }
 
     template<typename Type>
-    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] const void *to) {
+    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] const void *to) {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                using base_type = std::remove_reference_t<Type>;
+                using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
                 switch(op) {
-                case operation::REF:
-                case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type> : basic_vtable<const base_type &>;
-                    [[fallthrough]];
                 case operation::COPY:
+                    if constexpr(std::is_copy_constructible_v<base_type>) {
+                        as<basic_any>(to).template emplace<base_type>(*static_cast<const base_type *>(from.instance));
+                    }
+                    break;
                 case operation::MOVE:
-                    as_any(to).instance = from.instance;
+                    as<basic_any>(to).instance = from.instance;
                     [[fallthrough]];
                 case operation::DTOR:
                     break;
                 case operation::COMP:
-                    return compare<std::remove_const_t<base_type>>(from.instance, to) ? to : nullptr;
+                    return compare<base_type>(from.instance, to) ? to : nullptr;
                 case operation::ADDR:
-                    return std::is_const_v<base_type> ? nullptr : from.instance;
+                    return std::is_const_v<std::remove_reference_t<Type>> ? nullptr : from.instance;
                 case operation::CADDR:
                     return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const base_type &>;
+                    break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<std::remove_const_t<base_type>>();
+                    as<type_info>(to) = type_id<base_type>();
                     break;
                 }
             } else if constexpr(in_situ<Type>) {
-                #if __cpp_lib_launder >= 201606L
+                #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
                 auto *instance = const_cast<Type *>(std::launder(reinterpret_cast<const Type *>(&from.storage)));
                 #else
                 auto *instance = const_cast<Type *>(reinterpret_cast<const Type *>(&from.storage));
@@ -27218,10 +28662,13 @@ class any {
 
                 switch(op) {
                 case operation::COPY:
-                    new (&as_any(to).storage) Type{std::as_const(*instance)};
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        new (&as<basic_any>(to).storage) Type{std::as_const(*instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
                     break;
                 case operation::MOVE:
-                    new (&as_any(to).storage) Type{std::move(*instance)};
+                    new (&as<basic_any>(to).storage) Type{std::move(*instance)};
                     [[fallthrough]];
                 case operation::DTOR:
                     instance->~Type();
@@ -27232,36 +28679,50 @@ class any {
                 case operation::CADDR:
                     return instance;
                 case operation::REF:
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
                 case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
-                    as_any(to).instance = instance;
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
                     break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<Type>();
+                    as<type_info>(to) = type_id<Type>();
                     break;
                 }
             } else {
                 switch(op) {
                 case operation::COPY:
-                    as_any(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        as<basic_any>(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
                     break;
-                case operation::REF:
-                case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
-                    [[fallthrough]];
                 case operation::MOVE:
-                    as_any(to).instance = from.instance;
+                    as<basic_any>(to).instance = from.instance;
                     break;
                 case operation::DTOR:
-                    delete static_cast<const Type *>(from.instance);
+                    if constexpr(std::is_array_v<Type>) {
+                        delete[] static_cast<const Type *>(from.instance);
+                    } else {
+                        delete static_cast<const Type *>(from.instance);
+                    }
                     break;
                 case operation::COMP:
                     return compare<Type>(from.instance, to) ? to : nullptr;
                 case operation::ADDR:
                 case operation::CADDR:
                     return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
+                    break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<Type>();
+                    as<type_info>(to) = type_id<Type>();
                     break;
                 }
             }
@@ -27272,8 +28733,8 @@ class any {
 
 public:
     /*! @brief Default constructor. */
-    any() ENTT_NOEXCEPT
-        : any{std::in_place_type<void>}
+    basic_any() ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<void>}
     {}
 
     /**
@@ -27283,19 +28744,18 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : vtable{&basic_vtable<Type>},
-          instance{}
+    explicit basic_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
+        : instance{},
+          vtable{&basic_vtable<Type>}
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                static_assert(sizeof...(Args) == 1u && (std::is_pointer_v<std::remove_reference_t<Args>> && ...));
-                ENTT_ASSERT(((args != nullptr) && ...));
-                instance = (args, ...);
+                static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
+                instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<Type>) {
-                new (&storage) Type{std::forward<Args>(args)...};
+                new (&storage) Type(std::forward<Args>(args)...);
             } else {
-                instance = new Type{std::forward<Args>(args)...};
+                instance = new Type(std::forward<Args>(args)...);
             }
         }
     }
@@ -27306,8 +28766,8 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : any{std::in_place_type<Type &>, &value.get()}
+    basic_any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -27315,35 +28775,34 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, any>>>
-    any(Type &&value)
-        : any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
+    basic_any(Type &&value)
+        : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)}
     {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    any(const any &other)
-        : any{}
+    basic_any(const basic_any &other)
+        : basic_any{}
     {
-        vtable = other.vtable;
-        vtable(operation::COPY, other, this);
+        other.vtable(operation::COPY, other, this);
     }
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    any(any &&other) ENTT_NOEXCEPT
-        : any{}
+    basic_any(basic_any &&other) ENTT_NOEXCEPT
+        : basic_any{}
     {
+        other.vtable(operation::MOVE, other, this);
         vtable = std::exchange(other.vtable, &basic_vtable<void>);
-        vtable(operation::MOVE, other, this);
     }
 
     /*! @brief Frees the internal storage, whatever it means. */
-    ~any() {
+    ~basic_any() {
         vtable(operation::DTOR, *this, nullptr);
     }
 
@@ -27352,7 +28811,7 @@ public:
      * @param other The instance to assign from.
      * @return This any object.
      */
-    any & operator=(any other) {
+    basic_any & operator=(basic_any other) {
         swap(*this, other);
         return *this;
     }
@@ -27388,7 +28847,12 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        *this = any{std::in_place_type<Type>, std::forward<Args>(args)...};
+        *this = basic_any{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = basic_any{};
     }
 
     /**
@@ -27404,7 +28868,7 @@ public:
      * @param other Wrapper with which to compare.
      * @return False if the two objects differ in their content, true otherwise.
      */
-    bool operator==(const any &other) const ENTT_NOEXCEPT {
+    bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
         return type() == other.type() && (vtable(operation::COMP, *this, other.data()) == other.data());
     }
 
@@ -27413,8 +28877,8 @@ public:
      * @param lhs A valid any object.
      * @param rhs A valid any object.
      */
-    friend void swap(any &lhs, any &rhs) {
-        any tmp{};
+    friend void swap(basic_any &lhs, basic_any &rhs) {
+        basic_any tmp{};
         lhs.vtable(operation::MOVE, lhs, &tmp);
         rhs.vtable(operation::MOVE, rhs, &lhs);
         lhs.vtable(operation::MOVE, tmp, &rhs);
@@ -27423,35 +28887,37 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return An any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend any as_ref(any &other) ENTT_NOEXCEPT {
-        any ref{};
-        other.vtable(operation::REF, other, &ref);
+    [[nodiscard]] basic_any as_ref() ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::REF, *this, &ref);
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend any as_ref(const any &other) ENTT_NOEXCEPT {
-        any ref{};
-        other.vtable(operation::CREF, other, &ref);
+    [[nodiscard]] basic_any as_ref() const ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::CREF, *this, &ref);
         return ref;
     }
 
 private:
-    vtable_type *vtable;
     union { const void *instance; storage_type storage; };
+    vtable_type *vtable;
 };
 
 
 /**
  * @brief Checks if two wrappers differ in their content.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param lhs A wrapper, either empty or not.
  * @param rhs A wrapper, either empty or not.
  * @return True if the two wrappers differ in their content, false otherwise.
  */
-[[nodiscard]] inline bool operator!=(const any &lhs, const any &rhs) ENTT_NOEXCEPT {
+template<std::size_t Len, std::size_t Align>
+[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -27459,11 +28925,13 @@ private:
 /**
  * @brief Performs type-safe access to the contained object.
  * @tparam Type Type to which conversion is required.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param data Target any object.
  * @return The element converted to the requested type.
  */
-template<typename Type>
-Type any_cast(const any &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     const auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
@@ -27471,8 +28939,8 @@ Type any_cast(const any &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type any_cast(any &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -27481,8 +28949,8 @@ Type any_cast(any &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type any_cast(any &&data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -27491,17 +28959,17 @@ Type any_cast(any &&data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-const Type * any_cast(const any *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
 }
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type * any_cast(any *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     // last attempt to make wrappers for const references return their values
-    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<any, Type> *>(data)->data()) : nullptr);
+    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
 }
 
 
@@ -27622,6 +29090,8 @@ private:
 
 // #include "../core/type_info.hpp"
 
+// #include "../core/type_traits.hpp"
+
 // #include "adl_pointer.hpp"
 #ifndef ENTT_META_ADL_POINTER_HPP
 #define ENTT_META_ADL_POINTER_HPP
@@ -27736,7 +29206,283 @@ private:
 
 #endif
 
-// #include "internal.hpp"
+// #include "node.hpp"
+#ifndef ENTT_META_NODE_HPP
+#define ENTT_META_NODE_HPP
+
+
+#include <array>
+#include <cstddef>
+#include <type_traits>
+#include <utility>
+// #include "../config/config.h"
+
+// #include "../core/attribute.h"
+
+// #include "../core/fwd.hpp"
+
+// #include "../core/type_info.hpp"
+
+// #include "../core/type_traits.hpp"
+
+// #include "type_traits.hpp"
+
+
+
+namespace entt {
+
+
+class meta_any;
+class meta_type;
+struct meta_handle;
+
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+struct meta_type_node;
+
+
+struct meta_prop_node {
+    meta_prop_node * next;
+    const meta_any * const id;
+    meta_any * const value;
+};
+
+
+struct meta_base_node {
+    meta_type_node * const parent;
+    meta_base_node * next;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    const void *(* const cast)(const void *) ENTT_NOEXCEPT;
+};
+
+
+struct meta_conv_node {
+    meta_type_node * const parent;
+    meta_conv_node * next;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_any(* const conv)(const void *);
+};
+
+
+struct meta_ctor_node {
+    using size_type = std::size_t;
+    meta_type_node * const parent;
+    meta_ctor_node * next;
+    meta_prop_node * prop;
+    const size_type arity;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
+    meta_any(* const invoke)(meta_any * const);
+};
+
+
+struct meta_data_node {
+    id_type id;
+    meta_type_node * const parent;
+    meta_data_node * next;
+    meta_prop_node * prop;
+    const bool is_const;
+    const bool is_static;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    bool(* const set)(meta_handle, meta_any);
+    meta_any(* const get)(meta_handle);
+};
+
+
+struct meta_func_node {
+    using size_type = std::size_t;
+    id_type id;
+    meta_type_node * const parent;
+    meta_func_node * next;
+    meta_prop_node * prop;
+    const size_type arity;
+    const bool is_const;
+    const bool is_static;
+    meta_type_node *(* const ret)() ENTT_NOEXCEPT;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
+    meta_any(* const invoke)(meta_handle, meta_any *);
+};
+
+
+struct meta_template_info {
+    using size_type = std::size_t;
+    const bool is_template_specialization;
+    const size_type arity;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
+};
+
+
+struct meta_type_node {
+    using size_type = std::size_t;
+    const type_info info;
+    id_type id;
+    meta_type_node * next;
+    meta_prop_node * prop;
+    const size_type size_of;
+    const bool is_void;
+    const bool is_integral;
+    const bool is_floating_point;
+    const bool is_array;
+    const bool is_enum;
+    const bool is_union;
+    const bool is_class;
+    const bool is_pointer;
+    const bool is_function_pointer;
+    const bool is_member_object_pointer;
+    const bool is_member_function_pointer;
+    const bool is_pointer_like;
+    const bool is_sequence_container;
+    const bool is_associative_container;
+    const meta_template_info template_info;
+    const size_type rank;
+    size_type(* const extent)(const size_type) ENTT_NOEXCEPT ;
+    meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
+    meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
+    meta_ctor_node * const def_ctor;
+    meta_ctor_node *ctor{nullptr};
+    meta_base_node *base{nullptr};
+    meta_conv_node *conv{nullptr};
+    meta_data_node *data{nullptr};
+    meta_func_node *func{nullptr};
+    void(* dtor)(void *){nullptr};
+};
+
+
+template<auto Member, typename Op, typename Node>
+auto meta_visit(const Op &op, const Node *node)
+-> std::decay_t<decltype(node->*Member)> {
+    for(auto *curr = node->*Member; curr; curr = curr->next) {
+        if(op(curr)) {
+            return curr;
+        }
+    }
+
+    if constexpr(std::is_same_v<Node, meta_type_node>) {
+        for(auto *curr = node->base; curr; curr = curr->next) {
+            if(auto *ret = meta_visit<Member>(op, curr->type()); ret) {
+                return ret;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+
+template<typename... Args>
+meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT;
+
+
+template<typename Type>
+class ENTT_API meta_node {
+    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
+
+    template<std::size_t... Index>
+    [[nodiscard]] static auto extent(const meta_type_node::size_type dim, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        meta_type_node::size_type ext{};
+        ((ext = (dim == Index ? std::extent_v<Type, Index> : ext)), ...);
+        return ext;
+    }
+
+    [[nodiscard]] static meta_ctor_node * meta_default_constructor([[maybe_unused]] meta_type_node *type) ENTT_NOEXCEPT {
+        if constexpr(std::is_default_constructible_v<Type>) {
+            static meta_ctor_node node{
+                type,
+                nullptr,
+                nullptr,
+                0u,
+                nullptr,
+                [](meta_any * const) { return meta_any{std::in_place_type<Type>}; }
+            };
+
+            return &node;
+        } else {
+            return nullptr;
+        }
+    }
+
+    [[nodiscard]] static meta_template_info meta_template_descriptor() ENTT_NOEXCEPT {
+        if constexpr(is_complete_v<meta_template_traits<Type>>) {
+            return {
+                true,
+                meta_template_traits<Type>::args_type::size,
+                &meta_node<typename meta_template_traits<Type>::class_type>::resolve,
+                [](const std::size_t index) ENTT_NOEXCEPT {
+                    return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index);
+                }
+            };
+        } else {
+            return { false, 0u, nullptr, nullptr };
+        }
+    }
+
+public:
+    [[nodiscard]] static meta_type_node * resolve() ENTT_NOEXCEPT {
+        static meta_type_node node{
+            type_id<Type>(),
+            {},
+            nullptr,
+            nullptr,
+            size_of_v<Type>,
+            std::is_void_v<Type>,
+            std::is_integral_v<Type>,
+            std::is_floating_point_v<Type>,
+            std::is_array_v<Type>,
+            std::is_enum_v<Type>,
+            std::is_union_v<Type>,
+            std::is_class_v<Type>,
+            std::is_pointer_v<Type>,
+            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
+            std::is_member_object_pointer_v<Type>,
+            std::is_member_function_pointer_v<Type>,
+            is_meta_pointer_like_v<Type>,
+            is_complete_v<meta_sequence_container_traits<Type>>,
+            is_complete_v<meta_associative_container_traits<Type>>,
+            meta_template_descriptor(),
+            std::rank_v<Type>,
+            [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
+            &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
+            &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_extent_t<Type>>>>::resolve,
+            meta_default_constructor(&node),
+            meta_default_constructor(&node)
+        };
+
+        return &node;
+    }
+};
+
+
+template<typename Type>
+struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>> {};
+
+
+template<typename... Args>
+meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
+    return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_info<Args>::resolve()...}}[index];
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+}
+
+
+#endif
 
 // #include "range.hpp"
 #ifndef ENTT_META_RANGE_HPP
@@ -27745,8 +29491,6 @@ private:
 
 #include <cstddef>
 #include <iterator>
-// #include "internal.hpp"
-
 
 
 namespace entt {
@@ -27754,9 +29498,10 @@ namespace entt {
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
- * @tparam Type Type of meta objects iterated.
+ * @tparam Type Type of meta objects returned.
+ * @tparam Node Type of meta nodes iterated.
  */
-template<typename Type>
+template<typename Type, typename Node = typename Type::node_type>
 class meta_range {
     struct range_iterator {
         using difference_type = std::ptrdiff_t;
@@ -27764,7 +29509,7 @@ class meta_range {
         using pointer = void;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
-        using node_type = typename Type::node_type;
+        using node_type = Node;
 
         range_iterator() ENTT_NOEXCEPT = default;
 
@@ -27773,16 +29518,16 @@ class meta_range {
         {}
 
         range_iterator & operator++() ENTT_NOEXCEPT {
-            return ++it, *this;
+            return (it = it->next), *this;
         }
 
         range_iterator operator++(int) ENTT_NOEXCEPT {
             range_iterator orig = *this;
-            return it++, orig;
+            return ++(*this), orig;
         }
 
         [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return it.operator->();
+            return it;
         }
 
         [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
@@ -27794,12 +29539,12 @@ class meta_range {
         }
 
     private:
-        typename internal::meta_range<node_type>::iterator it{};
+        node_type *it{};
     };
 
 public:
     /*! @brief Node type. */
-    using node_type = typename Type::node_type;
+    using node_type = Node;
     /*! @brief Input iterator type. */
     using iterator = range_iterator;
 
@@ -27848,8 +29593,8 @@ private:
 namespace entt {
 
 
-class meta_type;
 class meta_any;
+class meta_type;
 
 
 /*! @brief Proxy object for sequence containers. */
@@ -27980,43 +29725,61 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    enum class operation { DEREF, CDEREF, SEQ, CSEQ, ASSOC, CASSOC };
+    enum class operation { DTOR, REF, CREF, DEREF, CDEREF, SEQ, CSEQ, ASSOC, CASSOC };
 
     using vtable_type = void(const operation, const any &, void *);
 
     template<typename Type>
     static void basic_vtable(const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] void *to) {
-        switch(op) {
-        case operation::DEREF:
-            if constexpr(is_meta_pointer_like_v<Type>) {
-                *static_cast<meta_any *>(to) = std::reference_wrapper{adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from))};
-            }
+        if constexpr(!std::is_void_v<Type>) {
+            using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
+
+            switch(op) {
+            case operation::DTOR:
+                if constexpr(!std::is_lvalue_reference_v<Type>) {
+                    if(auto *curr = static_cast<internal::meta_type_node *>(to); curr->dtor) {
+                        curr->dtor(const_cast<any &>(from).data());
+                    }
+                }
             break;
-        case operation::CDEREF:
-            if constexpr(is_meta_pointer_like_v<Type>) {
-                *static_cast<meta_any *>(to) = std::cref(adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from)));
+            case operation::REF:
+            case operation::CREF:
+                *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const base_type &>(from))});
+                break;
+            case operation::DEREF:
+            case operation::CDEREF:
+                if constexpr(is_meta_pointer_like_v<base_type>) {
+                    // for some reason vs2017 doesn't compile when using alias declarations with pointer_traits to get the element type
+                    using element_type = std::remove_const_t<typename std::pointer_traits<std::remove_const_t<std::remove_reference_t<Type>>>::element_type>;
+
+                    if constexpr(std::is_function_v<element_type>) {
+                        *static_cast<meta_any *>(to) = any_cast<base_type>(from);
+                    } else if constexpr(!std::is_same_v<element_type, void>) {
+                        // for some reason vs2017 doesn't compile when using alias declarations with adl_meta_pointer_like
+                        using adl_meta_pointer_like_type = adl_meta_pointer_like<std::remove_const_t<std::remove_reference_t<Type>>>;
+
+                        if constexpr(std::is_lvalue_reference_v<decltype(adl_meta_pointer_like_type::dereference(std::declval<const base_type &>()))>) {
+                            auto &&obj = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+                            *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::ref(obj)} : meta_any{std::cref(obj)});
+                        } else {
+                            *static_cast<meta_any *>(to) = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+                        }
+                    }
+                }
+                break;
+            case operation::SEQ:
+            case operation::CSEQ:
+                if constexpr(is_complete_v<meta_sequence_container_traits<base_type>>) {
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<base_type>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                }
+                break;
+            case operation::ASSOC:
+            case operation::CASSOC:
+                if constexpr(is_complete_v<meta_associative_container_traits<base_type>>) {
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<base_type>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                }
+                break;
             }
-            break;
-        case operation::SEQ:
-            if constexpr(has_meta_sequence_container_traits_v<Type>) {
-                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, as_ref(const_cast<any &>(from)) };
-            }
-            break;
-        case operation::CSEQ:
-            if constexpr(has_meta_sequence_container_traits_v<Type>) {
-                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, as_ref(from) };
-            }
-            break;
-        case operation::ASSOC:
-            if constexpr(has_meta_associative_container_traits_v<Type>) {
-                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, as_ref(const_cast<any &>(from)) };
-            }
-            break;
-        case operation::CASSOC:
-            if constexpr(has_meta_associative_container_traits_v<Type>) {
-                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, as_ref(from) };
-            }
-            break;
         }
     }
 
@@ -28024,8 +29787,8 @@ public:
     /*! @brief Default constructor. */
     meta_any() ENTT_NOEXCEPT
         : storage{},
-          vtable{},
-          node{}
+          node{},
+          vtable{&basic_vtable<void>}
     {}
 
     /**
@@ -28037,8 +29800,8 @@ public:
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&... args)
         : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
-          vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>},
-          node{internal::meta_info<std::remove_const_t<std::remove_reference_t<Type>>>::resolve()}
+          node{internal::meta_info<Type>::resolve()},
+          vtable{&basic_vtable<Type>}
     {}
 
     /**
@@ -28048,7 +29811,7 @@ public:
      */
     template<typename Type>
     meta_any(std::reference_wrapper<Type> value)
-        : meta_any{std::in_place_type<Type &>, &value.get()}
+        : meta_any{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -28079,8 +29842,8 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
-        if(node && node->dtor) {
-            node->dtor(storage.data());
+        if(vtable) {
+            vtable(operation::DTOR, storage, node);
         }
     }
 
@@ -28095,8 +29858,8 @@ public:
     }
 
     /**
-     * @brief Returns the meta type of the underlying object.
-     * @return The meta type of the underlying object, if any.
+     * @brief Returns the type of the underlying object.
+     * @return The type of the underlying object, if any.
      */
     [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
@@ -28116,7 +29879,7 @@ public:
     /**
      * @brief Invokes the underlying function, if possible.
      *
-     * @sa invoke
+     * @sa meta_func::invoke
      *
      * @tparam Args Types of arguments to use to invoke the function.
      * @param id Unique identifier.
@@ -28162,9 +29925,9 @@ public:
     template<typename Type>
     [[nodiscard]] const Type * try_cast() const {
         if(node) {
-            if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
+            if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
-            } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
+            } else if(const auto *base = internal::meta_visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
                 return static_cast<const Type *>(base->cast(storage.data()));
             }
         }
@@ -28176,9 +29939,9 @@ public:
     template<typename Type>
     [[nodiscard]] Type * try_cast() {
         if(node) {
-            if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
+            if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
-            } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
+            } else if(const auto *base = internal::meta_visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
                 return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
             }
         }
@@ -28192,8 +29955,7 @@ public:
      * The type of the instance must be such that the cast is possible.
      *
      * @warning
-     * Attempting to perform a cast that isn't viable results in undefined
-     * behavior.
+     * Attempting to perform an invalid cast results in undefined behavior.
      *
      * @tparam Type Type to which to cast the instance.
      * @return A reference to the contained instance.
@@ -28215,19 +29977,17 @@ public:
     }
 
     /**
-     * @brief Tries to make an instance castable to a certain type.
+     * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return A valid meta any object if there exists a a viable conversion
-     * that makes the cast possible, an invalid object otherwise.
+     * @return A valid meta any object if there exists a viable conversion, an
+     * invalid one otherwise.
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         if(try_cast<std::remove_reference_t<Type>>() != nullptr) {
-            return as_ref(*this);
+            return as_ref();
         } else if(node) {
-            if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-                return curr->type()->info == info;
-            }, node); conv) {
+            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = type_id<Type>()](const auto *curr) { return curr->type()->info == info; }, node); conv) {
                 return conv->conv(storage.data());
             }
         }
@@ -28236,21 +29996,17 @@ public:
     }
 
     /**
-     * @brief Tries to make an instance castable to a certain type.
+     * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return True if there exists a a viable conversion that makes the cast
-     * possible, false otherwise.
+     * @return True if there exists a viable conversion, false otherwise.
      */
     template<typename Type>
     bool allow_cast() {
         if(try_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>() != nullptr) {
             return true;
         } else if(node) {
-            if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-                return curr->type()->info == info;
-            }, node); conv) {
-                auto other = conv->conv(std::as_const(storage).data());
-                swap(other, *this);
+            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = type_id<Type>()](const auto *curr) { return curr->type()->info == info; }, node); conv) {
+                *this = conv->conv(std::as_const(storage).data());
                 return true;
             }
         }
@@ -28267,6 +30023,11 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
         *this = meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = meta_any{};
     }
 
     /**
@@ -28309,16 +30070,16 @@ public:
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
     [[nodiscard]] meta_any operator*() ENTT_NOEXCEPT {
-        meta_any any{};
-        vtable(operation::DEREF, storage, &any);
-        return any;
+        meta_any ret{};
+        vtable(operation::DEREF, storage, &ret);
+        return ret;
     }
 
     /*! @copydoc operator* */
     [[nodiscard]] meta_any operator*() const ENTT_NOEXCEPT {
-        meta_any any{};
-        vtable(operation::CDEREF, storage, &any);
-        return any;
+        meta_any ret{};
+        vtable(operation::CDEREF, storage, &ret);
+        return ret;
     }
 
     /**
@@ -28335,7 +30096,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const meta_any &other) const {
-        return (node == other.node) && (storage == other.storage);
+        return (!node && !other.node) || (node && other.node && node->info == other.node->info && storage == other.storage);
     }
 
     /**
@@ -28352,28 +30113,25 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return A meta any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend meta_any as_ref(meta_any &other) ENTT_NOEXCEPT {
-        meta_any ref = as_ref(std::as_const(other));
-        ref.storage = as_ref(other.storage);
+    [[nodiscard]] meta_any as_ref() ENTT_NOEXCEPT {
+        meta_any ref{};
+        vtable(operation::REF, storage, &ref);
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend meta_any as_ref(const meta_any &other) ENTT_NOEXCEPT {
+    [[nodiscard]] meta_any as_ref() const ENTT_NOEXCEPT {
         meta_any ref{};
-        ref.node = other.node;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+        vtable(operation::CREF, storage, &ref);
         return ref;
     }
 
 private:
     any storage;
-    vtable_type *vtable;
     internal::meta_type_node *node;
+    vtable_type *vtable;
 };
 
 
@@ -28393,11 +30151,30 @@ private:
  *
  * A handle doesn't perform copies and isn't responsible for the contained
  * object. It doesn't prolong the lifetime of the pointed instance.<br/>
- * Handles are used to generate meta references to actual objects when needed.
+ * Handles are used to generate references to actual objects when needed.
  */
 struct meta_handle {
     /*! @brief Default constructor. */
     meta_handle() = default;
+
+
+    /*! @brief Default copy constructor, deleted on purpose. */
+    meta_handle(const meta_handle &) = delete;
+
+    /*! @brief Default move constructor. */
+    meta_handle(meta_handle &&) = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This meta handle.
+     */
+    meta_handle & operator=(const meta_handle &) = delete;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This meta handle.
+     */
+    meta_handle & operator=(meta_handle &&) = default;
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
@@ -28409,18 +30186,18 @@ struct meta_handle {
         : meta_handle{}
     {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
-            any = as_ref(value);
+            any = value.as_ref();
         } else {
-            any = std::reference_wrapper{value};
+            any.emplace<Type &>(value);
         }
     }
 
     /**
-     * @brief Dereference operator for accessing the contained opaque object.
-     * @return A meta any that shares a reference to an unmanaged object.
+     * @brief Returns false if a handle is invalid, true otherwise.
+     * @return False if the handle is invalid, true otherwise.
      */
-    [[nodiscard]] meta_any operator*() const {
-        return any;
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(any);
     }
 
     /**
@@ -28431,10 +30208,7 @@ struct meta_handle {
         return &any;
     }
 
-    /**
-     * @brief Access operator for accessing the contained opaque object.
-     * @return A meta any that shares a reference to an unmanaged object.
-     */
+    /*! @copydoc operator-> */
     [[nodiscard]] const meta_any * operator->() const {
         return &any;
     }
@@ -28444,7 +30218,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta properties of any type. */
+/*! @brief Opaque wrapper for properties of any type. */
 struct meta_prop {
     /*! @brief Node type. */
     using node_type = internal::meta_prop_node;
@@ -28458,24 +30232,24 @@ struct meta_prop {
     {}
 
     /**
-     * @brief Returns the stored key.
+     * @brief Returns the stored key as a const reference.
      * @return A meta any containing the key stored with the property.
      */
     [[nodiscard]] meta_any key() const {
-        return node->key();
+        return node->id->as_ref();
     }
 
     /**
-     * @brief Returns the stored value.
+     * @brief Returns the stored value by copy.
      * @return A meta any containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node->value();
+        return *node->value;
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -28486,86 +30260,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta base classes. */
-struct meta_base {
-    /*! @brief Node type. */
-    using node_type = internal::meta_base_node;
-
-    /*! @copydoc meta_prop::meta_prop */
-    meta_base(const node_type *curr = nullptr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-    /**
-     * @brief Returns the meta type to which a meta object belongs.
-     * @return The meta type to which the meta object belongs.
-     */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
-
-    /*! @copydoc meta_any::type */
-    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
-
-    /**
-     * @brief Casts an instance from a parent type to a base type.
-     * @param instance The instance to cast.
-     * @return An opaque pointer to the base type.
-     */
-    [[nodiscard]] const void * cast(const void *instance) const ENTT_NOEXCEPT {
-        return node->cast(instance);
-    }
-
-    /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(node == nullptr);
-    }
-
-private:
-    const node_type *node;
-};
-
-
-/*! @brief Opaque wrapper for meta conversion functions. */
-struct meta_conv {
-    /*! @brief Node type. */
-    using node_type = internal::meta_conv_node;
-
-    /*! @copydoc meta_prop::meta_prop */
-    meta_conv(const node_type *curr = nullptr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-    /*! @copydoc meta_base::parent */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
-
-    /*! @copydoc meta_any::type */
-    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
-
-    /**
-     * @brief Converts an instance to the underlying type.
-     * @param instance The instance to convert.
-     * @return An opaque pointer to the instance to convert.
-     */
-    [[nodiscard]] meta_any convert(const void *instance) const {
-        return node->conv(instance);
-    }
-
-    /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(node == nullptr);
-    }
-
-private:
-    const node_type *node;
-};
-
-
-/*! @brief Opaque wrapper for meta constructors. */
+/*! @brief Opaque wrapper for constructors. */
 struct meta_ctor {
     /*! @brief Node type. */
     using node_type = internal::meta_ctor_node;
@@ -28577,37 +30272,39 @@ struct meta_ctor {
         : node{curr}
     {}
 
-    /*! @copydoc meta_base::parent */
+    /**
+     * @brief Returns the type to which an object belongs.
+     * @return The type to which the object belongs.
+     */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the number of arguments accepted by a meta constructor.
-     * @return The number of arguments accepted by the meta constructor.
+     * @brief Returns the number of arguments accepted by a constructor.
+     * @return The number of arguments accepted by the constructor.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return node->size;
+    [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
+        return node->arity;
     }
 
     /**
-     * @brief Returns the meta type of the i-th argument of a meta constructor.
-     * @param index The index of the argument of which to return the meta type.
-     * @return The meta type of the i-th argument of a meta constructor, if any.
+     * @brief Returns the type of the i-th argument of a constructor.
+     * @param index Index of the argument of which to return the type.
+     * @return The type of the i-th argument of a constructor.
      */
     [[nodiscard]] meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * To create a valid instance, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.
+     * Parameters must be such that a cast or conversion to the required types
+     * is possible. Otherwise, an empty and thus invalid wrapper is returned.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
      * @return A meta any containing the new instance, if any.
      */
     [[nodiscard]] meta_any invoke(meta_any * const args, const size_type sz) const {
-        return sz == size() ? node->invoke(args) : meta_any{};
+        return sz == arity() ? node->invoke(args) : meta_any{};
     }
 
     /**
@@ -28626,8 +30323,8 @@ struct meta_ctor {
     }
 
     /**
-     * @brief Returns a range to use to visit all meta properties.
-     * @return An iterable range to use to visit all meta properties.
+     * @brief Returns a range to use to visit all properties.
+     * @return An iterable range to use to visit all properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
@@ -28639,13 +30336,12 @@ struct meta_ctor {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        internal::meta_range range{node->prop};
-        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -28656,7 +30352,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta data. */
+/*! @brief Opaque wrapper for data members. */
 struct meta_data {
     /*! @brief Node type. */
     using node_type = internal::meta_data_node;
@@ -28671,20 +30367,20 @@ struct meta_data {
         return node->id;
     }
 
-    /*! @copydoc meta_base::parent */
+    /*! @copydoc meta_ctor::parent */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Indicates whether a meta data is constant or not.
-     * @return True if the meta data is constant, false otherwise.
+     * @brief Indicates whether a data member is constant or not.
+     * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return (node->set == nullptr);
+        return node->is_const;
     }
 
     /**
-     * @brief Indicates whether a meta data is static or not.
-     * @return True if the meta data is static, false otherwise.
+     * @brief Indicates whether a data member is static or not.
+     * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
         return node->is_static;
@@ -28696,8 +30392,8 @@ struct meta_data {
     /**
      * @brief Sets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the setter results in an undefined
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
@@ -28715,8 +30411,8 @@ struct meta_data {
     /**
      * @brief Gets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the getter results in an undefined behavior.
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the getter results in an undefined behavior.
      *
      * @param instance An opaque instance of the underlying type.
      * @return A meta any containing the value of the underlying variable.
@@ -28736,13 +30432,12 @@ struct meta_data {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        internal::meta_range range{node->prop};
-        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -28753,7 +30448,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta functions. */
+/*! @brief Opaque wrapper for member functions. */
 struct meta_func {
     /*! @brief Node type. */
     using node_type = internal::meta_func_node;
@@ -28770,53 +30465,53 @@ struct meta_func {
         return node->id;
     }
 
-    /*! @copydoc meta_base::parent */
+    /*! @copydoc meta_ctor::parent */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the number of arguments accepted by a meta function.
-     * @return The number of arguments accepted by the meta function.
+     * @brief Returns the number of arguments accepted by a member function.
+     * @return The number of arguments accepted by the member function.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return node->size;
+    [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
+        return node->arity;
     }
 
     /**
-     * @brief Indicates whether a meta function is constant or not.
-     * @return True if the meta function is constant, false otherwise.
+     * @brief Indicates whether a member function is constant or not.
+     * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
         return node->is_const;
     }
 
     /**
-     * @brief Indicates whether a meta function is static or not.
-     * @return True if the meta function is static, false otherwise.
+     * @brief Indicates whether a member function is static or not.
+     * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
         return node->is_static;
     }
 
     /**
-     * @brief Returns the meta type of the return type of a meta function.
-     * @return The meta type of the return type of the meta function.
+     * @brief Returns the return type of a member function.
+     * @return The return type of the member function.
      */
     [[nodiscard]] inline meta_type ret() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the meta type of the i-th argument of a meta function.
-     * @param index The index of the argument of which to return the meta type.
-     * @return The meta type of the i-th argument of a meta function, if any.
+     * @brief Returns the type of the i-th argument of a member function.
+     * @param index Index of the argument of which to return the type.
+     * @return The type of the i-th argument of a member function.
      */
     [[nodiscard]] inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Invokes the underlying function, if possible.
      *
-     * To invoke a meta function, the parameters must be such that a cast or
+     * To invoke a member function, the parameters must be such that a cast or
      * conversion to the required types is possible. Otherwise, an empty and
      * thus invalid wrapper is returned.<br/>
-     * It must be possible to cast the instance to the parent type of the meta
+     * It must be possible to cast the instance to the parent type of the member
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
      *
@@ -28826,7 +30521,7 @@ struct meta_func {
      * @return A meta any containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any * const args, const size_type sz) const {
-        return sz == size() ? node->invoke(std::move(instance), args) : meta_any{};
+        return sz == arity() ? node->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**
@@ -28856,13 +30551,12 @@ struct meta_func {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        internal::meta_range range{node->prop};
-        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -28873,17 +30567,21 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta types. */
+/*! @brief Opaque wrapper for types. */
 class meta_type {
-    static bool can_cast_or_convert(const meta_type type, const type_info info) ENTT_NOEXCEPT {
-        for(auto curr: type.conv()) {
-            if(curr.type().info() == info) {
+    static bool can_cast_or_convert(const internal::meta_type_node *type, const type_info info) ENTT_NOEXCEPT {
+        if(type->info == info) {
+            return true;
+        }
+
+        for(const auto *curr = type->conv; curr; curr = curr->next) {
+            if(curr->type()->info == info) {
                 return true;
             }
         }
 
-        for(auto curr: type.base()) {
-            if(curr.type().info() == info || can_cast_or_convert(curr.type(), info)) {
+        for(const auto *curr = type->base; curr; curr = curr->next) {
+            if(auto *target = curr->type(); can_cast_or_convert(target, info)) {
                 return true;
             }
         }
@@ -28892,10 +30590,10 @@ class meta_type {
     }
 
     template<typename... Args, auto... Index>
-    [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node * const curr, std::index_sequence<Index...>) {
-        for(const auto &candidate: internal::meta_range{curr}) {
-            if(candidate.size == sizeof...(Args) && ([](auto *from, auto *to) { return from->info == to->info || can_cast_or_convert(from, to->info); }(internal::meta_info<Args>::resolve(), candidate.arg(Index)) && ...)) {
-                return &candidate;
+    [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node *curr, std::index_sequence<Index...>) {
+        for(; curr; curr = curr->next) {
+            if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index).info()) && ...)) {
+                return curr;
             }
         }
 
@@ -28905,12 +30603,22 @@ class meta_type {
 public:
     /*! @brief Node type. */
     using node_type = internal::meta_type_node;
+    /*! @brief Node type. */
+    using base_node_type = internal::meta_base_node;
     /*! @brief Unsigned integer type. */
     using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
     meta_type(node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
+    {}
+
+    /**
+     * @brief Constructs an instance from a given base node.
+     * @param curr The base node with which to construct the instance.
+     */
+    meta_type(base_node_type *curr) ENTT_NOEXCEPT
+        : node{curr ? curr->type() : nullptr}
     {}
 
     /**
@@ -28922,8 +30630,8 @@ public:
     }
 
     /**
-     * @brief Returns the identifier assigned to a meta object.
-     * @return The identifier assigned to the meta object.
+     * @brief Returns the identifier assigned to a type.
+     * @return The identifier assigned to the type.
      */
     [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
@@ -29041,8 +30749,7 @@ public:
 
     /**
      * @brief Checks whether a type refers to a sequence container or not.
-     * @return True if the underlying type is a sequence container, false
-     * otherwise.
+     * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const ENTT_NOEXCEPT {
         return node->is_sequence_container;
@@ -29050,106 +30757,115 @@ public:
 
     /**
      * @brief Checks whether a type refers to an associative container or not.
-     * @return True if the underlying type is an associative container, false
-     * otherwise.
+     * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const ENTT_NOEXCEPT {
         return node->is_associative_container;
     }
 
     /**
-     * @brief If a type refers to an array type, provides the number of
-     * dimensions of the array.
-     * @return The number of dimensions of the array if the underlying type is
-     * an array type, 0 otherwise.
+     * @brief Checks whether a type refers to a recognized class template
+     * specialization or not.
+     * @return True if the type is a recognized class template specialization,
+     * false otherwise.
+     */
+    [[nodiscard]] bool is_template_specialization() const ENTT_NOEXCEPT {
+        return node->template_info.is_template_specialization;
+    }
+
+    /**
+     * @brief Returns the number of template arguments, if any.
+     * @return The number of template arguments, if any.
+     */
+    [[nodiscard]] size_type template_arity() const ENTT_NOEXCEPT {
+        return node->template_info.arity;
+    }
+
+    /**
+     * @brief Returns a tag for the class template of the underlying type.
+     *
+     * @sa meta_class_template_tag
+     *
+     * @return The tag for the class template of the underlying type.
+     */
+    [[nodiscard]] inline meta_type template_type() const ENTT_NOEXCEPT {
+        return is_template_specialization() ?  node->template_info.type() : meta_type{};
+    }
+
+    /**
+     * @brief Returns the type of the i-th template argument of a type.
+     * @param index Index of the template argument of which to return the type.
+     * @return The type of the i-th template argument of a type.
+     */
+    [[nodiscard]] inline meta_type template_arg(size_type index) const ENTT_NOEXCEPT {
+        return index < template_arity() ? node->template_info.arg(index) : meta_type{};
+    }
+
+    /**
+     * @brief Provides the number of dimensions of an array type.
+     * @return The number of dimensions in case of array types, 0 otherwise.
      */
     [[nodiscard]] size_type rank() const ENTT_NOEXCEPT {
         return node->rank;
     }
 
     /**
-     * @brief If a type refers to an array type, provides the number of elements
-     * along the given dimension of the array.
+     * @brief The number of elements along the given dimension of an array type.
      * @param dim The dimension of which to return the number of elements.
-     * @return The number of elements along the given dimension of the array if
-     * the underlying type is an array type, 0 otherwise.
+     * @return The number of elements along the given dimension in case of array
+     * types, 0 otherwise.
      */
     [[nodiscard]] size_type extent(size_type dim = {}) const ENTT_NOEXCEPT {
         return node->extent(dim);
     }
 
     /**
-     * @brief Provides the meta type for which the pointer is defined.
-     * @return The meta type for which the pointer is defined or this meta type
-     * if it doesn't refer to a pointer type.
+     * @brief Provides the type for which the pointer is defined.
+     * @return The type for which the pointer is defined or this type if it
+     * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const ENTT_NOEXCEPT {
         return node->remove_pointer();
     }
 
     /**
-     * @brief Provides the meta type for which the array is defined.
-     * @return The meta type for which the array is defined or this meta type
-     * if it doesn't refer to an array type.
+     * @brief Provides the type for which the array is defined.
+     * @return The type for which the array is defined or this type if it
+     * doesn't refer to an array type.
      */
     [[nodiscard]] meta_type remove_extent() const ENTT_NOEXCEPT {
         return node->remove_extent();
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta bases.
-     * @return An iterable range to use to visit top-level meta bases.
+     * @brief Returns a range to use to visit top-level base meta types.
+     * @return An iterable range to use to visit top-level base meta types.
      */
-    [[nodiscard]] meta_range<meta_base> base() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_type, internal::meta_base_node> base() const ENTT_NOEXCEPT {
         return node->base;
     }
 
     /**
-     * @brief Returns the meta base associated with a given identifier.
+     * @brief Returns the base meta type associated with a given identifier.
      * @param id Unique identifier.
-     * @return The meta base associated with the given identifier, if any.
+     * @return The base meta type associated with the given identifier, if any.
      */
-    [[nodiscard]] meta_base base(const id_type id) const {
-        return internal::find_if<&node_type::base>([id](const auto *curr) {
-            return curr->type()->id == id;
-        }, node);
+    [[nodiscard]] meta_type base(const id_type id) const {
+        return internal::meta_visit<&node_type::base>([id](const auto *curr) { return curr->type()->id == id; }, node);
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta conversion
-     * functions.
-     * @return An iterable range to use to visit top-level meta conversion
-     * functions.
-     */
-    [[nodiscard]] meta_range<meta_conv> conv() const ENTT_NOEXCEPT {
-        return node->conv;
-    }
-
-    /**
-     * @brief Returns the meta conversion function associated with a given type.
-     * @tparam Type The type to use to search for a meta conversion function.
-     * @return The meta conversion function associated with the given type, if
-     * any.
-     */
-    template<typename Type>
-    [[nodiscard]] meta_conv conv() const {
-        return internal::find_if<&node_type::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-            return curr->type()->info == info;
-        }, node);
-    }
-
-    /**
-     * @brief Returns a range to use to visit top-level meta constructors.
-     * @return An iterable range to use to visit top-level meta constructors.
+     * @brief Returns a range to use to visit top-level constructors.
+     * @return An iterable range to use to visit top-level constructors.
      */
     [[nodiscard]] meta_range<meta_ctor> ctor() const ENTT_NOEXCEPT {
         return node->ctor;
     }
 
     /**
-     * @brief Returns the meta constructor that accepts a given list of types of
-     * arguments.
-     * @return The requested meta constructor, if any.
+     * @brief Returns a constructor for a given list of types of arguments.
+     * @tparam Args Constructor arguments.
+     * @return The requested constructor, if any.
      */
     template<typename... Args>
     [[nodiscard]] meta_ctor ctor() const {
@@ -29157,70 +30873,61 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta data.
-     * @return An iterable range to use to visit top-level meta data.
+     * @brief Returns a range to use to visit top-level data.
+     * @return An iterable range to use to visit top-level data.
      */
     [[nodiscard]] meta_range<meta_data> data() const ENTT_NOEXCEPT {
         return node->data;
     }
 
     /**
-     * @brief Returns the meta data associated with a given identifier.
+     * @brief Returns the data associated with a given identifier.
      *
-     * The meta data of the base classes will also be visited, if any.
+     * The data of the base classes will also be visited, if any.
      *
      * @param id Unique identifier.
-     * @return The meta data associated with the given identifier, if any.
+     * @return The data associated with the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        return internal::find_if<&node_type::data>([id](const auto *curr) {
-            return curr->id == id;
-        }, node);
+        return internal::meta_visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta functions.
-     * @return An iterable range to use to visit top-level meta functions.
+     * @brief Returns a range to use to visit top-level functions.
+     * @return An iterable range to use to visit top-level functions.
      */
     [[nodiscard]] meta_range<meta_func> func() const ENTT_NOEXCEPT {
         return node->func;
     }
 
     /**
-     * @brief Returns the meta function associated with a given identifier.
+     * @brief Returns the function associated with a given identifier.
      *
-     * The meta functions of the base classes will also be visited, if any.<br/>
-     * In the case of overloaded meta functions, the first one with the required
-     * id will be returned.
+     * The functions of the base classes will also be visited, if any.<br/>
+     * In the case of overloaded functions, the first one with the required
+     * identifier will be returned.
      *
      * @param id Unique identifier.
-     * @return The meta function associated with the given identifier, if any.
+     * @return The function associated with the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        return internal::find_if<&node_type::func>([id](const auto *curr) {
-            return curr->id == id;
-        }, node);
+        return internal::meta_visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * To create a valid instance, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.
+     * Parameters must be such that a cast or conversion to the required types
+     * is possible. Otherwise, an empty and thus invalid wrapper is returned.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
      * @return A meta any containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
-        meta_any any{};
-
-        internal::find_if<&node_type::ctor>([args, sz, &any](const auto *curr) {
-            return (curr->size == sz) && (any = curr->invoke(args));
-        }, node);
-
-        return any;
+        meta_any ret{};
+        internal::meta_visit<&node_type::ctor>([args, sz, &ret](const auto *curr) { return (curr->arity == sz) && (ret = curr->invoke(args)); }, node);
+        return ret;
     }
 
     /**
@@ -29239,14 +30946,13 @@ public:
     }
 
     /**
-     * @brief Invokes the function with the given identifier, if possible.
+     * @brief Invokes a function given an identifier, if possible.
      *
-     * To invoke a meta function, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.<br/>
-     * It must be possible to cast the instance to the parent type of the meta
+     * It must be possible to cast the instance to the parent type of the member
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
+     *
+     * @sa meta_func::invoke
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
@@ -29259,14 +30965,14 @@ public:
         size_type extent{sz + 1u};
         bool ambiguous{};
 
-        for(auto *it = internal::find_if<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->size == sz; }, node); it && it->id == id && it->size == sz; it = it->next) {
+        for(auto *it = internal::meta_visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->arity == sz; }, node); it && it->id == id && it->arity == sz; it = it->next) {
             size_type direct{};
             size_type ext{};
 
             for(size_type next{}; next < sz && next == (direct + ext); ++next) {
                 const auto type = args[next].type();
-                const auto req = it->arg(next)->info;
-                type.info() == req ? ++direct : (ext += can_cast_or_convert(type, req));
+                const auto req = it->arg(next).info();
+                type.info() == req ? ++direct : (ext += can_cast_or_convert(type.node, req));
             }
 
             if((direct + ext) == sz) {
@@ -29280,7 +30986,7 @@ public:
             }
         }
 
-        return (candidate && !ambiguous) ? candidate->invoke(instance, args) : meta_any{};
+        return (candidate && !ambiguous) ? candidate->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**
@@ -29303,8 +31009,8 @@ public:
     /**
      * @brief Sets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the setter results in an undefined
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
@@ -29324,8 +31030,8 @@ public:
     /**
      * @brief Gets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the getter results in an undefined behavior.
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the getter results in an undefined behavior.
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
@@ -29337,8 +31043,8 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta properties.
-     * @return An iterable range to use to visit top-level meta properties.
+     * @brief Returns a range to use to visit top-level properties.
+     * @return An iterable range to use to visit top-level properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
@@ -29353,43 +31059,40 @@ public:
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::find_if<&node_type::prop>([key = std::move(key)](const auto *curr) {
-            return curr->key() == key;
-        }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
     /**
-     * @brief Checks if two meta objects refer to the same type.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same type, false
-     * otherwise.
+     * @brief Checks if two objects refer to the same type.
+     * @param other The object with which to compare.
+     * @return True if the objects refer to the same type, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
         return (!node && !other.node) || (node && other.node && node->info == other.node->info);
     }
 
     /**
-     * @brief Resets a meta type and all its parts.
+     * @brief Resets a type and all its parts.
      *
-     * This function resets a meta type and all its data members, member
-     * functions and properties, as well as its constructors, destructors and
-     * conversion functions if any.<br/>
+     * This function resets a type and all its data members, member functions
+     * and properties, as well as its constructors, destructors and conversion
+     * functions if any.<br/>
      * Base classes aren't reset but the link between the two types is removed.
      *
-     * The meta type is also removed from the list of searchable types.
+     * The type is also removed from the list of searchable types.
      */
     void reset() ENTT_NOEXCEPT {
         auto** it = internal::meta_context::global();
 
-        while (*it && *it != node) {
+        while(*it && *it != node) {
             it = &(*it)->next;
         }
 
@@ -29416,6 +31119,7 @@ public:
         unregister_all(&node->func, &internal::meta_func_node::prop);
 
         node->id = {};
+        node->ctor = node->def_ctor;
         node->dtor = nullptr;
     }
 
@@ -29425,10 +31129,10 @@ private:
 
 
 /**
- * @brief Checks if two meta objects refer to the same type.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return False if the two meta objects refer to the same node, true otherwise.
+ * @brief Checks if two objects refer to the same type.
+ * @param lhs An object, either valid or not.
+ * @param rhs An object, either valid or not.
+ * @return False if the objects refer to the same node, true otherwise.
  */
 [[nodiscard]] inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
@@ -29468,33 +31172,13 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 
-[[nodiscard]] inline meta_type meta_base::parent() const ENTT_NOEXCEPT {
-    return node->parent;
-}
-
-
-[[nodiscard]] inline meta_type meta_base::type() const ENTT_NOEXCEPT {
-    return node->type();
-}
-
-
-[[nodiscard]] inline meta_type meta_conv::parent() const ENTT_NOEXCEPT {
-    return node->parent;
-}
-
-
-[[nodiscard]] inline meta_type meta_conv::type() const ENTT_NOEXCEPT {
-    return node->type();
-}
-
-
 [[nodiscard]] inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
     return node->parent;
 }
 
 
 [[nodiscard]] inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index) : nullptr;
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 
@@ -29519,13 +31203,13 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index) : nullptr;
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 
-/*! @brief Opaque iterator for meta sequence containers. */
+/*! @brief Opaque iterator for sequence containers. */
 class meta_sequence_container::meta_iterator {
-    /*! @brief A meta sequence container can access the underlying iterator. */
+    /*! @brief A sequence container can access the underlying iterator. */
     friend class meta_sequence_container;
 
     enum class operation { INCR, DEREF };
@@ -29539,7 +31223,7 @@ class meta_sequence_container::meta_iterator {
             ++any_cast<It &>(const_cast<any &>(from));
             break;
         case operation::DEREF:
-            *static_cast<meta_any *>(to) = std::reference_wrapper{*any_cast<const It &>(from)};
+            static_cast<meta_any *>(to)->emplace<typename std::iterator_traits<It>::reference>(*any_cast<const It &>(from));
             break;
         }
     }
@@ -29582,20 +31266,18 @@ public:
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return True if the two meta iterators refer to the same element, false
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return True if the iterators refer to the same element, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
         return handle == other.handle;
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return False if the two meta iterators refer to the same element, true
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return False if the iterators refer to the same element, true otherwise.
      */
     [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
@@ -29603,7 +31285,7 @@ public:
 
     /**
      * @brief Indirection operator.
-     * @return The element to which the meta pointer points.
+     * @return The element to which the iterator points.
      */
     [[nodiscard]] reference operator*() const {
         meta_any other;
@@ -29620,8 +31302,8 @@ public:
     }
 
 private:
-    vtable_type *vtable;
-    any handle;
+    vtable_type *vtable{};
+    any handle{};
 };
 
 
@@ -29630,7 +31312,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     using traits_type = meta_sequence_container_traits<Type>;
 
     [[nodiscard]] static meta_type value_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::value_type>::resolve();
+        return internal::meta_info<typename Type::value_type>::resolve();
     }
 
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
@@ -29638,23 +31320,17 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static bool resize(any &container, size_type sz) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::resize(*cont, sz);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::resize(*cont, sz) : false;
     }
 
     [[nodiscard]] static bool clear(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::clear(*cont);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::clear(*cont) : false;
     }
 
     [[nodiscard]] static iterator begin(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{traits_type::begin(*cont)};
         }
 
@@ -29662,7 +31338,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static iterator end(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{traits_type::end(*cont)};
         }
 
@@ -29670,17 +31346,21 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static std::pair<iterator, bool> insert(any &container, iterator it, meta_any &value) {
-        if(auto *cont = any_cast<Type>(&container); cont && value.allow_cast<const typename traits_type::value_type &>()) {
-            auto ret = traits_type::insert(*cont, any_cast<const typename traits_type::iterator &>(it.handle), value.cast<const typename traits_type::value_type &>());
-            return { iterator{std::move(ret.first)}, ret.second };
+        if(auto * const cont = any_cast<Type>(&container); cont) {
+            // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
+            if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
+                const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                auto ret = traits_type::insert(*cont, any_cast<const typename Type::iterator &>(it.handle), element ? *element : value.cast<typename Type::value_type>());
+                return { iterator{std::move(ret.first)}, ret.second };
+            }
         }
 
         return {};
     }
 
     [[nodiscard]] static std::pair<iterator, bool> erase(any &container, iterator it) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            auto ret = traits_type::erase(*cont, any_cast<const typename traits_type::iterator &>(it.handle));
+        if(auto * const cont = any_cast<Type>(&container); cont) {
+            auto ret = traits_type::erase(*cont, any_cast<const typename Type::iterator &>(it.handle));
             return { iterator{std::move(ret.first)}, ret.second };
         }
 
@@ -29688,18 +31368,18 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static meta_any get(any &container, size_type pos) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return std::reference_wrapper{traits_type::get(*cont, pos)};
+        if(auto * const cont = any_cast<Type>(&container); cont) {
+            return meta_any{std::in_place_type<typename Type::reference>, traits_type::get(*cont, pos)};
         }
 
-        return std::reference_wrapper{traits_type::cget(any_cast<const Type &>(container), pos)};
+        return meta_any{std::in_place_type<typename Type::const_reference>, traits_type::cget(any_cast<const Type &>(container), pos)};
     }
 };
 
 
 /**
- * @brief Returns the value meta type of the wrapped container type.
- * @return The value meta type of the wrapped container type.
+ * @brief Returns the meta value type of a container.
+ * @return The meta value type of the container.
  */
 [[nodiscard]] inline meta_type meta_sequence_container::value_type() const ENTT_NOEXCEPT {
     return value_type_fn();
@@ -29707,8 +31387,8 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
 
 /**
- * @brief Returns the size of the wrapped container.
- * @return The size of the wrapped container.
+ * @brief Returns the size of a container.
+ * @return The size of the container.
  */
 [[nodiscard]] inline meta_sequence_container::size_type meta_sequence_container::size() const ENTT_NOEXCEPT {
     return size_fn(storage);
@@ -29716,7 +31396,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
 
 /**
- * @brief Resizes the wrapped container to contain a given number of elements.
+ * @brief Resizes a container to contain a given number of elements.
  * @param sz The new size of the container.
  * @return True in case of success, false otherwise.
  */
@@ -29726,7 +31406,7 @@ inline bool meta_sequence_container::resize(size_type sz) {
 
 
 /**
- * @brief Clears the content of the wrapped container.
+ * @brief Clears the content of a container.
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
@@ -29735,8 +31415,8 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Returns a meta iterator to the first element of the wrapped container.
- * @return A meta iterator to the first element of the wrapped container.
+ * @brief Returns an iterator to the first element of a container.
+ * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
     return begin_fn(storage);
@@ -29744,10 +31424,8 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Returns a meta iterator that is past the last element of the wrapped
- * container.
- * @return A meta iterator that is past the last element of the wrapped
- * container.
+ * @brief Returns an iterator that is past the last element of a container.
+ * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
     return end_fn(storage);
@@ -29755,11 +31433,11 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Inserts an element at a specified location of the wrapped container.
- * @param it Meta iterator before which the element will be inserted.
+ * @brief Inserts an element at a specified location of a container.
+ * @param it Iterator before which the element will be inserted.
  * @param value Element value to insert.
- * @return A pair consisting of a meta iterator to the inserted element (in
- * case of success) and a bool denoting whether the insertion took place.
+ * @return A pair consisting of an iterator to the inserted element (in case of
+ * success) and a bool denoting whether the insertion took place.
  */
 inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::insert(iterator it, meta_any value) {
     return insert_fn(storage, it, value);
@@ -29767,11 +31445,10 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 
 /**
- * @brief Removes the specified element from the wrapped container.
- * @param it Meta iterator to the element to remove.
- * @return A pair consisting of a meta iterator following the last removed
- * element (in case of success) and a bool denoting whether the insertion
- * took place.
+ * @brief Removes a given element from a container.
+ * @param it Iterator to the element to remove.
+ * @return A pair consisting of an iterator following the last removed element
+ * (in case of success) and a bool denoting whether the insertion took place.
  */
 inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::erase(iterator it) {
     return erase_fn(storage, it);
@@ -29779,8 +31456,8 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 
 /**
- * @brief Returns a reference to the element at a specified location of the
- * wrapped container (no bounds checking is performed).
+ * @brief Returns a reference to the element at a given location of a container
+ * (no bounds checking is performed).
  * @param pos The position of the element to return.
  * @return A reference to the requested element properly wrapped.
  */
@@ -29798,7 +31475,7 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 }
 
 
-/*! @brief Opaque iterator for meta associative containers. */
+/*! @brief Opaque iterator for associative containers. */
 class meta_associative_container::meta_iterator {
     enum operation { INCR, DEREF };
 
@@ -29812,9 +31489,9 @@ class meta_associative_container::meta_iterator {
             break;
         case operation::DEREF:
             if constexpr(KeyOnly) {
-                static_cast<std::pair<meta_any, meta_any> *>(to)->first = *any_cast<const It &>(from);
+                static_cast<std::pair<meta_any, meta_any> *>(to)->first = std::cref(*any_cast<const It &>(from));
             } else {
-                *static_cast<std::pair<meta_any, meta_any> *>(to) = std::make_pair<meta_any, meta_any>(any_cast<const It &>(from)->first, std::reference_wrapper{any_cast<const It &>(from)->second});
+                *static_cast<std::pair<meta_any, meta_any> *>(to) = std::make_pair<meta_any, meta_any>(std::cref(any_cast<const It &>(from)->first), std::ref(any_cast<const It &>(from)->second));
             }
             break;
         }
@@ -29836,9 +31513,8 @@ public:
     meta_iterator() ENTT_NOEXCEPT = default;
 
     /**
-     * @brief Constructs a meta iterator from a given iterator.
-     * @tparam KeyOnly True if the associative container is also key-only, false
-     * otherwise.
+     * @brief Constructs an meta iterator from a given iterator.
+     * @tparam KeyOnly True if the container is also key-only, false otherwise.
      * @tparam It Type of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
@@ -29860,20 +31536,18 @@ public:
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return True if the two meta iterators refer to the same element, false
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return True if the iterators refer to the same element, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
         return handle == other.handle;
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return False if the two meta iterators refer to the same element, true
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return False if the iterators refer to the same element, true otherwise.
      */
     [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
@@ -29881,7 +31555,7 @@ public:
 
     /**
      * @brief Indirection operator.
-     * @return The element to which the meta pointer points.
+     * @return The element to which the iterator points.
      */
     [[nodiscard]] reference operator*() const {
         reference other;
@@ -29898,8 +31572,8 @@ public:
     }
 
 private:
-    vtable_type *vtable;
-    any handle;
+    vtable_type *vtable{};
+    any handle{};
 };
 
 
@@ -29908,19 +31582,19 @@ struct meta_associative_container::meta_associative_container_proxy {
     using traits_type = meta_associative_container_traits<Type>;
 
     [[nodiscard]] static meta_type key_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::key_type>::resolve();
+        return internal::meta_info<typename Type::key_type>::resolve();
     }
 
     [[nodiscard]] static meta_type mapped_type() ENTT_NOEXCEPT {
         if constexpr(is_key_only_meta_associative_container_v<Type>) {
             return meta_type{};
         } else {
-            return internal::meta_info<typename traits_type::mapped_type>::resolve();
+            return internal::meta_info<typename Type::mapped_type>::resolve();
         }
     }
 
     [[nodiscard]] static meta_type value_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::value_type>::resolve();
+        return internal::meta_info<typename Type::value_type>::resolve();
     }
 
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
@@ -29928,15 +31602,12 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool clear(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::clear(*cont);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::clear(*cont) : false;
     }
 
     [[nodiscard]] static iterator begin(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::begin(*cont)};
         }
 
@@ -29944,7 +31615,7 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static iterator end(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::end(*cont)};
         }
 
@@ -29952,12 +31623,12 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, meta_any &value) {
-        if(auto *cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
+        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
             if constexpr(is_key_only_meta_associative_container_v<Type>) {
-                return traits_type::insert(*cont, key.cast<const typename traits_type::key_type &>());
+                return traits_type::insert(*cont, key.cast<const typename Type::key_type &>());
             } else {
-                if(value.allow_cast<const typename traits_type::mapped_type &>()) {
-                    return traits_type::insert(*cont, key.cast<const typename traits_type::key_type &>(), value.cast<const typename traits_type::mapped_type &>());
+                if(value.allow_cast<const typename Type::mapped_type &>()) {
+                    return traits_type::insert(*cont, key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>());
                 }
             }
         }
@@ -29966,20 +31637,20 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool erase(any &container, meta_any &key) {
-        if(auto *cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
-            return traits_type::erase(*cont, key.cast<const typename traits_type::key_type &>());
+        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
+            return traits_type::erase(*cont, key.cast<const typename Type::key_type &>());
         }
 
         return false;
     }
 
     [[nodiscard]] static iterator find(any &container, meta_any &key) {
-        if(key.allow_cast<const typename traits_type::key_type &>()) {
-            if(auto *cont = any_cast<Type>(&container); cont) {
-                return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*cont, key.cast<const typename traits_type::key_type &>())};
+        if(key.allow_cast<const typename Type::key_type &>()) {
+            if(auto * const cont = any_cast<Type>(&container); cont) {
+                return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*cont, key.cast<const typename Type::key_type &>())};
             }
 
-            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cfind(any_cast<const Type &>(container), key.cast<const typename traits_type::key_type &>())};
+            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cfind(any_cast<const Type &>(container), key.cast<const typename Type::key_type &>())};
         }
 
         return {};
@@ -29988,8 +31659,7 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns true if the associative container is also key-only, false
- * otherwise.
+ * @brief Returns true if a container is also key-only, false otherwise.
  * @return True if the associative container is also key-only, false otherwise.
  */
 [[nodiscard]] inline bool meta_associative_container::key_only() const ENTT_NOEXCEPT {
@@ -29998,8 +31668,8 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns the key meta type of the wrapped container type.
- * @return The key meta type of the wrapped container type.
+ * @brief Returns the meta key type of a container.
+ * @return The meta key type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::key_type() const ENTT_NOEXCEPT {
     return key_type_fn();
@@ -30007,8 +31677,8 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns the mapped meta type of the wrapped container type.
- * @return The mapped meta type of the wrapped container type.
+ * @brief Returns the meta mapped type of a container.
+ * @return The meta mapped type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::mapped_type() const ENTT_NOEXCEPT {
     return mapped_type_fn();
@@ -30046,7 +31716,7 @@ inline bool meta_associative_container::clear() {
 
 
 /**
- * @brief Inserts an element (a key/value pair) into the wrapped container.
+ * @brief Inserts an element (a key/value pair) into a container.
  * @param key The key of the element to insert.
  * @param value The value of the element to insert.
  * @return A bool denoting whether the insertion took place.
@@ -30057,7 +31727,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
 
 
 /**
- * @brief Removes the specified element from the wrapped container.
+ * @brief Removes the specified element from a container.
  * @param key The key of the element to remove.
  * @return A bool denoting whether the removal took place.
  */
@@ -30067,8 +31737,7 @@ inline bool meta_associative_container::erase(meta_any key) {
 
 
 /**
- * @brief Returns an iterator to the element with key equivalent to a given
- * one, if any.
+ * @brief Returns an iterator to the element with a given key, if any.
  * @param key The key of the element to search.
  * @return An iterator to the element with the given key, if any.
  */
@@ -30090,6 +31759,8 @@ inline bool meta_associative_container::erase(meta_any key) {
 
 
 #endif
+
+// #include "node.hpp"
 
 // #include "policy.hpp"
 #ifndef ENTT_META_POLICY_HPP
@@ -30120,6 +31791,310 @@ struct as_void_t {};
 
 #endif
 
+// #include "utility.hpp"
+#ifndef ENTT_META_UTILITY_HPP
+#define ENTT_META_UTILITY_HPP
+
+
+#include <array>
+#include <cstddef>
+#include <functional>
+#include <type_traits>
+#include <utility>
+// #include "../config/config.h"
+
+// #include "../core/type_traits.hpp"
+
+// #include "meta.hpp"
+
+// #include "node.hpp"
+
+// #include "policy.hpp"
+
+
+
+namespace entt {
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename, typename>
+struct meta_function_descriptor;
+
+
+/**
+ * @brief Meta function descriptor.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Ret Function return type.
+ * @tparam Class Actual owner of the member function.
+ * @tparam Args Function arguments.
+ */
+template<typename Type, typename Ret, typename Class, typename... Args>
+struct meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> {
+    /*! @brief Meta function return type. */
+    using return_type = Ret;
+    /*! @brief Meta function arguments. */
+    using args_type = std::conditional_t<std::is_same_v<Type, Class>, type_list<Args...>, type_list<const Class &, Args...>>;
+
+    /*! @brief True if the meta function is const, false otherwise. */
+    static constexpr auto is_const = true;
+    /*! @brief True if the meta function is static, false otherwise. */
+    static constexpr auto is_static = !std::is_same_v<Type, Class>;
+};
+
+
+/**
+ * @brief Meta function descriptor.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Ret Function return type.
+ * @tparam Class Actual owner of the member function.
+ * @tparam Args Function arguments.
+ */
+template<typename Type, typename Ret, typename Class, typename... Args>
+struct meta_function_descriptor<Type, Ret(Class:: *)(Args...)> {
+    /*! @brief Meta function return type. */
+    using return_type = Ret;
+    /*! @brief Meta function arguments. */
+    using args_type = std::conditional_t<std::is_same_v<Type, Class>, type_list<Args...>, type_list<Class &, Args...>>;
+
+    /*! @brief True if the meta function is const, false otherwise. */
+    static constexpr auto is_const = false;
+    /*! @brief True if the meta function is static, false otherwise. */
+    static constexpr auto is_static = !std::is_same_v<Type, Class>;
+};
+
+
+/**
+ * @brief Meta function descriptor.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Ret Function return type.
+ * @tparam Args Function arguments.
+ */
+template<typename Type, typename Ret, typename... Args>
+struct meta_function_descriptor<Type, Ret(*)(Args...)> {
+    /*! @brief Meta function return type. */
+    using return_type = Ret;
+    /*! @brief Meta function arguments. */
+    using args_type = type_list<Args...>;
+
+    /*! @brief True if the meta function is const, false otherwise. */
+    static constexpr auto is_const = false;
+    /*! @brief True if the meta function is static, false otherwise. */
+    static constexpr auto is_static = true;
+};
+
+
+/**
+ * @brief Meta function helper.
+ *
+ * Converts a function type to be associated with a reflected type into its meta
+ * function descriptor.
+ *
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Candidate The actual function to associate with the reflected type.
+ */
+template<typename Type, typename Candidate>
+class meta_function_helper {
+    template<typename Ret, typename... Args, typename Class>
+    static constexpr meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> get_rid_of_noexcept(Ret(Class:: *)(Args...) const);
+
+    template<typename Ret, typename... Args, typename Class>
+    static constexpr meta_function_descriptor<Type, Ret(Class:: *)(Args...)> get_rid_of_noexcept(Ret(Class:: *)(Args...));
+
+    template<typename Ret, typename... Args>
+    static constexpr meta_function_descriptor<Type, Ret(*)(Args...)> get_rid_of_noexcept(Ret(*)(Args...));
+
+public:
+    /*! @brief The meta function descriptor of the given function. */
+    using type = decltype(get_rid_of_noexcept(std::declval<Candidate>()));
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Candidate The actual function to associate with the reflected type.
+ */
+template<typename Type, typename Candidate>
+using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::type;
+
+
+/**
+ * @brief Returns the meta type of the i-th element of a list of arguments.
+ * @tparam Args Actual types of arguments.
+ * @return The meta type of the i-th element of the list of arguments.
+ */
+template<typename... Args>
+[[nodiscard]] static meta_type meta_arg(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
+    return internal::meta_arg_node(type_list<Args...>{}, index);
+}
+
+
+/**
+ * @brief Constructs an instance given a list of erased parameters, if possible.
+ * @tparam Type Actual type of the instance to construct.
+ * @tparam Args Types of arguments expected.
+ * @tparam Index Indexes to use to extract erased arguments from their list.
+ * @param args Parameters to use to construct the instance.
+ * @return A meta any containing the new instance, if any.
+ */
+template<typename Type, typename... Args, std::size_t... Index>
+[[nodiscard]] meta_any meta_construct(meta_any * const args, std::index_sequence<Index...>) {
+    if(((args+Index)->allow_cast<Args>() && ...)) {
+        return Type{(args+Index)->cast<Args>()...};
+    }
+
+    return {};
+}
+
+
+/**
+ * @brief Sets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to set.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @param value Parameter to use to set the variable.
+ * @return True in case of success, false otherwise.
+ */
+template<typename Type, auto Data>
+[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
+    if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
+        if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
+            using descriptor = meta_function_helper_t<Type, decltype(Data)>;
+            using data_type = type_list_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename descriptor::args_type>;
+
+            if(auto * const clazz = instance->try_cast<Type>(); clazz) {
+                if(value.allow_cast<data_type>()) {
+                    std::invoke(Data, *clazz, value.cast<data_type>());
+                    return true;
+                }
+            }
+        } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+            using data_type = std::remove_reference_t<decltype(std::declval<Type>().*Data)>;
+
+            if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+                if(auto * const clazz = instance->try_cast<Type>(); clazz) {
+                    if(value.allow_cast<data_type>()) {
+                        std::invoke(Data, clazz) = value.cast<data_type>();
+                        return true;
+                    }
+                }
+            }
+        } else {
+            using data_type = std::remove_reference_t<decltype(*Data)>;
+
+            if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+                if(value.allow_cast<data_type>()) {
+                    *Data = value.cast<data_type>();
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief Gets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to get.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @param instance An opaque instance of the underlying type, if required.
+ * @return A meta any containing the value of the underlying variable.
+ */
+template<typename Type, auto Data, typename Policy = as_is_t>
+[[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance) {
+    [[maybe_unused]] auto dispatch = [](auto &&value) {
+        if constexpr(std::is_same_v<Policy, as_void_t>) {
+            return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
+        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
+            return meta_any{std::reference_wrapper{std::forward<decltype(value)>(value)}};
+        } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
+            return meta_any{std::cref(std::forward<decltype(value)>(value))};
+        } else {
+            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
+            return meta_any{std::forward<decltype(value)>(value)};
+        }
+    };
+
+    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
+        auto * const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type &>, const Type, Type>>();
+        return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
+    } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+        if constexpr(std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
+            return meta_any{};
+        } else {
+            if(auto * clazz = instance->try_cast<Type>(); clazz) {
+                return dispatch(std::invoke(Data, *clazz));
+            } else {
+                auto * fallback = instance->try_cast<const Type>();
+                return fallback ? dispatch(std::invoke(Data, *fallback)) : meta_any{};
+            }
+        }
+    } else if constexpr(std::is_pointer_v<decltype(Data)>) {
+        if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
+            return meta_any{};
+        } else {
+            return dispatch(*Data);
+        }
+    } else {
+        return dispatch(Data);
+    }
+}
+
+
+/**
+ * @brief Invokes a function given a list of erased parameters, if possible.
+ * @tparam Type Reflected type to which the function is associated.
+ * @tparam Candidate The actual function to invoke.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @tparam Index Indexes to use to extract erased arguments from their list.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @param args Parameters to use to invoke the function.
+ * @return A meta any containing the returned value, if any.
+ */
+template<typename Type, auto Candidate, typename Policy = as_is_t, std::size_t... Index>
+[[nodiscard]] meta_any meta_invoke([[maybe_unused]] meta_handle instance, meta_any *args, std::index_sequence<Index...>) {
+    using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
+
+    auto dispatch = [](auto &&... params) {
+        if constexpr(std::is_void_v<std::remove_cv_t<typename descriptor::return_type>> || std::is_same_v<Policy, as_void_t>) {
+            std::invoke(Candidate, std::forward<decltype(params)>(params)...);
+            return meta_any{std::in_place_type<void>};
+        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
+            return meta_any{std::reference_wrapper{std::invoke(Candidate, std::forward<decltype(params)>(params)...)}};
+        } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
+            return meta_any{std::cref(std::invoke(Candidate, std::forward<decltype(params)>(params)...))};
+        } else {
+            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
+            return meta_any{std::invoke(Candidate, std::forward<decltype(params)>(params)...)};
+        }
+    };
+
+    if constexpr(std::is_invocable_v<decltype(Candidate), const Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
+        if(const auto * const clazz = instance->try_cast<const Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return dispatch(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        }
+    } else if constexpr(std::is_invocable_v<decltype(Candidate), Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
+        if(auto * const clazz = instance->try_cast<Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return dispatch(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        }
+    } else {
+        if(((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return dispatch((args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        }
+    }
+
+    return meta_any{};
+}
+
+
+}
+
+
+#endif
+
 
 
 namespace entt {
@@ -30134,165 +32109,19 @@ namespace entt {
 namespace internal {
 
 
-template<typename, bool, bool>
-struct meta_function_helper;
-
-
-template<typename Ret, typename... Args, bool Const, bool Static>
-struct meta_function_helper<Ret(Args...), Const, Static> {
-    using return_type = Ret;
-    using args_type = type_list<Args...>;
-
-    static constexpr auto is_static = Static;
-    static constexpr auto is_const = Const;
-
-    [[nodiscard]] static auto arg(typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
-        return std::array<meta_type_node *, sizeof...(Args)>{{meta_info<Args>::resolve()...}}[index];
-    }
-};
-
-
-template<typename Type, typename Ret, typename... Args, typename Class>
-constexpr meta_function_helper<std::conditional_t<std::is_same_v<Type, Class>, Ret(Args...), Ret(Class &, Args...)>, true, !std::is_same_v<Type, Class>>
-to_meta_function_helper(Ret(Class:: *)(Args...) const);
-
-
-template<typename Type, typename Ret, typename... Args, typename Class>
-constexpr meta_function_helper<std::conditional_t<std::is_same_v<Type, Class>, Ret(Args...), Ret(Class &, Args...)>, false, !std::is_same_v<Type, Class>>
-to_meta_function_helper(Ret(Class:: *)(Args...));
-
-
-template<typename Type, typename Ret, typename... Args>
-constexpr meta_function_helper<Ret(Args...), false, true>
-to_meta_function_helper(Ret(*)(Args...));
-
-
-template<typename Type>
-constexpr void to_meta_function_helper(...);
-
-
-template<typename Type, typename Candidate>
-using meta_function_helper_t = decltype(to_meta_function_helper<Type>(std::declval<Candidate>()));
-
-
-template<typename Type, typename... Args, std::size_t... Index>
-[[nodiscard]] meta_any construct(meta_any * const args, std::index_sequence<Index...>) {
-    if(((args+Index)->allow_cast<Args>() && ...)) {
-        return Type{(args+Index)->cast<Args>()...};
-    }
-
-    return {};
+template<typename Node>
+[[nodiscard]] bool find_if(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
+    return node && (node == candidate || find_if(candidate, node->next));
 }
 
 
-template<typename Type, auto Data>
-[[nodiscard]] bool setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
-    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
-        using helper_type = meta_function_helper_t<Type, decltype(Data)>;
-        using data_type = type_list_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
-
-        if(auto * const clazz = instance->try_cast<Type>(); clazz) {
-            if(value.allow_cast<data_type>()) {
-                std::invoke(Data, *clazz, value.cast<data_type>());
-                return true;
-            }
-        }
-    } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-        using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
-
-        if constexpr(!std::is_array_v<data_type>) {
-            if(auto * const clazz = instance->try_cast<Type>(); clazz) {
-                if(value.allow_cast<data_type>()) {
-                    std::invoke(Data, clazz) = value.cast<data_type>();
-                    return true;
-                }
-            }
-        }
+template<typename Id, typename Node>
+[[nodiscard]] bool find_if_not(const Id id, Node *node, const Node *owner) ENTT_NOEXCEPT {
+    if constexpr(std::is_pointer_v<Id>) {
+        return node && ((*node->id == *id && node != owner) || find_if_not(id, node->next, owner));
     } else {
-        using data_type = std::remove_cv_t<std::remove_reference_t<decltype(*Data)>>;
-
-        if constexpr(!std::is_array_v<data_type>) {
-            if(value.allow_cast<data_type>()) {
-                *Data = value.cast<data_type>();
-                return true;
-            }
-        }
+        return node && ((node->id == id && node != owner) || find_if_not(id, node->next, owner));
     }
-
-    return false;
-}
-
-
-template<typename Type, auto Data, typename Policy>
-[[nodiscard]] meta_any getter([[maybe_unused]] meta_handle instance) {
-    [[maybe_unused]] auto dispatch = [](auto &&value) {
-        if constexpr(std::is_same_v<Policy, as_void_t>) {
-            return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
-        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-            return meta_any{std::ref(std::forward<decltype(value)>(value))};
-        } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
-            return meta_any{std::cref(std::forward<decltype(value)>(value))};
-        } else {
-            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
-            return meta_any{std::forward<decltype(value)>(value)};
-        }
-    };
-
-    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
-        auto * const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type *>, const Type, Type>>();
-        return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
-    } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-        if constexpr(std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
-            return meta_any{};
-        } else {
-            auto * const clazz = instance->try_cast<std::conditional_t<std::is_same_v<Policy, as_ref_t>, Type, const Type>>();
-            return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
-        }
-    } else if constexpr(std::is_pointer_v<std::decay_t<decltype(Data)>>) {
-        if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
-            return meta_any{};
-        } else {
-            return dispatch(*Data);
-        }
-    } else {
-        return dispatch(Data);
-    }
-}
-
-
-template<typename Type, auto Candidate, typename Policy, std::size_t... Index>
-[[nodiscard]] meta_any invoke([[maybe_unused]] meta_handle instance, meta_any *args, std::index_sequence<Index...>) {
-    using helper_type = meta_function_helper_t<Type, decltype(Candidate)>;
-
-    auto dispatch = [](auto &&... params) {
-        if constexpr(std::is_void_v<std::remove_cv_t<typename helper_type::return_type>> || std::is_same_v<Policy, as_void_t>) {
-            std::invoke(Candidate, std::forward<decltype(params)>(params)...);
-            return meta_any{std::in_place_type<void>};
-        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-            return meta_any{std::ref(std::invoke(Candidate, std::forward<decltype(params)>(params)...))};
-        } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
-            return meta_any{std::cref(std::invoke(Candidate, std::forward<decltype(params)>(params)...))};
-        } else {
-            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
-            return meta_any{std::invoke(Candidate, std::forward<decltype(params)>(params)...)};
-        }
-    };
-
-    if constexpr(std::is_invocable_v<decltype(Candidate), const Type &, type_list_element_t<Index, typename helper_type::args_type>...>) {
-        if(const auto * const clazz = instance->try_cast<const Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename helper_type::args_type>>() && ...)) {
-            return dispatch(*clazz, (args+Index)->cast<type_list_element_t<Index, typename helper_type::args_type>>()...);
-        }
-    } else if constexpr(std::is_invocable_v<decltype(Candidate), Type &, type_list_element_t<Index, typename helper_type::args_type>...>) {
-        if(auto * const clazz = instance->try_cast<Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename helper_type::args_type>>() && ...)) {
-            return dispatch(*clazz, (args+Index)->cast<type_list_element_t<Index, typename helper_type::args_type>>()...);
-        }
-    } else {
-        if(((args+Index)->allow_cast<type_list_element_t<Index, typename helper_type::args_type>>() && ...)) {
-            return dispatch((args+Index)->cast<type_list_element_t<Index, typename helper_type::args_type>>()...);
-        }
-    }
-
-    return meta_any{};
 }
 
 
@@ -30314,7 +32143,7 @@ template<typename Type, auto Candidate, typename Policy, std::size_t... Index>
  * there are no subtle errors at runtime.
  */
 template<typename...>
-class meta_factory;
+struct meta_factory;
 
 
 /**
@@ -30323,11 +32152,8 @@ class meta_factory;
  * @tparam Spec Property specialization pack used to disambiguate overloads.
  */
 template<typename Type, typename... Spec>
-class meta_factory<Type, Spec...>: public meta_factory<Type> {
-    [[nodiscard]] bool exists(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
-        return node && (node->key() == key || exists(key, node->next));
-    }
-
+struct meta_factory<Type, Spec...>: public meta_factory<Type> {
+private:
     template<std::size_t Step = 0, std::size_t... Index, typename... Property, typename... Other>
     void unpack(std::index_sequence<Index...>, std::tuple<Property...> property, Other &&... other) {
         unroll<Step>(choice<3>, std::move(std::get<Index>(property))..., std::forward<Other>(other)...);
@@ -30359,27 +32185,25 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
     template<std::size_t>
     void unroll(choice_t<0>) {}
 
-    template<std::size_t = 0, typename Key, typename... Value>
-    void assign(Key &&key, Value &&... value) {
-        static const auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
+    template<std::size_t = 0, typename Key>
+    void assign(Key &&key, meta_any value = {}) {
+        static meta_any property[2u]{};
 
         static internal::meta_prop_node node{
             nullptr,
-            []() -> meta_any {
-                return std::get<0>(property);
-            },
-            []() -> meta_any {
-                if constexpr(sizeof...(Value) == 0) {
-                    return {};
-                } else {
-                    return std::get<1>(property);
-                }
-            }
+            property,
+            property + 1u
         };
 
-        ENTT_ASSERT(!exists(node.key(), *curr));
-        node.next = *curr;
-        *curr = &node;
+        entt::meta_any instance{std::forward<Key>(key)};
+        ENTT_ASSERT(!internal::find_if_not(&instance, *curr, &node));
+        property[0u] = std::move(instance);
+        property[1u] = std::move(value);
+
+        if(!internal::find_if(&node, *curr)) {
+            node.next = *curr;
+            *curr = &node;
+        }
     }
 
 public:
@@ -30439,18 +32263,7 @@ private:
  * @tparam Type Reflected type for which the factory was created.
  */
 template<typename Type>
-class meta_factory<Type> {
-    template<typename Node>
-    bool exists(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
-        return node && (node == candidate || exists(candidate, node->next));
-    }
-
-    template<typename Node>
-    bool exists(const id_type id, const Node *node) ENTT_NOEXCEPT {
-        return node && (node->id == id || exists(id, node->next));
-    }
-
-public:
+struct meta_factory<Type> {
     /**
      * @brief Makes a meta type _searchable_.
      * @param id Optional unique identifier.
@@ -30459,11 +32272,13 @@ public:
     auto type(const id_type id = type_hash<Type>::value()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!exists(id, *internal::meta_context::global()));
-        ENTT_ASSERT(!exists(node, *internal::meta_context::global()));
+        ENTT_ASSERT(!internal::find_if_not(id, *internal::meta_context::global(), node));
         node->id = id;
-        node->next = *internal::meta_context::global();
-        *internal::meta_context::global() = node;
+
+        if(!internal::find_if(node, *internal::meta_context::global())) {
+            node->next = *internal::meta_context::global();
+            *internal::meta_context::global() = node;
+        }
 
         return meta_factory<Type, Type>{&node->prop};
     }
@@ -30490,9 +32305,10 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->base));
-        node.next = type->base;
-        type->base = &node;
+        if(!internal::find_if(&node, type->base)) {
+            node.next = type->base;
+            type->base = &node;
+        }
 
         return meta_factory<Type>{};
     }
@@ -30520,9 +32336,10 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->conv));
-        node.next = type->conv;
-        type->conv = &node;
+        if(!internal::find_if(&node, type->conv)) {
+            node.next = type->conv;
+            type->conv = &node;
+        }
 
         return meta_factory<Type>{};
     }
@@ -30553,9 +32370,10 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->conv));
-        node.next = type->conv;
-        type->conv = &node;
+        if(!internal::find_if(&node, type->conv)) {
+            node.next = type->conv;
+            type->conv = &node;
+        }
 
         return meta_factory<Type>{};
     }
@@ -30575,24 +32393,27 @@ public:
      */
     template<auto Candidate, typename Policy = as_is_t>
     auto ctor() ENTT_NOEXCEPT {
-        using helper_type = internal::meta_function_helper_t<Type, decltype(Candidate)>;
-        static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename helper_type::return_type>>, Type>, "The function doesn't return an object of the required type");
+        using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
+        static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_ctor_node node{
             type,
             nullptr,
             nullptr,
-            helper_type::args_type::size,
-            &helper_type::arg,
-            [](meta_any * const any) {
-                return internal::invoke<Type, Candidate, Policy>({}, any, std::make_index_sequence<helper_type::args_type::size>{});
+            descriptor::args_type::size,
+            [](const typename internal::meta_ctor_node::size_type index) ENTT_NOEXCEPT {
+                return meta_arg(typename descriptor::args_type{}, index);
+            },
+            [](meta_any * const args) {
+                return meta_invoke<Type, Candidate, Policy>({}, args, std::make_index_sequence<descriptor::args_type::size>{});
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->ctor));
-        node.next = type->ctor;
-        type->ctor = &node;
+        if(!internal::find_if(&node, type->ctor)) {
+            node.next = type->ctor;
+            type->ctor = &node;
+        }
 
         return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
@@ -30609,23 +32430,26 @@ public:
      */
     template<typename... Args>
     auto ctor() ENTT_NOEXCEPT {
-        using helper_type = internal::meta_function_helper_t<Type, Type(*)(Args...)>;
+        using descriptor = meta_function_helper_t<Type, Type(*)(Args...)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_ctor_node node{
             type,
             nullptr,
             nullptr,
-            helper_type::args_type::size,
-            &helper_type::arg,
-            [](meta_any * const any) {
-                return internal::construct<Type, Args...>(any, std::make_index_sequence<helper_type::args_type::size>{});
+            descriptor::args_type::size,
+            [](const typename internal::meta_ctor_node::size_type index) ENTT_NOEXCEPT {
+                return meta_arg(typename descriptor::args_type{}, index);
+            },
+            [](meta_any * const args) {
+                return meta_construct<Type, Args...>(args, std::make_index_sequence<descriptor::args_type::size>{});
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->ctor));
-        node.next = type->ctor;
-        type->ctor = &node;
+        if(!internal::find_if(&node, type->ctor)) {
+            node.next = type->ctor;
+            type->ctor = &node;
+        }
 
         return meta_factory<Type, Type(Args...)>{&node.prop};
     }
@@ -30651,12 +32475,8 @@ public:
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto * const type = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!type->dtor);
-
         type->dtor = [](void *instance) {
-            if(instance) {
-                std::invoke(Func, *static_cast<Type *>(instance));
-            }
+            std::invoke(Func, *static_cast<Type *>(instance));
         };
 
         return meta_factory<Type>{};
@@ -30680,7 +32500,7 @@ public:
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             return data<Data, Data, Policy>(id);
         } else {
-            using data_type = std::remove_pointer_t<std::decay_t<decltype(Data)>>;
+            using data_type = std::remove_pointer_t<decltype(Data)>;
             auto * const type = internal::meta_info<Type>::resolve();
 
             static internal::meta_data_node node{
@@ -30688,23 +32508,20 @@ public:
                 type,
                 nullptr,
                 nullptr,
+                std::is_same_v<Type, data_type> || std::is_const_v<data_type>,
                 true,
                 &internal::meta_info<data_type>::resolve,
-                []() -> std::remove_cv_t<decltype(internal::meta_data_node::set)> {
-                    if constexpr(std::is_same_v<Type, data_type> || std::is_const_v<data_type>) {
-                        return nullptr;
-                    } else {
-                        return &internal::setter<Type, Data>;
-                    }
-                }(),
-                &internal::getter<Type, Data, Policy>
+                &meta_setter<Type, Data>,
+                &meta_getter<Type, Data, Policy>
             };
 
-            ENTT_ASSERT(!exists(id, type->data));
-            ENTT_ASSERT(!exists(&node, type->data));
+            ENTT_ASSERT(!internal::find_if_not(id, type->data, &node));
             node.id = id;
-            node.next = type->data;
-            type->data = &node;
+
+            if(!internal::find_if(&node, type->data)) {
+                node.next = type->data;
+                type->data = &node;
+            }
 
             return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&node.prop};
         }
@@ -30740,23 +32557,20 @@ public:
             type,
             nullptr,
             nullptr,
+            std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>),
             false,
             &internal::meta_info<underlying_type>::resolve,
-            []() -> std::remove_cv_t<decltype(internal::meta_data_node::set)> {
-                if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) {
-                    return nullptr;
-                } else {
-                    return &internal::setter<Type, Setter>;
-                }
-            }(),
-            &internal::getter<Type, Getter, Policy>
+            &meta_setter<Type, Setter>,
+            &meta_getter<Type, Getter, Policy>
         };
 
-        ENTT_ASSERT(!exists(id, type->data));
-        ENTT_ASSERT(!exists(&node, type->data));
+        ENTT_ASSERT(!internal::find_if_not(id, type->data, &node));
         node.id = id;
-        node.next = type->data;
-        type->data = &node;
+
+        if(!internal::find_if(&node, type->data)) {
+            node.next = type->data;
+            type->data = &node;
+        }
 
         return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
     }
@@ -30776,7 +32590,7 @@ public:
      */
     template<auto Candidate, typename Policy = as_is_t>
     auto func(const id_type id) ENTT_NOEXCEPT {
-        using helper_type = internal::meta_function_helper_t<Type, decltype(Candidate)>;
+        using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_func_node node{
@@ -30784,22 +32598,29 @@ public:
             type,
             nullptr,
             nullptr,
-            helper_type::args_type::size,
-            helper_type::is_const,
-            helper_type::is_static,
-            &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
-            &helper_type::arg,
+            descriptor::args_type::size,
+            descriptor::is_const,
+            descriptor::is_static,
+            &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename descriptor::return_type>>::resolve,
+            [](const typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
+                return meta_arg(typename descriptor::args_type{}, index);
+            },
             [](meta_handle instance, meta_any *args) {
-                return internal::invoke<Type, Candidate, Policy>(std::move(instance), args, std::make_index_sequence<helper_type::args_type::size>{});
+                return meta_invoke<Type, Candidate, Policy>(std::move(instance), args, std::make_index_sequence<descriptor::args_type::size>{});
             }
         };
 
-        ENTT_ASSERT(!exists(&node, type->func));
+        for(auto *it = &type->func; *it; it = &(*it)->next) {
+            if(*it == &node) {
+                *it = node.next;
+                break;
+            }
+        }
 
         internal::meta_func_node **it = &type->func;
         for(; *it && (*it)->id != id; it = &(*it)->next);
-        for(; *it && (*it)->id == id && (*it)->size < node.size; it = &(*it)->next);
-
+        for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
+        
         node.id = id;
         node.next = *it;
         *it = &node;
@@ -30833,303 +32654,16 @@ template<typename Type>
 
 #endif
 
-// #include "meta/internal.hpp"
-#ifndef ENTT_META_INTERNAL_HPP
-#define ENTT_META_INTERNAL_HPP
-
-
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <type_traits>
-#include <utility>
-// #include "../core/attribute.h"
-
-// #include "../config/config.h"
-
-// #include "../core/fwd.hpp"
-
-// #include "../core/type_info.hpp"
-
-// #include "../core/type_traits.hpp"
-
-// #include "type_traits.hpp"
-
-
-
-namespace entt {
-
-
-class meta_any;
-struct meta_handle;
-
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-struct meta_type_node;
-
-
-struct meta_prop_node {
-    meta_prop_node * next;
-    meta_any(* const key)();
-    meta_any(* const value)();
-};
-
-
-struct meta_base_node {
-    meta_type_node * const parent;
-    meta_base_node * next;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    const void *(* const cast)(const void *) ENTT_NOEXCEPT;
-};
-
-
-struct meta_conv_node {
-    meta_type_node * const parent;
-    meta_conv_node * next;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    meta_any(* const conv)(const void *);
-};
-
-
-struct meta_ctor_node {
-    using size_type = std::size_t;
-    meta_type_node * const parent;
-    meta_ctor_node * next;
-    meta_prop_node * prop;
-    const size_type size;
-    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
-    meta_any(* const invoke)(meta_any * const);
-};
-
-
-struct meta_data_node {
-    id_type id;
-    meta_type_node * const parent;
-    meta_data_node * next;
-    meta_prop_node * prop;
-    const bool is_static;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    bool(* const set)(meta_handle, meta_any);
-    meta_any(* const get)(meta_handle);
-};
-
-
-struct meta_func_node {
-    using size_type = std::size_t;
-    id_type id;
-    meta_type_node * const parent;
-    meta_func_node * next;
-    meta_prop_node * prop;
-    const size_type size;
-    const bool is_const;
-    const bool is_static;
-    meta_type_node *(* const ret)() ENTT_NOEXCEPT;
-    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
-    meta_any(* const invoke)(meta_handle, meta_any *);
-};
-
-
-struct meta_type_node {
-    using size_type = std::size_t;
-    const type_info info;
-    id_type id;
-    meta_type_node * next;
-    meta_prop_node * prop;
-    const size_type size_of;
-    const bool is_void;
-    const bool is_integral;
-    const bool is_floating_point;
-    const bool is_array;
-    const bool is_enum;
-    const bool is_union;
-    const bool is_class;
-    const bool is_pointer;
-    const bool is_function_pointer;
-    const bool is_member_object_pointer;
-    const bool is_member_function_pointer;
-    const bool is_pointer_like;
-    const bool is_sequence_container;
-    const bool is_associative_container;
-    const size_type rank;
-    size_type(* const extent)(size_type);
-    meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
-    meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
-    meta_base_node *base{nullptr};
-    meta_conv_node *conv{nullptr};
-    meta_ctor_node *ctor{nullptr};
-    meta_data_node *data{nullptr};
-    meta_func_node *func{nullptr};
-    void(* dtor)(void *){nullptr};
-};
-
-
-template<typename Node>
-class meta_range {
-    struct range_iterator {
-        using difference_type = std::ptrdiff_t;
-        using value_type = Node;
-        using pointer = value_type *;
-        using reference = value_type &;
-        using iterator_category = std::forward_iterator_tag;
-
-        range_iterator() ENTT_NOEXCEPT = default;
-
-        range_iterator(Node *head) ENTT_NOEXCEPT
-            : node{head}
-        {}
-
-        range_iterator & operator++() ENTT_NOEXCEPT {
-            return node = node->next, *this;
-        }
-
-        range_iterator operator++(int) ENTT_NOEXCEPT {
-            range_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
-            return other.node == node;
-        }
-
-        [[nodiscard]] bool operator!=(const range_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            return node;
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return *operator->();
-        }
-
-    private:
-        Node *node{nullptr};
-    };
-
-public:
-    using iterator = range_iterator;
-
-    meta_range() ENTT_NOEXCEPT = default;
-
-    meta_range(Node *head)
-        : node{head}
-    {}
-
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{node};
-    }
-
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{};
-    }
-
-private:
-    Node *node{nullptr};
-};
-
-
-template<auto Member, typename Op>
-auto find_if(const Op &op, const meta_type_node *node)
--> std::decay_t<decltype(node->*Member)> {
-    for(auto &&curr: meta_range{node->*Member}) {
-        if(op(&curr)) {
-            return &curr;
-        }
-    }
-
-    for(auto &&curr: meta_range{node->base}) {
-        if(auto *ret = find_if<Member>(op, curr.type()); ret) {
-            return ret;
-        }
-    }
-
-    return nullptr;
-}
-
-
-template<typename Type>
-class ENTT_API meta_node {
-    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
-
-    template<std::size_t... Index>
-    [[nodiscard]] static auto extent(meta_type_node::size_type dim, std::index_sequence<Index...>) {
-        meta_type_node::size_type ext{};
-        ((ext = (dim == Index ? std::extent_v<Type, Index> : ext)), ...);
-        return ext;
-    }
-
-public:
-    [[nodiscard]] static meta_type_node * resolve() ENTT_NOEXCEPT {
-        static meta_type_node node{
-            type_id<Type>(),
-            {},
-            nullptr,
-            nullptr,
-            size_of_v<Type>,
-            std::is_void_v<Type>,
-            std::is_integral_v<Type>,
-            std::is_floating_point_v<Type>,
-            std::is_array_v<Type>,
-            std::is_enum_v<Type>,
-            std::is_union_v<Type>,
-            std::is_class_v<Type>,
-            std::is_pointer_v<Type>,
-            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
-            std::is_member_object_pointer_v<Type>,
-            std::is_member_function_pointer_v<Type>,
-            is_meta_pointer_like_v<Type>,
-            has_meta_sequence_container_traits_v<Type>,
-            has_meta_associative_container_traits_v<Type>,
-            std::rank_v<Type>,
-            [](meta_type_node::size_type dim) {
-                return extent(dim, std::make_index_sequence<std::rank_v<Type>>{});
-            },
-            &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
-            &meta_node<std::remove_cv_t<std::remove_extent_t<Type>>>::resolve
-        };
-
-        return &node;
-    }
-};
-
-
-template<typename... Type>
-struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> {};
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
-
-
-}
-
-
-#endif
-
 // #include "meta/meta.hpp"
 #ifndef ENTT_META_META_HPP
 #define ENTT_META_META_HPP
 
 
-#include <algorithm>
 #include <array>
 #include <cstddef>
-#include <iterator>
 #include <functional>
+#include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 // #include "../config/config.h"
@@ -31142,11 +32676,13 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
 
 // #include "../core/type_info.hpp"
 
+// #include "../core/type_traits.hpp"
+
 // #include "adl_pointer.hpp"
 
 // #include "ctx.hpp"
 
-// #include "internal.hpp"
+// #include "node.hpp"
 
 // #include "range.hpp"
 
@@ -31157,8 +32693,8 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
 namespace entt {
 
 
-class meta_type;
 class meta_any;
+class meta_type;
 
 
 /*! @brief Proxy object for sequence containers. */
@@ -31289,43 +32825,61 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    enum class operation { DEREF, CDEREF, SEQ, CSEQ, ASSOC, CASSOC };
+    enum class operation { DTOR, REF, CREF, DEREF, CDEREF, SEQ, CSEQ, ASSOC, CASSOC };
 
     using vtable_type = void(const operation, const any &, void *);
 
     template<typename Type>
     static void basic_vtable(const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] void *to) {
-        switch(op) {
-        case operation::DEREF:
-            if constexpr(is_meta_pointer_like_v<Type>) {
-                *static_cast<meta_any *>(to) = std::reference_wrapper{adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from))};
-            }
+        if constexpr(!std::is_void_v<Type>) {
+            using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
+
+            switch(op) {
+            case operation::DTOR:
+                if constexpr(!std::is_lvalue_reference_v<Type>) {
+                    if(auto *curr = static_cast<internal::meta_type_node *>(to); curr->dtor) {
+                        curr->dtor(const_cast<any &>(from).data());
+                    }
+                }
             break;
-        case operation::CDEREF:
-            if constexpr(is_meta_pointer_like_v<Type>) {
-                *static_cast<meta_any *>(to) = std::cref(adl_meta_pointer_like<Type>::dereference(any_cast<const Type>(from)));
+            case operation::REF:
+            case operation::CREF:
+                *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const base_type &>(from))});
+                break;
+            case operation::DEREF:
+            case operation::CDEREF:
+                if constexpr(is_meta_pointer_like_v<base_type>) {
+                    // for some reason vs2017 doesn't compile when using alias declarations with pointer_traits to get the element type
+                    using element_type = std::remove_const_t<typename std::pointer_traits<std::remove_const_t<std::remove_reference_t<Type>>>::element_type>;
+
+                    if constexpr(std::is_function_v<element_type>) {
+                        *static_cast<meta_any *>(to) = any_cast<base_type>(from);
+                    } else if constexpr(!std::is_same_v<element_type, void>) {
+                        // for some reason vs2017 doesn't compile when using alias declarations with adl_meta_pointer_like
+                        using adl_meta_pointer_like_type = adl_meta_pointer_like<std::remove_const_t<std::remove_reference_t<Type>>>;
+
+                        if constexpr(std::is_lvalue_reference_v<decltype(adl_meta_pointer_like_type::dereference(std::declval<const base_type &>()))>) {
+                            auto &&obj = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+                            *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::ref(obj)} : meta_any{std::cref(obj)});
+                        } else {
+                            *static_cast<meta_any *>(to) = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+                        }
+                    }
+                }
+                break;
+            case operation::SEQ:
+            case operation::CSEQ:
+                if constexpr(is_complete_v<meta_sequence_container_traits<base_type>>) {
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<base_type>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                }
+                break;
+            case operation::ASSOC:
+            case operation::CASSOC:
+                if constexpr(is_complete_v<meta_associative_container_traits<base_type>>) {
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<base_type>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                }
+                break;
             }
-            break;
-        case operation::SEQ:
-            if constexpr(has_meta_sequence_container_traits_v<Type>) {
-                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, as_ref(const_cast<any &>(from)) };
-            }
-            break;
-        case operation::CSEQ:
-            if constexpr(has_meta_sequence_container_traits_v<Type>) {
-                *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, as_ref(from) };
-            }
-            break;
-        case operation::ASSOC:
-            if constexpr(has_meta_associative_container_traits_v<Type>) {
-                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, as_ref(const_cast<any &>(from)) };
-            }
-            break;
-        case operation::CASSOC:
-            if constexpr(has_meta_associative_container_traits_v<Type>) {
-                *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, as_ref(from) };
-            }
-            break;
         }
     }
 
@@ -31333,8 +32887,8 @@ public:
     /*! @brief Default constructor. */
     meta_any() ENTT_NOEXCEPT
         : storage{},
-          vtable{},
-          node{}
+          node{},
+          vtable{&basic_vtable<void>}
     {}
 
     /**
@@ -31346,8 +32900,8 @@ public:
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&... args)
         : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
-          vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>},
-          node{internal::meta_info<std::remove_const_t<std::remove_reference_t<Type>>>::resolve()}
+          node{internal::meta_info<Type>::resolve()},
+          vtable{&basic_vtable<Type>}
     {}
 
     /**
@@ -31357,7 +32911,7 @@ public:
      */
     template<typename Type>
     meta_any(std::reference_wrapper<Type> value)
-        : meta_any{std::in_place_type<Type &>, &value.get()}
+        : meta_any{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -31388,8 +32942,8 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
-        if(node && node->dtor) {
-            node->dtor(storage.data());
+        if(vtable) {
+            vtable(operation::DTOR, storage, node);
         }
     }
 
@@ -31404,8 +32958,8 @@ public:
     }
 
     /**
-     * @brief Returns the meta type of the underlying object.
-     * @return The meta type of the underlying object, if any.
+     * @brief Returns the type of the underlying object.
+     * @return The type of the underlying object, if any.
      */
     [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
@@ -31425,7 +32979,7 @@ public:
     /**
      * @brief Invokes the underlying function, if possible.
      *
-     * @sa invoke
+     * @sa meta_func::invoke
      *
      * @tparam Args Types of arguments to use to invoke the function.
      * @param id Unique identifier.
@@ -31471,9 +33025,9 @@ public:
     template<typename Type>
     [[nodiscard]] const Type * try_cast() const {
         if(node) {
-            if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
+            if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
-            } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
+            } else if(const auto *base = internal::meta_visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
                 return static_cast<const Type *>(base->cast(storage.data()));
             }
         }
@@ -31485,9 +33039,9 @@ public:
     template<typename Type>
     [[nodiscard]] Type * try_cast() {
         if(node) {
-            if(const auto info = internal::meta_info<Type>::resolve()->info; node->info == info) {
+            if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
-            } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
+            } else if(const auto *base = internal::meta_visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type()->info == info; }, node); base) {
                 return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
             }
         }
@@ -31501,8 +33055,7 @@ public:
      * The type of the instance must be such that the cast is possible.
      *
      * @warning
-     * Attempting to perform a cast that isn't viable results in undefined
-     * behavior.
+     * Attempting to perform an invalid cast results in undefined behavior.
      *
      * @tparam Type Type to which to cast the instance.
      * @return A reference to the contained instance.
@@ -31524,19 +33077,17 @@ public:
     }
 
     /**
-     * @brief Tries to make an instance castable to a certain type.
+     * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return A valid meta any object if there exists a a viable conversion
-     * that makes the cast possible, an invalid object otherwise.
+     * @return A valid meta any object if there exists a viable conversion, an
+     * invalid one otherwise.
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         if(try_cast<std::remove_reference_t<Type>>() != nullptr) {
-            return as_ref(*this);
+            return as_ref();
         } else if(node) {
-            if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-                return curr->type()->info == info;
-            }, node); conv) {
+            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = type_id<Type>()](const auto *curr) { return curr->type()->info == info; }, node); conv) {
                 return conv->conv(storage.data());
             }
         }
@@ -31545,21 +33096,17 @@ public:
     }
 
     /**
-     * @brief Tries to make an instance castable to a certain type.
+     * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return True if there exists a a viable conversion that makes the cast
-     * possible, false otherwise.
+     * @return True if there exists a viable conversion, false otherwise.
      */
     template<typename Type>
     bool allow_cast() {
         if(try_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>() != nullptr) {
             return true;
         } else if(node) {
-            if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-                return curr->type()->info == info;
-            }, node); conv) {
-                auto other = conv->conv(std::as_const(storage).data());
-                swap(other, *this);
+            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = type_id<Type>()](const auto *curr) { return curr->type()->info == info; }, node); conv) {
+                *this = conv->conv(std::as_const(storage).data());
                 return true;
             }
         }
@@ -31576,6 +33123,11 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
         *this = meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = meta_any{};
     }
 
     /**
@@ -31618,16 +33170,16 @@ public:
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
     [[nodiscard]] meta_any operator*() ENTT_NOEXCEPT {
-        meta_any any{};
-        vtable(operation::DEREF, storage, &any);
-        return any;
+        meta_any ret{};
+        vtable(operation::DEREF, storage, &ret);
+        return ret;
     }
 
     /*! @copydoc operator* */
     [[nodiscard]] meta_any operator*() const ENTT_NOEXCEPT {
-        meta_any any{};
-        vtable(operation::CDEREF, storage, &any);
-        return any;
+        meta_any ret{};
+        vtable(operation::CDEREF, storage, &ret);
+        return ret;
     }
 
     /**
@@ -31644,7 +33196,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const meta_any &other) const {
-        return (node == other.node) && (storage == other.storage);
+        return (!node && !other.node) || (node && other.node && node->info == other.node->info && storage == other.storage);
     }
 
     /**
@@ -31661,28 +33213,25 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return A meta any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend meta_any as_ref(meta_any &other) ENTT_NOEXCEPT {
-        meta_any ref = as_ref(std::as_const(other));
-        ref.storage = as_ref(other.storage);
+    [[nodiscard]] meta_any as_ref() ENTT_NOEXCEPT {
+        meta_any ref{};
+        vtable(operation::REF, storage, &ref);
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend meta_any as_ref(const meta_any &other) ENTT_NOEXCEPT {
+    [[nodiscard]] meta_any as_ref() const ENTT_NOEXCEPT {
         meta_any ref{};
-        ref.node = other.node;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+        vtable(operation::CREF, storage, &ref);
         return ref;
     }
 
 private:
     any storage;
-    vtable_type *vtable;
     internal::meta_type_node *node;
+    vtable_type *vtable;
 };
 
 
@@ -31702,11 +33251,30 @@ private:
  *
  * A handle doesn't perform copies and isn't responsible for the contained
  * object. It doesn't prolong the lifetime of the pointed instance.<br/>
- * Handles are used to generate meta references to actual objects when needed.
+ * Handles are used to generate references to actual objects when needed.
  */
 struct meta_handle {
     /*! @brief Default constructor. */
     meta_handle() = default;
+
+
+    /*! @brief Default copy constructor, deleted on purpose. */
+    meta_handle(const meta_handle &) = delete;
+
+    /*! @brief Default move constructor. */
+    meta_handle(meta_handle &&) = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This meta handle.
+     */
+    meta_handle & operator=(const meta_handle &) = delete;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This meta handle.
+     */
+    meta_handle & operator=(meta_handle &&) = default;
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
@@ -31718,18 +33286,18 @@ struct meta_handle {
         : meta_handle{}
     {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
-            any = as_ref(value);
+            any = value.as_ref();
         } else {
-            any = std::reference_wrapper{value};
+            any.emplace<Type &>(value);
         }
     }
 
     /**
-     * @brief Dereference operator for accessing the contained opaque object.
-     * @return A meta any that shares a reference to an unmanaged object.
+     * @brief Returns false if a handle is invalid, true otherwise.
+     * @return False if the handle is invalid, true otherwise.
      */
-    [[nodiscard]] meta_any operator*() const {
-        return any;
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(any);
     }
 
     /**
@@ -31740,10 +33308,7 @@ struct meta_handle {
         return &any;
     }
 
-    /**
-     * @brief Access operator for accessing the contained opaque object.
-     * @return A meta any that shares a reference to an unmanaged object.
-     */
+    /*! @copydoc operator-> */
     [[nodiscard]] const meta_any * operator->() const {
         return &any;
     }
@@ -31753,7 +33318,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta properties of any type. */
+/*! @brief Opaque wrapper for properties of any type. */
 struct meta_prop {
     /*! @brief Node type. */
     using node_type = internal::meta_prop_node;
@@ -31767,24 +33332,24 @@ struct meta_prop {
     {}
 
     /**
-     * @brief Returns the stored key.
+     * @brief Returns the stored key as a const reference.
      * @return A meta any containing the key stored with the property.
      */
     [[nodiscard]] meta_any key() const {
-        return node->key();
+        return node->id->as_ref();
     }
 
     /**
-     * @brief Returns the stored value.
+     * @brief Returns the stored value by copy.
      * @return A meta any containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node->value();
+        return *node->value;
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -31795,86 +33360,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta base classes. */
-struct meta_base {
-    /*! @brief Node type. */
-    using node_type = internal::meta_base_node;
-
-    /*! @copydoc meta_prop::meta_prop */
-    meta_base(const node_type *curr = nullptr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-    /**
-     * @brief Returns the meta type to which a meta object belongs.
-     * @return The meta type to which the meta object belongs.
-     */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
-
-    /*! @copydoc meta_any::type */
-    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
-
-    /**
-     * @brief Casts an instance from a parent type to a base type.
-     * @param instance The instance to cast.
-     * @return An opaque pointer to the base type.
-     */
-    [[nodiscard]] const void * cast(const void *instance) const ENTT_NOEXCEPT {
-        return node->cast(instance);
-    }
-
-    /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(node == nullptr);
-    }
-
-private:
-    const node_type *node;
-};
-
-
-/*! @brief Opaque wrapper for meta conversion functions. */
-struct meta_conv {
-    /*! @brief Node type. */
-    using node_type = internal::meta_conv_node;
-
-    /*! @copydoc meta_prop::meta_prop */
-    meta_conv(const node_type *curr = nullptr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-    /*! @copydoc meta_base::parent */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
-
-    /*! @copydoc meta_any::type */
-    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
-
-    /**
-     * @brief Converts an instance to the underlying type.
-     * @param instance The instance to convert.
-     * @return An opaque pointer to the instance to convert.
-     */
-    [[nodiscard]] meta_any convert(const void *instance) const {
-        return node->conv(instance);
-    }
-
-    /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(node == nullptr);
-    }
-
-private:
-    const node_type *node;
-};
-
-
-/*! @brief Opaque wrapper for meta constructors. */
+/*! @brief Opaque wrapper for constructors. */
 struct meta_ctor {
     /*! @brief Node type. */
     using node_type = internal::meta_ctor_node;
@@ -31886,37 +33372,39 @@ struct meta_ctor {
         : node{curr}
     {}
 
-    /*! @copydoc meta_base::parent */
+    /**
+     * @brief Returns the type to which an object belongs.
+     * @return The type to which the object belongs.
+     */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the number of arguments accepted by a meta constructor.
-     * @return The number of arguments accepted by the meta constructor.
+     * @brief Returns the number of arguments accepted by a constructor.
+     * @return The number of arguments accepted by the constructor.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return node->size;
+    [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
+        return node->arity;
     }
 
     /**
-     * @brief Returns the meta type of the i-th argument of a meta constructor.
-     * @param index The index of the argument of which to return the meta type.
-     * @return The meta type of the i-th argument of a meta constructor, if any.
+     * @brief Returns the type of the i-th argument of a constructor.
+     * @param index Index of the argument of which to return the type.
+     * @return The type of the i-th argument of a constructor.
      */
     [[nodiscard]] meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * To create a valid instance, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.
+     * Parameters must be such that a cast or conversion to the required types
+     * is possible. Otherwise, an empty and thus invalid wrapper is returned.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
      * @return A meta any containing the new instance, if any.
      */
     [[nodiscard]] meta_any invoke(meta_any * const args, const size_type sz) const {
-        return sz == size() ? node->invoke(args) : meta_any{};
+        return sz == arity() ? node->invoke(args) : meta_any{};
     }
 
     /**
@@ -31935,8 +33423,8 @@ struct meta_ctor {
     }
 
     /**
-     * @brief Returns a range to use to visit all meta properties.
-     * @return An iterable range to use to visit all meta properties.
+     * @brief Returns a range to use to visit all properties.
+     * @return An iterable range to use to visit all properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
@@ -31948,13 +33436,12 @@ struct meta_ctor {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        internal::meta_range range{node->prop};
-        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -31965,7 +33452,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta data. */
+/*! @brief Opaque wrapper for data members. */
 struct meta_data {
     /*! @brief Node type. */
     using node_type = internal::meta_data_node;
@@ -31980,20 +33467,20 @@ struct meta_data {
         return node->id;
     }
 
-    /*! @copydoc meta_base::parent */
+    /*! @copydoc meta_ctor::parent */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Indicates whether a meta data is constant or not.
-     * @return True if the meta data is constant, false otherwise.
+     * @brief Indicates whether a data member is constant or not.
+     * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return (node->set == nullptr);
+        return node->is_const;
     }
 
     /**
-     * @brief Indicates whether a meta data is static or not.
-     * @return True if the meta data is static, false otherwise.
+     * @brief Indicates whether a data member is static or not.
+     * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
         return node->is_static;
@@ -32005,8 +33492,8 @@ struct meta_data {
     /**
      * @brief Sets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the setter results in an undefined
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
@@ -32024,8 +33511,8 @@ struct meta_data {
     /**
      * @brief Gets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the getter results in an undefined behavior.
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the getter results in an undefined behavior.
      *
      * @param instance An opaque instance of the underlying type.
      * @return A meta any containing the value of the underlying variable.
@@ -32045,13 +33532,12 @@ struct meta_data {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        internal::meta_range range{node->prop};
-        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -32062,7 +33548,7 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta functions. */
+/*! @brief Opaque wrapper for member functions. */
 struct meta_func {
     /*! @brief Node type. */
     using node_type = internal::meta_func_node;
@@ -32079,53 +33565,53 @@ struct meta_func {
         return node->id;
     }
 
-    /*! @copydoc meta_base::parent */
+    /*! @copydoc meta_ctor::parent */
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the number of arguments accepted by a meta function.
-     * @return The number of arguments accepted by the meta function.
+     * @brief Returns the number of arguments accepted by a member function.
+     * @return The number of arguments accepted by the member function.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return node->size;
+    [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
+        return node->arity;
     }
 
     /**
-     * @brief Indicates whether a meta function is constant or not.
-     * @return True if the meta function is constant, false otherwise.
+     * @brief Indicates whether a member function is constant or not.
+     * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
         return node->is_const;
     }
 
     /**
-     * @brief Indicates whether a meta function is static or not.
-     * @return True if the meta function is static, false otherwise.
+     * @brief Indicates whether a member function is static or not.
+     * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
         return node->is_static;
     }
 
     /**
-     * @brief Returns the meta type of the return type of a meta function.
-     * @return The meta type of the return type of the meta function.
+     * @brief Returns the return type of a member function.
+     * @return The return type of the member function.
      */
     [[nodiscard]] inline meta_type ret() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Returns the meta type of the i-th argument of a meta function.
-     * @param index The index of the argument of which to return the meta type.
-     * @return The meta type of the i-th argument of a meta function, if any.
+     * @brief Returns the type of the i-th argument of a member function.
+     * @param index Index of the argument of which to return the type.
+     * @return The type of the i-th argument of a member function.
      */
     [[nodiscard]] inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Invokes the underlying function, if possible.
      *
-     * To invoke a meta function, the parameters must be such that a cast or
+     * To invoke a member function, the parameters must be such that a cast or
      * conversion to the required types is possible. Otherwise, an empty and
      * thus invalid wrapper is returned.<br/>
-     * It must be possible to cast the instance to the parent type of the meta
+     * It must be possible to cast the instance to the parent type of the member
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
      *
@@ -32135,7 +33621,7 @@ struct meta_func {
      * @return A meta any containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any * const args, const size_type sz) const {
-        return sz == size() ? node->invoke(std::move(instance), args) : meta_any{};
+        return sz == arity() ? node->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**
@@ -32165,13 +33651,12 @@ struct meta_func {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        internal::meta_range range{node->prop};
-        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
@@ -32182,17 +33667,21 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for meta types. */
+/*! @brief Opaque wrapper for types. */
 class meta_type {
-    static bool can_cast_or_convert(const meta_type type, const type_info info) ENTT_NOEXCEPT {
-        for(auto curr: type.conv()) {
-            if(curr.type().info() == info) {
+    static bool can_cast_or_convert(const internal::meta_type_node *type, const type_info info) ENTT_NOEXCEPT {
+        if(type->info == info) {
+            return true;
+        }
+
+        for(const auto *curr = type->conv; curr; curr = curr->next) {
+            if(curr->type()->info == info) {
                 return true;
             }
         }
 
-        for(auto curr: type.base()) {
-            if(curr.type().info() == info || can_cast_or_convert(curr.type(), info)) {
+        for(const auto *curr = type->base; curr; curr = curr->next) {
+            if(auto *target = curr->type(); can_cast_or_convert(target, info)) {
                 return true;
             }
         }
@@ -32201,10 +33690,10 @@ class meta_type {
     }
 
     template<typename... Args, auto... Index>
-    [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node * const curr, std::index_sequence<Index...>) {
-        for(const auto &candidate: internal::meta_range{curr}) {
-            if(candidate.size == sizeof...(Args) && ([](auto *from, auto *to) { return from->info == to->info || can_cast_or_convert(from, to->info); }(internal::meta_info<Args>::resolve(), candidate.arg(Index)) && ...)) {
-                return &candidate;
+    [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node *curr, std::index_sequence<Index...>) {
+        for(; curr; curr = curr->next) {
+            if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index).info()) && ...)) {
+                return curr;
             }
         }
 
@@ -32214,12 +33703,22 @@ class meta_type {
 public:
     /*! @brief Node type. */
     using node_type = internal::meta_type_node;
+    /*! @brief Node type. */
+    using base_node_type = internal::meta_base_node;
     /*! @brief Unsigned integer type. */
     using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
     meta_type(node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
+    {}
+
+    /**
+     * @brief Constructs an instance from a given base node.
+     * @param curr The base node with which to construct the instance.
+     */
+    meta_type(base_node_type *curr) ENTT_NOEXCEPT
+        : node{curr ? curr->type() : nullptr}
     {}
 
     /**
@@ -32231,8 +33730,8 @@ public:
     }
 
     /**
-     * @brief Returns the identifier assigned to a meta object.
-     * @return The identifier assigned to the meta object.
+     * @brief Returns the identifier assigned to a type.
+     * @return The identifier assigned to the type.
      */
     [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
@@ -32350,8 +33849,7 @@ public:
 
     /**
      * @brief Checks whether a type refers to a sequence container or not.
-     * @return True if the underlying type is a sequence container, false
-     * otherwise.
+     * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const ENTT_NOEXCEPT {
         return node->is_sequence_container;
@@ -32359,106 +33857,115 @@ public:
 
     /**
      * @brief Checks whether a type refers to an associative container or not.
-     * @return True if the underlying type is an associative container, false
-     * otherwise.
+     * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const ENTT_NOEXCEPT {
         return node->is_associative_container;
     }
 
     /**
-     * @brief If a type refers to an array type, provides the number of
-     * dimensions of the array.
-     * @return The number of dimensions of the array if the underlying type is
-     * an array type, 0 otherwise.
+     * @brief Checks whether a type refers to a recognized class template
+     * specialization or not.
+     * @return True if the type is a recognized class template specialization,
+     * false otherwise.
+     */
+    [[nodiscard]] bool is_template_specialization() const ENTT_NOEXCEPT {
+        return node->template_info.is_template_specialization;
+    }
+
+    /**
+     * @brief Returns the number of template arguments, if any.
+     * @return The number of template arguments, if any.
+     */
+    [[nodiscard]] size_type template_arity() const ENTT_NOEXCEPT {
+        return node->template_info.arity;
+    }
+
+    /**
+     * @brief Returns a tag for the class template of the underlying type.
+     *
+     * @sa meta_class_template_tag
+     *
+     * @return The tag for the class template of the underlying type.
+     */
+    [[nodiscard]] inline meta_type template_type() const ENTT_NOEXCEPT {
+        return is_template_specialization() ?  node->template_info.type() : meta_type{};
+    }
+
+    /**
+     * @brief Returns the type of the i-th template argument of a type.
+     * @param index Index of the template argument of which to return the type.
+     * @return The type of the i-th template argument of a type.
+     */
+    [[nodiscard]] inline meta_type template_arg(size_type index) const ENTT_NOEXCEPT {
+        return index < template_arity() ? node->template_info.arg(index) : meta_type{};
+    }
+
+    /**
+     * @brief Provides the number of dimensions of an array type.
+     * @return The number of dimensions in case of array types, 0 otherwise.
      */
     [[nodiscard]] size_type rank() const ENTT_NOEXCEPT {
         return node->rank;
     }
 
     /**
-     * @brief If a type refers to an array type, provides the number of elements
-     * along the given dimension of the array.
+     * @brief The number of elements along the given dimension of an array type.
      * @param dim The dimension of which to return the number of elements.
-     * @return The number of elements along the given dimension of the array if
-     * the underlying type is an array type, 0 otherwise.
+     * @return The number of elements along the given dimension in case of array
+     * types, 0 otherwise.
      */
     [[nodiscard]] size_type extent(size_type dim = {}) const ENTT_NOEXCEPT {
         return node->extent(dim);
     }
 
     /**
-     * @brief Provides the meta type for which the pointer is defined.
-     * @return The meta type for which the pointer is defined or this meta type
-     * if it doesn't refer to a pointer type.
+     * @brief Provides the type for which the pointer is defined.
+     * @return The type for which the pointer is defined or this type if it
+     * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const ENTT_NOEXCEPT {
         return node->remove_pointer();
     }
 
     /**
-     * @brief Provides the meta type for which the array is defined.
-     * @return The meta type for which the array is defined or this meta type
-     * if it doesn't refer to an array type.
+     * @brief Provides the type for which the array is defined.
+     * @return The type for which the array is defined or this type if it
+     * doesn't refer to an array type.
      */
     [[nodiscard]] meta_type remove_extent() const ENTT_NOEXCEPT {
         return node->remove_extent();
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta bases.
-     * @return An iterable range to use to visit top-level meta bases.
+     * @brief Returns a range to use to visit top-level base meta types.
+     * @return An iterable range to use to visit top-level base meta types.
      */
-    [[nodiscard]] meta_range<meta_base> base() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_type, internal::meta_base_node> base() const ENTT_NOEXCEPT {
         return node->base;
     }
 
     /**
-     * @brief Returns the meta base associated with a given identifier.
+     * @brief Returns the base meta type associated with a given identifier.
      * @param id Unique identifier.
-     * @return The meta base associated with the given identifier, if any.
+     * @return The base meta type associated with the given identifier, if any.
      */
-    [[nodiscard]] meta_base base(const id_type id) const {
-        return internal::find_if<&node_type::base>([id](const auto *curr) {
-            return curr->type()->id == id;
-        }, node);
+    [[nodiscard]] meta_type base(const id_type id) const {
+        return internal::meta_visit<&node_type::base>([id](const auto *curr) { return curr->type()->id == id; }, node);
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta conversion
-     * functions.
-     * @return An iterable range to use to visit top-level meta conversion
-     * functions.
-     */
-    [[nodiscard]] meta_range<meta_conv> conv() const ENTT_NOEXCEPT {
-        return node->conv;
-    }
-
-    /**
-     * @brief Returns the meta conversion function associated with a given type.
-     * @tparam Type The type to use to search for a meta conversion function.
-     * @return The meta conversion function associated with the given type, if
-     * any.
-     */
-    template<typename Type>
-    [[nodiscard]] meta_conv conv() const {
-        return internal::find_if<&node_type::conv>([info = internal::meta_info<Type>::resolve()->info](const auto *curr) {
-            return curr->type()->info == info;
-        }, node);
-    }
-
-    /**
-     * @brief Returns a range to use to visit top-level meta constructors.
-     * @return An iterable range to use to visit top-level meta constructors.
+     * @brief Returns a range to use to visit top-level constructors.
+     * @return An iterable range to use to visit top-level constructors.
      */
     [[nodiscard]] meta_range<meta_ctor> ctor() const ENTT_NOEXCEPT {
         return node->ctor;
     }
 
     /**
-     * @brief Returns the meta constructor that accepts a given list of types of
-     * arguments.
-     * @return The requested meta constructor, if any.
+     * @brief Returns a constructor for a given list of types of arguments.
+     * @tparam Args Constructor arguments.
+     * @return The requested constructor, if any.
      */
     template<typename... Args>
     [[nodiscard]] meta_ctor ctor() const {
@@ -32466,70 +33973,61 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta data.
-     * @return An iterable range to use to visit top-level meta data.
+     * @brief Returns a range to use to visit top-level data.
+     * @return An iterable range to use to visit top-level data.
      */
     [[nodiscard]] meta_range<meta_data> data() const ENTT_NOEXCEPT {
         return node->data;
     }
 
     /**
-     * @brief Returns the meta data associated with a given identifier.
+     * @brief Returns the data associated with a given identifier.
      *
-     * The meta data of the base classes will also be visited, if any.
+     * The data of the base classes will also be visited, if any.
      *
      * @param id Unique identifier.
-     * @return The meta data associated with the given identifier, if any.
+     * @return The data associated with the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        return internal::find_if<&node_type::data>([id](const auto *curr) {
-            return curr->id == id;
-        }, node);
+        return internal::meta_visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta functions.
-     * @return An iterable range to use to visit top-level meta functions.
+     * @brief Returns a range to use to visit top-level functions.
+     * @return An iterable range to use to visit top-level functions.
      */
     [[nodiscard]] meta_range<meta_func> func() const ENTT_NOEXCEPT {
         return node->func;
     }
 
     /**
-     * @brief Returns the meta function associated with a given identifier.
+     * @brief Returns the function associated with a given identifier.
      *
-     * The meta functions of the base classes will also be visited, if any.<br/>
-     * In the case of overloaded meta functions, the first one with the required
-     * id will be returned.
+     * The functions of the base classes will also be visited, if any.<br/>
+     * In the case of overloaded functions, the first one with the required
+     * identifier will be returned.
      *
      * @param id Unique identifier.
-     * @return The meta function associated with the given identifier, if any.
+     * @return The function associated with the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        return internal::find_if<&node_type::func>([id](const auto *curr) {
-            return curr->id == id;
-        }, node);
+        return internal::meta_visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * To create a valid instance, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.
+     * Parameters must be such that a cast or conversion to the required types
+     * is possible. Otherwise, an empty and thus invalid wrapper is returned.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
      * @return A meta any containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
-        meta_any any{};
-
-        internal::find_if<&node_type::ctor>([args, sz, &any](const auto *curr) {
-            return (curr->size == sz) && (any = curr->invoke(args));
-        }, node);
-
-        return any;
+        meta_any ret{};
+        internal::meta_visit<&node_type::ctor>([args, sz, &ret](const auto *curr) { return (curr->arity == sz) && (ret = curr->invoke(args)); }, node);
+        return ret;
     }
 
     /**
@@ -32548,14 +34046,13 @@ public:
     }
 
     /**
-     * @brief Invokes the function with the given identifier, if possible.
+     * @brief Invokes a function given an identifier, if possible.
      *
-     * To invoke a meta function, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.<br/>
-     * It must be possible to cast the instance to the parent type of the meta
+     * It must be possible to cast the instance to the parent type of the member
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
+     *
+     * @sa meta_func::invoke
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
@@ -32568,14 +34065,14 @@ public:
         size_type extent{sz + 1u};
         bool ambiguous{};
 
-        for(auto *it = internal::find_if<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->size == sz; }, node); it && it->id == id && it->size == sz; it = it->next) {
+        for(auto *it = internal::meta_visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->arity == sz; }, node); it && it->id == id && it->arity == sz; it = it->next) {
             size_type direct{};
             size_type ext{};
 
             for(size_type next{}; next < sz && next == (direct + ext); ++next) {
                 const auto type = args[next].type();
-                const auto req = it->arg(next)->info;
-                type.info() == req ? ++direct : (ext += can_cast_or_convert(type, req));
+                const auto req = it->arg(next).info();
+                type.info() == req ? ++direct : (ext += can_cast_or_convert(type.node, req));
             }
 
             if((direct + ext) == sz) {
@@ -32589,7 +34086,7 @@ public:
             }
         }
 
-        return (candidate && !ambiguous) ? candidate->invoke(instance, args) : meta_any{};
+        return (candidate && !ambiguous) ? candidate->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**
@@ -32612,8 +34109,8 @@ public:
     /**
      * @brief Sets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the setter results in an undefined
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
@@ -32633,8 +34130,8 @@ public:
     /**
      * @brief Gets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the getter results in an undefined behavior.
+     * It must be possible to cast the instance to the parent type of the data
+     * member. Otherwise, invoking the getter results in an undefined behavior.
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
@@ -32646,8 +34143,8 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level meta properties.
-     * @return An iterable range to use to visit top-level meta properties.
+     * @brief Returns a range to use to visit top-level properties.
+     * @return An iterable range to use to visit top-level properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
@@ -32662,43 +34159,40 @@ public:
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::find_if<&node_type::prop>([key = std::move(key)](const auto *curr) {
-            return curr->key() == key;
-        }, node);
+        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return *curr->id == key; }, node);
     }
 
     /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
     /**
-     * @brief Checks if two meta objects refer to the same type.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same type, false
-     * otherwise.
+     * @brief Checks if two objects refer to the same type.
+     * @param other The object with which to compare.
+     * @return True if the objects refer to the same type, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
         return (!node && !other.node) || (node && other.node && node->info == other.node->info);
     }
 
     /**
-     * @brief Resets a meta type and all its parts.
+     * @brief Resets a type and all its parts.
      *
-     * This function resets a meta type and all its data members, member
-     * functions and properties, as well as its constructors, destructors and
-     * conversion functions if any.<br/>
+     * This function resets a type and all its data members, member functions
+     * and properties, as well as its constructors, destructors and conversion
+     * functions if any.<br/>
      * Base classes aren't reset but the link between the two types is removed.
      *
-     * The meta type is also removed from the list of searchable types.
+     * The type is also removed from the list of searchable types.
      */
     void reset() ENTT_NOEXCEPT {
         auto** it = internal::meta_context::global();
 
-        while (*it && *it != node) {
+        while(*it && *it != node) {
             it = &(*it)->next;
         }
 
@@ -32725,6 +34219,7 @@ public:
         unregister_all(&node->func, &internal::meta_func_node::prop);
 
         node->id = {};
+        node->ctor = node->def_ctor;
         node->dtor = nullptr;
     }
 
@@ -32734,10 +34229,10 @@ private:
 
 
 /**
- * @brief Checks if two meta objects refer to the same type.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return False if the two meta objects refer to the same node, true otherwise.
+ * @brief Checks if two objects refer to the same type.
+ * @param lhs An object, either valid or not.
+ * @param rhs An object, either valid or not.
+ * @return False if the objects refer to the same node, true otherwise.
  */
 [[nodiscard]] inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
@@ -32777,33 +34272,13 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 
-[[nodiscard]] inline meta_type meta_base::parent() const ENTT_NOEXCEPT {
-    return node->parent;
-}
-
-
-[[nodiscard]] inline meta_type meta_base::type() const ENTT_NOEXCEPT {
-    return node->type();
-}
-
-
-[[nodiscard]] inline meta_type meta_conv::parent() const ENTT_NOEXCEPT {
-    return node->parent;
-}
-
-
-[[nodiscard]] inline meta_type meta_conv::type() const ENTT_NOEXCEPT {
-    return node->type();
-}
-
-
 [[nodiscard]] inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
     return node->parent;
 }
 
 
 [[nodiscard]] inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index) : nullptr;
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 
@@ -32828,13 +34303,13 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index) : nullptr;
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 
-/*! @brief Opaque iterator for meta sequence containers. */
+/*! @brief Opaque iterator for sequence containers. */
 class meta_sequence_container::meta_iterator {
-    /*! @brief A meta sequence container can access the underlying iterator. */
+    /*! @brief A sequence container can access the underlying iterator. */
     friend class meta_sequence_container;
 
     enum class operation { INCR, DEREF };
@@ -32848,7 +34323,7 @@ class meta_sequence_container::meta_iterator {
             ++any_cast<It &>(const_cast<any &>(from));
             break;
         case operation::DEREF:
-            *static_cast<meta_any *>(to) = std::reference_wrapper{*any_cast<const It &>(from)};
+            static_cast<meta_any *>(to)->emplace<typename std::iterator_traits<It>::reference>(*any_cast<const It &>(from));
             break;
         }
     }
@@ -32891,20 +34366,18 @@ public:
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return True if the two meta iterators refer to the same element, false
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return True if the iterators refer to the same element, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
         return handle == other.handle;
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return False if the two meta iterators refer to the same element, true
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return False if the iterators refer to the same element, true otherwise.
      */
     [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
@@ -32912,7 +34385,7 @@ public:
 
     /**
      * @brief Indirection operator.
-     * @return The element to which the meta pointer points.
+     * @return The element to which the iterator points.
      */
     [[nodiscard]] reference operator*() const {
         meta_any other;
@@ -32929,8 +34402,8 @@ public:
     }
 
 private:
-    vtable_type *vtable;
-    any handle;
+    vtable_type *vtable{};
+    any handle{};
 };
 
 
@@ -32939,7 +34412,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     using traits_type = meta_sequence_container_traits<Type>;
 
     [[nodiscard]] static meta_type value_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::value_type>::resolve();
+        return internal::meta_info<typename Type::value_type>::resolve();
     }
 
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
@@ -32947,23 +34420,17 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static bool resize(any &container, size_type sz) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::resize(*cont, sz);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::resize(*cont, sz) : false;
     }
 
     [[nodiscard]] static bool clear(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::clear(*cont);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::clear(*cont) : false;
     }
 
     [[nodiscard]] static iterator begin(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{traits_type::begin(*cont)};
         }
 
@@ -32971,7 +34438,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static iterator end(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{traits_type::end(*cont)};
         }
 
@@ -32979,17 +34446,21 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static std::pair<iterator, bool> insert(any &container, iterator it, meta_any &value) {
-        if(auto *cont = any_cast<Type>(&container); cont && value.allow_cast<const typename traits_type::value_type &>()) {
-            auto ret = traits_type::insert(*cont, any_cast<const typename traits_type::iterator &>(it.handle), value.cast<const typename traits_type::value_type &>());
-            return { iterator{std::move(ret.first)}, ret.second };
+        if(auto * const cont = any_cast<Type>(&container); cont) {
+            // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
+            if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
+                const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                auto ret = traits_type::insert(*cont, any_cast<const typename Type::iterator &>(it.handle), element ? *element : value.cast<typename Type::value_type>());
+                return { iterator{std::move(ret.first)}, ret.second };
+            }
         }
 
         return {};
     }
 
     [[nodiscard]] static std::pair<iterator, bool> erase(any &container, iterator it) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            auto ret = traits_type::erase(*cont, any_cast<const typename traits_type::iterator &>(it.handle));
+        if(auto * const cont = any_cast<Type>(&container); cont) {
+            auto ret = traits_type::erase(*cont, any_cast<const typename Type::iterator &>(it.handle));
             return { iterator{std::move(ret.first)}, ret.second };
         }
 
@@ -32997,18 +34468,18 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static meta_any get(any &container, size_type pos) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return std::reference_wrapper{traits_type::get(*cont, pos)};
+        if(auto * const cont = any_cast<Type>(&container); cont) {
+            return meta_any{std::in_place_type<typename Type::reference>, traits_type::get(*cont, pos)};
         }
 
-        return std::reference_wrapper{traits_type::cget(any_cast<const Type &>(container), pos)};
+        return meta_any{std::in_place_type<typename Type::const_reference>, traits_type::cget(any_cast<const Type &>(container), pos)};
     }
 };
 
 
 /**
- * @brief Returns the value meta type of the wrapped container type.
- * @return The value meta type of the wrapped container type.
+ * @brief Returns the meta value type of a container.
+ * @return The meta value type of the container.
  */
 [[nodiscard]] inline meta_type meta_sequence_container::value_type() const ENTT_NOEXCEPT {
     return value_type_fn();
@@ -33016,8 +34487,8 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
 
 /**
- * @brief Returns the size of the wrapped container.
- * @return The size of the wrapped container.
+ * @brief Returns the size of a container.
+ * @return The size of the container.
  */
 [[nodiscard]] inline meta_sequence_container::size_type meta_sequence_container::size() const ENTT_NOEXCEPT {
     return size_fn(storage);
@@ -33025,7 +34496,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
 
 /**
- * @brief Resizes the wrapped container to contain a given number of elements.
+ * @brief Resizes a container to contain a given number of elements.
  * @param sz The new size of the container.
  * @return True in case of success, false otherwise.
  */
@@ -33035,7 +34506,7 @@ inline bool meta_sequence_container::resize(size_type sz) {
 
 
 /**
- * @brief Clears the content of the wrapped container.
+ * @brief Clears the content of a container.
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
@@ -33044,8 +34515,8 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Returns a meta iterator to the first element of the wrapped container.
- * @return A meta iterator to the first element of the wrapped container.
+ * @brief Returns an iterator to the first element of a container.
+ * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
     return begin_fn(storage);
@@ -33053,10 +34524,8 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Returns a meta iterator that is past the last element of the wrapped
- * container.
- * @return A meta iterator that is past the last element of the wrapped
- * container.
+ * @brief Returns an iterator that is past the last element of a container.
+ * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
     return end_fn(storage);
@@ -33064,11 +34533,11 @@ inline bool meta_sequence_container::clear() {
 
 
 /**
- * @brief Inserts an element at a specified location of the wrapped container.
- * @param it Meta iterator before which the element will be inserted.
+ * @brief Inserts an element at a specified location of a container.
+ * @param it Iterator before which the element will be inserted.
  * @param value Element value to insert.
- * @return A pair consisting of a meta iterator to the inserted element (in
- * case of success) and a bool denoting whether the insertion took place.
+ * @return A pair consisting of an iterator to the inserted element (in case of
+ * success) and a bool denoting whether the insertion took place.
  */
 inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::insert(iterator it, meta_any value) {
     return insert_fn(storage, it, value);
@@ -33076,11 +34545,10 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 
 /**
- * @brief Removes the specified element from the wrapped container.
- * @param it Meta iterator to the element to remove.
- * @return A pair consisting of a meta iterator following the last removed
- * element (in case of success) and a bool denoting whether the insertion
- * took place.
+ * @brief Removes a given element from a container.
+ * @param it Iterator to the element to remove.
+ * @return A pair consisting of an iterator following the last removed element
+ * (in case of success) and a bool denoting whether the insertion took place.
  */
 inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::erase(iterator it) {
     return erase_fn(storage, it);
@@ -33088,8 +34556,8 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 
 /**
- * @brief Returns a reference to the element at a specified location of the
- * wrapped container (no bounds checking is performed).
+ * @brief Returns a reference to the element at a given location of a container
+ * (no bounds checking is performed).
  * @param pos The position of the element to return.
  * @return A reference to the requested element properly wrapped.
  */
@@ -33107,7 +34575,7 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 }
 
 
-/*! @brief Opaque iterator for meta associative containers. */
+/*! @brief Opaque iterator for associative containers. */
 class meta_associative_container::meta_iterator {
     enum operation { INCR, DEREF };
 
@@ -33121,9 +34589,9 @@ class meta_associative_container::meta_iterator {
             break;
         case operation::DEREF:
             if constexpr(KeyOnly) {
-                static_cast<std::pair<meta_any, meta_any> *>(to)->first = *any_cast<const It &>(from);
+                static_cast<std::pair<meta_any, meta_any> *>(to)->first = std::cref(*any_cast<const It &>(from));
             } else {
-                *static_cast<std::pair<meta_any, meta_any> *>(to) = std::make_pair<meta_any, meta_any>(any_cast<const It &>(from)->first, std::reference_wrapper{any_cast<const It &>(from)->second});
+                *static_cast<std::pair<meta_any, meta_any> *>(to) = std::make_pair<meta_any, meta_any>(std::cref(any_cast<const It &>(from)->first), std::ref(any_cast<const It &>(from)->second));
             }
             break;
         }
@@ -33145,9 +34613,8 @@ public:
     meta_iterator() ENTT_NOEXCEPT = default;
 
     /**
-     * @brief Constructs a meta iterator from a given iterator.
-     * @tparam KeyOnly True if the associative container is also key-only, false
-     * otherwise.
+     * @brief Constructs an meta iterator from a given iterator.
+     * @tparam KeyOnly True if the container is also key-only, false otherwise.
      * @tparam It Type of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
@@ -33169,20 +34636,18 @@ public:
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return True if the two meta iterators refer to the same element, false
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return True if the iterators refer to the same element, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
         return handle == other.handle;
     }
 
     /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return False if the two meta iterators refer to the same element, true
-     * otherwise.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return False if the iterators refer to the same element, true otherwise.
      */
     [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
@@ -33190,7 +34655,7 @@ public:
 
     /**
      * @brief Indirection operator.
-     * @return The element to which the meta pointer points.
+     * @return The element to which the iterator points.
      */
     [[nodiscard]] reference operator*() const {
         reference other;
@@ -33207,8 +34672,8 @@ public:
     }
 
 private:
-    vtable_type *vtable;
-    any handle;
+    vtable_type *vtable{};
+    any handle{};
 };
 
 
@@ -33217,19 +34682,19 @@ struct meta_associative_container::meta_associative_container_proxy {
     using traits_type = meta_associative_container_traits<Type>;
 
     [[nodiscard]] static meta_type key_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::key_type>::resolve();
+        return internal::meta_info<typename Type::key_type>::resolve();
     }
 
     [[nodiscard]] static meta_type mapped_type() ENTT_NOEXCEPT {
         if constexpr(is_key_only_meta_associative_container_v<Type>) {
             return meta_type{};
         } else {
-            return internal::meta_info<typename traits_type::mapped_type>::resolve();
+            return internal::meta_info<typename Type::mapped_type>::resolve();
         }
     }
 
     [[nodiscard]] static meta_type value_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename traits_type::value_type>::resolve();
+        return internal::meta_info<typename Type::value_type>::resolve();
     }
 
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
@@ -33237,15 +34702,12 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool clear(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
-            return traits_type::clear(*cont);
-        }
-
-        return false;
+        auto * const cont = any_cast<Type>(&container);
+        return cont ? traits_type::clear(*cont) : false;
     }
 
     [[nodiscard]] static iterator begin(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::begin(*cont)};
         }
 
@@ -33253,7 +34715,7 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static iterator end(any &container) {
-        if(auto *cont = any_cast<Type>(&container); cont) {
+        if(auto * const cont = any_cast<Type>(&container); cont) {
             return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::end(*cont)};
         }
 
@@ -33261,12 +34723,12 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, meta_any &value) {
-        if(auto *cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
+        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
             if constexpr(is_key_only_meta_associative_container_v<Type>) {
-                return traits_type::insert(*cont, key.cast<const typename traits_type::key_type &>());
+                return traits_type::insert(*cont, key.cast<const typename Type::key_type &>());
             } else {
-                if(value.allow_cast<const typename traits_type::mapped_type &>()) {
-                    return traits_type::insert(*cont, key.cast<const typename traits_type::key_type &>(), value.cast<const typename traits_type::mapped_type &>());
+                if(value.allow_cast<const typename Type::mapped_type &>()) {
+                    return traits_type::insert(*cont, key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>());
                 }
             }
         }
@@ -33275,20 +34737,20 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool erase(any &container, meta_any &key) {
-        if(auto *cont = any_cast<Type>(&container); cont && key.allow_cast<const typename traits_type::key_type &>()) {
-            return traits_type::erase(*cont, key.cast<const typename traits_type::key_type &>());
+        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
+            return traits_type::erase(*cont, key.cast<const typename Type::key_type &>());
         }
 
         return false;
     }
 
     [[nodiscard]] static iterator find(any &container, meta_any &key) {
-        if(key.allow_cast<const typename traits_type::key_type &>()) {
-            if(auto *cont = any_cast<Type>(&container); cont) {
-                return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*cont, key.cast<const typename traits_type::key_type &>())};
+        if(key.allow_cast<const typename Type::key_type &>()) {
+            if(auto * const cont = any_cast<Type>(&container); cont) {
+                return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*cont, key.cast<const typename Type::key_type &>())};
             }
 
-            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cfind(any_cast<const Type &>(container), key.cast<const typename traits_type::key_type &>())};
+            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cfind(any_cast<const Type &>(container), key.cast<const typename Type::key_type &>())};
         }
 
         return {};
@@ -33297,8 +34759,7 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns true if the associative container is also key-only, false
- * otherwise.
+ * @brief Returns true if a container is also key-only, false otherwise.
  * @return True if the associative container is also key-only, false otherwise.
  */
 [[nodiscard]] inline bool meta_associative_container::key_only() const ENTT_NOEXCEPT {
@@ -33307,8 +34768,8 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns the key meta type of the wrapped container type.
- * @return The key meta type of the wrapped container type.
+ * @brief Returns the meta key type of a container.
+ * @return The meta key type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::key_type() const ENTT_NOEXCEPT {
     return key_type_fn();
@@ -33316,8 +34777,8 @@ struct meta_associative_container::meta_associative_container_proxy {
 
 
 /**
- * @brief Returns the mapped meta type of the wrapped container type.
- * @return The mapped meta type of the wrapped container type.
+ * @brief Returns the meta mapped type of a container.
+ * @return The meta mapped type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::mapped_type() const ENTT_NOEXCEPT {
     return mapped_type_fn();
@@ -33355,7 +34816,7 @@ inline bool meta_associative_container::clear() {
 
 
 /**
- * @brief Inserts an element (a key/value pair) into the wrapped container.
+ * @brief Inserts an element (a key/value pair) into a container.
  * @param key The key of the element to insert.
  * @param value The value of the element to insert.
  * @return A bool denoting whether the insertion took place.
@@ -33366,7 +34827,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
 
 
 /**
- * @brief Removes the specified element from the wrapped container.
+ * @brief Removes the specified element from a container.
  * @param key The key of the element to remove.
  * @return A bool denoting whether the removal took place.
  */
@@ -33376,8 +34837,7 @@ inline bool meta_associative_container::erase(meta_any key) {
 
 
 /**
- * @brief Returns an iterator to the element with key equivalent to a given
- * one, if any.
+ * @brief Returns an iterator to the element with a given key, if any.
  * @param key The key of the element to search.
  * @return An iterator to the element with the given key, if any.
  */
@@ -33393,6 +34853,284 @@ inline bool meta_associative_container::erase(meta_any key) {
 [[nodiscard]] inline meta_associative_container::operator bool() const ENTT_NOEXCEPT {
     return static_cast<bool>(storage);
 }
+
+
+}
+
+
+#endif
+
+// #include "meta/node.hpp"
+#ifndef ENTT_META_NODE_HPP
+#define ENTT_META_NODE_HPP
+
+
+#include <array>
+#include <cstddef>
+#include <type_traits>
+#include <utility>
+// #include "../config/config.h"
+
+// #include "../core/attribute.h"
+
+// #include "../core/fwd.hpp"
+
+// #include "../core/type_info.hpp"
+
+// #include "../core/type_traits.hpp"
+
+// #include "type_traits.hpp"
+
+
+
+namespace entt {
+
+
+class meta_any;
+class meta_type;
+struct meta_handle;
+
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+struct meta_type_node;
+
+
+struct meta_prop_node {
+    meta_prop_node * next;
+    const meta_any * const id;
+    meta_any * const value;
+};
+
+
+struct meta_base_node {
+    meta_type_node * const parent;
+    meta_base_node * next;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    const void *(* const cast)(const void *) ENTT_NOEXCEPT;
+};
+
+
+struct meta_conv_node {
+    meta_type_node * const parent;
+    meta_conv_node * next;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_any(* const conv)(const void *);
+};
+
+
+struct meta_ctor_node {
+    using size_type = std::size_t;
+    meta_type_node * const parent;
+    meta_ctor_node * next;
+    meta_prop_node * prop;
+    const size_type arity;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
+    meta_any(* const invoke)(meta_any * const);
+};
+
+
+struct meta_data_node {
+    id_type id;
+    meta_type_node * const parent;
+    meta_data_node * next;
+    meta_prop_node * prop;
+    const bool is_const;
+    const bool is_static;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    bool(* const set)(meta_handle, meta_any);
+    meta_any(* const get)(meta_handle);
+};
+
+
+struct meta_func_node {
+    using size_type = std::size_t;
+    id_type id;
+    meta_type_node * const parent;
+    meta_func_node * next;
+    meta_prop_node * prop;
+    const size_type arity;
+    const bool is_const;
+    const bool is_static;
+    meta_type_node *(* const ret)() ENTT_NOEXCEPT;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
+    meta_any(* const invoke)(meta_handle, meta_any *);
+};
+
+
+struct meta_template_info {
+    using size_type = std::size_t;
+    const bool is_template_specialization;
+    const size_type arity;
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
+};
+
+
+struct meta_type_node {
+    using size_type = std::size_t;
+    const type_info info;
+    id_type id;
+    meta_type_node * next;
+    meta_prop_node * prop;
+    const size_type size_of;
+    const bool is_void;
+    const bool is_integral;
+    const bool is_floating_point;
+    const bool is_array;
+    const bool is_enum;
+    const bool is_union;
+    const bool is_class;
+    const bool is_pointer;
+    const bool is_function_pointer;
+    const bool is_member_object_pointer;
+    const bool is_member_function_pointer;
+    const bool is_pointer_like;
+    const bool is_sequence_container;
+    const bool is_associative_container;
+    const meta_template_info template_info;
+    const size_type rank;
+    size_type(* const extent)(const size_type) ENTT_NOEXCEPT ;
+    meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
+    meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
+    meta_ctor_node * const def_ctor;
+    meta_ctor_node *ctor{nullptr};
+    meta_base_node *base{nullptr};
+    meta_conv_node *conv{nullptr};
+    meta_data_node *data{nullptr};
+    meta_func_node *func{nullptr};
+    void(* dtor)(void *){nullptr};
+};
+
+
+template<auto Member, typename Op, typename Node>
+auto meta_visit(const Op &op, const Node *node)
+-> std::decay_t<decltype(node->*Member)> {
+    for(auto *curr = node->*Member; curr; curr = curr->next) {
+        if(op(curr)) {
+            return curr;
+        }
+    }
+
+    if constexpr(std::is_same_v<Node, meta_type_node>) {
+        for(auto *curr = node->base; curr; curr = curr->next) {
+            if(auto *ret = meta_visit<Member>(op, curr->type()); ret) {
+                return ret;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+
+template<typename... Args>
+meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT;
+
+
+template<typename Type>
+class ENTT_API meta_node {
+    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
+
+    template<std::size_t... Index>
+    [[nodiscard]] static auto extent(const meta_type_node::size_type dim, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        meta_type_node::size_type ext{};
+        ((ext = (dim == Index ? std::extent_v<Type, Index> : ext)), ...);
+        return ext;
+    }
+
+    [[nodiscard]] static meta_ctor_node * meta_default_constructor([[maybe_unused]] meta_type_node *type) ENTT_NOEXCEPT {
+        if constexpr(std::is_default_constructible_v<Type>) {
+            static meta_ctor_node node{
+                type,
+                nullptr,
+                nullptr,
+                0u,
+                nullptr,
+                [](meta_any * const) { return meta_any{std::in_place_type<Type>}; }
+            };
+
+            return &node;
+        } else {
+            return nullptr;
+        }
+    }
+
+    [[nodiscard]] static meta_template_info meta_template_descriptor() ENTT_NOEXCEPT {
+        if constexpr(is_complete_v<meta_template_traits<Type>>) {
+            return {
+                true,
+                meta_template_traits<Type>::args_type::size,
+                &meta_node<typename meta_template_traits<Type>::class_type>::resolve,
+                [](const std::size_t index) ENTT_NOEXCEPT {
+                    return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index);
+                }
+            };
+        } else {
+            return { false, 0u, nullptr, nullptr };
+        }
+    }
+
+public:
+    [[nodiscard]] static meta_type_node * resolve() ENTT_NOEXCEPT {
+        static meta_type_node node{
+            type_id<Type>(),
+            {},
+            nullptr,
+            nullptr,
+            size_of_v<Type>,
+            std::is_void_v<Type>,
+            std::is_integral_v<Type>,
+            std::is_floating_point_v<Type>,
+            std::is_array_v<Type>,
+            std::is_enum_v<Type>,
+            std::is_union_v<Type>,
+            std::is_class_v<Type>,
+            std::is_pointer_v<Type>,
+            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
+            std::is_member_object_pointer_v<Type>,
+            std::is_member_function_pointer_v<Type>,
+            is_meta_pointer_like_v<Type>,
+            is_complete_v<meta_sequence_container_traits<Type>>,
+            is_complete_v<meta_associative_container_traits<Type>>,
+            meta_template_descriptor(),
+            std::rank_v<Type>,
+            [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
+            &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
+            &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_extent_t<Type>>>>::resolve,
+            meta_default_constructor(&node),
+            meta_default_constructor(&node)
+        };
+
+        return &node;
+    }
+};
+
+
+template<typename Type>
+struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>> {};
+
+
+template<typename... Args>
+meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
+    return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_info<Args>::resolve()...}}[index];
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 
 }
@@ -33488,8 +35226,6 @@ struct as_void_t {};
 
 #include <cstddef>
 #include <iterator>
-// #include "internal.hpp"
-
 
 
 namespace entt {
@@ -33497,9 +35233,10 @@ namespace entt {
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
- * @tparam Type Type of meta objects iterated.
+ * @tparam Type Type of meta objects returned.
+ * @tparam Node Type of meta nodes iterated.
  */
-template<typename Type>
+template<typename Type, typename Node = typename Type::node_type>
 class meta_range {
     struct range_iterator {
         using difference_type = std::ptrdiff_t;
@@ -33507,7 +35244,7 @@ class meta_range {
         using pointer = void;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
-        using node_type = typename Type::node_type;
+        using node_type = Node;
 
         range_iterator() ENTT_NOEXCEPT = default;
 
@@ -33516,16 +35253,16 @@ class meta_range {
         {}
 
         range_iterator & operator++() ENTT_NOEXCEPT {
-            return ++it, *this;
+            return (it = it->next), *this;
         }
 
         range_iterator operator++(int) ENTT_NOEXCEPT {
             range_iterator orig = *this;
-            return it++, orig;
+            return ++(*this), orig;
         }
 
         [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return it.operator->();
+            return it;
         }
 
         [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
@@ -33537,12 +35274,12 @@ class meta_range {
         }
 
     private:
-        typename internal::meta_range<node_type>::iterator it{};
+        node_type *it{};
     };
 
 public:
     /*! @brief Node type. */
-    using node_type = typename Type::node_type;
+    using node_type = Node;
     /*! @brief Input iterator type. */
     using iterator = range_iterator;
 
@@ -33596,6 +35333,8 @@ private:
 
 // #include "meta.hpp"
 
+// #include "node.hpp"
+
 // #include "range.hpp"
 
 
@@ -33629,8 +35368,13 @@ template<typename Type>
  * @return The meta type associated with the given identifier, if any.
  */
 [[nodiscard]] inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
-    internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.begin(), range.end(), [id](const auto &curr) { return curr.id == id; }).operator->();
+    for(auto *curr = *internal::meta_context::global(); curr; curr = curr->next) {
+        if(curr->id == id) {
+            return curr;
+        }
+    }
+
+    return {};
 }
 
 
@@ -33641,9 +35385,50 @@ template<typename Type>
  * @return The meta type associated with the given type info object, if any.
  */
 [[nodiscard]] inline meta_type resolve(const type_info info) ENTT_NOEXCEPT {
-    internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.begin(), range.end(), [info](const auto &curr) { return curr.info == info; }).operator->();
+    for(auto *curr = *internal::meta_context::global(); curr; curr = curr->next) {
+        if(curr->info == info) {
+            return curr;
+        }
+    }
+
+    return {};
 }
+
+
+}
+
+
+#endif
+
+// #include "meta/template.hpp"
+#ifndef ENTT_META_TEMPLATE_HPP
+#define ENTT_META_TEMPLATE_HPP
+
+
+// #include "../core/type_traits.hpp"
+
+
+
+namespace entt {
+
+
+/*! @brief Utility class to disambiguate class templates. */
+template<template<typename...> typename>
+struct meta_class_template_tag {};
+
+
+/**
+ * @brief General purpose traits class for generating meta template information.
+ * @tparam Clazz Type of class template.
+ * @tparam Args Types of template arguments.
+ */
+template<template<typename...> typename Clazz, typename... Args>
+struct meta_template_traits<Clazz<Args...>> {
+    /*! @brief Wrapped class template. */
+    using class_type = meta_class_template_tag<Clazz>;
+    /*! @brief List of template arguments. */
+    using args_type = type_list<Args...>;
+};
 
 
 }
@@ -33664,6 +35449,14 @@ namespace entt {
 
 /**
  * @brief Traits class template to be specialized to enable support for meta
+ * template information.
+ */
+template<typename>
+struct meta_template_traits;
+
+
+/**
+ * @brief Traits class template to be specialized to enable support for meta
  * sequence containers.
  */
 template<typename>
@@ -33679,54 +35472,6 @@ struct meta_associative_container_traits;
 
 
 /**
- * @brief Provides the member constant `value` to true if support for meta
- * sequence containers is enabled for the given type, false otherwise.
- * @tparam Type Potentially sequence container type.
- */
-template<typename Type, typename = void>
-struct has_meta_sequence_container_traits: std::false_type {};
-
-
-/*! @copydoc has_meta_sequence_container_traits */
-template<typename Type>
-struct has_meta_sequence_container_traits<Type, std::void_t<typename meta_sequence_container_traits<Type>::value_type>>
-        : std::true_type
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially sequence container type.
- */
-template<typename Type>
-inline constexpr auto has_meta_sequence_container_traits_v = has_meta_sequence_container_traits<Type>::value;
-
-
-/**
- * @brief Provides the member constant `value` to true if support for meta
- * associative containers is enabled for the given type, false otherwise.
- * @tparam Type Potentially associative container type.
- */
-template<typename, typename = void>
-struct has_meta_associative_container_traits: std::false_type {};
-
-
-/*! @copydoc has_meta_associative_container_traits */
-template<typename Type>
-struct has_meta_associative_container_traits<Type, std::void_t<typename meta_associative_container_traits<Type>::key_type>>
-        : std::true_type
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially associative container type.
- */
-template<typename Type>
-inline constexpr auto has_meta_associative_container_traits_v = has_meta_associative_container_traits<Type>::value;
-
-
-/**
  * @brief Provides the member constant `value` to true if a meta associative
  * container claims to wrap a key-only type, false otherwise.
  * @tparam Type Potentially key-only meta associative container type.
@@ -33737,8 +35482,8 @@ struct is_key_only_meta_associative_container: std::true_type {};
 
 /*! @copydoc is_key_only_meta_associative_container */
 template<typename Type>
-struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_associative_container_traits<Type>::mapped_type>>
-        : std::false_type
+struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_associative_container_traits<Type>::type::mapped_type>>
+    : std::false_type
 {};
 
 
@@ -33774,6 +35519,310 @@ struct is_meta_pointer_like<const Type>: is_meta_pointer_like<Type> {};
  */
 template<typename Type>
 inline constexpr auto is_meta_pointer_like_v = is_meta_pointer_like<Type>::value;
+
+
+}
+
+
+#endif
+
+// #include "meta/utility.hpp"
+#ifndef ENTT_META_UTILITY_HPP
+#define ENTT_META_UTILITY_HPP
+
+
+#include <array>
+#include <cstddef>
+#include <functional>
+#include <type_traits>
+#include <utility>
+// #include "../config/config.h"
+
+// #include "../core/type_traits.hpp"
+
+// #include "meta.hpp"
+
+// #include "node.hpp"
+
+// #include "policy.hpp"
+
+
+
+namespace entt {
+
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename, typename>
+struct meta_function_descriptor;
+
+
+/**
+ * @brief Meta function descriptor.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Ret Function return type.
+ * @tparam Class Actual owner of the member function.
+ * @tparam Args Function arguments.
+ */
+template<typename Type, typename Ret, typename Class, typename... Args>
+struct meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> {
+    /*! @brief Meta function return type. */
+    using return_type = Ret;
+    /*! @brief Meta function arguments. */
+    using args_type = std::conditional_t<std::is_same_v<Type, Class>, type_list<Args...>, type_list<const Class &, Args...>>;
+
+    /*! @brief True if the meta function is const, false otherwise. */
+    static constexpr auto is_const = true;
+    /*! @brief True if the meta function is static, false otherwise. */
+    static constexpr auto is_static = !std::is_same_v<Type, Class>;
+};
+
+
+/**
+ * @brief Meta function descriptor.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Ret Function return type.
+ * @tparam Class Actual owner of the member function.
+ * @tparam Args Function arguments.
+ */
+template<typename Type, typename Ret, typename Class, typename... Args>
+struct meta_function_descriptor<Type, Ret(Class:: *)(Args...)> {
+    /*! @brief Meta function return type. */
+    using return_type = Ret;
+    /*! @brief Meta function arguments. */
+    using args_type = std::conditional_t<std::is_same_v<Type, Class>, type_list<Args...>, type_list<Class &, Args...>>;
+
+    /*! @brief True if the meta function is const, false otherwise. */
+    static constexpr auto is_const = false;
+    /*! @brief True if the meta function is static, false otherwise. */
+    static constexpr auto is_static = !std::is_same_v<Type, Class>;
+};
+
+
+/**
+ * @brief Meta function descriptor.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Ret Function return type.
+ * @tparam Args Function arguments.
+ */
+template<typename Type, typename Ret, typename... Args>
+struct meta_function_descriptor<Type, Ret(*)(Args...)> {
+    /*! @brief Meta function return type. */
+    using return_type = Ret;
+    /*! @brief Meta function arguments. */
+    using args_type = type_list<Args...>;
+
+    /*! @brief True if the meta function is const, false otherwise. */
+    static constexpr auto is_const = false;
+    /*! @brief True if the meta function is static, false otherwise. */
+    static constexpr auto is_static = true;
+};
+
+
+/**
+ * @brief Meta function helper.
+ *
+ * Converts a function type to be associated with a reflected type into its meta
+ * function descriptor.
+ *
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Candidate The actual function to associate with the reflected type.
+ */
+template<typename Type, typename Candidate>
+class meta_function_helper {
+    template<typename Ret, typename... Args, typename Class>
+    static constexpr meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> get_rid_of_noexcept(Ret(Class:: *)(Args...) const);
+
+    template<typename Ret, typename... Args, typename Class>
+    static constexpr meta_function_descriptor<Type, Ret(Class:: *)(Args...)> get_rid_of_noexcept(Ret(Class:: *)(Args...));
+
+    template<typename Ret, typename... Args>
+    static constexpr meta_function_descriptor<Type, Ret(*)(Args...)> get_rid_of_noexcept(Ret(*)(Args...));
+
+public:
+    /*! @brief The meta function descriptor of the given function. */
+    using type = decltype(get_rid_of_noexcept(std::declval<Candidate>()));
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Candidate The actual function to associate with the reflected type.
+ */
+template<typename Type, typename Candidate>
+using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::type;
+
+
+/**
+ * @brief Returns the meta type of the i-th element of a list of arguments.
+ * @tparam Args Actual types of arguments.
+ * @return The meta type of the i-th element of the list of arguments.
+ */
+template<typename... Args>
+[[nodiscard]] static meta_type meta_arg(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
+    return internal::meta_arg_node(type_list<Args...>{}, index);
+}
+
+
+/**
+ * @brief Constructs an instance given a list of erased parameters, if possible.
+ * @tparam Type Actual type of the instance to construct.
+ * @tparam Args Types of arguments expected.
+ * @tparam Index Indexes to use to extract erased arguments from their list.
+ * @param args Parameters to use to construct the instance.
+ * @return A meta any containing the new instance, if any.
+ */
+template<typename Type, typename... Args, std::size_t... Index>
+[[nodiscard]] meta_any meta_construct(meta_any * const args, std::index_sequence<Index...>) {
+    if(((args+Index)->allow_cast<Args>() && ...)) {
+        return Type{(args+Index)->cast<Args>()...};
+    }
+
+    return {};
+}
+
+
+/**
+ * @brief Sets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to set.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @param value Parameter to use to set the variable.
+ * @return True in case of success, false otherwise.
+ */
+template<typename Type, auto Data>
+[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
+    if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
+        if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
+            using descriptor = meta_function_helper_t<Type, decltype(Data)>;
+            using data_type = type_list_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename descriptor::args_type>;
+
+            if(auto * const clazz = instance->try_cast<Type>(); clazz) {
+                if(value.allow_cast<data_type>()) {
+                    std::invoke(Data, *clazz, value.cast<data_type>());
+                    return true;
+                }
+            }
+        } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+            using data_type = std::remove_reference_t<decltype(std::declval<Type>().*Data)>;
+
+            if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+                if(auto * const clazz = instance->try_cast<Type>(); clazz) {
+                    if(value.allow_cast<data_type>()) {
+                        std::invoke(Data, clazz) = value.cast<data_type>();
+                        return true;
+                    }
+                }
+            }
+        } else {
+            using data_type = std::remove_reference_t<decltype(*Data)>;
+
+            if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+                if(value.allow_cast<data_type>()) {
+                    *Data = value.cast<data_type>();
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief Gets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to get.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @param instance An opaque instance of the underlying type, if required.
+ * @return A meta any containing the value of the underlying variable.
+ */
+template<typename Type, auto Data, typename Policy = as_is_t>
+[[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance) {
+    [[maybe_unused]] auto dispatch = [](auto &&value) {
+        if constexpr(std::is_same_v<Policy, as_void_t>) {
+            return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
+        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
+            return meta_any{std::reference_wrapper{std::forward<decltype(value)>(value)}};
+        } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
+            return meta_any{std::cref(std::forward<decltype(value)>(value))};
+        } else {
+            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
+            return meta_any{std::forward<decltype(value)>(value)};
+        }
+    };
+
+    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
+        auto * const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type &>, const Type, Type>>();
+        return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
+    } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+        if constexpr(std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
+            return meta_any{};
+        } else {
+            if(auto * clazz = instance->try_cast<Type>(); clazz) {
+                return dispatch(std::invoke(Data, *clazz));
+            } else {
+                auto * fallback = instance->try_cast<const Type>();
+                return fallback ? dispatch(std::invoke(Data, *fallback)) : meta_any{};
+            }
+        }
+    } else if constexpr(std::is_pointer_v<decltype(Data)>) {
+        if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
+            return meta_any{};
+        } else {
+            return dispatch(*Data);
+        }
+    } else {
+        return dispatch(Data);
+    }
+}
+
+
+/**
+ * @brief Invokes a function given a list of erased parameters, if possible.
+ * @tparam Type Reflected type to which the function is associated.
+ * @tparam Candidate The actual function to invoke.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @tparam Index Indexes to use to extract erased arguments from their list.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @param args Parameters to use to invoke the function.
+ * @return A meta any containing the returned value, if any.
+ */
+template<typename Type, auto Candidate, typename Policy = as_is_t, std::size_t... Index>
+[[nodiscard]] meta_any meta_invoke([[maybe_unused]] meta_handle instance, meta_any *args, std::index_sequence<Index...>) {
+    using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
+
+    auto dispatch = [](auto &&... params) {
+        if constexpr(std::is_void_v<std::remove_cv_t<typename descriptor::return_type>> || std::is_same_v<Policy, as_void_t>) {
+            std::invoke(Candidate, std::forward<decltype(params)>(params)...);
+            return meta_any{std::in_place_type<void>};
+        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
+            return meta_any{std::reference_wrapper{std::invoke(Candidate, std::forward<decltype(params)>(params)...)}};
+        } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
+            return meta_any{std::cref(std::invoke(Candidate, std::forward<decltype(params)>(params)...))};
+        } else {
+            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
+            return meta_any{std::invoke(Candidate, std::forward<decltype(params)>(params)...)};
+        }
+    };
+
+    if constexpr(std::is_invocable_v<decltype(Candidate), const Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
+        if(const auto * const clazz = instance->try_cast<const Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return dispatch(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        }
+    } else if constexpr(std::is_invocable_v<decltype(Candidate), Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
+        if(auto * const clazz = instance->try_cast<Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return dispatch(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        }
+    } else {
+        if(((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return dispatch((args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        }
+    }
+
+    return meta_any{};
+}
 
 
 }
@@ -33903,7 +35952,9 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -33946,7 +35997,9 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 #define ENTT_CORE_ANY_HPP
 
 
+#include <cstddef>
 #include <functional>
+#include <memory>
 #include <new>
 #include <type_traits>
 #include <utility>
@@ -33974,7 +36027,9 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -34008,6 +36063,36 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 #       define ENTT_PRETTY_FUNCTION_SUFFIX '>'
 #   endif
 #endif
+
+
+#endif
+
+// #include "fwd.hpp"
+#ifndef ENTT_CORE_FWD_HPP
+#define ENTT_CORE_FWD_HPP
+
+
+#include <type_traits>
+// #include "../config/config.h"
+
+
+
+namespace entt {
+
+
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
+/*! @brief Alias declaration for type identifiers. */
+using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
+
+
+}
 
 
 #endif
@@ -34066,25 +36151,6 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 // #include "../config/config.h"
 
 // #include "fwd.hpp"
-#ifndef ENTT_CORE_FWD_HPP
-#define ENTT_CORE_FWD_HPP
-
-
-// #include "../config/config.h"
-
-
-
-namespace entt {
-
-
-/*! @brief Alias declaration for type identifiers. */
-using id_type = ENTT_ID_TYPE;
-
-
-}
-
-
-#endif
 
 
 
@@ -34380,7 +36446,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -34439,6 +36505,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -34460,6 +36529,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -34476,6 +36548,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -34518,7 +36593,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -34578,7 +36653,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -34607,6 +36682,32 @@ type_info type_id() ENTT_NOEXCEPT {
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -34688,32 +36789,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -34887,6 +36962,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -34994,19 +37094,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -35101,6 +37235,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -35124,7 +37282,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -35132,7 +37290,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -35187,15 +37345,20 @@ using member_class_t = typename member_class<Member>::type;
 namespace entt {
 
 
-/*! @brief A SBO friendly, type-safe container for single values of any type. */
-class any {
+/**
+ * @brief A SBO friendly, type-safe container for single values of any type.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
+ */
+template<std::size_t Len, std::size_t Align>
+class basic_any {
     enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
 
-    using storage_type = std::aligned_storage_t<sizeof(double[2]), alignof(double[2])>;
-    using vtable_type = const void *(const operation, const any &, const void *);
+    using storage_type = std::aligned_storage_t<Len + !Len, Align>;
+    using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
-    static constexpr auto in_situ = sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
@@ -35206,43 +37369,48 @@ class any {
         }
     }
 
-    static type_info & as_type_info(const void *data) {
-        return *const_cast<type_info *>(static_cast<const type_info *>(data));
-    }
-
-    static any & as_any(const void *data) {
-        return *const_cast<any *>(static_cast<const any *>(data));
+    template<typename Type>
+    static Type & as(const void *to) {
+        return *const_cast<Type *>(static_cast<const Type *>(to));
     }
 
     template<typename Type>
-    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] const void *to) {
+    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] const void *to) {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                using base_type = std::remove_reference_t<Type>;
+                using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
                 switch(op) {
-                case operation::REF:
-                case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type> : basic_vtable<const base_type &>;
-                    [[fallthrough]];
                 case operation::COPY:
+                    if constexpr(std::is_copy_constructible_v<base_type>) {
+                        as<basic_any>(to).template emplace<base_type>(*static_cast<const base_type *>(from.instance));
+                    }
+                    break;
                 case operation::MOVE:
-                    as_any(to).instance = from.instance;
+                    as<basic_any>(to).instance = from.instance;
                     [[fallthrough]];
                 case operation::DTOR:
                     break;
                 case operation::COMP:
-                    return compare<std::remove_const_t<base_type>>(from.instance, to) ? to : nullptr;
+                    return compare<base_type>(from.instance, to) ? to : nullptr;
                 case operation::ADDR:
-                    return std::is_const_v<base_type> ? nullptr : from.instance;
+                    return std::is_const_v<std::remove_reference_t<Type>> ? nullptr : from.instance;
                 case operation::CADDR:
                     return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const base_type &>;
+                    break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<std::remove_const_t<base_type>>();
+                    as<type_info>(to) = type_id<base_type>();
                     break;
                 }
             } else if constexpr(in_situ<Type>) {
-                #if __cpp_lib_launder >= 201606L
+                #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
                 auto *instance = const_cast<Type *>(std::launder(reinterpret_cast<const Type *>(&from.storage)));
                 #else
                 auto *instance = const_cast<Type *>(reinterpret_cast<const Type *>(&from.storage));
@@ -35250,10 +37418,13 @@ class any {
 
                 switch(op) {
                 case operation::COPY:
-                    new (&as_any(to).storage) Type{std::as_const(*instance)};
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        new (&as<basic_any>(to).storage) Type{std::as_const(*instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
                     break;
                 case operation::MOVE:
-                    new (&as_any(to).storage) Type{std::move(*instance)};
+                    new (&as<basic_any>(to).storage) Type{std::move(*instance)};
                     [[fallthrough]];
                 case operation::DTOR:
                     instance->~Type();
@@ -35264,36 +37435,50 @@ class any {
                 case operation::CADDR:
                     return instance;
                 case operation::REF:
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
                 case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
-                    as_any(to).instance = instance;
+                    as<basic_any>(to).instance = instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
                     break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<Type>();
+                    as<type_info>(to) = type_id<Type>();
                     break;
                 }
             } else {
                 switch(op) {
                 case operation::COPY:
-                    as_any(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                    if constexpr(std::is_copy_constructible_v<Type>) {
+                        as<basic_any>(to).instance = new Type{*static_cast<const Type *>(from.instance)};
+                        as<basic_any>(to).vtable = from.vtable;
+                    }
                     break;
-                case operation::REF:
-                case operation::CREF:
-                    as_any(to).vtable = (op == operation::REF) ? basic_vtable<Type &> : basic_vtable<const Type &>;
-                    [[fallthrough]];
                 case operation::MOVE:
-                    as_any(to).instance = from.instance;
+                    as<basic_any>(to).instance = from.instance;
                     break;
                 case operation::DTOR:
-                    delete static_cast<const Type *>(from.instance);
+                    if constexpr(std::is_array_v<Type>) {
+                        delete[] static_cast<const Type *>(from.instance);
+                    } else {
+                        delete static_cast<const Type *>(from.instance);
+                    }
                     break;
                 case operation::COMP:
                     return compare<Type>(from.instance, to) ? to : nullptr;
                 case operation::ADDR:
                 case operation::CADDR:
                     return from.instance;
+                case operation::REF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<Type &>;
+                    break;
+                case operation::CREF:
+                    as<basic_any>(to).instance = from.instance;
+                    as<basic_any>(to).vtable = basic_vtable<const Type &>;
+                    break;
                 case operation::TYPE:
-                    as_type_info(to) = type_id<Type>();
+                    as<type_info>(to) = type_id<Type>();
                     break;
                 }
             }
@@ -35304,8 +37489,8 @@ class any {
 
 public:
     /*! @brief Default constructor. */
-    any() ENTT_NOEXCEPT
-        : any{std::in_place_type<void>}
+    basic_any() ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<void>}
     {}
 
     /**
@@ -35315,19 +37500,18 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : vtable{&basic_vtable<Type>},
-          instance{}
+    explicit basic_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
+        : instance{},
+          vtable{&basic_vtable<Type>}
     {
         if constexpr(!std::is_void_v<Type>) {
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                static_assert(sizeof...(Args) == 1u && (std::is_pointer_v<std::remove_reference_t<Args>> && ...));
-                ENTT_ASSERT(((args != nullptr) && ...));
-                instance = (args, ...);
+                static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
+                instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<Type>) {
-                new (&storage) Type{std::forward<Args>(args)...};
+                new (&storage) Type(std::forward<Args>(args)...);
             } else {
-                instance = new Type{std::forward<Args>(args)...};
+                instance = new Type(std::forward<Args>(args)...);
             }
         }
     }
@@ -35338,8 +37522,8 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : any{std::in_place_type<Type &>, &value.get()}
+    basic_any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
+        : basic_any{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -35347,35 +37531,34 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, any>>>
-    any(Type &&value)
-        : any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
+    basic_any(Type &&value)
+        : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)}
     {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    any(const any &other)
-        : any{}
+    basic_any(const basic_any &other)
+        : basic_any{}
     {
-        vtable = other.vtable;
-        vtable(operation::COPY, other, this);
+        other.vtable(operation::COPY, other, this);
     }
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    any(any &&other) ENTT_NOEXCEPT
-        : any{}
+    basic_any(basic_any &&other) ENTT_NOEXCEPT
+        : basic_any{}
     {
+        other.vtable(operation::MOVE, other, this);
         vtable = std::exchange(other.vtable, &basic_vtable<void>);
-        vtable(operation::MOVE, other, this);
     }
 
     /*! @brief Frees the internal storage, whatever it means. */
-    ~any() {
+    ~basic_any() {
         vtable(operation::DTOR, *this, nullptr);
     }
 
@@ -35384,7 +37567,7 @@ public:
      * @param other The instance to assign from.
      * @return This any object.
      */
-    any & operator=(any other) {
+    basic_any & operator=(basic_any other) {
         swap(*this, other);
         return *this;
     }
@@ -35420,7 +37603,12 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        *this = any{std::in_place_type<Type>, std::forward<Args>(args)...};
+        *this = basic_any{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = basic_any{};
     }
 
     /**
@@ -35436,7 +37624,7 @@ public:
      * @param other Wrapper with which to compare.
      * @return False if the two objects differ in their content, true otherwise.
      */
-    bool operator==(const any &other) const ENTT_NOEXCEPT {
+    bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
         return type() == other.type() && (vtable(operation::COMP, *this, other.data()) == other.data());
     }
 
@@ -35445,8 +37633,8 @@ public:
      * @param lhs A valid any object.
      * @param rhs A valid any object.
      */
-    friend void swap(any &lhs, any &rhs) {
-        any tmp{};
+    friend void swap(basic_any &lhs, basic_any &rhs) {
+        basic_any tmp{};
         lhs.vtable(operation::MOVE, lhs, &tmp);
         rhs.vtable(operation::MOVE, rhs, &lhs);
         lhs.vtable(operation::MOVE, tmp, &rhs);
@@ -35455,35 +37643,37 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return An any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend any as_ref(any &other) ENTT_NOEXCEPT {
-        any ref{};
-        other.vtable(operation::REF, other, &ref);
+    [[nodiscard]] basic_any as_ref() ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::REF, *this, &ref);
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend any as_ref(const any &other) ENTT_NOEXCEPT {
-        any ref{};
-        other.vtable(operation::CREF, other, &ref);
+    [[nodiscard]] basic_any as_ref() const ENTT_NOEXCEPT {
+        basic_any ref{};
+        vtable(operation::CREF, *this, &ref);
         return ref;
     }
 
 private:
-    vtable_type *vtable;
     union { const void *instance; storage_type storage; };
+    vtable_type *vtable;
 };
 
 
 /**
  * @brief Checks if two wrappers differ in their content.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param lhs A wrapper, either empty or not.
  * @param rhs A wrapper, either empty or not.
  * @return True if the two wrappers differ in their content, false otherwise.
  */
-[[nodiscard]] inline bool operator!=(const any &lhs, const any &rhs) ENTT_NOEXCEPT {
+template<std::size_t Len, std::size_t Align>
+[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -35491,11 +37681,13 @@ private:
 /**
  * @brief Performs type-safe access to the contained object.
  * @tparam Type Type to which conversion is required.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  * @param data Target any object.
  * @return The element converted to the requested type.
  */
-template<typename Type>
-Type any_cast(const any &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     const auto * const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
@@ -35503,8 +37695,8 @@ Type any_cast(const any &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type any_cast(any &data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -35513,8 +37705,8 @@ Type any_cast(any &data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type any_cast(any &&data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
     ENTT_ASSERT(instance);
@@ -35523,17 +37715,17 @@ Type any_cast(any &&data) ENTT_NOEXCEPT {
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-const Type * any_cast(const any *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
 }
 
 
 /*! @copydoc any_cast */
-template<typename Type>
-Type * any_cast(any *data) ENTT_NOEXCEPT {
+template<typename Type, std::size_t Len, std::size_t Align>
+Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     // last attempt to make wrappers for const references return their values
-    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<any, Type> *>(data)->data()) : nullptr);
+    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
 }
 
 
@@ -35587,7 +37779,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -35646,6 +37838,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -35667,6 +37862,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -35683,6 +37881,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -35725,7 +37926,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -35785,7 +37986,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -35814,6 +38015,32 @@ type_info type_id() ENTT_NOEXCEPT {
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -35895,32 +38122,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -36094,6 +38295,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -36201,19 +38427,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -36308,6 +38568,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -36331,7 +38615,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -36339,7 +38623,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -36389,6 +38673,34 @@ using member_class_t = typename member_class<Member>::type;
 
 #endif
 
+// #include "fwd.hpp"
+#ifndef ENTT_POLY_FWD_HPP
+#define ENTT_POLY_FWD_HPP
+
+
+#include <type_traits>
+
+
+namespace entt {
+
+
+template<typename, std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_poly;
+
+
+/**
+ * @brief Alias declaration for the most common use case.
+ * @tparam Concept Concept descriptor.
+ */
+template<typename Concept>
+using poly = basic_poly<Concept, sizeof(double[2])>;
+
+
+}
+
+
+#endif
+
 
 
 namespace entt {
@@ -36422,29 +38734,31 @@ struct poly_inspector {
 /**
  * @brief Static virtual table factory.
  * @tparam Concept Concept descriptor.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Alignment requirement.
  */
-template<typename Concept>
+template<typename Concept, std::size_t Len, std::size_t Align>
 class poly_vtable {
     using inspector = typename Concept::template type<poly_inspector>;
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(inspector &, Args...)) -> Ret(*)(any &, Args...);
+    static auto vtable_entry(Ret(*)(inspector &, Args...)) -> Ret(*)(basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(const inspector &, Args...)) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(*)(const inspector &, Args...)) -> Ret(*)(const basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(*)(Args...)) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(*)(Args...)) -> Ret(*)(const basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(inspector:: *)(Args...)) -> Ret(*)(any &, Args...);
+    static auto vtable_entry(Ret(inspector:: *)(Args...)) -> Ret(*)(basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename... Args>
-    static auto vtable_entry(Ret(inspector:: *)(Args...) const) -> Ret(*)(const any &, Args...);
+    static auto vtable_entry(Ret(inspector:: *)(Args...) const) -> Ret(*)(const basic_any<Len, Align> &, Args...);
 
     template<auto... Candidate>
     static auto make_vtable(value_list<Candidate...>)
-    -> std::tuple<decltype(vtable_entry(Candidate))...>;
+    -> decltype(std::make_tuple(vtable_entry(Candidate)...));
 
     template<typename... Func>
     [[nodiscard]] static constexpr auto make_vtable(type_list<Func...>)  {
@@ -36462,8 +38776,8 @@ class poly_vtable {
                 return std::invoke(Candidate, std::forward<Args>(args)...);
             };
         } else {
-            entry = +[](Any &any, Args... args) -> Ret {
-                return static_cast<Ret>(std::invoke(Candidate, any_cast<constness_as_t<Type, Any> &>(any), std::forward<Args>(args)...));
+            entry = +[](Any &instance, Args... args) -> Ret {
+                return static_cast<Ret>(std::invoke(Candidate, any_cast<constness_as_t<Type, Any> &>(instance), std::forward<Args>(args)...));
             };
         }
     }
@@ -36549,20 +38863,22 @@ decltype(auto) poly_call(Poly &&self, Args &&... args) {
  * Moreover, the `poly` class template also works with unmanaged objects.
  *
  * @tparam Concept Concept descriptor.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
  */
-template<typename Concept>
-class poly: private Concept::template type<poly_base<poly<Concept>>> {
+template<typename Concept, std::size_t Len, std::size_t Align>
+class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, Len, Align>>> {
     /*! @brief A poly base is allowed to snoop into a poly object. */
-    friend struct poly_base<poly<Concept>>;
+    friend struct poly_base<basic_poly>;
 
-    using vtable_type = typename poly_vtable<Concept>::type;
+    using vtable_type = typename poly_vtable<Concept, Len, Align>::type;
 
 public:
     /*! @brief Concept type. */
-    using concept_type = typename Concept::template type<poly_base<poly<Concept>>>;
+    using concept_type = typename Concept::template type<poly_base<basic_poly>>;
 
     /*! @brief Default constructor. */
-    poly() ENTT_NOEXCEPT
+    basic_poly() ENTT_NOEXCEPT
         : storage{},
           vtable{}
     {}
@@ -36574,9 +38890,9 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit poly(std::in_place_type_t<Type>, Args &&... args)
+    explicit basic_poly(std::in_place_type_t<Type>, Args &&... args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
+          vtable{poly_vtable<Concept, Len, Align>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()}
     {}
 
     /**
@@ -36585,8 +38901,8 @@ public:
      * @param value An instance of an object to use to initialize the poly.
      */
     template<typename Type>
-    poly(std::reference_wrapper<Type> value)
-        : poly{std::in_place_type<Type &>, &value.get()}
+    basic_poly(std::reference_wrapper<Type> value)
+        : basic_poly{std::in_place_type<Type &>, value.get()}
     {}
 
     /**
@@ -36594,23 +38910,23 @@ public:
      * @tparam Type Type of object to use to initialize the poly.
      * @param value An instance of an object to use to initialize the poly.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, poly>>>
-    poly(Type &&value) ENTT_NOEXCEPT
-        : poly{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, basic_poly>>>
+    basic_poly(Type &&value) ENTT_NOEXCEPT
+        : basic_poly{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
     {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    poly(const poly &other) = default;
+    basic_poly(const basic_poly &other) = default;
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    poly(poly &&other) ENTT_NOEXCEPT
-        : poly{}
+    basic_poly(basic_poly &&other) ENTT_NOEXCEPT
+        : basic_poly{}
     {
         swap(*this, other);
     }
@@ -36620,7 +38936,7 @@ public:
      * @param other The instance to assign from.
      * @return This poly object.
      */
-    poly & operator=(poly other) {
+    basic_poly & operator=(basic_poly other) {
         swap(other, *this);
         return *this;
     }
@@ -36654,8 +38970,12 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        storage.emplace<Type>(std::forward<Args>(args)...);
-        vtable = poly_vtable<Concept>::template instance<Type>();
+        *this = basic_poly{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    /*! @brief Destroys contained object */
+    void reset() {
+        *this = basic_poly{};
     }
 
     /**
@@ -36684,7 +39004,7 @@ public:
      * @param lhs A valid poly object.
      * @param rhs A valid poly object.
      */
-    friend void swap(poly &lhs, poly &rhs) {
+    friend void swap(basic_poly &lhs, basic_poly &rhs) {
         using std::swap;
         swap(lhs.storage, rhs.storage);
         swap(lhs.vtable, rhs.vtable);
@@ -36692,26 +39012,24 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @param other A reference to an object that isn't necessarily initialized.
      * @return A poly that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] friend poly as_ref(poly &other) ENTT_NOEXCEPT {
-        poly ref;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+    [[nodiscard]] basic_poly as_ref() ENTT_NOEXCEPT {
+        basic_poly ref = std::as_const(*this).as_ref();
+        ref.storage = storage.as_ref();
         return ref;
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] friend poly as_ref(const poly &other) ENTT_NOEXCEPT {
-        poly ref;
-        ref.storage = as_ref(other.storage);
-        ref.vtable = other.vtable;
+    [[nodiscard]] basic_poly as_ref() const ENTT_NOEXCEPT {
+        basic_poly ref{};
+        ref.storage = storage.as_ref();
+        ref.vtable = vtable;
         return ref;
     }
 
 private:
-    any storage;
+    basic_any<Len, Align> storage;
     const vtable_type *vtable;
 };
 
@@ -36752,7 +39070,9 @@ private:
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -36863,7 +39183,8 @@ class process {
         SUCCEEDED,
         FAILED,
         ABORTED,
-        FINISHED
+        FINISHED,
+        REJECTED
     };
 
     template<typename Target = Derived>
@@ -37003,7 +39324,7 @@ public:
      * @return True if the process terminated with errors, false otherwise.
      */
     [[nodiscard]] bool rejected() const ENTT_NOEXCEPT {
-        return stopped;
+        return current == state::REJECTED;
     }
 
     /**
@@ -37033,13 +39354,11 @@ public:
             break;
         case state::FAILED:
             next(std::integral_constant<state, state::FAILED>{});
-            current = state::FINISHED;
-            stopped = true;
+            current = state::REJECTED;
             break;
         case state::ABORTED:
             next(std::integral_constant<state, state::ABORTED>{});
-            current = state::FINISHED;
-            stopped = true;
+            current = state::REJECTED;
             break;
         default:
             // suppress warnings
@@ -37049,7 +39368,6 @@ public:
 
 private:
     state current{state::UNINITIALIZED};
-    bool stopped{false};
 };
 
 
@@ -37214,7 +39532,8 @@ class process {
         SUCCEEDED,
         FAILED,
         ABORTED,
-        FINISHED
+        FINISHED,
+        REJECTED
     };
 
     template<typename Target = Derived>
@@ -37354,7 +39673,7 @@ public:
      * @return True if the process terminated with errors, false otherwise.
      */
     [[nodiscard]] bool rejected() const ENTT_NOEXCEPT {
-        return stopped;
+        return current == state::REJECTED;
     }
 
     /**
@@ -37384,13 +39703,11 @@ public:
             break;
         case state::FAILED:
             next(std::integral_constant<state, state::FAILED>{});
-            current = state::FINISHED;
-            stopped = true;
+            current = state::REJECTED;
             break;
         case state::ABORTED:
             next(std::integral_constant<state, state::ABORTED>{});
-            current = state::FINISHED;
-            stopped = true;
+            current = state::REJECTED;
             break;
         default:
             // suppress warnings
@@ -37400,7 +39717,6 @@ public:
 
 private:
     state current{state::UNINITIALIZED};
-    bool stopped{false};
 };
 
 
@@ -37546,19 +39862,19 @@ class scheduler {
         auto *process = static_cast<Proc *>(handler.instance.get());
         process->tick(delta, data);
 
-        auto dead = process->dead();
-
-        if(dead) {
-            if(handler.next && !process->rejected()) {
+        if(process->rejected()) {
+            return true;
+        } else if(process->dead()) {
+            if(handler.next) {
                 handler = std::move(*handler.next);
                 // forces the process to exit the uninitialized state
-                dead = handler.update(handler, {}, nullptr);
-            } else {
-                handler.instance.reset();
+                return handler.update(handler, {}, nullptr);
             }
+
+            return true;
         }
 
-        return dead;
+        return false;
     }
 
     template<typename Proc>
@@ -37714,19 +40030,17 @@ public:
      * @param data Optional data.
      */
     void update(const Delta delta, void *data = nullptr) {
-        bool clean = false;
+        auto sz = handlers.size();
 
         for(auto pos = handlers.size(); pos; --pos) {
             auto &handler = handlers[pos-1];
-            const bool dead = handler.update(handler, delta, data);
-            clean = clean || dead;
+
+            if(const auto dead = handler.update(handler, delta, data); dead) {
+                std::swap(handler, handlers[--sz]);
+            }
         }
 
-        if(clean) {
-            handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](auto &handler) {
-                return !handler.instance;
-            }), handlers.end());
-        }
+        handlers.erase(handlers.begin() + sz, handlers.end());
     }
 
     /**
@@ -37766,7 +40080,6 @@ private:
 #define ENTT_RESOURCE_CACHE_HPP
 
 
-#include <memory>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -37794,7 +40107,9 @@ private:
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -37837,6 +40152,7 @@ private:
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 // #include "../config/config.h"
 #ifndef ENTT_CONFIG_CONFIG_H
 #define ENTT_CONFIG_CONFIG_H
@@ -37861,7 +40177,9 @@ private:
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -37904,8 +40222,16 @@ private:
 namespace entt {
 
 
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
 
 
 }
@@ -37935,7 +40261,7 @@ struct resource_cache;
 
 
 template<typename>
-class resource_handle;
+struct resource_handle;
 
 
 template<typename, typename>
@@ -37965,17 +40291,17 @@ namespace entt {
  * @tparam Resource Type of resource managed by a handle.
  */
 template<typename Resource>
-class resource_handle {
-    /*! @brief Resource handles are friends of their caches. */
-    friend struct resource_cache<Resource>;
+struct resource_handle {
+    /*! @brief Default constructor. */
+    resource_handle() ENTT_NOEXCEPT = default;
 
+    /**
+     * @brief Creates a handle from a shared pointer, namely a resource.
+     * @param res A pointer to a properly initialized resource.
+     */
     resource_handle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
         : resource{std::move(res)}
     {}
-
-public:
-    /*! @brief Default constructor. */
-    resource_handle() ENTT_NOEXCEPT = default;
 
     /**
      * @brief Gets a reference to the managed resource.
@@ -38057,8 +40383,9 @@ private:
 #define ENTT_RESOURCE_LOADER_HPP
 
 
-#include <memory>
 // #include "fwd.hpp"
+
+// #include "handle.hpp"
 
 
 
@@ -38071,14 +40398,14 @@ namespace entt {
  * Resource loaders must inherit from this class and stay true to the CRTP
  * idiom. Moreover, a resource loader must expose a public, const member
  * function named `load` that accepts a variable number of arguments and returns
- * a shared pointer to the resource just created.<br/>
+ * a handle to the resource just created.<br/>
  * As an example:
  *
  * @code{.cpp}
  * struct my_resource {};
  *
  * struct my_loader: entt::resource_loader<my_loader, my_resource> {
- *     std::shared_ptr<my_resource> load(int) const {
+ *     resource_handle<my_resource> load(int value) const {
  *         // use the integer value somehow
  *         return std::make_shared<my_resource>();
  *     }
@@ -38109,7 +40436,7 @@ class resource_loader {
      * @return The resource just loaded or an empty pointer in case of errors.
      */
     template<typename... Args>
-    [[nodiscard]] std::shared_ptr<Resource> get(Args &&... args) const {
+    [[nodiscard]] resource_handle<Resource> get(Args &&... args) const {
         return static_cast<const Loader *>(this)->load(std::forward<Args>(args)...);
     }
 };
@@ -38204,18 +40531,16 @@ struct resource_cache {
     template<typename Loader, typename... Args>
     resource_handle<Resource> load(const id_type id, Args &&... args) {
         static_assert(std::is_base_of_v<resource_loader<Loader, Resource>, Loader>, "Invalid loader type");
-        resource_handle<Resource> resource{};
 
         if(auto it = resources.find(id); it == resources.cend()) {
-            if(auto instance = Loader{}.get(std::forward<Args>(args)...); instance) {
-                resources[id] = instance;
-                resource = std::move(instance);
+            if(auto handle = temp<Loader>(std::forward<Args>(args)...); handle) {
+                return (resources[id] = std::move(handle));
             }
         } else {
-            resource = it->second;
+            return it->second;
         }
 
-        return resource;
+        return {};
     }
 
     /**
@@ -38260,7 +40585,7 @@ struct resource_cache {
      */
     template<typename Loader, typename... Args>
     [[nodiscard]] resource_handle<Resource> temp(Args &&... args) const {
-        return { Loader{}.get(std::forward<Args>(args)...) };
+        return Loader{}.get(std::forward<Args>(args)...);
     }
 
     /**
@@ -38277,8 +40602,11 @@ struct resource_cache {
      * @return A handle for the given resource.
      */
     [[nodiscard]] resource_handle<Resource> handle(const id_type id) const {
-        auto it = resources.find(id);
-        return { it == resources.end() ? nullptr : it->second };
+        if(auto it = resources.find(id); it != resources.cend()) {
+            return it->second;
+        }
+
+        return {};
     }
 
     /**
@@ -38332,15 +40660,15 @@ struct resource_cache {
             if constexpr(std::is_invocable_v<Func, id_type>) {
                 func(curr->first);
             } else if constexpr(std::is_invocable_v<Func, resource_handle<Resource>>) {
-                func(resource_handle{ curr->second });
+                func(curr->second);
             } else {
-                func(curr->first, resource_handle{ curr->second });
+                func(curr->first, curr->second);
             }
         }
     }
 
 private:
-    std::unordered_map<id_type, std::shared_ptr<Resource>> resources;
+    std::unordered_map<id_type, resource_handle<Resource>> resources;
 };
 
 
@@ -38378,17 +40706,17 @@ namespace entt {
  * @tparam Resource Type of resource managed by a handle.
  */
 template<typename Resource>
-class resource_handle {
-    /*! @brief Resource handles are friends of their caches. */
-    friend struct resource_cache<Resource>;
+struct resource_handle {
+    /*! @brief Default constructor. */
+    resource_handle() ENTT_NOEXCEPT = default;
 
+    /**
+     * @brief Creates a handle from a shared pointer, namely a resource.
+     * @param res A pointer to a properly initialized resource.
+     */
     resource_handle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
         : resource{std::move(res)}
     {}
-
-public:
-    /*! @brief Default constructor. */
-    resource_handle() ENTT_NOEXCEPT = default;
 
     /**
      * @brief Gets a reference to the managed resource.
@@ -38470,8 +40798,9 @@ private:
 #define ENTT_RESOURCE_LOADER_HPP
 
 
-#include <memory>
 // #include "fwd.hpp"
+
+// #include "handle.hpp"
 
 
 
@@ -38484,14 +40813,14 @@ namespace entt {
  * Resource loaders must inherit from this class and stay true to the CRTP
  * idiom. Moreover, a resource loader must expose a public, const member
  * function named `load` that accepts a variable number of arguments and returns
- * a shared pointer to the resource just created.<br/>
+ * a handle to the resource just created.<br/>
  * As an example:
  *
  * @code{.cpp}
  * struct my_resource {};
  *
  * struct my_loader: entt::resource_loader<my_loader, my_resource> {
- *     std::shared_ptr<my_resource> load(int) const {
+ *     resource_handle<my_resource> load(int value) const {
  *         // use the integer value somehow
  *         return std::make_shared<my_resource>();
  *     }
@@ -38522,7 +40851,7 @@ class resource_loader {
      * @return The resource just loaded or an empty pointer in case of errors.
      */
     template<typename... Args>
-    [[nodiscard]] std::shared_ptr<Resource> get(Args &&... args) const {
+    [[nodiscard]] resource_handle<Resource> get(Args &&... args) const {
         return static_cast<const Loader *>(this)->load(std::forward<Args>(args)...);
     }
 };
@@ -38575,7 +40904,9 @@ class resource_loader {
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -38618,6 +40949,7 @@ class resource_loader {
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 // #include "../config/config.h"
 
 
@@ -38625,8 +40957,16 @@ class resource_loader {
 namespace entt {
 
 
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
 
 
 }
@@ -38637,6 +40977,32 @@ using id_type = ENTT_ID_TYPE;
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+struct choice_t
+    // Unfortunately, doxygen cannot parse such a construct.
+    /*! @cond TURN_OFF_DOXYGEN */
+    : choice_t<N-1>
+    /*! @endcond */
+{};
+
+
+/*! @copybrief choice_t */
+template<>
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -38718,32 +41084,6 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
  */
 template<id_type Value>
 using tag = integral_constant<Value>;
-
-
-/**
- * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-struct choice_t
-        // Unfortunately, doxygen cannot parse such a construct.
-        /*! @cond TURN_OFF_DOXYGEN */
-        : choice_t<N-1>
-        /*! @endcond */
-{};
-
-
-/*! @copybrief choice_t */
-template<>
-struct choice_t<0> {};
-
-
-/**
- * @brief Variable template for the choice trick.
- * @tparam N Number of choices available.
- */
-template<std::size_t N>
-inline constexpr choice_t<N> choice{};
 
 
 /**
@@ -38917,6 +41257,31 @@ template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_diff;
+
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ */
+template<typename... Type, typename... Other>
+struct type_list_diff<type_list<Type...>, type_list<Other...>> {
+    /*! @brief A type list that is the difference between the two type lists. */
+    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam List Type lists between which to compute the difference.
+ */
+template<typename... List>
+using type_list_diff_t = typename type_list_diff<List...>::type;
+
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.
@@ -39024,19 +41389,53 @@ using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::value_type>(choice<2>);
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
 template<typename Type, typename = void>
-struct is_equality_comparable: std::false_type {};
-
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
-        : std::true_type
-{};
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
 
 
 /**
@@ -39131,6 +41530,30 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * hashable, false otherwise.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type, typename = void>
+struct is_std_hashable: std::false_type {};
+
+
+/*! @copydoc is_std_hashable */
+template <typename Type>
+struct is_std_hashable<Type, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::hash<Type>>()(std::declval<Type>())), std::size_t>>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially hashable type.
+ */
+template <typename Type>
+inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.
  * @tparam Type Potential empty type.
@@ -39154,7 +41577,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::remove_const_t<To>;
 };
 
@@ -39162,7 +41585,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
-    /*! @brief The type resulting from the transcription of the constness */
+    /*! @brief The type resulting from the transcription of the constness. */
     using type = std::add_const_t<To>;
 };
 
@@ -39236,7 +41659,9 @@ using member_class_t = typename member_class<Member>::type;
 #endif
 
 
-#ifndef ENTT_PAGE_SIZE
+#ifdef ENTT_PAGE_SIZE
+static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#else
 #   define ENTT_PAGE_SIZE 4096
 #endif
 
@@ -39553,7 +41978,7 @@ public:
      * @return The value returned by the underlying function.
      */
     Ret operator()(Args... args) const {
-        ENTT_ASSERT(fn);
+        ENTT_ASSERT(static_cast<bool>(*this));
         return fn(data, std::forward<Args>(args)...);
     }
 
@@ -39646,6 +42071,7 @@ delegate(Ret(*)(const void *, Args...), const void * = nullptr) ENTT_NOEXCEPT
 #define ENTT_CORE_FWD_HPP
 
 
+#include <type_traits>
 // #include "../config/config.h"
 
 
@@ -39653,8 +42079,16 @@ delegate(Ret(*)(const void *, Args...), const void * = nullptr) ENTT_NOEXCEPT
 namespace entt {
 
 
+template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+class basic_any;
+
+
 /*! @brief Alias declaration for type identifiers. */
 using id_type = ENTT_ID_TYPE;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using any = basic_any<sizeof(double[2])>;
 
 
 }
@@ -40011,7 +42445,7 @@ template<typename Type>
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
 #else
-    return std::string_view{};
+    return std::string_view{""};
 #endif
 }
 
@@ -40070,6 +42504,9 @@ struct ENTT_API type_seq final {
         static const id_type value = internal::type_seq::next();
         return value;
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -40091,6 +42528,9 @@ struct type_hash final {
         return type_seq<Type>::value();
 #endif
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator id_type() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -40107,6 +42547,9 @@ struct type_name final {
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>(0);
     }
+
+    /*! @copydoc value */
+    [[nodiscard]] constexpr operator std::string_view() const ENTT_NOEXCEPT { return value(); }
 };
 
 
@@ -40149,7 +42592,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !name_value.empty();
+        return name_value.data() != nullptr;
     }
 
     /**
@@ -40209,7 +42652,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
     return type_info{
         type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
         type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
@@ -40529,7 +42972,7 @@ public:
      * @return The value returned by the underlying function.
      */
     Ret operator()(Args... args) const {
-        ENTT_ASSERT(fn);
+        ENTT_ASSERT(static_cast<bool>(*this));
         return fn(data, std::forward<Args>(args)...);
     }
 
@@ -41240,6 +43683,15 @@ class dispatcher {
     }
 
 public:
+    /*! @brief Default constructor. */
+    dispatcher() = default;
+
+    /*! @brief Default move constructor. */
+    dispatcher(dispatcher &&) = default;
+
+    /*! @brief Default move assignment operator. @return This dispatcher. */
+    dispatcher & operator=(dispatcher &&) = default;
+
     /**
      * @brief Returns a sink object for the given event.
      *
