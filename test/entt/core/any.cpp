@@ -917,3 +917,9 @@ TEST(Any, Alignment) {
     entt::basic_any<alignment, alignment> sbo[2] = { over_aligned{}, over_aligned{} };
     test(sbo, [](auto *pre, auto *post) { ASSERT_NE(pre, post); });
 }
+
+TEST(Any, AggregatesMustWork) {
+    struct aggregate_type { int value; };
+    // the goal of this test is to enforce the requirements for aggregate types
+    entt::any{std::in_place_type<aggregate_type>, 42}.emplace<aggregate_type>(42);
+}
