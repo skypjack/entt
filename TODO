@@ -7,7 +7,9 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
+* HP: see msvc only issue at https://godbolt.org/z/8KW9PhG4c
 * HP: scheduler, use any (or poly?) instead of unique_ptr
+* HP: any and the like: remove constructor that accepts reference wrapper, allow only in-place T& and entt::make_any<T>(...)
 * HP: resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * HP: make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * HP: add user data to type_info
@@ -22,7 +24,6 @@ WIP:
 * HP: make runtime views use opaque storage and therefore return also elements.
 * HP: add exclude-only views to combine with packs
 * HP: entity-aware observer, add observer functions aside observer class
-* HP: any and the like: remove constructor that accepts reference wrapper, allow only in-place T&?
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
 * snapshot: support for range-based archives
