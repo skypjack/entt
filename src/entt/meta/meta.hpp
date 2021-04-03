@@ -267,25 +267,62 @@ public:
      * @param other The instance to move from.
      */
     meta_any(meta_any &&other) ENTT_NOEXCEPT
-        : meta_any{}
-    {
-        swap(*this, other);
-    }
+        : storage{std::move(other.storage)},
+          vtable{std::exchange(other.vtable, &basic_vtable<void>)},
+          node{std::exchange(other.node, nullptr)}
+    {}
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
-        if(vtable) {
-            vtable(operation::DTOR, storage, node);
-        }
+        vtable(operation::DTOR, storage, node);
     }
 
     /**
-     * @brief Assignment operator.
-     * @param other The instance to assign from.
+     * @brief Copy assignment operator.
+     * @param other The instance to copy from.
      * @return This meta any object.
      */
-    meta_any & operator=(meta_any other) {
-        swap(other, *this);
+    meta_any & operator=(const meta_any &other) {
+        std::exchange(vtable, other.vtable)(operation::DTOR, storage, node);
+        storage = other.storage;
+        node = other.node;
+        return *this;
+    }
+
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to move from.
+     * @return This meta any object.
+     */
+    meta_any & operator=(meta_any &&other) {
+        std::exchange(vtable, std::exchange(other.vtable, &basic_vtable<void>))(operation::DTOR, storage, node);
+        storage = std::move(other.storage);
+        node = std::exchange(other.node, nullptr);
+        return *this;
+    }
+
+    /**
+     * @brief Value assignment operator.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
+     * @return This meta any object.
+     */
+    template<typename Type>
+    meta_any & operator=(std::reference_wrapper<Type> value) {
+        emplace<Type &>(value.get());
+        return *this;
+    }
+
+    /**
+     * @brief Value assignment operator.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
+     * @return This meta any object.
+     */
+    template<typename Type>
+    std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>, meta_any &>
+    operator=(Type &&value) {
+        emplace<std::decay_t<Type>>(std::forward<Type>(value));
         return *this;
     }
 
@@ -454,12 +491,16 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        *this = meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
+        std::exchange(vtable, &basic_vtable<Type>)(operation::DTOR, storage, node);
+        storage.emplace<Type>(std::forward<Args>(args)...);
+        node = internal::meta_info<Type>::resolve();
     }
 
     /*! @brief Destroys contained object */
     void reset() {
-        *this = meta_any{};
+        std::exchange(vtable, &basic_vtable<void>)(operation::DTOR, storage, node);
+        storage.reset();
+        node = nullptr;
     }
 
     /**
@@ -529,18 +570,6 @@ public:
      */
     [[nodiscard]] bool operator==(const meta_any &other) const {
         return (!node && !other.node) || (node && other.node && node->info == other.node->info && storage == other.storage);
-    }
-
-    /**
-     * @brief Swaps two meta any objects.
-     * @param lhs A valid meta any object.
-     * @param rhs A valid meta any object.
-     */
-    friend void swap(meta_any &lhs, meta_any &rhs) {
-        using std::swap;
-        swap(lhs.storage, rhs.storage);
-        swap(lhs.vtable, rhs.vtable);
-        swap(lhs.node, rhs.node);
     }
 
     /**
