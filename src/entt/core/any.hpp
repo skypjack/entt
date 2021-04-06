@@ -419,7 +419,7 @@ Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
 template<typename Type, std::size_t Len, std::size_t Align>
 Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
-    auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
+    auto * const instance = any_cast<std::remove_reference_t<const Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(*instance);
 }
@@ -429,7 +429,7 @@ Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
 template<typename Type, std::size_t Len, std::size_t Align>
 Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
     // forces const on non-reference types to make them work also with wrappers for const references
-    auto * const instance = any_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>(&data);
+    auto * const instance = any_cast<std::remove_reference_t<const Type>>(&data);
     ENTT_ASSERT(instance);
     return static_cast<Type>(std::move(*instance));
 }

@@ -234,7 +234,7 @@ public:
             meta_template_descriptor(),
             std::rank_v<Type>,
             [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
-            &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
+            &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<Type>>>>::resolve,
             &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_extent_t<Type>>>>::resolve,
             meta_default_constructor(&node),
             meta_default_constructor(&node)

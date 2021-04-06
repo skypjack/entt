@@ -66,6 +66,15 @@ struct is_meta_pointer_like: std::false_type {};
 
 
 /**
+ * @brief Partial specialization to ensure that arrays aren't accepted.
+ * @tparam Type Type of elements of the array.
+ * @tparam N Number of elements of the array.
+ */
+template<typename Type, std::size_t N>
+struct is_meta_pointer_like<Type[N]>: std::false_type {};
+
+
+/**
  * @brief Partial specialization to ensure that const pointer-like types are
  * also accepted.
  * @tparam Type Potentially pointer-like type.

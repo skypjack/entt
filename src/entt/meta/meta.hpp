@@ -164,8 +164,6 @@ class meta_any {
     template<typename Type>
     static void basic_vtable(const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] void *to) {
         if constexpr(!std::is_void_v<Type>) {
-            using base_type = std::remove_const_t<std::remove_reference_t<Type>>;
-
             switch(op) {
             case operation::DTOR:
                 if constexpr(!std::is_lvalue_reference_v<Type>) {
@@ -176,39 +174,37 @@ class meta_any {
             break;
             case operation::REF:
             case operation::CREF:
-                *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const base_type &>(from))});
+                *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const std::decay_t<Type> &>(from))});
                 break;
             case operation::DEREF:
             case operation::CDEREF:
-                if constexpr(is_meta_pointer_like_v<base_type>) {
-                    // for some reason vs2017 doesn't compile when using alias declarations with pointer_traits to get the element type
-                    using element_type = std::remove_const_t<typename std::pointer_traits<std::remove_const_t<std::remove_reference_t<Type>>>::element_type>;
+                if constexpr(is_meta_pointer_like_v<std::decay_t<Type>>) {
+                    using element_type = std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>;
 
                     if constexpr(std::is_function_v<element_type>) {
-                        *static_cast<meta_any *>(to) = any_cast<base_type>(from);
+                        *static_cast<meta_any *>(to) = any_cast<std::decay_t<Type>>(from);
                     } else if constexpr(!std::is_same_v<element_type, void>) {
-                        // for some reason vs2017 doesn't compile when using alias declarations with adl_meta_pointer_like
-                        using adl_meta_pointer_like_type = adl_meta_pointer_like<std::remove_const_t<std::remove_reference_t<Type>>>;
+                        using adl_meta_pointer_like_type = adl_meta_pointer_like<std::decay_t<Type>>;
 
-                        if constexpr(std::is_lvalue_reference_v<decltype(adl_meta_pointer_like_type::dereference(std::declval<const base_type &>()))>) {
-                            auto &&obj = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+                        if constexpr(std::is_lvalue_reference_v<decltype(adl_meta_pointer_like_type::dereference(std::declval<const std::decay_t<Type> &>()))>) {
+                            auto &&obj = adl_meta_pointer_like_type::dereference(any_cast<const std::decay_t<Type> &>(from));
                             *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::ref(obj)} : meta_any{std::cref(obj)});
                         } else {
-                            *static_cast<meta_any *>(to) = adl_meta_pointer_like_type::dereference(any_cast<const base_type &>(from));
+                            *static_cast<meta_any *>(to) = adl_meta_pointer_like_type::dereference(any_cast<const std::decay_t<Type> &>(from));
                         }
                     }
                 }
                 break;
             case operation::SEQ:
             case operation::CSEQ:
-                if constexpr(is_complete_v<meta_sequence_container_traits<base_type>>) {
-                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<base_type>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                if constexpr(is_complete_v<meta_sequence_container_traits<std::decay_t<Type>>>) {
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<std::decay_t<Type>>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
                 }
                 break;
             case operation::ASSOC:
             case operation::CASSOC:
-                if constexpr(is_complete_v<meta_associative_container_traits<base_type>>) {
-                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<base_type>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                if constexpr(is_complete_v<meta_associative_container_traits<std::decay_t<Type>>>) {
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<std::decay_t<Type>>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
                 }
                 break;
             }
@@ -440,9 +436,9 @@ public:
     template<typename Type>
     [[nodiscard]] Type cast() {
         // forces const on non-reference types to make them work also with wrappers for const references
-        auto * const actual = try_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>();
-        ENTT_ASSERT(actual);
-        return static_cast<Type>(*actual);
+        auto * const instance = try_cast<std::remove_reference_t<const Type>>();
+        ENTT_ASSERT(instance);
+        return static_cast<Type>(*instance);
     }
 
     /**
@@ -471,7 +467,8 @@ public:
      */
     template<typename Type>
     bool allow_cast() {
-        if(try_cast<std::conditional_t<std::is_reference_v<Type>, std::remove_reference_t<Type>, const Type>>() != nullptr) {
+        // forces const on non-reference types to make them work also with wrappers for const references
+        if(try_cast<std::remove_reference_t<const Type>>() != nullptr) {
             return true;
         } else if(node) {
             if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>([info = type_id<Type>()](const auto *curr) { return curr->type()->info == info; }, node); conv) {
