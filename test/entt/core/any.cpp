@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <string.h>
 #include <unordered_map>
 #include <vector>
 #include <gtest/gtest.h>
@@ -965,4 +966,18 @@ TEST_F(Any, AggregatesMustWork) {
     struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
     entt::any{std::in_place_type<aggregate_type>, 42}.emplace<aggregate_type>(42);
+}
+
+TEST_F(Any, DeducedArrayType) {
+    entt::any any{"array of char"};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::type_id<const char *>());
+    ASSERT_EQ((std::strcmp("array of char", entt::any_cast<const char *>(any))), 0);
+
+    any = "another array of char";
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::type_id<const char *>());
+    ASSERT_EQ((std::strcmp("another array of char", entt::any_cast<const char *>(any))), 0);
 }
