@@ -2,7 +2,6 @@
 #define ENTT_META_META_HPP
 
 
-#include <array>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -776,8 +775,8 @@ struct meta_ctor {
      */
     template<typename... Args>
     [[nodiscard]] meta_any invoke([[maybe_unused]] Args &&... args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return invoke(arguments.data(), sizeof...(Args));
+        meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
+        return invoke(arguments, sizeof...(Args));
     }
 
     /**
@@ -994,8 +993,8 @@ struct meta_func {
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&... args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return invoke(std::move(instance), arguments.data(), sizeof...(Args));
+        meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
+        return invoke(std::move(instance), arguments, sizeof...(Args));
     }
 
     /*! @copydoc meta_ctor::prop */
@@ -1399,8 +1398,8 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&... args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return construct(arguments.data(), sizeof...(Args));
+        meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
+        return construct(arguments, sizeof...(Args));
     }
 
     /**
@@ -1460,8 +1459,8 @@ public:
      */
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&... args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return invoke(id, std::move(instance), arguments.data(), sizeof...(Args));
+        meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
+        return invoke(id, std::move(instance), arguments, sizeof...(Args));
     }
 
     /**
