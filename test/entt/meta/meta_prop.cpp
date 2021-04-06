@@ -67,7 +67,7 @@ TEST_F(MetaProp, DeducedArrayType) {
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.key(), "char[]"_hs);
     ASSERT_EQ(prop.value().type(), entt::resolve<const char *>());
-    ASSERT_EQ(std::strcmp(prop.value().cast<const char *>(), "char[]"), 0);
+    ASSERT_EQ(strcmp(prop.value().cast<const char *>(), "char[]"), 0);
 }
 
 TEST_F(MetaProp, ReRegistration) {
