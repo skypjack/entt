@@ -115,7 +115,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
 
         private:
             It it;
-            const std::tuple<storage_type<Get> *...> pools;
+            std::tuple<storage_type<Get> *...> pools;
         };
 
         iterable_group(basic_sparse_set<Entity> * const ref, const std::tuple<storage_type<Get> *...> &cpools)
