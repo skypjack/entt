@@ -1,3 +1,4 @@
+#include <string.h>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -18,7 +19,8 @@ struct MetaProp: ::testing::Test {
 
         entt::meta<base_2_t>()
             .type("base_2"_hs)
-            .prop("bool"_hs, false);
+            .prop("bool"_hs, false)
+            .prop("char[]"_hs, "char[]");
 
         entt::meta<derived_t>()
             .type("derived"_hs)
@@ -55,6 +57,17 @@ TEST_F(MetaProp, FromBase) {
 
     ASSERT_FALSE(prop_bool.value().cast<bool>());
     ASSERT_EQ(prop_int.value().cast<int>(), 42);
+}
+
+TEST_F(MetaProp, DeducedArrayType) {
+    using namespace entt::literals;
+
+    auto prop = entt::resolve<base_2_t>().prop("char[]"_hs);
+
+    ASSERT_TRUE(prop);
+    ASSERT_EQ(prop.key(), "char[]"_hs);
+    ASSERT_EQ(prop.value().type(), entt::resolve<const char *>());
+    ASSERT_EQ(std::strcmp(prop.value().cast<const char *>(), "char[]"), 0);
 }
 
 TEST_F(MetaProp, ReRegistration) {

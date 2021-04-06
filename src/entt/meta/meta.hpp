@@ -251,9 +251,9 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>>>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(Type &&value)
-        : meta_any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+        : meta_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)}
     {}
 
     /**
@@ -642,11 +642,11 @@ struct meta_handle {
      * @tparam Type Type of object to use to initialize the handle.
      * @param value An instance of an object to use to initialize the handle.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_handle>>>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(Type &value) ENTT_NOEXCEPT
         : meta_handle{}
     {
-        if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
+        if constexpr(std::is_same_v<std::decay_t<Type>, meta_any>) {
             any = value.as_ref();
         } else {
             any.emplace<Type &>(value);
