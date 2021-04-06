@@ -268,8 +268,8 @@ public:
      */
     meta_any(meta_any &&other) ENTT_NOEXCEPT
         : storage{std::move(other.storage)},
-          vtable{std::exchange(other.vtable, &basic_vtable<void>)},
-          node{std::exchange(other.node, nullptr)}
+          node{std::exchange(other.node, nullptr)},
+          vtable{std::exchange(other.vtable, &basic_vtable<void>)}
     {}
 
     /*! @brief Frees the internal storage, whatever it means. */
