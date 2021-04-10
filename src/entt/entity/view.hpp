@@ -681,7 +681,8 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
-        : pools{}
+        : pools{},
+          filter{}
     {}
 
     /**
@@ -689,7 +690,8 @@ public:
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : pools{&ref}
+        : pools{&ref},
+          filter{}
     {}
 
     /**
