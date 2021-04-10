@@ -956,7 +956,7 @@ private:
  * @param storage The storage for the types to iterate.
  */
 template<typename... Storage>
-basic_view(Storage &... storage) ENTT_NOEXCEPT
+basic_view(Storage &... storage)
 -> basic_view<std::common_type_t<typename Storage::entity_type...>, entt::exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
 
 

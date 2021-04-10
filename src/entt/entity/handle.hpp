@@ -324,7 +324,8 @@ bool operator!=(const basic_handle<Type> &lhs, const basic_handle<Other> &rhs) E
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-basic_handle(basic_registry<Entity> &, Entity) -> basic_handle<Entity>;
+basic_handle(basic_registry<Entity> &, Entity)
+-> basic_handle<Entity>;
 
 
 /**
@@ -332,7 +333,8 @@ basic_handle(basic_registry<Entity> &, Entity) -> basic_handle<Entity>;
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-basic_handle(const basic_registry<Entity> &, Entity) -> basic_handle<const Entity>;
+basic_handle(const basic_registry<Entity> &, Entity)
+-> basic_handle<const Entity>;
 
 
 }
