@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -67,7 +67,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_README"></a><img src="https://user-images.githubusercontent.com/1812216/103550016-90752280-4ea8-11eb-8667-12ed2219e137.png" alt="EnTT: Gaming meets modern C++" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md138"></a>
+<h1><a class="anchor" id="autotoc_md145"></a>
 Introduction</h1>
 <p>The entity-component-system (also known as <em>ECS</em>) is an architectural pattern used mostly in game development. For further details:</p>
 <ul>
@@ -94,9 +94,9 @@ Introduction</h1>
 <li>And <b>much more</b>! Check out the <a href="https://github.com/skypjack/entt/wiki"><b>wiki</b></a>.</li>
 </ul>
 <p>Consider this list a work in progress as well as the project. The whole API is fully documented in-code for those who are brave enough to read it.</p>
-<p>It is also known that <code>EnTT</code> (version 3) is used in <b>Minecraft</b>.<br  />
+<p>It is also known that <code>EnTT</code> is used in <b>Minecraft</b>.<br  />
  Given that the game is available literally everywhere, I can confidently say that the library has been sufficiently tested on every platform that can come to mind.</p>
-<h2><a class="anchor" id="autotoc_md139"></a>
+<h2><a class="anchor" id="autotoc_md146"></a>
 Code Example</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div>
 <div class="line"> </div>
@@ -142,12 +142,12 @@ Code Example</h2>
 <div class="line"> </div>
 <div class="line">    update(registry);</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md140"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md147"></a>
 Motivation</h2>
 <p>I started developing <code>EnTT</code> for the <em>wrong</em> reason: my goal was to design an entity-component system to beat another well known open source solution both in terms of performance and possibly memory usage.<br  />
  In the end, I did it, but it wasn't very satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed. When I realized it, I tried hard to keep intact the great performance of <code>EnTT</code> and to add all the features I wanted to see in <em>my own library</em> at the same time.</p>
 <p>Nowadays, <code>EnTT</code> is finally what I was looking for: still faster than its <em>competitors</em>, lower memory usage in the average case, a really good API and an amazing set of features. And even more, of course.</p>
-<h2><a class="anchor" id="autotoc_md141"></a>
+<h2><a class="anchor" id="autotoc_md148"></a>
 Performance</h2>
 <p>The proposed entity-component system is incredibly fast to iterate entities and components, this is a fact. Some compilers make a lot of optimizations because of how <code>EnTT</code> works, some others aren't that good. In general, if we consider real world cases, <code>EnTT</code> is somewhere between a bit and much faster than many of the other solutions around, although I couldn't check them all for obvious reasons.</p>
 <p>If you are interested, you can compile the <code>benchmark</code> test in release mode (to enable compiler optimizations, otherwise it would make little sense) by setting the <code>ENTT_BUILD_BENCHMARK</code> option of <code>CMake</code> to <code>ON</code>, then evaluate yourself whether you're satisfied with the results or not.</p>
@@ -156,9 +156,15 @@ Performance</h2>
 <p>The choice to use <code>EnTT</code> should be based on its carefully designed API, its set of features and the general performance, <b>not</b> because some single benchmark shows it to be the fastest tool available.</p>
 <p>In the future I'll likely try to get even better performance while still adding new features, mainly for fun.<br  />
  If you want to contribute and/or have suggestions, feel free to make a PR or open an issue to discuss your idea.</p>
-<h1><a class="anchor" id="autotoc_md142"></a>
-Build Instructions</h1>
-<h2><a class="anchor" id="autotoc_md143"></a>
+<h1><a class="anchor" id="autotoc_md149"></a>
+Integration</h1>
+<p><code>EnTT</code> is a header-only library. This means that including the <code><a class="el" href="entt_8hpp_source.html">entt.hpp</a></code> header is enough to include the library as a whole and use it. For those who are interested only in the entity-component system, consider to include the sole <code><a class="el" href="registry_8hpp_source.html">entity/registry.hpp</a></code> header instead.<br  />
+ It's a matter of adding the following line to the top of a file:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div>
+</div><!-- fragment --><p>Use the line below to include only the entity-component system instead:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entity/registry.hpp&gt;</span></div>
+</div><!-- fragment --><p>Then pass the proper <code>-I</code> argument to the compiler to add the <code>src</code> directory to the include paths.</p>
+<h2><a class="anchor" id="autotoc_md150"></a>
 Requirements</h2>
 <p>To be able to use <code>EnTT</code>, users must provide a full-featured compiler that supports at least C++17.<br  />
  The requirements below are mandatory to compile the tests and to extract the documentation:</p>
@@ -168,36 +174,13 @@ Requirements</h2>
 </ul>
 <p>Alternatively, <a href="https://bazel.build">Bazel</a> is also supported as a build system (credits to <a href="https://github.com/zaucy">zaucy</a> who offered to maintain it).<br  />
  In the documentation below I'll still refer to <code>CMake</code>, this being the official build system of the library.</p>
-<p>If you are looking for a C++14 version of <code>EnTT</code>, check out the git tag <code>cpp14</code>.</p>
-<h2><a class="anchor" id="autotoc_md144"></a>
-Library</h2>
-<p><code>EnTT</code> is a header-only library. This means that including the <code><a class="el" href="entt_8hpp_source.html">entt.hpp</a></code> header is enough to include the library as a whole and use it. For those who are interested only in the entity-component system, consider to include the sole <code><a class="el" href="registry_8hpp_source.html">entity/registry.hpp</a></code> header instead.<br  />
- It's a matter of adding the following line to the top of a file:</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div>
-</div><!-- fragment --><p>Use the line below to include only the entity-component system instead:</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entity/registry.hpp&gt;</span></div>
-</div><!-- fragment --><p>Then pass the proper <code>-I</code> argument to the compiler to add the <code>src</code> directory to the include paths.</p>
-<h2><a class="anchor" id="autotoc_md145"></a>
-Documentation</h2>
-<p>The documentation is based on <a href="http://www.doxygen.nl/">doxygen</a>. To build it: </p><pre class="fragment">$ cd build
-$ cmake .. -DENTT_BUILD_DOCS=ON
-$ make
-</pre><p>The API reference will be created in HTML format within the directory <code>build/docs/html</code>. To navigate it with your favorite browser: </p><pre class="fragment">$ cd build
-$ your_favorite_browser docs/html/index.html
-</pre><h2><a class="anchor" id="autotoc_md146"></a>
-Tests</h2>
-<p>To compile and run the tests, <code>EnTT</code> requires <em>googletest</em>.<br  />
- <code>cmake</code> will download and compile the library before compiling anything else. In order to build the tests, set the CMake option <code>ENTT_BUILD_TESTING</code> to <code>ON</code>.</p>
-<p>To build the most basic set of tests:</p>
-<ul>
-<li><code>$ cd build</code></li>
-<li><code>$ cmake -DENTT_BUILD_TESTING=ON ..</code></li>
-<li><code>$ make</code></li>
-<li><code>$ make test</code></li>
-</ul>
-<p>Note that benchmarks are not part of this set.</p>
-<h1><a class="anchor" id="autotoc_md147"></a>
-Packaging Tools</h1>
+<h2><a class="anchor" id="autotoc_md151"></a>
+CMake</h2>
+<p>To use <code>EnTT</code> from a <code>CMake</code> project, just link an existing target to the <code>EnTT::EnTT</code> alias.<br  />
+ The library offers everything you need for locating (as in <code>find_package</code>), embedding (as in <code>add_subdirectory</code>), fetching (as in <code>FetchContent</code>) or using it in many of the ways that you can think of and that involve <code>CMake</code>.<br  />
+ Covering all possible cases would require a treaty and not a simple README file, but I'm confident that anyone reading this section also knows what it's about and can use <code>EnTT</code> from a <code>CMake</code> project without problems.</p>
+<h2><a class="anchor" id="autotoc_md152"></a>
+Packaging Tools</h2>
 <p><code>EnTT</code> is available for some of the most known packaging tools. In particular:</p>
 <ul>
 <li><a href="https://github.com/conan-io/conan-center-index"><code>Conan</code></a>, the C/C++ Package Manager for Developers.</li>
@@ -227,8 +210,31 @@ Packaging Tools</h1>
 <li><a href="https://github.com/build2-packaging/entt">Package source repository</a>: accessible as either <code><a href="https://github.com/build2-packaging/entt.git">https://github.com/build2-packaging/entt.git</a></code> or <code>ssh://git@github.com/build2-packaging/entt.git</code>. Feel free to <a href="https://github.com/build2-packaging/entt">report issues</a> with this package.</li>
 </ul>
 <p>Both can be used with <code>bpkg add-repo</code> or added in a project <code>repositories.manifest</code>. See the official <a href="https://build2.org/build2-toolchain/doc/build2-toolchain-intro.xhtml#guide-repositories">documentation</a> for more details.</p>
-<p>Consider this list a work in progress and help me to make it longer.</p>
-<h1><a class="anchor" id="autotoc_md148"></a>
+<p>Consider this list a work in progress and help me to make it longer if you like.</p>
+<h2><a class="anchor" id="autotoc_md153"></a>
+pkg-config</h2>
+<p><code>EnTT</code> also supports <code>pkg-config</code> (for some definition of <em>supports</em> at least). A suitable file called <code>entt.pc</code> is generated and installed in a proper directory when running <code>CMake</code>.<br  />
+ This should also make it easier to use with tools such as <code>Meson</code> or similar.</p>
+<h1><a class="anchor" id="autotoc_md154"></a>
+Documentation</h1>
+<p>The documentation is based on <a href="http://www.doxygen.nl/">doxygen</a>. To build it: </p><pre class="fragment">$ cd build
+$ cmake .. -DENTT_BUILD_DOCS=ON
+$ make
+</pre><p>The API reference will be created in HTML format within the directory <code>build/docs/html</code>. To navigate it with your favorite browser: </p><pre class="fragment">$ cd build
+$ your_favorite_browser docs/html/index.html
+</pre><h1><a class="anchor" id="autotoc_md155"></a>
+Tests</h1>
+<p>To compile and run the tests, <code>EnTT</code> requires <em>googletest</em>.<br  />
+ <code>cmake</code> will download and compile the library before compiling anything else. In order to build the tests, set the <code>CMake</code> option <code>ENTT_BUILD_TESTING</code> to <code>ON</code>.</p>
+<p>To build the most basic set of tests:</p>
+<ul>
+<li><code>$ cd build</code></li>
+<li><code>$ cmake -DENTT_BUILD_TESTING=ON ..</code></li>
+<li><code>$ make</code></li>
+<li><code>$ make test</code></li>
+</ul>
+<p>Note that benchmarks are not part of this set.</p>
+<h1><a class="anchor" id="autotoc_md156"></a>
 License</h1>
 <p>Code and documentation Copyright (c) 2017-2021 Michele Caini.<br  />
  Colorful logo Copyright (c) 2018-2021 Richard Caseres.</p>

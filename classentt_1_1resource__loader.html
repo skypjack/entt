@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -91,12 +91,12 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 class entt::resource_loader&lt; Loader, Resource &gt;</h3>
 
 <p>Base class for resource loaders. </p>
-<p>Resource loaders must inherit from this class and stay true to the CRTP idiom. Moreover, a resource loader must expose a public, const member function named <code>load</code> that accepts a variable number of arguments and returns a shared pointer to the resource just created.<br  />
+<p>Resource loaders must inherit from this class and stay true to the CRTP idiom. Moreover, a resource loader must expose a public, const member function named <code>load</code> that accepts a variable number of arguments and returns a handle to the resource just created.<br  />
  As an example:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>my_resource {};</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">struct </span>my_loader: <a class="code" href="classentt_1_1resource__loader.html">entt::resource_loader</a>&lt;my_loader, my_resource&gt; {</div>
-<div class="line">    std::shared_ptr&lt;my_resource&gt; load(<span class="keywordtype">int</span>)<span class="keyword"> const </span>{</div>
+<div class="line">    resource_handle&lt;my_resource&gt; load(<span class="keywordtype">int</span> value)<span class="keyword"> const </span>{</div>
 <div class="line">        <span class="comment">// use the integer value somehow</span></div>
 <div class="line">        <span class="keywordflow">return</span> std::make_shared&lt;my_resource&gt;();</div>
 <div class="line">    }</div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -104,7 +104,7 @@ $(function() {
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordflow">while</span>(first != last) {</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a> = *(first++);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <span class="keywordflow">if</span>(reg-&gt;template has&lt;Component&gt;(<a class="code" href="namespaceentt.html">entt</a>)) {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <span class="keywordflow">if</span>(reg-&gt;template all_of&lt;Component&gt;(<a class="code" href="namespaceentt.html">entt</a>)) {</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                std::apply(archive, std::tuple_cat(std::make_tuple(<a class="code" href="namespaceentt.html">entt</a>), <a class="code" href="classentt_1_1basic__view.html">view</a>.get(<a class="code" href="namespaceentt.html">entt</a>)));</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            }</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        }</div>
@@ -117,7 +117,7 @@ $(function() {
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">while</span>(begin != last) {</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a> = *(begin++);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            ((reg-&gt;template has&lt;Component&gt;(<a class="code" href="namespaceentt.html">entt</a>) ? ++size[Index] : size[Index]), ...);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            ((reg-&gt;template all_of&lt;Component&gt;(<a class="code" href="namespaceentt.html">entt</a>) ? ++size[Index] : size[Index]), ...);</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        (get&lt;Component&gt;(archive, size[Index], first, last), ...);</div>
@@ -140,7 +140,7 @@ $(function() {
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        archive(<span class="keyword">typename</span> traits_type::entity_type(sz));</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> first = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1db6c4749dda201f7f74004ea22de193">data</a>(), last = first + sz; first != last; ++first) {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> first = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a62001aa75a17144bf3f78e43f1c28be7">data</a>(), last = first + sz; first != last; ++first) {</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            archive(*first);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        }</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
@@ -151,352 +151,358 @@ $(function() {
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Component, <span class="keyword">typename</span> Archive&gt;</div>
 <div class="line"><a name="l00119"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot.html#a59cf70d5b7730d388f3a63845e8faede">  119</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot.html">basic_snapshot</a> &amp; <a class="code" href="classentt_1_1basic__snapshot.html#a59cf70d5b7730d388f3a63845e8faede">component</a>(Archive &amp;archive)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        (component&lt;Component&gt;(archive, reg-&gt;template data&lt;Component&gt;(), reg-&gt;template data&lt;Component&gt;() + reg-&gt;template size&lt;Component&gt;()), ...);</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    }</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Component, <span class="keyword">typename</span> Archive, <span class="keyword">typename</span> It&gt;</div>
-<div class="line"><a name="l00139"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot.html#a05fff12a4af42f0ad77dc4893856772c">  139</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot.html">basic_snapshot</a> &amp; <a class="code" href="classentt_1_1basic__snapshot.html#a05fff12a4af42f0ad77dc4893856772c">component</a>(Archive &amp;archive, It first, It last)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        component&lt;Component...&gt;(archive, first, last, std::index_sequence_for&lt;Component...&gt;{});</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> *reg;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;};</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Entity&gt;</div>
-<div class="line"><a name="l00160"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html">  160</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> {</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1entt__traits.html">traits_type</a> = <a class="code" href="structentt_1_1entt__traits.html">entt_traits&lt;Entity&gt;</a>;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type, <span class="keyword">typename</span> Archive&gt;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordtype">void</span> assign(Archive &amp;archive)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <span class="keyword">typename</span> traits_type::entity_type length{};</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        archive(length);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <a class="code" href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>{};</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keywordflow">if</span> constexpr(std::tuple_size_v&lt;decltype(reg-&gt;template <a class="code" href="classentt_1_1basic__view.html">view&lt;Type&gt;</a>().get({}))&gt; == 0) {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            <span class="keywordflow">while</span>(length--) {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                archive(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(<a class="code" href="namespaceentt.html">entt</a>) ? <a class="code" href="namespaceentt.html">entt</a> : reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                ENTT_ASSERT(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> == <a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                reg-&gt;template emplace&lt;Type&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            }</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;            Type instance{};</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;            <span class="keywordflow">while</span>(length--) {</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;                archive(<a class="code" href="namespaceentt.html">entt</a>, instance);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(<a class="code" href="namespaceentt.html">entt</a>) ? <a class="code" href="namespaceentt.html">entt</a> : reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;                ENTT_ASSERT(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> == <a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;                reg-&gt;template emplace&lt;Type&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>, std::move(instance));</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            }</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        }</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    }</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00191"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">  191</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">entity_type</a> = Entity;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
-<div class="line"><a name="l00197"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#a03d8dd8dee059da759e407387b09ff8d">  197</a></span>&#160;    <a class="code" href="classentt_1_1basic__snapshot__loader.html#a03d8dd8dee059da759e407387b09ff8d">basic_snapshot_loader</a>(<a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> &amp;source) ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        : reg{&amp;source}</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        <span class="comment">// restoring a snapshot as a whole requires a clean registry</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        ENTT_ASSERT(reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#aba306a930c1a516cb9c9a764d2f4791f">empty</a>());</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    }</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
-<div class="line"><a name="l00205"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#acc078b2e9068ae41a2910168b40322d4">  205</a></span>&#160;    <a class="code" href="classentt_1_1basic__snapshot__loader.html#acc078b2e9068ae41a2910168b40322d4">basic_snapshot_loader</a>(<a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#aa55eeaad2ab4dd117524afff9d6e184b">  208</a></span>&#160;    <a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp; <a class="code" href="classentt_1_1basic__snapshot__loader.html#aa55eeaad2ab4dd117524afff9d6e184b">operator=</a>(<a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="keywordflow">if</span> constexpr(<span class="keyword">sizeof</span>...(Component) == 1u) {</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="classentt_1_1basic__view.html">view</a> = reg-&gt;template <a class="code" href="classentt_1_1basic__view.html">view</a>&lt;<span class="keyword">const</span> Component...&gt;();</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;            (component&lt;Component&gt;(archive, <a class="code" href="classentt_1_1basic__view.html">view</a>.data(), <a class="code" href="classentt_1_1basic__view.html">view</a>.data() + <a class="code" href="classentt_1_1basic__view.html">view</a>.size()), ...);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            (component&lt;Component&gt;(archive), ...);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        }</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Component, <span class="keyword">typename</span> Archive, <span class="keyword">typename</span> It&gt;</div>
+<div class="line"><a name="l00145"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot.html#a05fff12a4af42f0ad77dc4893856772c">  145</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot.html">basic_snapshot</a> &amp; <a class="code" href="classentt_1_1basic__snapshot.html#a05fff12a4af42f0ad77dc4893856772c">component</a>(Archive &amp;archive, It first, It last)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        component&lt;Component...&gt;(archive, first, last, std::index_sequence_for&lt;Component...&gt;{});</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    }</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> *reg;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;};</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Entity&gt;</div>
+<div class="line"><a name="l00166"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html">  166</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1entt__traits.html">traits_type</a> = <a class="code" href="structentt_1_1entt__traits.html">entt_traits&lt;Entity&gt;</a>;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type, <span class="keyword">typename</span> Archive&gt;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordtype">void</span> assign(Archive &amp;archive)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keyword">typename</span> traits_type::entity_type length{};</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        archive(length);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <a class="code" href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>{};</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keywordflow">if</span> constexpr(std::tuple_size_v&lt;decltype(reg-&gt;template <a class="code" href="classentt_1_1basic__view.html">view&lt;Type&gt;</a>().get({}))&gt; == 0) {</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            <span class="keywordflow">while</span>(length--) {</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;                archive(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(<a class="code" href="namespaceentt.html">entt</a>) ? <a class="code" href="namespaceentt.html">entt</a> : reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;                ENTT_ASSERT(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> == <a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;                reg-&gt;template emplace&lt;Type&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            }</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;            Type instance{};</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            <span class="keywordflow">while</span>(length--) {</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                archive(<a class="code" href="namespaceentt.html">entt</a>, instance);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(<a class="code" href="namespaceentt.html">entt</a>) ? <a class="code" href="namespaceentt.html">entt</a> : reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;                ENTT_ASSERT(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> == <a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;                reg-&gt;template emplace&lt;Type&gt;(<a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>, std::move(instance));</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;            }</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        }</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    }</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00197"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">  197</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">entity_type</a> = Entity;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00203"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#a03d8dd8dee059da759e407387b09ff8d">  203</a></span>&#160;    <a class="code" href="classentt_1_1basic__snapshot__loader.html#a03d8dd8dee059da759e407387b09ff8d">basic_snapshot_loader</a>(<a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> &amp;source) ENTT_NOEXCEPT</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        : reg{&amp;source}</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    {</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        <span class="comment">// restoring a snapshot as a whole requires a clean registry</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        ENTT_ASSERT(reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#aba306a930c1a516cb9c9a764d2f4791f">empty</a>());</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    }</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Archive&gt;</div>
-<div class="line"><a name="l00221"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#a0ee608c24b47e2f54a1224177a0dc741">  221</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp; <a class="code" href="classentt_1_1basic__snapshot__loader.html#a0ee608c24b47e2f54a1224177a0dc741">entities</a>(Archive &amp;archive)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        <span class="keyword">typename</span> traits_type::entity_type length{};</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        archive(length);</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        std::vector&lt;entity_type&gt; all(length);</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        <span class="keywordflow">for</span>(decltype(length) pos{}; pos &lt; length; ++pos) {</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            archive(all[pos]);</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        }</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <a class="code" href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">entity_type</a> destroyed;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        archive(destroyed);</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a35d217b9bc09235d55388941de380f72">assign</a>(all.cbegin(), all.cend(), destroyed);</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    }</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Component, <span class="keyword">typename</span> Archive&gt;</div>
-<div class="line"><a name="l00253"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#af7352e091c3421432cc2ef77010a0a2d">  253</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp; <a class="code" href="classentt_1_1basic__snapshot__loader.html#af7352e091c3421432cc2ef77010a0a2d">component</a>(Archive &amp;archive)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        (assign&lt;Component&gt;(archive), ...);</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    }</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00268"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#acd881016761f5eb598763fbf3595a625">  268</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp; <a class="code" href="classentt_1_1basic__snapshot__loader.html#acd881016761f5eb598763fbf3595a625">orphans</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#ae337ceb77e75c10c73ffa671e09bfff8">orphans</a>([<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a>) {</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;            reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        });</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    }</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> *reg;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;};</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Entity&gt;</div>
-<div class="line"><a name="l00298"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html">  298</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> {</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1entt__traits.html">traits_type</a> = <a class="code" href="structentt_1_1entt__traits.html">entt_traits&lt;Entity&gt;</a>;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160; </div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <span class="keywordtype">void</span> destroy(Entity <a class="code" href="namespaceentt.html">entt</a>) {</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> it = remloc.find(<a class="code" href="namespaceentt.html">entt</a>); it == remloc.cend()) {</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> local = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>();</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;            remloc.emplace(<a class="code" href="namespaceentt.html">entt</a>, std::make_pair(local, <span class="keyword">true</span>));</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;            reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a>(local);</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        }</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordtype">void</span> restore(Entity <a class="code" href="namespaceentt.html">entt</a>) {</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> it = remloc.find(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        <span class="keywordflow">if</span>(it == remloc.cend()) {</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> local = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>();</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;            remloc.emplace(<a class="code" href="namespaceentt.html">entt</a>, std::make_pair(local, <span class="keyword">true</span>));</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;            <span class="keywordflow">if</span>(!reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(remloc[<a class="code" href="namespaceentt.html">entt</a>].first)) {</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;                remloc[<a class="code" href="namespaceentt.html">entt</a>].first = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>();</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;            }</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;            <span class="comment">// set the dirty flag</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;            remloc[<a class="code" href="namespaceentt.html">entt</a>].second = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        }</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    }</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160; </div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container&gt;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keyword">auto</span> update(<span class="keywordtype">int</span>, Container &amp;container)</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    -&gt; decltype(<span class="keyword">typename</span> Container::mapped_type{}, void()) {</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        <span class="comment">// map like container</span></div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        Container other;</div>
+<div class="line"><a name="l00211"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#acc078b2e9068ae41a2910168b40322d4">  211</a></span>&#160;    <a class="code" href="classentt_1_1basic__snapshot__loader.html#acc078b2e9068ae41a2910168b40322d4">basic_snapshot_loader</a>(<a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00214"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#aa55eeaad2ab4dd117524afff9d6e184b">  214</a></span>&#160;    <a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp; <a class="code" href="classentt_1_1basic__snapshot__loader.html#aa55eeaad2ab4dd117524afff9d6e184b">operator=</a>(<a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Archive&gt;</div>
+<div class="line"><a name="l00227"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#a0ee608c24b47e2f54a1224177a0dc741">  227</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp; <a class="code" href="classentt_1_1basic__snapshot__loader.html#a0ee608c24b47e2f54a1224177a0dc741">entities</a>(Archive &amp;archive)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        <span class="keyword">typename</span> traits_type::entity_type length{};</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        archive(length);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        std::vector&lt;entity_type&gt; all(length);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="keywordflow">for</span>(decltype(length) pos{}; pos &lt; length; ++pos) {</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            archive(all[pos]);</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        }</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <a class="code" href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">entity_type</a> destroyed;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        archive(destroyed);</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a35d217b9bc09235d55388941de380f72">assign</a>(all.cbegin(), all.cend(), destroyed);</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    }</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Component, <span class="keyword">typename</span> Archive&gt;</div>
+<div class="line"><a name="l00259"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#af7352e091c3421432cc2ef77010a0a2d">  259</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp; <a class="code" href="classentt_1_1basic__snapshot__loader.html#af7352e091c3421432cc2ef77010a0a2d">component</a>(Archive &amp;archive)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        (assign&lt;Component&gt;(archive), ...);</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    }</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
+<div class="line"><a name="l00274"></a><span class="lineno"><a class="line" href="classentt_1_1basic__snapshot__loader.html#acd881016761f5eb598763fbf3595a625">  274</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1basic__snapshot__loader.html">basic_snapshot_loader</a> &amp; <a class="code" href="classentt_1_1basic__snapshot__loader.html#acd881016761f5eb598763fbf3595a625">orphans</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#ae337ceb77e75c10c73ffa671e09bfff8">orphans</a>([<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a>) {</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        });</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    }</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> *reg;</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;};</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160; </div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Entity&gt;</div>
+<div class="line"><a name="l00304"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html">  304</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> {</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1entt__traits.html">traits_type</a> = <a class="code" href="structentt_1_1entt__traits.html">entt_traits&lt;Entity&gt;</a>;</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160; </div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keywordtype">void</span> destroy(Entity <a class="code" href="namespaceentt.html">entt</a>) {</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> it = remloc.find(<a class="code" href="namespaceentt.html">entt</a>); it == remloc.cend()) {</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> local = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>();</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;            remloc.emplace(<a class="code" href="namespaceentt.html">entt</a>, std::make_pair(local, <span class="keyword">true</span>));</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;            reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a>(local);</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        }</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    }</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="keywordtype">void</span> restore(Entity <a class="code" href="namespaceentt.html">entt</a>) {</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> it = remloc.find(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160; </div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        <span class="keywordflow">if</span>(it == remloc.cend()) {</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> local = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>();</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;            remloc.emplace(<a class="code" href="namespaceentt.html">entt</a>, std::make_pair(local, <span class="keyword">true</span>));</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;            <span class="keywordflow">if</span>(!reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(remloc[<a class="code" href="namespaceentt.html">entt</a>].first)) {</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;                remloc[<a class="code" href="namespaceentt.html">entt</a>].first = reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">create</a>();</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;            }</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160; </div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;            <span class="comment">// set the dirty flag</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;            remloc[<a class="code" href="namespaceentt.html">entt</a>].second = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        }</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    }</div>
 <div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;pair: container) {</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;            <span class="keyword">using</span> first_type = std::remove_const_t&lt;<span class="keyword">typename</span> std::decay_t&lt;decltype(pair)&gt;::first_type&gt;;</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;            <span class="keyword">using</span> second_type = <span class="keyword">typename</span> std::decay_t&lt;decltype(pair)&gt;::second_type;</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;            <span class="keywordflow">if</span> constexpr(std::is_same_v&lt;first_type, entity_type&gt; &amp;&amp; std::is_same_v&lt;second_type, entity_type&gt;) {</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;                other.emplace(<a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(pair.first), <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(pair.second));</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr(std::is_same_v&lt;first_type, entity_type&gt;) {</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;                other.emplace(<a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(pair.first), std::move(pair.second));</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;                static_assert(std::is_same_v&lt;second_type, entity_type&gt;, <span class="stringliteral">&quot;Neither the key nor the value are of entity type&quot;</span>);</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;                other.emplace(std::move(pair.first), <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(pair.second));</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;            }</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        }</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160; </div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        std::swap(container, other);</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    }</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160; </div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container&gt;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    <span class="keyword">auto</span> update(<span class="keywordtype">char</span>, Container &amp;container)</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    -&gt; decltype(<span class="keyword">typename</span> Container::value_type{}, void()) {</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;        <span class="comment">// vector like container</span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;        static_assert(std::is_same_v&lt;typename Container::value_type, entity_type&gt;, <span class="stringliteral">&quot;Invalid value type&quot;</span>);</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container&gt;</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    <span class="keyword">auto</span> update(<span class="keywordtype">int</span>, Container &amp;container)</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    -&gt; decltype(<span class="keyword">typename</span> Container::mapped_type{}, void()) {</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;        <span class="comment">// map like container</span></div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        Container other;</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160; </div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;pair: container) {</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;            <span class="keyword">using</span> first_type = std::remove_const_t&lt;<span class="keyword">typename</span> std::decay_t&lt;decltype(pair)&gt;::first_type&gt;;</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            <span class="keyword">using</span> second_type = <span class="keyword">typename</span> std::decay_t&lt;decltype(pair)&gt;::second_type;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160; </div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;            <span class="keywordflow">if</span> constexpr(std::is_same_v&lt;first_type, entity_type&gt; &amp;&amp; std::is_same_v&lt;second_type, entity_type&gt;) {</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;                other.emplace(<a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(pair.first), <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(pair.second));</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr(std::is_same_v&lt;first_type, entity_type&gt;) {</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;                other.emplace(<a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(pair.first), std::move(pair.second));</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;                static_assert(std::is_same_v&lt;second_type, entity_type&gt;, <span class="stringliteral">&quot;Neither the key nor the value are of entity type&quot;</span>);</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;                other.emplace(std::move(pair.first), <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(pair.second));</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;            }</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        }</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160; </div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;        std::swap(container, other);</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    }</div>
 <div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160; </div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;<a class="code" href="namespaceentt.html">entt</a>: container) {</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;            <a class="code" href="namespaceentt.html">entt</a> = <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        }</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    }</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Other, <span class="keyword">typename</span> Type, <span class="keyword">typename</span> Member&gt;</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    <span class="keywordtype">void</span> update([[maybe_unused]] Other &amp;instance, [[maybe_unused]] Member Type:: *member) {</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;        <span class="keywordflow">if</span> constexpr(!std::is_same_v&lt;Other, Type&gt;) {</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;            <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr(std::is_same_v&lt;Member, entity_type&gt;) {</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;            instance.*member = <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(instance.*member);</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;            <span class="comment">// maybe a container? let&#39;s try...</span></div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;            update(0, instance.*member);</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        }</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    }</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160; </div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Component&gt;</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="keywordtype">void</span> remove_if_exists() {</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;ref: remloc) {</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> local = ref.second.first;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160; </div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;            <span class="keywordflow">if</span>(reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(local)) {</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;                reg-&gt;template remove_if_exists&lt;Component&gt;(local);</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;            }</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        }</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    }</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Container&gt;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="keyword">auto</span> update(<span class="keywordtype">char</span>, Container &amp;container)</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    -&gt; decltype(<span class="keyword">typename</span> Container::value_type{}, void()) {</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;        <span class="comment">// vector like container</span></div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;        static_assert(std::is_same_v&lt;typename Container::value_type, entity_type&gt;, <span class="stringliteral">&quot;Invalid value type&quot;</span>);</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160; </div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;<a class="code" href="namespaceentt.html">entt</a>: container) {</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;            <a class="code" href="namespaceentt.html">entt</a> = <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;        }</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    }</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Other, <span class="keyword">typename</span> Type, <span class="keyword">typename</span> Member&gt;</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="keywordtype">void</span> update([[maybe_unused]] Other &amp;instance, [[maybe_unused]] Member Type:: *member) {</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        <span class="keywordflow">if</span> constexpr(!std::is_same_v&lt;Other, Type&gt;) {</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;            <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr(std::is_same_v&lt;Member, entity_type&gt;) {</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;            instance.*member = <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(instance.*member);</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            <span class="comment">// maybe a container? let&#39;s try...</span></div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;            update(0, instance.*member);</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;        }</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    }</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160; </div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Component&gt;</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keywordtype">void</span> remove_if_exists() {</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;ref: remloc) {</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> local = ref.second.first;</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160; </div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Other, <span class="keyword">typename</span> Archive, <span class="keyword">typename</span>... Type, <span class="keyword">typename</span>... Member&gt;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <span class="keywordtype">void</span> assign(Archive &amp;archive, [[maybe_unused]] Member Type:: *... member) {</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        <span class="keyword">typename</span> traits_type::entity_type length{};</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        archive(length);</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>{};</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160; </div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        <span class="keywordflow">if</span> constexpr(std::tuple_size_v&lt;decltype(reg-&gt;template <a class="code" href="classentt_1_1basic__view.html">view&lt;Other&gt;</a>().get({}))&gt; == 0) {</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;            <span class="keywordflow">while</span>(length--) {</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                archive(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                restore(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                reg-&gt;template emplace_or_replace&lt;Other&gt;(<a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;            }</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;            Other instance{};</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            <span class="keywordflow">while</span>(length--) {</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;                archive(<a class="code" href="namespaceentt.html">entt</a>, instance);</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;                (update(instance, member), ...);</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;                restore(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;                reg-&gt;template emplace_or_replace&lt;Other&gt;(<a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(<a class="code" href="namespaceentt.html">entt</a>), std::move(instance));</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;            }</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;        }</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    }</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00409"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">  409</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> = Entity;</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160; </div>
-<div class="line"><a name="l00415"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#ab2eab82a338dc65729f63d8b079237fd">  415</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html#ab2eab82a338dc65729f63d8b079237fd">basic_continuous_loader</a>(<a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> &amp;source) ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        : reg{&amp;source}</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    {}</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160; </div>
-<div class="line"><a name="l00420"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a619f3aa278b405481fd1e26c46a96a5c">  420</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html#a619f3aa278b405481fd1e26c46a96a5c">basic_continuous_loader</a>(<a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
-<div class="line"><a name="l00423"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#afd396d84cb27e070a6a812bd28140c75">  423</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#afd396d84cb27e070a6a812bd28140c75">operator=</a>(<a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;            <span class="keywordflow">if</span>(reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(local)) {</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;                reg-&gt;template remove_if_exists&lt;Component&gt;(local);</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;            }</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        }</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    }</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160; </div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Other, <span class="keyword">typename</span> Archive, <span class="keyword">typename</span>... Type, <span class="keyword">typename</span>... Member&gt;</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    <span class="keywordtype">void</span> assign(Archive &amp;archive, [[maybe_unused]] Member Type:: *... member) {</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;        <span class="keyword">typename</span> traits_type::entity_type length{};</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        archive(length);</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160; </div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;        <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>{};</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160; </div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;        <span class="keywordflow">if</span> constexpr(std::tuple_size_v&lt;decltype(reg-&gt;template <a class="code" href="classentt_1_1basic__view.html">view&lt;Other&gt;</a>().get({}))&gt; == 0) {</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;            <span class="keywordflow">while</span>(length--) {</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;                archive(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;                restore(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;                reg-&gt;template emplace_or_replace&lt;Other&gt;(<a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;            }</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;            Other instance{};</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160; </div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;            <span class="keywordflow">while</span>(length--) {</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;                archive(<a class="code" href="namespaceentt.html">entt</a>, instance);</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;                (update(instance, member), ...);</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;                restore(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;                reg-&gt;template emplace_or_replace&lt;Other&gt;(<a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(<a class="code" href="namespaceentt.html">entt</a>), std::move(instance));</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;            }</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        }</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    }</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160; </div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00415"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">  415</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> = Entity;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160; </div>
+<div class="line"><a name="l00421"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#ab2eab82a338dc65729f63d8b079237fd">  421</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html#ab2eab82a338dc65729f63d8b079237fd">basic_continuous_loader</a>(<a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> &amp;source) ENTT_NOEXCEPT</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        : reg{&amp;source}</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    {}</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160; </div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Archive&gt;</div>
-<div class="line"><a name="l00436"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#ae6655c1c6868b11f2781cec2aee77abb">  436</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#ae6655c1c6868b11f2781cec2aee77abb">entities</a>(Archive &amp;archive) {</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;        <span class="keyword">typename</span> traits_type::entity_type length{};</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>{};</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160; </div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;        archive(length);</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160; </div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;        <span class="keywordflow">for</span>(decltype(length) pos{}; pos &lt; length; ++pos) {</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;            archive(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;            <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> = (<a class="code" href="namespaceentt.html#a71abd3e36498ea599ce0abc367d7c3ae">to_integral</a>(<a class="code" href="namespaceentt.html">entt</a>) &amp; traits_type::entity_mask); <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> == pos) {</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;                restore(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;                destroy(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;            }</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        }</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160; </div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;        <span class="comment">// discards the head of the list of destroyed entities</span></div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;        archive(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160; </div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    }</div>
+<div class="line"><a name="l00426"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a619f3aa278b405481fd1e26c46a96a5c">  426</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html#a619f3aa278b405481fd1e26c46a96a5c">basic_continuous_loader</a>(<a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
+<div class="line"><a name="l00429"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#afd396d84cb27e070a6a812bd28140c75">  429</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#afd396d84cb27e070a6a812bd28140c75">operator=</a>(<a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160; </div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Archive&gt;</div>
+<div class="line"><a name="l00442"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#ae6655c1c6868b11f2781cec2aee77abb">  442</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#ae6655c1c6868b11f2781cec2aee77abb">entities</a>(Archive &amp;archive) {</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;        <span class="keyword">typename</span> traits_type::entity_type length{};</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>{};</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160; </div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;        archive(length);</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        <span class="keywordflow">for</span>(decltype(length) pos{}; pos &lt; length; ++pos) {</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;            archive(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;            <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> = (<a class="code" href="namespaceentt.html#a71abd3e36498ea599ce0abc367d7c3ae">to_integral</a>(<a class="code" href="namespaceentt.html">entt</a>) &amp; traits_type::entity_mask); <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a> == pos) {</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;                restore(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;                destroy(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;            }</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        }</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160; </div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Component, <span class="keyword">typename</span> Archive, <span class="keyword">typename</span>... Type, <span class="keyword">typename</span>... Member&gt;</div>
-<div class="line"><a name="l00478"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a315b55f7576992d9261ee812f202d5ad">  478</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#a315b55f7576992d9261ee812f202d5ad">component</a>(Archive &amp;archive, Member Type:: *... member) {</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;        (remove_if_exists&lt;Component&gt;(), ...);</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;        (assign&lt;Component&gt;(archive, member...), ...);</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    }</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160; </div>
-<div class="line"><a name="l00492"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a01b949f4a5829bd5bf3738a7e0f776d2">  492</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#a01b949f4a5829bd5bf3738a7e0f776d2">shrink</a>() {</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;        <span class="keyword">auto</span> it = remloc.begin();</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160; </div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;        <span class="keywordflow">while</span>(it != remloc.cend()) {</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> local = it-&gt;second.first;</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;            <span class="keywordtype">bool</span> &amp;dirty = it-&gt;second.second;</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160; </div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;            <span class="keywordflow">if</span>(dirty) {</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;                dirty = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;                ++it;</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;                <span class="keywordflow">if</span>(reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(local)) {</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;                    reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a>(local);</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;                }</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160; </div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;                it = remloc.erase(it);</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;            }</div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;        }</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160; </div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;    }</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160; </div>
-<div class="line"><a name="l00524"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#ac8b328bb8c6c4acde51ab5b943f0ea86">  524</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#ac8b328bb8c6c4acde51ab5b943f0ea86">orphans</a>() {</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;        reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#ae337ceb77e75c10c73ffa671e09bfff8">orphans</a>([<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a>) {</div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;            reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;        });</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160; </div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    }</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160; </div>
-<div class="line"><a name="l00537"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a4fee46b0b6f3387ed88b087282b53472">  537</a></span>&#160;    [[nodiscard]] <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1basic__continuous__loader.html#a4fee46b0b6f3387ed88b087282b53472">contains</a>(<a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;        <span class="keywordflow">return</span> (remloc.find(<a class="code" href="namespaceentt.html">entt</a>) != remloc.cend());</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    }</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160; </div>
-<div class="line"><a name="l00546"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">  546</a></span>&#160;    [[nodiscard]] <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(<a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> it = remloc.find(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;        <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> other = <span class="keyword">null</span>;</div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160; </div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;        <span class="keywordflow">if</span>(it != remloc.cend()) {</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;            other = it-&gt;second.first;</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;        }</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160; </div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;        <span class="keywordflow">return</span> other;</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    }</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160; </div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    std::unordered_map&lt;entity_type, std::pair&lt;entity_type, bool&gt;&gt; remloc;</div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;    <a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> *reg;</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;};</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160; </div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;        <span class="comment">// discards the head of the list of destroyed entities</span></div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;        archive(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160; </div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    }</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; </div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Component, <span class="keyword">typename</span> Archive, <span class="keyword">typename</span>... Type, <span class="keyword">typename</span>... Member&gt;</div>
+<div class="line"><a name="l00484"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a315b55f7576992d9261ee812f202d5ad">  484</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#a315b55f7576992d9261ee812f202d5ad">component</a>(Archive &amp;archive, Member Type:: *... member) {</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;        (remove_if_exists&lt;Component&gt;(), ...);</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;        (assign&lt;Component&gt;(archive, member...), ...);</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    }</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160; </div>
+<div class="line"><a name="l00498"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a01b949f4a5829bd5bf3738a7e0f776d2">  498</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#a01b949f4a5829bd5bf3738a7e0f776d2">shrink</a>() {</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;        <span class="keyword">auto</span> it = remloc.begin();</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160; </div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;        <span class="keywordflow">while</span>(it != remloc.cend()) {</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> local = it-&gt;second.first;</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;            <span class="keywordtype">bool</span> &amp;dirty = it-&gt;second.second;</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160; </div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;            <span class="keywordflow">if</span>(dirty) {</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;                dirty = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;                ++it;</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;                <span class="keywordflow">if</span>(reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">valid</a>(local)) {</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;                    reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a>(local);</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;                }</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160; </div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;                it = remloc.erase(it);</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;            }</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;        }</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160; </div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    }</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160; </div>
+<div class="line"><a name="l00530"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#ac8b328bb8c6c4acde51ab5b943f0ea86">  530</a></span>&#160;    <a class="code" href="classentt_1_1basic__continuous__loader.html">basic_continuous_loader</a> &amp; <a class="code" href="classentt_1_1basic__continuous__loader.html#ac8b328bb8c6c4acde51ab5b943f0ea86">orphans</a>() {</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;        reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#ae337ceb77e75c10c73ffa671e09bfff8">orphans</a>([<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a>) {</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;            reg-&gt;<a class="code" href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">destroy</a>(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;        });</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160; </div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;    }</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160; </div>
+<div class="line"><a name="l00543"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#a4fee46b0b6f3387ed88b087282b53472">  543</a></span>&#160;    [[nodiscard]] <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1basic__continuous__loader.html#a4fee46b0b6f3387ed88b087282b53472">contains</a>(<a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;        <span class="keywordflow">return</span> (remloc.find(<a class="code" href="namespaceentt.html">entt</a>) != remloc.cend());</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    }</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160; </div>
+<div class="line"><a name="l00552"></a><span class="lineno"><a class="line" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">  552</a></span>&#160;    [[nodiscard]] <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">map</a>(<a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> it = remloc.find(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;        <a class="code" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entity_type</a> other = <span class="keyword">null</span>;</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160; </div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;        <span class="keywordflow">if</span>(it != remloc.cend()) {</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;            other = it-&gt;second.first;</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;        }</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160; </div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        <span class="keywordflow">return</span> other;</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    }</div>
 <div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160; </div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;}</div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160; </div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160; </div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;    std::unordered_map&lt;entity_type, std::pair&lt;entity_type, bool&gt;&gt; remloc;</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    <a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;entity_type&gt;</a> *reg;</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;};</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160; </div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160; </div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;}</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160; </div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160; </div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a90a0d33147978cb3c142408487428277"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entt::basic_continuous_loader::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00409">snapshot.hpp:409</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a91bfd7ec05e6d718e47da581a893cdc4"><div class="ttname"><a href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">entt::basic_registry::create</a></div><div class="ttdeci">entity_type create()</div><div class="ttdoc">Creates a new entity and returns it.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00443">registry.hpp:443</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a1db6c4749dda201f7f74004ea22de193"><div class="ttname"><a href="classentt_1_1basic__registry.html#a1db6c4749dda201f7f74004ea22de193">entt::basic_registry::data</a></div><div class="ttdeci">const entity_type * data() const</div><div class="ttdoc">Direct access to the list of entities of a given pool.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00355">registry.hpp:355</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a90a0d33147978cb3c142408487428277"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entt::basic_continuous_loader::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00415">snapshot.hpp:415</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_a91bfd7ec05e6d718e47da581a893cdc4"><div class="ttname"><a href="classentt_1_1basic__registry.html#a91bfd7ec05e6d718e47da581a893cdc4">entt::basic_registry::create</a></div><div class="ttdeci">entity_type create()</div><div class="ttdoc">Creates a new entity and returns it.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00392">registry.hpp:392</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot_html"><div class="ttname"><a href="classentt_1_1basic__snapshot.html">entt::basic_snapshot</a></div><div class="ttdoc">Utility class to create snapshots from a registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00034">snapshot.hpp:34</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a71abd3e36498ea599ce0abc367d7c3ae"><div class="ttname"><a href="namespaceentt.html#a71abd3e36498ea599ce0abc367d7c3ae">entt::to_integral</a></div><div class="ttdeci">constexpr auto to_integral(const Entity entity) noexcept</div><div class="ttdoc">Converts an entity type to its underlying type.</div><div class="ttdef"><b>Definition:</b> <a href="entity_8hpp_source.html#l00093">entity.hpp:93</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot_html_a59cf70d5b7730d388f3a63845e8faede"><div class="ttname"><a href="classentt_1_1basic__snapshot.html#a59cf70d5b7730d388f3a63845e8faede">entt::basic_snapshot::component</a></div><div class="ttdeci">const basic_snapshot &amp; component(Archive &amp;archive) const</div><div class="ttdoc">Puts aside the given components.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00119">snapshot.hpp:119</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_a03d8dd8dee059da759e407387b09ff8d"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#a03d8dd8dee059da759e407387b09ff8d">entt::basic_snapshot_loader::basic_snapshot_loader</a></div><div class="ttdeci">basic_snapshot_loader(basic_registry&lt; entity_type &gt; &amp;source) noexcept</div><div class="ttdoc">Constructs an instance that is bound to a given registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00197">snapshot.hpp:197</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a35d217b9bc09235d55388941de380f72"><div class="ttname"><a href="classentt_1_1basic__registry.html#a35d217b9bc09235d55388941de380f72">entt::basic_registry::assign</a></div><div class="ttdeci">void assign(It first, It last, const entity_type destroyed)</div><div class="ttdoc">Assigns entities to an empty registry.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00520">registry.hpp:520</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_a03d8dd8dee059da759e407387b09ff8d"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#a03d8dd8dee059da759e407387b09ff8d">entt::basic_snapshot_loader::basic_snapshot_loader</a></div><div class="ttdeci">basic_snapshot_loader(basic_registry&lt; entity_type &gt; &amp;source) noexcept</div><div class="ttdoc">Constructs an instance that is bound to a given registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00203">snapshot.hpp:203</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_a35d217b9bc09235d55388941de380f72"><div class="ttname"><a href="classentt_1_1basic__registry.html#a35d217b9bc09235d55388941de380f72">entt::basic_registry::assign</a></div><div class="ttdeci">void assign(It first, It last, const entity_type destroyed)</div><div class="ttdoc">Assigns entities to an empty registry.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00469">registry.hpp:469</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a619f3aa278b405481fd1e26c46a96a5c"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a619f3aa278b405481fd1e26c46a96a5c">entt::basic_continuous_loader::basic_continuous_loader</a></div><div class="ttdeci">basic_continuous_loader(basic_continuous_loader &amp;&amp;)=default</div><div class="ttdoc">Default move constructor.</div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_a0ee608c24b47e2f54a1224177a0dc741"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#a0ee608c24b47e2f54a1224177a0dc741">entt::basic_snapshot_loader::entities</a></div><div class="ttdeci">const basic_snapshot_loader &amp; entities(Archive &amp;archive) const</div><div class="ttdoc">Restores entities that were in use during serialization.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00221">snapshot.hpp:221</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_a0ee608c24b47e2f54a1224177a0dc741"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#a0ee608c24b47e2f54a1224177a0dc741">entt::basic_snapshot_loader::entities</a></div><div class="ttdeci">const basic_snapshot_loader &amp; entities(Archive &amp;archive) const</div><div class="ttdoc">Restores entities that were in use during serialization.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00227">snapshot.hpp:227</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot_html_a10f658d8e4feb7df9da8b48119551334"><div class="ttname"><a href="classentt_1_1basic__snapshot.html#a10f658d8e4feb7df9da8b48119551334">entt::basic_snapshot::basic_snapshot</a></div><div class="ttdeci">basic_snapshot(basic_snapshot &amp;&amp;)=default</div><div class="ttdoc">Default move constructor.</div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_af58f3add442cfb3f1fa470402db072bd"><div class="ttname"><a href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">entt::basic_registry::destroy</a></div><div class="ttdeci">void destroy(const entity_type entity)</div><div class="ttdoc">Destroys an entity.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00536">registry.hpp:536</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a747d182de87516a3445f8df77d65e815"><div class="ttname"><a href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815">entt::basic_registry::size</a></div><div class="ttdeci">size_type size() const</div><div class="ttdoc">Returns the number of existing components of the given type.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00204">registry.hpp:204</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_aba306a930c1a516cb9c9a764d2f4791f"><div class="ttname"><a href="classentt_1_1basic__registry.html#aba306a930c1a516cb9c9a764d2f4791f">entt::basic_registry::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdoc">Checks whether the registry or the pools of the given components are empty.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00304">registry.hpp:304</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_af58f3add442cfb3f1fa470402db072bd"><div class="ttname"><a href="classentt_1_1basic__registry.html#af58f3add442cfb3f1fa470402db072bd">entt::basic_registry::destroy</a></div><div class="ttdeci">void destroy(const entity_type entity)</div><div class="ttdoc">Destroys an entity.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00485">registry.hpp:485</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_a747d182de87516a3445f8df77d65e815"><div class="ttname"><a href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815">entt::basic_registry::size</a></div><div class="ttdeci">size_type size() const</div><div class="ttdoc">Returns the number of existing components of the given type.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00220">registry.hpp:220</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_aba306a930c1a516cb9c9a764d2f4791f"><div class="ttname"><a href="classentt_1_1basic__registry.html#aba306a930c1a516cb9c9a764d2f4791f">entt::basic_registry::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdoc">Checks whether the registry or the pools of the given components are empty.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00319">registry.hpp:319</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_acc078b2e9068ae41a2910168b40322d4"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#acc078b2e9068ae41a2910168b40322d4">entt::basic_snapshot_loader::basic_snapshot_loader</a></div><div class="ttdeci">basic_snapshot_loader(basic_snapshot_loader &amp;&amp;)=default</div><div class="ttdoc">Default move constructor.</div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_ae6655c1c6868b11f2781cec2aee77abb"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#ae6655c1c6868b11f2781cec2aee77abb">entt::basic_continuous_loader::entities</a></div><div class="ttdeci">basic_continuous_loader &amp; entities(Archive &amp;archive)</div><div class="ttdoc">Restores entities that were in use during serialization.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00436">snapshot.hpp:436</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a4fee46b0b6f3387ed88b087282b53472"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a4fee46b0b6f3387ed88b087282b53472">entt::basic_continuous_loader::contains</a></div><div class="ttdeci">bool contains(entity_type entt) const noexcept</div><div class="ttdoc">Tests if a loader knows about a given entity.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00537">snapshot.hpp:537</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_ae337ceb77e75c10c73ffa671e09bfff8"><div class="ttname"><a href="classentt_1_1basic__registry.html#ae337ceb77e75c10c73ffa671e09bfff8">entt::basic_registry::orphans</a></div><div class="ttdeci">void orphans(Func func) const</div><div class="ttdoc">Iterates orphans and applies them the given function object.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l01018">registry.hpp:1018</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_ae6655c1c6868b11f2781cec2aee77abb"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#ae6655c1c6868b11f2781cec2aee77abb">entt::basic_continuous_loader::entities</a></div><div class="ttdeci">basic_continuous_loader &amp; entities(Archive &amp;archive)</div><div class="ttdoc">Restores entities that were in use during serialization.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00442">snapshot.hpp:442</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a4fee46b0b6f3387ed88b087282b53472"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a4fee46b0b6f3387ed88b087282b53472">entt::basic_continuous_loader::contains</a></div><div class="ttdeci">bool contains(entity_type entt) const noexcept</div><div class="ttdoc">Tests if a loader knows about a given entity.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00543">snapshot.hpp:543</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_ae337ceb77e75c10c73ffa671e09bfff8"><div class="ttname"><a href="classentt_1_1basic__registry.html#ae337ceb77e75c10c73ffa671e09bfff8">entt::basic_registry::orphans</a></div><div class="ttdeci">void orphans(Func func) const</div><div class="ttdoc">Iterates orphans and applies them the given function object.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00964">registry.hpp:964</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot_html_aeb9724b67563bf7f74440e5a8feb711c"><div class="ttname"><a href="classentt_1_1basic__snapshot.html#aeb9724b67563bf7f74440e5a8feb711c">entt::basic_snapshot::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00066">snapshot.hpp:66</a></div></div>
 <div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot_html_a1484b609195cfd057bbdd8808d4392bc"><div class="ttname"><a href="classentt_1_1basic__snapshot.html#a1484b609195cfd057bbdd8808d4392bc">entt::basic_snapshot::operator=</a></div><div class="ttdeci">basic_snapshot &amp; operator=(basic_snapshot &amp;&amp;)=default</div><div class="ttdoc">Default move assignment operator.</div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_ab2eab82a338dc65729f63d8b079237fd"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#ab2eab82a338dc65729f63d8b079237fd">entt::basic_continuous_loader::basic_continuous_loader</a></div><div class="ttdeci">basic_continuous_loader(basic_registry&lt; entity_type &gt; &amp;source) noexcept</div><div class="ttdoc">Constructs an instance that is bound to a given registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00415">snapshot.hpp:415</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot_html_a05fff12a4af42f0ad77dc4893856772c"><div class="ttname"><a href="classentt_1_1basic__snapshot.html#a05fff12a4af42f0ad77dc4893856772c">entt::basic_snapshot::component</a></div><div class="ttdeci">const basic_snapshot &amp; component(Archive &amp;archive, It first, It last) const</div><div class="ttdoc">Puts aside the given components for the entities in a range.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00139">snapshot.hpp:139</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_ac8b328bb8c6c4acde51ab5b943f0ea86"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#ac8b328bb8c6c4acde51ab5b943f0ea86">entt::basic_continuous_loader::orphans</a></div><div class="ttdeci">basic_continuous_loader &amp; orphans()</div><div class="ttdoc">Destroys those entities that have no components.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00524">snapshot.hpp:524</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_ab2eab82a338dc65729f63d8b079237fd"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#ab2eab82a338dc65729f63d8b079237fd">entt::basic_continuous_loader::basic_continuous_loader</a></div><div class="ttdeci">basic_continuous_loader(basic_registry&lt; entity_type &gt; &amp;source) noexcept</div><div class="ttdoc">Constructs an instance that is bound to a given registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00421">snapshot.hpp:421</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot_html_a05fff12a4af42f0ad77dc4893856772c"><div class="ttname"><a href="classentt_1_1basic__snapshot.html#a05fff12a4af42f0ad77dc4893856772c">entt::basic_snapshot::component</a></div><div class="ttdeci">const basic_snapshot &amp; component(Archive &amp;archive, It first, It last) const</div><div class="ttdoc">Puts aside the given components for the entities in a range.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00145">snapshot.hpp:145</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_ac8b328bb8c6c4acde51ab5b943f0ea86"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#ac8b328bb8c6c4acde51ab5b943f0ea86">entt::basic_continuous_loader::orphans</a></div><div class="ttdeci">basic_continuous_loader &amp; orphans()</div><div class="ttdoc">Destroys those entities that have no components.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00530">snapshot.hpp:530</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_afd396d84cb27e070a6a812bd28140c75"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#afd396d84cb27e070a6a812bd28140c75">entt::basic_continuous_loader::operator=</a></div><div class="ttdeci">basic_continuous_loader &amp; operator=(basic_continuous_loader &amp;&amp;)=default</div><div class="ttdoc">Default move assignment operator.</div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_aca776bfffb1de02a3422ee38de3460b7"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">entt::basic_continuous_loader::map</a></div><div class="ttdeci">entity_type map(entity_type entt) const noexcept</div><div class="ttdoc">Returns the identifier to which an entity refers.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00546">snapshot.hpp:546</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_aca776bfffb1de02a3422ee38de3460b7"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#aca776bfffb1de02a3422ee38de3460b7">entt::basic_continuous_loader::map</a></div><div class="ttdeci">entity_type map(entity_type entt) const noexcept</div><div class="ttdoc">Returns the identifier to which an entity refers.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00552">snapshot.hpp:552</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_aa55eeaad2ab4dd117524afff9d6e184b"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#aa55eeaad2ab4dd117524afff9d6e184b">entt::basic_snapshot_loader::operator=</a></div><div class="ttdeci">basic_snapshot_loader &amp; operator=(basic_snapshot_loader &amp;&amp;)=default</div><div class="ttdoc">Default move assignment operator.</div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_acd881016761f5eb598763fbf3595a625"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#acd881016761f5eb598763fbf3595a625">entt::basic_snapshot_loader::orphans</a></div><div class="ttdeci">const basic_snapshot_loader &amp; orphans() const</div><div class="ttdoc">Destroys those entities that have no components.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00268">snapshot.hpp:268</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a01b949f4a5829bd5bf3738a7e0f776d2"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a01b949f4a5829bd5bf3738a7e0f776d2">entt::basic_continuous_loader::shrink</a></div><div class="ttdeci">basic_continuous_loader &amp; shrink()</div><div class="ttdoc">Helps to purge entities that no longer have a conterpart.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00492">snapshot.hpp:492</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html">entt::basic_continuous_loader</a></div><div class="ttdoc">Utility class for continuous loading.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00298">snapshot.hpp:298</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a3e7a0f4223ab5bded3bd69e2f8d351f3"><div class="ttname"><a href="classentt_1_1basic__registry.html#a3e7a0f4223ab5bded3bd69e2f8d351f3">entt::basic_registry::destroyed</a></div><div class="ttdeci">entity_type destroyed() const noexcept</div><div class="ttdoc">Returns the head of the list of destroyed entities.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00384">registry.hpp:384</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_acd881016761f5eb598763fbf3595a625"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#acd881016761f5eb598763fbf3595a625">entt::basic_snapshot_loader::orphans</a></div><div class="ttdeci">const basic_snapshot_loader &amp; orphans() const</div><div class="ttdoc">Destroys those entities that have no components.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00274">snapshot.hpp:274</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a01b949f4a5829bd5bf3738a7e0f776d2"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a01b949f4a5829bd5bf3738a7e0f776d2">entt::basic_continuous_loader::shrink</a></div><div class="ttdeci">basic_continuous_loader &amp; shrink()</div><div class="ttdoc">Helps to purge entities that no longer have a conterpart.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00498">snapshot.hpp:498</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html">entt::basic_continuous_loader</a></div><div class="ttdoc">Utility class for continuous loading.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00304">snapshot.hpp:304</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_a3e7a0f4223ab5bded3bd69e2f8d351f3"><div class="ttname"><a href="classentt_1_1basic__registry.html#a3e7a0f4223ab5bded3bd69e2f8d351f3">entt::basic_registry::destroyed</a></div><div class="ttdeci">entity_type destroyed() const noexcept</div><div class="ttdoc">Returns the head of the list of destroyed entities.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00351">registry.hpp:351</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__registry_html"><div class="ttname"><a href="classentt_1_1basic__registry.html">entt::basic_registry&lt; entity_type &gt;</a></div></div>
 <div class="ttc" id="astructentt_1_1entt__traits_html"><div class="ttname"><a href="structentt_1_1entt__traits.html">entt::entt_traits</a></div><div class="ttdoc">Entity traits.</div><div class="ttdef"><b>Definition:</b> <a href="entity_8hpp_source.html#l00021">entity.hpp:21</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a315b55f7576992d9261ee812f202d5ad"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a315b55f7576992d9261ee812f202d5ad">entt::basic_continuous_loader::component</a></div><div class="ttdeci">basic_continuous_loader &amp; component(Archive &amp;archive, Member Type::*... member)</div><div class="ttdoc">Restores components and assigns them to the right entities.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00478">snapshot.hpp:478</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__registry_html_a1795b1221d728f806319a685930f520d"><div class="ttname"><a href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">entt::basic_registry::valid</a></div><div class="ttdeci">bool valid(const entity_type entity) const</div><div class="ttdoc">Checks if an entity identifier refers to a valid entity.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00393">registry.hpp:393</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_a62001aa75a17144bf3f78e43f1c28be7"><div class="ttname"><a href="classentt_1_1basic__registry.html#a62001aa75a17144bf3f78e43f1c28be7">entt::basic_registry::data</a></div><div class="ttdeci">const entity_type * data() const noexcept</div><div class="ttdoc">Direct access to the list of entities of a registry.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00339">registry.hpp:339</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__continuous__loader_html_a315b55f7576992d9261ee812f202d5ad"><div class="ttname"><a href="classentt_1_1basic__continuous__loader.html#a315b55f7576992d9261ee812f202d5ad">entt::basic_continuous_loader::component</a></div><div class="ttdeci">basic_continuous_loader &amp; component(Archive &amp;archive, Member Type::*... member)</div><div class="ttdoc">Restores components and assigns them to the right entities.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00484">snapshot.hpp:484</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__registry_html_a1795b1221d728f806319a685930f520d"><div class="ttname"><a href="classentt_1_1basic__registry.html#a1795b1221d728f806319a685930f520d">entt::basic_registry::valid</a></div><div class="ttdeci">bool valid(const entity_type entity) const</div><div class="ttdoc">Checks if an entity identifier refers to a valid entity.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00360">registry.hpp:360</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__view_html"><div class="ttname"><a href="classentt_1_1basic__view.html">entt::basic_view</a></div><div class="ttdoc">View.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00024">fwd.hpp:24</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a0b54e231d069e8a231e14b223388808a"><div class="ttname"><a href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entt::entity</a></div><div class="ttdeci">entity</div><div class="ttdoc">Default entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00060">fwd.hpp:60</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot_html_a79fe1641f3b448b37b8aecfcabf52a5e"><div class="ttname"><a href="classentt_1_1basic__snapshot.html#a79fe1641f3b448b37b8aecfcabf52a5e">entt::basic_snapshot::entities</a></div><div class="ttdeci">const basic_snapshot &amp; entities(Archive &amp;archive) const</div><div class="ttdoc">Puts aside all the entities from the underlying registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00093">snapshot.hpp:93</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_af7352e091c3421432cc2ef77010a0a2d"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#af7352e091c3421432cc2ef77010a0a2d">entt::basic_snapshot_loader::component</a></div><div class="ttdeci">const basic_snapshot_loader &amp; component(Archive &amp;archive) const</div><div class="ttdoc">Restores components and assigns them to the right entities.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00253">snapshot.hpp:253</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_a73d5864a57a78d528cc0bcbe36ff5039"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">entt::basic_snapshot_loader::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00191">snapshot.hpp:191</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_af7352e091c3421432cc2ef77010a0a2d"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#af7352e091c3421432cc2ef77010a0a2d">entt::basic_snapshot_loader::component</a></div><div class="ttdeci">const basic_snapshot_loader &amp; component(Archive &amp;archive) const</div><div class="ttdoc">Restores components and assigns them to the right entities.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00259">snapshot.hpp:259</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html_a73d5864a57a78d528cc0bcbe36ff5039"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html#a73d5864a57a78d528cc0bcbe36ff5039">entt::basic_snapshot_loader::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00197">snapshot.hpp:197</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__snapshot_html_aff1115b349483d09d10fa4054e458e5e"><div class="ttname"><a href="classentt_1_1basic__snapshot.html#aff1115b349483d09d10fa4054e458e5e">entt::basic_snapshot::basic_snapshot</a></div><div class="ttdeci">basic_snapshot(const basic_registry&lt; entity_type &gt; &amp;source) noexcept</div><div class="ttdoc">Constructs an instance that is bound to a given registry.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00072">snapshot.hpp:72</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html">entt::basic_snapshot_loader</a></div><div class="ttdoc">Utility class to restore a snapshot as a whole.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00160">snapshot.hpp:160</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__snapshot__loader_html"><div class="ttname"><a href="classentt_1_1basic__snapshot__loader.html">entt::basic_snapshot_loader</a></div><div class="ttdoc">Utility class to restore a snapshot as a whole.</div><div class="ttdef"><b>Definition:</b> <a href="snapshot_8hpp_source.html#l00166">snapshot.hpp:166</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20

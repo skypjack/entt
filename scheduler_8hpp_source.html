@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -130,19 +130,19 @@ $(function() {
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keyword">auto</span> *<a class="code" href="classentt_1_1process.html">process</a> = <span class="keyword">static_cast&lt;</span>Proc *<span class="keyword">&gt;</span>(handler.instance.get());</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <a class="code" href="classentt_1_1process.html">process</a>-&gt;<a class="code" href="classentt_1_1process.html#aacc7fe0ef3265113079c70ff8cd9478d">tick</a>(delta, data);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keyword">auto</span> dead = <a class="code" href="classentt_1_1process.html">process</a>-&gt;<a class="code" href="classentt_1_1process.html#ac889b66e80ecaac22816927a120a416a">dead</a>();</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">if</span>(dead) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            <span class="keywordflow">if</span>(handler.next &amp;&amp; !<a class="code" href="classentt_1_1process.html">process</a>-&gt;<a class="code" href="classentt_1_1process.html#a6c716b08baea91192512aeb14f26328b">rejected</a>()) {</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classentt_1_1process.html">process</a>-&gt;<a class="code" href="classentt_1_1process.html#a6c716b08baea91192512aeb14f26328b">rejected</a>()) {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="classentt_1_1process.html">process</a>-&gt;<a class="code" href="classentt_1_1process.html#ac889b66e80ecaac22816927a120a416a">dead</a>()) {</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            <span class="keywordflow">if</span>(handler.next) {</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                handler = std::move(*handler.next);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                <span class="comment">// forces the process to exit the uninitialized state</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                dead = handler.update(handler, {}, <span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                handler.instance.reset();</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            }</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                <span class="keywordflow">return</span> handler.update(handler, {}, <span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            }</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        }</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keywordflow">return</span> dead;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    }</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Proc&gt;</div>
@@ -193,44 +193,42 @@ $(function() {
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    }</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
 <div class="line"><a name="l00254"></a><span class="lineno"><a class="line" href="classentt_1_1scheduler.html#a827eae426378df9ed9190752156a4154">  254</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1scheduler.html#a827eae426378df9ed9190752156a4154">update</a>(<span class="keyword">const</span> Delta delta, <span class="keywordtype">void</span> *data = <span class="keyword">nullptr</span>) {</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="keywordtype">bool</span> clean = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="keyword">auto</span> sz = handlers.size();</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> pos = handlers.size(); pos; --pos) {</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            <span class="keyword">auto</span> &amp;handler = handlers[pos-1];</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">bool</span> dead = handler.update(handler, delta, data);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            clean = clean || dead;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        }</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="keywordflow">if</span>(clean) {</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](<span class="keyword">auto</span> &amp;handler) {</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                return !handler.instance;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;            }), handlers.end());</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        }</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    }</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
-<div class="line"><a name="l00280"></a><span class="lineno"><a class="line" href="classentt_1_1scheduler.html#aabc25388bff1b3b0770f913f54b915f2">  280</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1scheduler.html#aabc25388bff1b3b0770f913f54b915f2">abort</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> immediately = <span class="keyword">false</span>) {</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        decltype(handlers) exec;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        exec.swap(handlers);</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160; </div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;handler: exec) {</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            handler.abort(handler, immediately);</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        }</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        std::move(handlers.begin(), handlers.end(), std::back_inserter(exec));</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        handlers.swap(exec);</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    }</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160; </div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    std::vector&lt;process_handler&gt; handlers{};</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;};</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160; </div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> dead = handler.update(handler, delta, data); dead) {</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                std::swap(handler, handlers[--sz]);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;            }</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        }</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        handlers.erase(handlers.begin() + sz, handlers.end());</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    }</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
+<div class="line"><a name="l00278"></a><span class="lineno"><a class="line" href="classentt_1_1scheduler.html#aabc25388bff1b3b0770f913f54b915f2">  278</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1scheduler.html#aabc25388bff1b3b0770f913f54b915f2">abort</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> immediately = <span class="keyword">false</span>) {</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        decltype(handlers) exec;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        exec.swap(handlers);</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;handler: exec) {</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;            handler.abort(handler, immediately);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        }</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160; </div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        std::move(handlers.begin(), handlers.end(), std::back_inserter(exec));</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        handlers.swap(exec);</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    }</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160; </div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    std::vector&lt;process_handler&gt; handlers{};</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;};</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160; </div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160; </div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;}</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160; </div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;}</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160; </div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160; </div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1process_html_a6c716b08baea91192512aeb14f26328b"><div class="ttname"><a href="classentt_1_1process.html#a6c716b08baea91192512aeb14f26328b">entt::process::rejected</a></div><div class="ttdeci">bool rejected() const noexcept</div><div class="ttdoc">Returns true if a process terminated with errors.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00220">process.hpp:220</a></div></div>
+<div class="ttc" id="aclassentt_1_1process_html_a6c716b08baea91192512aeb14f26328b"><div class="ttname"><a href="classentt_1_1process.html#a6c716b08baea91192512aeb14f26328b">entt::process::rejected</a></div><div class="ttdeci">bool rejected() const noexcept</div><div class="ttdoc">Returns true if a process terminated with errors.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00221">process.hpp:221</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_af582ffea72368a83ea4dd7d9e563f715"><div class="ttname"><a href="classentt_1_1scheduler.html#af582ffea72368a83ea4dd7d9e563f715">entt::scheduler::scheduler</a></div><div class="ttdeci">scheduler(scheduler &amp;&amp;)=default</div><div class="ttdoc">Default move constructor.</div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_a871812d08af8483316d1ce5d1e9d686f"><div class="ttname"><a href="classentt_1_1scheduler.html#a871812d08af8483316d1ce5d1e9d686f">entt::scheduler::attach</a></div><div class="ttdeci">auto attach(Func &amp;&amp;func)</div><div class="ttdoc">Schedules a process for the next tick.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00238">scheduler.hpp:238</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_a5a0f92dbe54b58751237a567e86805e0"><div class="ttname"><a href="classentt_1_1scheduler.html#a5a0f92dbe54b58751237a567e86805e0">entt::scheduler::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Discards all scheduled processes.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00147">scheduler.hpp:147</a></div></div>
@@ -239,14 +237,14 @@ $(function() {
 <div class="ttc" id="aclassentt_1_1scheduler_html_a49a81e662dc26831f4a951a715705d6e"><div class="ttname"><a href="classentt_1_1scheduler.html#a49a81e662dc26831f4a951a715705d6e">entt::scheduler::scheduler</a></div><div class="ttdeci">scheduler()=default</div><div class="ttdoc">Default constructor.</div></div>
 <div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_afcec47d6ec28a994af2a7097348ce59f"><div class="ttname"><a href="classentt_1_1scheduler.html#afcec47d6ec28a994af2a7097348ce59f">entt::scheduler::size_type</a></div><div class="ttdeci">std::size_t size_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00114">scheduler.hpp:114</a></div></div>
-<div class="ttc" id="aclassentt_1_1process_html_ac889b66e80ecaac22816927a120a416a"><div class="ttname"><a href="classentt_1_1process.html#ac889b66e80ecaac22816927a120a416a">entt::process::dead</a></div><div class="ttdeci">bool dead() const noexcept</div><div class="ttdoc">Returns true if a process is already terminated.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00204">process.hpp:204</a></div></div>
-<div class="ttc" id="aclassentt_1_1scheduler_html_aabc25388bff1b3b0770f913f54b915f2"><div class="ttname"><a href="classentt_1_1scheduler.html#aabc25388bff1b3b0770f913f54b915f2">entt::scheduler::abort</a></div><div class="ttdeci">void abort(const bool immediately=false)</div><div class="ttdoc">Aborts all scheduled processes.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00280">scheduler.hpp:280</a></div></div>
+<div class="ttc" id="aclassentt_1_1process_html_ac889b66e80ecaac22816927a120a416a"><div class="ttname"><a href="classentt_1_1process.html#ac889b66e80ecaac22816927a120a416a">entt::process::dead</a></div><div class="ttdeci">bool dead() const noexcept</div><div class="ttdoc">Returns true if a process is already terminated.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00205">process.hpp:205</a></div></div>
+<div class="ttc" id="aclassentt_1_1scheduler_html_aabc25388bff1b3b0770f913f54b915f2"><div class="ttname"><a href="classentt_1_1scheduler.html#aabc25388bff1b3b0770f913f54b915f2">entt::scheduler::abort</a></div><div class="ttdeci">void abort(const bool immediately=false)</div><div class="ttdoc">Aborts all scheduled processes.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00278">scheduler.hpp:278</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_a991b4a1e5c02f66734552ded7acec4df"><div class="ttname"><a href="classentt_1_1scheduler.html#a991b4a1e5c02f66734552ded7acec4df">entt::scheduler::size</a></div><div class="ttdeci">size_type size() const noexcept</div><div class="ttdoc">Number of processes currently scheduled.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00129">scheduler.hpp:129</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_a827eae426378df9ed9190752156a4154"><div class="ttname"><a href="classentt_1_1scheduler.html#a827eae426378df9ed9190752156a4154">entt::scheduler::update</a></div><div class="ttdeci">void update(const Delta delta, void *data=nullptr)</div><div class="ttdoc">Updates all scheduled processes.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00254">scheduler.hpp:254</a></div></div>
-<div class="ttc" id="astructentt_1_1process__adaptor_html"><div class="ttname"><a href="structentt_1_1process__adaptor.html">entt::process_adaptor</a></div><div class="ttdoc">Adaptor for lambdas and functors to turn them into processes.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00311">process.hpp:311</a></div></div>
+<div class="ttc" id="astructentt_1_1process__adaptor_html"><div class="ttname"><a href="structentt_1_1process__adaptor.html">entt::process_adaptor</a></div><div class="ttdoc">Adaptor for lambdas and functors to turn them into processes.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00309">process.hpp:309</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_a729c83e1983123c642a08cda67e486e3"><div class="ttname"><a href="classentt_1_1scheduler.html#a729c83e1983123c642a08cda67e486e3">entt::scheduler::attach</a></div><div class="ttdeci">auto attach(Args &amp;&amp;... args)</div><div class="ttdoc">Schedules a process for the next tick.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00177">scheduler.hpp:177</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_a42a072d6ad1473e1f1f688826f942931"><div class="ttname"><a href="classentt_1_1scheduler.html#a42a072d6ad1473e1f1f688826f942931">entt::scheduler::empty</a></div><div class="ttdeci">bool empty() const noexcept</div><div class="ttdoc">Returns true if at least a process is currently scheduled.</div><div class="ttdef"><b>Definition:</b> <a href="scheduler_8hpp_source.html#l00137">scheduler.hpp:137</a></div></div>
-<div class="ttc" id="aclassentt_1_1process_html_aacc7fe0ef3265113079c70ff8cd9478d"><div class="ttname"><a href="classentt_1_1process.html#aacc7fe0ef3265113079c70ff8cd9478d">entt::process::tick</a></div><div class="ttdeci">void tick(const Delta delta, void *data=nullptr)</div><div class="ttdoc">Updates a process and its internal state if required.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00229">process.hpp:229</a></div></div>
+<div class="ttc" id="aclassentt_1_1process_html_aacc7fe0ef3265113079c70ff8cd9478d"><div class="ttname"><a href="classentt_1_1process.html#aacc7fe0ef3265113079c70ff8cd9478d">entt::process::tick</a></div><div class="ttdeci">void tick(const Delta delta, void *data=nullptr)</div><div class="ttdoc">Updates a process and its internal state if required.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00230">process.hpp:230</a></div></div>
 <div class="ttc" id="aclassentt_1_1scheduler_html_aea6ab78dbf00ba17c6e828ee0505afd9"><div class="ttname"><a href="classentt_1_1scheduler.html#aea6ab78dbf00ba17c6e828ee0505afd9">entt::scheduler::operator=</a></div><div class="ttdeci">scheduler &amp; operator=(scheduler &amp;&amp;)=default</div><div class="ttdoc">Default move assignment operator.</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

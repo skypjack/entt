@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1basic__container.html" title=" " alt="" coords="5,35,171,91"/>
-<area shape="rect" id="node2" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="219,5,501,120"/>
-<area shape="rect" id="node3" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::maps of any type." alt="" coords="549,35,752,91"/>
+<area shape="rect" id="node1" href="$structentt_1_1basic__container.html" title=" " alt="" coords="5,27,176,69"/>
+<area shape="rect" id="node2" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="224,5,412,91"/>
+<area shape="rect" id="node3" href="$structentt_1_1meta__sequence__container__traits_3_01std_1_1array_3_01Type_00_01N_01_4_01_4.html" title="Meta sequence container traits for std::arrays of any type." alt="" coords="460,20,608,76"/>
 </map>

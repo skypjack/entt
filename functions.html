@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -73,17 +73,30 @@ $(function() {
 : <a class="el" href="classentt_1_1basic__registry.html#a7a42cddcb9bd14802bd597e789ff341f">entt::basic_registry&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1process.html#aacb0108ddb7ee68eac145c092b4e4163">entt::process&lt; Derived, Delta &gt;</a>
 </li>
-<li>allow_cast()
-: <a class="el" href="classentt_1_1meta__any.html#a66606e3abbe512e064a0e1440a069594">entt::meta_any</a>
+<li>all_of()
+: <a class="el" href="structentt_1_1basic__handle.html#a29185b95a343d6770517683daebb20c9">entt::basic_handle&lt; Entity, Type &gt;</a>
+, <a class="el" href="classentt_1_1basic__registry.html#a40072eca607846f43f47d0e3f11dd196">entt::basic_registry&lt; Entity &gt;</a>
 </li>
-<li>any()
-: <a class="el" href="classentt_1_1any.html#a72bd43c4dc96316b665c0fa529eaa5d0">entt::any</a>
-, <a class="el" href="structentt_1_1basic__handle.html#aed123ed9ec89643d45b824f81012d2ed">entt::basic_handle&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1basic__registry.html#ab0f856eae9b92a4c97689540968c6bde">entt::basic_registry&lt; Entity &gt;</a>
+<li>allow_cast()
+: <a class="el" href="classentt_1_1meta__any.html#af3bf7b2771fc6a67c2a26b19d364e85a">entt::meta_any</a>
+</li>
+<li>any_of()
+: <a class="el" href="structentt_1_1basic__handle.html#a01a92bc7ed67cc044bb245308de39443">entt::basic_handle&lt; Entity, Type &gt;</a>
+, <a class="el" href="classentt_1_1basic__registry.html#a08f819276fd2d8b2b2b6d01357f61a42">entt::basic_registry&lt; Entity &gt;</a>
 </li>
 <li>arg()
 : <a class="el" href="structentt_1_1meta__ctor.html#a14c719cf290329ce5e96efff296a6286">entt::meta_ctor</a>
 , <a class="el" href="structentt_1_1meta__func.html#ad1194298057174d7eaa0c5501b053453">entt::meta_func</a>
+</li>
+<li>args_type
+: <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07Args_8_8_8_08_4.html#a545176bcdf581359456ab58b81513f87">entt::meta_function_descriptor&lt; Type, Ret(*)(Args...)&gt;</a>
+, <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_01const_01_4.html#a2446827fb076fcb5bddf6310c40e28cc">entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...) const &gt;</a>
+, <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a327a5f8c4f6a34d1d1117fd9c98d8e38">entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...)&gt;</a>
+, <a class="el" href="structentt_1_1meta__template__traits_3_01Clazz_3_01Args_8_8_8_01_4_01_4.html#a9d0bdf951c08413401de8a4cb8f00541">entt::meta_template_traits&lt; Clazz&lt; Args... &gt; &gt;</a>
+</li>
+<li>arity()
+: <a class="el" href="structentt_1_1meta__ctor.html#a3f3c0d033eda3932cf1051d6b8010618">entt::meta_ctor</a>
+, <a class="el" href="structentt_1_1meta__func.html#ae4b3fd3397828894d1a8e9df4d69ad6e">entt::meta_func</a>
 </li>
 <li>as_associative_container()
 : <a class="el" href="classentt_1_1meta__any.html#a11bc40bc571d2aa5df17de278948ff59">entt::meta_any</a>
@@ -91,13 +104,13 @@ $(function() {
 <li>as_group()
 : <a class="el" href="structentt_1_1as__group.html#a631a3000218160018872f3046bce4a9a">entt::as_group&lt; Entity &gt;</a>
 </li>
-<li>as_ref
-: <a class="el" href="classentt_1_1any.html#afab99ca4bc599559a04bd786bbb8af12">entt::any</a>
-, <a class="el" href="classentt_1_1meta__any.html#aa98f1940fe4ca97369315371751435d9">entt::meta_any</a>
-, <a class="el" href="classentt_1_1poly.html#a6554825ca6c990853864a7f4c203e3c8">entt::poly&lt; Concept &gt;</a>
+<li>as_ref()
+: <a class="el" href="classentt_1_1basic__any.html#ac0a6730e219bb15d8e4f8f63d270e0d3">entt::basic_any&lt; Len, Align &gt;</a>
+, <a class="el" href="classentt_1_1basic__poly.html#a327c0a52b8eff8be5746bd0215d6a6d0">entt::basic_poly&lt; Concept, Len, Align &gt;</a>
+, <a class="el" href="classentt_1_1meta__any.html#a6532f908884d751a9ea382c93fdcc79f">entt::meta_any</a>
 </li>
 <li>as_sequence_container()
-: <a class="el" href="classentt_1_1meta__any.html#a466877798f1f160a929b03f0e3146f0b">entt::meta_any</a>
+: <a class="el" href="classentt_1_1meta__any.html#adf9565cacb9c6c824a47766dcaed2e34">entt::meta_any</a>
 </li>
 <li>as_view()
 : <a class="el" href="structentt_1_1as__view.html#a4268e90b647cb78614581afd53e2e5c5">entt::as_view&lt; Entity &gt;</a>
@@ -105,8 +118,11 @@ $(function() {
 <li>assign()
 : <a class="el" href="classentt_1_1basic__registry.html#a35d217b9bc09235d55388941de380f72">entt::basic_registry&lt; Entity &gt;</a>
 </li>
+<li>at()
+: <a class="el" href="classentt_1_1basic__sparse__set.html#a59c07ea42869c1ac22a3ed27ebe6d4e3">entt::basic_sparse_set&lt; Entity &gt;</a>
+</li>
 <li>attach()
-: <a class="el" href="classentt_1_1scheduler.html#a871812d08af8483316d1ce5d1e9d686f">entt::scheduler&lt; Delta &gt;</a>
+: <a class="el" href="classentt_1_1scheduler.html#a729c83e1983123c642a08cda67e486e3">entt::scheduler&lt; Delta &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->

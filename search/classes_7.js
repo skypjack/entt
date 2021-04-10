@@ -1,7 +1,25 @@
 var searchData=
 [
-  ['has_5fmeta_5fassociative_5fcontainer_5ftraits_565',['has_meta_associative_container_traits',['../structentt_1_1has__meta__associative__container__traits.html',1,'entt']]],
-  ['has_5fmeta_5fassociative_5fcontainer_5ftraits_3c_20type_2c_20std_3a_3avoid_5ft_3c_20typename_20meta_5fassociative_5fcontainer_5ftraits_3c_20type_20_3e_3a_3akey_5ftype_20_3e_20_3e_566',['has_meta_associative_container_traits&lt; Type, std::void_t&lt; typename meta_associative_container_traits&lt; Type &gt;::key_type &gt; &gt;',['../structentt_1_1has__meta__associative__container__traits_3_01Type_00_01std_1_1void__t_3_01typenam21a695b0ef9490dc30d599dbd3717cc9.html',1,'entt']]],
-  ['has_5fmeta_5fsequence_5fcontainer_5ftraits_567',['has_meta_sequence_container_traits',['../structentt_1_1has__meta__sequence__container__traits.html',1,'entt']]],
-  ['has_5fmeta_5fsequence_5fcontainer_5ftraits_3c_20type_2c_20std_3a_3avoid_5ft_3c_20typename_20meta_5fsequence_5fcontainer_5ftraits_3c_20type_20_3e_3a_3avalue_5ftype_20_3e_20_3e_568',['has_meta_sequence_container_traits&lt; Type, std::void_t&lt; typename meta_sequence_container_traits&lt; Type &gt;::value_type &gt; &gt;',['../structentt_1_1has__meta__sequence__container__traits_3_01Type_00_01std_1_1void__t_3_01typename_0354118c7c2a13f482a34301995287a7a.html',1,'entt']]]
+  ['identifier_587',['identifier',['../classentt_1_1identifier.html',1,'entt']]],
+  ['identity_588',['identity',['../structentt_1_1identity.html',1,'entt']]],
+  ['insertion_5fsort_589',['insertion_sort',['../structentt_1_1insertion__sort.html',1,'entt']]],
+  ['is_5fapplicable_590',['is_applicable',['../structentt_1_1is__applicable.html',1,'entt']]],
+  ['is_5fapplicable_3c_20func_2c_20const_20tuple_3c_20args_2e_2e_2e_20_3e_20_3e_591',['is_applicable&lt; Func, const Tuple&lt; Args... &gt; &gt;',['../structentt_1_1is__applicable_3_01Func_00_01const_01Tuple_3_01Args_8_8_8_01_4_01_4.html',1,'entt']]],
+  ['is_5fapplicable_3c_20func_2c_20tuple_3c_20args_2e_2e_2e_20_3e_20_3e_592',['is_applicable&lt; Func, Tuple&lt; Args... &gt; &gt;',['../structentt_1_1is__applicable_3_01Func_00_01Tuple_3_01Args_8_8_8_01_4_01_4.html',1,'entt']]],
+  ['is_5fapplicable_5fr_593',['is_applicable_r',['../structentt_1_1is__applicable__r.html',1,'entt']]],
+  ['is_5fapplicable_5fr_3c_20ret_2c_20func_2c_20std_3a_3atuple_3c_20args_2e_2e_2e_20_3e_20_3e_594',['is_applicable_r&lt; Ret, Func, std::tuple&lt; Args... &gt; &gt;',['../structentt_1_1is__applicable__r_3_01Ret_00_01Func_00_01std_1_1tuple_3_01Args_8_8_8_01_4_01_4.html',1,'entt']]],
+  ['is_5fcomplete_595',['is_complete',['../structentt_1_1is__complete.html',1,'entt']]],
+  ['is_5fcomplete_3c_20type_2c_20std_3a_3avoid_5ft_3c_20decltype_28sizeof_28type_29_29_3e_20_3e_596',['is_complete&lt; Type, std::void_t&lt; decltype(sizeof(Type))&gt; &gt;',['../structentt_1_1is__complete_3_01Type_00_01std_1_1void__t_3_01decltype_07sizeof_07Type_08_08_4_01_4.html',1,'entt']]],
+  ['is_5fempty_597',['is_empty',['../structentt_1_1is__empty.html',1,'entt']]],
+  ['is_5fequality_5fcomparable_598',['is_equality_comparable',['../structentt_1_1is__equality__comparable.html',1,'entt']]],
+  ['is_5fkey_5fonly_5fmeta_5fassociative_5fcontainer_599',['is_key_only_meta_associative_container',['../structentt_1_1is__key__only__meta__associative__container.html',1,'entt']]],
+  ['is_5fkey_5fonly_5fmeta_5fassociative_5fcontainer_3c_20type_2c_20std_3a_3avoid_5ft_3c_20typename_20meta_5fassociative_5fcontainer_5ftraits_3c_20type_20_3e_3a_3atype_3a_3amapped_5ftype_20_3e_20_3e_600',['is_key_only_meta_associative_container&lt; Type, std::void_t&lt; typename meta_associative_container_traits&lt; Type &gt;::type::mapped_type &gt; &gt;',['../structentt_1_1is__key__only__meta__associative__container_3_01Type_00_01std_1_1void__t_3_01typen08c4aa5308e52cbb686af55767e67d40.html',1,'entt']]],
+  ['is_5fmeta_5fpointer_5flike_601',['is_meta_pointer_like',['../structentt_1_1is__meta__pointer__like.html',1,'entt']]],
+  ['is_5fmeta_5fpointer_5flike_3c_20const_20type_20_3e_602',['is_meta_pointer_like&lt; const Type &gt;',['../structentt_1_1is__meta__pointer__like_3_01const_01Type_01_4.html',1,'entt']]],
+  ['is_5fmeta_5fpointer_5flike_3c_20std_3a_3ashared_5fptr_3c_20type_20_3e_20_3e_603',['is_meta_pointer_like&lt; std::shared_ptr&lt; Type &gt; &gt;',['../structentt_1_1is__meta__pointer__like_3_01std_1_1shared__ptr_3_01Type_01_4_01_4.html',1,'entt']]],
+  ['is_5fmeta_5fpointer_5flike_3c_20std_3a_3aunique_5fptr_3c_20type_2c_20args_2e_2e_2e_20_3e_20_3e_604',['is_meta_pointer_like&lt; std::unique_ptr&lt; Type, Args... &gt; &gt;',['../structentt_1_1is__meta__pointer__like_3_01std_1_1unique__ptr_3_01Type_00_01Args_8_8_8_01_4_01_4.html',1,'entt']]],
+  ['is_5fmeta_5fpointer_5flike_3c_20type_20_2a_20_3e_605',['is_meta_pointer_like&lt; Type * &gt;',['../structentt_1_1is__meta__pointer__like_3_01Type_01_5_01_4.html',1,'entt']]],
+  ['is_5fmeta_5fpointer_5flike_3c_20type_20_3e_606',['is_meta_pointer_like&lt; Type &gt;',['../structentt_1_1is__meta__pointer__like.html',1,'entt']]],
+  ['is_5fstd_5fhashable_607',['is_std_hashable',['../structentt_1_1is__std__hashable.html',1,'entt']]],
+  ['is_5fstd_5fhashable_3c_20type_2c_20std_3a_3aenable_5fif_5ft_3c_20std_3a_3ais_5fconvertible_5fv_3c_20decltype_28std_3a_3adeclval_3c_20std_3a_3ahash_3c_20type_20_3e_3e_28_29_28std_3a_3adeclval_3c_20type_20_3e_28_29_29_29_2c_20std_3a_3asize_5ft_20_3e_20_3e_20_3e_608',['is_std_hashable&lt; Type, std::enable_if_t&lt; std::is_convertible_v&lt; decltype(std::declval&lt; std::hash&lt; Type &gt;&gt;()(std::declval&lt; Type &gt;())), std::size_t &gt; &gt; &gt;',['../structentt_1_1is__std__hashable_3_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__convertible__v2db25a6fc70291b2836fc8dfe05b5c23.html',1,'entt']]]
 ];

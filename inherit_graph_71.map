@@ -1,5 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,57,97,84"/>
-<area shape="rect" id="node2" href="$structentt_1_1is__applicable_3_01Func_00_01const_01Tuple_3_01Args_8_8_8_01_4_01_4.html" title="Same as std::is_invocable, but with tuples." alt="" coords="165,5,303,61"/>
-<area shape="rect" id="node3" href="$structentt_1_1is__applicable_3_01Func_00_01Tuple_3_01Args_8_8_8_01_4_01_4.html" title="Same as std::is_invocable, but with tuples." alt="" coords="145,86,323,127"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,254,87,281"/>
+<area shape="rect" id="node2" href="$structentt_1_1is__applicable.html" title="Same as std::is_invocable, but with tuples." alt="" coords="150,5,318,47"/>
+<area shape="rect" id="node3" href="$structentt_1_1is__applicable__r.html" title="Same as std::is_invocable_r, but with tuples for arguments." alt="" coords="149,71,319,127"/>
+<area shape="rect" id="node4" href="$structentt_1_1is__complete.html" title="Provides the member constant value to true if a given type is complete, false otherwise." alt="" coords="169,152,299,193"/>
+<area shape="rect" id="node5" href="$structentt_1_1is__key__only__meta__associative__container_3_01Type_00_01std_1_1void__t_3_01typen08c4aa5308e52cbb686af55767e67d40.html" title="Provides the member constant value to true if a meta associative container claims to wrap a key&#45;only ..." alt="" coords="135,217,333,317"/>
+<area shape="rect" id="node6" href="$structentt_1_1is__meta__pointer__like.html" title="Provides the member constant value to true if a given type is a pointer&#45;like type from the point of v..." alt="" coords="162,341,306,383"/>
+<area shape="rect" id="node7" href="$structentt_1_1is__std__hashable.html" title="Provides the member constant value to true if a given type is hashable, false otherwise." alt="" coords="161,407,307,448"/>
+<area shape="rect" id="node8" href="$structentt_1_1is__meta__pointer__like.html" title=" " alt="" coords="162,472,306,513"/>
+<area shape="rect" id="node9" href="$structentt_1_1is__meta__pointer__like_3_01const_01Type_01_4.html" title="Partial specialization to ensure that const pointer&#45;like types are also accepted." alt="" coords="381,472,525,513"/>
 </map>

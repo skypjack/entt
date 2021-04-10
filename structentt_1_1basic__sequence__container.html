@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -81,12 +81,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a925367702bf4cacdfe84f05d9a1b7375"><td class="memItemLeft" align="right" valign="top">static Container::value_type &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__sequence__container.html#a925367702bf4cacdfe84f05d9a1b7375">get</a> (Container &amp;cont, typename Container::size_type pos)</td></tr>
-<tr class="memdesc:a925367702bf4cacdfe84f05d9a1b7375"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the element at the specified location of the given container (no bounds checking is performed).  <a href="structentt_1_1basic__sequence__container.html#a925367702bf4cacdfe84f05d9a1b7375">More...</a><br /></td></tr>
-<tr class="separator:a925367702bf4cacdfe84f05d9a1b7375"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4aa7de7a23f96d12fb75804d7bbcb65a"><td class="memItemLeft" align="right" valign="top">static const Container::value_type &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__sequence__container.html#a4aa7de7a23f96d12fb75804d7bbcb65a">cget</a> (const Container &amp;cont, typename Container::size_type pos)</td></tr>
-<tr class="memdesc:a4aa7de7a23f96d12fb75804d7bbcb65a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the element at the specified location of the given container (no bounds checking is performed).  <a href="structentt_1_1basic__sequence__container.html#a4aa7de7a23f96d12fb75804d7bbcb65a">More...</a><br /></td></tr>
-<tr class="separator:a4aa7de7a23f96d12fb75804d7bbcb65a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3158ad53a5e11dd4220a201ad3c454e2"><td class="memItemLeft" align="right" valign="top">static Container::reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__sequence__container.html#a3158ad53a5e11dd4220a201ad3c454e2">get</a> (Container &amp;cont, typename Container::size_type pos)</td></tr>
+<tr class="memdesc:a3158ad53a5e11dd4220a201ad3c454e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the element at the specified location of the given container (no bounds checking is performed).  <a href="structentt_1_1basic__sequence__container.html#a3158ad53a5e11dd4220a201ad3c454e2">More...</a><br /></td></tr>
+<tr class="separator:a3158ad53a5e11dd4220a201ad3c454e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20ae69674b1e6803a96a48be0165a3d8"><td class="memItemLeft" align="right" valign="top">static Container::const_reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__sequence__container.html#a20ae69674b1e6803a96a48be0165a3d8">cget</a> (const Container &amp;cont, typename Container::size_type pos)</td></tr>
+<tr class="memdesc:a20ae69674b1e6803a96a48be0165a3d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the element at the specified location of the given container (no bounds checking is performed).  <a href="structentt_1_1basic__sequence__container.html#a20ae69674b1e6803a96a48be0165a3d8">More...</a><br /></td></tr>
+<tr class="separator:a20ae69674b1e6803a96a48be0165a3d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Container&gt;<br />
@@ -100,10 +100,10 @@ struct entt::basic_sequence_container&lt; Container &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00160">160</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00151">151</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a4aa7de7a23f96d12fb75804d7bbcb65a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4aa7de7a23f96d12fb75804d7bbcb65a">&#9670;&nbsp;</a></span>cget()</h2>
+<a id="a20ae69674b1e6803a96a48be0165a3d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20ae69674b1e6803a96a48be0165a3d8">&#9670;&nbsp;</a></span>cget()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -114,7 +114,7 @@ template&lt;typename Container &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const Container::value_type&amp; <a class="el" href="structentt_1_1basic__sequence__container.html">entt::basic_sequence_container</a>&lt; Container &gt;::cget </td>
+          <td class="memname">static Container::const_reference <a class="el" href="structentt_1_1basic__sequence__container.html">entt::basic_sequence_container</a>&lt; Container &gt;::cget </td>
           <td>(</td>
           <td class="paramtype">const Container &amp;&#160;</td>
           <td class="paramname"><em>cont</em>, </td>
@@ -148,12 +148,12 @@ template&lt;typename Container &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the requested element. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00173">173</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00164">164</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a925367702bf4cacdfe84f05d9a1b7375"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a925367702bf4cacdfe84f05d9a1b7375">&#9670;&nbsp;</a></span>get()</h2>
+<a id="a3158ad53a5e11dd4220a201ad3c454e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3158ad53a5e11dd4220a201ad3c454e2">&#9670;&nbsp;</a></span>get()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -164,7 +164,7 @@ template&lt;typename Container &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static Container::value_type&amp; <a class="el" href="structentt_1_1basic__sequence__container.html">entt::basic_sequence_container</a>&lt; Container &gt;::get </td>
+          <td class="memname">static Container::reference <a class="el" href="structentt_1_1basic__sequence__container.html">entt::basic_sequence_container</a>&lt; Container &gt;::get </td>
           <td>(</td>
           <td class="paramtype">Container &amp;&#160;</td>
           <td class="paramname"><em>cont</em>, </td>
@@ -198,7 +198,7 @@ template&lt;typename Container &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the requested element. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00168">168</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="container_8hpp_source.html#l00159">159</a> of file <a class="el" href="container_8hpp_source.html">container.hpp</a>.</p>
 
 </div>
 </div>

@@ -1,4 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,13,80,39"/>
-<area shape="rect" id="node2" href="$structentt_1_1is__empty.html" title="Provides the member constant value to true if a given type is empty and the empty type optimization i..." alt="" coords="128,5,277,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,220,81,247"/>
+<area shape="rect" id="node2" href="$structentt_1_1is__complete_3_01Type_00_01std_1_1void__t_3_01decltype_07sizeof_07Type_08_08_4_01_4.html" title="Provides the member constant value to true if a given type is complete, false otherwise." alt="" coords="132,5,305,61"/>
+<area shape="rect" id="node3" href="$structentt_1_1is__key__only__meta__associative__container.html" title="Provides the member constant value to true if a meta associative container claims to wrap a key&#45;only ..." alt="" coords="135,85,303,141"/>
+<area shape="rect" id="node4" href="$structentt_1_1is__meta__pointer__like_3_01std_1_1shared__ptr_3_01Type_01_4_01_4.html" title="Makes std::shared_ptrs of any type pointer&#45;like types for the meta system." alt="" coords="145,165,293,221"/>
+<area shape="rect" id="node5" href="$structentt_1_1is__meta__pointer__like_3_01std_1_1unique__ptr_3_01Type_00_01Args_8_8_8_01_4_01_4.html" title="Makes std::unique_ptrs of any type pointer&#45;like types for the meta system." alt="" coords="145,245,292,301"/>
+<area shape="rect" id="node6" href="$structentt_1_1is__meta__pointer__like_3_01Type_01_5_01_4.html" title="Makes plain pointers pointer&#45;like types for the meta system." alt="" coords="147,326,291,367"/>
+<area shape="rect" id="node7" href="$structentt_1_1is__std__hashable_3_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__convertible__v2db25a6fc70291b2836fc8dfe05b5c23.html" title="Provides the member constant value to true if a given type is hashable, false otherwise." alt="" coords="129,392,308,507"/>
 </map>

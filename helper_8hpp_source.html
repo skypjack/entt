@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -151,14 +151,15 @@ $(function() {
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Entity, <span class="keyword">typename</span> Component&gt;</div>
 <div class="line"><a name="l00147"></a><span class="lineno"><a class="line" href="namespaceentt.html#adb31e9165a07456c03f8c64295117824">  147</a></span>&#160;Entity <a class="code" href="namespaceentt.html#adb31e9165a07456c03f8c64295117824">to_entity</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1basic__registry.html">basic_registry&lt;Entity&gt;</a> &amp;reg, <span class="keyword">const</span> Component &amp;component) {</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">return</span> *(reg.template data&lt;Component&gt;() + (&amp;component - reg.template raw&lt;Component&gt;()));</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;}</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="classentt_1_1basic__view.html">view</a> = reg.template <a class="code" href="classentt_1_1basic__view.html">view&lt;const Component&gt;</a>();</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">return</span> *(<a class="code" href="classentt_1_1basic__view.html">view</a>.data() + (&amp;component - <a class="code" href="classentt_1_1basic__view.html">view</a>.raw()));</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;}</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;}</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;}</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructentt_1_1as__view_html_acf6e812f1ff9a8a0a0af828b6597dace"><div class="ttname"><a href="structentt_1_1as__view.html#acf6e812f1ff9a8a0a0af828b6597dace">entt::as_view::registry_type</a></div><div class="ttdeci">constness_as_t&lt; basic_registry&lt; entity_type &gt;, Entity &gt; registry_type</div><div class="ttdoc">Type of registry to convert.</div><div class="ttdef"><b>Definition:</b> <a href="helper_8hpp_source.html#l00025">helper.hpp:25</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a8c24ecc5ab0055f9f2a4725c95afb29e"><div class="ttname"><a href="namespaceentt.html#a8c24ecc5ab0055f9f2a4725c95afb29e">entt::get</a></div><div class="ttdeci">constexpr get_t&lt; Type... &gt; get</div><div class="ttdoc">Variable template for lists of observed components.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2utility_8hpp_source.html#l00040">utility.hpp:40</a></div></div>
@@ -177,9 +178,9 @@ $(function() {
 <div class="ttc" id="aclassentt_1_1basic__view_html"><div class="ttname"><a href="classentt_1_1basic__view.html">entt::basic_view</a></div><div class="ttdoc">View.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00024">fwd.hpp:24</a></div></div>
 <div class="ttc" id="astructentt_1_1as__group_html_a6aa30140ac29c50156197aad66b54ccb"><div class="ttname"><a href="structentt_1_1as__group.html#a6aa30140ac29c50156197aad66b54ccb">entt::as_group::registry_type</a></div><div class="ttdeci">constness_as_t&lt; basic_registry&lt; entity_type &gt;, Entity &gt; registry_type</div><div class="ttdoc">Type of registry to convert.</div><div class="ttdef"><b>Definition:</b> <a href="helper_8hpp_source.html#l00075">helper.hpp:75</a></div></div>
 <div class="ttc" id="aclassentt_1_1delegate_html"><div class="ttname"><a href="classentt_1_1delegate.html">entt::delegate</a></div><div class="ttdoc">Basic delegate implementation.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00082">delegate.hpp:82</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a7b051461867d3c5c97f77f10b662c26b"><div class="ttname"><a href="namespaceentt.html#a7b051461867d3c5c97f77f10b662c26b">entt::constness_as_t</a></div><div class="ttdeci">typename constness_as&lt; To, From &gt;::type constness_as_t</div><div class="ttdoc">Alias template to facilitate the transcription of the constness.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00549">type_traits.hpp:549</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a7b051461867d3c5c97f77f10b662c26b"><div class="ttname"><a href="namespaceentt.html#a7b051461867d3c5c97f77f10b662c26b">entt::constness_as_t</a></div><div class="ttdeci">typename constness_as&lt; To, From &gt;::type constness_as_t</div><div class="ttdoc">Alias template to facilitate the transcription of the constness.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00632">type_traits.hpp:632</a></div></div>
 <div class="ttc" id="astructentt_1_1as__group_html_ab9e7aee21b99a979368535a5d5054137"><div class="ttname"><a href="structentt_1_1as__group.html#ab9e7aee21b99a979368535a5d5054137">entt::as_group::entity_type</a></div><div class="ttdeci">std::remove_const_t&lt; Entity &gt; entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="helper_8hpp_source.html#l00073">helper.hpp:73</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a49f19d031690e5ebfffd6c7a4f6bd364"><div class="ttname"><a href="namespaceentt.html#a49f19d031690e5ebfffd6c7a4f6bd364">entt::member_class_t</a></div><div class="ttdeci">typename member_class&lt; Member &gt;::type member_class_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00580">type_traits.hpp:580</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a49f19d031690e5ebfffd6c7a4f6bd364"><div class="ttname"><a href="namespaceentt.html#a49f19d031690e5ebfffd6c7a4f6bd364">entt::member_class_t</a></div><div class="ttdeci">typename member_class&lt; Member &gt;::type member_class_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00663">type_traits.hpp:663</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20

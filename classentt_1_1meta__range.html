@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.20"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnTT: entt::meta_range&lt; Type &gt; Class Template Reference</title>
+<title>EnTT: entt::meta_range&lt; Type, Node &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -72,7 +72,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classentt_1_1meta__range-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">entt::meta_range&lt; Type &gt; Class Template Reference</div>  </div>
+<div class="title">entt::meta_range&lt; Type, Node &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -83,60 +83,61 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a34ce9cf71ff25bea6eb17b0738a0abfa"><td class="memItemLeft" align="right" valign="top"><a id="a34ce9cf71ff25bea6eb17b0738a0abfa"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#a34ce9cf71ff25bea6eb17b0738a0abfa">node_type</a> = typename Type::node_type</td></tr>
-<tr class="memdesc:a34ce9cf71ff25bea6eb17b0738a0abfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Node type. <br /></td></tr>
-<tr class="separator:a34ce9cf71ff25bea6eb17b0738a0abfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1d6f13f25371db5fb55890de315c47a"><td class="memItemLeft" align="right" valign="top"><a id="ad1d6f13f25371db5fb55890de315c47a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#ad1d6f13f25371db5fb55890de315c47a">iterator</a> = range_iterator</td></tr>
-<tr class="memdesc:ad1d6f13f25371db5fb55890de315c47a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input iterator type. <br /></td></tr>
-<tr class="separator:ad1d6f13f25371db5fb55890de315c47a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a432a47eca3a3f2615a989f74d45b08d8"><td class="memItemLeft" align="right" valign="top"><a id="a432a47eca3a3f2615a989f74d45b08d8"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#a432a47eca3a3f2615a989f74d45b08d8">node_type</a> = Node</td></tr>
+<tr class="memdesc:a432a47eca3a3f2615a989f74d45b08d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Node type. <br /></td></tr>
+<tr class="separator:a432a47eca3a3f2615a989f74d45b08d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee64416aa8a96b20e10c4879dd34d0db"><td class="memItemLeft" align="right" valign="top"><a id="aee64416aa8a96b20e10c4879dd34d0db"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#aee64416aa8a96b20e10c4879dd34d0db">iterator</a> = range_iterator</td></tr>
+<tr class="memdesc:aee64416aa8a96b20e10c4879dd34d0db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input iterator type. <br /></td></tr>
+<tr class="separator:aee64416aa8a96b20e10c4879dd34d0db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a38ed5d1eef984704803fe07c9591444a"><td class="memItemLeft" align="right" valign="top"><a id="a38ed5d1eef984704803fe07c9591444a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#a38ed5d1eef984704803fe07c9591444a">meta_range</a> () noexcept=default</td></tr>
-<tr class="memdesc:a38ed5d1eef984704803fe07c9591444a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
-<tr class="separator:a38ed5d1eef984704803fe07c9591444a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad01ac11a7d41361631c8003a4dcc8b3e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#ad01ac11a7d41361631c8003a4dcc8b3e">meta_range</a> (<a class="el" href="classentt_1_1meta__range.html#a34ce9cf71ff25bea6eb17b0738a0abfa">node_type</a> *head)</td></tr>
-<tr class="memdesc:ad01ac11a7d41361631c8003a4dcc8b3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a meta range from a given node.  <a href="classentt_1_1meta__range.html#ad01ac11a7d41361631c8003a4dcc8b3e">More...</a><br /></td></tr>
-<tr class="separator:ad01ac11a7d41361631c8003a4dcc8b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef13d506c6cbfa08a5bb507337d86c52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__range.html#ad1d6f13f25371db5fb55890de315c47a">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#aef13d506c6cbfa08a5bb507337d86c52">begin</a> () const noexcept</td></tr>
-<tr class="memdesc:aef13d506c6cbfa08a5bb507337d86c52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="classentt_1_1meta__range.html#aef13d506c6cbfa08a5bb507337d86c52">More...</a><br /></td></tr>
-<tr class="separator:aef13d506c6cbfa08a5bb507337d86c52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ae1612edb40a8e756c40442001bcf45"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__range.html#ad1d6f13f25371db5fb55890de315c47a">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#a0ae1612edb40a8e756c40442001bcf45">end</a> () const noexcept</td></tr>
-<tr class="memdesc:a0ae1612edb40a8e756c40442001bcf45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="classentt_1_1meta__range.html#a0ae1612edb40a8e756c40442001bcf45">More...</a><br /></td></tr>
-<tr class="separator:a0ae1612edb40a8e756c40442001bcf45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9211ac6461120ea81c1ba632db875bbe"><td class="memItemLeft" align="right" valign="top"><a id="a9211ac6461120ea81c1ba632db875bbe"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#a9211ac6461120ea81c1ba632db875bbe">meta_range</a> () ENTT_NOEXCEPT=default</td></tr>
+<tr class="memdesc:a9211ac6461120ea81c1ba632db875bbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a9211ac6461120ea81c1ba632db875bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9eb66c65013ff00985f88e956360511"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#aa9eb66c65013ff00985f88e956360511">meta_range</a> (<a class="el" href="classentt_1_1meta__range.html#a432a47eca3a3f2615a989f74d45b08d8">node_type</a> *head)</td></tr>
+<tr class="memdesc:aa9eb66c65013ff00985f88e956360511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a meta range from a given node.  <a href="classentt_1_1meta__range.html#aa9eb66c65013ff00985f88e956360511">More...</a><br /></td></tr>
+<tr class="separator:aa9eb66c65013ff00985f88e956360511"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87aca0f2c3f9d0c91e75ed9c9901569b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__range.html#aee64416aa8a96b20e10c4879dd34d0db">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#a87aca0f2c3f9d0c91e75ed9c9901569b">begin</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a87aca0f2c3f9d0c91e75ed9c9901569b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="classentt_1_1meta__range.html#a87aca0f2c3f9d0c91e75ed9c9901569b">More...</a><br /></td></tr>
+<tr class="separator:a87aca0f2c3f9d0c91e75ed9c9901569b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae941b7fcda707d80d62a173b353ab803"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__range.html#aee64416aa8a96b20e10c4879dd34d0db">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__range.html#ae941b7fcda707d80d62a173b353ab803">end</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ae941b7fcda707d80d62a173b353ab803"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="classentt_1_1meta__range.html#ae941b7fcda707d80d62a173b353ab803">More...</a><br /></td></tr>
+<tr class="separator:ae941b7fcda707d80d62a173b353ab803"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Type&gt;<br />
-class entt::meta_range&lt; Type &gt;</h3>
+<div class="textblock"><h3>template&lt;typename Type, typename Node = typename Type::node_type&gt;<br />
+class entt::meta_range&lt; Type, Node &gt;</h3>
 
 <p>Iterable range to use to iterate all types of meta objects. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Type</td><td>Type of meta objects iterated. </td></tr>
+    <tr><td class="paramname">Type</td><td>Type of meta objects returned. </td></tr>
+    <tr><td class="paramname">Node</td><td>Type of meta nodes iterated. </td></tr>
   </table>
   </dd>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="range_8hpp_source.html#l00018">18</a> of file <a class="el" href="range_8hpp_source.html">range.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad01ac11a7d41361631c8003a4dcc8b3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad01ac11a7d41361631c8003a4dcc8b3e">&#9670;&nbsp;</a></span>meta_range()</h2>
+<a id="aa9eb66c65013ff00985f88e956360511"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9eb66c65013ff00985f88e956360511">&#9670;&nbsp;</a></span>meta_range()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Type &gt; </div>
+template&lt;typename Type , typename Node  = typename Type::node_type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1meta__range.html">entt::meta_range</a>&lt; Type &gt;::<a class="el" href="classentt_1_1meta__range.html">meta_range</a> </td>
+          <td class="memname"><a class="el" href="classentt_1_1meta__range.html">entt::meta_range</a>&lt; Type, Node &gt;::<a class="el" href="classentt_1_1meta__range.html">meta_range</a> </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1meta__range.html#a34ce9cf71ff25bea6eb17b0738a0abfa">node_type</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1meta__range.html#a432a47eca3a3f2615a989f74d45b08d8">node_type</a> *&#160;</td>
           <td class="paramname"><em>head</em></td><td>)</td>
           <td></td>
         </tr>
@@ -161,19 +162,19 @@ template&lt;typename Type &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aef13d506c6cbfa08a5bb507337d86c52"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef13d506c6cbfa08a5bb507337d86c52">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="a87aca0f2c3f9d0c91e75ed9c9901569b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87aca0f2c3f9d0c91e75ed9c9901569b">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Type &gt; </div>
+template&lt;typename Type , typename Node  = typename Type::node_type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1meta__range.html#ad1d6f13f25371db5fb55890de315c47a">iterator</a> <a class="el" href="classentt_1_1meta__range.html">entt::meta_range</a>&lt; Type &gt;::begin </td>
+          <td class="memname"><a class="el" href="classentt_1_1meta__range.html#aee64416aa8a96b20e10c4879dd34d0db">iterator</a> <a class="el" href="classentt_1_1meta__range.html">entt::meta_range</a>&lt; Type, Node &gt;::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -181,7 +182,7 @@ template&lt;typename Type &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -193,19 +194,19 @@ template&lt;typename Type &gt; </div>
 
 </div>
 </div>
-<a id="a0ae1612edb40a8e756c40442001bcf45"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ae1612edb40a8e756c40442001bcf45">&#9670;&nbsp;</a></span>end()</h2>
+<a id="ae941b7fcda707d80d62a173b353ab803"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae941b7fcda707d80d62a173b353ab803">&#9670;&nbsp;</a></span>end()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Type &gt; </div>
+template&lt;typename Type , typename Node  = typename Type::node_type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1meta__range.html#ad1d6f13f25371db5fb55890de315c47a">iterator</a> <a class="el" href="classentt_1_1meta__range.html">entt::meta_range</a>&lt; Type &gt;::end </td>
+          <td class="memname"><a class="el" href="classentt_1_1meta__range.html#aee64416aa8a96b20e10c4879dd34d0db">iterator</a> <a class="el" href="classentt_1_1meta__range.html">entt::meta_range</a>&lt; Type, Node &gt;::end </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -213,7 +214,7 @@ template&lt;typename Type &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

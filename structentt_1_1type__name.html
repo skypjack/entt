@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -67,6 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="structentt_1_1type__name-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -79,6 +80,12 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="type__info_8hpp_source.html">type_info.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:aa5ff3bff84b5b96fc77e63a7af1e3d7a"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1type__name.html#aa5ff3bff84b5b96fc77e63a7af1e3d7a">operator std::string_view</a> () const noexcept</td></tr>
+<tr class="memdesc:aa5ff3bff84b5b96fc77e63a7af1e3d7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of a given type.  <a href="structentt_1_1type__name.html#aa5ff3bff84b5b96fc77e63a7af1e3d7a">More...</a><br /></td></tr>
+<tr class="separator:aa5ff3bff84b5b96fc77e63a7af1e3d7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a25bf087449089be106e33b64430bcbd4"><td class="memItemLeft" align="right" valign="top">static constexpr std::string_view&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1type__name.html#a25bf087449089be106e33b64430bcbd4">value</a> () noexcept</td></tr>
@@ -97,8 +104,40 @@ struct entt::type_name&lt; Type, typename &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="type__info_8hpp_source.html#l00129">129</a> of file <a class="el" href="type__info_8hpp_source.html">type_info.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="type__info_8hpp_source.html#l00135">135</a> of file <a class="el" href="type__info_8hpp_source.html">type_info.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa5ff3bff84b5b96fc77e63a7af1e3d7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5ff3bff84b5b96fc77e63a7af1e3d7a">&#9670;&nbsp;</a></span>operator std::string_view()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename  = void&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr <a class="el" href="structentt_1_1type__name.html">entt::type_name</a>&lt; Type, typename &gt;::operator std::string_view </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the name of a given type. </p>
+<dl class="section return"><dt>Returns</dt><dd>The name of the given type. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="type__info_8hpp_source.html#l00145">145</a> of file <a class="el" href="type__info_8hpp_source.html">type_info.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a25bf087449089be106e33b64430bcbd4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a25bf087449089be106e33b64430bcbd4">&#9670;&nbsp;</a></span>value()</h2>
 
@@ -127,7 +166,7 @@ template&lt;typename Type , typename  = void&gt; </div>
 <p>Returns the name of a given type. </p>
 <dl class="section return"><dt>Returns</dt><dd>The name of the given type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="type__info_8hpp_source.html#l00134">134</a> of file <a class="el" href="type__info_8hpp_source.html">type_info.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="type__info_8hpp_source.html#l00140">140</a> of file <a class="el" href="type__info_8hpp_source.html">type_info.hpp</a>.</p>
 
 </div>
 </div>

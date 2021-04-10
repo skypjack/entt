@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -74,22 +74,31 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define ENTT_CORE_FWD_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">   12</a></span>&#160;<span class="keyword">using</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> = ENTT_ID_TYPE;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> Len, std::<span class="keywordtype">size_t</span> = alignof(<span class="keyword">typename</span> std::aligned_storage_t&lt;Len + !Len&gt;)&gt;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">class </span>basic_any;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;}</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">   17</a></span>&#160;<span class="keyword">using</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> = ENTT_ID_TYPE;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="namespaceentt.html#a4dc3b1582213034f13e2afe5c475467a">   21</a></span>&#160;<span class="keyword">using</span> <a class="code" href="classentt_1_1basic__any.html">any</a> = <a class="code" href="classentt_1_1basic__any.html">basic_any</a>&lt;<span class="keyword">sizeof</span>(<span class="keywordtype">double</span>[2])&gt;;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;}</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00012">fwd.hpp:12</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00017">fwd.hpp:17</a></div></div>
 <div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__any_html"><div class="ttname"><a href="classentt_1_1basic__any.html">entt::basic_any&lt; sizeof(double[2])&gt;</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20

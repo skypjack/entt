@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -64,13 +64,32 @@ $(function() {
 <div class="contents">
 &#160;
 
+<h3><a id="index_a"></a>- a -</h3><ul>
+<li>args_type
+: <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07Args_8_8_8_08_4.html#a545176bcdf581359456ab58b81513f87">entt::meta_function_descriptor&lt; Type, Ret(*)(Args...)&gt;</a>
+, <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_01const_01_4.html#a2446827fb076fcb5bddf6310c40e28cc">entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...) const &gt;</a>
+, <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a327a5f8c4f6a34d1d1117fd9c98d8e38">entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...)&gt;</a>
+, <a class="el" href="structentt_1_1meta__template__traits_3_01Clazz_3_01Args_8_8_8_01_4_01_4.html#a9d0bdf951c08413401de8a4cb8f00541">entt::meta_template_traits&lt; Clazz&lt; Args... &gt; &gt;</a>
+</li>
+</ul>
+
+
+<h3><a id="index_b"></a>- b -</h3><ul>
+<li>base_node_type
+: <a class="el" href="classentt_1_1meta__type.html#af5c8ce79f2b30967048acc2f4c890ff4">entt::meta_type</a>
+</li>
+</ul>
+
+
 <h3><a id="index_c"></a>- c -</h3><ul>
+<li>class_type
+: <a class="el" href="structentt_1_1meta__template__traits_3_01Clazz_3_01Args_8_8_8_01_4_01_4.html#a4223977fdb0b34434781d3dccee131c0">entt::meta_template_traits&lt; Clazz&lt; Args... &gt; &gt;</a>
+</li>
 <li>concept_type
-: <a class="el" href="classentt_1_1poly.html#ae973185bf35eb205634103498dbda652">entt::poly&lt; Concept &gt;</a>
+: <a class="el" href="classentt_1_1basic__poly.html#ad3c8c25e48b14267dc3fc0de326a9660">entt::basic_poly&lt; Concept, Len, Align &gt;</a>
 </li>
 <li>const_iterator
-: <a class="el" href="structentt_1_1basic__container.html#ab7b4e2cc9e908f3bb4742e6a42913ede">entt::basic_container&lt; Container &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage.html#a7bd7ed8c51254df6f6337db3503a5e12">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+: <a class="el" href="classentt_1_1basic__storage.html#a7bd7ed8c51254df6f6337db3503a5e12">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
 </li>
 <li>const_reverse_iterator
 : <a class="el" href="classentt_1_1basic__storage.html#a512f0f9f97404851a0b7c1f7419a9b45">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
@@ -115,10 +134,8 @@ $(function() {
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01exclude__t_3_4_00_01Component_01_4.html#a0494ae46c922ce0c897aef9d7bd18533">entt::basic_view&lt; Entity, exclude_t&lt;&gt;, Component &gt;</a>
 , <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint32__t_01_4.html#aecde3ac9bfc28e7f0f880a74ee2c5d8f">entt::entt_traits&lt; std::uint32_t &gt;</a>
 , <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#a304eb4dc4a1487cf2966d902214f7185">entt::entt_traits&lt; std::uint64_t &gt;</a>
-, <a class="el" href="structentt_1_1sigh__storage__mixin.html#a031de2e34d8e3b4f99e6677e57a71fc7">entt::sigh_storage_mixin&lt; Type &gt;</a>
-, <a class="el" href="structentt_1_1Storage.html#acc5e415e274d1a89dcca28586f0c1fe1">entt::Storage&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1sigh__storage__mixin.html#a031de2e34d8e3b4f99e6677e57a71fc7">entt::sigh_storage_mixin&lt; Type &gt;</a>
 , <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entt::storage_adapter_mixin&lt; Type &gt;</a>
-, <a class="el" href="classentt_1_1view__pack.html#a5e00d34e835686a66d12c5e39046cbec">entt::view_pack&lt; Head, Tail &gt;</a>
 </li>
 </ul>
 
@@ -146,14 +163,13 @@ $(function() {
 : <a class="el" href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">entt::identifier&lt; Types &gt;</a>
 </li>
 <li>impl
-: <a class="el" href="structentt_1_1Storage.html#ae402e9acb7cfa58b2c2e18ee51b06d62">entt::Storage&lt; Entity &gt;</a>
+: <a class="el" href="structentt_1_1Storage.html#ab6a12e5caa7b719323490ace1ea1e483">entt::Storage&lt; Entity &gt;</a>
 </li>
 <li>instance_type
 : <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_4.html#a932f446e04a732546e7af0f2922ed2fa">entt::sigh&lt; Ret(Args...)&gt;</a>
 </li>
 <li>iterator
-: <a class="el" href="structentt_1_1basic__container.html#a980602ee3d88568dfbe10e37cf96077c">entt::basic_container&lt; Container &gt;</a>
-, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a641dabfbb74540f8812c7f240a24a3cb">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt; &gt;</a>
+: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a641dabfbb74540f8812c7f240a24a3cb">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt; &gt;</a>
 , <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_1aada3a14110654dc27700c17c9c2396.html#a720e71f06da569695a58420f58f749e9">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt;, Owned... &gt;</a>
 , <a class="el" href="classentt_1_1basic__observer.html#a3b57e5efae80301542b1b4011debb680">entt::basic_observer&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__runtime__view.html#a9ae6398953c3d724227e0fb25a7b61bd">entt::basic_runtime_view&lt; Entity &gt;</a>
@@ -162,20 +178,12 @@ $(function() {
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01Component_8_8_8_01_4.html#a807d082dd879b9015fc73908d82405ba">entt::basic_view&lt; Entity, exclude_t&lt; Exclude... &gt;, Component... &gt;</a>
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01exclude__t_3_4_00_01Component_01_4.html#a1363664c9ba7b23612f8ee1bae02048e">entt::basic_view&lt; Entity, exclude_t&lt;&gt;, Component &gt;</a>
 , <a class="el" href="classentt_1_1meta__associative__container.html#aafbaf281035562432a4e8e55443e9584">entt::meta_associative_container</a>
-, <a class="el" href="classentt_1_1meta__range.html#ad1d6f13f25371db5fb55890de315c47a">entt::meta_range&lt; Type &gt;</a>
+, <a class="el" href="classentt_1_1meta__range.html#aee64416aa8a96b20e10c4879dd34d0db">entt::meta_range&lt; Type, Node &gt;</a>
 , <a class="el" href="classentt_1_1meta__sequence__container.html#a878e2f710e88a6ae42449cb7a93c3928">entt::meta_sequence_container</a>
-, <a class="el" href="classentt_1_1view__pack.html#a07555d7a45373ea0b0fa4686091f99c8">entt::view_pack&lt; Head, Tail &gt;</a>
 </li>
 <li>iterator_category
 : <a class="el" href="classentt_1_1meta__associative__container_1_1meta__iterator.html#a8243592766417eadc3118ce9d251350e">entt::meta_associative_container::meta_iterator</a>
 , <a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#aade7df8f3ede442e7c811828e93bbd3c">entt::meta_sequence_container::meta_iterator</a>
-</li>
-</ul>
-
-
-<h3><a id="index_k"></a>- k -</h3><ul>
-<li>key_type
-: <a class="el" href="structentt_1_1basic__associative__container.html#aca5ce0d6705090acd3bd0023c175e9b4">entt::basic_associative_container&lt; Container &gt;</a>
 </li>
 </ul>
 
@@ -187,23 +195,13 @@ $(function() {
 </ul>
 
 
-<h3><a id="index_m"></a>- m -</h3><ul>
-<li>mapped_type
-: <a class="el" href="structentt_1_1meta__associative__container__traits_3_01std_1_1map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html#a1e1cf9977fcc990cf47783cb07b4dfe1">entt::meta_associative_container_traits&lt; std::map&lt; Key, Value, Args... &gt; &gt;</a>
-, <a class="el" href="structentt_1_1meta__associative__container__traits_3_01std_1_1unordered__map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html#a841c763c3c7d9a1a8d653b24097d4eea">entt::meta_associative_container_traits&lt; std::unordered_map&lt; Key, Value, Args... &gt; &gt;</a>
-</li>
-</ul>
-
-
 <h3><a id="index_n"></a>- n -</h3><ul>
 <li>node_type
-: <a class="el" href="structentt_1_1meta__base.html#a9dc262abb55f0d0c13c2848d83a26631">entt::meta_base</a>
-, <a class="el" href="structentt_1_1meta__conv.html#a2a184d32afd64728156252dc0343f81d">entt::meta_conv</a>
-, <a class="el" href="structentt_1_1meta__ctor.html#a6a3c2ed04bac33a7f937812dbe6f7663">entt::meta_ctor</a>
+: <a class="el" href="structentt_1_1meta__ctor.html#a6a3c2ed04bac33a7f937812dbe6f7663">entt::meta_ctor</a>
 , <a class="el" href="structentt_1_1meta__data.html#a0aa23c3d404c35751aa6b85870eafc21">entt::meta_data</a>
 , <a class="el" href="structentt_1_1meta__func.html#ac3c77ffeae29f5d511a5961cc25617c0">entt::meta_func</a>
 , <a class="el" href="structentt_1_1meta__prop.html#a9da5b4916bdadd45ff0e0d90b245226c">entt::meta_prop</a>
-, <a class="el" href="classentt_1_1meta__range.html#a34ce9cf71ff25bea6eb17b0738a0abfa">entt::meta_range&lt; Type &gt;</a>
+, <a class="el" href="classentt_1_1meta__range.html#a432a47eca3a3f2615a989f74d45b08d8">entt::meta_range&lt; Type, Node &gt;</a>
 , <a class="el" href="classentt_1_1meta__type.html#a2dc19d640208c4f887a1abb5d4fe7f61">entt::meta_type</a>
 </li>
 </ul>
@@ -239,6 +237,11 @@ $(function() {
 <li>result_type
 : <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a9bca9876e6671a34c6503b7de65402b6">entt::delegate&lt; Ret(Args...)&gt;</a>
 </li>
+<li>return_type
+: <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07Args_8_8_8_08_4.html#a55593948f0d7e85a04a1002f528c1bed">entt::meta_function_descriptor&lt; Type, Ret(*)(Args...)&gt;</a>
+, <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_01const_01_4.html#aae0a4b941e6c2a4ee5239d5110c88e39">entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...) const &gt;</a>
+, <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a63465b01fc295a119b70095722c0e677">entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...)&gt;</a>
+</li>
 <li>reverse_iterator
 : <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#af0f6c9d3098984efff9a93d2c95141d4">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt; &gt;</a>
 , <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_1aada3a14110654dc27700c17c9c2396.html#acdb732b267ba173980511c0e4b265bda">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt;, Owned... &gt;</a>
@@ -246,7 +249,6 @@ $(function() {
 , <a class="el" href="classentt_1_1basic__storage.html#a165b562c6886b302b9114a2b604cb439">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01Component_8_8_8_01_4.html#a3c27366ca18c1d0bc157337aa2e25aad">entt::basic_view&lt; Entity, exclude_t&lt; Exclude... &gt;, Component... &gt;</a>
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01exclude__t_3_4_00_01Component_01_4.html#ac6908355d99c46b70396c17ade970084">entt::basic_view&lt; Entity, exclude_t&lt;&gt;, Component &gt;</a>
-, <a class="el" href="classentt_1_1view__pack.html#aa2b234cd09285e2095c6fe0dc8180c61">entt::view_pack&lt; Head, Tail &gt;</a>
 </li>
 </ul>
 
@@ -259,8 +261,7 @@ $(function() {
 : <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_4.html#ae3b533533001fd0d5d56b9d17af8299f">entt::sigh&lt; Ret(Args...)&gt;</a>
 </li>
 <li>size_type
-: <a class="el" href="structentt_1_1basic__container.html#a22e81e6f0d46434a0b5cb2c2d98d8e60">entt::basic_container&lt; Container &gt;</a>
-, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#abdaf90d7a55b932927cfcb6a14cb3068">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt; &gt;</a>
+: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#abdaf90d7a55b932927cfcb6a14cb3068">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt; &gt;</a>
 , <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_1aada3a14110654dc27700c17c9c2396.html#a1c83478c5db4749a31a4fb638901a153">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt;, Owned... &gt;</a>
 , <a class="el" href="classentt_1_1basic__observer.html#a147a0e35035fc3c19b67b31d66d2d80b">entt::basic_observer&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__organizer.html#afcf528b532b3c41ab06c11d5c82a7260">entt::basic_organizer&lt; Entity &gt;</a>
@@ -279,18 +280,10 @@ $(function() {
 , <a class="el" href="structentt_1_1resource__cache.html#aa9251f4bd388f39b18b6b416f58170e1">entt::resource_cache&lt; Resource &gt;</a>
 , <a class="el" href="classentt_1_1scheduler.html#afcec47d6ec28a994af2a7097348ce59f">entt::scheduler&lt; Delta &gt;</a>
 , <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_4.html#aa1eb227b5cb5c4910dacccd38748a209">entt::sigh&lt; Ret(Args...)&gt;</a>
-, <a class="el" href="structentt_1_1Storage.html#afaeed3a89f28b208c18d7283def2fe91">entt::Storage&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1view__pack.html#a162be543e5199311f882a62be7e31504">entt::view_pack&lt; Head, Tail &gt;</a>
-</li>
-<li>storage_category
-: <a class="el" href="classentt_1_1basic__storage.html#a43a1e8ab7ad31d8ef65bdfc66c114466">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01is__empty__v_3_01Type_01_4_01_4_01_4.html#a16e0ed5087455ba40eb082650cf51153">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; is_empty_v&lt; Type &gt; &gt; &gt;</a>
-, <a class="el" href="structentt_1_1sigh__storage__mixin.html#a33864d8def7c5448ef6c2ec7467a5076">entt::sigh_storage_mixin&lt; Type &gt;</a>
-, <a class="el" href="structentt_1_1storage__adapter__mixin.html#aeb9606c0c90fdb33de776c1bbadde122">entt::storage_adapter_mixin&lt; Type &gt;</a>
 </li>
 <li>storage_type
 : <a class="el" href="structentt_1_1poly__storage__traits.html#a5e3fe08d9e265dde0da33854a5436611">entt::poly_storage_traits&lt; Entity, typename &gt;</a>
-, <a class="el" href="structentt_1_1storage__traits.html#ae65f1c2e181f0145b25881bdfcb39a6a">entt::storage_traits&lt; Entity, Type, typename &gt;</a>
+, <a class="el" href="structentt_1_1storage__traits.html#a7cda978d208a50c536ae96570d76bf8e">entt::storage_traits&lt; Entity, Type, typename &gt;</a>
 </li>
 </ul>
 
@@ -301,12 +294,15 @@ $(function() {
 , <a class="el" href="structentt_1_1constness__as_3_01To_00_01const_01From_01_4.html#ac31754183e91b36738ecd41e291c521e">entt::constness_as&lt; To, const From &gt;</a>
 , <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#ada5b094a0d859325dbe1241f3d956c02">entt::delegate&lt; Ret(Args...)&gt;</a>
 , <a class="el" href="classentt_1_1member__class.html#aa512dd4465bfab2dc09f759ae882a08a">entt::member_class&lt; Member &gt;</a>
-, <a class="el" href="classentt_1_1poly__vtable.html#a8485d35f0d5231a6bcf53ef9ad77a16c">entt::poly_vtable&lt; Concept &gt;</a>
+, <a class="el" href="structentt_1_1meta__container__traits.html#aca30f255c0b6be6ac4b15aad3a54f818">entt::meta_container_traits&lt; Container, Trait &gt;</a>
+, <a class="el" href="classentt_1_1meta__function__helper.html#a74ea1aa3fe0edfad96898520cbf6eeae">entt::meta_function_helper&lt; Type, Candidate &gt;</a>
+, <a class="el" href="classentt_1_1poly__vtable.html#ad0c73c2e1f47b41454d922951b800c86">entt::poly_vtable&lt; Concept, Len, Align &gt;</a>
 , <a class="el" href="structentt_1_1type__identity.html#ae47a6cef2041ad7d82c8ecd6b97a8524">entt::type_identity&lt; Type &gt;</a>
 , <a class="el" href="structentt_1_1type__list.html#ad39ae8961200964418fef5090f44cd00">entt::type_list&lt; Type &gt;</a>
 , <a class="el" href="structentt_1_1type__list__cat_3_01type__list_3_01Type_8_8_8_01_4_01_4.html#a0c40287fad9d80f0532d80bf48f219ed">entt::type_list_cat&lt; type_list&lt; Type... &gt; &gt;</a>
 , <a class="el" href="structentt_1_1type__list__cat_3_01type__list_3_01Type_8_8_8_01_4_00_01type__list_3_01Other_8_8_8_01_4_00_01List_8_8_8_01_4.html#ae17db475954ad06eba24fd1eedba5f8b">entt::type_list_cat&lt; type_list&lt; Type... &gt;, type_list&lt; Other... &gt;, List... &gt;</a>
 , <a class="el" href="structentt_1_1type__list__cat_3_4.html#a957e88d5bc4c1cbf4a13fbddbe2e176f">entt::type_list_cat&lt;&gt;</a>
+, <a class="el" href="structentt_1_1type__list__diff_3_01type__list_3_01Type_8_8_8_01_4_00_01type__list_3_01Other_8_8_8_01_4_01_4.html#a32f539337660ac18fe3c3461949fb0eb">entt::type_list_diff&lt; type_list&lt; Type... &gt;, type_list&lt; Other... &gt; &gt;</a>
 , <a class="el" href="structentt_1_1type__list__element_3_010u_00_01type__list_3_01Type_00_01Other_8_8_8_01_4_01_4.html#a9762bf53c4d223834d7ab7b0d9d66a3e">entt::type_list_element&lt; 0u, type_list&lt; Type, Other... &gt; &gt;</a>
 , <a class="el" href="structentt_1_1type__list__unique_3_01type__list_3_01Type_00_01Other_8_8_8_01_4_01_4.html#a378823486aa4e4f288b1d73b2703c485">entt::type_list_unique&lt; type_list&lt; Type, Other... &gt; &gt;</a>
 , <a class="el" href="structentt_1_1type__list__unique_3_01type__list_3_4_01_4.html#a48245981f9818ca2601b9815cbfa5b79">entt::type_list_unique&lt; type_list&lt;&gt; &gt;</a>
@@ -320,13 +316,12 @@ $(function() {
 
 <h3><a id="index_v"></a>- v -</h3><ul>
 <li>value_type
-: <a class="el" href="structentt_1_1basic__container.html#a072d9cc2d2fa351b9de8c7328fff211c">entt::basic_container&lt; Container &gt;</a>
-, <a class="el" href="classentt_1_1basic__hashed__string.html#ad4e8f181e92b9218747ac43fe24c4cbc">entt::basic_hashed_string&lt; Char &gt;</a>
+: <a class="el" href="classentt_1_1basic__hashed__string.html#ad4e8f181e92b9218747ac43fe24c4cbc">entt::basic_hashed_string&lt; Char &gt;</a>
 , <a class="el" href="classentt_1_1basic__storage.html#aa5b7f0d0c7b64522503c073fabc2a827">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
 , <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01is__empty__v_3_01Type_01_4_01_4_01_4.html#afcde2606a83266fa437954400a43be3a">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; is_empty_v&lt; Type &gt; &gt; &gt;</a>
 , <a class="el" href="classentt_1_1meta__associative__container_1_1meta__iterator.html#aedcf370f9d9d6666bbdebb0cb9883069">entt::meta_associative_container::meta_iterator</a>
 , <a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a452e7367da253653f8a5e3a4c9d4f155">entt::meta_sequence_container::meta_iterator</a>
-, <a class="el" href="structentt_1_1sigh__storage__mixin.html#a0e2d25bd7c3072ffacab6fbed19e05bf">entt::sigh_storage_mixin&lt; Type &gt;</a>
+, <a class="el" href="classentt_1_1sigh__storage__mixin.html#a0e2d25bd7c3072ffacab6fbed19e05bf">entt::sigh_storage_mixin&lt; Type &gt;</a>
 , <a class="el" href="structentt_1_1storage__adapter__mixin.html#a5004a20309df319e85e315ffbb52d8df">entt::storage_adapter_mixin&lt; Type &gt;</a>
 </li>
 <li>version_type

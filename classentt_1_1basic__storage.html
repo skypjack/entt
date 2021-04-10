@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -70,6 +70,7 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classentt_1_1basic__storage-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">entt::basic_storage&lt; Entity, Type, typename &gt; Class Template Reference</div>  </div>
@@ -85,7 +86,7 @@ $(function() {
 Public Types</h2></td></tr>
 <tr class="memitem:aa5b7f0d0c7b64522503c073fabc2a827"><td class="memItemLeft" align="right" valign="top"><a id="aa5b7f0d0c7b64522503c073fabc2a827"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#aa5b7f0d0c7b64522503c073fabc2a827">value_type</a> = Type</td></tr>
-<tr class="memdesc:aa5b7f0d0c7b64522503c073fabc2a827"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the objects associated with the entities. <br /></td></tr>
+<tr class="memdesc:aa5b7f0d0c7b64522503c073fabc2a827"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the objects assigned to entities. <br /></td></tr>
 <tr class="separator:aa5b7f0d0c7b64522503c073fabc2a827"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab49ab5a065759dcd17f6c0b6a0b8fcba"><td class="memItemLeft" align="right" valign="top"><a id="ab49ab5a065759dcd17f6c0b6a0b8fcba"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#ab49ab5a065759dcd17f6c0b6a0b8fcba">entity_type</a> = Entity</td></tr>
@@ -111,10 +112,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#a512f0f9f97404851a0b7c1f7419a9b45">const_reverse_iterator</a> = const Type *</td></tr>
 <tr class="memdesc:a512f0f9f97404851a0b7c1f7419a9b45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant reverse iterator type. <br /></td></tr>
 <tr class="separator:a512f0f9f97404851a0b7c1f7419a9b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43a1e8ab7ad31d8ef65bdfc66c114466"><td class="memItemLeft" align="right" valign="top"><a id="a43a1e8ab7ad31d8ef65bdfc66c114466"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#a43a1e8ab7ad31d8ef65bdfc66c114466">storage_category</a> = <a class="el" href="structentt_1_1dense__storage__tag.html">dense_storage_tag</a></td></tr>
-<tr class="memdesc:a43a1e8ab7ad31d8ef65bdfc66c114466"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structentt_1_1Storage.html" title="Basic poly storage implementation.">Storage</a> category. <br /></td></tr>
-<tr class="separator:a43a1e8ab7ad31d8ef65bdfc66c114466"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -168,15 +165,19 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:a6570d0a34cb6a731e079536f17aa0618"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reverse iterator to the end.  <a href="classentt_1_1basic__storage.html#a6570d0a34cb6a731e079536f17aa0618">More...</a><br /></td></tr>
 <tr class="separator:a6570d0a34cb6a731e079536f17aa0618"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ed5094d61941d46c34e6e18fd73f578"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1basic__storage.html#aa5b7f0d0c7b64522503c073fabc2a827">value_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#a2ed5094d61941d46c34e6e18fd73f578">get</a> (const <a class="el" href="classentt_1_1basic__storage.html#ab49ab5a065759dcd17f6c0b6a0b8fcba">entity_type</a> entt) const</td></tr>
-<tr class="memdesc:a2ed5094d61941d46c34e6e18fd73f578"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the object associated with an entity.  <a href="classentt_1_1basic__storage.html#a2ed5094d61941d46c34e6e18fd73f578">More...</a><br /></td></tr>
+<tr class="memdesc:a2ed5094d61941d46c34e6e18fd73f578"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the object assigned to an entity.  <a href="classentt_1_1basic__storage.html#a2ed5094d61941d46c34e6e18fd73f578">More...</a><br /></td></tr>
 <tr class="separator:a2ed5094d61941d46c34e6e18fd73f578"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ee59dd153af233b3ccd95bc74b1bfca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__storage.html#aa5b7f0d0c7b64522503c073fabc2a827">value_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#a0ee59dd153af233b3ccd95bc74b1bfca">get</a> (const <a class="el" href="classentt_1_1basic__storage.html#ab49ab5a065759dcd17f6c0b6a0b8fcba">entity_type</a> entt)</td></tr>
-<tr class="memdesc:a0ee59dd153af233b3ccd95bc74b1bfca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the object associated with an entity.  <a href="classentt_1_1basic__storage.html#a0ee59dd153af233b3ccd95bc74b1bfca">More...</a><br /></td></tr>
+<tr class="memdesc:a0ee59dd153af233b3ccd95bc74b1bfca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the object assigned to an entity.  <a href="classentt_1_1basic__storage.html#a0ee59dd153af233b3ccd95bc74b1bfca">More...</a><br /></td></tr>
 <tr class="separator:a0ee59dd153af233b3ccd95bc74b1bfca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7eca6c57538e87443ce9be3f294c563"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
 <tr class="memitem:af7eca6c57538e87443ce9be3f294c563"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__storage.html#aa5b7f0d0c7b64522503c073fabc2a827">value_type</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#af7eca6c57538e87443ce9be3f294c563">emplace</a> (const <a class="el" href="classentt_1_1basic__storage.html#ab49ab5a065759dcd17f6c0b6a0b8fcba">entity_type</a> entt, Args &amp;&amp;... args)</td></tr>
 <tr class="memdesc:af7eca6c57538e87443ce9be3f294c563"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a storage and constructs its object.  <a href="classentt_1_1basic__storage.html#af7eca6c57538e87443ce9be3f294c563">More...</a><br /></td></tr>
 <tr class="separator:af7eca6c57538e87443ce9be3f294c563"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebdbce0a3103f780f8a34ff0c3e0672f"><td class="memTemplParams" colspan="2">template&lt;typename... Func&gt; </td></tr>
+<tr class="memitem:aebdbce0a3103f780f8a34ff0c3e0672f"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#aebdbce0a3103f780f8a34ff0c3e0672f">patch</a> (const <a class="el" href="classentt_1_1basic__storage.html#ab49ab5a065759dcd17f6c0b6a0b8fcba">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>, Func &amp;&amp;... func)</td></tr>
+<tr class="memdesc:aebdbce0a3103f780f8a34ff0c3e0672f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the instance assigned to a given entity in-place.  <a href="classentt_1_1basic__storage.html#aebdbce0a3103f780f8a34ff0c3e0672f">More...</a><br /></td></tr>
+<tr class="separator:aebdbce0a3103f780f8a34ff0c3e0672f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a18fbea023050e5f40753c608bdd21cf8"><td class="memTemplParams" colspan="2">template&lt;typename It &gt; </td></tr>
 <tr class="memitem:a18fbea023050e5f40753c608bdd21cf8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#a18fbea023050e5f40753c608bdd21cf8">insert</a> (It first, It last, const <a class="el" href="classentt_1_1basic__storage.html#aa5b7f0d0c7b64522503c073fabc2a827">value_type</a> &amp;value={})</td></tr>
 <tr class="memdesc:a18fbea023050e5f40753c608bdd21cf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns one or more entities to a storage and constructs their objects from a given instance.  <a href="classentt_1_1basic__storage.html#a18fbea023050e5f40753c608bdd21cf8">More...</a><br /></td></tr>
@@ -193,6 +194,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:ac1ed30f50fdc3eb2f994e3b4440dcf32"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#ac1ed30f50fdc3eb2f994e3b4440dcf32">sort</a> (Compare compare, Sort algo=Sort{}, Args &amp;&amp;... args)</td></tr>
 <tr class="memdesc:ac1ed30f50fdc3eb2f994e3b4440dcf32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sort all elements according to the given comparison function.  <a href="classentt_1_1basic__storage.html#ac1ed30f50fdc3eb2f994e3b4440dcf32">More...</a><br /></td></tr>
 <tr class="separator:ac1ed30f50fdc3eb2f994e3b4440dcf32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:ad22de6546f3f56c9efb52f69adbbe721"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#ad22de6546f3f56c9efb52f69adbbe721">swap_at</a> (const std::size_t lhs, const std::size_t rhs)</td></tr>
+<tr class="memdesc:ad22de6546f3f56c9efb52f69adbbe721"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swaps two entities in the internal packed array.  <a href="classentt_1_1basic__storage.html#ad22de6546f3f56c9efb52f69adbbe721">More...</a><br /></td></tr>
+<tr class="separator:ad22de6546f3f56c9efb52f69adbbe721"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a678277e37027b2009b0751718db4d923"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage.html#a678277e37027b2009b0751718db4d923">swap_and_pop</a> (const std::size_t pos, void *)</td></tr>
+<tr class="memdesc:a678277e37027b2009b0751718db4d923"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to remove an entity from the internal packed array.  <a href="classentt_1_1basic__storage.html#a678277e37027b2009b0751718db4d923">More...</a><br /></td></tr>
+<tr class="separator:a678277e37027b2009b0751718db4d923"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity, typename Type, typename = void&gt;<br />
@@ -213,7 +223,7 @@ Internal data structures arrange elements to maximize performance. There are no 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00058">58</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00052">52</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a6a1a37940bf86e28814f8cd4f638a472"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6a1a37940bf86e28814f8cd4f638a472">&#9670;&nbsp;</a></span>begin() <span class="overload">[1/2]</span></h2>
@@ -244,7 +254,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the first instance of the internal array. If the storage is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__storage.html#a8f4968b7ed57d0ffe34370e1d3fb8f1d" title="Returns an iterator to the end.">end()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00253">253</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00251">251</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -277,7 +287,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the first instance of the internal array. If the storage is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__storage.html#a8f4968b7ed57d0ffe34370e1d3fb8f1d" title="Returns an iterator to the end.">end()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00258">258</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00256">256</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -310,7 +320,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the first instance of the internal array. If the storage is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__storage.html#a8f4968b7ed57d0ffe34370e1d3fb8f1d" title="Returns an iterator to the end.">end()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00247">247</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00245">245</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -343,7 +353,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the element following the last instance of the internal array. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00273">273</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00271">271</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -376,7 +386,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the first instance of the reversed internal array. If the storage is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__storage.html#a6570d0a34cb6a731e079536f17aa0618" title="Returns a reverse iterator to the end.">rend()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the reversed internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00296">296</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00294">294</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -409,7 +419,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the element following the last instance of the reversed internal array. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the reversed internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00320">320</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00318">318</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -469,7 +479,7 @@ template&lt;typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00370">370</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00368">368</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -502,7 +512,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the element following the last instance of the internal array. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00278">278</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00276">276</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -535,7 +545,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the element following the last instance of the internal array. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00283">283</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00281">281</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -565,7 +575,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the object associated with an entity. </p>
+<p>Returns the object assigned to an entity. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an entity that doesn't belong to the storage results in undefined behavior.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -573,9 +583,9 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The object associated with the entity. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The object assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00349">349</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00347">347</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -605,7 +615,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the object associated with an entity. </p>
+<p>Returns the object assigned to an entity. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an entity that doesn't belong to the storage results in undefined behavior.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -613,9 +623,9 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The object associated with the entity. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The object assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00344">344</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00342">342</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -688,7 +698,7 @@ template&lt;typename EIt , typename CIt &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00416">416</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00428">428</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -753,7 +763,65 @@ template&lt;typename It &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00396">396</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00408">408</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aebdbce0a3103f780f8a34ff0c3e0672f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebdbce0a3103f780f8a34ff0c3e0672f">&#9670;&nbsp;</a></span>patch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Type , typename  = void&gt; </div>
+<div class="memtemplate">
+template&lt;typename... Func&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">decltype(auto) <a class="el" href="classentt_1_1basic__storage.html">entt::basic_storage</a>&lt; Entity, Type, typename &gt;::patch </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1basic__storage.html#ab49ab5a065759dcd17f6c0b6a0b8fcba">entity_type</a>&#160;</td>
+          <td class="paramname"><em>entity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Func &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>func</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Updates the instance assigned to a given entity in-place. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Func</td><td>Types of the function objects to invoke. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+    <tr><td class="paramname">func</td><td>Valid function objects. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the updated instance. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00388">388</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -787,7 +855,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Objects are in the reverse order as returned by the <code>begin</code>/<code>end</code> iterators.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of objects. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00230">230</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00228">228</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -821,7 +889,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Objects are in the reverse order as returned by the <code>begin</code>/<code>end</code> iterators.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of objects. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00235">235</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00233">233</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -854,7 +922,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the first instance of the reversed internal array. If the storage is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__storage.html#a6570d0a34cb6a731e079536f17aa0618" title="Returns a reverse iterator to the end.">rend()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the reversed internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00301">301</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00299">299</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -887,7 +955,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the first instance of the reversed internal array. If the storage is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__storage.html#a6570d0a34cb6a731e079536f17aa0618" title="Returns a reverse iterator to the end.">rend()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the reversed internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00306">306</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00304">304</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -920,7 +988,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the element following the last instance of the reversed internal array. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the reversed internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00325">325</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00323">323</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -953,7 +1021,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
 <p>The returned iterator points to the element following the last instance of the reversed internal array. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the reversed internal array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00330">330</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00328">328</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -992,7 +1060,7 @@ template&lt;typename Entity , typename Type , typename  = void&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00207">207</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00205">205</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -1059,7 +1127,7 @@ template&lt;typename Compare , typename Sort  = std_sort, typename... Args&gt; <
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00481">481</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00493">493</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -1143,7 +1211,104 @@ template&lt;typename Compare , typename Sort  = std_sort, typename... Args&gt; <
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00458">458</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00470">470</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a678277e37027b2009b0751718db4d923"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a678277e37027b2009b0751718db4d923">&#9670;&nbsp;</a></span>swap_and_pop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Type , typename  = void&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1basic__storage.html">entt::basic_storage</a>&lt; Entity, Type, typename &gt;::swap_and_pop </td>
+          <td>(</td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Attempts to remove an entity from the internal packed array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>A valid position of an entity within storage. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00175">175</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad22de6546f3f56c9efb52f69adbbe721"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad22de6546f3f56c9efb52f69adbbe721">&#9670;&nbsp;</a></span>swap_at()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Type , typename  = void&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1basic__storage.html">entt::basic_storage</a>&lt; Entity, Type, typename &gt;::swap_at </td>
+          <td>(</td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Swaps two entities in the internal packed array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lhs</td><td>A valid position of an entity within storage. </td></tr>
+    <tr><td class="paramname">rhs</td><td>A valid position of an entity within storage. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00167">167</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>

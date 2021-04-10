@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -66,11 +66,11 @@ $(function() {
 <div class="title">Push EnTT across boundaries </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md88"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md92"></a>
 Working across boundaries</h1>
 <p><code>EnTT</code> has historically had a limit when used across boundaries on Windows in general and on GNU/Linux when default visibility was set to hidden. The limitation was mainly due to a custom utility used to assign unique, sequential identifiers with different types.<br  />
  Fortunately, nowadays using <code>EnTT</code> across boundaries is easier. However, use in standalone applications is favored and user intervention is otherwise required.</p>
-<h2><a class="anchor" id="autotoc_md89"></a>
+<h2><a class="anchor" id="autotoc_md93"></a>
 The EnTT way</h2>
 <p>Many classes in <code>EnTT</code> make extensive use of type erasure for their purposes. This isn't a problem in itself (in fact, it's the basis of an API so convenient to use). However, a way is needed to recognize the objects whose type has been erased on the other side of a boundary.<br  />
  The <code>type_hash</code> class template is how identifiers are generated and thus made available to the rest of the library. The <code>type_seq</code> class template makes all types <em>indexable</em> instead, so as to speed up the lookup.</p>
@@ -86,7 +86,7 @@ The EnTT way</h2>
 </ul>
 <p>For anyone who needs more details, the test suite contains multiple examples covering the most common cases (see the <code>lib</code> directory for all details).<br  />
  It goes without saying that it's impossible to cover all the possible cases. However, what is offered should hopefully serve as a basis for all of them.</p>
-<h2><a class="anchor" id="autotoc_md90"></a>
+<h2><a class="anchor" id="autotoc_md94"></a>
 Meta context</h2>
 <p>The runtime reflection system deserves a special mention when it comes to using it across boundaries.<br  />
  Since it's linked already to a static context to which the visible components are attached and different contexts don't relate to each other, they must be <em>shared</em> to allow the use of meta types across boundaries.</p>
@@ -96,10 +96,10 @@ Meta context</h2>
 <div class="fragment"><div class="line"><a class="code" href="structentt_1_1meta__ctx.html#ac42cb95e72447d49b7e1400512426e21">entt::meta_ctx::bind</a>(ctx);</div>
 </div><!-- fragment --><p>From now on, both spaces will refer to the same context and on it will be attached the new visible meta types, no matter where they are created.<br  />
  A context can also be reset and then associated again locally as:</p>
-<div class="fragment"><div class="line"><a class="code" href="structentt_1_1meta__ctx.html#ac42cb95e72447d49b7e1400512426e21">entt::meta_ctx::bind</a>{<a class="code" href="structentt_1_1meta__ctx.html">entt::meta_ctx</a>{});</div>
+<div class="fragment"><div class="line"><a class="code" href="structentt_1_1meta__ctx.html#ac42cb95e72447d49b7e1400512426e21">entt::meta_ctx::bind</a>(<a class="code" href="structentt_1_1meta__ctx.html">entt::meta_ctx</a>{});</div>
 </div><!-- fragment --><p>This is allowed because local and global contexts are separated. Therefore, it's always possible to make the local context the current one again.</p>
 <p>Before to release a context, all locally registered types should be reset to avoid dangling references. Otherwise, if a type is accessed from another space by name, there could be an attempt to address its parts that are no longer available.</p>
-<h2><a class="anchor" id="autotoc_md91"></a>
+<h2><a class="anchor" id="autotoc_md95"></a>
 Memory Management</h2>
 <p>There is another subtle problem due to memory management that can lead to headaches.<br  />
  It can occur where there are pools of objects (such as components or events) dynamically created on demand. This is usually not a problem when working with linked libraries that rely on the same dynamic runtime. However, it can occur in the case of plugins or statically linked runtimes.</p>

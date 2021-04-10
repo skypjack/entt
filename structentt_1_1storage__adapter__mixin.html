@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -102,16 +102,12 @@ Collaboration diagram for entt::storage_adapter_mixin&lt; Type &gt;:</div>
 Public Types</h2></td></tr>
 <tr class="memitem:a5004a20309df319e85e315ffbb52d8df"><td class="memItemLeft" align="right" valign="top"><a id="a5004a20309df319e85e315ffbb52d8df"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1storage__adapter__mixin.html#a5004a20309df319e85e315ffbb52d8df">value_type</a> = typename Type::value_type</td></tr>
-<tr class="memdesc:a5004a20309df319e85e315ffbb52d8df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the objects associated with the entities. <br /></td></tr>
+<tr class="memdesc:a5004a20309df319e85e315ffbb52d8df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the objects assigned to entities. <br /></td></tr>
 <tr class="separator:a5004a20309df319e85e315ffbb52d8df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4b2c512f61d1d14880f7dd6fe257b72"><td class="memItemLeft" align="right" valign="top"><a id="af4b2c512f61d1d14880f7dd6fe257b72"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> = typename Type::entity_type</td></tr>
 <tr class="memdesc:af4b2c512f61d1d14880f7dd6fe257b72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity identifier. <br /></td></tr>
 <tr class="separator:af4b2c512f61d1d14880f7dd6fe257b72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb9606c0c90fdb33de776c1bbadde122"><td class="memItemLeft" align="right" valign="top"><a id="aeb9606c0c90fdb33de776c1bbadde122"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1storage__adapter__mixin.html#aeb9606c0c90fdb33de776c1bbadde122">storage_category</a> = typename Type::storage_category</td></tr>
-<tr class="memdesc:aeb9606c0c90fdb33de776c1bbadde122"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structentt_1_1Storage.html" title="Basic poly storage implementation.">Storage</a> category. <br /></td></tr>
-<tr class="separator:aeb9606c0c90fdb33de776c1bbadde122"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -123,17 +119,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae5a47ad69fca5a8593378cf420b1e078"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1storage__adapter__mixin.html#ae5a47ad69fca5a8593378cf420b1e078">insert</a> (<a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> &gt; &amp;, It first, It last, Args &amp;&amp;... args)</td></tr>
 <tr class="memdesc:ae5a47ad69fca5a8593378cf420b1e078"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns entities to a storage.  <a href="structentt_1_1storage__adapter__mixin.html#ae5a47ad69fca5a8593378cf420b1e078">More...</a><br /></td></tr>
 <tr class="separator:ae5a47ad69fca5a8593378cf420b1e078"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d8dcae9e7a91046c4a6aaa28eff7d80"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1storage__adapter__mixin.html#a5d8dcae9e7a91046c4a6aaa28eff7d80">remove</a> (<a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> &gt; &amp;, const <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>)</td></tr>
-<tr class="memdesc:a5d8dcae9e7a91046c4a6aaa28eff7d80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes entities from a storage.  <a href="structentt_1_1storage__adapter__mixin.html#a5d8dcae9e7a91046c4a6aaa28eff7d80">More...</a><br /></td></tr>
-<tr class="separator:a5d8dcae9e7a91046c4a6aaa28eff7d80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaf04be698874394a4e4d59388a44b2a"><td class="memTemplParams" colspan="2">template&lt;typename It &gt; </td></tr>
-<tr class="memitem:afaf04be698874394a4e4d59388a44b2a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1storage__adapter__mixin.html#afaf04be698874394a4e4d59388a44b2a">remove</a> (<a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> &gt; &amp;, It first, It last)</td></tr>
-<tr class="memdesc:afaf04be698874394a4e4d59388a44b2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes entities from a storage.  <a href="structentt_1_1storage__adapter__mixin.html#afaf04be698874394a4e4d59388a44b2a">More...</a><br /></td></tr>
-<tr class="separator:afaf04be698874394a4e4d59388a44b2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48dc11729e25cf0d2aba5c580c88e96d"><td class="memTemplParams" colspan="2">template&lt;typename... Func&gt; </td></tr>
-<tr class="memitem:a48dc11729e25cf0d2aba5c580c88e96d"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1storage__adapter__mixin.html#a48dc11729e25cf0d2aba5c580c88e96d">patch</a> (<a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> &gt; &amp;, const <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>, [[maybe_unused]] Func &amp;&amp;... func)</td></tr>
-<tr class="memdesc:a48dc11729e25cf0d2aba5c580c88e96d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Patches the given instance for an entity.  <a href="structentt_1_1storage__adapter__mixin.html#a48dc11729e25cf0d2aba5c580c88e96d">More...</a><br /></td></tr>
-<tr class="separator:a48dc11729e25cf0d2aba5c580c88e96d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a600fe42b649d7569af42ee0a03f997de"><td class="memTemplParams" colspan="2">template&lt;typename... Func&gt; </td></tr>
+<tr class="memitem:a600fe42b649d7569af42ee0a03f997de"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1storage__adapter__mixin.html#a600fe42b649d7569af42ee0a03f997de">patch</a> (<a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> &gt; &amp;, const <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>, Func &amp;&amp;... func)</td></tr>
+<tr class="memdesc:a600fe42b649d7569af42ee0a03f997de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Patches the given instance for an entity.  <a href="structentt_1_1storage__adapter__mixin.html#a600fe42b649d7569af42ee0a03f997de">More...</a><br /></td></tr>
+<tr class="separator:a600fe42b649d7569af42ee0a03f997de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Type&gt;<br />
@@ -147,7 +136,7 @@ struct entt::storage_adapter_mixin&lt; Type &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00545">545</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00580">580</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="adce3f49e15f28c81d4d42fc2501aa972"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adce3f49e15f28c81d4d42fc2501aa972">&#9670;&nbsp;</a></span>emplace()</h2>
@@ -209,7 +198,7 @@ template&lt;typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00563">563</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00596">596</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +256,7 @@ template&lt;typename It , typename... Args&gt; </div>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">It</td><td>Type of input iterator. </td></tr>
-    <tr><td class="paramname">Args</td><td>Types of arguments to use to construct the objects associated with the entities. </td></tr>
+    <tr><td class="paramname">Args</td><td>Types of arguments to use to construct the objects assigned to the entities. </td></tr>
   </table>
   </dd>
 </dl>
@@ -275,17 +264,17 @@ template&lt;typename It , typename... Args&gt; </div>
   <table class="params">
     <tr><td class="paramname">first</td><td>An iterator to the first element of the range of entities. </td></tr>
     <tr><td class="paramname">last</td><td>An iterator past the last element of the range of entities. </td></tr>
-    <tr><td class="paramname">args</td><td>Parameters to use to initialize the objects associated with the entities. </td></tr>
+    <tr><td class="paramname">args</td><td>Parameters to use to initialize the objects assigned to the entities. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00578">578</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00611">611</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a48dc11729e25cf0d2aba5c580c88e96d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48dc11729e25cf0d2aba5c580c88e96d">&#9670;&nbsp;</a></span>patch()</h2>
+<a id="a600fe42b649d7569af42ee0a03f997de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a600fe42b649d7569af42ee0a03f997de">&#9670;&nbsp;</a></span>patch()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -312,7 +301,7 @@ template&lt;typename... Func&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">[[maybe_unused] ] Func &amp;&amp;...&#160;</td>
+          <td class="paramtype">Func &amp;&amp;...&#160;</td>
           <td class="paramname"><em>func</em>&#160;</td>
         </tr>
         <tr>
@@ -344,118 +333,7 @@ template&lt;typename... Func&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the patched instance. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00609">609</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a5d8dcae9e7a91046c4a6aaa28eff7d80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5d8dcae9e7a91046c4a6aaa28eff7d80">&#9670;&nbsp;</a></span>remove() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Type &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="structentt_1_1storage__adapter__mixin.html">entt::storage_adapter_mixin</a>&lt; Type &gt;::remove </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> &gt; &amp;&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a>&#160;</td>
-          <td class="paramname"><em>entity</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Removes entities from a storage. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00586">586</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
-
-</div>
-</div>
-<a id="afaf04be698874394a4e4d59388a44b2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afaf04be698874394a4e4d59388a44b2a">&#9670;&nbsp;</a></span>remove() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Type &gt; </div>
-<div class="memtemplate">
-template&lt;typename It &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="structentt_1_1storage__adapter__mixin.html">entt::storage_adapter_mixin</a>&lt; Type &gt;::remove </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1basic__registry.html">basic_registry</a>&lt; <a class="el" href="structentt_1_1storage__adapter__mixin.html#af4b2c512f61d1d14880f7dd6fe257b72">entity_type</a> &gt; &amp;&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">It&#160;</td>
-          <td class="paramname"><em>first</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">It&#160;</td>
-          <td class="paramname"><em>last</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Removes entities from a storage. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">It</td><td>Type of input iterator. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">first</td><td>An iterator to the first element of the range of entities. </td></tr>
-    <tr><td class="paramname">last</td><td>An iterator past the last element of the range of entities. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00597">597</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00623">623</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>

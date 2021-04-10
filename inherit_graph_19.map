@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1basic__continuous__loader.html" title="Utility class for continuous loading." alt="" coords="5,5,159,47"/>
+<area shape="rect" id="node1" href="$structentt_1_1basic__container.html" title=" " alt="" coords="5,35,148,91"/>
+<area shape="rect" id="node2" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="196,5,399,120"/>
+<area shape="rect" id="node3" href="$structentt_1_1meta__sequence__container__traits_3_01std_1_1vector_3_01Type_00_01Args_8_8_8_01_4_01_4.html" title="Meta sequence container traits for std::vectors of any type." alt="" coords="447,35,621,91"/>
 </map>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -84,8 +84,8 @@ Inheritance diagram for entt::Storage&lt; Entity &gt;:</div>
 <div class="dyncontent">
 <div class="center"><img src="structentt_1_1Storage__inherit__graph.png" border="0" usemap="#aentt_1_1Storage_3_01Entity_01_4_inherit__map" alt="Inheritance graph"/></div>
 <map name="entt_1_1Storage_3_01Entity_01_4_inherit__map" id="aentt_1_1Storage_3_01Entity_01_4_inherit__map">
-<area shape="rect" title="Basic poly storage implementation." alt="" coords="232,35,387,61"/>
-<area shape="rect" href="structentt_1_1type__list.html" title=" " alt="" coords="5,5,184,91"/>
+<area shape="rect" title="Basic poly storage implementation." alt="" coords="9,95,164,121"/>
+<area shape="rect" href="structentt_1_1type__list.html" title=" " alt="" coords="5,5,168,47"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -93,8 +93,8 @@ Collaboration diagram for entt::Storage&lt; Entity &gt;:</div>
 <div class="dyncontent">
 <div class="center"><img src="structentt_1_1Storage__coll__graph.png" border="0" usemap="#aentt_1_1Storage_3_01Entity_01_4_coll__map" alt="Collaboration graph"/></div>
 <map name="entt_1_1Storage_3_01Entity_01_4_coll__map" id="aentt_1_1Storage_3_01Entity_01_4_coll__map">
-<area shape="rect" title="Basic poly storage implementation." alt="" coords="232,35,387,61"/>
-<area shape="rect" href="structentt_1_1type__list.html" title=" " alt="" coords="5,5,184,91"/>
+<area shape="rect" title="Basic poly storage implementation." alt="" coords="9,95,164,121"/>
+<area shape="rect" href="structentt_1_1type__list.html" title=" " alt="" coords="5,5,168,47"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -106,19 +106,11 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:acc5e415e274d1a89dcca28586f0c1fe1"><td class="memItemLeft" align="right" valign="top"><a id="acc5e415e274d1a89dcca28586f0c1fe1"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1Storage.html#acc5e415e274d1a89dcca28586f0c1fe1">entity_type</a> = Entity</td></tr>
-<tr class="memdesc:acc5e415e274d1a89dcca28586f0c1fe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity identifier. <br /></td></tr>
-<tr class="separator:acc5e415e274d1a89dcca28586f0c1fe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaeed3a89f28b208c18d7283def2fe91"><td class="memItemLeft" align="right" valign="top"><a id="afaeed3a89f28b208c18d7283def2fe91"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1Storage.html#afaeed3a89f28b208c18d7283def2fe91">size_type</a> = std::size_t</td></tr>
-<tr class="memdesc:afaeed3a89f28b208c18d7283def2fe91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
-<tr class="separator:afaeed3a89f28b208c18d7283def2fe91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae402e9acb7cfa58b2c2e18ee51b06d62"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
-<tr class="memitem:ae402e9acb7cfa58b2c2e18ee51b06d62"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1Storage.html#ae402e9acb7cfa58b2c2e18ee51b06d62">impl</a> = <a class="el" href="structentt_1_1value__list.html">value_list</a>&lt; &amp;<a class="el" href="namespaceentt.html#ab03b2c2ea5e867fd6f43c0ac49149dea">type_id</a>&lt; typename Type::value_type &gt;, &amp;Type::template remove&lt; const <a class="el" href="structentt_1_1Storage.html#acc5e415e274d1a89dcca28586f0c1fe1">entity_type</a> * &gt; &gt;</td></tr>
-<tr class="memdesc:ae402e9acb7cfa58b2c2e18ee51b06d62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept implementation.  <a href="structentt_1_1Storage.html#ae402e9acb7cfa58b2c2e18ee51b06d62">More...</a><br /></td></tr>
-<tr class="separator:ae402e9acb7cfa58b2c2e18ee51b06d62"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_types_structentt_1_1type__list"><td colspan="2" onclick="javascript:toggleInherit('pub_types_structentt_1_1type__list')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="structentt_1_1type__list.html">entt::type_list&lt; type_info() const noexcept, void(basic_registry&lt; Entity &gt; &amp;, const Entity *, const Entity *) &gt;</a></td></tr>
+<tr class="memitem:ab6a12e5caa7b719323490ace1ea1e483"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
+<tr class="memitem:ab6a12e5caa7b719323490ace1ea1e483"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1Storage.html#ab6a12e5caa7b719323490ace1ea1e483">impl</a> = <a class="el" href="structentt_1_1value__list.html">value_list</a>&lt;&amp;<a class="el" href="namespaceentt.html#ab03b2c2ea5e867fd6f43c0ac49149dea">type_id</a>&lt; typename Type::value_type &gt; &gt;</td></tr>
+<tr class="memdesc:ab6a12e5caa7b719323490ace1ea1e483"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept implementation.  <a href="structentt_1_1Storage.html#ab6a12e5caa7b719323490ace1ea1e483">More...</a><br /></td></tr>
+<tr class="separator:ab6a12e5caa7b719323490ace1ea1e483"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_types_structentt_1_1type__list"><td colspan="2" onclick="javascript:toggleInherit('pub_types_structentt_1_1type__list')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="structentt_1_1type__list.html">entt::type_list&lt; type_info() const noexcept &gt;</a></td></tr>
 <tr class="memitem:ad39ae8961200964418fef5090f44cd00 inherit pub_types_structentt_1_1type__list"><td class="memItemLeft" align="right" valign="top"><a id="ad39ae8961200964418fef5090f44cd00"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1type__list.html#ad39ae8961200964418fef5090f44cd00">type</a> = <a class="el" href="structentt_1_1type__list.html">type_list</a></td></tr>
 <tr class="memdesc:ad39ae8961200964418fef5090f44cd00 inherit pub_types_structentt_1_1type__list"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type list type. <br /></td></tr>
@@ -126,7 +118,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="str
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_static_attribs_structentt_1_1type__list"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_structentt_1_1type__list')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="structentt_1_1type__list.html">entt::type_list&lt; type_info() const noexcept, void(basic_registry&lt; Entity &gt; &amp;, const Entity *, const Entity *) &gt;</a></td></tr>
+<tr class="inherit_header pub_static_attribs_structentt_1_1type__list"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_structentt_1_1type__list')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="structentt_1_1type__list.html">entt::type_list&lt; type_info() const noexcept &gt;</a></td></tr>
 <tr class="memitem:a430c0675bdbcbb40be9b8f13f7259484 inherit pub_static_attribs_structentt_1_1type__list"><td class="memItemLeft" align="right" valign="top"><a id="a430c0675bdbcbb40be9b8f13f7259484"></a>
 static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1type__list.html#a430c0675bdbcbb40be9b8f13f7259484">size</a></td></tr>
 <tr class="memdesc:a430c0675bdbcbb40be9b8f13f7259484 inherit pub_static_attribs_structentt_1_1type__list"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile-time number of elements in the type list. <br /></td></tr>
@@ -146,8 +138,8 @@ struct entt::Storage&lt; Entity &gt;</h3>
 
 <p class="definition">Definition at line <a class="el" href="poly__storage_8hpp_source.html#l00021">21</a> of file <a class="el" href="poly__storage_8hpp_source.html">poly_storage.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="ae402e9acb7cfa58b2c2e18ee51b06d62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae402e9acb7cfa58b2c2e18ee51b06d62">&#9670;&nbsp;</a></span>impl</h2>
+<a id="ab6a12e5caa7b719323490ace1ea1e483"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6a12e5caa7b719323490ace1ea1e483">&#9670;&nbsp;</a></span>impl</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -157,7 +149,7 @@ template&lt;typename Entity &gt; </div>
 template&lt;typename Type &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structentt_1_1Storage.html">entt::Storage</a>&lt; Entity &gt;::<a class="el" href="structentt_1_1Storage.html#ae402e9acb7cfa58b2c2e18ee51b06d62">impl</a> =  <a class="el" href="structentt_1_1value__list.html">value_list</a>&lt; &amp;<a class="el" href="namespaceentt.html#ab03b2c2ea5e867fd6f43c0ac49149dea">type_id</a>&lt;typename Type::value_type&gt;, &amp;Type::template remove&lt;const <a class="el" href="structentt_1_1Storage.html#acc5e415e274d1a89dcca28586f0c1fe1">entity_type</a> *&gt; &gt;</td>
+          <td class="memname">using <a class="el" href="structentt_1_1Storage.html">entt::Storage</a>&lt; Entity &gt;::<a class="el" href="structentt_1_1Storage.html#ab6a12e5caa7b719323490ace1ea1e483">impl</a> =  <a class="el" href="structentt_1_1value__list.html">value_list</a>&lt;&amp;<a class="el" href="namespaceentt.html#ab03b2c2ea5e867fd6f43c0ac49149dea">type_id</a>&lt;typename Type::value_type&gt; &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -170,7 +162,7 @@ template&lt;typename Type &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="poly__storage_8hpp_source.html#l00062">62</a> of file <a class="el" href="poly__storage_8hpp_source.html">poly_storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly__storage_8hpp_source.html#l00042">42</a> of file <a class="el" href="poly__storage_8hpp_source.html">poly_storage.hpp</a>.</p>
 
 </div>
 </div>

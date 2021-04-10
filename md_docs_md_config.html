@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -88,8 +88,8 @@ ENTT_ID_TYPE</h2>
  By default, its type is <code>std::uint32_t</code>. However, users can define a different default type if necessary.</p>
 <h2><a class="anchor" id="autotoc_md6"></a>
 ENTT_PAGE_SIZE</h2>
-<p>As is known, the ECS module of <code>EnTT</code> is based on <em>sparse sets</em>. What is less known perhaps is that these are paged to reduce memory consumption in some corner cases.<br  />
- The default size of a page is 32kB but users can adjust it if appropriate. In all case, the chosen value <b>must</b> be a power of 2.</p>
+<p>As is known, the ECS module of <code>EnTT</code> is based on <em>sparse sets</em>. What is less known perhaps is that these are paged to reduce memory consumption.<br  />
+ Default size of pages (that is, the number of elements they contain) is 4096 but users can adjust it if appropriate. In all case, the chosen value <b>must</b> be a power of 2.</p>
 <h2><a class="anchor" id="autotoc_md7"></a>
 ENTT_ASSERT</h2>
 <p>For performance reasons, <code>EnTT</code> doesn't use exceptions or any other control structures. In fact, it offers many features that result in undefined behavior if not used correctly.<br  />

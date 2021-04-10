@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.20"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnTT: entt::poly_vtable&lt; Concept &gt; Class Template Reference</title>
+<title>EnTT: entt::poly_vtable&lt; Concept, Len, Align &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classentt_1_1poly__vtable-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">entt::poly_vtable&lt; Concept &gt; Class Template Reference</div>  </div>
+<div class="title">entt::poly_vtable&lt; Concept, Len, Align &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -82,39 +82,41 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a8485d35f0d5231a6bcf53ef9ad77a16c"><td class="memItemLeft" align="right" valign="top"><a id="a8485d35f0d5231a6bcf53ef9ad77a16c"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1poly__vtable.html#a8485d35f0d5231a6bcf53ef9ad77a16c">type</a> = decltype(make_vtable(Concept{}))</td></tr>
-<tr class="memdesc:a8485d35f0d5231a6bcf53ef9ad77a16c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual table type. <br /></td></tr>
-<tr class="separator:a8485d35f0d5231a6bcf53ef9ad77a16c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0c73c2e1f47b41454d922951b800c86"><td class="memItemLeft" align="right" valign="top"><a id="ad0c73c2e1f47b41454d922951b800c86"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1poly__vtable.html#ad0c73c2e1f47b41454d922951b800c86">type</a> = decltype(make_vtable(Concept{}))</td></tr>
+<tr class="memdesc:ad0c73c2e1f47b41454d922951b800c86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual table type. <br /></td></tr>
+<tr class="separator:ad0c73c2e1f47b41454d922951b800c86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a7a929a8714de517d80285ebed865aa9c"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
-<tr class="memitem:a7a929a8714de517d80285ebed865aa9c"><td class="memTemplItemLeft" align="right" valign="top">static const auto *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1poly__vtable.html#a7a929a8714de517d80285ebed865aa9c">instance</a> ()</td></tr>
-<tr class="memdesc:a7a929a8714de517d80285ebed865aa9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a static virtual table for a specific concept and type.  <a href="classentt_1_1poly__vtable.html#a7a929a8714de517d80285ebed865aa9c">More...</a><br /></td></tr>
-<tr class="separator:a7a929a8714de517d80285ebed865aa9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cf1b279c051f86db9412af890c97267"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
+<tr class="memitem:a1cf1b279c051f86db9412af890c97267"><td class="memTemplItemLeft" align="right" valign="top">static const auto *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1poly__vtable.html#a1cf1b279c051f86db9412af890c97267">instance</a> ()</td></tr>
+<tr class="memdesc:a1cf1b279c051f86db9412af890c97267"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a static virtual table for a specific concept and type.  <a href="classentt_1_1poly__vtable.html#a1cf1b279c051f86db9412af890c97267">More...</a><br /></td></tr>
+<tr class="separator:a1cf1b279c051f86db9412af890c97267"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Concept&gt;<br />
-class entt::poly_vtable&lt; Concept &gt;</h3>
+<div class="textblock"><h3>template&lt;typename Concept, std::size_t Len, std::size_t Align&gt;<br />
+class entt::poly_vtable&lt; Concept, Len, Align &gt;</h3>
 
 <p>Static virtual table factory. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Concept</td><td>Concept descriptor. </td></tr>
+    <tr><td class="paramname">Len</td><td>Size of the storage reserved for the small buffer optimization. </td></tr>
+    <tr><td class="paramname">Align</td><td>Alignment requirement. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00049">49</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00052">52</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7a929a8714de517d80285ebed865aa9c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a929a8714de517d80285ebed865aa9c">&#9670;&nbsp;</a></span>instance()</h2>
+<a id="a1cf1b279c051f86db9412af890c97267"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cf1b279c051f86db9412af890c97267">&#9670;&nbsp;</a></span>instance()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Concept &gt; </div>
+template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 <div class="memtemplate">
 template&lt;typename Type &gt; </div>
 <table class="mlabels">
@@ -122,7 +124,7 @@ template&lt;typename Type &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const auto* <a class="el" href="classentt_1_1poly__vtable.html">entt::poly_vtable</a>&lt; Concept &gt;::instance </td>
+          <td class="memname">static const auto* <a class="el" href="classentt_1_1poly__vtable.html">entt::poly_vtable</a>&lt; Concept, Len, Align &gt;::instance </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -144,7 +146,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A static virtual table for the given concept and type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00110">110</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00113">113</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>

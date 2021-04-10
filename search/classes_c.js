@@ -1,12 +1,7 @@
 var searchData=
 [
-  ['poly_627',['poly',['../classentt_1_1poly.html',1,'entt']]],
-  ['poly_5fbase_628',['poly_base',['../structentt_1_1poly__base.html',1,'entt']]],
-  ['poly_5finspector_629',['poly_inspector',['../structentt_1_1poly__inspector.html',1,'entt']]],
-  ['poly_5fstorage_5ftraits_630',['poly_storage_traits',['../structentt_1_1poly__storage__traits.html',1,'entt']]],
-  ['poly_5fstorage_5ftraits_3c_20entity_20_3e_631',['poly_storage_traits&lt; Entity &gt;',['../structentt_1_1poly__storage__traits.html',1,'entt']]],
-  ['poly_5fvtable_632',['poly_vtable',['../classentt_1_1poly__vtable.html',1,'entt']]],
-  ['process_633',['process',['../classentt_1_1process.html',1,'entt']]],
-  ['process_3c_20process_5fadaptor_3c_20func_2c_20delta_20_3e_2c_20delta_20_3e_634',['process&lt; process_adaptor&lt; Func, Delta &gt;, Delta &gt;',['../classentt_1_1process.html',1,'entt']]],
-  ['process_5fadaptor_635',['process_adaptor',['../structentt_1_1process__adaptor.html',1,'entt']]]
+  ['radix_5fsort_660',['radix_sort',['../structentt_1_1radix__sort.html',1,'entt']]],
+  ['resource_5fcache_661',['resource_cache',['../structentt_1_1resource__cache.html',1,'entt']]],
+  ['resource_5fhandle_662',['resource_handle',['../structentt_1_1resource__handle.html',1,'entt']]],
+  ['resource_5floader_663',['resource_loader',['../classentt_1_1resource__loader.html',1,'entt']]]
 ];

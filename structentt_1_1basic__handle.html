@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.6.0</span>
+   &#160;<span id="projectnumber">3.7.0</span>
    </div>
   </td>
  </tr>
@@ -156,14 +156,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aefed83d8596de41136f15d13fdbc6ccd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#aefed83d8596de41136f15d13fdbc6ccd">remove_all</a> () const</td></tr>
 <tr class="memdesc:aefed83d8596de41136f15d13fdbc6ccd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all the components from a handle and makes it orphaned.  <a href="structentt_1_1basic__handle.html#aefed83d8596de41136f15d13fdbc6ccd">More...</a><br /></td></tr>
 <tr class="separator:aefed83d8596de41136f15d13fdbc6ccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a9f93ae1d06c42cdcd42f495f65e4a7"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
-<tr class="memitem:a0a9f93ae1d06c42cdcd42f495f65e4a7"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a0a9f93ae1d06c42cdcd42f495f65e4a7">has</a> () const</td></tr>
-<tr class="memdesc:a0a9f93ae1d06c42cdcd42f495f65e4a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a handle has all the given components.  <a href="structentt_1_1basic__handle.html#a0a9f93ae1d06c42cdcd42f495f65e4a7">More...</a><br /></td></tr>
-<tr class="separator:a0a9f93ae1d06c42cdcd42f495f65e4a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed123ed9ec89643d45b824f81012d2ed"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
-<tr class="memitem:aed123ed9ec89643d45b824f81012d2ed"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#aed123ed9ec89643d45b824f81012d2ed">any</a> () const</td></tr>
-<tr class="memdesc:aed123ed9ec89643d45b824f81012d2ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a handle has at least one of the given components.  <a href="structentt_1_1basic__handle.html#aed123ed9ec89643d45b824f81012d2ed">More...</a><br /></td></tr>
-<tr class="separator:aed123ed9ec89643d45b824f81012d2ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29185b95a343d6770517683daebb20c9"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
+<tr class="memitem:a29185b95a343d6770517683daebb20c9"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a29185b95a343d6770517683daebb20c9">all_of</a> () const</td></tr>
+<tr class="memdesc:a29185b95a343d6770517683daebb20c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a handle has all the given components.  <a href="structentt_1_1basic__handle.html#a29185b95a343d6770517683daebb20c9">More...</a><br /></td></tr>
+<tr class="separator:a29185b95a343d6770517683daebb20c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01a92bc7ed67cc044bb245308de39443"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
+<tr class="memitem:a01a92bc7ed67cc044bb245308de39443"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a01a92bc7ed67cc044bb245308de39443">any_of</a> () const</td></tr>
+<tr class="memdesc:a01a92bc7ed67cc044bb245308de39443"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a handle has at least one of the given components.  <a href="structentt_1_1basic__handle.html#a01a92bc7ed67cc044bb245308de39443">More...</a><br /></td></tr>
+<tr class="separator:a01a92bc7ed67cc044bb245308de39443"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e27c0778d8018e7c54249a365716127"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:a1e27c0778d8018e7c54249a365716127"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a1e27c0778d8018e7c54249a365716127">get</a> () const</td></tr>
 <tr class="memdesc:a1e27c0778d8018e7c54249a365716127"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns references to the given components for a handle.  <a href="structentt_1_1basic__handle.html#a1e27c0778d8018e7c54249a365716127">More...</a><br /></td></tr>
@@ -250,8 +250,8 @@ template&lt;typename Entity , typename... Type&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aed123ed9ec89643d45b824f81012d2ed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed123ed9ec89643d45b824f81012d2ed">&#9670;&nbsp;</a></span>any()</h2>
+<a id="a29185b95a343d6770517683daebb20c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29185b95a343d6770517683daebb20c9">&#9670;&nbsp;</a></span>all_of()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -264,7 +264,48 @@ template&lt;typename... Component&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">decltype(auto) <a class="el" href="structentt_1_1basic__handle.html">entt::basic_handle</a>&lt; Entity, Type &gt;::<a class="el" href="classentt_1_1any.html">any</a> </td>
+          <td class="memname">decltype(auto) <a class="el" href="structentt_1_1basic__handle.html">entt::basic_handle</a>&lt; Entity, Type &gt;::all_of </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if a handle has all the given components. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a40072eca607846f43f47d0e3f11dd196" title="Checks if an entity has all the given components.">basic_registry::all_of</a> </dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Component</td><td>Components for which to perform the check. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the handle has all the components, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00228">228</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a01a92bc7ed67cc044bb245308de39443"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01a92bc7ed67cc044bb245308de39443">&#9670;&nbsp;</a></span>any_of()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename... Type&gt; </div>
+<div class="memtemplate">
+template&lt;typename... Component&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">decltype(auto) <a class="el" href="structentt_1_1basic__handle.html">entt::basic_handle</a>&lt; Entity, Type &gt;::any_of </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -278,7 +319,7 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Checks if a handle has at least one of the given components. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#ab0f856eae9b92a4c97689540968c6bde" title="Checks if an entity has at least one of the given components.">basic_registry::any</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a08f819276fd2d8b2b2b6d01357f61a42" title="Checks if an entity has at least one of the given components.">basic_registry::any_of</a> </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Components for which to perform the check. </td></tr>
@@ -579,47 +620,6 @@ template&lt;typename Component , typename... Args&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>Reference to the component owned by the handle. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00265">265</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a0a9f93ae1d06c42cdcd42f495f65e4a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a9f93ae1d06c42cdcd42f495f65e4a7">&#9670;&nbsp;</a></span>has()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity , typename... Type&gt; </div>
-<div class="memtemplate">
-template&lt;typename... Component&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">decltype(auto) <a class="el" href="structentt_1_1basic__handle.html">entt::basic_handle</a>&lt; Entity, Type &gt;::has </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Checks if a handle has all the given components. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#ae0948bfee43711e2df12946a63a2b258" title="Checks if an entity has all the given components.">basic_registry::has</a> </dd></dl>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Component</td><td>Components for which to perform the check. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the handle has all the components, false otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00228">228</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
