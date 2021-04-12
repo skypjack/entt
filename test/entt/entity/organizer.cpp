@@ -140,8 +140,6 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     entt::registry registry;
     clazz instance;
 
-    // TODO
-
     organizer.emplace<&clazz::ro_int_char_double>(instance, "t1");
     organizer.emplace<&clazz::ro_int_with_payload>(instance, "t2");
     organizer.emplace<&clazz::ro_char_with_payload, const clazz>(instance, "t3");
