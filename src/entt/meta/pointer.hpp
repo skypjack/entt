@@ -21,6 +21,17 @@ struct is_meta_pointer_like<Type *>
 
 
 /**
+ * @brief Partial specialization used to reject pointers to arrays.
+ * @tparam Type Type of elements of the array.
+ * @tparam N Number of elements of the array.
+ */
+template<typename Type, std::size_t N>
+struct is_meta_pointer_like<Type(*)[N]>
+    : std::false_type
+{};
+
+
+/**
  * @brief Makes `std::shared_ptr`s of any type pointer-like types for the meta
  * system.
  * @tparam Type Element type.
