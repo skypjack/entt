@@ -119,11 +119,6 @@ TEST(TypeTraits, IsComplete) {
     static_assert(!entt::is_complete_v<void>);
 }
 
-TEST(TypeTraits, IsStdHashable) {
-    static_assert(entt::is_std_hashable_v<int>);
-    static_assert(!entt::is_std_hashable_v<not_comparable>);
-}
-
 TEST(TypeTraits, ConstnessAs) {
     static_assert(std::is_same_v<entt::constness_as_t<int, char>, int>);
     static_assert(std::is_same_v<entt::constness_as_t<const int, char>, int>);
