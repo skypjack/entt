@@ -5,16 +5,17 @@
 
 struct entity_id {
     using entity_type = typename entt::entt_traits<entt::entity>::entity_type;
+    static constexpr auto null = entt::null;
 
-    entity_id(entity_type value = entt::null)
+    constexpr entity_id(entity_type value = null)
         : entt{value}
     {}
 
-    entity_id(const entity_id &other)
+    constexpr entity_id(const entity_id &other)
         : entt{other.entt}
     {}
 
-    operator entity_type() const {
+    constexpr operator entity_type() const {
         return entt;
     }
 
