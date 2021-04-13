@@ -777,14 +777,6 @@ private:
 
 /**
  * @brief Defines the component-to-storage conversion.
- *
- * Formally:
- *
- * * If the component type is a non-const one, the member typedef type is the
- *   declared storage type.
- * * If the component type is a const one, the member typedef type is the
- *   declared storage type, except it has a const-qualifier added.
- *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Type Type of objects assigned to the entities.
  */
