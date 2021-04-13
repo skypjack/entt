@@ -681,11 +681,11 @@ public:
     }
 
     /**
-     * @brief Direct access to the list of components of a given pool.
+     * @brief Direct access to the raw representation offered by the storage.
      *
-     * The returned pointer is such that range
-     * `[raw<Component>(), raw<Component>() + size())` is always a valid range,
-     * even if the container is empty.<br/>
+     * For fully contiguous storage classes, the returned pointer is such that
+     * range `[raw<Component>(), raw<Component>() + size())` is always a valid
+     * range, even if the container is empty.
      *
      * @warning
      * This function is only available for owned types.
@@ -694,10 +694,10 @@ public:
      * @return A pointer to the array of components.
      */
     template<typename Component>
-    [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] auto raw() const ENTT_NOEXCEPT {
         static_assert((std::is_same_v<Component, Owned> || ...), "Non-owned type");
         auto *cpool = std::get<storage_type<Component> *>(pools);
-        return cpool ? cpool->raw() : nullptr;
+        return cpool ? cpool->raw() : decltype(cpool->raw()){};
     }
 
     /**

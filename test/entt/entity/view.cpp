@@ -226,8 +226,8 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(view.size(), 1u);
     ASSERT_EQ(cview.size(), 1u);
 
-    static_assert(std::is_same_v<typename decltype(view)::raw_type, int>);
-    static_assert(std::is_same_v<typename decltype(cview)::raw_type, const int>);
+    static_assert(std::is_same_v<decltype(view.raw()), int *>);
+    static_assert(std::is_same_v<decltype(cview.raw()), const int *>);
 
     static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(view.get({})), std::tuple<int &>>);
@@ -267,9 +267,6 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
 
     ASSERT_EQ(view.size(), 1u);
     ASSERT_EQ(cview.size(), 1u);
-
-    static_assert(std::is_same_v<typename decltype(view)::raw_type, empty_type>);
-    static_assert(std::is_same_v<typename decltype(cview)::raw_type, const empty_type>);
 
     static_assert(std::is_same_v<decltype(view.get({})), std::tuple<>>);
     static_assert(std::is_same_v<decltype(cview.get({})), std::tuple<>>);

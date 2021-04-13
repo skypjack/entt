@@ -668,8 +668,6 @@ class basic_view<Entity, exclude_t<>, Component> final {
     };
 
 public:
-    /*! @brief Type of component iterated by the view. */
-    using raw_type = Component;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -711,14 +709,15 @@ public:
     }
 
     /**
-     * @brief Direct access to the list of components.
+     * @brief Direct access to the raw representation offered by the storage.
      *
-     * The returned pointer is such that range `[raw(), raw() + size())` is
-     * always a valid range, even if the container is empty.
+     * For fully contiguous storage classes, the returned pointer is such that
+     * range `[raw<Component>(), raw<Component>() + size())` is always a valid
+     * range, even if the container is empty.
      *
      * @return A pointer to the array of components.
      */
-    [[nodiscard]] raw_type * raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] auto raw() const ENTT_NOEXCEPT {
         return std::get<0>(pools)->raw();
     }
 
