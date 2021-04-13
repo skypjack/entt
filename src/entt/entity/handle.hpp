@@ -24,10 +24,12 @@ namespace entt {
  */
 template<typename Entity, typename... Type>
 struct basic_handle {
-    /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<Entity>;
     /*! @brief Type of registry accepted by the handle. */
-    using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
+    using registry_type = constness_as_t<basic_registry<std::remove_const_t<Entity>>, Entity>;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = typename registry_type::entity_type;
+    /*! @brief Underlying version type. */
+    using version_type = typename registry_type::version_type;
 
     /*! @brief Constructs an invalid handle. */
     basic_handle() ENTT_NOEXCEPT
@@ -126,7 +128,7 @@ struct basic_handle {
      * @sa basic_registry::destroy
      * @param version A desired version upon destruction.
      */
-    void destroy(const typename registry_type::version_type version) {
+    void destroy(const version_type version) {
         reg->destroy(entt, version);
     }
 
