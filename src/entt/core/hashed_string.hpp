@@ -212,7 +212,7 @@ private:
  * @param str Human-readable identifer.
  */
 template<typename Char, std::size_t N>
-basic_hashed_string(const Char (&str)[N]) ENTT_NOEXCEPT
+basic_hashed_string(const Char (&str)[N])
 -> basic_hashed_string<Char>;
 
 

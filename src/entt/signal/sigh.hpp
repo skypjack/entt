@@ -510,7 +510,8 @@ private:
  * @tparam Args Types of arguments of a function type.
  */
 template<typename Ret, typename... Args>
-sink(sigh<Ret(Args...)> &) ENTT_NOEXCEPT -> sink<Ret(Args...)>;
+sink(sigh<Ret(Args...)> &)
+-> sink<Ret(Args...)>;
 
 
 }

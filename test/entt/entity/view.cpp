@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <tuple>
 #include <utility>
 #include <type_traits>
@@ -176,10 +177,14 @@ TEST(SingleComponentView, Each) {
     registry.emplace<int>(registry.create(), 1);
 
     auto view = registry.view<int>();
+    auto iterable = view.each();
+
     auto cview = std::as_const(registry).view<const int>();
+    auto citerable = cview.each();
+
     std::size_t cnt = 0;
 
-    for(auto first = cview.each().rbegin(), last = cview.each().rend(); first != last; ++first) {
+    for(auto first = citerable.rbegin(), last = citerable.rend(); first != last; ++first) {
         static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &>>);
         ASSERT_EQ(std::get<1>(*first), cnt++);
     }
@@ -192,7 +197,8 @@ TEST(SingleComponentView, Each) {
     cview.each([&cnt](const int &) { --cnt; });
     cview.each([&cnt](auto, const int &) { --cnt; });
 
-    for(auto [entt, iv]: view.each()) {
+    // do not use iterable, make sure an iterable view works when created from a temporary
+    for(auto [entt, iv]: registry.view<int>().each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         ASSERT_EQ(iv, --cnt);
@@ -200,11 +206,11 @@ TEST(SingleComponentView, Each) {
 
     ASSERT_EQ(cnt, std::size_t{0});
 
-    auto it = view.each().begin();
-    auto rit = view.each().rbegin();
+    auto it = iterable.begin();
+    auto rit = iterable.rbegin();
 
-    ASSERT_EQ((it++, ++it), view.each().end());
-    ASSERT_EQ((rit++, ++rit), view.each().rend());
+    ASSERT_EQ((it++, ++it), iterable.end());
+    ASSERT_EQ((rit++, ++rit), iterable.rend());
 }
 
 TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
@@ -381,6 +387,19 @@ TEST(SingleComponentView, DeductionGuide) {
 
     static_assert(std::is_same_v<decltype(entt::basic_view{storage}), entt::basic_view<entt::entity, entt::exclude_t<>, int>>);
     static_assert(std::is_same_v<decltype(entt::basic_view{std::as_const(storage)}), entt::basic_view<entt::entity, entt::exclude_t<>, const int>>);
+}
+
+TEST(SingleComponentView, IterableViewAlgorithmCompatibility) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity);
+
+    const auto view = registry.view<int>();
+    const auto iterable = view.each();
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [entity](auto args) { return std::get<0>(args) == entity; });
+
+    ASSERT_EQ(std::get<0>(*it), entity);
 }
 
 TEST(MultiComponentView, Functionalities) {
@@ -583,10 +602,14 @@ TEST(MultiComponentView, Each) {
     registry.emplace<char>(e1);
 
     auto view = registry.view<int, char>();
+    auto iterable = view.each();
+
     auto cview = std::as_const(registry).view<const int, const char>();
+    auto citerable = cview.each();
+
     std::size_t cnt = 0;
 
-    for(auto first = cview.each().rbegin(), last = cview.each().rend(); first != last; ++first) {
+    for(auto first = citerable.rbegin(), last = citerable.rend(); first != last; ++first) {
         static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &, const char &>>);
         ASSERT_EQ(std::get<1>(*first), cnt++);
     }
@@ -599,7 +622,8 @@ TEST(MultiComponentView, Each) {
     cview.each([&cnt](const int &, const char &) { --cnt; });
     cview.each([&cnt](auto, const int &, const char &) { --cnt; });
 
-    for(auto [entt, iv, cv]: view.each()) {
+    // do not use iterable, make sure an iterable view works when created from a temporary
+    for(auto [entt, iv, cv]: registry.view<int, char>().each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -608,11 +632,11 @@ TEST(MultiComponentView, Each) {
 
     ASSERT_EQ(cnt, std::size_t{0});
 
-    auto it = view.each().begin();
-    auto rit = view.each().rbegin();
+    auto it = iterable.begin();
+    auto rit = iterable.rbegin();
 
-    ASSERT_EQ((it++, ++it), view.each().end());
-    ASSERT_EQ((rit++, ++rit), view.each().rend());
+    ASSERT_EQ((it++, ++it), iterable.end());
+    ASSERT_EQ((rit++, ++rit), iterable.rend());
 }
 
 TEST(MultiComponentView, EachWithSuggestedType) {
@@ -923,6 +947,20 @@ TEST(MultiComponentView, DeductionGuide) {
     static_assert(std::is_same_v<decltype(entt::basic_view{std::as_const(istorage), dstorage}), entt::basic_view<entt::entity, entt::exclude_t<>, const int, double>>);
     static_assert(std::is_same_v<decltype(entt::basic_view{istorage, std::as_const(dstorage)}), entt::basic_view<entt::entity, entt::exclude_t<>, int, const double>>);
     static_assert(std::is_same_v<decltype(entt::basic_view{std::as_const(istorage), std::as_const(dstorage)}), entt::basic_view<entt::entity, entt::exclude_t<>, const int, const double>>);
+}
+
+TEST(MultiComponentView, IterableViewAlgorithmCompatibility) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+
+    const auto view = registry.view<int, char>();
+    const auto iterable = view.each();
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [entity](auto args) { return std::get<0>(args) == entity; });
+
+    ASSERT_EQ(std::get<0>(*it), entity);
 }
 
 TEST(View, Pipe) {

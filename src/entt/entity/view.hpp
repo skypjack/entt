@@ -155,7 +155,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         class iterable_view_iterator final {
             friend class iterable_view;
 
-            iterable_view_iterator(It from, const basic_view &parent) ENTT_NOEXCEPT
+            iterable_view_iterator(It from, const basic_view *parent) ENTT_NOEXCEPT
                 : it{from},
                   view{parent}
             {}
@@ -177,7 +177,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
             }
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-                return std::tuple_cat(std::make_tuple(*it), view.get(*it));
+                return std::tuple_cat(std::make_tuple(*it), view->get(*it));
             }
 
             [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
@@ -190,7 +190,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
         private:
             It it;
-            const basic_view view;
+            const basic_view *view;
         };
 
         iterable_view(const basic_view &parent)
@@ -202,19 +202,19 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         using reverse_iterator = iterable_view_iterator<view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>>;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return { view.begin(), view };
+            return { view.begin(), &view };
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return { view.end(), view };
+            return { view.end(), &view };
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return { view.rbegin(), view };
+            return { view.rbegin(), &view };
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return { view.rend(), view };
+            return { view.rend(), &view };
         }
 
     private:
@@ -230,7 +230,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     [[nodiscard]] unchecked_type unchecked(const basic_sparse_set<Entity> *cpool) const {
         std::size_t pos{};
         unchecked_type other{};
-        (static_cast<void>(std::get<storage_type<Component> *>(pools) == cpool ? nullptr : (other[pos] = std::get<storage_type<Component> *>(pools), other[pos++])), ...);
+        (static_cast<void>(std::get<storage_type<Component> *>(pools) == cpool ? void() : void(other[pos++] = std::get<storage_type<Component> *>(pools))), ...);
         return other;
     }
 
@@ -681,7 +681,8 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
-        : pools{}
+        : pools{},
+          filter{}
     {}
 
     /**
@@ -689,7 +690,8 @@ public:
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : pools{&ref}
+        : pools{&ref},
+          filter{}
     {}
 
     /**
@@ -956,7 +958,7 @@ private:
  * @param storage The storage for the types to iterate.
  */
 template<typename... Storage>
-basic_view(Storage &... storage) ENTT_NOEXCEPT
+basic_view(Storage &... storage)
 -> basic_view<std::common_type_t<typename Storage::entity_type...>, entt::exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
 
 

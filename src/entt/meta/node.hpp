@@ -2,7 +2,6 @@
 #define ENTT_META_NODE_HPP
 
 
-#include <array>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -36,8 +35,8 @@ struct meta_type_node;
 
 struct meta_prop_node {
     meta_prop_node * next;
-    const meta_any * const id;
-    meta_any * const value;
+    const meta_any &id;
+    meta_any &value;
 };
 
 
@@ -234,7 +233,7 @@ public:
             meta_template_descriptor(),
             std::rank_v<Type>,
             [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
-            &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
+            &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<Type>>>>::resolve,
             &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_extent_t<Type>>>>::resolve,
             meta_default_constructor(&node),
             meta_default_constructor(&node)
@@ -251,7 +250,8 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>> {};
 
 template<typename... Args>
 meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
-    return std::array<meta_type_node *, sizeof...(Args)>{{internal::meta_info<Args>::resolve()...}}[index];
+    meta_type_node *args[sizeof...(Args) + 1u]{nullptr, internal::meta_info<Args>::resolve()...};
+    return args[index + 1u];
 }
 
 

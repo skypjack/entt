@@ -2,7 +2,6 @@
 #define ENTT_META_UTILITY_HPP
 
 
-#include <array>
 #include <cstddef>
 #include <functional>
 #include <type_traits>

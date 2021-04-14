@@ -1,7 +1,7 @@
-#include <utility>
-#include <iterator>
 #include <algorithm>
+#include <iterator>
 #include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/group.hpp>
@@ -101,15 +101,6 @@ TEST(NonOwningGroup, Invalid) {
     ASSERT_EQ(group.find(entity), group.end());
     ASSERT_EQ(group.front(), entt::entity{entt::null});
     ASSERT_EQ(group.back(), entt::entity{entt::null});
-
-    group.each([](const auto, const auto &) { FAIL(); });
-    group.each([](const auto &) { FAIL(); });
-
-    for([[maybe_unused]] auto all: group.each()) { FAIL(); }
-    for(auto first = group.each().rbegin(), last = group.each().rend(); first != last; ++first) { FAIL(); }
-
-    ASSERT_NO_FATAL_FAILURE(group.sort([](const auto, const auto) { FAIL(), true; }));
-    ASSERT_NO_FATAL_FAILURE(group.sort<const empty_type>());
 }
 
 TEST(NonOwningGroup, ElementAccess) {
@@ -168,6 +159,7 @@ TEST(NonOwningGroup, Empty) {
 TEST(NonOwningGroup, Each) {
     entt::registry registry;
     auto group = registry.group(entt::get<int, char>);
+    auto iterable = group.each();
 
     const auto e0 = registry.create();
     registry.emplace<int>(e0, 0);
@@ -178,9 +170,10 @@ TEST(NonOwningGroup, Each) {
     registry.emplace<char>(e1);
 
     auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
+    auto citerable = cgroup.each();
     std::size_t cnt = 0;
 
-    for(auto first = cgroup.each().rbegin(), last = cgroup.each().rend(); first != last; ++first) {
+    for(auto first = citerable.rbegin(), last = citerable.rend(); first != last; ++first) {
         static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &, const char &>>);
         ASSERT_EQ(std::get<1>(*first), cnt++);
     }
@@ -193,7 +186,8 @@ TEST(NonOwningGroup, Each) {
     cgroup.each([&cnt](const int &, const char &) { --cnt; });
     cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
 
-    for(auto [entt, iv, cv]: group.each()) {
+    // do not use iterable, make sure an iterable group works when created from a temporary
+    for(auto [entt, iv, cv]: registry.group(entt::get<int, char>).each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -202,11 +196,11 @@ TEST(NonOwningGroup, Each) {
 
     ASSERT_EQ(cnt, std::size_t{0});
 
-    auto it = group.each().begin();
-    auto rit = group.each().rbegin();
+    auto it = iterable.begin();
+    auto rit = iterable.rbegin();
 
-    ASSERT_EQ((it++, ++it), group.each().end());
-    ASSERT_EQ((rit++, ++rit), group.each().rend());
+    ASSERT_EQ((it++, ++it), iterable.end());
+    ASSERT_EQ((rit++, ++rit), iterable.rend());
 }
 
 TEST(NonOwningGroup, Sort) {
@@ -566,8 +560,9 @@ TEST(NonOwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     }
 
-    registry.group(entt::get<int, char, double>).each([](const auto, int, char, double) { FAIL(); });
-    ASSERT_EQ(registry.group(entt::get<int, char, double>).each().begin(), registry.group(entt::get<int, char, double>).each().end());
+    auto iterable = registry.group(entt::get<int, char, double>).each();
+
+    ASSERT_EQ(iterable.begin(), iterable.end());
 }
 
 TEST(NonOwningGroup, FrontBack) {
@@ -620,6 +615,20 @@ TEST(NonOwningGroup, ExtendedGet) {
 
     ASSERT_EQ(std::get<0>(tup), 42);
     ASSERT_EQ(std::get<1>(tup), 'c');
+}
+
+TEST(NonOwningGroup, IterableGroupAlgorithmCompatibility) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+
+    const auto group = registry.group(entt::get<int, char>);
+    const auto iterable = group.each();
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [entity](auto args) { return std::get<0>(args) == entity; });
+
+    ASSERT_EQ(std::get<0>(*it), entity);
 }
 
 TEST(OwningGroup, Functionalities) {
@@ -707,12 +716,6 @@ TEST(OwningGroup, Invalid) {
     ASSERT_EQ(group.find(entity), group.end());
     ASSERT_EQ(group.front(), entt::entity{entt::null});
     ASSERT_EQ(group.back(), entt::entity{entt::null});
-
-    group.each([](const auto, const auto &) { FAIL(); });
-    group.each([](const auto &) { FAIL(); });
-
-    for([[maybe_unused]] auto all: group.each()) { FAIL(); }
-    for(auto first = group.each().rbegin(), last = group.each().rend(); first != last; ++first) { FAIL(); }
 }
 
 TEST(OwningGroup, ElementAccess) {
@@ -771,6 +774,7 @@ TEST(OwningGroup, Empty) {
 TEST(OwningGroup, Each) {
     entt::registry registry;
     auto group = registry.group<int>(entt::get<char>);
+    auto iterable = group.each();
 
     const auto e0 = registry.create();
     registry.emplace<int>(e0, 0);
@@ -781,9 +785,10 @@ TEST(OwningGroup, Each) {
     registry.emplace<char>(e1);
 
     auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
+    auto citerable = cgroup.each();
     std::size_t cnt = 0;
 
-    for(auto first = cgroup.each().rbegin(), last = cgroup.each().rend(); first != last; ++first) {
+    for(auto first = citerable.rbegin(), last = citerable.rend(); first != last; ++first) {
         static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &, const char &>>);
         ASSERT_EQ(std::get<1>(*first), cnt++);
     }
@@ -796,7 +801,8 @@ TEST(OwningGroup, Each) {
     cgroup.each([&cnt](const int &, const char &) { --cnt; });
     cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
 
-    for(auto [entt, iv, cv]: group.each()) {
+    // do not use iterable, make sure an iterable group works when created from a temporary
+    for(auto [entt, iv, cv]: registry.group<int>(entt::get<char>).each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -805,11 +811,11 @@ TEST(OwningGroup, Each) {
 
     ASSERT_EQ(cnt, std::size_t{0});
 
-    auto it = group.each().begin();
-    auto rit = group.each().rbegin();
+    auto it = iterable.begin();
+    auto rit = iterable.rbegin();
 
-    ASSERT_EQ((it++, ++it), group.each().end());
-    ASSERT_EQ((rit++, ++rit), group.each().rend());
+    ASSERT_EQ((it++, ++it), iterable.end());
+    ASSERT_EQ((rit++, ++rit), iterable.rend());
 }
 
 TEST(OwningGroup, SortOrdered) {
@@ -1259,8 +1265,9 @@ TEST(OwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     }
 
-    registry.group<double>(entt::get<int, char>).each([](const auto, double, int, char) { FAIL(); });
-    ASSERT_EQ(registry.group<double>(entt::get<int, char>).each().begin(), registry.group<double>(entt::get<int, char>).each().end());
+    auto iterable = registry.group<double>(entt::get<int, char>).each();
+
+    ASSERT_EQ(iterable.begin(), iterable.end());
 }
 
 TEST(OwningGroup, FrontBack) {
@@ -1361,4 +1368,18 @@ TEST(OwningGroup, ExtendedGet) {
 
     ASSERT_EQ(std::get<0>(tup), 42);
     ASSERT_EQ(std::get<1>(tup), 'c');
+}
+
+TEST(OwningGroup, IterableGroupAlgorithmCompatibility) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+
+    const auto group = registry.group<int>(entt::get<char>);
+    const auto iterable = group.each();
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [entity](auto args) { return std::get<0>(args) == entity; });
+
+    ASSERT_EQ(std::get<0>(*it), entity);
 }
