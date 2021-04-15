@@ -177,7 +177,7 @@ class meta_any {
                 break;
             case operation::DEREF:
             case operation::CDEREF:
-                if constexpr(is_meta_pointer_like_v<std::decay_t<Type>>) {
+                if constexpr(is_meta_pointer_like_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
                     using element_type = std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>;
 
                     if constexpr(std::is_function_v<element_type>) {

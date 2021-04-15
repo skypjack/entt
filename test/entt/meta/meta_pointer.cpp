@@ -333,3 +333,14 @@ TEST(MetaPointerLike, DereferenceProxyPointer) {
 
     ASSERT_EQ(value, 42);
 }
+
+TEST(MetaPointerLike, DereferenceArray) {
+    entt::meta_any array{std::in_place_type<int[3]>};
+    entt::meta_any array_of_array{std::in_place_type<int[3][3]>};
+
+    ASSERT_EQ(array.type(), entt::resolve<int[3]>());
+    ASSERT_EQ(array_of_array.type(), entt::resolve<int[3][3]>());
+
+    ASSERT_FALSE(*array);
+    ASSERT_FALSE(*array_of_array);
+}
