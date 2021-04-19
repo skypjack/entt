@@ -173,11 +173,25 @@ class basic_sparse_set {
     }
 
 protected:
-    /*! @brief Swaps two entities in the internal packed array. */
-    virtual void swap_at(const std::size_t, const std::size_t) {}
+    /**
+     * @brief Swaps two entities in the internal packed array.
+     * @param lhs A valid position of an entity within storage.
+     * @param rhs A valid position of an entity within storage.
+     */
+    virtual void swap_at(const std::size_t lhs, const std::size_t rhs) {}
 
-    /*! @brief Attempts to remove an entity from the internal packed array. */
-    virtual void swap_and_pop(const std::size_t, void *) {}
+    /**
+     * @brief Attempts to remove an entity from the internal packed array.
+     * @param pos A valid position of an entity within storage.
+     */
+    virtual void swap_and_pop(const std::size_t pos) {}
+
+    /**
+     * @brief Last chance to use an entity that is about to be removed.
+     * @param entity A valid entity identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    virtual void about_to_remove(const Entity entity, void *ud) {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -445,19 +459,23 @@ public:
      */
     void remove(const entity_type entt, void *ud = nullptr) {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
-        auto &ref = sparse[page(entt)][offset(entt)];
 
         // last chance to use the entity for derived classes and mixins, if any
-        swap_and_pop(size_type{to_integral(ref)}, ud);
+        about_to_remove(entt, ud);
+
+        auto &ref = sparse[page(entt)][offset(entt)];
+        const auto pos = size_type{to_integral(ref)};
 
         const auto other = packed.back();
         sparse[page(other)][offset(other)] = ref;
-        // if it looks weird, imagine what the subtle bugs it prevents are
-        ENTT_ASSERT((packed.back() = entt, true), "");
-        packed[size_type{to_integral(ref)}] = other;
         ref = null;
 
+        // if it looks weird, imagine what the subtle bugs it prevents are
+        ENTT_ASSERT((packed.back() = entt, true), "");
+        packed[pos] = other;
         packed.pop_back();
+
+        swap_and_pop(pos);
     }
 
     /**

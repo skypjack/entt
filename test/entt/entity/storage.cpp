@@ -24,6 +24,17 @@ struct throwing_component {
     int data;
 };
 
+struct update_from_destructor {
+    ~update_from_destructor() {
+        if(target != entt::null) {
+            storage->remove(target);
+        }
+    }
+
+    entt::storage<update_from_destructor> *storage{};
+    entt::entity target{entt::null};
+};
+
 TEST(Storage, Functionalities) {
     entt::storage<int> pool;
 
@@ -648,4 +659,29 @@ TEST(Storage, ConstructorExceptionDoesNotAddToStorage) {
     }
 
     ASSERT_TRUE(pool.empty());
+}
+
+TEST(Storage, UpdateFromDestructor) {
+    static constexpr auto size = 10u;
+
+    auto test = [](const auto target) {
+        entt::storage<update_from_destructor> pool;
+
+        for(std::size_t next{}; next < size; ++next) {
+            pool.emplace(entt::entity(next), &pool);
+        }
+
+        for(std::size_t next{}; next < size; ++next) {
+            ASSERT_EQ(pool.get(entt::entity(next)).target, entt::entity{entt::null});
+        }
+
+        pool.get(entt::entity(size/2)).target = target;
+        pool.remove(entt::entity(size/2));
+
+        ASSERT_EQ(pool.size(), size - 1u - (target != entt::null));
+    };
+
+    test(entt::null);
+    test(entt::entity(size - 1u));
+    test(entt::entity{0u});
 }

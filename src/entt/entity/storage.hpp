@@ -159,22 +159,16 @@ class basic_storage: public basic_sparse_set<Entity> {
     };
 
 protected:
-    /**
-     * @copybrief basic_sparse_set::swap_at
-     * @param lhs A valid position of an entity within storage.
-     * @param rhs A valid position of an entity within storage.
-     */
-    void swap_at(const std::size_t lhs, const std::size_t rhs) {
+    /*! @copydoc basic_sparse_set::swap_at */
+    void swap_at(const std::size_t lhs, const std::size_t rhs) final {
         std::swap(instances[lhs], instances[rhs]);
     }
 
-    /**
-     * @copybrief basic_sparse_set::swap_and_pop
-     * @param pos A valid position of an entity within storage.
-     */
-    void swap_and_pop(const std::size_t pos, void *) {
-        auto other = std::move(instances.back());
-        instances[pos] = std::move(other);
+    /*! @copydoc basic_sparse_set::swap_and_pop */
+    void swap_and_pop(const std::size_t pos) final {
+        // required because pop_back isn't guaranteed to shrink before removing the element
+        [[maybe_unused]] auto other = std::move(instances[pos]);
+        instances[pos] = std::move(instances.back());
         instances.pop_back();
     }
 
@@ -632,17 +626,13 @@ struct storage_adapter_mixin: Type {
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    /**
-     * @copybrief basic_sparse_set::swap_and_pop
-     * @param pos A valid position of an entity within storage.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
-     */
-    void swap_and_pop(const std::size_t pos, void *ud) final {
+    using Entity = typename Type::entity_type;
+
+    /*! @copydoc basic_sparse_set::about_to_remove */
+    void about_to_remove(const Entity entity, void *ud) final {
         ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
-        const auto entity = basic_sparse_set<typename Type::entity_type>::operator[](pos);
         destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entity);
-        // the position may have changed due to the actions of a listener
-        Type::swap_and_pop(this->index(entity), ud);
+        Type::about_to_remove(entity, ud);
     }
 
 public:
