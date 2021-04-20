@@ -178,20 +178,20 @@ protected:
      * @param lhs A valid position of an entity within storage.
      * @param rhs A valid position of an entity within storage.
      */
-    virtual void swap_at(const std::size_t lhs, const std::size_t rhs) {}
+    virtual void swap_at([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) {}
 
     /**
      * @brief Attempts to remove an entity from the internal packed array.
      * @param pos A valid position of an entity within storage.
      */
-    virtual void swap_and_pop(const std::size_t pos) {}
+    virtual void swap_and_pop([[maybe_unused]] const std::size_t pos) {}
 
     /**
      * @brief Last chance to use an entity that is about to be removed.
      * @param entity A valid entity identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    virtual void about_to_remove(const Entity entity, void *ud) {}
+    virtual void about_to_remove([[maybe_unused]] const Entity entity, [[maybe_unused]] void *ud) {}
 
 public:
     /*! @brief Underlying entity identifier. */
