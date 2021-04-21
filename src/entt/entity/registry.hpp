@@ -737,11 +737,10 @@ public:
      */
     void remove_all(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        entity_type wrap[1u]{entity};
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.pool->erase(std::begin(wrap), std::end(wrap), this);
+                pdata.pool->erase(entity, this);
             }
         }
     }
