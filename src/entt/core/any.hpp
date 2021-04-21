@@ -178,13 +178,13 @@ class basic_any {
                 static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
                 instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<Type>) {
-                if constexpr(std::is_aggregate_v<Type>) {
+                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<Type>) {
                     new (&storage) Type{std::forward<Args>(args)...};
                 } else {
                     new (&storage) Type(std::forward<Args>(args)...);
                 }
             } else {
-                if constexpr(std::is_aggregate_v<Type>) {
+                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<Type>) {
                     instance = new Type{std::forward<Args>(args)...};
                 } else {
                     instance = new Type(std::forward<Args>(args)...);
