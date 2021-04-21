@@ -493,6 +493,31 @@ public:
     }
 
     /**
+     * @brief Removes an entity from a sparse set if it exists.
+     * @param entt A valid entity identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    void remove(const entity_type entt, void *ud = nullptr) {
+        if(contains(entt)) {
+            erase(entt, ud);
+        }
+    }
+
+    /**
+     * @brief Removes multiple entities from a sparse set if they exist.
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    template<typename It>
+    void remove(It first, It last, void *ud = nullptr) {
+        for(; first != last; ++first) {
+            remove(*first, ud);
+        }
+    }
+
+    /**
      * @copybrief swap_at
      *
      * For what it's worth, this function affects both the internal sparse array

@@ -131,34 +131,82 @@ TEST(Storage, InsertEmptyType) {
     ASSERT_EQ(pool.size(), 2u);
 }
 
+TEST(Storage, Erase) {
+    entt::storage<int> pool;
+    entt::entity entities[3];
+
+    entities[0] = entt::entity{3};
+    entities[1] = entt::entity{42};
+    entities[2] = entt::entity{9};
+
+    pool.emplace(entities[0]);
+    pool.emplace(entities[1]);
+    pool.emplace(entities[2]);
+    pool.erase(std::begin(entities), std::end(entities));
+
+    ASSERT_DEATH(pool.erase(std::begin(entities), std::end(entities)), "");
+    ASSERT_TRUE(pool.empty());
+
+    pool.emplace(entities[0], 0);
+    pool.emplace(entities[1], 1);
+    pool.emplace(entities[2], 2);
+    pool.erase(entities, entities + 2u);
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(*pool.begin(), 2);
+
+    pool.erase(entities[2]);
+
+    ASSERT_DEATH(pool.erase(entities[2]), "");
+    ASSERT_TRUE(pool.empty());
+
+    pool.emplace(entities[0], 0);
+    pool.emplace(entities[1], 1);
+    pool.emplace(entities[2], 2);
+    std::swap(entities[1], entities[2]);
+    pool.erase(entities, entities + 2u);
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(*pool.begin(), 1);
+}
+
 TEST(Storage, Remove) {
     entt::storage<int> pool;
-    entt::sparse_set &base = pool;
+    entt::entity entities[3];
 
-    pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42});
-    base.erase(base.begin(), base.end());
+    entities[0] = entt::entity{3};
+    entities[1] = entt::entity{42};
+    entities[2] = entt::entity{9};
+
+    pool.emplace(entities[0]);
+    pool.emplace(entities[1]);
+    pool.emplace(entities[2]);
+    pool.remove(std::begin(entities), std::end(entities));
+    pool.remove(std::begin(entities), std::end(entities));
 
     ASSERT_TRUE(pool.empty());
 
-    pool.emplace(entt::entity{3}, 3);
-    pool.emplace(entt::entity{42}, 42);
-    pool.emplace(entt::entity{9}, 9);
-    base.erase(base.rbegin(), base.rbegin() + 2u);
+    pool.emplace(entities[0], 0);
+    pool.emplace(entities[1], 1);
+    pool.emplace(entities[2], 2);
+    pool.remove(entities, entities + 2u);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(*pool.begin(), 9);
+    ASSERT_EQ(*pool.begin(), 2);
 
-    pool.clear();
-    pool.emplace(entt::entity{3}, 3);
-    pool.emplace(entt::entity{42}, 42);
-    pool.emplace(entt::entity{9}, 9);
+    pool.remove(entities[2]);
+    pool.remove(entities[2]);
 
-    entt::entity entities[2]{entt::entity{3}, entt::entity{9}};
-    base.erase(std::begin(entities), std::end(entities));
+    ASSERT_TRUE(pool.empty());
+
+    pool.emplace(entities[0], 0);
+    pool.emplace(entities[1], 1);
+    pool.emplace(entities[2], 2);
+    std::swap(entities[1], entities[2]);
+    pool.remove(entities, entities + 2u);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(*pool.begin(), 42);
+    ASSERT_EQ(*pool.begin(), 1);
 }
 
 TEST(Storage, AggregatesMustWork) {
