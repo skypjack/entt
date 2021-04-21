@@ -896,9 +896,7 @@ public:
 
             each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
         } else {
-            ([this](auto *cpool) {
-                cpool->erase(cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end(), this);
-            }(assure<Component>()), ...);
+            (assure<Component>()->clear(this), ...);
         }
     }
 
