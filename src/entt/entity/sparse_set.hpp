@@ -181,17 +181,17 @@ protected:
     virtual void swap_at([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) {}
 
     /**
-     * @brief Attempts to remove an entity from the internal packed array.
+     * @brief Attempts to erase an entity from the internal packed array.
      * @param pos A valid position of an entity within storage.
      */
     virtual void swap_and_pop([[maybe_unused]] const std::size_t pos) {}
 
     /**
-     * @brief Last chance to use an entity that is about to be removed.
+     * @brief Last chance to use an entity that is about to be erased.
      * @param entity A valid entity identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    virtual void about_to_remove([[maybe_unused]] const Entity entity, [[maybe_unused]] void *ud) {}
+    virtual void about_to_erase([[maybe_unused]] const Entity entity, [[maybe_unused]] void *ud) {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -448,20 +448,20 @@ public:
     }
 
     /**
-     * @brief Removes an entity from a sparse set.
+     * @brief Erases an entity from a sparse set.
      *
      * @warning
-     * Attempting to remove an entity that doesn't belong to the sparse set
+     * Attempting to erase an entity that doesn't belong to the sparse set
      * results in undefined behavior.
      *
      * @param entt A valid entity identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void remove(const entity_type entt, void *ud = nullptr) {
+    void erase(const entity_type entt, void *ud = nullptr) {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
 
         // last chance to use the entity for derived classes and mixins, if any
-        about_to_remove(entt, ud);
+        about_to_erase(entt, ud);
 
         auto &ref = sparse[page(entt)][offset(entt)];
         const auto pos = size_type{to_integral(ref)};
@@ -479,16 +479,16 @@ public:
     }
 
     /**
-     * @brief Removes multiple entities from a pool.
+     * @brief Erases multiple entities from a set.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     template<typename It>
-    void remove(It first, It last, void *ud = nullptr) {
+    void erase(It first, It last, void *ud = nullptr) {
         for(; first != last; ++first) {
-            remove(*first, ud);
+            erase(*first, ud);
         }
     }
 
@@ -620,7 +620,7 @@ public:
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void clear(void *ud = nullptr) ENTT_NOEXCEPT {
-        remove(begin(), end(), ud);
+        erase(begin(), end(), ud);
     }
 
 private:

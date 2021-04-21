@@ -626,11 +626,11 @@ struct storage_adapter_mixin: Type {
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    /*! @copydoc basic_sparse_set::about_to_remove */
-    void about_to_remove(const typename Type::entity_type entity, void *ud) final {
+    /*! @copydoc basic_sparse_set::about_to_erase */
+    void about_to_erase(const typename Type::entity_type entity, void *ud) final {
         ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
         destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entity);
-        Type::about_to_remove(entity, ud);
+        Type::about_to_erase(entity, ud);
     }
 
 public:

@@ -27,7 +27,7 @@ struct throwing_component {
 struct update_from_destructor {
     ~update_from_destructor() {
         if(target != entt::null) {
-            storage->remove(target);
+            storage->erase(target);
         }
     }
 
@@ -58,7 +58,7 @@ TEST(Storage, Functionalities) {
     ASSERT_TRUE(pool.contains(entt::entity{41}));
     ASSERT_EQ(pool.get(entt::entity{41}), 3);
 
-    pool.remove(entt::entity{41});
+    pool.erase(entt::entity{41});
 
     ASSERT_TRUE(pool.empty());
     ASSERT_EQ(pool.size(), 0u);
@@ -137,14 +137,14 @@ TEST(Storage, Remove) {
 
     pool.emplace(entt::entity{3});
     pool.emplace(entt::entity{42});
-    base.remove(base.begin(), base.end());
+    base.erase(base.begin(), base.end());
 
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entt::entity{3}, 3);
     pool.emplace(entt::entity{42}, 42);
     pool.emplace(entt::entity{9}, 9);
-    base.remove(base.rbegin(), base.rbegin() + 2u);
+    base.erase(base.rbegin(), base.rbegin() + 2u);
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 9);
@@ -155,7 +155,7 @@ TEST(Storage, Remove) {
     pool.emplace(entt::entity{9}, 9);
 
     entt::entity entities[2]{entt::entity{3}, entt::entity{9}};
-    base.remove(std::begin(entities), std::end(entities));
+    base.erase(std::begin(entities), std::end(entities));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 42);
@@ -171,7 +171,7 @@ TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::unordered_set<int>> pool;
     pool.emplace(entt::entity{0}).insert(42);
-    pool.remove(entt::entity{0});
+    pool.erase(entt::entity{0});
 }
 
 TEST(Storage, Iterator) {
@@ -676,7 +676,7 @@ TEST(Storage, UpdateFromDestructor) {
         }
 
         pool.get(entt::entity(size/2)).target = target;
-        pool.remove(entt::entity(size/2));
+        pool.erase(entt::entity(size/2));
 
         ASSERT_EQ(pool.size(), size - 1u - (target != entt::null));
     };

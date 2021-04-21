@@ -191,7 +191,7 @@ class basic_observer {
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, basic_registry<Entity> &, const Entity entt) {
             if(obs.storage.contains(entt) && !(obs.storage.get(entt) &= (~(1 << Index)))) {
-                obs.storage.remove(entt);
+                obs.storage.erase(entt);
             }
         }
 
@@ -234,7 +234,7 @@ class basic_observer {
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, basic_registry<Entity> &, const Entity entt) {
             if(obs.storage.contains(entt) && !(obs.storage.get(entt) &= (~(1 << Index)))) {
-                obs.storage.remove(entt);
+                obs.storage.erase(entt);
             }
         }
 

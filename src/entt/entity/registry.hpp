@@ -84,7 +84,7 @@ class basic_registry {
         void discard_if([[maybe_unused]] basic_registry &owner, const Entity entt) {
             if constexpr(sizeof...(Owned) == 0) {
                 if(current.contains(entt)) {
-                    current.remove(entt);
+                    current.erase(entt);
                 }
             } else {
                 if(const auto cpools = std::make_tuple(owner.assure<Owned>()...); std::get<0>(cpools)->contains(entt) && (std::get<0>(cpools)->index(entt) < current)) {
@@ -674,7 +674,7 @@ public:
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>()->remove(entity, this), ...);
+        (assure<Component>()->erase(entity, this), ...);
     }
 
     /**
@@ -691,7 +691,7 @@ public:
     void remove(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>()->remove(first, last, this), ...);
+        (assure<Component>()->erase(first, last, this), ...);
     }
 
     /**
@@ -717,7 +717,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         return ([this, entity](auto *cpool) {
-            return cpool->contains(entity) ? (cpool->remove(entity, this), true) : false;
+            return cpool->contains(entity) ? (cpool->erase(entity, this), true) : false;
         }(assure<Component>()) + ... + size_type{});
     }
 
@@ -741,7 +741,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.pool->remove(std::begin(wrap), std::end(wrap), this);
+                pdata.pool->erase(std::begin(wrap), std::end(wrap), this);
             }
         }
     }
@@ -897,7 +897,7 @@ public:
             each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
         } else {
             ([this](auto *cpool) {
-                cpool->remove(cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end(), this);
+                cpool->erase(cpool->basic_sparse_set<entity_type>::begin(), cpool->basic_sparse_set<entity_type>::end(), this);
             }(assure<Component>()), ...);
         }
     }

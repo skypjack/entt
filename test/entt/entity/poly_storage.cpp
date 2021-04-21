@@ -24,7 +24,7 @@ struct PolyStorage: entt::type_list_cat_t<
     struct type: entt::Storage<Entity>::template type<Base> {
         static constexpr auto base = decltype(as_type_list(std::declval<entt::Storage<Entity>>()))::size;
 
-        void remove(entt::basic_registry<Entity> &owner, const entity_type *first, const entity_type *last) {
+        void erase(entt::basic_registry<Entity> &owner, const entity_type *first, const entity_type *last) {
             entt::poly_call<base + 0>(*this, first, last, &owner);
         }
 
@@ -60,7 +60,7 @@ struct PolyStorage: entt::type_list_cat_t<
     using impl = entt::value_list_cat_t<
         typename entt::Storage<Entity>::template impl<Type>,
         entt::value_list<
-            &Type::template remove<const entity_type *>,
+            &Type::template erase<const entity_type *>,
             &members<Type>::emplace,
             &members<Type>::get,
             &members<Type>::copy_to
@@ -128,14 +128,14 @@ TEST(PolyStorage, Constness) {
     entity[0] = registry.create();
     registry.emplace<int>(entity[0], 42);
 
-    // cannot invoke remove on a const storage, let's copy the returned value
+    // cannot invoke erase on a const storage, let's copy the returned value
     auto cstorage = cregistry.storage(entt::type_id<int>());
 
-    ASSERT_DEATH(cstorage->remove(registry, std::begin(entity), std::end(entity)), "");
+    ASSERT_DEATH(cstorage->erase(registry, std::begin(entity), std::end(entity)), "");
     ASSERT_TRUE(registry.all_of<int>(entity[0]));
 
     auto &&storage = registry.storage(entt::type_id<int>());
-    storage->remove(registry, std::begin(entity), std::end(entity));
+    storage->erase(registry, std::begin(entity), std::end(entity));
 
     ASSERT_FALSE(registry.all_of<int>(entity[0]));
 }

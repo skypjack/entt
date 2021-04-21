@@ -37,7 +37,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(set[0u], entt::entity{42});
 
-    set.remove(entt::entity{42});
+    set.erase(entt::entity{42});
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
@@ -101,14 +101,14 @@ TEST(SparseSet, Pagination) {
     ASSERT_TRUE(set.contains(entt::entity{page_size}));
     ASSERT_FALSE(set.contains(entt::entity{page_size+1}));
 
-    set.remove(entt::entity{page_size-1});
+    set.erase(entt::entity{page_size-1});
 
     ASSERT_EQ(set.extent(), 2 * page_size);
     ASSERT_FALSE(set.contains(entt::entity{page_size-1}));
     ASSERT_TRUE(set.contains(entt::entity{page_size}));
 
     set.shrink_to_fit();
-    set.remove(entt::entity{page_size});
+    set.erase(entt::entity{page_size});
 
     ASSERT_EQ(set.extent(), 2 * page_size);
     ASSERT_FALSE(set.contains(entt::entity{page_size-1}));
@@ -149,7 +149,7 @@ TEST(SparseSet, Insert) {
     ASSERT_EQ(set.data()[set.index(entt::entity{24})], entt::entity{24});
 }
 
-TEST(SparseSet, Remove) {
+TEST(SparseSet, Erase) {
     entt::sparse_set set;
     entt::entity entities[3];
 
@@ -158,17 +158,17 @@ TEST(SparseSet, Remove) {
     entities[2] = entt::entity{9};
 
     set.insert(std::begin(entities), std::end(entities));
-    set.remove(set.begin(), set.end());
+    set.erase(set.begin(), set.end());
 
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
-    set.remove(set.begin(), set.end());
+    set.erase(set.begin(), set.end());
 
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
-    set.remove(entities, entities + 2u);
+    set.erase(entities, entities + 2u);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(*set.begin(), entt::entity{9});
@@ -176,7 +176,7 @@ TEST(SparseSet, Remove) {
     set.clear();
     set.insert(std::begin(entities), std::end(entities));
     std::swap(entities[1], entities[2]);
-    set.remove(entities, entities + 2u);
+    set.erase(entities, entities + 2u);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(*set.begin(), entt::entity{42});
