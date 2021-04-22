@@ -496,11 +496,10 @@ public:
      * @brief Removes an entity from a sparse set if it exists.
      * @param entt A valid entity identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
+     * @return True if the entity is actually removed, false otherwise.
      */
-    void remove(const entity_type entt, void *ud = nullptr) {
-        if(contains(entt)) {
-            erase(entt, ud);
-        }
+    bool remove(const entity_type entt, void *ud = nullptr) {
+        return contains(entt) ? (erase(entt, ud), true) : false;
     }
 
     /**
@@ -509,12 +508,17 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param ud Optional user data that are forwarded as-is to derived classes.
+     * @return The number of entities actually removed.
      */
     template<typename It>
-    void remove(It first, It last, void *ud = nullptr) {
+    size_type remove(It first, It last, void *ud = nullptr) {
+        size_type count{};
+
         for(; first != last; ++first) {
-            remove(*first, ud);
+            count += remove(*first, ud);
         }
+
+        return count;
     }
 
     /**

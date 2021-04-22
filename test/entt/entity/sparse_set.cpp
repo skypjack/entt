@@ -198,36 +198,35 @@ TEST(SparseSet, Remove) {
 
     ASSERT_TRUE(set.empty());
 
-    set.remove(std::begin(entities), std::end(entities));
-    set.remove(entities[1]);
+    ASSERT_EQ(set.remove(std::begin(entities), std::end(entities)), 0u);
+    ASSERT_EQ(set.remove(entities[1]), 0u);
 
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
-    set.remove(set.begin(), set.end());
 
+    ASSERT_EQ(set.remove(set.begin(), set.end()), 3u);
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
-    set.remove(entities, entities + 2u);
 
+    ASSERT_EQ(set.remove(entities, entities + 2u), 2u);
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(*set.begin(), entt::entity{9});
 
-    set.remove(entities[2]);
-    set.remove(entities[2]);
-
+    ASSERT_EQ(set.remove(entities[2]), 1u);
+    ASSERT_EQ(set.remove(entities[2]), 0u);
     ASSERT_TRUE(set.empty());
 
     set.insert(entities, entities + 2u);
-    set.remove(std::begin(entities), std::end(entities));
 
+    ASSERT_EQ(set.remove(std::begin(entities), std::end(entities)), 2u);
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
     std::swap(entities[1], entities[2]);
-    set.remove(entities, entities + 2u);
 
+    ASSERT_EQ(set.remove(entities, entities + 2u), 2u);
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(*set.begin(), entt::entity{42});
 }

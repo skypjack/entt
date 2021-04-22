@@ -83,9 +83,7 @@ class basic_registry {
 
         void discard_if([[maybe_unused]] basic_registry &owner, const Entity entt) {
             if constexpr(sizeof...(Owned) == 0) {
-                if(current.contains(entt)) {
-                    current.erase(entt);
-                }
+                current.remove(entt);
             } else {
                 if(const auto cpools = std::make_tuple(owner.assure<Owned>()...); std::get<0>(cpools)->contains(entt) && (std::get<0>(cpools)->index(entt) < current)) {
                     const auto pos = --current;

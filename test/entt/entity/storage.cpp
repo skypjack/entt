@@ -181,30 +181,29 @@ TEST(Storage, Remove) {
     pool.emplace(entities[0]);
     pool.emplace(entities[1]);
     pool.emplace(entities[2]);
-    pool.remove(std::begin(entities), std::end(entities));
-    pool.remove(std::begin(entities), std::end(entities));
 
+    ASSERT_EQ(pool.remove(std::begin(entities), std::end(entities)), 3u);
+    ASSERT_EQ(pool.remove(std::begin(entities), std::end(entities)), 0u);
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entities[0], 0);
     pool.emplace(entities[1], 1);
     pool.emplace(entities[2], 2);
-    pool.remove(entities, entities + 2u);
 
+    ASSERT_EQ(pool.remove(entities, entities + 2u), 2u);
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 2);
 
-    pool.remove(entities[2]);
-    pool.remove(entities[2]);
-
+    ASSERT_EQ(pool.remove(entities[2]), 1u);
+    ASSERT_EQ(pool.remove(entities[2]), 0u);
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entities[0], 0);
     pool.emplace(entities[1], 1);
     pool.emplace(entities[2], 2);
     std::swap(entities[1], entities[2]);
-    pool.remove(entities, entities + 2u);
 
+    ASSERT_EQ(pool.remove(entities, entities + 2u), 2u);
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 1);
 }
