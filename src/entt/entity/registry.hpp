@@ -713,10 +713,7 @@ public:
     template<typename... Component>
     size_type remove_if_exists(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-
-        return ([this, entity](auto *cpool) {
-            return cpool->contains(entity) ? (cpool->erase(entity, this), true) : false;
-        }(assure<Component>()) + ... + size_type{});
+        return (assure<Component>()->remove(entity, this) + ... + size_type{});
     }
 
     /**
@@ -737,9 +734,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.pool->erase(entity, this);
-            }
+            pools[pos-1].pool && pools[pos-1].pool->remove(entity, this);
         }
     }
 
