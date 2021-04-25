@@ -10,8 +10,8 @@ WIP:
 * isolate view iterator, unwrap iterators in registry ::remove/::erase/::destroy to use the faster solution for non-view iterators
 * compressed pair to exploit ebo in sparse set and the others
 * rename sparse_set::entity_type (and the others) to value_type
+* any/meta: remove dependency on <functional> (reference_wrapper, invoke)
 * scheduler, use any (or poly?) instead of unique_ptr
-* any and the like: remove constructor that accepts reference wrapper, allow only in-place T& and entt::make_any<T>(...)
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * add user data to type_info

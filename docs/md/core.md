@@ -280,21 +280,16 @@ an opaque container for const and non-const references:
 ```cpp
 int value = 42;
 
-// reference construction
-entt::any any{std::ref(value)};
-entt::any cany{std::cref(value)};
+entt::any any{std::in_place_type<int &>(value)};
+entt::any cany = entt::make_any<const int &>(value);
 
-// alias construction
-int value = 42;
-entt::any in_place{std::in_place_type<int &>, value};
-entt::any make_any = entt::make_any<int &>(value);
+any.emplace<const int &>(value);
 ```
 
-In other words, whenever `any` intercepts a `reference_wrapper` or is explicitly
-told that users want to construct an alias, it acts as a pointer to the original
-instance rather than making a copy of it or moving it internally. The contained
-object is never destroyed and users must ensure that its lifetime exceeds that
-of the container.<br/>
+In other words, whenever `any` is explicitly told to construct an _alias_, it
+acts as a pointer to the original instance rather than making a copy of it or
+moving it internally. The contained object is never destroyed and users must
+ensure that its lifetime exceeds that of the container.<br/>
 Similarly, it's possible to create non-owning copies of `any` from an existing
 object:
 

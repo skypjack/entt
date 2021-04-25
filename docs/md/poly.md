@@ -312,13 +312,13 @@ instance->draw();
 
 The `poly` class template offers a wide range of constructors, from the default
 one (which will return an uninitialized `poly` object) to the copy and move
-constructor, as well as the ability to create objects in-place.<br/>
-Among others, there is a constructor that allows users to wrap unmanaged objects
-in a `poly` instance (either const or non-const ones):
+constructors, as well as the ability to create objects in-place.<br/>
+Among others, there is also a constructor that allows users to wrap unmanaged
+objects in a `poly` instance (either const or non-const ones):
 
 ```cpp
 circle shape;
-drawable instance{std::ref(shape)};
+drawable instance{std::in_place_type<circle &>, shape};
 ```
 
 Similarly, it's possible to create non-owning copies of `poly` from an existing
