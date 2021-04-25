@@ -185,12 +185,11 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &> or entt::make_any<T &> instead")]]
     basic_any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : instance{},
-          vtable{&basic_vtable<Type &>}
+        : basic_any{}
     {
-        initialize<Type &>(value.get());
+        // invokes deprecated assignment operator (and avoids issues with vs2017)
+        *this = value;
     }
 
     /**
@@ -262,7 +261,7 @@ public:
      * @return This any object.
      */
     template<typename Type>
-    [[deprecated("Use emplace<Type &> instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &> or emplace<Type &> instead")]]
     basic_any & operator=(std::reference_wrapper<Type> value) ENTT_NOEXCEPT {
         emplace<Type &>(value.get());
         return *this;

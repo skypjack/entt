@@ -253,10 +253,12 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &> or entt::make_meta_any<T &> instead")]]
     meta_any(std::reference_wrapper<Type> value)
-        : meta_any{std::in_place_type<Type &>, value.get()}
-    {}
+        : meta_any{}
+    {
+        // invokes deprecated assignment operator (and avoids issues with vs2017)
+        *this = value;
+    }
 
     /**
      * @brief Constructs a wrapper from a given value.
@@ -320,7 +322,7 @@ public:
      * @return This meta any object.
      */
     template<typename Type>
-    [[deprecated("Use emplace<Type &> instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_meta_any<T &> or emplace<Type &> instead")]]
     meta_any & operator=(std::reference_wrapper<Type> value) {
         emplace<Type &>(value.get());
         return *this;
