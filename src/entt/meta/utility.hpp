@@ -209,9 +209,10 @@ template<typename Type, auto Data, typename Policy = as_is_t>
         if constexpr(std::is_same_v<Policy, as_void_t>) {
             return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
         } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-            return meta_any{std::reference_wrapper{std::forward<decltype(value)>(value)}};
+            return meta_any{std::in_place_type<decltype(value)>, std::forward<decltype(value)>(value)};
         } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
-            return meta_any{std::cref(std::forward<decltype(value)>(value))};
+            const auto &cvalue = std::as_const(value);
+            return meta_any{std::in_place_type<decltype(cvalue)>, cvalue};
         } else {
             static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
             return meta_any{std::forward<decltype(value)>(value)};
@@ -263,9 +264,11 @@ template<typename Type, auto Candidate, typename Policy = as_is_t, std::size_t..
             std::invoke(Candidate, std::forward<decltype(params)>(params)...);
             return meta_any{std::in_place_type<void>};
         } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-            return meta_any{std::reference_wrapper{std::invoke(Candidate, std::forward<decltype(params)>(params)...)}};
+            auto &value = std::invoke(Candidate, std::forward<decltype(params)>(params)...);
+            return meta_any{std::in_place_type<decltype(value)>, value};
         } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
-            return meta_any{std::cref(std::invoke(Candidate, std::forward<decltype(params)>(params)...))};
+            const auto &cvalue = std::invoke(Candidate, std::forward<decltype(params)>(params)...);
+            return meta_any{std::in_place_type<decltype(cvalue)>, cvalue};
         } else {
             static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
             return meta_any{std::invoke(Candidate, std::forward<decltype(params)>(params)...)};

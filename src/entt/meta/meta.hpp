@@ -172,38 +172,54 @@ class meta_any {
                 }
             break;
             case operation::REF:
+                static_cast<meta_any *>(to)->emplace<Type &>(any_cast<Type &>(const_cast<any &>(from)));
+                break;
             case operation::CREF:
-                *static_cast<meta_any *>(to) = (op == operation::REF ? meta_any{std::ref(any_cast<Type &>(const_cast<any &>(from)))} : meta_any{std::cref(any_cast<const std::decay_t<Type> &>(from))});
+                static_cast<meta_any *>(to)->emplace<const std::remove_reference_t<Type> &>(any_cast<const std::remove_reference_t<Type> &>(from));
                 break;
             case operation::DEREF:
+                if constexpr(is_meta_pointer_like_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
+                    using element_type = std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>;
+
+                    if constexpr(std::is_function_v<element_type>) {
+                        *static_cast<meta_any *>(to) = any_cast<std::decay_t<Type>>(from);
+                    } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>, void>) {
+                        using in_place_type = decltype(adl_meta_pointer_like<std::decay_t<Type>>::dereference(any_cast<const std::decay_t<Type> &>(from)));
+                        static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<std::decay_t<Type>>::dereference(any_cast<const std::decay_t<Type> &>(from)));
+                    }
+                }
+                break;
             case operation::CDEREF:
                 if constexpr(is_meta_pointer_like_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
                     using element_type = std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>;
 
                     if constexpr(std::is_function_v<element_type>) {
                         *static_cast<meta_any *>(to) = any_cast<std::decay_t<Type>>(from);
-                    } else if constexpr(!std::is_same_v<element_type, void>) {
-                        using adl_meta_pointer_like_type = adl_meta_pointer_like<std::decay_t<Type>>;
-
-                        if constexpr(std::is_lvalue_reference_v<decltype(adl_meta_pointer_like_type::dereference(std::declval<const std::decay_t<Type> &>()))>) {
-                            auto &&obj = adl_meta_pointer_like_type::dereference(any_cast<const std::decay_t<Type> &>(from));
-                            *static_cast<meta_any *>(to) = (op == operation::DEREF ? meta_any{std::ref(obj)} : meta_any{std::cref(obj)});
-                        } else {
-                            *static_cast<meta_any *>(to) = adl_meta_pointer_like_type::dereference(any_cast<const std::decay_t<Type> &>(from));
-                        }
+                    } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>, void>) {
+                        using deref_type = decltype(adl_meta_pointer_like<std::decay_t<Type>>::dereference(any_cast<const std::decay_t<Type> &>(from)));
+                        using in_place_type = std::conditional_t<std::is_lvalue_reference_v<deref_type>, const std::remove_reference_t<deref_type> &, deref_type>;
+                        static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<std::decay_t<Type>>::dereference(any_cast<const std::decay_t<Type> &>(from)));
                     }
                 }
                 break;
             case operation::SEQ:
+                if constexpr(is_complete_v<meta_sequence_container_traits<std::decay_t<Type>>>) {
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<std::decay_t<Type>>, const_cast<any &>(from).as_ref() };
+                }
+                break;
             case operation::CSEQ:
                 if constexpr(is_complete_v<meta_sequence_container_traits<std::decay_t<Type>>>) {
-                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<std::decay_t<Type>>, (op == operation::SEQ ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<std::decay_t<Type>>, from.as_ref() };
                 }
                 break;
             case operation::ASSOC:
+                if constexpr(is_complete_v<meta_associative_container_traits<std::decay_t<Type>>>) {
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<std::decay_t<Type>>, const_cast<any &>(from).as_ref() };
+                }
+                break;
             case operation::CASSOC:
                 if constexpr(is_complete_v<meta_associative_container_traits<std::decay_t<Type>>>) {
-                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<std::decay_t<Type>>, (op == operation::ASSOC ? const_cast<any &>(from).as_ref() : from.as_ref()) };
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<std::decay_t<Type>>, from.as_ref() };
                 }
                 break;
             }
@@ -1958,10 +1974,12 @@ class meta_associative_container::meta_iterator {
             ++any_cast<It &>(const_cast<any &>(from));
             break;
         case operation::DEREF:
+            const auto &it = any_cast<const It &>(from);
             if constexpr(KeyOnly) {
-                static_cast<std::pair<meta_any, meta_any> *>(to)->first = std::cref(*any_cast<const It &>(from));
+                static_cast<std::pair<meta_any, meta_any> *>(to)->first.emplace<decltype(*it)>(*it);
             } else {
-                *static_cast<std::pair<meta_any, meta_any> *>(to) = std::make_pair<meta_any, meta_any>(std::cref(any_cast<const It &>(from)->first), std::ref(any_cast<const It &>(from)->second));
+                static_cast<std::pair<meta_any, meta_any> *>(to)->first.emplace<decltype((it->first))>(it->first);
+                static_cast<std::pair<meta_any, meta_any> *>(to)->second.emplace<decltype((it->second))>(it->second);
             }
             break;
         }
