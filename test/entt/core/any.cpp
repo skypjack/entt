@@ -857,6 +857,29 @@ TEST_F(Any, AnyCast) {
     ASSERT_DEATH(entt::any_cast<double>(entt::any{42}), "");
 }
 
+TEST_F(Any, MakeAny) {
+    int value = 42;
+    auto any = entt::make_any<int>(value);
+    auto ext = entt::make_any<int, sizeof(int), alignof(int)>(value);
+    auto ref = entt::make_any<int &>(value);
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(ext);
+    ASSERT_TRUE(ref);
+
+    ASSERT_EQ(entt::any_cast<const int &>(any), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(ext), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(ref), 42);
+
+    ASSERT_EQ(decltype(any)::length, entt::any::length);
+    ASSERT_NE(decltype(ext)::length, entt::any::length);
+    ASSERT_EQ(decltype(ref)::length, entt::any::length);
+
+    ASSERT_NE(any.data(), &value);
+    ASSERT_NE(ext.data(), &value);
+    ASSERT_EQ(ref.data(), &value);
+}
+
 TEST_F(Any, NotCopyableType) {
     auto test = [](entt::any any) {
         entt::any copy{any};

@@ -247,8 +247,16 @@ entt::any any{0};
 entt::any in_place{std::in_place_type<int>, 42};
 ```
 
-The `any` class takes the burden of destroying the contained element when
-required, regardless of the storage strategy used for the specific object.<br/>
+Alternatively, the `make_any` function serves the same purpose but requires to
+always be explicit about the type:
+
+```cpp
+entt::any any = entt::make_any<int>(42);
+```
+
+In both cases, the `any` class takes the burden of destroying the contained
+element when required, regardless of the storage strategy used for the specific
+object.<br/>
 Furthermore, an instance of `any` is not tied to an actual type. Therefore, the
 wrapper will be reconfigured by assigning it an object of a different type than
 the one contained, so as to be able to handle the new instance.<br/>
@@ -278,7 +286,8 @@ entt::any cany{std::cref(value)};
 
 // alias construction
 int value = 42;
-entt::any in_place{std::in_place_type<int &>, &value};
+entt::any in_place{std::in_place_type<int &>, value};
+entt::any make_any = entt::make_any<int &>(value);
 ```
 
 In other words, whenever `any` intercepts a `reference_wrapper` or is explicitly

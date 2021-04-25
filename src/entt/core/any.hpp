@@ -154,6 +154,11 @@ class basic_any {
     }
 
 public:
+    /*! @brief Size of the internal storage. */
+    static constexpr auto length = Len;
+    /*! @brief Alignment requirement. */
+    static constexpr auto alignment = Align;
+
     /*! @brief Default constructor. */
     basic_any() ENTT_NOEXCEPT
         : instance{},
@@ -161,7 +166,7 @@ public:
     {}
 
     /**
-     * @brief Constructs an any by directly initializing the new object.
+     * @brief Constructs a wrapper by directly initializing the new object.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
@@ -175,7 +180,7 @@ public:
     }
 
     /**
-     * @brief Constructs an any that holds an unmanaged object.
+     * @brief Constructs a wrapper that holds an unmanaged object.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
@@ -188,7 +193,7 @@ public:
     }
 
     /**
-     * @brief Constructs an any from a given value.
+     * @brief Constructs a wrapper from a given value.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
@@ -334,7 +339,7 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @return An any that shares a reference to an unmanaged object.
+     * @return A wrapper that shares a reference to an unmanaged object.
      */
     [[nodiscard]] basic_any as_ref() ENTT_NOEXCEPT {
         basic_any ref{};
@@ -417,6 +422,21 @@ template<typename Type, std::size_t Len, std::size_t Align>
 Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     // last attempt to make wrappers for const references return their values
     return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
+}
+
+
+/**
+ * @brief Constructs a wrapper from a given type, passing it all arguments.
+ * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
+ * @tparam Args Types of arguments to use to construct the new instance.
+ * @param args Parameters to use to construct the instance.
+ * @return A properly initialized wrapper for an object of the given type.
+ */
+template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename... Args>
+basic_any<Len, Align> make_any(Args &&... args) {
+    return basic_any<Len, Align>{std::in_place_type<Type>, std::forward<Args>(args)...};
 }
 
 

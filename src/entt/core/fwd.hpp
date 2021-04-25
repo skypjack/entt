@@ -9,7 +9,7 @@
 namespace entt {
 
 
-template<std::size_t Len, std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
+template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(typename std::aligned_storage_t<Len + !Len>)>
 class basic_any;
 
 
@@ -18,7 +18,7 @@ using id_type = ENTT_ID_TYPE;
 
 
 /*! @brief Alias declaration for the most common use case. */
-using any = basic_any<sizeof(double[2])>;
+using any = basic_any<>;
 
 
 }
