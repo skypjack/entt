@@ -207,16 +207,6 @@ public:
     {}
 
     /**
-     * @brief Constructs a poly that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the poly.
-     * @param value An instance of an object to use to initialize the poly.
-     */
-    template<typename Type>
-    basic_poly(std::reference_wrapper<Type> value)
-        : basic_poly{std::in_place_type<Type &>, value.get()}
-    {}
-
-    /**
      * @brief Constructs a poly from a given value.
      * @tparam Type Type of object to use to initialize the poly.
      * @param value An instance of an object to use to initialize the poly.

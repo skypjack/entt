@@ -54,7 +54,7 @@ TEST(PolyDefined, Functionalities) {
 
     entt::poly<Defined> empty{};
     entt::poly<Defined> in_place{std::in_place_type<impl>, 3};
-    entt::poly<Defined> alias{std::ref(instance)};
+    entt::poly<Defined> alias{std::in_place_type<impl &>, instance};
     entt::poly<Defined> value{impl{}};
 
     ASSERT_FALSE(empty);
@@ -140,7 +140,7 @@ TEST(PolyDefined, Owned) {
 
 TEST(PolyDefined, Reference) {
     impl instance{};
-    entt::poly<Defined> poly{std::ref(instance)};
+    entt::poly<Defined> poly{std::in_place_type<impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_NE(poly.data(), nullptr);
@@ -164,7 +164,7 @@ TEST(PolyDefined, Reference) {
 
 TEST(PolyDefined, ConstReference) {
     impl instance{};
-    entt::poly<Defined> poly{std::cref(instance)};
+    entt::poly<Defined> poly{std::in_place_type<const impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_EQ(poly.data(), nullptr);

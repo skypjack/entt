@@ -48,7 +48,7 @@ TEST(PolyDeduced, Functionalities) {
 
     entt::poly<Deduced> empty{};
     entt::poly<Deduced> in_place{std::in_place_type<impl>, 3};
-    entt::poly<Deduced> alias{std::ref(instance)};
+    entt::poly<Deduced> alias{std::in_place_type<impl &>, instance};
     entt::poly<Deduced> value{impl{}};
 
     ASSERT_FALSE(empty);
@@ -134,7 +134,7 @@ TEST(PolyDeduced, Owned) {
 
 TEST(PolyDeduced, Reference) {
     impl instance{};
-    entt::poly<Deduced> poly{std::ref(instance)};
+    entt::poly<Deduced> poly{std::in_place_type<impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_NE(poly.data(), nullptr);
@@ -158,7 +158,7 @@ TEST(PolyDeduced, Reference) {
 
 TEST(PolyDeduced, ConstReference) {
     impl instance{};
-    entt::poly<Deduced> poly{std::cref(instance)};
+    entt::poly<Deduced> poly{std::in_place_type<const impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_EQ(poly.data(), nullptr);
