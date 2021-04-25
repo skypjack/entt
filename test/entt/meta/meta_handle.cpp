@@ -42,7 +42,7 @@ TEST_F(MetaHandle, Functionalities) {
     ASSERT_TRUE(handle->invoke("incr"_hs));
     ASSERT_EQ(instance.value, 1);
 
-    entt::meta_any any{std::ref(instance)};
+    auto any = entt::make_meta_any<clazz_t &>(instance);
     handle = entt::meta_handle{any};
 
     ASSERT_FALSE(std::as_const(handle)->invoke("decr"_hs));
