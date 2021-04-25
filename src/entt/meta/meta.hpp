@@ -219,7 +219,7 @@ public:
     {}
 
     /**
-     * @brief Constructs a meta any by directly initializing the new object.
+     * @brief Constructs a wrapper by directly initializing the new object.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
@@ -232,7 +232,7 @@ public:
     {}
 
     /**
-     * @brief Constructs a meta any that holds an unmanaged object.
+     * @brief Constructs a wrapper that holds an unmanaged object.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
@@ -242,7 +242,7 @@ public:
     {}
 
     /**
-     * @brief Constructs a meta any from a given value.
+     * @brief Constructs a wrapper from a given value.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
@@ -348,7 +348,7 @@ public:
      * @tparam Args Types of arguments to use to invoke the function.
      * @param id Unique identifier.
      * @param args Parameters to use to invoke the function.
-     * @return A meta any containing the returned value, if any.
+     * @return A wrapper containing the returned value, if any.
      */
     template<typename... Args>
     meta_any invoke(const id_type id, Args &&... args) const;
@@ -374,7 +374,7 @@ public:
     /**
      * @brief Gets the value of a given variable.
      * @param id Unique identifier.
-     * @return A meta any containing the value of the underlying variable.
+     * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(const id_type id) const;
 
@@ -535,7 +535,7 @@ public:
 
     /**
      * @brief Indirection operator for dereferencing opaque objects.
-     * @return A meta any that shares a reference to an unmanaged object if the
+     * @return A wrapper that shares a reference to an unmanaged object if the
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
     [[nodiscard]] meta_any operator*() ENTT_NOEXCEPT {
@@ -570,7 +570,7 @@ public:
 
     /**
      * @brief Aliasing constructor.
-     * @return A meta any that shares a reference to an unmanaged object.
+     * @return A wrapper that shares a reference to an unmanaged object.
      */
     [[nodiscard]] meta_any as_ref() ENTT_NOEXCEPT {
         meta_any ref{};
@@ -594,12 +594,25 @@ private:
 
 /**
  * @brief Checks if two wrappers differ in their content.
- * @param lhs A meta any object, either empty or not.
- * @param rhs A meta any object, either empty or not.
+ * @param lhs A wrapper, either empty or not.
+ * @param rhs A wrapper, either empty or not.
  * @return True if the two wrappers differ in their content, false otherwise.
  */
 [[nodiscard]] inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
+}
+
+
+/**
+ * @brief Constructs a wrapper from a given type, passing it all arguments.
+ * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Args Types of arguments to use to construct the new instance.
+ * @param args Parameters to use to construct the instance.
+ * @return A properly initialized wrapper for an object of the given type.
+ */
+template<typename Type, typename... Args>
+meta_any make_meta_any(Args &&... args) {
+    return meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
 }
 
 
@@ -659,7 +672,7 @@ struct meta_handle {
 
     /**
      * @brief Access operator for accessing the contained opaque object.
-     * @return A meta any that shares a reference to an unmanaged object.
+     * @return A wrapper that shares a reference to an unmanaged object.
      */
     [[nodiscard]] meta_any * operator->() {
         return &any;
@@ -690,7 +703,7 @@ struct meta_prop {
 
     /**
      * @brief Returns the stored key as a const reference.
-     * @return A meta any containing the key stored with the property.
+     * @return A wrapper containing the key stored with the property.
      */
     [[nodiscard]] meta_any key() const {
         return node->id.as_ref();
@@ -698,7 +711,7 @@ struct meta_prop {
 
     /**
      * @brief Returns the stored value by copy.
-     * @return A meta any containing the value stored with the property.
+     * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
         return node->value;
@@ -758,7 +771,7 @@ struct meta_ctor {
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
-     * @return A meta any containing the new instance, if any.
+     * @return A wrapper containing the new instance, if any.
      */
     [[nodiscard]] meta_any invoke(meta_any * const args, const size_type sz) const {
         return sz == arity() ? node->invoke(args) : meta_any{};
@@ -771,7 +784,7 @@ struct meta_ctor {
      *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.
-     * @return A meta any containing the new instance, if any.
+     * @return A wrapper containing the new instance, if any.
      */
     template<typename... Args>
     [[nodiscard]] meta_any invoke([[maybe_unused]] Args &&... args) const {
@@ -872,7 +885,7 @@ struct meta_data {
      * member. Otherwise, invoking the getter results in an undefined behavior.
      *
      * @param instance An opaque instance of the underlying type.
-     * @return A meta any containing the value of the underlying variable.
+     * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
         return node->get(std::move(instance));
@@ -975,7 +988,7 @@ struct meta_func {
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
      * @param sz Number of parameters to use to invoke the function.
-     * @return A meta any containing the returned value, if any.
+     * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any * const args, const size_type sz) const {
         return sz == arity() ? node->invoke(std::move(instance), args) : meta_any{};
@@ -989,7 +1002,7 @@ struct meta_func {
      * @tparam Args Types of arguments to use to invoke the function.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
-     * @return A meta any containing the new instance, if any.
+     * @return A wrapper containing the new instance, if any.
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&... args) const {
@@ -1379,7 +1392,7 @@ public:
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
-     * @return A meta any containing the new instance, if any.
+     * @return A wrapper containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
         meta_any ret{};
@@ -1394,7 +1407,7 @@ public:
      *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.
-     * @return A meta any containing the new instance, if any.
+     * @return A wrapper containing the new instance, if any.
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&... args) const {
@@ -1415,7 +1428,7 @@ public:
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
      * @param sz Number of parameters to use to invoke the function.
-     * @return A meta any containing the returned value, if any.
+     * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any * const args, const size_type sz) const {
         const internal::meta_func_node* candidate{};
@@ -1455,7 +1468,7 @@ public:
      * @tparam Args Types of arguments to use to invoke the function.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
-     * @return A meta any containing the new instance, if any.
+     * @return A wrapper containing the new instance, if any.
      */
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&... args) const {
@@ -1492,7 +1505,7 @@ public:
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
-     * @return A meta any containing the value of the underlying variable.
+     * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(const id_type id, meta_handle instance) const {
         auto const candidate = data(id);

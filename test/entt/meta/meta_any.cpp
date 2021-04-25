@@ -908,3 +908,18 @@ TEST_F(MetaAny, SetGet) {
     ASSERT_FALSE(any.set("non_existent"_hs, 42));
     ASSERT_FALSE(any.get("non_existent"_hs));
 }
+
+TEST_F(MetaAny, MakeMetaAny) {
+    int value = 42;
+    auto any = entt::make_meta_any<int>(value);
+    auto ref = entt::make_meta_any<int &>(value);
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(ref);
+
+    ASSERT_EQ(any.cast<const int &>(), 42);
+    ASSERT_EQ(ref.cast<const int &>(), 42);
+
+    ASSERT_NE(any.data(), &value);
+    ASSERT_EQ(ref.data(), &value);
+}
