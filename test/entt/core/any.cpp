@@ -94,7 +94,7 @@ TEST_F(Any, SBOInPlaceTypeConstruction) {
 
 TEST_F(Any, SBOAsRefConstruction) {
     int value = 42;
-    entt::any any{std::ref(value)};
+    entt::any any{std::in_place_type<int &>, value};
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<int>());
@@ -111,7 +111,7 @@ TEST_F(Any, SBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &value);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    any = std::ref(value);
+    any.emplace<int &>(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<int>());
@@ -127,7 +127,7 @@ TEST_F(Any, SBOAsRefConstruction) {
 
 TEST_F(Any, SBOAsConstRefConstruction) {
     int value = 42;
-    entt::any any{std::cref(value)};
+    entt::any any{std::in_place_type<const int &>, value};
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<int>());
@@ -144,7 +144,7 @@ TEST_F(Any, SBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    any = std::cref(value);
+    any.emplace<const int &>(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<int>());
@@ -241,7 +241,7 @@ TEST_F(Any, NoSBOInPlaceTypeConstruction) {
 
 TEST_F(Any, NoSBOAsRefConstruction) {
     fat instance{.1, .2, .3, .4};
-    entt::any any{std::ref(instance)};
+    entt::any any{std::in_place_type<fat &>, instance};
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
@@ -258,7 +258,7 @@ TEST_F(Any, NoSBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &instance);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    any = std::ref(instance);
+    any.emplace<fat &>(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
@@ -274,7 +274,7 @@ TEST_F(Any, NoSBOAsRefConstruction) {
 
 TEST_F(Any, NoSBOAsConstRefConstruction) {
     fat instance{.1, .2, .3, .4};
-    entt::any any{std::cref(instance)};
+    entt::any any{std::in_place_type<const fat &>, instance};
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
@@ -291,7 +291,7 @@ TEST_F(Any, NoSBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    any = std::cref(instance);
+    any.emplace<const fat &>(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
@@ -574,7 +574,7 @@ TEST_F(Any, SBOWithNoSBOSwap) {
 
 TEST_F(Any, SBOWithRefSwap) {
     int value = 3;
-    entt::any lhs{std::ref(value)};
+    entt::any lhs{std::in_place_type<int &>, value};
     entt::any rhs{'c'};
 
     std::swap(lhs, rhs);
@@ -590,7 +590,7 @@ TEST_F(Any, SBOWithRefSwap) {
 
 TEST_F(Any, SBOWithConstRefSwap) {
     int value = 3;
-    entt::any lhs{std::cref(value)};
+    entt::any lhs{std::in_place_type<const int &>, value};
     entt::any rhs{'c'};
 
     std::swap(lhs, rhs);
@@ -649,7 +649,7 @@ TEST_F(Any, SBOWithVoidSwap) {
 
 TEST_F(Any, NoSBOWithRefSwap) {
     int value = 3;
-    entt::any lhs{std::ref(value)};
+    entt::any lhs{std::in_place_type<int &>, value};
     entt::any rhs{fat{.1, .2, .3, .4}};
 
     std::swap(lhs, rhs);
@@ -665,7 +665,7 @@ TEST_F(Any, NoSBOWithRefSwap) {
 
 TEST_F(Any, NoSBOWithConstRefSwap) {
     int value = 3;
-    entt::any lhs{std::cref(value)};
+    entt::any lhs{std::in_place_type<const int &>, value};
     entt::any rhs{fat{.1, .2, .3, .4}};
 
     std::swap(lhs, rhs);
@@ -804,13 +804,13 @@ TEST_F(Any, Comparable) {
 
     test('c', 'a');
     test(fat{.1, .2, .3, .4}, fat{.0, .1, .2, .3});
-    test(std::ref(value), 3);
-    test(3, std::cref(value));
+    test(entt::make_any<int &>(value), 3);
+    test(3, entt::make_any<const int &>(value));
 }
 
 TEST_F(Any, NotComparable) {
     auto test = [](const auto &instance) {
-        entt::any any{std::cref(instance)};
+        auto any = entt::make_any<decltype(instance)>(instance);
 
         ASSERT_EQ(any, any);
         ASSERT_NE(any, entt::any{instance});
@@ -917,10 +917,10 @@ TEST_F(Any, Array) {
 TEST_F(Any, CopyMoveReference) {
     int value{};
 
-    auto test = [&](auto ref) {
+    auto test = [&](auto &&ref) {
         value = 3;
 
-        entt::any any{ref};
+        auto any = entt::make_any<decltype(ref)>(ref);
         entt::any move = std::move(any);
         entt::any copy = move;
 
@@ -943,8 +943,8 @@ TEST_F(Any, CopyMoveReference) {
         ASSERT_EQ(entt::any_cast<const int &>(copy), 3);
     };
 
-    test(std::ref(value));
-    test(std::cref(value));
+    test(value);
+    test(std::as_const(value));
 }
 
 TEST_F(Any, SBOVsZeroedSBOSize) {
