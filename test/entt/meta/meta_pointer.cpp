@@ -182,7 +182,7 @@ TEST(MetaPointerLike, PointerToConstMoveOnlyType) {
 TEST(MetaPointerLike, AsRef) {
     int value = 0;
     int * ptr = &value;
-    auto any = entt::make_meta_any<int * &>(ptr);
+    entt::meta_any any{std::ref(ptr)};
 
     ASSERT_TRUE(any.type().is_pointer());
     ASSERT_TRUE(any.type().is_pointer_like());
@@ -204,7 +204,7 @@ TEST(MetaPointerLike, AsRef) {
 TEST(MetaPointerLike, AsConstRef) {
     int value = 42;
     int * ptr = &value;
-    auto any = entt::make_meta_any<int * const &>(ptr);
+    entt::meta_any any{std::cref(ptr)};
 
     ASSERT_TRUE(any.type().is_pointer());
     ASSERT_TRUE(any.type().is_pointer_like());
@@ -302,14 +302,17 @@ TEST(MetaPointerLike, DereferencePointerToFunction) {
         ASSERT_EQ(any.cast<int(*)()>()(), 42);
     };
 
-    test(entt::meta_any{&test_function});
-    test(*entt::meta_any{&test_function});
-    test(**entt::meta_any{&test_function});
+    entt::meta_any func{&test_function};
+
+    test(func);
+    test(*func);
+    test(**func);
+    test(*std::as_const(func));
 }
 
 TEST(MetaPointerLike, DereferenceSelfPointer) {
     self_ptr obj{42};
-    auto any = entt::make_meta_any<self_ptr &>(obj);
+    entt::meta_any any{std::ref(obj)};
     entt::meta_any deref = *any;
 
     ASSERT_TRUE(deref);
