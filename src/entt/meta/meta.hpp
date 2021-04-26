@@ -170,7 +170,7 @@ class meta_any {
                         curr->dtor(const_cast<any &>(from).data());
                     }
                 }
-            break;
+                break;
             case operation::REF:
                 static_cast<meta_any *>(to)->emplace<Type &>(any_cast<Type &>(const_cast<any &>(from)));
                 break;
@@ -1513,8 +1513,8 @@ public:
      */
     template<typename Type>
     bool set(const id_type id, meta_handle instance, Type &&value) const {
-        auto const candidate = data(id);
-        return candidate ? candidate.set(std::move(instance), std::forward<Type>(value)) : false;
+        const auto candidate = data(id);
+        return candidate && candidate.set(std::move(instance), std::forward<Type>(value));
     }
 
     /**
@@ -1528,7 +1528,7 @@ public:
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(const id_type id, meta_handle instance) const {
-        auto const candidate = data(id);
+        const auto candidate = data(id);
         return candidate ? candidate.get(std::move(instance)) : meta_any{};
     }
 
@@ -1580,23 +1580,18 @@ public:
      * The type is also removed from the list of searchable types.
      */
     void reset() ENTT_NOEXCEPT {
-        auto** it = internal::meta_context::global();
-
-        while(*it && *it != node) {
-            it = &(*it)->next;
-        }
-
-        if(*it) {
-            *it = (*it)->next;
+        for(auto** it = internal::meta_context::global(); *it; it = &(*it)->next) {
+            if(*it == node) {
+                *it = (*it)->next;
+                break;
+            }
         }
 
         const auto unregister_all = y_combinator{
             [](auto &&self, auto **curr, auto... member) {
                 while(*curr) {
-                    auto *prev = *curr;
-                    (self(&(prev->*member)), ...);
-                    *curr = prev->next;
-                    prev->next = nullptr;
+                    (self(&((*curr)->*member)), ...);
+                    *curr = std::exchange((*curr)->next, nullptr);
                 }
             }
         };
@@ -1811,12 +1806,12 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
     [[nodiscard]] static bool resize(any &container, size_type sz) {
         auto * const cont = any_cast<Type>(&container);
-        return cont ? traits_type::resize(*cont, sz) : false;
+        return cont && traits_type::resize(*cont, sz);
     }
 
     [[nodiscard]] static bool clear(any &container) {
         auto * const cont = any_cast<Type>(&container);
-        return cont ? traits_type::clear(*cont) : false;
+        return cont && traits_type::clear(*cont);
     }
 
     [[nodiscard]] static iterator begin(any &container) {
@@ -2095,7 +2090,7 @@ struct meta_associative_container::meta_associative_container_proxy {
 
     [[nodiscard]] static bool clear(any &container) {
         auto * const cont = any_cast<Type>(&container);
-        return cont ? traits_type::clear(*cont) : false;
+        return cont && traits_type::clear(*cont);
     }
 
     [[nodiscard]] static iterator begin(any &container) {
@@ -2119,9 +2114,8 @@ struct meta_associative_container::meta_associative_container_proxy {
             if constexpr(is_key_only_meta_associative_container_v<Type>) {
                 return traits_type::insert(*cont, key.cast<const typename Type::key_type &>());
             } else {
-                if(value.allow_cast<const typename Type::mapped_type &>()) {
-                    return traits_type::insert(*cont, key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>());
-                }
+                return value.allow_cast<const typename Type::mapped_type &>()
+                    && traits_type::insert(*cont, key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>());
             }
         }
 
