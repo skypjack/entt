@@ -29,6 +29,8 @@ struct not_comparable {
     bool operator==(const not_comparable &) const = delete;
 };
 
+struct not_hashable {};
+
 template<auto Sz>
 struct not_copyable {
     not_copyable(): payload{} {}
@@ -839,6 +841,36 @@ TEST_F(Any, CompareVoid) {
     ASSERT_FALSE(entt::any{'a'} == any);
     ASSERT_TRUE(any != entt::any{'a'});
     ASSERT_FALSE(entt::any{} != any);
+}
+
+template <typename Type>
+void test_hashable(const Type& value)
+{
+    const std::hash<Type> type_hasher;
+    const std::hash<entt::any> any_hasher;
+    const size_t hash = type_hasher(value);
+
+    entt::any any{value};
+    entt::any ref_any{std::ref(value)};
+    entt::any cref_any{std::cref(value)};
+
+    ASSERT_EQ(hash, any.hash());
+    ASSERT_EQ(hash, ref_any.hash());
+    ASSERT_EQ(hash, cref_any.hash());
+
+    ASSERT_EQ(hash, any_hasher(any));
+    ASSERT_EQ(hash, any_hasher(ref_any));
+    ASSERT_EQ(hash, any_hasher(cref_any));
+}
+
+TEST_F(Any, Hashable) {
+    test_hashable(42);
+    test_hashable('a');
+    test_hashable(std::string("hello world"));
+}
+
+TEST_F(Any, NotHashable) {
+    ASSERT_EQ(entt::any(not_hashable{}).hash(), 0);
 }
 
 TEST_F(Any, AnyCast) {

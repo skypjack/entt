@@ -569,6 +569,14 @@ public:
     }
 
     /**
+     * @brief Returns std::hash of the contained object, 0 if std::hash is not defined for contained object type
+     * @return std::hash of the contained object, 0 if std::hash is not defined for contained object type
+     */
+    size_t hash() const ENTT_NOEXCEPT {
+        return storage.hash();
+    }
+
+    /**
      * @brief Aliasing constructor.
      * @return A meta any that shares a reference to an unmanaged object.
      */
@@ -2210,6 +2218,21 @@ inline bool meta_associative_container::erase(meta_any key) {
 [[nodiscard]] inline meta_associative_container::operator bool() const ENTT_NOEXCEPT {
     return static_cast<bool>(storage);
 }
+
+
+}
+
+
+namespace std
+{
+
+
+template<> struct hash<entt::meta_any>
+{
+    std::size_t operator()(const entt::meta_any& s) const ENTT_NOEXCEPT {
+        return s.hash();
+    }
+};
 
 
 }
