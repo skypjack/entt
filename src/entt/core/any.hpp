@@ -25,7 +25,7 @@ namespace entt {
  */
 template<std::size_t Len, std::size_t Align>
 class basic_any {
-    enum class operation { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
+    enum class operation: std::uint8_t { COPY, MOVE, DTOR, COMP, ADDR, CADDR, REF, CREF, TYPE };
 
     using storage_type = std::aligned_storage_t<Len + !Len, Align>;
     using vtable_type = const void *(const operation, const basic_any &, void *);
@@ -53,39 +53,7 @@ class basic_any {
             default:
                 break;
             }
-        } else if constexpr(std::is_lvalue_reference_v<Type>) {
-            using base_type = std::decay_t<Type>;
-
-            switch(op) {
-            case operation::COPY:
-                if constexpr(std::is_copy_constructible_v<base_type>) {
-                    static_cast<basic_any *>(to)->emplace<base_type>(*static_cast<const base_type *>(from.instance));
-                }
-                break;
-            case operation::MOVE:
-                static_cast<basic_any *>(to)->instance = from.instance;
-                [[fallthrough]];
-            case operation::DTOR:
-                break;
-            case operation::COMP:
-                return compare<base_type>(from.instance, (*static_cast<const basic_any **>(to))->data()) ? to : nullptr;
-            case operation::ADDR:
-                return std::is_const_v<std::remove_reference_t<Type>> ? nullptr : from.instance;
-            case operation::CADDR:
-                return from.instance;
-            case operation::REF:
-                static_cast<basic_any *>(to)->instance = from.instance;
-                static_cast<basic_any *>(to)->vtable = basic_vtable<Type>;
-                break;
-            case operation::CREF:
-                static_cast<basic_any *>(to)->instance = from.instance;
-                static_cast<basic_any *>(to)->vtable = basic_vtable<const base_type &>;
-                break;
-            case operation::TYPE:
-                *static_cast<type_info *>(to) = type_id<base_type>();
-                break;
-            }
-        } else if constexpr(in_situ<Type>) {
+        } else if constexpr(!std::is_lvalue_reference_v<Type> && in_situ<Type>) {
             #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
             const auto *instance = std::launder(reinterpret_cast<const Type *>(&from.storage));
             #else
@@ -121,11 +89,13 @@ class basic_any {
                 *static_cast<type_info *>(to) = type_id<Type>();
                 break;
             }
-        } else {
+        } else { /* either a reference or a dynamically allocated object */
+            const auto *instance = static_cast<const std::decay_t<Type> *>(from.instance);
+
             switch(op) {
             case operation::COPY:
-                if constexpr(std::is_copy_constructible_v<Type>) {
-                    static_cast<basic_any *>(to)->emplace<Type>(*static_cast<const Type *>(from.instance));
+                if constexpr(std::is_copy_constructible_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
+                    static_cast<basic_any *>(to)->emplace<std::decay_t<Type>>(*instance);
                 }
                 break;
             case operation::MOVE:
@@ -133,26 +103,27 @@ class basic_any {
                 break;
             case operation::DTOR:
                 if constexpr(std::is_array_v<Type>) {
-                    delete[] static_cast<const Type *>(from.instance);
-                } else {
-                    delete static_cast<const Type *>(from.instance);
+                    delete[] instance;
+                } else if constexpr(!std::is_lvalue_reference_v<Type>) {
+                    delete instance;
                 }
                 break;
             case operation::COMP:
-                return compare<Type>(from.instance, (*static_cast<const basic_any **>(to))->data()) ? to : nullptr;
+                return compare<std::remove_const_t<std::remove_reference_t<Type>>>(instance, (*static_cast<const basic_any **>(to))->data()) ? to : nullptr;
             case operation::ADDR:
+                return std::is_const_v<std::remove_reference_t<Type>> ? nullptr : instance;
             case operation::CADDR:
-                return from.instance;
+                return instance;
             case operation::REF:
-                static_cast<basic_any *>(to)->instance = from.instance;
+                static_cast<basic_any *>(to)->instance = instance;
                 static_cast<basic_any *>(to)->vtable = basic_vtable<Type &>;
                 break;
             case operation::CREF:
-                static_cast<basic_any *>(to)->instance = from.instance;
-                static_cast<basic_any *>(to)->vtable = basic_vtable<const Type &>;
+                static_cast<basic_any *>(to)->instance = instance;
+                static_cast<basic_any *>(to)->vtable = basic_vtable<const std::remove_reference_t<Type> &>;
                 break;
             case operation::TYPE:
-                *static_cast<type_info *>(to) = type_id<Type>();
+                *static_cast<type_info *>(to) = type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
                 break;
             }
         }

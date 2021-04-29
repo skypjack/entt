@@ -901,7 +901,7 @@ TEST_F(Any, CopyMoveReference) {
         entt::any move = std::move(any);
         entt::any copy = move;
 
-        ASSERT_TRUE(any);
+        ASSERT_FALSE(any);
         ASSERT_TRUE(move);
         ASSERT_TRUE(copy);
 
