@@ -264,7 +264,7 @@ public:
      * @return This any object.
      */
     basic_any & operator=(const basic_any &other) {
-        vtable(operation::DTOR, *this, nullptr);
+        std::exchange(vtable, &basic_vtable<void>)(operation::DTOR, *this, nullptr);
         other.vtable(operation::COPY, other, this);
         return *this;
     }
