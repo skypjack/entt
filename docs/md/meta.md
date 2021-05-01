@@ -210,9 +210,10 @@ Among the few relevant differences, `meta_any` adds support for containers and
 pointer-like types (see the following sections for more details), while `any`
 does not.<br/>
 Similar to `any`, this class can also be used to create _aliases_ for unmanaged
-objects either upon construction using `std::in_place_type<T &>` or from an
-existing instance by means of the `as_ref` function. However, unlike `any`,
-`meta_any` treats an empty instance and one initialized with `void` differently:
+objects either with `forward_as_meta` or using the `std::in_place_type<T &>`
+disambiguation tag, as well as from an existing object by means of the `as_ref`
+member function. However, unlike `any`, `meta_any` treats an empty instance and
+one initialized with `void` differently:
 
 ```cpp
 entt::meta_any empty{};
@@ -386,7 +387,7 @@ object for a sequence container:
 
 ```cpp
 std::vector<int> vec{1, 2, 3};
-entt::meta_any any = std::make_meta_any<std::vector<int> &>(vec);
+entt::meta_any any = entt::forward_as_meta(vec);
 
 if(any.type().is_sequence_container()) {
     if(auto view = any.as_sequence_container(); view) {

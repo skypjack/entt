@@ -282,6 +282,7 @@ int value = 42;
 
 entt::any any{std::in_place_type<int &>(value)};
 entt::any cany = entt::make_any<const int &>(value);
+entt::any fwd = entt::forward_as_any(value);
 
 any.emplace<const int &>(value);
 ```
