@@ -94,7 +94,7 @@ TEST_F(Any, SBOInPlaceTypeConstruction) {
 
 TEST_F(Any, SBOAsRefConstruction) {
     int value = 42;
-    entt::any any{std::in_place_type<int &>, value};
+    entt::any any{entt::forward_as_any(value)};
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<int>());
@@ -126,8 +126,8 @@ TEST_F(Any, SBOAsRefConstruction) {
 }
 
 TEST_F(Any, SBOAsConstRefConstruction) {
-    int value = 42;
-    entt::any any{std::in_place_type<const int &>, value};
+    const int value = 42;
+    entt::any any{entt::forward_as_any(value)};
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<int>());
@@ -241,7 +241,7 @@ TEST_F(Any, NoSBOInPlaceTypeConstruction) {
 
 TEST_F(Any, NoSBOAsRefConstruction) {
     fat instance{.1, .2, .3, .4};
-    entt::any any{std::in_place_type<fat &>, instance};
+    entt::any any{entt::forward_as_any(instance)};
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
@@ -273,8 +273,8 @@ TEST_F(Any, NoSBOAsRefConstruction) {
 }
 
 TEST_F(Any, NoSBOAsConstRefConstruction) {
-    fat instance{.1, .2, .3, .4};
-    entt::any any{std::in_place_type<const fat &>, instance};
+    const fat instance{.1, .2, .3, .4};
+    entt::any any{entt::forward_as_any(instance)};
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
@@ -574,7 +574,7 @@ TEST_F(Any, SBOWithNoSBOSwap) {
 
 TEST_F(Any, SBOWithRefSwap) {
     int value = 3;
-    entt::any lhs{std::in_place_type<int &>, value};
+    entt::any lhs{entt::forward_as_any(value)};
     entt::any rhs{'c'};
 
     std::swap(lhs, rhs);
@@ -589,8 +589,8 @@ TEST_F(Any, SBOWithRefSwap) {
 }
 
 TEST_F(Any, SBOWithConstRefSwap) {
-    int value = 3;
-    entt::any lhs{std::in_place_type<const int &>, value};
+    const int value = 3;
+    entt::any lhs{entt::forward_as_any(value)};
     entt::any rhs{'c'};
 
     std::swap(lhs, rhs);
@@ -649,7 +649,7 @@ TEST_F(Any, SBOWithVoidSwap) {
 
 TEST_F(Any, NoSBOWithRefSwap) {
     int value = 3;
-    entt::any lhs{std::in_place_type<int &>, value};
+    entt::any lhs{entt::forward_as_any(value)};
     entt::any rhs{fat{.1, .2, .3, .4}};
 
     std::swap(lhs, rhs);
@@ -664,8 +664,8 @@ TEST_F(Any, NoSBOWithRefSwap) {
 }
 
 TEST_F(Any, NoSBOWithConstRefSwap) {
-    int value = 3;
-    entt::any lhs{std::in_place_type<const int &>, value};
+    const int value = 3;
+    entt::any lhs{entt::forward_as_any(value)};
     entt::any rhs{fat{.1, .2, .3, .4}};
 
     std::swap(lhs, rhs);
@@ -804,13 +804,13 @@ TEST_F(Any, Comparable) {
 
     test('c', 'a');
     test(fat{.1, .2, .3, .4}, fat{.0, .1, .2, .3});
-    test(entt::make_any<int &>(value), 3);
+    test(entt::forward_as_any(value), 3);
     test(3, entt::make_any<const int &>(value));
 }
 
 TEST_F(Any, NotComparable) {
     auto test = [](const auto &instance) {
-        auto any = entt::make_any<decltype(instance)>(instance);
+        auto any = entt::forward_as_any(instance);
 
         ASSERT_EQ(any, any);
         ASSERT_NE(any, entt::any{instance});
@@ -880,6 +880,28 @@ TEST_F(Any, MakeAny) {
     ASSERT_EQ(ref.data(), &value);
 }
 
+TEST_F(Any, ForwardAsAny) {
+    int value = 42;
+    auto any = entt::forward_as_any(std::move(value));
+    auto ref = entt::forward_as_any(value);
+    auto cref = entt::forward_as_any(std::as_const(value));
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(ref);
+    ASSERT_TRUE(cref);
+
+    ASSERT_NE(entt::any_cast<int>(&any), nullptr);
+    ASSERT_NE(entt::any_cast<int>(&ref), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
+
+    ASSERT_EQ(entt::any_cast<const int &>(any), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(ref), 42);
+    ASSERT_EQ(entt::any_cast<const int &>(cref), 42);
+
+    ASSERT_NE(any.data(), &value);
+    ASSERT_EQ(ref.data(), &value);
+}
+
 TEST_F(Any, NotCopyableType) {
     auto test = [](entt::any any) {
         entt::any copy{any};
@@ -920,7 +942,7 @@ TEST_F(Any, CopyMoveReference) {
     auto test = [&](auto &&ref) {
         value = 3;
 
-        auto any = entt::make_any<decltype(ref)>(ref);
+        auto any = entt::forward_as_any(ref);
         entt::any move = std::move(any);
         entt::any copy = move;
 

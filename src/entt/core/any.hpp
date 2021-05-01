@@ -441,6 +441,20 @@ basic_any<Len, Align> make_any(Args &&... args) {
 }
 
 
+/**
+ * @brief Forwards its argument and avoids copies for lvalue references.
+ * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Align Optional alignment requirement.
+ * @tparam Type Type of argument to use to construct the new instance.
+ * @param value Parameter to use to construct the instance.
+ * @return A properly initialized and not necessarily owning wrapper.
+ */
+template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename Type>
+basic_any<Len, Align> forward_as_any(Type &&value) {
+    return basic_any<Len, Align>{std::in_place_type<std::conditional_t<std::is_rvalue_reference_v<Type>, std::decay_t<Type>, Type>>, std::forward<Type>(value)};
+}
+
+
 }
 
 
