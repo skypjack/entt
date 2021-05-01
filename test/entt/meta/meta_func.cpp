@@ -332,7 +332,7 @@ TEST_F(MetaFunc, ArgsByRef) {
     entt::meta_any any{3};
     int value = 4;
 
-    ASSERT_EQ(func.invoke({}, entt::make_meta<int &>(value)).cast<int>(), 8);
+    ASSERT_EQ(func.invoke({}, entt::forward_as_meta(value)).cast<int>(), 8);
     ASSERT_EQ(func.invoke({}, any.as_ref()).cast<int>(), 6);
     ASSERT_EQ(any.cast<int>(), 6);
     ASSERT_EQ(value, 8);
@@ -434,7 +434,7 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
 
     ASSERT_FALSE(registry.all_of<func_t>(entity));
 
-    func.invoke({}, entt::make_meta<entt::registry &>(registry), entity);
+    func.invoke({}, entt::forward_as_meta(registry), entity);
 
     ASSERT_TRUE(registry.all_of<func_t>(entity));
 }

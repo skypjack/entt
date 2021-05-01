@@ -637,6 +637,18 @@ meta_any make_meta(Args &&... args) {
 
 
 /**
+ * @brief Forwards its argument and avoids copies for lvalue references.
+ * @tparam Type Type of argument to use to construct the new instance.
+ * @param value Parameter to use to construct the instance.
+ * @return A properly initialized and not necessarily owning wrapper.
+ */
+template<typename Type>
+meta_any forward_as_meta(Type &&value) {
+    return meta_any{std::in_place_type<std::conditional_t<std::is_rvalue_reference_v<Type>, std::decay_t<Type>, Type>>, std::forward<Type>(value)};
+}
+
+
+/**
  * @brief Opaque pointers to instances of any type.
  *
  * A handle doesn't perform copies and isn't responsible for the contained

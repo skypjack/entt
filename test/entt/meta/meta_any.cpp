@@ -147,7 +147,7 @@ TEST_F(MetaAny, SBOInPlaceTypeConstruction) {
 TEST_F(MetaAny, SBOAsRefConstruction) {
     int value = 3;
     int compare = 42;
-    auto any = entt::make_meta<int &>(value);
+    auto any = entt::forward_as_meta(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -159,8 +159,8 @@ TEST_F(MetaAny, SBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &value);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    ASSERT_EQ(any, entt::make_meta<int &>(value));
-    ASSERT_NE(any, entt::make_meta<int &>(compare));
+    ASSERT_EQ(any, entt::forward_as_meta(value));
+    ASSERT_NE(any, entt::forward_as_meta(compare));
 
     ASSERT_NE(any, entt::meta_any{42});
     ASSERT_EQ(entt::meta_any{3}, any);
@@ -180,9 +180,9 @@ TEST_F(MetaAny, SBOAsRefConstruction) {
 }
 
 TEST_F(MetaAny, SBOAsConstRefConstruction) {
-    int value = 3;
+    const int value = 3;
     int compare = 42;
-    auto any = entt::make_meta<const int &>(value);
+    auto any = entt::forward_as_meta(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -194,8 +194,8 @@ TEST_F(MetaAny, SBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    ASSERT_EQ(any, entt::make_meta<const int &>(value));
-    ASSERT_NE(any, entt::make_meta<const int &>(compare));
+    ASSERT_EQ(any, entt::forward_as_meta(value));
+    ASSERT_NE(any, entt::forward_as_meta(compare));
 
     ASSERT_NE(any, entt::meta_any{42});
     ASSERT_EQ(entt::meta_any{3}, any);
@@ -291,7 +291,7 @@ TEST_F(MetaAny, NoSBOInPlaceTypeConstruction) {
 
 TEST_F(MetaAny, NoSBOAsRefConstruction) {
     fat_t instance{.1, .2, .3, .4};
-    auto any = entt::make_meta<fat_t &>(instance);
+    auto any = entt::forward_as_meta(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
@@ -303,7 +303,7 @@ TEST_F(MetaAny, NoSBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &instance);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    ASSERT_EQ(any, entt::make_meta<fat_t &>(instance));
+    ASSERT_EQ(any, entt::forward_as_meta(instance));
 
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
@@ -323,8 +323,8 @@ TEST_F(MetaAny, NoSBOAsRefConstruction) {
 }
 
 TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
-    fat_t instance{.1, .2, .3, .4};
-    auto any = entt::make_meta<const fat_t &>(instance);
+    const fat_t instance{.1, .2, .3, .4};
+    auto any = entt::forward_as_meta(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
@@ -336,7 +336,7 @@ TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    ASSERT_EQ(any, entt::make_meta<const fat_t &>(instance));
+    ASSERT_EQ(any, entt::forward_as_meta(instance));
 
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
@@ -852,7 +852,7 @@ TEST_F(MetaAny, ConstConvert) {
 
 TEST_F(MetaAny, UnmanageableType) {
     unmanageable_t instance;
-    auto any = entt::make_meta<unmanageable_t &>(instance);
+    auto any = entt::forward_as_meta(instance);
     entt::meta_any other = any.as_ref();
 
     std::swap(any, other);
@@ -876,7 +876,7 @@ TEST_F(MetaAny, Invoke) {
     using namespace entt::literals;
 
     clazz_t instance;
-    auto any = entt::make_meta<clazz_t &>(instance);
+    auto any = entt::forward_as_meta(instance);
 
     ASSERT_TRUE(any.invoke("func"_hs));
     ASSERT_TRUE(any.invoke("member"_hs, 42));
@@ -892,7 +892,7 @@ TEST_F(MetaAny, SetGet) {
     using namespace entt::literals;
 
     clazz_t instance;
-    auto any = entt::make_meta<clazz_t &>(instance);
+    auto any = entt::forward_as_meta(instance);
 
     ASSERT_TRUE(any.set("value"_hs, 42));
 
@@ -919,6 +919,28 @@ TEST_F(MetaAny, MakeMeta) {
 
     ASSERT_EQ(any.cast<const int &>(), 42);
     ASSERT_EQ(ref.cast<const int &>(), 42);
+
+    ASSERT_NE(any.data(), &value);
+    ASSERT_EQ(ref.data(), &value);
+}
+
+TEST_F(MetaAny, ForwardAsMeta) {
+    int value = 42;
+    auto any = entt::forward_as_meta(std::move(value));
+    auto ref = entt::forward_as_meta(value);
+    auto cref = entt::forward_as_meta(std::as_const(value));
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(ref);
+    ASSERT_TRUE(cref);
+
+    ASSERT_NE(any.try_cast<int>(), nullptr);
+    ASSERT_NE(ref.try_cast<int>(), nullptr);
+    ASSERT_EQ(cref.try_cast<int>(), nullptr);
+
+    ASSERT_EQ(any.cast<const int &>(), 42);
+    ASSERT_EQ(ref.cast<const int &>(), 42);
+    ASSERT_EQ(cref.cast<const int &>(), 42);
 
     ASSERT_NE(any.data(), &value);
     ASSERT_EQ(ref.data(), &value);

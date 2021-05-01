@@ -57,7 +57,7 @@ TEST_F(MetaContainer, EmptyAssociativeContainer) {
 
 TEST_F(MetaContainer, SequenceContainerIterator) {
     std::vector<int> vec{2, 3, 4};
-    auto any = entt::make_meta<std::vector<int> &>(vec);
+    auto any = entt::forward_as_meta(vec);
     entt::meta_sequence_container::iterator first{};
     auto view = any.as_sequence_container();
 
@@ -84,7 +84,7 @@ TEST_F(MetaContainer, SequenceContainerIterator) {
 
 TEST_F(MetaContainer, AssociativeContainerIterator) {
     std::map<int, char> map{{2, 'c'}, {3, 'd'}, {4, 'e'}};
-    auto any = entt::make_meta<std::map<int, char> &>(map);
+    auto any = entt::forward_as_meta(map);
     entt::meta_associative_container::iterator first{};
     auto view = any.as_associative_container();
 
@@ -111,7 +111,7 @@ TEST_F(MetaContainer, AssociativeContainerIterator) {
 
 TEST_F(MetaContainer, StdVector) {
     std::vector<int> vec{};
-    auto any = entt::make_meta<std::vector<int> &>(vec);
+    auto any = entt::forward_as_meta(vec);
 
     auto view = any.as_sequence_container();
 
@@ -154,7 +154,7 @@ TEST_F(MetaContainer, StdVector) {
 
 TEST_F(MetaContainer, StdArray) {
     std::array<int, 3> arr{};
-    auto any = entt::make_meta<std::array<int, 3> &>(arr);
+    auto any = entt::forward_as_meta(arr);
 
     auto view = any.as_sequence_container();
 
@@ -196,7 +196,7 @@ TEST_F(MetaContainer, StdArray) {
 
 TEST_F(MetaContainer, StdMap) {
     std::map<int, char> map{{2, 'c'}, {3, 'd'}, {4, 'e'}};
-    auto any = entt::make_meta<std::map<int, char> &>(map);
+    auto any = entt::forward_as_meta(map);
 
     auto view = any.as_associative_container();
 
@@ -240,7 +240,7 @@ TEST_F(MetaContainer, StdMap) {
 
 TEST_F(MetaContainer, StdSet) {
     std::set<int> set{2, 3, 4};
-    auto any = entt::make_meta<std::set<int> &>(set);
+    auto any = entt::forward_as_meta(set);
 
     auto view = any.as_associative_container();
 
@@ -283,7 +283,7 @@ TEST_F(MetaContainer, StdSet) {
 
 TEST_F(MetaContainer, ConstSequenceContainer) {
     std::vector<int> vec{};
-    auto any = entt::make_meta<const std::vector<int> &>(vec);
+    auto any = entt::forward_as_meta(std::as_const(vec));
 
     auto view = any.as_sequence_container();
 
@@ -324,7 +324,7 @@ TEST_F(MetaContainer, ConstSequenceContainer) {
 
 TEST_F(MetaContainer, ConstKeyValueAssociativeContainer) {
     std::map<int, char> map{};
-    auto any = entt::make_meta<const std::map<int, char> &>(map);
+    auto any = entt::forward_as_meta(std::as_const(map));
 
     auto view = any.as_associative_container();
 
@@ -360,7 +360,7 @@ TEST_F(MetaContainer, ConstKeyValueAssociativeContainer) {
 
 TEST_F(MetaContainer, ConstKeyOnlyAssociativeContainer) {
     std::set<int> set{};
-    auto any = entt::make_meta<const std::set<int> &>(set);
+    auto any = entt::forward_as_meta(std::as_const(set));
 
     auto view = any.as_associative_container();
 
@@ -409,8 +409,8 @@ TEST_F(MetaContainer, SequenceContainerConstMetaAny) {
     std::vector<int> vec{42};
 
     test(vec);
-    test(entt::make_meta<std::vector<int> &>(vec));
-    test(entt::make_meta<const std::vector<int> &>(vec));
+    test(entt::forward_as_meta(vec));
+    test(entt::forward_as_meta(std::as_const(vec)));
 }
 
 TEST_F(MetaContainer, KeyValueAssociativeContainerConstMetaAny) {
@@ -426,8 +426,8 @@ TEST_F(MetaContainer, KeyValueAssociativeContainerConstMetaAny) {
     std::map<int, char> map{{2, 'c'}};
 
     test(map);
-    test(entt::make_meta<std::map<int, char> &>(map));
-    test(entt::make_meta<const std::map<int, char> &>(map));
+    test(entt::forward_as_meta(map));
+    test(entt::forward_as_meta(std::as_const(map)));
 }
 
 TEST_F(MetaContainer, KeyOnlyAssociativeContainerConstMetaAny) {
@@ -446,8 +446,8 @@ TEST_F(MetaContainer, KeyOnlyAssociativeContainerConstMetaAny) {
     std::set<int> set{2};
 
     test(set);
-    test(entt::make_meta<std::set<int> &>(set));
-    test(entt::make_meta<const std::set<int> &>(set));
+    test(entt::forward_as_meta(set));
+    test(entt::forward_as_meta(std::as_const(set)));
 }
 
 TEST_F(MetaContainer, StdVectorBool) {
@@ -455,7 +455,7 @@ TEST_F(MetaContainer, StdVectorBool) {
     using const_proxy_type = typename std::vector<bool>::const_reference;
 
     std::vector<bool> vec{};
-    auto any = entt::make_meta<std::vector<bool> &>(vec);
+    auto any = entt::forward_as_meta(vec);
     auto cany = std::as_const(any).as_ref();
 
     auto view = any.as_sequence_container();
