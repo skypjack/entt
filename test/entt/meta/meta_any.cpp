@@ -147,7 +147,7 @@ TEST_F(MetaAny, SBOInPlaceTypeConstruction) {
 TEST_F(MetaAny, SBOAsRefConstruction) {
     int value = 3;
     int compare = 42;
-    auto any = entt::make_meta_any<int &>(value);
+    auto any = entt::make_meta<int &>(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -159,13 +159,13 @@ TEST_F(MetaAny, SBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &value);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    ASSERT_EQ(any, entt::make_meta_any<int &>(value));
-    ASSERT_NE(any, entt::make_meta_any<int &>(compare));
+    ASSERT_EQ(any, entt::make_meta<int &>(value));
+    ASSERT_NE(any, entt::make_meta<int &>(compare));
 
     ASSERT_NE(any, entt::meta_any{42});
     ASSERT_EQ(entt::meta_any{3}, any);
 
-    any = entt::make_meta_any<int &>(value);
+    any = entt::make_meta<int &>(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -182,7 +182,7 @@ TEST_F(MetaAny, SBOAsRefConstruction) {
 TEST_F(MetaAny, SBOAsConstRefConstruction) {
     int value = 3;
     int compare = 42;
-    auto any = entt::make_meta_any<const int &>(value);
+    auto any = entt::make_meta<const int &>(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -194,13 +194,13 @@ TEST_F(MetaAny, SBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &value);
 
-    ASSERT_EQ(any, entt::make_meta_any<const int &>(value));
-    ASSERT_NE(any, entt::make_meta_any<const int &>(compare));
+    ASSERT_EQ(any, entt::make_meta<const int &>(value));
+    ASSERT_NE(any, entt::make_meta<const int &>(compare));
 
     ASSERT_NE(any, entt::meta_any{42});
     ASSERT_EQ(entt::meta_any{3}, any);
 
-    any = entt::make_meta_any<const int &>(value);
+    any = entt::make_meta<const int &>(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -291,7 +291,7 @@ TEST_F(MetaAny, NoSBOInPlaceTypeConstruction) {
 
 TEST_F(MetaAny, NoSBOAsRefConstruction) {
     fat_t instance{.1, .2, .3, .4};
-    auto any = entt::make_meta_any<fat_t &>(instance);
+    auto any = entt::make_meta<fat_t &>(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
@@ -303,12 +303,12 @@ TEST_F(MetaAny, NoSBOAsRefConstruction) {
     ASSERT_EQ(any.data(), &instance);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    ASSERT_EQ(any, entt::make_meta_any<fat_t &>(instance));
+    ASSERT_EQ(any, entt::make_meta<fat_t &>(instance));
 
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
 
-    any = entt::make_meta_any<fat_t &>(instance);
+    any = entt::make_meta<fat_t &>(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
@@ -324,7 +324,7 @@ TEST_F(MetaAny, NoSBOAsRefConstruction) {
 
 TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
     fat_t instance{.1, .2, .3, .4};
-    auto any = entt::make_meta_any<const fat_t &>(instance);
+    auto any = entt::make_meta<const fat_t &>(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
@@ -336,12 +336,12 @@ TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(std::as_const(any).data(), &instance);
 
-    ASSERT_EQ(any, entt::make_meta_any<const fat_t &>(instance));
+    ASSERT_EQ(any, entt::make_meta<const fat_t &>(instance));
 
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
 
-    any = entt::make_meta_any<const fat_t &>(instance);
+    any = entt::make_meta<const fat_t &>(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
@@ -852,7 +852,7 @@ TEST_F(MetaAny, ConstConvert) {
 
 TEST_F(MetaAny, UnmanageableType) {
     unmanageable_t instance;
-    auto any = entt::make_meta_any<unmanageable_t &>(instance);
+    auto any = entt::make_meta<unmanageable_t &>(instance);
     entt::meta_any other = any.as_ref();
 
     std::swap(any, other);
@@ -876,7 +876,7 @@ TEST_F(MetaAny, Invoke) {
     using namespace entt::literals;
 
     clazz_t instance;
-    auto any = entt::make_meta_any<clazz_t &>(instance);
+    auto any = entt::make_meta<clazz_t &>(instance);
 
     ASSERT_TRUE(any.invoke("func"_hs));
     ASSERT_TRUE(any.invoke("member"_hs, 42));
@@ -892,7 +892,7 @@ TEST_F(MetaAny, SetGet) {
     using namespace entt::literals;
 
     clazz_t instance;
-    auto any = entt::make_meta_any<clazz_t &>(instance);
+    auto any = entt::make_meta<clazz_t &>(instance);
 
     ASSERT_TRUE(any.set("value"_hs, 42));
 
@@ -909,10 +909,10 @@ TEST_F(MetaAny, SetGet) {
     ASSERT_FALSE(any.get("non_existent"_hs));
 }
 
-TEST_F(MetaAny, MakeMetaAny) {
+TEST_F(MetaAny, MakeMeta) {
     int value = 42;
-    auto any = entt::make_meta_any<int>(value);
-    auto ref = entt::make_meta_any<int &>(value);
+    auto any = entt::make_meta<int>(value);
+    auto ref = entt::make_meta<int &>(value);
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(ref);

@@ -322,7 +322,7 @@ public:
      * @return This meta any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_meta_any<T &> or emplace<Type &> instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_meta<T &> or emplace<Type &> instead")]]
     meta_any & operator=(std::reference_wrapper<Type> value) {
         emplace<Type &>(value.get());
         return *this;
@@ -631,7 +631,7 @@ private:
  * @return A properly initialized wrapper for an object of the given type.
  */
 template<typename Type, typename... Args>
-meta_any make_meta_any(Args &&... args) {
+meta_any make_meta(Args &&... args) {
     return meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
 }
 
