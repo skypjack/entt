@@ -261,7 +261,7 @@ public:
      * @return This any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &> or emplace<Type &> instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Type &> or forward_as_any instead")]]
     basic_any & operator=(std::reference_wrapper<Type> value) ENTT_NOEXCEPT {
         emplace<Type &>(value.get());
         return *this;

@@ -322,7 +322,7 @@ public:
      * @return This meta any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_meta<T &> or emplace<Type &> instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_meta<T &>, emplace<Type &> or forward_as_meta instead")]]
     meta_any & operator=(std::reference_wrapper<Type> value) {
         emplace<Type &>(value.get());
         return *this;
