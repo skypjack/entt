@@ -52,6 +52,7 @@ TEST_F(Any, SBO) {
     entt::any any{'c'};
 
     ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<char>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<char>(any), 'c');
@@ -62,6 +63,7 @@ TEST_F(Any, NoSBO) {
     entt::any any{instance};
 
     ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
@@ -71,6 +73,7 @@ TEST_F(Any, Empty) {
     entt::any any{};
 
     ASSERT_FALSE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_FALSE(any.type());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(any.data(), nullptr);
@@ -80,6 +83,7 @@ TEST_F(Any, SBOInPlaceTypeConstruction) {
     entt::any any{std::in_place_type<int>, 42};
 
     ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<int>(any), 42);
@@ -87,6 +91,7 @@ TEST_F(Any, SBOInPlaceTypeConstruction) {
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
+    ASSERT_FALSE(other.owner());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(other), 42);
     ASSERT_EQ(other.data(), any.data());
@@ -97,6 +102,7 @@ TEST_F(Any, SBOAsRefConstruction) {
     entt::any any{entt::forward_as_any(value)};
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
 
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
@@ -114,12 +120,14 @@ TEST_F(Any, SBOAsRefConstruction) {
     any.emplace<int &>(value);
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(&any), &value);
 
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
+    ASSERT_FALSE(other.owner());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(other), 42);
     ASSERT_EQ(other.data(), any.data());
@@ -130,6 +138,7 @@ TEST_F(Any, SBOAsConstRefConstruction) {
     entt::any any{entt::forward_as_any(value)};
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
 
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
@@ -147,12 +156,14 @@ TEST_F(Any, SBOAsConstRefConstruction) {
     any.emplace<const int &>(value);
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<const int>(&any), &value);
 
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
+    ASSERT_FALSE(other.owner());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(other), 42);
     ASSERT_EQ(other.data(), any.data());
@@ -164,6 +175,8 @@ TEST_F(Any, SBOCopyConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
@@ -178,6 +191,8 @@ TEST_F(Any, SBOCopyAssignment) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
@@ -190,6 +205,8 @@ TEST_F(Any, SBOMoveConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_NE(any.data(), nullptr);
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -205,6 +222,8 @@ TEST_F(Any, SBOMoveAssignment) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_NE(any.data(), nullptr);
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(other.type(), entt::type_id<int>());
@@ -217,6 +236,7 @@ TEST_F(Any, SBODirectAssignment) {
     any = 42;
 
     ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<int>(any), 42);
@@ -227,6 +247,7 @@ TEST_F(Any, NoSBOInPlaceTypeConstruction) {
     entt::any any{std::in_place_type<fat>, instance};
 
     ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
@@ -234,6 +255,7 @@ TEST_F(Any, NoSBOInPlaceTypeConstruction) {
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
+    ASSERT_FALSE(other.owner());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<fat>(other), (fat{.1, .2, .3, .4}));
     ASSERT_EQ(other.data(), any.data());
@@ -244,6 +266,7 @@ TEST_F(Any, NoSBOAsRefConstruction) {
     entt::any any{entt::forward_as_any(instance)};
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
 
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
@@ -261,12 +284,14 @@ TEST_F(Any, NoSBOAsRefConstruction) {
     any.emplace<fat &>(instance);
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<fat>(&any), &instance);
 
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
+    ASSERT_FALSE(other.owner());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<fat>(other), (fat{.1, .2, .3, .4}));
     ASSERT_EQ(other.data(), any.data());
@@ -277,6 +302,7 @@ TEST_F(Any, NoSBOAsConstRefConstruction) {
     entt::any any{entt::forward_as_any(instance)};
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
 
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
@@ -294,12 +320,14 @@ TEST_F(Any, NoSBOAsConstRefConstruction) {
     any.emplace<const fat &>(instance);
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<const fat>(&any), &instance);
 
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
+    ASSERT_FALSE(other.owner());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<fat>(other), (fat{.1, .2, .3, .4}));
     ASSERT_EQ(other.data(), any.data());
@@ -312,6 +340,8 @@ TEST_F(Any, NoSBOCopyConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
@@ -327,6 +357,8 @@ TEST_F(Any, NoSBOCopyAssignment) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
@@ -340,6 +372,8 @@ TEST_F(Any, NoSBOMoveConstruction) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -356,6 +390,8 @@ TEST_F(Any, NoSBOMoveAssignment) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
@@ -369,6 +405,7 @@ TEST_F(Any, NoSBODirectAssignment) {
     any = instance;
 
     ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
@@ -378,6 +415,7 @@ TEST_F(Any, VoidInPlaceTypeConstruction) {
     entt::any any{std::in_place_type<void>};
 
     ASSERT_FALSE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_FALSE(any.type());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
 }
@@ -388,6 +426,8 @@ TEST_F(Any, VoidCopyConstruction) {
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_FALSE(any.type());
     ASSERT_FALSE(other.type());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
@@ -402,6 +442,8 @@ TEST_F(Any, VoidCopyAssignment) {
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_FALSE(any.type());
     ASSERT_FALSE(other.type());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
@@ -414,6 +456,8 @@ TEST_F(Any, VoidMoveConstruction) {
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_FALSE(any.type());
     ASSERT_FALSE(other.type());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
@@ -428,6 +472,8 @@ TEST_F(Any, VoidMoveAssignment) {
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(other);
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(other.owner());
     ASSERT_FALSE(any.type());
     ASSERT_FALSE(other.type());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
@@ -499,6 +545,7 @@ TEST_F(Any, Emplace) {
     any.emplace<int>(42);
 
     ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<int>(any), 42);
@@ -509,6 +556,7 @@ TEST_F(Any, EmplaceVoid) {
     any.emplace<void>();
 
     ASSERT_FALSE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_FALSE(any.type());
  }
 
@@ -516,11 +564,26 @@ TEST_F(Any, Reset) {
     entt::any any{42};
 
     ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<int>());
 
     any.reset();
 
     ASSERT_FALSE(any);
+    ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.type(), entt::type_info{});
+
+    int value = 42;
+    any.emplace<int &>(value);
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.type(), entt::type_id<int>());
+
+    any.reset();
+
+    ASSERT_FALSE(any);
+    ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_info{});
 }
 
@@ -529,6 +592,9 @@ TEST_F(Any, SBOSwap) {
     entt::any rhs{42};
 
     std::swap(lhs, rhs);
+
+    ASSERT_TRUE(lhs.owner());
+    ASSERT_TRUE(rhs.owner());
 
     ASSERT_EQ(lhs.type(), entt::type_id<int>());
     ASSERT_EQ(rhs.type(), entt::type_id<char>());
@@ -544,6 +610,9 @@ TEST_F(Any, NoSBOSwap) {
 
     std::swap(lhs, rhs);
 
+    ASSERT_TRUE(lhs.owner());
+    ASSERT_TRUE(rhs.owner());
+
     ASSERT_EQ(entt::any_cast<fat>(lhs), (fat{.4, .3, .2, .1}));
     ASSERT_EQ(entt::any_cast<fat>(rhs), (fat{.1, .2, .3, .4}));
 }
@@ -555,6 +624,9 @@ TEST_F(Any, VoidSwap) {
 
     std::swap(lhs, rhs);
 
+    ASSERT_TRUE(lhs.owner());
+    ASSERT_TRUE(rhs.owner());
+
     ASSERT_EQ(pre, lhs.data());
 }
 
@@ -563,6 +635,9 @@ TEST_F(Any, SBOWithNoSBOSwap) {
     entt::any rhs{'c'};
 
     std::swap(lhs, rhs);
+
+    ASSERT_TRUE(lhs.owner());
+    ASSERT_TRUE(rhs.owner());
 
     ASSERT_EQ(lhs.type(), entt::type_id<char>());
     ASSERT_EQ(rhs.type(), entt::type_id<fat>());
@@ -579,6 +654,9 @@ TEST_F(Any, SBOWithRefSwap) {
 
     std::swap(lhs, rhs);
 
+    ASSERT_TRUE(lhs.owner());
+    ASSERT_FALSE(rhs.owner());
+
     ASSERT_EQ(lhs.type(), entt::type_id<char>());
     ASSERT_EQ(rhs.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(&lhs), nullptr);
@@ -594,6 +672,9 @@ TEST_F(Any, SBOWithConstRefSwap) {
     entt::any rhs{'c'};
 
     std::swap(lhs, rhs);
+
+    ASSERT_TRUE(lhs.owner());
+    ASSERT_FALSE(rhs.owner());
 
     ASSERT_EQ(lhs.type(), entt::type_id<char>());
     ASSERT_EQ(rhs.type(), entt::type_id<int>());
@@ -612,6 +693,7 @@ TEST_F(Any, SBOWithEmptySwap) {
     std::swap(lhs, rhs);
 
     ASSERT_FALSE(lhs);
+    ASSERT_TRUE(lhs.owner());
     ASSERT_EQ(rhs.type(), entt::type_id<char>());
     ASSERT_EQ(entt::any_cast<char>(&lhs), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&rhs), nullptr);
@@ -620,6 +702,7 @@ TEST_F(Any, SBOWithEmptySwap) {
     std::swap(lhs, rhs);
 
     ASSERT_FALSE(rhs);
+    ASSERT_TRUE(rhs.owner());
     ASSERT_EQ(lhs.type(), entt::type_id<char>());
     ASSERT_EQ(entt::any_cast<double>(&lhs), nullptr);
     ASSERT_EQ(entt::any_cast<char>(&rhs), nullptr);
@@ -633,6 +716,7 @@ TEST_F(Any, SBOWithVoidSwap) {
     std::swap(lhs, rhs);
 
     ASSERT_FALSE(lhs);
+    ASSERT_TRUE(lhs.owner());
     ASSERT_EQ(rhs.type(), entt::type_id<char>());
     ASSERT_EQ(entt::any_cast<char>(&lhs), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&rhs), nullptr);
@@ -641,6 +725,7 @@ TEST_F(Any, SBOWithVoidSwap) {
     std::swap(lhs, rhs);
 
     ASSERT_FALSE(rhs);
+    ASSERT_TRUE(rhs.owner());
     ASSERT_EQ(lhs.type(), entt::type_id<char>());
     ASSERT_EQ(entt::any_cast<double>(&lhs), nullptr);
     ASSERT_EQ(entt::any_cast<char>(&rhs), nullptr);
@@ -653,6 +738,9 @@ TEST_F(Any, NoSBOWithRefSwap) {
     entt::any rhs{fat{.1, .2, .3, .4}};
 
     std::swap(lhs, rhs);
+
+    ASSERT_TRUE(lhs.owner());
+    ASSERT_FALSE(rhs.owner());
 
     ASSERT_EQ(lhs.type(), entt::type_id<fat>());
     ASSERT_EQ(rhs.type(), entt::type_id<int>());
@@ -669,6 +757,9 @@ TEST_F(Any, NoSBOWithConstRefSwap) {
     entt::any rhs{fat{.1, .2, .3, .4}};
 
     std::swap(lhs, rhs);
+
+    ASSERT_TRUE(lhs.owner());
+    ASSERT_FALSE(rhs.owner());
 
     ASSERT_EQ(lhs.type(), entt::type_id<fat>());
     ASSERT_EQ(rhs.type(), entt::type_id<int>());
@@ -687,6 +778,7 @@ TEST_F(Any, NoSBOWithEmptySwap) {
     std::swap(lhs, rhs);
 
     ASSERT_FALSE(lhs);
+    ASSERT_TRUE(lhs.owner());
     ASSERT_EQ(rhs.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<fat>(&lhs), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&rhs), nullptr);
@@ -695,6 +787,7 @@ TEST_F(Any, NoSBOWithEmptySwap) {
     std::swap(lhs, rhs);
 
     ASSERT_FALSE(rhs);
+    ASSERT_TRUE(rhs.owner());
     ASSERT_EQ(lhs.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&lhs), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(&rhs), nullptr);
@@ -708,6 +801,7 @@ TEST_F(Any, NoSBOWithVoidSwap) {
     std::swap(lhs, rhs);
 
     ASSERT_FALSE(lhs);
+    ASSERT_TRUE(lhs.owner());
     ASSERT_EQ(rhs.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<fat>(&lhs), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&rhs), nullptr);
@@ -716,6 +810,7 @@ TEST_F(Any, NoSBOWithVoidSwap) {
     std::swap(lhs, rhs);
 
     ASSERT_FALSE(rhs);
+    ASSERT_TRUE(rhs.owner());
     ASSERT_EQ(lhs.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&lhs), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(&rhs), nullptr);
@@ -726,6 +821,9 @@ TEST_F(Any, AsRef) {
     entt::any any{42};
     auto ref = any.as_ref();
     auto cref = std::as_const(any).as_ref();
+
+    ASSERT_FALSE(ref.owner());
+    ASSERT_FALSE(cref.owner());
 
     ASSERT_EQ(entt::any_cast<int>(&any), any.data());
     ASSERT_EQ(entt::any_cast<int>(&ref), any.data());
@@ -758,11 +856,17 @@ TEST_F(Any, AsRef) {
 
     std::swap(ref, cref);
 
+    ASSERT_FALSE(ref.owner());
+    ASSERT_FALSE(cref.owner());
+
     ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
     ASSERT_EQ(entt::any_cast<int>(&cref), any.data());
 
     ref = ref.as_ref();
     cref = std::as_const(cref).as_ref();
+
+    ASSERT_FALSE(ref.owner());
+    ASSERT_FALSE(cref.owner());
 
     ASSERT_EQ(entt::any_cast<int>(&ref), nullptr);
     ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
@@ -777,6 +881,9 @@ TEST_F(Any, AsRef) {
 
     ref = 42;
     cref = 42;
+
+    ASSERT_TRUE(ref.owner());
+    ASSERT_TRUE(cref.owner());
 
     ASSERT_NE(entt::any_cast<int>(&ref), nullptr);
     ASSERT_NE(entt::any_cast<int>(&cref), nullptr);
@@ -867,6 +974,10 @@ TEST_F(Any, MakeAny) {
     ASSERT_TRUE(ext);
     ASSERT_TRUE(ref);
 
+    ASSERT_TRUE(any.owner());
+    ASSERT_TRUE(ext.owner());
+    ASSERT_FALSE(ref.owner());
+
     ASSERT_EQ(entt::any_cast<const int &>(any), 42);
     ASSERT_EQ(entt::any_cast<const int &>(ext), 42);
     ASSERT_EQ(entt::any_cast<const int &>(ref), 42);
@@ -890,6 +1001,10 @@ TEST_F(Any, ForwardAsAny) {
     ASSERT_TRUE(ref);
     ASSERT_TRUE(cref);
 
+    ASSERT_TRUE(any.owner());
+    ASSERT_FALSE(ref.owner());
+    ASSERT_FALSE(cref.owner());
+
     ASSERT_NE(entt::any_cast<int>(&any), nullptr);
     ASSERT_NE(entt::any_cast<int>(&ref), nullptr);
     ASSERT_EQ(entt::any_cast<int>(&cref), nullptr);
@@ -909,10 +1024,16 @@ TEST_F(Any, NotCopyableType) {
         ASSERT_TRUE(any);
         ASSERT_FALSE(copy);
 
+        ASSERT_TRUE(any.owner());
+        ASSERT_TRUE(copy.owner());
+
         copy = any;
 
         ASSERT_TRUE(any);
         ASSERT_FALSE(copy);
+
+        ASSERT_TRUE(any.owner());
+        ASSERT_TRUE(copy.owner());
     };
 
     test(entt::any{std::in_place_type<not_copyable<1>>});
@@ -949,6 +1070,10 @@ TEST_F(Any, CopyMoveReference) {
         ASSERT_FALSE(any);
         ASSERT_TRUE(move);
         ASSERT_TRUE(copy);
+
+        ASSERT_FALSE(any.owner());
+        ASSERT_FALSE(move.owner());
+        ASSERT_TRUE(copy.owner());
 
         ASSERT_EQ(move.type(), entt::type_id<int>());
         ASSERT_EQ(copy.type(), entt::type_id<int>());

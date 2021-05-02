@@ -25,7 +25,7 @@ namespace entt {
 template<std::size_t Len, std::size_t Align>
 class basic_any {
     enum class operation: std::uint8_t { COPY, MOVE, DTOR, COMP, ADDR, CADDR, TYPE };
-    enum class policy: std::uint8_t { OWNED, REF, CREF };
+    enum class policy: std::uint8_t { OWNER, REF, CREF };
 
     using storage_type = std::aligned_storage_t<Len + !Len, Align>;
     using vtable_type = const void *(const operation, const basic_any &, void *);
@@ -42,7 +42,7 @@ class basic_any {
                 return policy::REF;
             }
         } else {
-            return policy::OWNED;
+            return policy::OWNER;
         }
     }
 
@@ -60,7 +60,7 @@ class basic_any {
         static_assert(std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
 
         if constexpr(!std::is_void_v<Type>) {
-            const Type *instance = (in_situ<Type> && from.mode == policy::OWNED)
+            const Type *instance = (in_situ<Type> && from.mode == policy::OWNER)
                 ? ENTT_LAUNDER(reinterpret_cast<const Type *>(&from.storage))
                 : static_cast<const Type *>(from.instance);
 
@@ -72,14 +72,14 @@ class basic_any {
                 break;
             case operation::MOVE:
                 if constexpr(in_situ<Type>) {
-                    if(from.mode == policy::OWNED) {
+                    if(from.mode == policy::OWNER) {
                         return new (&static_cast<basic_any *>(to)->storage) Type{std::move(*const_cast<Type *>(instance))};
                     }
                 }
 
                 return (static_cast<basic_any *>(to)->instance = std::exchange(const_cast<basic_any &>(from).instance, nullptr));
             case operation::DTOR:
-                if(from.mode == policy::OWNED) {
+                if(from.mode == policy::OWNER) {
                     if constexpr(in_situ<Type>) {
                         instance->~Type();
                     } else if constexpr(std::is_array_v<Type>) {
@@ -145,7 +145,7 @@ public:
     basic_any() ENTT_NOEXCEPT
         : instance{},
           vtable{&basic_vtable<void>},
-          mode{policy::OWNED}
+          mode{policy::OWNER}
     {}
 
     /**
@@ -185,7 +185,7 @@ public:
     basic_any(Type &&value)
         : instance{},
           vtable{&basic_vtable<std::decay_t<Type>>},
-          mode{policy::OWNED}
+          mode{policy::OWNER}
     {
         initialize<std::decay_t<Type>>(std::forward<Type>(value));
     }
@@ -197,7 +197,7 @@ public:
     basic_any(const basic_any &other)
         : instance{},
           vtable{&basic_vtable<void>},
-          mode{policy::OWNED}
+          mode{policy::OWNER}
     {
         other.vtable(operation::COPY, other, this);
     }
@@ -307,7 +307,7 @@ public:
     /*! @brief Destroys contained object */
     void reset() {
         std::exchange(vtable, &basic_vtable<void>)(operation::DTOR, *this, nullptr);
-        mode = policy::OWNED;
+        mode = policy::OWNER;
     }
 
     /**
@@ -339,6 +339,14 @@ public:
     /*! @copydoc as_ref */
     [[nodiscard]] basic_any as_ref() const ENTT_NOEXCEPT {
         return basic_any{*this, policy::CREF};
+    }
+
+    /**
+     * @brief Returns true if a wrapper owns its object, false otherwise.
+     * @return True if the wrapper owns its object, false otherwise.
+     */
+    [[nodiscard]] bool owner() const ENTT_NOEXCEPT {
+        return (mode == policy::OWNER);
     }
 
 private:
