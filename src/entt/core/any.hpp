@@ -70,11 +70,9 @@ class basic_any {
                 case operation::CADDR:
                     return instance;
                 case operation::REF:
-                    static_cast<basic_any *>(to)->instance = instance;
                     static_cast<basic_any *>(to)->vtable = basic_vtable<Type &>;
                     break;
                 case operation::CREF:
-                    static_cast<basic_any *>(to)->instance = instance;
                     static_cast<basic_any *>(to)->vtable = basic_vtable<const Type &>;
                     break;
                 case operation::TYPE:
@@ -107,11 +105,9 @@ class basic_any {
                 case operation::CADDR:
                     return instance;
                 case operation::REF:
-                    static_cast<basic_any *>(to)->instance = instance;
                     static_cast<basic_any *>(to)->vtable = basic_vtable<Type &>;
                     break;
                 case operation::CREF:
-                    static_cast<basic_any *>(to)->instance = instance;
                     static_cast<basic_any *>(to)->vtable = basic_vtable<const std::remove_reference_t<Type> &>;
                     break;
                 case operation::TYPE:
@@ -337,6 +333,7 @@ public:
      */
     [[nodiscard]] basic_any as_ref() ENTT_NOEXCEPT {
         basic_any ref{};
+        ref.instance = vtable(operation::CADDR, *this, nullptr);
         vtable(operation::REF, *this, &ref);
         return ref;
     }
@@ -344,6 +341,7 @@ public:
     /*! @copydoc as_ref */
     [[nodiscard]] basic_any as_ref() const ENTT_NOEXCEPT {
         basic_any ref{};
+        ref.instance = vtable(operation::CADDR, *this, nullptr);
         vtable(operation::CREF, *this, &ref);
         return ref;
     }
