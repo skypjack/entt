@@ -7,6 +7,14 @@
 #endif
 
 
+#if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
+#   include <new>
+#   define ENTT_LAUNDER(expr) std::launder(expr)
+#else
+#   define ENTT_LAUNDER(expr) expr
+#endif
+
+
 #ifndef ENTT_USE_ATOMIC
 #   define ENTT_MAYBE_ATOMIC(Type) Type
 #else
