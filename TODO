@@ -10,6 +10,7 @@ WIP:
 * isolate view iterator, unwrap iterators in registry ::remove/::erase/::destroy to use the faster solution for non-view iterators
 * compressed pair to exploit ebo in sparse set and the others
 * rename sparse_set::entity_type (and the others) to value_type
+* meta: use forward_as_any to forward arguments from eg meta_func::invoke, so as to remove the need for the user to explicitly forward references
 * any/meta: remove dependency on <functional> (reference_wrapper, invoke), remove meta_any::type and use something like entt::type_from_meta
 * scheduler, use any (or poly?) instead of unique_ptr
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points

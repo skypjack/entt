@@ -156,75 +156,75 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    enum class operation { DTOR, REF, CREF, DEREF, CDEREF, SEQ, CSEQ, ASSOC, CASSOC };
+    enum class operation { DTOR, DEREF, CDEREF, SEQ, CSEQ, ASSOC, CASSOC };
 
     using vtable_type = void(const operation, const any &, void *);
 
     template<typename Type>
     static void basic_vtable(const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] void *to) {
+        static_assert(std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
+
         if constexpr(!std::is_void_v<Type>) {
             switch(op) {
             case operation::DTOR:
-                if constexpr(!std::is_lvalue_reference_v<Type>) {
-                    if(auto *curr = static_cast<internal::meta_type_node *>(to); curr->dtor) {
-                        curr->dtor(const_cast<any &>(from).data());
-                    }
+                if(auto *curr = static_cast<internal::meta_type_node *>(to); curr->dtor && from.owner()) {
+                    curr->dtor(const_cast<any &>(from).data());
                 }
                 break;
-            case operation::REF:
-                static_cast<meta_any *>(to)->emplace<Type &>(any_cast<Type &>(const_cast<any &>(from)));
-                break;
-            case operation::CREF:
-                static_cast<meta_any *>(to)->emplace<const std::remove_reference_t<Type> &>(any_cast<const std::remove_reference_t<Type> &>(from));
-                break;
             case operation::DEREF:
-                if constexpr(is_meta_pointer_like_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
-                    using element_type = std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>;
+                if constexpr(is_meta_pointer_like_v<Type>) {
+                    using element_type = std::remove_const_t<typename std::pointer_traits<Type>::element_type>;
 
                     if constexpr(std::is_function_v<element_type>) {
-                        *static_cast<meta_any *>(to) = any_cast<std::decay_t<Type>>(from);
-                    } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>, void>) {
-                        using in_place_type = decltype(adl_meta_pointer_like<std::decay_t<Type>>::dereference(any_cast<const std::decay_t<Type> &>(from)));
-                        static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<std::decay_t<Type>>::dereference(any_cast<const std::decay_t<Type> &>(from)));
+                        *static_cast<meta_any *>(to) = any_cast<Type>(from);
+                    } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
+                        using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
+                        static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
                     }
                 }
                 break;
             case operation::CDEREF:
-                if constexpr(is_meta_pointer_like_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
-                    using element_type = std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>;
+                if constexpr(is_meta_pointer_like_v<Type>) {
+                    using element_type = std::remove_const_t<typename std::pointer_traits<Type>::element_type>;
 
                     if constexpr(std::is_function_v<element_type>) {
-                        *static_cast<meta_any *>(to) = any_cast<std::decay_t<Type>>(from);
-                    } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<std::decay_t<Type>>::element_type>, void>) {
-                        using deref_type = decltype(adl_meta_pointer_like<std::decay_t<Type>>::dereference(any_cast<const std::decay_t<Type> &>(from)));
+                        *static_cast<meta_any *>(to) = any_cast<Type>(from);
+                    } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
+                        using deref_type = decltype(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
                         using in_place_type = std::conditional_t<std::is_lvalue_reference_v<deref_type>, const std::remove_reference_t<deref_type> &, deref_type>;
-                        static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<std::decay_t<Type>>::dereference(any_cast<const std::decay_t<Type> &>(from)));
+                        static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
                     }
                 }
                 break;
             case operation::SEQ:
-                if constexpr(is_complete_v<meta_sequence_container_traits<std::decay_t<Type>>>) {
-                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<std::decay_t<Type>>, const_cast<any &>(from).as_ref() };
+                if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, const_cast<any &>(from).as_ref() };
                 }
                 break;
             case operation::CSEQ:
-                if constexpr(is_complete_v<meta_sequence_container_traits<std::decay_t<Type>>>) {
-                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<std::decay_t<Type>>, from.as_ref() };
+                if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, from.as_ref() };
                 }
                 break;
             case operation::ASSOC:
-                if constexpr(is_complete_v<meta_associative_container_traits<std::decay_t<Type>>>) {
-                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<std::decay_t<Type>>, const_cast<any &>(from).as_ref() };
+                if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, const_cast<any &>(from).as_ref() };
                 }
                 break;
             case operation::CASSOC:
-                if constexpr(is_complete_v<meta_associative_container_traits<std::decay_t<Type>>>) {
-                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<std::decay_t<Type>>, from.as_ref() };
+                if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, from.as_ref() };
                 }
                 break;
             }
         }
     }
+
+    meta_any(const meta_any &other, any ref) ENTT_NOEXCEPT
+        : storage{std::move(ref)},
+          node{storage ? other.node : nullptr},
+          vtable{storage ? other.vtable : &basic_vtable<void>}
+    {}
 
 public:
     /*! @brief Default constructor. */
@@ -244,7 +244,7 @@ public:
     explicit meta_any(std::in_place_type_t<Type>, Args &&... args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
           node{internal::meta_info<Type>::resolve()},
-          vtable{&basic_vtable<Type>}
+          vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>}
     {}
 
     /**
@@ -267,7 +267,9 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(Type &&value)
-        : meta_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)}
+        : storage{std::forward<Type>(value)},
+          node{internal::meta_info<std::decay_t<Type>>::resolve()},
+          vtable{&basic_vtable<std::decay_t<Type>>}
     {}
 
     /**
@@ -308,7 +310,7 @@ public:
      * @param other The instance to move from.
      * @return This meta any object.
      */
-    meta_any & operator=(meta_any &&other) {
+    meta_any & operator=(meta_any &&other) ENTT_NOEXCEPT {
         std::exchange(vtable, std::exchange(other.vtable, &basic_vtable<void>))(operation::DTOR, storage, node);
         storage = std::move(other.storage);
         node = std::exchange(other.node, nullptr);
@@ -507,7 +509,7 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        std::exchange(vtable, &basic_vtable<Type>)(operation::DTOR, storage, node);
+        std::exchange(vtable, &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>)(operation::DTOR, storage, node);
         storage.emplace<Type>(std::forward<Args>(args)...);
         node = internal::meta_info<Type>::resolve();
     }
@@ -593,16 +595,12 @@ public:
      * @return A wrapper that shares a reference to an unmanaged object.
      */
     [[nodiscard]] meta_any as_ref() ENTT_NOEXCEPT {
-        meta_any ref{};
-        vtable(operation::REF, storage, &ref);
-        return ref;
+        return meta_any{*this, storage.as_ref()};
     }
 
     /*! @copydoc as_ref */
     [[nodiscard]] meta_any as_ref() const ENTT_NOEXCEPT {
-        meta_any ref{};
-        vtable(operation::CREF, storage, &ref);
-        return ref;
+        return meta_any{*this, storage.as_ref()};
     }
 
 private:
