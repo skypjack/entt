@@ -235,7 +235,7 @@ public:
      * @param other The instance to move from.
      * @return This any object.
      */
-    basic_any & operator=(basic_any &&other) {
+    basic_any & operator=(basic_any &&other) ENTT_NOEXCEPT {
         std::exchange(vtable, other.vtable)(operation::DTOR, *this, nullptr);
         other.vtable(operation::MOVE, other, this);
         mode = other.mode;
