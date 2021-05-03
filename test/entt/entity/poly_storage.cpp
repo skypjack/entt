@@ -52,7 +52,8 @@ struct PolyStorage: entt::type_list_cat_t<
         }
 
         static void copy_to(const Type &self, entt::basic_registry<entity_type> &other) {
-            other.template insert<typename Type::value_type>(self.data(), self.data() + self.size(), self.raw(), self.raw() + self.size());
+            const entt::sparse_set &base = self;
+            other.template insert<typename Type::value_type>(base.rbegin(), base.rend(), self.rbegin(), self.rend());
         }
     };
 
