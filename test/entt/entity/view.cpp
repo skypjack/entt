@@ -50,8 +50,8 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_EQ(*(view.raw() + 0), '2');
     ASSERT_EQ(*(cview.raw() + 1), '1');
 
-    registry.remove<char>(e0);
-    registry.remove<char>(e1);
+    registry.erase<char>(e0);
+    registry.erase<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_EQ(view.rbegin(), view.rend());
@@ -296,7 +296,7 @@ TEST(SingleComponentView, Find) {
     const auto e3 = registry.create();
     registry.emplace<int>(e3);
 
-    registry.remove<int>(e1);
+    registry.erase<int>(e1);
 
     ASSERT_NE(view.find(e0), view.end());
     ASSERT_EQ(view.find(e1), view.end());
@@ -760,7 +760,7 @@ TEST(MultiComponentView, Find) {
     registry.emplace<int>(e3);
     registry.emplace<char>(e3);
 
-    registry.remove<int>(e1);
+    registry.erase<int>(e1);
 
     ASSERT_NE(view.find(e0), view.end());
     ASSERT_EQ(view.find(e1), view.end());
@@ -816,8 +816,8 @@ TEST(MultiComponentView, ExcludedComponents) {
 
     registry.emplace<char>(e0);
     registry.emplace<char>(e2);
-    registry.remove<char>(e1);
-    registry.remove<char>(e3);
+    registry.erase<char>(e1);
+    registry.erase<char>(e3);
 
     for(const auto entity: view) {
         ASSERT_TRUE(entity == e1 || entity == e3);

@@ -43,7 +43,7 @@ TEST(NonOwningGroup, Functionalities) {
 
     ASSERT_EQ(group.size(), 2u);
 
-    registry.remove<int>(e0);
+    registry.erase<int>(e0);
 
     ASSERT_EQ(group.size(), 1u);
 
@@ -55,8 +55,8 @@ TEST(NonOwningGroup, Functionalities) {
 
     ASSERT_EQ(*(group.data() + 0), e1);
 
-    registry.remove<char>(e0);
-    registry.remove<char>(e1);
+    registry.erase<char>(e0);
+    registry.erase<char>(e1);
 
     ASSERT_EQ(group.begin(), group.end());
     ASSERT_EQ(cgroup.begin(), cgroup.end());
@@ -396,7 +396,7 @@ TEST(NonOwningGroup, Find) {
     registry.emplace<int>(e3);
     registry.emplace<char>(e3);
 
-    registry.remove<int>(e1);
+    registry.erase<int>(e1);
 
     ASSERT_NE(group.find(e0), group.end());
     ASSERT_EQ(group.find(e1), group.end());
@@ -455,8 +455,8 @@ TEST(NonOwningGroup, ExcludedComponents) {
 
     ASSERT_TRUE(group.empty());
 
-    registry.remove<char>(e1);
-    registry.remove<char>(e3);
+    registry.erase<char>(e1);
+    registry.erase<char>(e3);
 
     for(const auto entity: group) {
         ASSERT_TRUE(entity == e1 || entity == e3);
@@ -512,7 +512,7 @@ TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
     ASSERT_TRUE(group.empty());
     ASSERT_TRUE(cgroup.empty());
 
-    registry.remove<char>(entity);
+    registry.erase<char>(entity);
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE(cgroup.empty());
@@ -661,7 +661,7 @@ TEST(OwningGroup, Functionalities) {
 
     ASSERT_EQ(group.size(), 2u);
 
-    registry.remove<int>(e0);
+    registry.erase<int>(e0);
 
     ASSERT_EQ(group.size(), 1u);
 
@@ -677,8 +677,8 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_EQ(*(group.data() + 0), e1);
     ASSERT_EQ(*(group.raw<int>() + 0), 42);
 
-    registry.remove<char>(e0);
-    registry.remove<char>(e1);
+    registry.erase<char>(e0);
+    registry.erase<char>(e1);
 
     ASSERT_EQ(group.begin(), group.end());
     ASSERT_EQ(cgroup.begin(), cgroup.end());
@@ -1101,7 +1101,7 @@ TEST(OwningGroup, Find) {
     registry.emplace<int>(e3);
     registry.emplace<char>(e3);
 
-    registry.remove<int>(e1);
+    registry.erase<int>(e1);
 
     ASSERT_NE(group.find(e0), group.end());
     ASSERT_EQ(group.find(e1), group.end());
@@ -1160,8 +1160,8 @@ TEST(OwningGroup, ExcludedComponents) {
 
     ASSERT_TRUE(group.empty());
 
-    registry.remove<char>(e1);
-    registry.remove<double>(e3);
+    registry.erase<char>(e1);
+    registry.erase<double>(e3);
 
     for(const auto entity: group) {
         ASSERT_TRUE(entity == e1 || entity == e3);
@@ -1217,7 +1217,7 @@ TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
     ASSERT_TRUE(group.empty());
     ASSERT_TRUE(cgroup.empty());
 
-    registry.remove<char>(entity);
+    registry.erase<char>(entity);
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE(cgroup.empty());

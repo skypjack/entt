@@ -662,17 +662,17 @@ public:
      * @brief Removes the given components from an entity.
      *
      * @warning
-     * Attempting to use an invalid entity or to remove a component from an
-     * entity that doesn't own it results in undefined behavior.
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Types of components to remove.
      * @param entity A valid entity identifier.
+     * @return The number of components actually removed.
      */
     template<typename... Component>
-    void remove(const entity_type entity) {
+    size_type remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>()->erase(entity, this), ...);
+        return (assure<Component>()->remove(entity, this) + ... + size_type{});
     }
 
     /**
@@ -684,36 +684,54 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @return The number of components actually removed.
      */
     template<typename... Component, typename It>
-    void remove(It first, It last) {
+    size_type remove(It first, It last) {
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
+        return (assure<Component>()->remove(first, last, this) + ... + size_type{});
+    }
+
+    /**
+     * @brief Erases the given components from an entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to erase a component from an
+     * entity that doesn't own it results in undefined behavior.
+     *
+     * @tparam Component Types of components to erase.
+     * @param entity A valid entity identifier.
+     */
+    template<typename... Component>
+    void erase(const entity_type entity) {
+        ENTT_ASSERT(valid(entity), "Invalid entity");
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
+        (assure<Component>()->erase(entity, this), ...);
+    }
+
+    /**
+     * @brief Erases the given components from all the entities in a range.
+     *
+     * @sa erase
+     *
+     * @tparam Component Types of components to erase.
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename... Component, typename It>
+    void erase(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
         (assure<Component>()->erase(first, last, this), ...);
     }
 
-    /**
-     * @brief Removes the given components from an entity.
-     *
-     * Equivalent to the following snippet (pseudocode):
-     *
-     * @code{.cpp}
-     * if(registry.all_of<Component>(entity)) { registry.remove<Component>(entity) }
-     * @endcode
-     *
-     * Prefer this function anyway because it has slightly better performance.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
-     *
-     * @tparam Component Types of components to remove.
-     * @param entity A valid entity identifier.
-     * @return The number of components actually removed.
-     */
+    /*! @copydoc remove */
     template<typename... Component>
+    [[deprecated("Use ::remove instead")]]
     size_type remove_if_exists(const entity_type entity) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<Component>()->remove(entity, this) + ... + size_type{});
+        return remove<Component...>(entity);
     }
 
     /**

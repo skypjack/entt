@@ -296,24 +296,24 @@ bool all = registry.all_of<position, velocity>(entity);
 bool any = registry.any_of<position, velocity>(entity);
 ```
 
-If the goal is to delete a component from an entity that owns it, the `remove`
+If the goal is to delete a component from an entity that owns it, the `erase`
 member function template is the way to go:
+
+```cpp
+registry.erase<position>(entity);
+```
+
+When in doubt whether the entity owns the component, use the `remove` member
+function instead. It behaves similarly to `erase` but it erases the component
+if and only if it exists, otherwise it returns safely to the caller:
 
 ```cpp
 registry.remove<position>(entity);
 ```
 
-When in doubt whether the entity owns the component, use the `remove_if_exists`
-member function instead. It behaves similarly to `remove` but it discards the
-component if and only if it exists, otherwise it returns safely to the caller:
-
-```cpp
-registry.remove_if_exists<position>(entity);
-```
-
 The `clear` member function works similarly and can be used to either:
 
-* Remove all instances of the given components from the entities that own them:
+* Erases all instances of the given components from the entities that own them:
 
   ```cpp
   registry.clear<position>();

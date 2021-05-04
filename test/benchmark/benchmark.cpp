@@ -45,9 +45,9 @@ void pathological(Func func) {
 
     for(auto i = 0; i < 10; ++i) {
         registry.each([i = 0, &registry](const auto entity) mutable {
-            if(!(++i % 7)) { registry.remove_if_exists<position>(entity); }
-            if(!(++i % 11)) { registry.remove_if_exists<velocity>(entity); }
-            if(!(++i % 13)) { registry.remove_if_exists<comp<0>>(entity); }
+            if(!(++i % 7)) { registry.remove<position>(entity); }
+            if(!(++i % 11)) { registry.remove<velocity>(entity); }
+            if(!(++i % 13)) { registry.remove<comp<0>>(entity); }
             if(!(++i % 17)) { registry.destroy(entity); }
         });
 
@@ -120,6 +120,39 @@ TEST(Benchmark, CreateManyWithComponents) {
     timer.elapsed();
 }
 
+TEST(Benchmark, Erase) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Removing 1000000 components from their entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+
+    for(auto entity: registry.view<int>()) {
+        registry.erase<int>(entity);
+    }
+
+    timer.elapsed();
+}
+
+TEST(Benchmark, EraseMany) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Removing 999999 components from their entities at once" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    auto view = registry.view<int>();
+    registry.erase<int>(++view.begin(), view.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, Remove) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
@@ -150,21 +183,6 @@ TEST(Benchmark, RemoveMany) {
     timer timer;
     auto view = registry.view<int>();
     registry.remove<int>(++view.begin(), view.end());
-    timer.elapsed();
-}
-
-TEST(Benchmark, RemoveAll) {
-    entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
-
-    std::cout << "Removing 1000000 components from their entities at once" << std::endl;
-
-    registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
-
-    timer timer;
-    auto view = registry.view<int>();
-    registry.remove<int>(view.begin(), view.end());
     timer.elapsed();
 }
 

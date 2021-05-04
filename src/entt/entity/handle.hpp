@@ -30,6 +30,8 @@ struct basic_handle {
     using entity_type = typename registry_type::entity_type;
     /*! @brief Underlying version type. */
     using version_type = typename registry_type::version_type;
+    /*! @brief Unsigned integer type. */
+    using size_type = typename registry_type::size_type;
 
     /*! @brief Constructs an invalid handle. */
     basic_handle() ENTT_NOEXCEPT
@@ -194,21 +196,27 @@ struct basic_handle {
      * @tparam Component Types of components to remove.
      */
     template<typename... Component>
-    void remove() const {
+    size_type remove() const {
         static_assert(sizeof...(Type) == 0 || (type_list_contains_v<type_list<Type...>, Component> && ...), "Invalid type");
-        reg->template remove<Component...>(entt);
+        return reg->template remove<Component...>(entt);
     }
 
     /**
-     * @brief Removes the given components from a handle.
-     * @sa basic_registry::remove_if_exists
-     * @tparam Component Types of components to remove.
-     * @return The number of components actually removed.
+     * @brief Erases the given components from a handle.
+     * @sa basic_registry::erase
+     * @tparam Component Types of components to erase.
      */
     template<typename... Component>
-    decltype(auto) remove_if_exists() const {
+    void erase() const {
         static_assert(sizeof...(Type) == 0 || (type_list_contains_v<type_list<Type...>, Component> && ...), "Invalid type");
-        return reg->template remove_if_exists<Component...>(entt);
+        reg->template erase<Component...>(entt);
+    }
+
+    /*! @copydoc remove */
+    template<typename... Component>
+    [[deprecated("Use ::remove instead")]]
+    size_type remove_if_exists() const {
+        return remove<Component...>();
     }
 
     /**
