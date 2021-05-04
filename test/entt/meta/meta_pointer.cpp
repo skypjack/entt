@@ -103,25 +103,36 @@ TEST(MetaPointerLike, DereferenceOperatorConstType) {
     ASSERT_EQ(deref.cast<const int &>(), 42);
 }
 
-TEST(MetaPointerLike, DereferenceOperatorConstAny) {
-    auto test = [](const entt::meta_any any) {
-        auto deref = *any;
-
-        ASSERT_TRUE(deref);
-        ASSERT_FALSE(deref.type().is_pointer());
-        ASSERT_FALSE(deref.type().is_pointer_like());
-        ASSERT_EQ(deref.type(), entt::resolve<int>());
-
-        ASSERT_EQ(deref.try_cast<int>(), nullptr);
-        ASSERT_NE(deref.try_cast<const int>(), nullptr);
-        ASSERT_DEATH(deref.cast<int &>() = 0, "");
-        ASSERT_EQ(deref.cast<const int &>(), 42);
-    };
-
+TEST(MetaPointerLike, DereferenceOperatorConstAnyNonConstType) {
     int value = 42;
+    const entt::meta_any any{&value};
+    auto deref = *any;
 
-    test(&value);
-    test(&std::as_const(value));
+    ASSERT_TRUE(deref);
+    ASSERT_FALSE(deref.type().is_pointer());
+    ASSERT_FALSE(deref.type().is_pointer_like());
+    ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+    ASSERT_NE(deref.try_cast<int>(), nullptr);
+    ASSERT_NE(deref.try_cast<const int>(), nullptr);
+    ASSERT_EQ(deref.cast<int &>(), 42);
+    ASSERT_EQ(deref.cast<const int &>(), 42);
+}
+
+TEST(MetaPointerLike, DereferenceOperatorConstAnyConstType) {
+    const int value = 42;
+    const entt::meta_any any{&value};
+    auto deref = *any;
+
+    ASSERT_TRUE(deref);
+    ASSERT_FALSE(deref.type().is_pointer());
+    ASSERT_FALSE(deref.type().is_pointer_like());
+    ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+    ASSERT_EQ(deref.try_cast<int>(), nullptr);
+    ASSERT_NE(deref.try_cast<const int>(), nullptr);
+    ASSERT_DEATH(deref.cast<int &>() = 0, "");
+    ASSERT_EQ(deref.cast<const int &>(), 42);
 }
 
 TEST(MetaPointerLike, DereferenceOperatorRawPointer) {

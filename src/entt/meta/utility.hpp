@@ -158,25 +158,27 @@ template<typename Type, typename... Args, std::size_t... Index>
 template<typename Type, auto Data>
 [[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
     if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
-        if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
-            using descriptor = meta_function_helper_t<Type, decltype(Data)>;
-            using data_type = type_list_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename descriptor::args_type>;
+        if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
+            using data_type = type_list_element_t<1u, typename meta_function_helper_t<Type, decltype(Data)>::args_type>;
 
-            if(auto * const clazz = instance->try_cast<Type>(); clazz) {
-                if(value.allow_cast<data_type>()) {
-                    std::invoke(Data, *clazz, value.cast<data_type>());
-                    return true;
-                }
+            if(auto * const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
+                Data(*clazz, value.cast<data_type>());
+                return true;
+            }
+        } else if constexpr(std::is_member_function_pointer_v<decltype(Data)>) {
+            using data_type = type_list_element_t<0u, typename meta_function_helper_t<Type, decltype(Data)>::args_type>;
+
+            if(auto * const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
+                (clazz->*Data)(value.cast<data_type>());
+                return true;
             }
         } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_reference_t<decltype(std::declval<Type>().*Data)>;
 
             if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
-                if(auto * const clazz = instance->try_cast<Type>(); clazz) {
-                    if(value.allow_cast<data_type>()) {
-                        std::invoke(Data, clazz) = value.cast<data_type>();
-                        return true;
-                    }
+                if(auto * const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
+                    clazz->*Data = value.cast<data_type>();
+                    return true;
                 }
             }
         } else {
@@ -196,6 +198,29 @@ template<typename Type, auto Data>
 
 
 /**
+ * @brief Wraps a value depending on the given policy.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @tparam Type Type of value to wrap.
+ * @param value Value to wrap.
+ * @return A meta any containing the returned value.
+ */
+template<typename Policy = as_is_t, typename Type>
+meta_any meta_dispatch(Type &&value) {
+    if constexpr(std::is_same_v<Policy, as_void_t>) {
+        return meta_any{std::in_place_type<void>, std::forward<Type>(value)};
+    } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
+        return meta_any{std::in_place_type<Type>, std::forward<Type>(value)};
+    } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
+        static_assert(std::is_lvalue_reference_v<Type>, "Invalid type");
+        return meta_any{std::in_place_type<const std::remove_reference_t<Type> &>, std::as_const(value)};
+    } else {
+        static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
+        return meta_any{std::forward<Type>(value)};
+    }
+}
+
+
+/**
  * @brief Gets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
  * @tparam Data The actual variable to get.
@@ -205,42 +230,30 @@ template<typename Type, auto Data>
  */
 template<typename Type, auto Data, typename Policy = as_is_t>
 [[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance) {
-    [[maybe_unused]] auto dispatch = [](auto &&value) {
-        if constexpr(std::is_same_v<Policy, as_void_t>) {
-            return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
-        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-            return meta_any{std::in_place_type<decltype(value)>, std::forward<decltype(value)>(value)};
-        } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
-            const auto &cvalue = std::as_const(value);
-            return meta_any{std::in_place_type<decltype(cvalue)>, cvalue};
-        } else {
-            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
-            return meta_any{std::forward<decltype(value)>(value)};
-        }
-    };
-
-    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
+    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
         auto * const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type &>, const Type, Type>>();
-        return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
+        return clazz ? meta_dispatch<Policy>(Data(*clazz)) : meta_any{};
+    } else if constexpr(std::is_member_function_pointer_v<decltype(Data)>) {
+        auto * const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type &>, const Type, Type>>();
+        return clazz ? meta_dispatch<Policy>((clazz->*Data)()) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-        if constexpr(std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
-            return meta_any{};
-        } else {
+        if constexpr(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
             if(auto * clazz = instance->try_cast<Type>(); clazz) {
-                return dispatch(std::invoke(Data, *clazz));
-            } else {
-                auto * fallback = instance->try_cast<const Type>();
-                return fallback ? dispatch(std::invoke(Data, *fallback)) : meta_any{};
+                return meta_dispatch<Policy>(clazz->*Data);
+            } else if(auto * fallback = instance->try_cast<const Type>(); fallback) {
+                return meta_dispatch<Policy>(fallback->*Data);
             }
         }
+
+        return meta_any{};
     } else if constexpr(std::is_pointer_v<decltype(Data)>) {
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
             return meta_any{};
         } else {
-            return dispatch(*Data);
+            return meta_dispatch<Policy>(*Data);
         }
     } else {
-        return dispatch(Data);
+        return meta_dispatch<Policy>(Data);
     }
 }
 
@@ -256,40 +269,61 @@ template<typename Type, auto Data, typename Policy = as_is_t>
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t, std::size_t... Index>
-[[nodiscard]] meta_any meta_invoke([[maybe_unused]] meta_handle instance, meta_any *args, std::index_sequence<Index...>) {
+[[nodiscard]] std::enable_if_t<!std::is_invocable_v<decltype(Candidate)>, meta_any> meta_invoke([[maybe_unused]] meta_handle instance, meta_any *args, std::index_sequence<Index...>) {
     using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
 
-    auto dispatch = [](auto &&... params) {
-        if constexpr(std::is_void_v<std::remove_cv_t<typename descriptor::return_type>> || std::is_same_v<Policy, as_void_t>) {
-            std::invoke(Candidate, std::forward<decltype(params)>(params)...);
-            return meta_any{std::in_place_type<void>};
-        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-            auto &value = std::invoke(Candidate, std::forward<decltype(params)>(params)...);
-            return meta_any{std::in_place_type<decltype(value)>, value};
-        } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
-            const auto &cvalue = std::invoke(Candidate, std::forward<decltype(params)>(params)...);
-            return meta_any{std::in_place_type<decltype(cvalue)>, cvalue};
+    const auto invoke = [](auto &&maybe_clazz, auto &&... other) {
+        if constexpr(std::is_member_function_pointer_v<decltype(Candidate)>) {
+            if constexpr(std::is_void_v<typename descriptor::return_type>) {
+                (std::forward<decltype(maybe_clazz)>(maybe_clazz).*Candidate)(std::forward<decltype(other)>(other)...);
+                return meta_any{std::in_place_type<void>};
+            } else {
+                return meta_dispatch<Policy>((std::forward<decltype(maybe_clazz)>(maybe_clazz).*Candidate)(std::forward<decltype(other)>(other)...));
+            }
         } else {
-            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
-            return meta_any{std::invoke(Candidate, std::forward<decltype(params)>(params)...)};
+            if constexpr(std::is_void_v<typename descriptor::return_type>) {
+                Candidate(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...);
+                return meta_any{std::in_place_type<void>};
+            } else {
+                return meta_dispatch<Policy>(Candidate(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...));
+            }
         }
     };
 
     if constexpr(std::is_invocable_v<decltype(Candidate), const Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
         if(const auto * const clazz = instance->try_cast<const Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return dispatch(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return invoke(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else if constexpr(std::is_invocable_v<decltype(Candidate), Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
         if(auto * const clazz = instance->try_cast<Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return dispatch(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return invoke(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else {
         if(((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return dispatch((args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return invoke((args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     }
 
     return meta_any{};
+}
+
+
+/**
+ * @brief Invokes a function given a list of erased parameters, if possible.
+ * @tparam Type Reflected type to which the function is associated.
+ * @tparam Candidate The actual function to invoke.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @tparam Index Indexes to use to extract erased arguments from their list.
+ * @return A meta any containing the returned value, if any.
+ */
+template<typename Type, auto Candidate, typename Policy = as_is_t, std::size_t... Index>
+[[nodiscard]] std::enable_if_t<std::is_invocable_v<decltype(Candidate)>, meta_any> meta_invoke(meta_handle, meta_any *, std::index_sequence<Index...>) {
+    if constexpr(std::is_void_v<decltype(Candidate())>) {
+        Candidate();
+        return meta_any{std::in_place_type<void>};
+    } else {
+        return meta_dispatch<Policy>(Candidate());
+    }
 }
 
 

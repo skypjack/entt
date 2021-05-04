@@ -156,7 +156,7 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    enum class operation { DTOR, DEREF, CDEREF, SEQ, CSEQ, ASSOC, CASSOC };
+    enum class operation { DTOR, DEREF, SEQ, ASSOC };
 
     using vtable_type = void(const operation, const any &, void *);
 
@@ -182,38 +182,14 @@ class meta_any {
                         static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
                     }
                 }
-                break;
-            case operation::CDEREF:
-                if constexpr(is_meta_pointer_like_v<Type>) {
-                    using element_type = std::remove_const_t<typename std::pointer_traits<Type>::element_type>;
-
-                    if constexpr(std::is_function_v<element_type>) {
-                        *static_cast<meta_any *>(to) = any_cast<Type>(from);
-                    } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
-                        using deref_type = decltype(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
-                        using in_place_type = std::conditional_t<std::is_lvalue_reference_v<deref_type>, const std::remove_reference_t<deref_type> &, deref_type>;
-                        static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
-                    }
-                }
-                break;
             case operation::SEQ:
                 if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, const_cast<any &>(from).as_ref() };
-                }
-                break;
-            case operation::CSEQ:
-                if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, from.as_ref() };
+                    *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, std::move(const_cast<any &>(from)) };
                 }
                 break;
             case operation::ASSOC:
                 if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, const_cast<any &>(from).as_ref() };
-                }
-                break;
-            case operation::CASSOC:
-                if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, from.as_ref() };
+                    *static_cast<meta_associative_container *>(to) = { std::in_place_type<Type>, std::move(const_cast<any &>(from)) };
                 }
                 break;
             }
@@ -527,14 +503,14 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() ENTT_NOEXCEPT {
         meta_sequence_container proxy;
-        vtable(operation::SEQ, storage, &proxy);
+        vtable(operation::SEQ, storage.as_ref(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const ENTT_NOEXCEPT {
         meta_sequence_container proxy;
-        vtable(operation::CSEQ, storage, &proxy);
+        vtable(operation::SEQ, storage.as_ref(), &proxy);
         return proxy;
     }
 
@@ -544,14 +520,14 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() ENTT_NOEXCEPT {
         meta_associative_container proxy;
-        vtable(operation::ASSOC, storage, &proxy);
+        vtable(operation::ASSOC, storage.as_ref(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const ENTT_NOEXCEPT {
         meta_associative_container proxy;
-        vtable(operation::CASSOC, storage, &proxy);
+        vtable(operation::ASSOC, storage.as_ref(), &proxy);
         return proxy;
     }
 
@@ -560,16 +536,9 @@ public:
      * @return A wrapper that shares a reference to an unmanaged object if the
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
-    [[nodiscard]] meta_any operator*() ENTT_NOEXCEPT {
-        meta_any ret{};
-        vtable(operation::DEREF, storage, &ret);
-        return ret;
-    }
-
-    /*! @copydoc operator* */
     [[nodiscard]] meta_any operator*() const ENTT_NOEXCEPT {
         meta_any ret{};
-        vtable(operation::CDEREF, storage, &ret);
+        vtable(operation::DEREF, storage, &ret);
         return ret;
     }
 
