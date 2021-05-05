@@ -235,6 +235,63 @@ struct meta_factory<Type> {
     /**
      * @brief Assigns a meta conversion function to a meta type.
      *
+     * Conversion functions can be either free functions or member
+     * functions.<br/>
+     * In case of free functions, they must accept a const reference to an
+     * instance of the parent type as an argument. In case of member functions,
+     * they should have no arguments at all.
+     *
+     * @tparam Candidate The actual function to use for the conversion.
+     * @return A meta factory for the parent type.
+     */
+    template<auto Candidate>
+    std::enable_if_t<std::is_member_function_pointer_v<decltype(Candidate)>, meta_factory<Type>> conv() ENTT_NOEXCEPT {
+        using conv_type = std::invoke_result_t<decltype(Candidate), Type &>;
+        auto * const type = internal::meta_info<Type>::resolve();
+
+        static internal::meta_conv_node node{
+            type,
+            nullptr,
+            &internal::meta_info<conv_type>::resolve,
+            [](const void *instance) -> meta_any {
+                return (static_cast<const Type *>(instance)->*Candidate)();
+            }
+        };
+
+        if(!internal::find_if(&node, type->conv)) {
+            node.next = type->conv;
+            type->conv = &node;
+        }
+
+        return meta_factory<Type>{};
+    }
+
+    /*! @copydoc conv */
+    template<auto Candidate>
+    std::enable_if_t<!std::is_member_function_pointer_v<decltype(Candidate)>, meta_factory<Type>> conv() ENTT_NOEXCEPT {
+        using conv_type = std::invoke_result_t<decltype(Candidate), Type &>;
+        auto * const type = internal::meta_info<Type>::resolve();
+
+        static internal::meta_conv_node node{
+            type,
+            nullptr,
+            &internal::meta_info<conv_type>::resolve,
+            [](const void *instance) -> meta_any {
+                return Candidate(*static_cast<const Type *>(instance));
+            }
+        };
+
+        if(!internal::find_if(&node, type->conv)) {
+            node.next = type->conv;
+            type->conv = &node;
+        }
+
+        return meta_factory<Type>{};
+    }
+
+    /**
+     * @brief Assigns a meta conversion function to a meta type.
+     *
      * The given type must be such that an instance of the reflected type can be
      * converted to it.
      *
@@ -252,44 +309,6 @@ struct meta_factory<Type> {
             &internal::meta_info<To>::resolve,
             [](const void *instance) -> meta_any {
                 return static_cast<To>(*static_cast<const Type *>(instance));
-            }
-        };
-
-        if(!internal::find_if(&node, type->conv)) {
-            node.next = type->conv;
-            type->conv = &node;
-        }
-
-        return meta_factory<Type>{};
-    }
-
-    /**
-     * @brief Assigns a meta conversion function to a meta type.
-     *
-     * Conversion functions can be either free functions or member
-     * functions.<br/>
-     * In case of free functions, they must accept a const reference to an
-     * instance of the parent type as an argument. In case of member functions,
-     * they should have no arguments at all.
-     *
-     * @tparam Candidate The actual function to use for the conversion.
-     * @return A meta factory for the parent type.
-     */
-    template<auto Candidate>
-    auto conv() ENTT_NOEXCEPT {
-        using conv_type = std::invoke_result_t<decltype(Candidate), Type &>;
-        auto * const type = internal::meta_info<Type>::resolve();
-
-        static internal::meta_conv_node node{
-            type,
-            nullptr,
-            &internal::meta_info<conv_type>::resolve,
-            [](const void *instance) -> meta_any {
-                if constexpr(std::is_member_function_pointer_v<decltype(Candidate)>) {
-                    return (static_cast<const Type *>(instance)->*Candidate)();
-                } else {
-                    return Candidate(*static_cast<const Type *>(instance));
-                }
             }
         };
 
