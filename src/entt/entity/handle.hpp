@@ -194,6 +194,7 @@ struct basic_handle {
      * @brief Removes the given components from a handle.
      * @sa basic_registry::remove
      * @tparam Component Types of components to remove.
+     * @return The number of components actually removed.
      */
     template<typename... Component>
     size_type remove() const {
