@@ -593,18 +593,24 @@ TEST(Registry, Each) {
 TEST(Registry, Orphans) {
     entt::registry registry;
     entt::registry::size_type tot{};
+    entt::entity entities[3u]{};
 
-    registry.emplace<int>(registry.create());
-    registry.create();
-    registry.emplace<int>(registry.create());
+    registry.create(std::begin(entities), std::end(entities));
+    registry.emplace<int>(entities[0u]);
+    registry.emplace<int>(entities[2u]);
 
     registry.orphans([&](auto) { ++tot; });
+
     ASSERT_EQ(tot, 1u);
-    tot = {};
 
-    registry.each([&](auto entity) { registry.remove_all(entity); });
+    registry.erase<int>(entities[0u]);
+    registry.erase<int>(entities[2u]);
+
+    tot = {};
     registry.orphans([&](auto) { ++tot; });
+
     ASSERT_EQ(tot, 3u);
+
     registry.clear();
     tot = {};
 

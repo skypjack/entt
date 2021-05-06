@@ -186,20 +186,6 @@ TEST(BasicHandle, Component) {
     ASSERT_EQ(nullptr, std::get<1>(handle.try_get<int, char, double>()));
 }
 
-TEST(BasicHandle, RemoveAll) {
-    entt::registry registry;
-    const auto entity = registry.create();
-    entt::handle handle{registry, entity};
-
-    ASSERT_EQ(3, handle.emplace<int>(3));
-    ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
-    ASSERT_TRUE((handle.all_of<int, char>()));
-
-    handle.remove_all();
-
-    ASSERT_FALSE((handle.any_of<int, char>()));
-}
-
 TEST(BasicHandle, FromEntity) {
     entt::registry registry;
     const auto entity = registry.create();

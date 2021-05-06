@@ -748,6 +748,7 @@ public:
      *
      * @param entity A valid entity identifier.
      */
+    [[deprecated("Use ::destroy(entity)/::create(entity) instead")]]
     void remove_all(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
 

@@ -224,6 +224,7 @@ struct basic_handle {
      * @brief Removes all the components from a handle and makes it orphaned.
      * @sa basic_registry::remove_all
      */
+    [[deprecated("No longer supported")]]
     void remove_all() const {
         static_assert(sizeof...(Type) == 0, "Invalid operation");
         reg->remove_all(entt);
