@@ -473,10 +473,14 @@ public:
     /**
      * @brief Destroys an entity.
      *
-     * When an entity is destroyed, its version is updated and the identifier
-     * can be recycled at any time.
+     * The version is updated and the identifier can be recycled at any time.
      *
-     * @sa remove_all
+     * @warning
+     * Adding or removing components to an entity that is being destroyed can
+     * result in undefined behavior.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @param entity A valid entity identifier.
      */
@@ -487,16 +491,20 @@ public:
     /**
      * @brief Destroys an entity.
      *
-     * If the entity isn't already destroyed, the suggested version is used
-     * instead of the implicitly generated one.
+     * The suggested version is used instead of the implicitly generated one.
      *
-     * @sa remove_all
+     * @sa destroy
      *
      * @param entity A valid entity identifier.
      * @param version A desired version upon destruction.
      */
     void destroy(const entity_type entity, const version_type version) {
-        remove_all(entity);
+        ENTT_ASSERT(valid(entity), "Invalid entity");
+
+        for(auto pos = pools.size(); pos; --pos) {
+            pools[pos-1].pool && pools[pos-1].pool->remove(entity, this);
+        }
+
         release_entity(entity, version);
     }
 
@@ -512,7 +520,7 @@ public:
     template<typename It>
     void destroy(It first, It last) {
         for(; first != last; ++first) {
-            destroy(*first);
+            destroy(*first, version(*first) + 1u);
         }
     }
 

@@ -7,7 +7,8 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
-* registry: deprecate remove_if_exists/remove_all, add remove/erase similar to sparse set that also remove all in case of no components
+* compressed pair to exploit ebo in sparse set and the others
+* rename sparse_set::entity_type (and the others) to value_type
 * scheduler, use any (or poly?) instead of unique_ptr
 * any and the like: remove constructor that accepts reference wrapper, allow only in-place T& and entt::make_any<T>(...)
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
