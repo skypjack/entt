@@ -1069,6 +1069,14 @@ class meta_type {
         return nullptr;
     }
 
+    template<auto... Member, typename Node>
+    void unregister_all(Node **curr) {
+        while(*curr) {
+            (unregister_all(&((*curr)->*Member)), ...);
+            *curr = std::exchange((*curr)->next, nullptr);
+        }
+    };
+
 public:
     /*! @brief Node type. */
     using node_type = internal::meta_type_node;
@@ -1566,21 +1574,12 @@ public:
             }
         }
 
-        const auto unregister_all = y_combinator{
-            [](auto &&self, auto **curr, auto... member) {
-                while(*curr) {
-                    (self(&((*curr)->*member)), ...);
-                    *curr = std::exchange((*curr)->next, nullptr);
-                }
-            }
-        };
-
         unregister_all(&node->prop);
         unregister_all(&node->base);
         unregister_all(&node->conv);
-        unregister_all(&node->ctor, &internal::meta_ctor_node::prop);
-        unregister_all(&node->data, &internal::meta_data_node::prop);
-        unregister_all(&node->func, &internal::meta_func_node::prop);
+        unregister_all<&internal::meta_ctor_node::prop>(&node->ctor);
+        unregister_all<&internal::meta_data_node::prop>(&node->data);
+        unregister_all<&internal::meta_func_node::prop>(&node->func);
 
         node->id = {};
         node->ctor = node->def_ctor;
