@@ -696,9 +696,13 @@ public:
      */
     template<typename... Component, typename It>
     size_type remove(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        return (assure<Component>()->remove(first, last, this) + ... + size_type{});
+        size_type count{};
+
+        for(; first != last; ++first) {
+            count += remove<Component...>(*first);
+        }
+
+        return count;
     }
 
     /**
@@ -730,9 +734,9 @@ public:
      */
     template<typename... Component, typename It>
     void erase(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>()->erase(first, last, this), ...);
+        for(; first != last; ++first) {
+            erase<Component...>(*first);
+        }
     }
 
     /*! @copydoc remove */

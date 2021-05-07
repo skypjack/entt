@@ -7,6 +7,7 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
+* isolate view iterator, unwrap iterators in registry ::remove/::erase/::destroy to use the faster solution for non-view iterators
 * compressed pair to exploit ebo in sparse set and the others
 * rename sparse_set::entity_type (and the others) to value_type
 * scheduler, use any (or poly?) instead of unique_ptr
@@ -28,5 +29,4 @@ WIP:
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
 * snapshot: support for range-based archives
-* page size 0 -> page less mode
 * add example: 64 bit ids with 32 bits reserved for users' purposes
