@@ -1075,7 +1075,7 @@ class meta_type {
             (unregister_all(&((*curr)->*Member)), ...);
             *curr = std::exchange((*curr)->next, nullptr);
         }
-    };
+    }
 
 public:
     /*! @brief Node type. */
