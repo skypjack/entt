@@ -442,7 +442,11 @@ template<typename Type>
 template<typename Type>
 [[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
 -> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
-    return is_equality_comparable<typename Type::value_type>(choice<2>);
+    if constexpr(std::is_same_v<typename Type::value_type, Type>) {
+        return is_equality_comparable<Type>(choice<0>);
+    } else {
+        return is_equality_comparable<typename Type::value_type>(choice<2>);
+    }
 }
 
 
