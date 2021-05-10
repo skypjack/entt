@@ -51,7 +51,7 @@ public:
      */
     template<typename Type>
     meta_sequence_container(std::in_place_type_t<Type>, any instance) ENTT_NOEXCEPT
-        : value_type_fn{&meta_sequence_container_proxy<Type>::value_type},
+        : value_type_node{internal::meta_info<typename Type::value_type>::resolve()},
           size_fn{&meta_sequence_container_proxy<Type>::size},
           resize_fn{&meta_sequence_container_proxy<Type>::resize},
           clear_fn{&meta_sequence_container_proxy<Type>::clear},
@@ -75,7 +75,7 @@ public:
     [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
 
 private:
-    meta_type(* value_type_fn)() ENTT_NOEXCEPT = nullptr;
+    internal::meta_type_node *value_type_node = nullptr;
     size_type(* size_fn)(const any &) ENTT_NOEXCEPT = nullptr;
     bool(* resize_fn)(any &, size_type) = nullptr;
     bool(* clear_fn)(any &) = nullptr;
@@ -112,9 +112,9 @@ public:
     template<typename Type>
     meta_associative_container(std::in_place_type_t<Type>, any instance) ENTT_NOEXCEPT
         : key_only_container{is_key_only_meta_associative_container_v<Type>},
-          key_type_fn{&meta_associative_container_proxy<Type>::key_type},
-          mapped_type_fn{&meta_associative_container_proxy<Type>::mapped_type},
-          value_type_fn{&meta_associative_container_proxy<Type>::value_type},
+          key_type_node{internal::meta_info<typename Type::key_type>::resolve()},
+          mapped_type_node{nullptr},
+          value_type_node{internal::meta_info<typename Type::value_type>::resolve()},
           size_fn{&meta_associative_container_proxy<Type>::size},
           clear_fn{&meta_associative_container_proxy<Type>::clear},
           begin_fn{&meta_associative_container_proxy<Type>::begin},
@@ -123,7 +123,11 @@ public:
           erase_fn{&meta_associative_container_proxy<Type>::erase},
           find_fn{&meta_associative_container_proxy<Type>::find},
           storage{std::move(instance)}
-    {}
+    {
+        if constexpr(!is_key_only_meta_associative_container_v<Type>) {
+            mapped_type_node = internal::meta_info<typename Type::mapped_type>::resolve();
+        }
+    }
 
     [[nodiscard]] inline bool key_only() const ENTT_NOEXCEPT;
     [[nodiscard]] inline meta_type key_type() const ENTT_NOEXCEPT;
@@ -140,9 +144,9 @@ public:
 
 private:
     bool key_only_container{};
-    meta_type(* key_type_fn)() ENTT_NOEXCEPT = nullptr;
-    meta_type(* mapped_type_fn)() ENTT_NOEXCEPT = nullptr;
-    meta_type(* value_type_fn)() ENTT_NOEXCEPT = nullptr;
+    internal::meta_type_node *key_type_node = nullptr;
+    internal::meta_type_node *mapped_type_node = nullptr;
+    internal::meta_type_node *value_type_node = nullptr;
     size_type(* size_fn)(const any &) ENTT_NOEXCEPT = nullptr;
     bool(* clear_fn)(any &) = nullptr;
     iterator(* begin_fn)(any &) = nullptr;
@@ -1780,10 +1784,6 @@ template<typename Type>
 struct meta_sequence_container::meta_sequence_container_proxy {
     using traits_type = meta_sequence_container_traits<Type>;
 
-    [[nodiscard]] static meta_type value_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename Type::value_type>::resolve();
-    }
-
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
         return traits_type::size(any_cast<const Type &>(container));
     }
@@ -1851,7 +1851,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
  * @return The meta value type of the container.
  */
 [[nodiscard]] inline meta_type meta_sequence_container::value_type() const ENTT_NOEXCEPT {
-    return value_type_fn();
+    return value_type_node;
 }
 
 
@@ -2052,22 +2052,6 @@ template<typename Type>
 struct meta_associative_container::meta_associative_container_proxy {
     using traits_type = meta_associative_container_traits<Type>;
 
-    [[nodiscard]] static meta_type key_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename Type::key_type>::resolve();
-    }
-
-    [[nodiscard]] static meta_type mapped_type() ENTT_NOEXCEPT {
-        if constexpr(is_key_only_meta_associative_container_v<Type>) {
-            return meta_type{};
-        } else {
-            return internal::meta_info<typename Type::mapped_type>::resolve();
-        }
-    }
-
-    [[nodiscard]] static meta_type value_type() ENTT_NOEXCEPT {
-        return internal::meta_info<typename Type::value_type>::resolve();
-    }
-
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
         return traits_type::size(any_cast<const Type &>(container));
     }
@@ -2142,7 +2126,7 @@ struct meta_associative_container::meta_associative_container_proxy {
  * @return The meta key type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::key_type() const ENTT_NOEXCEPT {
-    return key_type_fn();
+    return key_type_node;
 }
 
 
@@ -2151,13 +2135,13 @@ struct meta_associative_container::meta_associative_container_proxy {
  * @return The meta mapped type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::mapped_type() const ENTT_NOEXCEPT {
-    return mapped_type_fn();
+    return mapped_type_node;
 }
 
 
 /*! @copydoc meta_sequence_container::value_type */
 [[nodiscard]] inline meta_type meta_associative_container::value_type() const ENTT_NOEXCEPT {
-    return value_type_fn();
+    return value_type_node;
 }
 
 
