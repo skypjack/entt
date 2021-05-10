@@ -161,7 +161,7 @@ class meta_any {
     using vtable_type = void(const operation, const any &, void *);
 
     template<typename Type>
-    static void basic_vtable(const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] void *to) {
+    static void basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const any &from, [[maybe_unused]] void *to) {
         static_assert(std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
 
         if constexpr(!std::is_void_v<Type>) {
