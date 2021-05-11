@@ -154,8 +154,8 @@ TEST(Registry, Functionalities) {
     ASSERT_TRUE(registry.empty());
 
     ASSERT_EQ(registry.capacity(), 42u);
-    ASSERT_EQ(registry.capacity<int>(), 8u);
-    ASSERT_EQ(registry.capacity<char>(), 8u);
+    ASSERT_EQ(registry.capacity<int>(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(registry.capacity<char>(), ENTT_PAGE_SIZE);
     ASSERT_EQ(registry.size<int>(), 0u);
     ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE((registry.empty<int, char>()));
@@ -295,8 +295,8 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE(registry.empty<int>());
 
-    ASSERT_EQ(registry.capacity<int>(), 8u);
-    ASSERT_EQ(registry.capacity<char>(), 8u);
+    ASSERT_EQ(registry.capacity<int>(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(registry.capacity<char>(), ENTT_PAGE_SIZE);
 
     registry.shrink_to_fit<int, char>();
 
@@ -530,11 +530,23 @@ TEST(Registry, VersionOverflow) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.destroy(entity, typename traits_type::version_type(traits_type::version_mask));
+    registry.destroy(entity);
+
+    ASSERT_NE(registry.current(entity), registry.version(entity));
+    ASSERT_NE(registry.current(entity), typename traits_type::version_type{});
+
+    registry.destroy(registry.create(), typename traits_type::version_type{traits_type::version_mask});
     registry.destroy(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));
     ASSERT_EQ(registry.current(entity), typename traits_type::version_type{});
+}
+
+TEST(Registry, NullEntity) {
+    entt::registry registry;
+
+    ASSERT_FALSE(registry.valid(entt::null));
+    ASSERT_DEATH(static_cast<void>(registry.create(entt::null)), "");
 }
 
 TEST(Registry, Each) {

@@ -41,19 +41,39 @@ TEST(Helper, Invoke) {
 
 TEST(Helper, ToEntity) {
     entt::registry registry;
-    const auto entity = registry.create();
-    const auto other = registry.create();
+    const entt::entity null = entt::null;
+    const int value = 42;
 
+    ASSERT_EQ(entt::to_entity(registry, 42), null);
+    ASSERT_EQ(entt::to_entity(registry, value), null);
+
+    const auto entity = registry.create();
     registry.emplace<int>(entity);
+
+    while(registry.size<int>() < (ENTT_PAGE_SIZE - 1u)) {
+        registry.emplace<int>(registry.create(), value);
+    }
+
+    const auto other = registry.create();
+    const auto next = registry.create();
+
     registry.emplace<int>(other);
-    registry.emplace<char>(other);
+    registry.emplace<int>(next);
 
     ASSERT_EQ(entt::to_entity(registry, registry.get<int>(entity)), entity);
     ASSERT_EQ(entt::to_entity(registry, registry.get<int>(other)), other);
-    ASSERT_EQ(entt::to_entity(registry, registry.get<char>(other)), other);
+    ASSERT_EQ(entt::to_entity(registry, registry.get<int>(next)), next);
 
-    registry.destroy(entity);
+    ASSERT_EQ(&registry.get<int>(entity) + ENTT_PAGE_SIZE - 1u, &registry.get<int>(other));
+    ASSERT_NE(&registry.get<int>(entity) + ENTT_PAGE_SIZE, &registry.get<int>(next));
 
-    ASSERT_EQ(entt::to_entity(registry, registry.get<int>(other)), other);
-    ASSERT_EQ(entt::to_entity(registry, registry.get<char>(other)), other);
+    registry.destroy(other);
+
+    ASSERT_EQ(entt::to_entity(registry, registry.get<int>(entity)), entity);
+    ASSERT_EQ(entt::to_entity(registry, registry.get<int>(next)), next);
+
+    ASSERT_EQ(&registry.get<int>(entity) + ENTT_PAGE_SIZE - 1u, &registry.get<int>(next));
+
+    ASSERT_EQ(entt::to_entity(registry, 42), null);
+    ASSERT_EQ(entt::to_entity(registry, value), null);
 }

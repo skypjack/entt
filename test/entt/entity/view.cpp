@@ -47,9 +47,6 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_EQ(*(view.data() + 0), e1);
     ASSERT_EQ(*(view.data() + 1), e0);
 
-    ASSERT_EQ(*(view.raw() + 0), '2');
-    ASSERT_EQ(*(cview.raw() + 1), '1');
-
     registry.erase<char>(e0);
     registry.erase<char>(e1);
 
@@ -64,7 +61,7 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
-TEST(SingleComponentView, RawData) {
+TEST(SingleComponentView, Data) {
     entt::registry registry;
     auto view = registry.view<int>();
     auto cview = std::as_const(registry).view<const int>();
@@ -73,8 +70,6 @@ TEST(SingleComponentView, RawData) {
 
     ASSERT_EQ(view.size(), 0u);
     ASSERT_EQ(cview.size(), 0u);
-    ASSERT_EQ(view.raw(), nullptr);
-    ASSERT_EQ(cview.raw(), nullptr);
     ASSERT_EQ(view.data(), nullptr);
     ASSERT_EQ(cview.data(), nullptr);
 
@@ -82,8 +77,6 @@ TEST(SingleComponentView, RawData) {
 
     ASSERT_NE(view.size(), 0u);
     ASSERT_NE(cview.size(), 0u);
-    ASSERT_EQ(*view.raw(), 42);
-    ASSERT_EQ(*cview.raw(), 42);
     ASSERT_EQ(*view.data(), entity);
     ASSERT_EQ(*cview.data(), entity);
 
@@ -105,7 +98,6 @@ TEST(SingleComponentView, LazyTypeFromConstRegistry) {
     ASSERT_TRUE(cview);
     ASSERT_TRUE(eview);
 
-    ASSERT_NE(cview.raw(), nullptr);
     ASSERT_NE(eview.data(), nullptr);
 
     ASSERT_FALSE(cview.empty());
@@ -226,15 +218,10 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(view.size(), 1u);
     ASSERT_EQ(cview.size(), 1u);
 
-    static_assert(std::is_same_v<decltype(view.raw()), int *>);
-    static_assert(std::is_same_v<decltype(cview.raw()), const int *>);
-
     static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(view.get({})), std::tuple<int &>>);
-    static_assert(std::is_same_v<decltype(view.raw()), int *>);
     static_assert(std::is_same_v<decltype(cview.get<const int>({})), const int &>);
     static_assert(std::is_same_v<decltype(cview.get({})), std::tuple<const int &>>);
-    static_assert(std::is_same_v<decltype(cview.raw()), const int *>);
 
     view.each([](auto &&i) {
         static_assert(std::is_same_v<decltype(i), int &>);

@@ -135,16 +135,29 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
 
 /**
  * @brief Returns the entity associated with a given component.
+ *
+ * @warning
+ * Currently, this function only works correctly with the default pool as it
+ * makes assumptions about how the components are laid out.
+ *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component Type of component.
  * @param reg A registry that contains the given entity and its components.
- * @param component A valid component instance.
+ * @param instance A valid component instance.
  * @return The entity associated with the given component.
  */
 template<typename Entity, typename Component>
-Entity to_entity(const basic_registry<Entity> &reg, const Component &component) {
+Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
     const auto view = reg.template view<const Component>();
-    return *(view.data() + (&component - view.raw()));
+    const auto *addr = std::addressof(instance);
+
+    for(auto it = view.rbegin(), last = view.rend(); it < last; it += ENTT_PAGE_SIZE) {
+        if(const auto dist = (addr - std::addressof(view.template get<const Component>(*it))); dist >= 0 && dist < ENTT_PAGE_SIZE) {
+            return *(it + dist);
+        }
+    }
+
+    return entt::null;
 }
 
 

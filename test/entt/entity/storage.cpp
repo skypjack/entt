@@ -40,7 +40,7 @@ TEST(Storage, Functionalities) {
 
     pool.reserve(42);
 
-    ASSERT_EQ(pool.capacity(), 42u);
+    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
     ASSERT_TRUE(pool.empty());
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(std::as_const(pool).begin(), std::as_const(pool).end());
@@ -80,7 +80,7 @@ TEST(Storage, Functionalities) {
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_FALSE(pool.contains(entt::entity{41}));
 
-    ASSERT_EQ(pool.capacity(), 42u);
+    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
 
     pool.shrink_to_fit();
 
@@ -206,6 +206,35 @@ TEST(Storage, Remove) {
     ASSERT_EQ(pool.remove(entities, entities + 2u), 2u);
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 1);
+}
+
+TEST(Storage, ShrinkToFit) {
+    entt::storage<int> pool;
+
+    for(std::size_t next{}; next < ENTT_PAGE_SIZE; ++next) {
+        pool.emplace(entt::entity(next));
+    }
+
+    pool.emplace(entt::entity{ENTT_PAGE_SIZE});
+    pool.erase(entt::entity{ENTT_PAGE_SIZE});
+
+    ASSERT_EQ(pool.capacity(), 2 * ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.size(), ENTT_PAGE_SIZE);
+
+    pool.shrink_to_fit();
+
+    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.size(), ENTT_PAGE_SIZE);
+
+    pool.clear();
+
+    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.size(), 0u);
+
+    pool.shrink_to_fit();
+
+    ASSERT_EQ(pool.capacity(), 0u);
+    ASSERT_EQ(pool.size(), 0u);
 }
 
 TEST(Storage, AggregatesMustWork) {
@@ -389,22 +418,6 @@ TEST(Storage, ConstReverseIterator) {
     ASSERT_GE(cend, pool.crend());
 }
 
-TEST(Storage, Raw) {
-    entt::storage<int> pool;
-
-    pool.emplace(entt::entity{3}, 3);
-    pool.emplace(entt::entity{12}, 6);
-    pool.emplace(entt::entity{42}, 9);
-
-    ASSERT_EQ(pool.get(entt::entity{3}), 3);
-    ASSERT_EQ(std::as_const(pool).get(entt::entity{12}), 6);
-    ASSERT_EQ(pool.get(entt::entity{42}), 9);
-
-    ASSERT_EQ(pool.raw()[0u], 3);
-    ASSERT_EQ(std::as_const(pool).raw()[1u], 6);
-    ASSERT_EQ(pool.raw()[2u], 9);
-}
-
 TEST(Storage, SortOrdered) {
     entt::storage<boxed_int> pool;
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
@@ -467,9 +480,9 @@ TEST(Storage, SortRange) {
 
     pool.sort_n(2u, [](auto lhs, auto rhs) { return lhs.value < rhs.value; });
 
-    ASSERT_EQ(pool.raw()[0u], boxed_int{6});
-    ASSERT_EQ(pool.raw()[1u], boxed_int{3});
-    ASSERT_EQ(pool.raw()[2u], boxed_int{1});
+    ASSERT_EQ(pool.rbegin()[0u], boxed_int{6});
+    ASSERT_EQ(pool.rbegin()[1u], boxed_int{3});
+    ASSERT_EQ(pool.rbegin()[2u], boxed_int{1});
 
     ASSERT_EQ(pool.data()[0u], entt::entity{42});
     ASSERT_EQ(pool.data()[1u], entt::entity{12});
@@ -650,12 +663,12 @@ TEST(Storage, CanModifyDuringIteration) {
     entt::storage<int> pool;
     pool.emplace(entt::entity{0}, 42);
 
-    ASSERT_EQ(pool.capacity(), 1u);
+    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
 
     const auto it = pool.cbegin();
-    pool.reserve(2u);
+    pool.reserve(ENTT_PAGE_SIZE + 1u);
 
-    ASSERT_EQ(pool.capacity(), 2u);
+    ASSERT_EQ(pool.capacity(), 2 * ENTT_PAGE_SIZE);
 
     // this should crash with asan enabled if we break the constraint
     const auto entity = *it;
@@ -696,7 +709,7 @@ TEST(Storage, MoveOnlyComponent) {
     (void)pool;
 }
 
-TEST(Storage, ConstructorExceptionDoesNotAddToStorage) {
+TEST(Storage, EmplaceStrongExceptionGuarantee) {
     entt::storage<throwing_component> pool;
 
     try {

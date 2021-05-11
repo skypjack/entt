@@ -681,26 +681,6 @@ public:
     }
 
     /**
-     * @brief Direct access to the raw representation offered by the storage.
-     *
-     * For fully contiguous storage classes, the returned pointer is such that
-     * range `[raw<Component>(), raw<Component>() + size())` is always a valid
-     * range, even if the container is empty.
-     *
-     * @warning
-     * This function is only available for owned types.
-     *
-     * @tparam Component Type of component in which one is interested.
-     * @return A pointer to the array of components.
-     */
-    template<typename Component>
-    [[nodiscard]] auto raw() const ENTT_NOEXCEPT {
-        static_assert((std::is_same_v<Component, Owned> || ...), "Non-owned type");
-        auto *cpool = std::get<storage_type<Component> *>(pools);
-        return cpool ? cpool->raw() : decltype(cpool->raw()){};
-    }
-
-    /**
      * @brief Direct access to the list of entities.
      *
      * The returned pointer is such that range `[data(), data() + size())` is
@@ -940,7 +920,7 @@ public:
     template<typename... Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) const {
         auto *cpool = std::get<0>(pools);
-        
+
         if constexpr(sizeof...(Component) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
             cpool->sort_n(*length, std::move(compare), std::move(algo), std::forward<Args>(args)...);
@@ -953,7 +933,7 @@ public:
                 return compare(std::forward_as_tuple(std::get<storage_type<Component> *>(pools)->get(lhs)...), std::forward_as_tuple(std::get<storage_type<Component> *>(pools)->get(rhs)...));
             }, std::move(algo), std::forward<Args>(args)...);
         }
-        
+
         [this](auto *head, auto *... other) {
             for(auto next = *length; next; --next) {
                 const auto pos = next - 1;

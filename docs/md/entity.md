@@ -7,10 +7,9 @@
 
 * [Introduction](#introduction)
 * [Design decisions](#design-decisions)
-  * [A bitset-free entity-component system](#a-bitset-free-entity-component-system)
+  * [Type-less and bitset-free](#type-less-and-bitset-free)
+  * [Build your own](#build-your-own)
   * [Pay per use](#pay-per-use)
-  * [All or nothing](#all-or-nothing)
-  * [Stateless systems](#stateless-systems)
 * [Vademecum](#vademecum)
 * [Pools](#pools)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
@@ -63,7 +62,7 @@ used mostly in game development.
 
 # Design decisions
 
-## A bitset-free entity-component system
+## Type-less and bitset-free
 
 `EnTT` offers a _bitset-free_ entity-component system that doesn't require users
 to specify the set of components neither at compile-time nor at runtime.<br/>
@@ -81,6 +80,23 @@ entt::registry<comp_0, comp_1, ..., comp_n> registry;
 
 Furthermore, it isn't necessary to announce the existence of a component type.
 When the time comes, just use it and that's all.
+
+## Build your own
+
+`EnTT` is designed as a container that can be used at any time just as a vector
+or any other tool would be used. It doesn't attempt in any way to take over on
+the user code base, nor to control its main loop or process scheduling.<br/>
+Unlike other more or less known models, it makes use of independent pools. This
+has some advantages and disadvantages. The main purpose is to provide a fully
+customizable tool, where users have the freedom to define pools and opaque
+proxies for types with specific requirements.
+
+The library provides a default implementation for many things and a mixin model
+that allows users to completely replace or even just enrich the pool dedicated
+to one or more components.<br/>
+The built-in signal support is an example of that: defined as a mixin, it's
+easily disabled if not needed. Similarly, poly storage is another example of how
+everything is customizable down to the smallest detail.
 
 ## Pay per use
 
@@ -101,28 +117,6 @@ performance where needed.
 
 So far, this choice has proven to be a good one and I really hope it can be for
 many others besides me.
-
-## All or nothing
-
-`EnTT` is such that at every moment a pair `(T *, size)` is available to
-directly access all the instances of a given component type `T`.<br/>
-This was a guideline and a design decision that influenced many choices, for
-better and for worse. I cannot say whether it will be useful or not to the
-reader, but it's worth to mention it since it's one of the corner stones of
-this library.
-
-Many of the tools described below give the possibility to get this information
-and have been designed around this need.<br/>
-The rest is experimentation and the desire to invent something new, hoping to
-have succeeded.
-
-## Stateless systems
-
-`EnTT` is designed so that it can work with _stateless systems_. In other words,
-all systems can be free functions and there is no need to define them as classes
-(although nothing prevents users from doing so).<br/>
-This is possible because the main class with which the users will work provides
-all what is needed to act as the sole _source of truth_ of an application.
 
 # Vademecum
 
@@ -631,9 +625,7 @@ instance of a component and returns the entity associated with the latter:
 const auto entity = entt::to_entity(registry, position);
 ```
 
-This utility doesn't perform any check on the validity of the component.
-Therefore, trying to take the entity of an invalid element or of an instance
-that isn't associated with the given registry can result in undefined behavior.
+A null entity is returned in case the component doesn't belong to the registry.
 
 ### Dependencies
 
@@ -947,7 +939,7 @@ copying an entity will be as easy as:
 
 ```cpp
 registry.visit(entity, [&](const auto info) {
-    auto storage = registry.storage(info);
+    auto &&storage = registry.storage(info);
     storage->emplace(registry, other, storage->get(entity));
 });
 ```
@@ -957,8 +949,7 @@ Similarly, copying entire pools between different registries can look like this:
 
 ```cpp
 registry.visit([&](const auto info) {
-    auto storage = registry.storage(info);
-    other.storage(info)->insert(other, storage->data(), storage->raw(), storage->size());
+    registry.storage(info)->copy_to(other);
 });
 ```
 
@@ -1249,9 +1240,8 @@ data structures directly and avoid superfluous checks. There is nothing as fast
 as a single component view. In fact, they walk through a packed array of
 components and return them one at a time.<br/>
 Single component views offer a bunch of functionalities to get the number of
-entities they are going to return and a raw access to the entity list as well as
-to the component list. It's also possible to ask a view if it contains a given
-entity.<br/>
+entities they are going to return and a raw access to the entity list. It's also
+possible to ask a view if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
 Multi component views iterate entities that have at least all the given
@@ -1368,8 +1358,8 @@ the above type order rules apply sequentially.
 
 Runtime views iterate entities that have at least all the given components in
 their bags. During construction, these views look at the number of entities
-available for each component and pick up a reference to the smallest
-set of candidates in order to speed up iterations.<br/>
+available for each component and pick up a reference to the smallest set of
+candidates in order to speed up iterations.<br/>
 They offer more or less the same functionalities of a multi component view.
 However, they don't expose a `get` member function and users should refer to the
 registry that generated the view to access components. In particular, a runtime
@@ -1445,9 +1435,8 @@ However, it's unlikely that users will be able to appreciate the impact of
 groups on the other functionalities of a registry.
 
 Groups offer a bunch of functionalities to get the number of entities they are
-going to return and a raw access to the entity list as well as to the component
-list for owned components. It's also possible to ask a group if it contains a
-given entity.<br/>
+going to return and a raw access to the entity list. It's also possible to ask a
+group if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
 There is no need to store groups aside for they are extremely cheap to
@@ -1760,17 +1749,20 @@ not be used frequently to avoid the risk of a performance hit.
 ## What is allowed and what is not
 
 Most of the _ECS_ available out there don't allow to create and destroy entities
-and components during iterations.<br/>
+and components during iterations, nor to have pointer stability.<br/>
 `EnTT` partially solves the problem with a few limitations:
 
-* Creating entities and components is allowed during iterations in most cases.
+* Creating entities and components is allowed during iterations in most cases
+  and it never invalidates already existing references.
 
 * Deleting the current entity or removing its components is allowed during
-  iterations. For all the other entities, destroying them or removing their
-  components isn't allowed and can result in undefined behavior.
+  iterations but it could invalidate references. For all the other entities,
+  destroying them or removing their components isn't allowed and can result in
+  undefined behavior.
 
-In these cases, iterators aren't invalidated. To be clear, it doesn't mean that
-also references will continue to be valid.<br/>
+In other terms, iterators are never invalidated. Also, component references
+aren't invalidated when a new element is added while they could be invalidated
+upon deletion, due to the _swap-and-pop_ policy.<br/>
 Consider the following example:
 
 ```cpp
@@ -1780,13 +1772,15 @@ registry.view<position>([&](const auto entity, auto &pos) {
 });
 ```
 
-The `each` member function won't break (because iterators aren't invalidated)
-but there are no guarantees on references. Use a common range-for loop and get
-components directly from the view or move the creation of components at the end
-of the function to avoid dangling pointers.
+The `each` member function won't break (because iterators remain valid) nor will
+any reference be invalidated. Instead, more attention should be paid to the
+destruction of entities or the removal of components.<br/>
+Use a common range-for loop and get components directly from the view or move
+the deletion of entities and components at the end of the function to avoid
+dangling pointers.
 
-Iterators are invalidated instead and the behavior is undefined if an entity is
-modified or destroyed and it's not the one currently returned by the iterator
+Conversely, iterators are invalidated and the behavior is undefined if an entity
+is modified or destroyed and it's not the one currently returned by the iterator
 nor a newly created one.<br/>
 To work around it, possible approaches are:
 
@@ -1852,9 +1846,9 @@ When an empty type is detected, it's not instantiated in any case. Therefore,
 only the entities to which it's assigned are made available.<br/>
 There doesn't exist a way to _get_ empty types from a registry, views and groups
 will never return instances for them (for example, during a call to `each`) and
-some functions such as `try_get` or the raw access to the list of components
-won't be available. Finally, the `sort` functionality will onlyaccepts callbacks
-that require to return entities rather than components:
+some functions such as `try_get` aren't available for empty types. Finally, the
+`sort` functionality will only accepts callbacks that require to return entities
+rather than components:
 
 ```cpp
 registry.sort<empty_type>([](const entt::entity lhs, const entt::entity rhs) {
