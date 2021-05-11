@@ -1050,7 +1050,7 @@ class meta_type {
         }
 
         for(const auto *curr = type->base; curr; curr = curr->next) {
-            if(auto *target = curr->type(); can_cast_or_convert(target, info)) {
+            if(can_cast_or_convert(curr->type(), info)) {
                 return true;
             }
         }
@@ -1402,9 +1402,15 @@ public:
      * @return A wrapper containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
-        meta_any ret{};
-        internal::meta_visit<&node_type::ctor>([args, sz, &ret](const auto *curr) { return (curr->arity == sz) && (ret = curr->invoke(args)); }, node);
-        return ret;
+        for(auto *curr = node->ctor; curr; curr = curr->next) {
+            if(curr->arity == sz) {
+                if(auto ret = curr->invoke(args); ret) {
+                    return ret;
+                }
+            }
+        }
+
+        return {};
     }
 
     /**
