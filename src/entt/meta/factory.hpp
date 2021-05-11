@@ -562,7 +562,7 @@ struct meta_factory<Type> {
         internal::meta_func_node **it = &type->func;
         for(; *it && (*it)->id != id; it = &(*it)->next);
         for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
-        
+
         node.id = id;
         node.next = *it;
         *it = &node;
