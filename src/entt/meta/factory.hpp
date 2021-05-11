@@ -344,12 +344,8 @@ struct meta_factory<Type> {
             nullptr,
             nullptr,
             descriptor::args_type::size,
-            [](const typename internal::meta_ctor_node::size_type index) ENTT_NOEXCEPT {
-                return meta_arg(typename descriptor::args_type{}, index);
-            },
-            [](meta_any * const args) {
-                return meta_invoke<Type, Candidate, Policy>({}, args, std::make_index_sequence<descriptor::args_type::size>{});
-            }
+            &meta_arg<typename descriptor::args_type>,
+            &meta_construct<Type, Candidate, Policy>
         };
 
         if(!internal::find_if(&node, type->ctor)) {
@@ -380,12 +376,8 @@ struct meta_factory<Type> {
             nullptr,
             nullptr,
             descriptor::args_type::size,
-            [](const typename internal::meta_ctor_node::size_type index) ENTT_NOEXCEPT {
-                return meta_arg(typename descriptor::args_type{}, index);
-            },
-            [](meta_any * const args) {
-                return meta_construct<Type, Args...>(args, std::make_index_sequence<descriptor::args_type::size>{});
-            }
+            &meta_arg<typename descriptor::args_type>,
+            &meta_construct<Type, Args...>
         };
 
         if(!internal::find_if(&node, type->ctor)) {
@@ -544,12 +536,8 @@ struct meta_factory<Type> {
             descriptor::is_const,
             descriptor::is_static,
             &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename descriptor::return_type>>::resolve,
-            [](const typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
-                return meta_arg(typename descriptor::args_type{}, index);
-            },
-            [](meta_handle instance, meta_any * const args) {
-                return meta_invoke<Type, Candidate, Policy>(std::move(instance), args, std::make_index_sequence<descriptor::args_type::size>{});
-            }
+            &meta_arg<typename descriptor::args_type>,
+            &meta_invoke<Type, Candidate, Policy>
         };
 
         for(auto *it = &type->func; *it; it = &(*it)->next) {
