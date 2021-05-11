@@ -486,7 +486,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) {
-        destroy(entity, static_cast<typename traits_type::version_type>(version(entity) + 1u));
+        destroy(entity, version(entity) + 1u);
     }
 
     /**
