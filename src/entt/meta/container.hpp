@@ -24,10 +24,7 @@ namespace entt {
  * @tparam Trait Traits associated with the underlying container.
  */
 template<typename Container, template<typename> class... Trait>
-struct meta_container_traits: public Trait<Container>... {
-    /*! @brief Type of container. */
-    using type = Container;
-};
+struct meta_container_traits: public Trait<Container>... {};
 
 
 /**

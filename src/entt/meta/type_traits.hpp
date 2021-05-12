@@ -3,6 +3,7 @@
 
 
 #include <type_traits>
+#include <utility>
 
 
 namespace entt {
@@ -43,7 +44,7 @@ struct is_key_only_meta_associative_container: std::true_type {};
 
 /*! @copydoc is_key_only_meta_associative_container */
 template<typename Type>
-struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_associative_container_traits<Type>::type::mapped_type>>
+struct is_key_only_meta_associative_container<Type, std::void_t<decltype(meta_associative_container_traits<Type>::insert(std::declval<Type>(), {}, {}))>>
     : std::false_type
 {};
 
