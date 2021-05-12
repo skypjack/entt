@@ -256,9 +256,11 @@ TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<std::shared_ptr<int>>().is_pointer_like());
     ASSERT_FALSE(entt::resolve<int>().is_pointer_like());
 
+    ASSERT_FALSE((entt::resolve<int>().is_sequence_container()));
     ASSERT_TRUE(entt::resolve<std::vector<int>>().is_sequence_container());
     ASSERT_FALSE((entt::resolve<std::map<int, char>>().is_sequence_container()));
 
+    ASSERT_FALSE((entt::resolve<int>().is_associative_container()));
     ASSERT_TRUE((entt::resolve<std::map<int, char>>().is_associative_container()));
     ASSERT_FALSE(entt::resolve<std::vector<int>>().is_associative_container());
 

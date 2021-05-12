@@ -30,9 +30,6 @@ class meta_type;
 
 /*! @brief Proxy object for sequence containers. */
 class meta_sequence_container {
-    template<typename>
-    struct meta_sequence_container_proxy;
-
     class meta_iterator;
 
 public:
@@ -52,14 +49,14 @@ public:
     template<typename Type>
     meta_sequence_container(std::in_place_type_t<Type>, any instance) ENTT_NOEXCEPT
         : value_type_node{internal::meta_info<typename Type::value_type>::resolve()},
-          size_fn{&meta_sequence_container_proxy<Type>::size},
-          resize_fn{&meta_sequence_container_proxy<Type>::resize},
-          clear_fn{&meta_sequence_container_proxy<Type>::clear},
-          begin_fn{&meta_sequence_container_proxy<Type>::begin},
-          end_fn{&meta_sequence_container_proxy<Type>::end},
-          insert_fn{&meta_sequence_container_proxy<Type>::insert},
-          erase_fn{&meta_sequence_container_proxy<Type>::erase},
-          get_fn{&meta_sequence_container_proxy<Type>::get},
+          size_fn{&meta_sequence_container_traits<Type>::size},
+          resize_fn{&meta_sequence_container_traits<Type>::resize},
+          clear_fn{&meta_sequence_container_traits<Type>::clear},
+          begin_fn{&meta_sequence_container_traits<Type>::begin},
+          end_fn{&meta_sequence_container_traits<Type>::end},
+          insert_fn{&meta_sequence_container_traits<Type>::insert},
+          erase_fn{&meta_sequence_container_traits<Type>::erase},
+          get_fn{&meta_sequence_container_traits<Type>::get},
           storage{std::move(instance)}
     {}
 
@@ -90,9 +87,6 @@ private:
 
 /*! @brief Proxy object for associative containers. */
 class meta_associative_container {
-    template<typename>
-    struct meta_associative_container_proxy;
-
     class meta_iterator;
 
 public:
@@ -111,20 +105,20 @@ public:
      */
     template<typename Type>
     meta_associative_container(std::in_place_type_t<Type>, any instance) ENTT_NOEXCEPT
-        : key_only_container{is_key_only_meta_associative_container_v<Type>},
+        : key_only_container{meta_associative_container_traits<Type>::key_only()},
           key_type_node{internal::meta_info<typename Type::key_type>::resolve()},
           mapped_type_node{nullptr},
           value_type_node{internal::meta_info<typename Type::value_type>::resolve()},
-          size_fn{&meta_associative_container_proxy<Type>::size},
-          clear_fn{&meta_associative_container_proxy<Type>::clear},
-          begin_fn{&meta_associative_container_proxy<Type>::begin},
-          end_fn{&meta_associative_container_proxy<Type>::end},
-          insert_fn{&meta_associative_container_proxy<Type>::insert},
-          erase_fn{&meta_associative_container_proxy<Type>::erase},
-          find_fn{&meta_associative_container_proxy<Type>::find},
+          size_fn{&meta_associative_container_traits<Type>::size},
+          clear_fn{&meta_associative_container_traits<Type>::clear},
+          begin_fn{&meta_associative_container_traits<Type>::begin},
+          end_fn{&meta_associative_container_traits<Type>::end},
+          insert_fn{&meta_associative_container_traits<Type>::insert},
+          erase_fn{&meta_associative_container_traits<Type>::erase},
+          find_fn{&meta_associative_container_traits<Type>::find},
           storage{std::move(instance)}
     {
-        if constexpr(!is_key_only_meta_associative_container_v<Type>) {
+        if constexpr(!meta_associative_container_traits<Type>::key_only()) {
             mapped_type_node = internal::meta_info<typename Type::mapped_type>::resolve();
         }
     }
@@ -1682,9 +1676,6 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 /*! @brief Opaque iterator for sequence containers. */
 class meta_sequence_container::meta_iterator {
-    /*! @brief A sequence container can access the underlying iterator. */
-    friend class meta_sequence_container;
-
     enum class operation { INCR, DEREF };
 
     using vtable_type = void(const operation, const any &, void *);
@@ -1774,75 +1765,17 @@ public:
         return static_cast<bool>(handle);
     }
 
+    /**
+     * @brief Returns the underlying iterator.
+     * @return The underlying iterator.
+     */
+    any base() const ENTT_NOEXCEPT {
+        return handle.as_ref();
+    }
+
 private:
     vtable_type *vtable{};
     any handle{};
-};
-
-
-template<typename Type>
-struct meta_sequence_container::meta_sequence_container_proxy {
-    using traits_type = meta_sequence_container_traits<Type>;
-
-    [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
-        return traits_type::size(any_cast<const Type &>(container));
-    }
-
-    [[nodiscard]] static bool resize(any &container, size_type sz) {
-        auto * const cont = any_cast<Type>(&container);
-        return cont && traits_type::resize(*cont, sz);
-    }
-
-    [[nodiscard]] static bool clear(any &container) {
-        auto * const cont = any_cast<Type>(&container);
-        return cont && traits_type::clear(*cont);
-    }
-
-    [[nodiscard]] static iterator begin(any &container) {
-        if(auto * const cont = any_cast<Type>(&container); cont) {
-            return iterator{traits_type::begin(*cont)};
-        }
-
-        return iterator{traits_type::cbegin(any_cast<const Type &>(container))};
-    }
-
-    [[nodiscard]] static iterator end(any &container) {
-        if(auto * const cont = any_cast<Type>(&container); cont) {
-            return iterator{traits_type::end(*cont)};
-        }
-
-        return iterator{traits_type::cend(any_cast<const Type &>(container))};
-    }
-
-    [[nodiscard]] static std::pair<iterator, bool> insert(any &container, iterator it, meta_any &value) {
-        if(auto * const cont = any_cast<Type>(&container); cont) {
-            // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-            if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
-                const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                auto ret = traits_type::insert(*cont, any_cast<const typename Type::iterator &>(it.handle), element ? *element : value.cast<typename Type::value_type>());
-                return { iterator{std::move(ret.first)}, ret.second };
-            }
-        }
-
-        return {};
-    }
-
-    [[nodiscard]] static std::pair<iterator, bool> erase(any &container, iterator it) {
-        if(auto * const cont = any_cast<Type>(&container); cont) {
-            auto ret = traits_type::erase(*cont, any_cast<const typename Type::iterator &>(it.handle));
-            return { iterator{std::move(ret.first)}, ret.second };
-        }
-
-        return {};
-    }
-
-    [[nodiscard]] static meta_any get(any &container, size_type pos) {
-        if(auto * const cont = any_cast<Type>(&container); cont) {
-            return meta_any{std::in_place_type<typename Type::reference>, traits_type::get(*cont, pos)};
-        }
-
-        return meta_any{std::in_place_type<typename Type::const_reference>, traits_type::cget(any_cast<const Type &>(container), pos)};
-    }
 };
 
 
@@ -1946,7 +1879,7 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 /*! @brief Opaque iterator for associative containers. */
 class meta_associative_container::meta_iterator {
-    enum operation { INCR, DEREF };
+    enum class operation { INCR, DEREF };
 
     using vtable_type = void(const operation, const any &, void *);
 
@@ -2045,70 +1978,6 @@ public:
 private:
     vtable_type *vtable{};
     any handle{};
-};
-
-
-template<typename Type>
-struct meta_associative_container::meta_associative_container_proxy {
-    using traits_type = meta_associative_container_traits<Type>;
-
-    [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
-        return traits_type::size(any_cast<const Type &>(container));
-    }
-
-    [[nodiscard]] static bool clear(any &container) {
-        auto * const cont = any_cast<Type>(&container);
-        return cont && traits_type::clear(*cont);
-    }
-
-    [[nodiscard]] static iterator begin(any &container) {
-        if(auto * const cont = any_cast<Type>(&container); cont) {
-            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::begin(*cont)};
-        }
-
-        return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cbegin(any_cast<const Type &>(container))};
-    }
-
-    [[nodiscard]] static iterator end(any &container) {
-        if(auto * const cont = any_cast<Type>(&container); cont) {
-            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::end(*cont)};
-        }
-
-        return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cend(any_cast<const Type &>(container))};
-    }
-
-    [[nodiscard]] static bool insert(any &container, meta_any &key, meta_any &value) {
-        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
-            if constexpr(is_key_only_meta_associative_container_v<Type>) {
-                return traits_type::insert(*cont, key.cast<const typename Type::key_type &>());
-            } else {
-                return value.allow_cast<const typename Type::mapped_type &>()
-                    && traits_type::insert(*cont, key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>());
-            }
-        }
-
-        return false;
-    }
-
-    [[nodiscard]] static bool erase(any &container, meta_any &key) {
-        if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
-            return traits_type::erase(*cont, key.cast<const typename Type::key_type &>());
-        }
-
-        return false;
-    }
-
-    [[nodiscard]] static iterator find(any &container, meta_any &key) {
-        if(key.allow_cast<const typename Type::key_type &>()) {
-            if(auto * const cont = any_cast<Type>(&container); cont) {
-                return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*cont, key.cast<const typename Type::key_type &>())};
-            }
-
-            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::cfind(any_cast<const Type &>(container), key.cast<const typename Type::key_type &>())};
-        }
-
-        return {};
-    }
 };
 
 

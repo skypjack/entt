@@ -34,30 +34,6 @@ struct meta_associative_container_traits;
 
 
 /**
- * @brief Provides the member constant `value` to true if a meta associative
- * container claims to wrap a key-only type, false otherwise.
- * @tparam Type Potentially key-only meta associative container type.
- */
-template<typename, typename = void>
-struct is_key_only_meta_associative_container: std::true_type {};
-
-
-/*! @copydoc is_key_only_meta_associative_container */
-template<typename Type>
-struct is_key_only_meta_associative_container<Type, std::void_t<decltype(meta_associative_container_traits<Type>::insert(std::declval<Type>(), {}, {}))>>
-    : std::false_type
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially key-only meta associative container type.
- */
-template<typename Type>
-inline constexpr auto is_key_only_meta_associative_container_v = is_key_only_meta_associative_container<Type>::value;
-
-
-/**
  * @brief Provides the member constant `value` to true if a given type is a
  * pointer-like type from the point of view of the meta system, false otherwise.
  * @tparam Type Potentially pointer-like type.
