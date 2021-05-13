@@ -268,6 +268,7 @@ public:
      * @brief Reserves enough space to store `count` pools.
      * @param count Number of pools to reserve space for.
      */
+    [[deprecated("No longer supported")]]
     void reserve_pools(const size_t count) {
         pools.reserve(count);
     }
