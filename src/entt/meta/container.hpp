@@ -5,6 +5,7 @@
 #include <array>
 #include <map>
 #include <set>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -133,8 +134,12 @@ struct basic_meta_associative_container_traits {
     }
 
     [[nodiscard]] static bool clear(any &container) {
-        auto * const cont = any_cast<Type>(&container);
-        return cont && (cont->clear(), true);
+        if(auto * const cont = any_cast<Type>(&container); cont) {
+            cont->clear();
+            return true;
+        }
+
+        return false;
     }
 
     [[nodiscard]] static iterator begin(any &container) {
@@ -158,8 +163,9 @@ struct basic_meta_associative_container_traits {
             if constexpr(is_key_only_meta_associative_container<Type>::value) {
                 return cont->insert(key.cast<const typename Type::key_type &>()).second;
             } else {
-                return value.allow_cast<const typename Type::mapped_type &>()
-                    && cont->emplace(key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>()).second;
+                if(value.allow_cast<const typename Type::mapped_type &>()) {
+                    return cont->emplace(key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>()).second;
+                }
             }
         }
 
