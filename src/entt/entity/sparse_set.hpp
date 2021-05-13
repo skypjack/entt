@@ -207,8 +207,8 @@ class basic_sparse_set {
 
     template<typename It>
     void push_back(It first, It last) {
-        if(const std::size_t req = count + std::distance(first, last); reserved < req) {
-            const std::size_t sz = reserved * growth_factor + !reserved;
+        if(const size_type req = count + std::distance(first, last); reserved < req) {
+            const size_type sz = size_type(reserved * growth_factor) + (reserved == 0u);
             resize_packed(sz < req ? req : sz);
         }
 
