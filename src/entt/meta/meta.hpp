@@ -66,8 +66,8 @@ public:
     inline bool clear();
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
-    inline std::pair<iterator, bool> insert(iterator, meta_any);
-    inline std::pair<iterator, bool> erase(iterator);
+    inline iterator insert(iterator, meta_any);
+    inline iterator erase(iterator);
     [[nodiscard]] inline meta_any operator[](size_type);
     [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
 
@@ -78,8 +78,8 @@ private:
     bool(* clear_fn)(any &) = nullptr;
     iterator(* begin_fn)(any &) = nullptr;
     iterator(* end_fn)(any &) = nullptr;
-    std::pair<iterator, bool>(* insert_fn)(any &, iterator, meta_any &) = nullptr;
-    std::pair<iterator, bool>(* erase_fn)(any &, iterator) = nullptr;
+    iterator(* insert_fn)(any &, iterator, meta_any &) = nullptr;
+    iterator(* erase_fn)(any &, iterator) = nullptr;
     meta_any(* get_fn)(any &, size_type) = nullptr;
     any storage{};
 };
@@ -1838,10 +1838,9 @@ inline bool meta_sequence_container::clear() {
  * @brief Inserts an element at a specified location of a container.
  * @param it Iterator before which the element will be inserted.
  * @param value Element value to insert.
- * @return A pair consisting of an iterator to the inserted element (in case of
- * success) and a bool denoting whether the insertion took place.
+ * @return A possibly invalid iterator to the inserted element.
  */
-inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::insert(iterator it, meta_any value) {
+inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
     return insert_fn(storage, it, value);
 }
 
@@ -1849,10 +1848,9 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 /**
  * @brief Removes a given element from a container.
  * @param it Iterator to the element to remove.
- * @return A pair consisting of an iterator following the last removed element
- * (in case of success) and a bool denoting whether the deletion took place.
+ * @return A possibly invalid iterator following the last removed element.
  */
-inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::erase(iterator it) {
+inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
     return erase_fn(storage, it);
 }
 

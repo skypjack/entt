@@ -49,20 +49,24 @@ struct basic_meta_sequence_container_traits {
 
     [[nodiscard]] static bool resize(any &container, size_type sz) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
-            auto * const cont = any_cast<Type>(&container);
-            return cont && (cont->resize(sz), true);
-        } else {
-            return false;
+            if(auto * const cont = any_cast<Type>(&container); cont) {
+                cont->resize(sz);
+                return true;
+            }
         }
+
+        return false;
     }
 
     [[nodiscard]] static bool clear(any &container) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
-            auto * const cont = any_cast<Type>(&container);
-            return cont && (cont->clear(), true);
-        } else {
-            return false;
+            if(auto * const cont = any_cast<Type>(&container); cont) {
+                cont->clear();
+                return true;
+            }
         }
+
+        return false;
     }
 
     [[nodiscard]] static iterator begin(any &container) {
@@ -81,13 +85,13 @@ struct basic_meta_sequence_container_traits {
         return iterator{any_cast<const Type &>(container).end()};
     }
 
-    [[nodiscard]] static std::pair<iterator, bool> insert(any &container, iterator it, meta_any &value) {
+    [[nodiscard]] static iterator insert(any &container, iterator it, meta_any &value) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto * const cont = any_cast<Type>(&container); cont) {
                 // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
                 if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
                     const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                    return { iterator{cont->insert(any_cast<const typename Type::iterator &>(it.base()), element ? *element : value.cast<typename Type::value_type>())}, true };
+                    return iterator{cont->insert(any_cast<const typename Type::iterator &>(it.base()), element ? *element : value.cast<typename Type::value_type>())};
                 }
             }
         }
@@ -95,10 +99,10 @@ struct basic_meta_sequence_container_traits {
         return {};
     }
 
-    [[nodiscard]] static std::pair<iterator, bool> erase(any &container, iterator it) {
+    [[nodiscard]] static iterator erase(any &container, iterator it) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto * const cont = any_cast<Type>(&container); cont) {
-                return { iterator{cont->erase(any_cast<const typename Type::iterator &>(it.base()))}, true };
+                return iterator{cont->erase(any_cast<const typename Type::iterator &>(it.base()))};
             }
         }
 
@@ -155,7 +159,7 @@ struct basic_meta_associative_container_traits {
                 return cont->insert(key.cast<const typename Type::key_type &>()).second;
             } else {
                 return value.allow_cast<const typename Type::mapped_type &>()
-                    && cont->insert(std::make_pair(key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>())).second;
+                    && cont->emplace(key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>()).second;
             }
         }
 

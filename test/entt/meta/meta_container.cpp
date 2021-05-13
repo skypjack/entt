@@ -133,9 +133,9 @@ TEST_F(MetaContainer, StdVector) {
     auto it = view.begin();
     auto ret = view.insert(it, 0);
 
-    ASSERT_TRUE(ret.second);
-    ASSERT_FALSE(view.insert(ret.first, 'c').second);
-    ASSERT_TRUE(view.insert(++ret.first, 1.).second);
+    ASSERT_TRUE(ret);
+    ASSERT_FALSE(view.insert(ret, 'c'));
+    ASSERT_TRUE(view.insert(++ret, 1.));
 
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ((*view.begin()).cast<int>(), 0);
@@ -144,9 +144,9 @@ TEST_F(MetaContainer, StdVector) {
     it = view.begin();
     ret = view.erase(it);
 
-    ASSERT_TRUE(ret.second);
+    ASSERT_TRUE(ret);
     ASSERT_EQ(view.size(), 4u);
-    ASSERT_EQ((*ret.first).cast<int>(), 1);
+    ASSERT_EQ((*ret).cast<int>(), 1);
 
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
@@ -175,9 +175,9 @@ TEST_F(MetaContainer, StdArray) {
     auto it = view.begin();
     auto ret = view.insert(it, 0);
 
-    ASSERT_FALSE(ret.second);
-    ASSERT_FALSE(view.insert(it, 'c').second);
-    ASSERT_FALSE(view.insert(++it, 1).second);
+    ASSERT_FALSE(ret);
+    ASSERT_FALSE(view.insert(it, 'c'));
+    ASSERT_FALSE(view.insert(++it, 1));
 
     ASSERT_EQ(view.size(), 3u);
     ASSERT_EQ((*view.begin()).cast<int>(), 2);
@@ -186,7 +186,7 @@ TEST_F(MetaContainer, StdArray) {
     it = view.begin();
     ret = view.erase(it);
 
-    ASSERT_FALSE(ret.second);
+    ASSERT_FALSE(ret);
     ASSERT_EQ(view.size(), 3u);
     ASSERT_EQ((*it).cast<int>(), 2);
 
@@ -307,7 +307,7 @@ TEST_F(MetaContainer, ConstSequenceContainer) {
     auto it = view.begin();
     auto ret = view.insert(it, 0);
 
-    ASSERT_FALSE(ret.second);
+    ASSERT_FALSE(ret);
     ASSERT_EQ(view.size(), 1u);
     ASSERT_EQ((*it).cast<int>(), 42);
     ASSERT_EQ(++it, view.end());
@@ -315,7 +315,7 @@ TEST_F(MetaContainer, ConstSequenceContainer) {
     it = view.begin();
     ret = view.erase(it);
 
-    ASSERT_FALSE(ret.second);
+    ASSERT_FALSE(ret);
     ASSERT_EQ(view.size(), 1u);
 
     ASSERT_FALSE(view.clear());
@@ -479,9 +479,9 @@ TEST_F(MetaContainer, StdVectorBool) {
     auto it = view.begin();
     auto ret = view.insert(it, true);
 
-    ASSERT_TRUE(ret.second);
-    ASSERT_FALSE(view.insert(ret.first, 'c').second);
-    ASSERT_TRUE(view.insert(++ret.first, false).second);
+    ASSERT_TRUE(ret);
+    ASSERT_FALSE(view.insert(ret, 'c'));
+    ASSERT_TRUE(view.insert(++ret, false));
 
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ((*view.begin()).cast<proxy_type>(), true);
@@ -490,9 +490,9 @@ TEST_F(MetaContainer, StdVectorBool) {
     it = view.begin();
     ret = view.erase(it);
 
-    ASSERT_TRUE(ret.second);
+    ASSERT_TRUE(ret);
     ASSERT_EQ(view.size(), 4u);
-    ASSERT_EQ((*ret.first).cast<proxy_type>(), false);
+    ASSERT_EQ((*ret).cast<proxy_type>(), false);
 
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(cview.size(), 0u);
