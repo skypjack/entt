@@ -65,6 +65,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using bucket_alloc_pointer = typename bucket_alloc_traits::pointer;
     using bucket_alloc_const_pointer = typename bucket_alloc_traits::const_pointer;
 
+    using entity_alloc_type = typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>;
+
     static_assert(alloc_traits::propagate_on_container_move_assignment::value);
     static_assert(bucket_alloc_traits::propagate_on_container_move_assignment::value);
 
@@ -282,7 +284,8 @@ public:
      * @param alloc Allocator to use (possibly default-constructed).
      */
     explicit basic_storage(const allocator_type &alloc = {})
-        : allocator{alloc},
+        : basic_sparse_set<entity_type, entity_alloc_type>{alloc},
+          allocator{alloc},
           bucket_allocator{alloc},
           packed{},
           bucket{},
