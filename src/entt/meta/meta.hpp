@@ -1917,7 +1917,7 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
  * @brief Removes a given element from a container.
  * @param it Iterator to the element to remove.
  * @return A pair consisting of an iterator following the last removed element
- * (in case of success) and a bool denoting whether the insertion took place.
+ * (in case of success) and a bool denoting whether the deletion took place.
  */
 inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::erase(iterator it) {
     return erase_fn(storage, it);
