@@ -121,22 +121,22 @@ using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::t
 /**
  * @brief Wraps a value depending on the given policy.
  * @tparam Policy Optional policy (no policy set by default).
- * @tparam Type Optional type of value to wrap.
- * @param value Optional value to wrap.
+ * @tparam Type Type of value to wrap.
+ * @param value Value to wrap.
  * @return A meta any containing the returned value, if any.
  */
-template<typename Policy = as_is_t, typename... Type>
-meta_any meta_dispatch([[maybe_unused]] Type &&... value) {
-    if constexpr(std::is_same_v<Policy, as_void_t> || !sizeof...(Type)) {
+template<typename Policy = as_is_t, typename Type>
+meta_any meta_dispatch([[maybe_unused]] Type &&value) {
+    if constexpr(std::is_same_v<Policy, as_void_t>) {
         return meta_any{std::in_place_type<void>};
     } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-        return meta_any{std::in_place_type<Type...>, std::forward<Type>(value)...};
+        return meta_any{std::in_place_type<Type>, std::forward<Type>(value)};
     } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
-        static_assert(std::is_lvalue_reference_v<Type...>, "Invalid type");
-        return meta_any{std::in_place_type<const std::remove_reference_t<Type> &...>, std::as_const(value)...};
+        static_assert(std::is_lvalue_reference_v<Type>, "Invalid type");
+        return meta_any{std::in_place_type<const std::remove_reference_t<Type> &>, std::as_const(value)};
     } else {
         static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
-        return meta_any{std::forward<Type>(value)...};
+        return meta_any{std::forward<Type>(value)};
     }
 }
 
@@ -257,14 +257,14 @@ template<typename Type, auto Candidate, typename Policy = as_is_t, std::size_t..
         if constexpr(std::is_member_function_pointer_v<decltype(Candidate)>) {
             if constexpr(std::is_void_v<typename descriptor::return_type>) {
                 (std::forward<decltype(maybe_clazz)>(maybe_clazz).*Candidate)(std::forward<decltype(other)>(other)...);
-                return meta_dispatch();
+                return meta_any{std::in_place_type<void>};
             } else {
                 return meta_dispatch<Policy>((std::forward<decltype(maybe_clazz)>(maybe_clazz).*Candidate)(std::forward<decltype(other)>(other)...));
             }
         } else {
             if constexpr(std::is_void_v<typename descriptor::return_type>) {
                 Candidate(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...);
-                return meta_dispatch();
+                return meta_any{std::in_place_type<void>};
             } else {
                 return meta_dispatch<Policy>(Candidate(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...));
             }
@@ -322,7 +322,7 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
     if constexpr(std::is_invocable_v<decltype(Candidate)>) {
         if constexpr(std::is_void_v<decltype(Candidate())>) {
             Candidate();
-            return meta_dispatch();
+            return meta_any{std::in_place_type<void>};
         } else {
             return meta_dispatch<Policy>(Candidate());
         }

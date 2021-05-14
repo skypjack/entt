@@ -95,9 +95,8 @@ struct meta_func_node {
 };
 
 
-struct meta_template_info {
+struct meta_template_node {
     using size_type = std::size_t;
-    const bool is_template_specialization;
     const size_type arity;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
     meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
@@ -125,11 +124,11 @@ struct meta_type_node {
     const bool is_pointer_like;
     const bool is_sequence_container;
     const bool is_associative_container;
-    const meta_template_info template_info;
     const size_type rank;
     size_type(* const extent)(const size_type) ENTT_NOEXCEPT ;
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
+    const meta_template_node *const templ;
     meta_ctor_node * const def_ctor;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
@@ -193,18 +192,19 @@ class ENTT_API meta_node {
         }
     }
 
-    [[nodiscard]] static meta_template_info meta_template_descriptor() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_template_node * meta_template_info() ENTT_NOEXCEPT {
         if constexpr(is_complete_v<meta_template_traits<Type>>) {
-            return {
-                true,
+            static meta_template_node node{
                 meta_template_traits<Type>::args_type::size,
                 &meta_node<typename meta_template_traits<Type>::class_type>::resolve,
                 [](const std::size_t index) ENTT_NOEXCEPT {
                     return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index);
                 }
             };
+
+            return &node;
         } else {
-            return { false, 0u, nullptr, nullptr };
+            return nullptr;
         }
     }
 
@@ -230,11 +230,11 @@ public:
             is_meta_pointer_like_v<Type>,
             is_complete_v<meta_sequence_container_traits<Type>>,
             is_complete_v<meta_associative_container_traits<Type>>,
-            meta_template_descriptor(),
             std::rank_v<Type>,
             [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
             &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<Type>>>>::resolve,
             &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_extent_t<Type>>>>::resolve,
+            meta_template_info(),
             meta_default_constructor(&node),
             meta_default_constructor(&node)
         };

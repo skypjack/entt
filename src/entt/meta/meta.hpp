@@ -1245,7 +1245,7 @@ public:
      * false otherwise.
      */
     [[nodiscard]] bool is_template_specialization() const ENTT_NOEXCEPT {
-        return node->template_info.is_template_specialization;
+        return (node->templ != nullptr);
     }
 
     /**
@@ -1253,7 +1253,7 @@ public:
      * @return The number of template arguments, if any.
      */
     [[nodiscard]] size_type template_arity() const ENTT_NOEXCEPT {
-        return node->template_info.arity;
+        return node->templ ? node->templ->arity : size_type{};
     }
 
     /**
@@ -1264,7 +1264,7 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const ENTT_NOEXCEPT {
-        return is_template_specialization() ?  node->template_info.type() : meta_type{};
+        return node->templ ? node->templ->type() : meta_type{};
     }
 
     /**
@@ -1273,7 +1273,7 @@ public:
      * @return The type of the i-th template argument of a type.
      */
     [[nodiscard]] inline meta_type template_arg(size_type index) const ENTT_NOEXCEPT {
-        return index < template_arity() ? node->template_info.arg(index) : meta_type{};
+        return index < template_arity() ? node->templ->arg(index) : meta_type{};
     }
 
     /**
