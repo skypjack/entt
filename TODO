@@ -1,5 +1,4 @@
 * long term feature: shared_ptr less locator and resource cache
-* custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * allow to replace std:: with custom implementations
@@ -7,20 +6,20 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
-* isolate view iterator, unwrap iterators in registry ::remove/::erase/::destroy to use the faster solution for non-view iterators
+* custom allocators all over
+
+WIP:
+* make pools available (registry/view/group), review operator| for views
 * compressed pair to exploit ebo in sparse set and the others
-* rename sparse_set::entity_type (and the others) to value_type
+* isolate view iterator, unwrap iterators in registry ::remove/::erase/::destroy to use the faster solution for non-view iterators
 * meta: use forward_as_any to forward arguments from eg meta_func::invoke, so as to remove the need for the user to explicitly forward references
-* any/meta: remove dependency on <functional> (reference_wrapper, invoke), remove meta_any::type and use something like entt::type_from_meta
 * scheduler, use any (or poly?) instead of unique_ptr
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * add user data to type_info
-* make pools available (registry/view/group), review operator| for views
 * any_vector for context variables
 * make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
 * weak reference wrapper example with custom storage
-* paginate pools
 * headless (sparse set only) view
 * write documentation for custom storages and views!!
 * registry: use a poly object for pools, no more pool_data type.
@@ -28,6 +27,5 @@ WIP:
 * add exclude-only views to combine with packs
 * entity-aware observer, add observer functions aside observer class
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
-* pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
 * snapshot: support for range-based archives
 * add example: 64 bit ids with 32 bits reserved for users' purposes
