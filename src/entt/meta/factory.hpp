@@ -547,7 +547,7 @@ struct meta_factory<Type> {
             [](const typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
                 return meta_arg(typename descriptor::args_type{}, index);
             },
-            [](meta_handle instance, meta_any *args) {
+            [](meta_handle instance, meta_any * const args) {
                 return meta_invoke<Type, Candidate, Policy>(std::move(instance), args, std::make_index_sequence<descriptor::args_type::size>{});
             }
         };

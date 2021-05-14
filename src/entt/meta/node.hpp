@@ -91,7 +91,7 @@ struct meta_func_node {
     const bool is_static;
     meta_type_node *(* const ret)() ENTT_NOEXCEPT;
     meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
-    meta_any(* const invoke)(meta_handle, meta_any *);
+    meta_any(* const invoke)(meta_handle, meta_any * const);
 };
 
 
