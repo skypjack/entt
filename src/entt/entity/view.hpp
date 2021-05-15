@@ -587,11 +587,11 @@ template<typename Entity, typename Component>
 class basic_view<Entity, exclude_t<>, Component> final {
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
-    class iterable_view {
+    class iterable_view final {
         friend class basic_view<Entity, exclude_t<>, Component>;
 
         template<typename... It>
-        class iterable_view_iterator {
+        class iterable_view_iterator final {
             friend class iterable_view;
 
             template<typename... Discard>
