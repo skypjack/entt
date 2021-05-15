@@ -125,10 +125,10 @@ class basic_registry {
         return (!(index < pools.size()) || !pools[index].pool) ? nullptr : static_cast<const storage_type<Component> *>(pools[index].pool.get());
     }
 
-    Entity generate_identifier() {
+    Entity generate_identifier(const std::size_t pos) {
         // traits_type::entity_mask is reserved to allow for null identifiers
-        ENTT_ASSERT(static_cast<typename traits_type::entity_type>(entities.size()) < traits_type::entity_mask, "No entities available");
-        return entities.emplace_back(entity_type{static_cast<typename traits_type::entity_type>(entities.size())});
+        ENTT_ASSERT(static_cast<typename traits_type::entity_type>(pos) < traits_type::entity_mask, "No entities available");
+        return entity_type{static_cast<typename traits_type::entity_type>(pos)};
     }
 
     Entity recycle_identifier() {
@@ -389,7 +389,7 @@ public:
      * @return A valid entity identifier.
      */
     entity_type create() {
-        return available == null ? generate_identifier() : recycle_identifier();
+        return (available == null) ? entities.emplace_back(generate_identifier(entities.size())) : recycle_identifier();
     }
 
     /**
@@ -405,26 +405,24 @@ public:
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
         ENTT_ASSERT(hint != null, "Null entity not available");
-        entity_type entt;
+        const auto length = entities.size();
 
-        if(const auto req = (to_integral(hint) & traits_type::entity_mask); !(req < entities.size())) {
-            entities.reserve(size_type(req) + 1u);
+        if(const auto req = (to_integral(hint) & traits_type::entity_mask); !(req < length)) {
+            entities.resize(size_type(req) + 1u, null);
 
-            for(auto pos = entities.size(); pos < req; ++pos) {
-                release_entity(generate_identifier(), {});
+            for(auto pos = length; pos < req; ++pos) {
+                release_entity(generate_identifier(pos), {});
             }
 
-            entt = entities.emplace_back(hint);
+            return (entities[req] = hint);
         } else if(const auto curr = (to_integral(entities[req]) & traits_type::entity_mask); req == curr) {
-            entt = create();
+            return create();
         } else {
             auto *it = &available;
             for(; (to_integral(*it) & traits_type::entity_mask) != req; it = &entities[to_integral(*it) & traits_type::entity_mask]);
             *it = entity_type{curr | (to_integral(*it) & (traits_type::version_mask << traits_type::entity_shift))};
-            entt = entities[req] = hint;
+            return (entities[req] = hint);
         }
-
-        return entt;
     }
 
     /**
@@ -442,8 +440,11 @@ public:
             *first = recycle_identifier();
         }
 
-        for(; first != last; ++first) {
-            *first = generate_identifier();
+        const auto length = entities.size();
+        entities.resize(length + std::distance(first, last), null);
+
+        for(auto pos = length; first != last; ++first, ++pos) {
+            *first = entities[pos] = generate_identifier(pos);
         }
     }
 
