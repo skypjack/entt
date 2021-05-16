@@ -112,6 +112,8 @@ I hope this list can grow much more in the future:
     modular, tiny and fast C++ game engine, aimed to develop 3D desktop games.
   * [Spike](https://github.com/FahimFuad/Spike): a powerful game engine which
     can run on a toaster.
+  * [Helena Framework](https://github.com/NIKEA-SOFT/HelenaFramework): a modern
+    framework in C++17 for backend development.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
