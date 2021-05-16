@@ -208,7 +208,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] auto data() const ENTT_NOEXCEPT {
         return *this ? handler->data() : nullptr;
     }
 
@@ -688,7 +688,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] auto data() const ENTT_NOEXCEPT {
         return *this ? std::get<0>(pools)->data() : nullptr;
     }
 
