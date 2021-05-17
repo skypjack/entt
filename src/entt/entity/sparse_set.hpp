@@ -147,7 +147,7 @@ class basic_sparse_set {
 
         [[nodiscard]] pointer operator->() const {
             const auto pos = size_type(index-1u);
-            return &(*packed)[pos];
+            return std::addressof((*packed)[pos]);
         }
 
         [[nodiscard]] reference operator*() const {
