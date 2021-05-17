@@ -158,7 +158,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
         [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
             const auto pos = size_type(index-1u);
-            return &(*packed)[page(pos)][offset(pos)];
+            return std::addressof((*packed)[page(pos)][offset(pos)]);
         }
 
         [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
