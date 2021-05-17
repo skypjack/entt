@@ -681,6 +681,22 @@ public:
     }
 
     /**
+     * @brief Direct access to the raw representation offered by the storage.
+     *
+     * @warning
+     * This function is only available for owned types.
+     *
+     * @tparam Component Type of component in which one is interested.
+     * @return A pointer to the array of components.
+     */
+    template<typename Component>
+    [[nodiscard]] auto raw() const ENTT_NOEXCEPT {
+        static_assert((std::is_same_v<Component, Owned> || ...), "Non-owned type");
+        auto *cpool = std::get<storage_type<Component> *>(pools);
+        return cpool ? cpool->raw() : decltype(cpool->raw()){};
+    }
+
+    /**
      * @brief Direct access to the list of entities.
      *
      * The returned pointer is such that range `[data(), data() + size())` is

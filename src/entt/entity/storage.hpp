@@ -59,11 +59,12 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using alloc_type = typename std::allocator_traits<Allocator>::template rebind_alloc<Type>;
     using alloc_traits = std::allocator_traits<alloc_type>;
     using alloc_pointer = typename alloc_traits::pointer;
+    using alloc_const_pointer = typename alloc_traits::const_pointer;
 
     using bucket_alloc_type = typename std::allocator_traits<Allocator>::template rebind_alloc<alloc_pointer>;
     using bucket_alloc_traits = std::allocator_traits<bucket_alloc_type>;
     using bucket_alloc_pointer = typename bucket_alloc_traits::pointer;
-    using bucket_alloc_const_pointer = typename bucket_alloc_traits::const_pointer;
+    using bucket_alloc_const_pointer = typename std::allocator_traits<Allocator>::template rebind_alloc<alloc_const_pointer>::const_pointer;
 
     using entity_alloc_type = typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>;
 
@@ -74,7 +75,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     class storage_iterator final {
         friend class basic_storage<Entity, Type>;
 
-        storage_iterator(const bucket_alloc_const_pointer *ref, const typename traits_type::difference_type idx) ENTT_NOEXCEPT
+        storage_iterator(bucket_alloc_pointer const *ref, const typename traits_type::difference_type idx) ENTT_NOEXCEPT
             : packed{ref}, index{idx}
         {}
 
@@ -166,7 +167,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         }
 
     private:
-        const bucket_alloc_const_pointer *packed;
+        bucket_alloc_pointer const *packed;
         difference_type index;
     };
 
@@ -270,6 +271,10 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Pointer type to contained elements. */
+    using pointer = bucket_alloc_pointer;
+    /*! @brief Constant pointer type to contained elements. */
+    using const_pointer = bucket_alloc_const_pointer;
     /*! @brief Random access iterator type. */
     using iterator = storage_iterator<Type>;
     /*! @brief Constant random access iterator type. */
@@ -352,6 +357,19 @@ public:
     void shrink_to_fit() {
         underlying_type::shrink_to_fit();
         count ? maybe_resize_packed(count) : reset_to_empty();
+    }
+
+    /**
+     * @brief Direct access to the array of objects.
+     * @return A pointer to the array of objects.
+     */
+    [[nodiscard]] const_pointer raw() const ENTT_NOEXCEPT {
+        return packed;
+    }
+
+    /*! @copydoc raw */
+    [[nodiscard]] pointer raw() ENTT_NOEXCEPT {
+        return packed;
     }
 
     /**

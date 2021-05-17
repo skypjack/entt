@@ -53,7 +53,7 @@ TEST(NonOwningGroup, Functionalities) {
         ASSERT_EQ(cgroup.get<const char>(entity), '2');
     }
 
-    ASSERT_EQ(*(group.data() + 0), e1);
+    ASSERT_EQ(group.data()[0u], e1);
 
     registry.erase<char>(e0);
     registry.erase<char>(e1);
@@ -221,17 +221,17 @@ TEST(NonOwningGroup, Sort) {
     registry.emplace<int>(e1, 1);
     registry.emplace<int>(e2, 2);
 
-    ASSERT_EQ(*(group.data() + 0u), e0);
-    ASSERT_EQ(*(group.data() + 1u), e1);
-    ASSERT_EQ(*(group.data() + 2u), e2);
+    ASSERT_EQ(group.data()[0u], e0);
+    ASSERT_EQ(group.data()[1u], e1);
+    ASSERT_EQ(group.data()[2u], e2);
 
     group.sort([](const entt::entity lhs, const entt::entity rhs) {
         return entt::to_integral(lhs) < entt::to_integral(rhs);
     });
 
-    ASSERT_EQ(*(group.data() + 0u), e2);
-    ASSERT_EQ(*(group.data() + 1u), e1);
-    ASSERT_EQ(*(group.data() + 2u), e0);
+    ASSERT_EQ(group.data()[0u], e2);
+    ASSERT_EQ(group.data()[1u], e1);
+    ASSERT_EQ(group.data()[2u], e0);
 
     ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
     ASSERT_EQ((group.get<const int, unsigned int>(e1)), (std::make_tuple(1, 1u)));
@@ -243,9 +243,9 @@ TEST(NonOwningGroup, Sort) {
         return lhs > rhs;
     });
 
-    ASSERT_EQ(*(group.data() + 0u), e0);
-    ASSERT_EQ(*(group.data() + 1u), e1);
-    ASSERT_EQ(*(group.data() + 2u), e2);
+    ASSERT_EQ(group.data()[0u], e0);
+    ASSERT_EQ(group.data()[1u], e1);
+    ASSERT_EQ(group.data()[2u], e2);
 
     ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
     ASSERT_EQ((group.get<const int, unsigned int>(e1)), (std::make_tuple(1, 1u)));
@@ -259,9 +259,9 @@ TEST(NonOwningGroup, Sort) {
         return std::get<0>(lhs) < std::get<0>(rhs);
     });
 
-    ASSERT_EQ(*(group.data() + 0u), e2);
-    ASSERT_EQ(*(group.data() + 1u), e1);
-    ASSERT_EQ(*(group.data() + 2u), e0);
+    ASSERT_EQ(group.data()[0u], e2);
+    ASSERT_EQ(group.data()[1u], e1);
+    ASSERT_EQ(group.data()[2u], e0);
 
     ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
     ASSERT_EQ((group.get<const int, unsigned int>(e1)), (std::make_tuple(1, 1u)));
@@ -665,8 +665,8 @@ TEST(OwningGroup, Functionalities) {
 
     ASSERT_EQ(group.size(), 1u);
 
-    ASSERT_EQ(*(cgroup.rbegin() + 0), e1);
-    ASSERT_EQ(*(group.rbegin() + 0), e1);
+    ASSERT_EQ(cgroup.raw<const int>()[0u][0u], 42);
+    ASSERT_EQ(group.raw<int>()[0u][0u], 42);
 
     for(auto entity: group) {
         ASSERT_EQ(std::get<0>(cgroup.get<const int, const char>(entity)), 42);
@@ -674,7 +674,8 @@ TEST(OwningGroup, Functionalities) {
         ASSERT_EQ(cgroup.get<const char>(entity), '2');
     }
 
-    ASSERT_EQ(*(group.data() + 0), e1);
+    ASSERT_EQ(group.data()[0u], e1);
+    ASSERT_EQ(group.raw<int>()[0u][0u], 42);
 
     registry.erase<char>(e0);
     registry.erase<char>(e1);
@@ -705,6 +706,7 @@ TEST(OwningGroup, Invalid) {
     ASSERT_TRUE(group.empty());
     ASSERT_EQ(group.size(), 0u);
 
+    ASSERT_EQ(group.raw<const int>(), nullptr);
     ASSERT_EQ(group.data(), nullptr);
 
     ASSERT_EQ(group.begin(), group.end());
@@ -839,17 +841,21 @@ TEST(OwningGroup, SortOrdered) {
         return group.get<boxed_int>(lhs).value < group.get<boxed_int>(rhs).value;
     });
 
-    ASSERT_EQ(*(group.data() + 0u), entities[0]);
-    ASSERT_EQ(*(group.data() + 1u), entities[1]);
-    ASSERT_EQ(*(group.data() + 2u), entities[2]);
+    ASSERT_EQ(group.data()[0u], entities[0]);
+    ASSERT_EQ(group.data()[1u], entities[1]);
+    ASSERT_EQ(group.data()[2u], entities[2]);
+    ASSERT_EQ(group.data()[3u], entities[3]);
+    ASSERT_EQ(group.data()[4u], entities[4]);
 
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 0u)).value, 12);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 1u)).value, 9);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 2u)).value, 6);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][0u].value, 12);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][1u].value, 9);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][2u].value, 6);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][3u].value, 1);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][4u].value, 2);
 
-    ASSERT_EQ(group.get<char>(*(group.data() + 0u)), 'a');
-    ASSERT_EQ(group.get<char>(*(group.data() + 1u)), 'b');
-    ASSERT_EQ(group.get<char>(*(group.data() + 2u)), 'c');
+    ASSERT_EQ(group.raw<char>()[0u][0u], 'a');
+    ASSERT_EQ(group.raw<char>()[0u][1u], 'b');
+    ASSERT_EQ(group.raw<char>()[0u][2u], 'c');
 
     ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{12}, 'a')));
     ASSERT_EQ((group.get<boxed_int, char>(entities[1])), (std::make_tuple(boxed_int{9}, 'b')));
@@ -882,17 +888,21 @@ TEST(OwningGroup, SortReverse) {
         return lhs.value < rhs.value;
     });
 
-    ASSERT_EQ(*(group.data() + 0u), entities[2]);
-    ASSERT_EQ(*(group.data() + 1u), entities[1]);
-    ASSERT_EQ(*(group.data() + 2u), entities[0]);
+    ASSERT_EQ(group.data()[0u], entities[2]);
+    ASSERT_EQ(group.data()[1u], entities[1]);
+    ASSERT_EQ(group.data()[2u], entities[0]);
+    ASSERT_EQ(group.data()[3u], entities[3]);
+    ASSERT_EQ(group.data()[4u], entities[4]);
 
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 0u)).value, 12);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 1u)).value, 9);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 2u)).value, 6);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][0u].value, 12);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][1u].value, 9);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][2u].value, 6);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][3u].value, 1);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][4u].value, 2);
 
-    ASSERT_EQ(group.get<char>(*(group.data() + 0u)), 'c');
-    ASSERT_EQ(group.get<char>(*(group.data() + 1u)), 'b');
-    ASSERT_EQ(group.get<char>(*(group.data() + 2u)), 'a');
+    ASSERT_EQ(group.raw<char>()[0u][0u], 'c');
+    ASSERT_EQ(group.raw<char>()[0u][1u], 'b');
+    ASSERT_EQ(group.raw<char>()[0u][2u], 'a');
 
     ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{6}, 'a')));
     ASSERT_EQ((group.get<boxed_int, char>(entities[1])), (std::make_tuple(boxed_int{9}, 'b')));
@@ -933,29 +943,27 @@ TEST(OwningGroup, SortUnordered) {
         return std::get<1>(lhs) < std::get<1>(rhs);
     });
 
-    ASSERT_EQ(*(group.data() + 0u), entities[4]);
-    ASSERT_EQ(*(group.data() + 1u), entities[3]);
-    ASSERT_EQ(*(group.data() + 2u), entities[0]);
-    ASSERT_EQ(*(group.data() + 3u), entities[1]);
-    ASSERT_EQ(*(group.data() + 4u), entities[2]);
+    ASSERT_EQ(group.data()[0u], entities[4]);
+    ASSERT_EQ(group.data()[1u], entities[3]);
+    ASSERT_EQ(group.data()[2u], entities[0]);
+    ASSERT_EQ(group.data()[3u], entities[1]);
+    ASSERT_EQ(group.data()[4u], entities[2]);
+    ASSERT_EQ(group.data()[5u], entities[5]);
+    ASSERT_EQ(group.data()[6u], entities[6]);
 
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 0u)).value, 12);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 1u)).value, 9);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 2u)).value, 6);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 3u)).value, 3);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 4u)).value, 1);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][0u].value, 12);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][1u].value, 9);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][2u].value, 6);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][3u].value, 3);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][4u].value, 1);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][5u].value, 4);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][6u].value, 5);
 
-    ASSERT_EQ(group.get<char>(*(group.data() + 0u)), 'e');
-    ASSERT_EQ(group.get<char>(*(group.data() + 1u)), 'd');
-    ASSERT_EQ(group.get<char>(*(group.data() + 2u)), 'c');
-    ASSERT_EQ(group.get<char>(*(group.data() + 3u)), 'b');
-    ASSERT_EQ(group.get<char>(*(group.data() + 4u)), 'a');
-
-    ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{6}, 'c')));
-    ASSERT_EQ((group.get<boxed_int, char>(entities[1])), (std::make_tuple(boxed_int{3}, 'b')));
-    ASSERT_EQ((group.get<boxed_int, char>(entities[2])), (std::make_tuple(boxed_int{1}, 'a')));
-    ASSERT_EQ((group.get<boxed_int, char>(entities[3])), (std::make_tuple(boxed_int{9}, 'd')));
-    ASSERT_EQ((group.get<boxed_int, char>(entities[4])), (std::make_tuple(boxed_int{12}, 'e')));
+    ASSERT_EQ(group.get<char>(group.data()[0u]), 'e');
+    ASSERT_EQ(group.get<char>(group.data()[1u]), 'd');
+    ASSERT_EQ(group.get<char>(group.data()[2u]), 'c');
+    ASSERT_EQ(group.get<char>(group.data()[3u]), 'b');
+    ASSERT_EQ(group.get<char>(group.data()[4u]), 'a');
 
     ASSERT_FALSE(group.contains(entities[5]));
     ASSERT_FALSE(group.contains(entities[6]));
@@ -980,15 +988,20 @@ TEST(OwningGroup, SortWithExclusionList) {
         return lhs < rhs;
     });
 
-    ASSERT_EQ(*(group.data() + 0u), entities[4]);
-    ASSERT_EQ(*(group.data() + 1u), entities[3]);
-    ASSERT_EQ(*(group.data() + 2u), entities[1]);
-    ASSERT_EQ(*(group.data() + 3u), entities[0]);
+    ASSERT_EQ(group.data()[0u], entities[4]);
+    ASSERT_EQ(group.data()[1u], entities[3]);
+    ASSERT_EQ(group.data()[2u], entities[1]);
+    ASSERT_EQ(group.data()[3u], entities[0]);
 
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 0u)).value, 4);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 1u)).value, 3);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 2u)).value, 1);
-    ASSERT_EQ(group.get<boxed_int>(*(group.data() + 3u)).value, 0);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][0u].value, 4);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][1u].value, 3);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][2u].value, 1);
+    ASSERT_EQ(group.raw<boxed_int>()[0u][3u].value, 0);
+
+    ASSERT_EQ(group.get<boxed_int>(entities[0]).value, 0);
+    ASSERT_EQ(group.get<boxed_int>(entities[1]).value, 1);
+    ASSERT_EQ(group.get<boxed_int>(entities[3]).value, 3);
+    ASSERT_EQ(group.get<boxed_int>(entities[4]).value, 4);
 
     ASSERT_FALSE(group.contains(entities[2]));
 }
@@ -1049,6 +1062,8 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(group.get<int, const char, double, const float>({})), std::tuple<int &, const char &, double &, const float &>>);
     static_assert(std::is_same_v<decltype(group.get({})), std::tuple<int &, const char &, double &, const float &>>);
     static_assert(std::is_same_v<decltype(group.data()), const entt::entity *>);
+    static_assert(std::is_same_v<decltype(group.raw<const char>()), const char * const *>);
+    static_assert(std::is_same_v<decltype(group.raw<int>()), int **>);
 
     group.each([](auto &&i, auto &&c, auto &&d, auto &&f) {
         static_assert(std::is_same_v<decltype(i), int &>);

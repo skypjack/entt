@@ -418,6 +418,22 @@ TEST(Storage, ConstReverseIterator) {
     ASSERT_GE(cend, pool.crend());
 }
 
+TEST(Storage, Raw) {
+    entt::storage<int> pool;
+
+    pool.emplace(entt::entity{3}, 3);
+    pool.emplace(entt::entity{12}, 6);
+    pool.emplace(entt::entity{42}, 9);
+
+    ASSERT_EQ(pool.get(entt::entity{3}), 3);
+    ASSERT_EQ(std::as_const(pool).get(entt::entity{12}), 6);
+    ASSERT_EQ(pool.get(entt::entity{42}), 9);
+
+    ASSERT_EQ(pool.raw()[0u][0u], 3);
+    ASSERT_EQ(std::as_const(pool).raw()[0u][1u], 6);
+    ASSERT_EQ(pool.raw()[0u][2u], 9);
+}
+
 TEST(Storage, SortOrdered) {
     entt::storage<boxed_int> pool;
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
@@ -480,9 +496,9 @@ TEST(Storage, SortRange) {
 
     pool.sort_n(2u, [](auto lhs, auto rhs) { return lhs.value < rhs.value; });
 
-    ASSERT_EQ(pool.rbegin()[0u], boxed_int{6});
-    ASSERT_EQ(pool.rbegin()[1u], boxed_int{3});
-    ASSERT_EQ(pool.rbegin()[2u], boxed_int{1});
+    ASSERT_EQ(pool.raw()[0u][0u], boxed_int{6});
+    ASSERT_EQ(pool.raw()[0u][1u], boxed_int{3});
+    ASSERT_EQ(pool.raw()[0u][2u], boxed_int{1});
 
     ASSERT_EQ(pool.data()[0u], entt::entity{42});
     ASSERT_EQ(pool.data()[1u], entt::entity{12});

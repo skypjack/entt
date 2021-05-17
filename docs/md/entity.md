@@ -10,6 +10,7 @@
   * [Type-less and bitset-free](#type-less-and-bitset-free)
   * [Build your own](#build-your-own)
   * [Pay per use](#pay-per-use)
+  * [All or nothing](#all-or-nothing)
 * [Vademecum](#vademecum)
 * [Pools](#pools)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
@@ -117,6 +118,19 @@ performance where needed.
 
 So far, this choice has proven to be a good one and I really hope it can be for
 many others besides me.
+
+## All or nothing
+
+`EnTT` is such that a `T**` pointer (or whatever a custom pool returns) is
+always available to directly access all the instances of a given component type
+`T`.<br/>
+I cannot say whether it will be useful or not to the reader, but it's worth to
+mention it since it's one of the corner stones of this library.
+
+Many of the tools described below give the possibility to get this information
+and have been designed around this need.<br/>
+The rest is experimentation and the desire to invent something new, hoping to
+have succeeded.
 
 # Vademecum
 
@@ -1237,11 +1251,12 @@ different in the two cases.
 Single component views are specialized in order to give a boost in terms of
 performance in all the situations. This kind of views can access the underlying
 data structures directly and avoid superfluous checks. There is nothing as fast
-as a single component view. In fact, they walk through a packed array of
-components and return them one at a time.<br/>
-Single component views offer a bunch of functionalities to get the number of
-entities they are going to return and a raw access to the entity list. It's also
-possible to ask a view if it contains a given entity.<br/>
+as a single component view. In fact, they walk through a packed (actually paged)
+array of components and return them one at a time.<br/>
+Single component views also offer a bunch of functionalities to get the number
+of entities they are going to return and a raw access to the entity list as well
+as to the component list. It's also possible to ask a view if it contains a
+given entity.<br/>
 Refer to the inline documentation for all the details.
 
 Multi component views iterate entities that have at least all the given
@@ -1435,8 +1450,9 @@ However, it's unlikely that users will be able to appreciate the impact of
 groups on the other functionalities of a registry.
 
 Groups offer a bunch of functionalities to get the number of entities they are
-going to return and a raw access to the entity list. It's also possible to ask a
-group if it contains a given entity.<br/>
+going to return and a raw access to the entity list as well as to the component
+list for owned components. It's also possible to ask a group if it contains a
+given entity.<br/>
 Refer to the inline documentation for all the details.
 
 There is no need to store groups aside for they are extremely cheap to
@@ -1846,9 +1862,9 @@ When an empty type is detected, it's not instantiated in any case. Therefore,
 only the entities to which it's assigned are made available.<br/>
 There doesn't exist a way to _get_ empty types from a registry, views and groups
 will never return instances for them (for example, during a call to `each`) and
-some functions such as `try_get` aren't available for empty types. Finally, the
-`sort` functionality will only accepts callbacks that require to return entities
-rather than components:
+some functions such as `try_get` or the raw access to the list of components
+aren't available for empty types. Finally, the `sort` functionality will only
+accepts callbacks that require to return entities rather than components:
 
 ```cpp
 registry.sort<empty_type>([](const entt::entity lhs, const entt::entity rhs) {
