@@ -181,6 +181,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     void maybe_resize_packed(const std::size_t req) {
         ENTT_ASSERT(req && !(req < count), "Invalid request");
+
         if(const auto length = std::exchange(bucket, (req + page_size - 1u) / page_size); bucket != length) {
             const auto old = std::exchange(packed, bucket_alloc_traits::allocate(bucket_allocator, bucket));
 
@@ -214,17 +215,17 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     template<typename... Args>
-    Type & push_back(Args &&... args) {
-        ENTT_ASSERT(count != (bucket * page_size), "No more space left");
+    Type & construct_at(const std::size_t pos, Args &&... args) {
+        ENTT_ASSERT(pos < (bucket * page_size), "No more space left");
+        auto &ref = packed[page(pos)][offset(pos)];
 
         if constexpr(std::is_aggregate_v<value_type>) {
-            alloc_traits::construct(allocator, std::addressof(*(packed[page(count)] + offset(count))), Type{std::forward<Args>(args)...});
+            alloc_traits::construct(allocator, std::addressof(ref), Type{std::forward<Args>(args)...});
         } else {
-            alloc_traits::construct(allocator, std::addressof(*(packed[page(count)] + offset(count))), std::forward<Args>(args)...);
+            alloc_traits::construct(allocator, std::addressof(ref), std::forward<Args>(args)...);
         }
 
-        const auto last = count++;
-        return packed[page(last)][offset(last)];
+        return ref;
     }
 
     void reset_to_empty() {
@@ -506,7 +507,7 @@ public:
     template<typename... Args>
     value_type & emplace(const entity_type entt, Args &&... args) {
         maybe_resize_packed(count + 1u);
-        auto &value = push_back(std::forward<Args>(args)...);
+        auto &value = construct_at(count++, std::forward<Args>(args)...);
         // entity goes after component in case constructor throws
         underlying_type::emplace(entt);
         return value;
@@ -542,11 +543,11 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        if(const auto length = std::distance(first, last); length) {
-            maybe_resize_packed(count + length);
+        if(const auto sz = count + std::distance(first, last); sz != count) {
+            maybe_resize_packed(sz);
 
-            for(auto pos = length; pos; --pos) {
-                push_back(value);
+            for(; count < sz; ++count) {
+                construct_at(count, value);
             }
 
             underlying_type::insert(first, last);
@@ -568,11 +569,11 @@ public:
      */
     template<typename EIt, typename CIt>
     void insert(EIt first, EIt last, CIt from, CIt to) {
-        if(const auto length = std::distance(from, to); length) {
-            maybe_resize_packed(count + length);
+        if(const auto sz = count + std::distance(from, to); sz != count) {
+            maybe_resize_packed(sz);
 
-            for(; from != to; ++from) {
-                push_back(*from);
+            for(; count < sz; ++count) {
+                construct_at(count, *(from++));
             }
 
             underlying_type::insert(first, last);
