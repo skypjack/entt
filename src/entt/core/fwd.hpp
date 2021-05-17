@@ -17,6 +17,9 @@ class basic_any;
 using id_type = ENTT_ID_TYPE;
 
 
+/*! @brief Default page size. */
+inline static constexpr auto page_size = ENTT_PAGE_SIZE;
+
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
 

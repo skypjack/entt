@@ -9,6 +9,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/fwd.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -42,7 +43,6 @@ namespace entt {
 template<typename Entity, typename Allocator>
 class basic_sparse_set {
     static constexpr auto growth_factor = 1.5;
-    static constexpr auto page_size = ENTT_PAGE_SIZE;
 
     using traits_type = entt_traits<Entity>;
 

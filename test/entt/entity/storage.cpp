@@ -40,7 +40,7 @@ TEST(Storage, Functionalities) {
 
     pool.reserve(42);
 
-    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.capacity(), entt::page_size);
     ASSERT_TRUE(pool.empty());
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(std::as_const(pool).begin(), std::as_const(pool).end());
@@ -80,7 +80,7 @@ TEST(Storage, Functionalities) {
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_FALSE(pool.contains(entt::entity{41}));
 
-    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.capacity(), entt::page_size);
 
     pool.shrink_to_fit();
 
@@ -211,24 +211,24 @@ TEST(Storage, Remove) {
 TEST(Storage, ShrinkToFit) {
     entt::storage<int> pool;
 
-    for(std::size_t next{}; next < ENTT_PAGE_SIZE; ++next) {
+    for(std::size_t next{}; next < entt::page_size; ++next) {
         pool.emplace(entt::entity(next));
     }
 
-    pool.emplace(entt::entity{ENTT_PAGE_SIZE});
-    pool.erase(entt::entity{ENTT_PAGE_SIZE});
+    pool.emplace(entt::entity{entt::page_size});
+    pool.erase(entt::entity{entt::page_size});
 
-    ASSERT_EQ(pool.capacity(), 2 * ENTT_PAGE_SIZE);
-    ASSERT_EQ(pool.size(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.capacity(), 2 * entt::page_size);
+    ASSERT_EQ(pool.size(), entt::page_size);
 
     pool.shrink_to_fit();
 
-    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
-    ASSERT_EQ(pool.size(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.capacity(), entt::page_size);
+    ASSERT_EQ(pool.size(), entt::page_size);
 
     pool.clear();
 
-    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.capacity(), entt::page_size);
     ASSERT_EQ(pool.size(), 0u);
 
     pool.shrink_to_fit();
@@ -679,12 +679,12 @@ TEST(Storage, CanModifyDuringIteration) {
     entt::storage<int> pool;
     pool.emplace(entt::entity{0}, 42);
 
-    ASSERT_EQ(pool.capacity(), ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.capacity(), entt::page_size);
 
     const auto it = pool.cbegin();
-    pool.reserve(ENTT_PAGE_SIZE + 1u);
+    pool.reserve(entt::page_size + 1u);
 
-    ASSERT_EQ(pool.capacity(), 2 * ENTT_PAGE_SIZE);
+    ASSERT_EQ(pool.capacity(), 2 * entt::page_size);
 
     // this should crash with asan enabled if we break the constraint
     const auto entity = *it;

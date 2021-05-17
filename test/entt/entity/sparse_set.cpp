@@ -85,34 +85,33 @@ TEST(SparseSet, Functionalities) {
 
 TEST(SparseSet, Pagination) {
     entt::sparse_set set;
-    constexpr auto page_size = ENTT_PAGE_SIZE;
 
     ASSERT_EQ(set.extent(), 0u);
 
-    set.emplace(entt::entity{page_size-1});
+    set.emplace(entt::entity{entt::page_size-1u});
 
-    ASSERT_EQ(set.extent(), page_size);
-    ASSERT_TRUE(set.contains(entt::entity{page_size-1}));
+    ASSERT_EQ(set.extent(), entt::page_size);
+    ASSERT_TRUE(set.contains(entt::entity{entt::page_size-1u}));
 
-    set.emplace(entt::entity{page_size});
+    set.emplace(entt::entity{entt::page_size});
 
-    ASSERT_EQ(set.extent(), 2 * page_size);
-    ASSERT_TRUE(set.contains(entt::entity{page_size-1}));
-    ASSERT_TRUE(set.contains(entt::entity{page_size}));
-    ASSERT_FALSE(set.contains(entt::entity{page_size+1}));
+    ASSERT_EQ(set.extent(), 2 * entt::page_size);
+    ASSERT_TRUE(set.contains(entt::entity{entt::page_size-1u}));
+    ASSERT_TRUE(set.contains(entt::entity{entt::page_size}));
+    ASSERT_FALSE(set.contains(entt::entity{entt::page_size+1u}));
 
-    set.erase(entt::entity{page_size-1});
+    set.erase(entt::entity{entt::page_size-1u});
 
-    ASSERT_EQ(set.extent(), 2 * page_size);
-    ASSERT_FALSE(set.contains(entt::entity{page_size-1}));
-    ASSERT_TRUE(set.contains(entt::entity{page_size}));
+    ASSERT_EQ(set.extent(), 2 * entt::page_size);
+    ASSERT_FALSE(set.contains(entt::entity{entt::page_size-1u}));
+    ASSERT_TRUE(set.contains(entt::entity{entt::page_size}));
 
     set.shrink_to_fit();
-    set.erase(entt::entity{page_size});
+    set.erase(entt::entity{entt::page_size});
 
-    ASSERT_EQ(set.extent(), 2 * page_size);
-    ASSERT_FALSE(set.contains(entt::entity{page_size-1}));
-    ASSERT_FALSE(set.contains(entt::entity{page_size}));
+    ASSERT_EQ(set.extent(), 2 * entt::page_size);
+    ASSERT_FALSE(set.contains(entt::entity{entt::page_size-1u}));
+    ASSERT_FALSE(set.contains(entt::entity{entt::page_size}));
 
     set.shrink_to_fit();
 

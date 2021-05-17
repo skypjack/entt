@@ -10,6 +10,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
 #include "entity.hpp"
@@ -51,7 +52,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The managed type must be at least move constructible and assignable");
 
     static constexpr auto growth_factor = 1.5;
-    static constexpr auto page_size = ENTT_PAGE_SIZE;
 
     using underlying_type = basic_sparse_set<Entity>;
     using traits_type = entt_traits<Entity>;
