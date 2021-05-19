@@ -451,7 +451,7 @@ TEST(Storage, SortOrdered) {
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
     boxed_int values[5u]{{12}, {9}, {6}, {3}, {1}};
 
-    pool.insert(std::begin(entities), std::end(entities), std::begin(values), std::end(values));
+    pool.insert(std::begin(entities), std::end(entities), values);
     pool.sort([](auto lhs, auto rhs) { return lhs.value < rhs.value; });
 
     ASSERT_TRUE(std::equal(std::rbegin(entities), std::rend(entities), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
@@ -463,7 +463,7 @@ TEST(Storage, SortReverse) {
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
     boxed_int values[5u]{{1}, {3}, {6}, {9}, {12}};
 
-    pool.insert(std::begin(entities), std::end(entities), std::begin(values), std::end(values));
+    pool.insert(std::begin(entities), std::end(entities), values);
     pool.sort([](auto lhs, auto rhs) { return lhs.value < rhs.value; });
 
     ASSERT_TRUE(std::equal(std::begin(entities), std::end(entities), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
@@ -475,7 +475,7 @@ TEST(Storage, SortUnordered) {
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
     boxed_int values[5u]{{6}, {3}, {1}, {9}, {12}};
 
-    pool.insert(std::begin(entities), std::end(entities), std::begin(values), std::end(values));
+    pool.insert(std::begin(entities), std::end(entities), values);
     pool.sort([](auto lhs, auto rhs) { return lhs.value < rhs.value; });
 
     auto begin = pool.begin();
@@ -500,7 +500,7 @@ TEST(Storage, SortRange) {
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
     boxed_int values[5u]{{3}, {6}, {1}, {9}, {12}};
 
-    pool.insert(std::begin(entities), std::end(entities), std::begin(values), std::end(values));
+    pool.insert(std::begin(entities), std::end(entities), values);
     pool.sort_n(0u, [](auto lhs, auto rhs) { return lhs.value < rhs.value; });
 
     ASSERT_TRUE(std::equal(std::rbegin(entities), std::rend(entities), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
@@ -541,7 +541,7 @@ TEST(Storage, RespectDisjoint) {
 
     entt::entity lhs_entities[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
     int lhs_values[3u]{3, 6, 9};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), std::begin(lhs_values), std::end(lhs_values));
+    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), lhs_values);
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -558,11 +558,11 @@ TEST(Storage, RespectOverlap) {
 
     entt::entity lhs_entities[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
     int lhs_values[3u]{3, 6, 9};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), std::begin(lhs_values), std::end(lhs_values));
+    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), lhs_values);
 
     entt::entity rhs_entities[1u]{entt::entity{12}};
     int rhs_values[1u]{6};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities), std::begin(rhs_values), std::end(rhs_values));
+    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities), rhs_values);
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -591,11 +591,11 @@ TEST(Storage, RespectOrdered) {
 
     entt::entity lhs_entities[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
     int lhs_values[5u]{1, 2, 3, 4, 5};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), std::begin(lhs_values), std::end(lhs_values));
+    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), lhs_values);
 
     entt::entity rhs_entities[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
     int rhs_values[6u]{6, 1, 2, 3, 4, 5};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities), std::begin(rhs_values), std::end(rhs_values));
+    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities), rhs_values);
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -615,11 +615,11 @@ TEST(Storage, RespectReverse) {
 
     entt::entity lhs_entities[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
     int lhs_values[5u]{1, 2, 3, 4, 5};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), std::begin(lhs_values), std::end(lhs_values));
+    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), lhs_values);
 
     entt::entity rhs_entities[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}};
     int rhs_values[6u]{5, 4, 3, 2, 1, 6};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities), std::begin(rhs_values), std::end(rhs_values));
+    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities), rhs_values);
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -654,11 +654,11 @@ TEST(Storage, RespectUnordered) {
 
     entt::entity lhs_entities[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
     int lhs_values[5u]{1, 2, 3, 4, 5};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), std::begin(lhs_values), std::end(lhs_values));
+    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities), lhs_values);
 
     entt::entity rhs_entities[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}};
     int rhs_values[6u]{3, 2, 6, 1, 4, 5};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities), std::begin(rhs_values), std::end(rhs_values));
+    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities), rhs_values);
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));

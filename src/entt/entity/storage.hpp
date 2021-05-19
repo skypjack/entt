@@ -563,15 +563,15 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of objects.
-     * @param to An iterator past the last element of the range of objects.
      */
-    template<typename EIt, typename CIt>
-    void insert(EIt first, EIt last, CIt from, CIt to) {
+    template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
+    void insert(EIt first, EIt last, CIt from) {
         if(const auto length = underlying_type::insert(first, last); length) {
-            maybe_resize_packed(count + length);
+            const auto sz = count + length;
+            maybe_resize_packed(sz);
 
-            for(; from != to; ++from) {
-                push_back(*from);
+            while(count != sz) {
+                push_back(*(from++));
             }
         }
     }

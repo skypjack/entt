@@ -1269,7 +1269,7 @@ TEST(Registry, Insert) {
     float value[3]{0.f, 1.f, 2.f};
 
     const auto iview = registry.view<int>();
-    registry.insert<float>(iview.data(), iview.data() + iview.size(), value, value + iview.size());
+    registry.insert<float>(iview.data(), iview.data() + iview.size(), value);
 
     ASSERT_EQ(registry.get<float>(e0), 0.f);
     ASSERT_EQ(registry.get<float>(e1), 1.f);
