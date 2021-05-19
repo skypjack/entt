@@ -134,7 +134,10 @@ TEST(SparseSet, Insert) {
     entities[1] = entt::entity{42};
 
     set.emplace(entt::entity{12});
-    set.insert(std::begin(entities), std::end(entities));
+
+    ASSERT_EQ(set.insert(std::end(entities), std::end(entities)), 0u);
+    ASSERT_EQ(set.insert(std::begin(entities), std::end(entities)), 2u);
+
     set.emplace(entt::entity{24});
 
     ASSERT_TRUE(set.contains(entities[0]));

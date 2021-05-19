@@ -227,15 +227,18 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     template<typename... Args>
-    Type & construct_at(const std::size_t pos, Args &&... args) {
-        ENTT_ASSERT(pos < (bucket * page_size), "No more space left");
-        auto &ref = packed[page(pos)][offset(pos)];
+    Type & push_back(Args &&... args) {
+        ENTT_ASSERT(count < (bucket * page_size), "No more space left");
+        auto &ref = packed[page(count)][offset(count)];
 
         if constexpr(std::is_aggregate_v<value_type>) {
             alloc_traits::construct(allocator, std::addressof(ref), Type{std::forward<Args>(args)...});
         } else {
             alloc_traits::construct(allocator, std::addressof(ref), std::forward<Args>(args)...);
         }
+
+        // exception safety guarantee requires to update this after construction
+        ++count;
 
         return ref;
     }
@@ -503,7 +506,7 @@ public:
     template<typename... Args>
     value_type & emplace(const entity_type entt, Args &&... args) {
         maybe_resize_packed(count + 1u);
-        auto &value = construct_at(count++, std::forward<Args>(args)...);
+        auto &value = push_back(std::forward<Args>(args)...);
         // entity goes after component in case constructor throws
         underlying_type::emplace(entt);
         return value;
@@ -539,14 +542,13 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        if(const auto sz = count + std::distance(first, last); sz != count) {
+        if(const auto length = underlying_type::insert(first, last); length) {
+            const auto sz = count + length;
             maybe_resize_packed(sz);
 
-            for(; count < sz; ++count) {
-                construct_at(count, value);
+            while(count != sz) {
+                push_back(value);
             }
-
-            underlying_type::insert(first, last);
         }
     }
 
@@ -565,14 +567,12 @@ public:
      */
     template<typename EIt, typename CIt>
     void insert(EIt first, EIt last, CIt from, CIt to) {
-        if(const auto sz = count + std::distance(from, to); sz != count) {
-            maybe_resize_packed(sz);
+        if(const auto length = underlying_type::insert(first, last); length) {
+            maybe_resize_packed(count + length);
 
-            for(; count < sz; ++count) {
-                construct_at(count, *(from++));
+            for(; from != to; ++from) {
+                push_back(*from);
             }
-
-            underlying_type::insert(first, last);
         }
     }
 

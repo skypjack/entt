@@ -239,7 +239,9 @@ class basic_sparse_set {
     void push_back(const Entity entt) {
         ENTT_ASSERT(count != reserved, "No more space left");
         assure_page(page(entt))[offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(count)};
-        alloc_traits::construct(allocator, std::addressof(packed[count++]), entt);
+        alloc_traits::construct(allocator, std::addressof(packed[count]), entt);
+        // exception safety guarantee requires to update this after construction
+        ++count;
     }
 
     void pop(const Entity entt, void *ud) {
@@ -558,15 +560,19 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @return The number of elements assigned to the sparse set.
      */
     template<typename It>
-    void insert(It first, It last) {
-        maybe_resize_packed(packed_size_for(count + std::distance(first, last)));
+    size_type insert(It first, It last) {
+        const auto length = std::distance(first, last);
+        maybe_resize_packed(packed_size_for(count + length));
 
         for(; first != last; ++first) {
             ENTT_ASSERT(!contains(*first), "Set already contains entity");
             push_back(*first);
         }
+
+        return length;
     }
 
     /**
