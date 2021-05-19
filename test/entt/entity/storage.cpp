@@ -48,6 +48,11 @@ TEST(Storage, Functionalities) {
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_FALSE(pool.contains(entt::entity{41}));
 
+    pool.reserve(0);
+
+    ASSERT_EQ(pool.capacity(), entt::page_size);
+    ASSERT_TRUE(pool.empty());
+
     pool.emplace(entt::entity{41}, 3);
 
     ASSERT_FALSE(pool.empty());

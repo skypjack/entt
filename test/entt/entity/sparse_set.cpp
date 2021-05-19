@@ -24,6 +24,11 @@ TEST(SparseSet, Functionalities) {
     ASSERT_FALSE(set.contains(entt::entity{0}));
     ASSERT_FALSE(set.contains(entt::entity{42}));
 
+    set.reserve(0);
+
+    ASSERT_EQ(set.capacity(), 42u);
+    ASSERT_TRUE(set.empty());
+
     set.emplace(entt::entity{42});
 
     ASSERT_FALSE(set.empty());

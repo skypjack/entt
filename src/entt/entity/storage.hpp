@@ -180,21 +180,31 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     void maybe_resize_packed(const std::size_t req) {
-        ENTT_ASSERT(req && !(req < count), "Invalid request");
+        if(const auto length = std::exchange(bucket, (req + page_size - 1u) / page_size); !bucket) {
+            for(size_type pos{}; pos < length; ++pos) {
+                if(count) {
+                    const auto sz = count > page_size ? page_size : count;
+                    std::destroy(packed[pos], packed[pos] + sz);
+                    count -= sz;
+                }
+            
+                alloc_traits::deallocate(allocator, packed[pos], page_size);
+                bucket_alloc_traits::destroy(bucket_allocator, std::addressof(packed[pos]));
+            }
 
-        if(const auto length = std::exchange(bucket, (req + page_size - 1u) / page_size); bucket != length) {
+            if(length) {
+                bucket_alloc_traits::deallocate(bucket_allocator, packed, length);
+            }
+        } else if(bucket != length) {
+            ENTT_ASSERT(!(req < count), "Invalid request");
             const auto old = std::exchange(packed, bucket_alloc_traits::allocate(bucket_allocator, bucket));
 
             if(bucket > length) {
-                if(length) {
-                    for(size_type pos{}; pos < length; ++pos) {
-                        bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), old[pos]);
-                        bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
-                    }
-
-                    bucket_alloc_traits::deallocate(bucket_allocator, old, length);
+                for(size_type pos{}; pos < length; ++pos) {
+                    bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), old[pos]);
+                    bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
                 }
-
+    
                 for(auto pos = length; pos < bucket; ++pos) {
                     bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), alloc_traits::allocate(allocator, page_size));
                 }
@@ -203,12 +213,14 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
                     bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), old[pos]);
                     bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
                 }
-
+    
                 for(auto pos = bucket; pos < length; ++pos) {
                     alloc_traits::deallocate(allocator, old[pos], page_size);
                     bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
                 }
+            }
 
+            if(length) {
                 bucket_alloc_traits::deallocate(bucket_allocator, old, length);
             }
         }
@@ -228,23 +240,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         return ref;
     }
 
-    void reset_to_empty() {
-        if(const auto length = std::exchange(bucket, 0u); length) {
-            for(size_type pos{}; pos < length; ++pos) {
-                if(count) {
-                    const auto sz = count > page_size ? page_size : count;
-                    std::destroy(packed[pos], packed[pos] + sz);
-                    count -= sz;
-                }
-
-                alloc_traits::deallocate(allocator, packed[pos], page_size);
-                bucket_alloc_traits::destroy(bucket_allocator, std::addressof(packed[pos]));
-            }
-
-            bucket_alloc_traits::deallocate(bucket_allocator, packed, length);
-        }
-    }
-
 protected:
     /*! @copydoc basic_sparse_set::swap_at */
     void swap_at(const std::size_t lhs, const std::size_t rhs) final {
@@ -255,12 +250,10 @@ protected:
     void swap_and_pop(const std::size_t pos) final {
         auto &&elem = packed[page(pos)][offset(pos)];
         [[maybe_unused]] auto other = std::move(elem);
+        auto &&last = (--count, packed[page(count)][offset(count)]);
 
-        auto &&last = packed[page(count - 1)][offset(count - 1)];
         elem = std::move(last);
         alloc_traits::destroy(allocator, std::addressof(last));
-
-        --count;
     }
 
 public:
@@ -312,7 +305,7 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_storage() override {
-        reset_to_empty();
+        maybe_resize_packed(0u);
     }
 
     /**
@@ -357,7 +350,7 @@ public:
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
         underlying_type::shrink_to_fit();
-        count ? maybe_resize_packed(count) : reset_to_empty();
+        maybe_resize_packed(count);
     }
 
     /**

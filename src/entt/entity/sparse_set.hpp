@@ -191,32 +191,55 @@ class basic_sparse_set {
         return sparse[idx];
     }
 
-    void resize_packed(const std::size_t req) {
-        ENTT_ASSERT(req && !(req < count), "Invalid request");
-        auto old = std::exchange(packed, alloc_traits::allocate(allocator, req));
+    void maybe_release_pages() {
+        if(!count && bucket) {
+            for(size_type pos{}; pos < bucket; ++pos) {
+                if(sparse[pos]) {
+                    std::destroy(sparse[pos], sparse[pos] + page_size);
+                    alloc_traits::deallocate(allocator, sparse[pos], page_size);
+                }
 
-        if(const auto length = std::exchange(reserved, req); length) {
+                bucket_alloc_traits::destroy(bucket_allocator, std::addressof(sparse[pos]));
+            }
+
+            bucket_alloc_traits::deallocate(bucket_allocator, sparse, std::exchange(bucket, 0u));
+        }
+    }
+
+    [[nodiscard]] std::size_t packed_size_for(const std::size_t req) {
+        auto sz = reserved;
+
+        while(req > sz) {
+            const size_type next(sz * growth_factor);
+            sz = next + !(next > sz);
+        }
+
+        return sz;
+    }
+
+    void maybe_resize_packed(const std::size_t req) {
+        if(const auto length = std::exchange(reserved, req); !reserved) {
+            if(length) {
+                std::destroy(packed, packed + std::exchange(count, 0u));
+                alloc_traits::deallocate(allocator, packed, length);
+            }
+        } else if(reserved != length) {
+            ENTT_ASSERT(!(req < count), "Invalid request");
+            auto old = std::exchange(packed, alloc_traits::allocate(allocator, req));
+
             for(size_type pos{}; pos < count; ++pos) {
                 alloc_traits::construct(allocator, std::addressof(packed[pos]), std::move(old[pos]));
                 alloc_traits::destroy(allocator, std::addressof(old[pos]));
             }
-
+            
             alloc_traits::deallocate(allocator, old, length);
         }
     }
 
-    template<typename It>
-    void push_back(It first, It last) {
-        if(const size_type req = count + std::distance(first, last); reserved < req) {
-            const size_type sz = size_type(reserved * growth_factor) + (reserved == 0u);
-            resize_packed(sz < req ? req : sz);
-        }
-
-        for(; first != last; ++first) {
-            ENTT_ASSERT(!contains(*first), "Set already contains entity");
-            assure_page(page(*first))[offset(*first)] = entity_type{static_cast<typename traits_type::entity_type>(count)};
-            alloc_traits::construct(allocator, std::addressof(packed[count++]), *first);
-        }
+    void push_back(const Entity entt) {
+        ENTT_ASSERT(count != reserved, "No more space left");
+        assure_page(page(entt))[offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(count)};
+        alloc_traits::construct(allocator, std::addressof(packed[count++]), entt);
     }
 
     void pop(const Entity entt, void *ud) {
@@ -236,26 +259,6 @@ class basic_sparse_set {
 
         // don't expect exceptions here, instead allow for nosy destructors
         swap_and_pop(pos);
-    }
-
-    void reset_to_empty() {
-        if(const auto length = std::exchange(reserved, 0u); length) {
-            std::destroy(packed, packed + std::exchange(count, 0u));
-            alloc_traits::deallocate(allocator, packed, length);
-        }
-
-        if(const auto length = std::exchange(bucket, 0u); length) {
-            for(size_type pos{}; pos < length; ++pos) {
-                if(sparse[pos]) {
-                    std::destroy(sparse[pos], sparse[pos] + page_size);
-                    alloc_traits::deallocate(allocator, sparse[pos], page_size);
-                }
-
-                bucket_alloc_traits::destroy(bucket_allocator, std::addressof(sparse[pos]));
-            }
-
-            bucket_alloc_traits::deallocate(bucket_allocator, sparse, std::exchange(bucket, 0u));
-        }
     }
 
 protected:
@@ -323,7 +326,8 @@ public:
 
     /*! @brief Default destructor. */
     virtual ~basic_sparse_set() {
-        reset_to_empty();
+        maybe_resize_packed(0u);
+        maybe_release_pages();
     }
 
     /**
@@ -352,7 +356,7 @@ public:
      */
     void reserve(const size_type cap) {
         if(cap > reserved) {
-            resize_packed(cap);
+            maybe_resize_packed(cap);
         }
     }
 
@@ -367,11 +371,8 @@ public:
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
-        if(!count) {
-            reset_to_empty();
-        } else if(reserved > count) {
-            resize_packed(count);
-        }
+        maybe_resize_packed(count);
+        maybe_release_pages();
     }
 
     /**
@@ -538,8 +539,9 @@ public:
      * @param entt A valid entity identifier.
      */
     void emplace(const entity_type entt) {
-        entity_type arr[1u]{entt};
-        push_back(arr, arr + 1u);
+        ENTT_ASSERT(!contains(entt), "Set already contains entity");
+        maybe_resize_packed(packed_size_for(count + 1u));
+        push_back(entt);
     }
 
     /**
@@ -555,7 +557,12 @@ public:
      */
     template<typename It>
     void insert(It first, It last) {
-        push_back(first, last);
+        maybe_resize_packed(packed_size_for(count + std::distance(first, last)));
+
+        for(; first != last; ++first) {
+            ENTT_ASSERT(!contains(*first), "Set already contains entity");
+            push_back(*first);
+        }
     }
 
     /**
