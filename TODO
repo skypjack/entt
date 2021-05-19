@@ -9,11 +9,11 @@ WIP:
 * custom allocators all over
 
 WIP:
+* registry: switch to the udata/mixin model and get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
 * make pools available (registry/view/group), review operator| for views
 * compressed pair to exploit ebo in sparse set and the others
 * isolate view iterator, unwrap iterators in registry ::remove/::erase/::destroy to use the faster solution for non-view iterators
-* meta: use forward_as_any to forward arguments from eg meta_func::invoke, so as to remove the need for the user to explicitly forward references
-* scheduler, use any (or poly?) instead of unique_ptr
+* meta: use almost always meta handles to accept arguments from eg meta_func::invoke, so as to remove the need for the user to explicitly forward references
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * add user data to type_info
@@ -22,7 +22,6 @@ WIP:
 * weak reference wrapper example with custom storage
 * headless (sparse set only) view
 * write documentation for custom storages and views!!
-* registry: use a poly object for pools, no more pool_data type.
 * make runtime views use opaque storage and therefore return also elements.
 * add exclude-only views to combine with packs
 * entity-aware observer, add observer functions aside observer class
