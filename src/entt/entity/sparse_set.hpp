@@ -206,17 +206,6 @@ class basic_sparse_set {
         }
     }
 
-    [[nodiscard]] std::size_t packed_size_for(const std::size_t req) {
-        auto sz = reserved;
-
-        while(req > sz) {
-            const size_type next(sz * growth_factor);
-            sz = next + !(next > sz);
-        }
-
-        return sz;
-    }
-
     void maybe_resize_packed(const std::size_t req) {
         if(const auto length = std::exchange(reserved, req); !reserved) {
             if(length) {
@@ -225,7 +214,7 @@ class basic_sparse_set {
             }
         } else if(reserved != length) {
             ENTT_ASSERT(!(req < count), "Invalid request");
-            auto old = std::exchange(packed, alloc_traits::allocate(allocator, req));
+            auto old = std::exchange(packed, alloc_traits::allocate(allocator, reserved));
 
             for(size_type pos{}; pos < count; ++pos) {
                 alloc_traits::construct(allocator, std::addressof(packed[pos]), std::move(old[pos]));
@@ -546,7 +535,12 @@ public:
      */
     void emplace(const entity_type entt) {
         ENTT_ASSERT(!contains(entt), "Set already contains entity");
-        maybe_resize_packed(packed_size_for(count + 1u));
+
+        if(count == reserved) {
+            const size_type sz(reserved * growth_factor);
+            maybe_resize_packed(sz + !(sz > reserved));
+        }
+
         push_back(entt);
     }
 
@@ -565,7 +559,7 @@ public:
     template<typename It>
     size_type insert(It first, It last) {
         const auto length = std::distance(first, last);
-        maybe_resize_packed(packed_size_for(count + length));
+        reserve(count + length);
 
         for(; first != last; ++first) {
             ENTT_ASSERT(!contains(*first), "Set already contains entity");
