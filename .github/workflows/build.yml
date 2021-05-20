@@ -11,7 +11,7 @@ jobs:
       matrix:
         compiler: [
             g++-7, g++-8, g++-9, g++,
-            clang++-8, clang++-9, clang++
+            clang++-8, clang++-9, clang++-10, clang++
         ]
 
     runs-on: ubuntu-latest
@@ -33,6 +33,16 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install clang-8 -y
+    - name: Install clang-9
+      if: ${{ matrix.compiler == 'clang++-9' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install clang-9 -y
+    - name: Install clang-10
+      if: ${{ matrix.compiler == 'clang++-10' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install clang-10 -y
     - name: Compile tests
       working-directory: build
       env:
