@@ -4,6 +4,7 @@
 
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include "../config/config.h"
 #include "../core/attribute.h"
 #include "hashed_string.hpp"
@@ -151,22 +152,48 @@ class type_info final {
     template<typename>
     friend type_info type_id() ENTT_NOEXCEPT;
 
-    type_info(id_type seq_v, id_type hash_v, std::string_view name_v) ENTT_NOEXCEPT
-        : seq_value{seq_v},
-          hash_value{hash_v},
-          name_value{name_v}
-    {}
+    enum class operation { SEQ, HASH, NAME };
+
+    using vtable_type = id_type(const operation, void *);
+
+    template<typename Type>
+    static id_type basic_vtable(const operation op, void *to) {
+        static_assert(std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
+
+        switch(op) {
+        case operation::SEQ:
+            return type_seq<Type>::value();
+            break;
+        case operation::HASH:
+            return type_hash<Type>::value();
+            break;
+        case operation::NAME:
+            *static_cast<std::string_view *>(to) = type_name<Type>::value();
+            break;
+        }
+
+        return {};
+    }
 
 public:
     /*! @brief Default constructor. */
-    type_info() ENTT_NOEXCEPT
-        : type_info({}, {}, {})
+    constexpr type_info() ENTT_NOEXCEPT
+        : vtable{}
     {}
 
     /*! @brief Default copy constructor. */
     type_info(const type_info &) ENTT_NOEXCEPT = default;
     /*! @brief Default move constructor. */
     type_info(type_info &&) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Creates a type info object for a given type.
+     * @tparam Type Type for which to generate a type info object.
+     */
+    template<typename Type>
+    type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
+        : vtable{&basic_vtable<Type>}
+    {}
 
     /**
      * @brief Default copy assignment operator.
@@ -185,7 +212,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return name_value.data() != nullptr;
+        return vtable != nullptr;
     }
 
     /**
@@ -193,7 +220,7 @@ public:
      * @return Type sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
-        return seq_value;
+        return vtable ? vtable(operation::SEQ, nullptr) : id_type{};
     }
 
     /**
@@ -201,7 +228,7 @@ public:
      * @return Type hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
-        return hash_value;
+        return vtable ? vtable(operation::HASH, nullptr) : id_type{};
     }
 
     /**
@@ -209,7 +236,13 @@ public:
      * @return Type name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
-        return name_value;
+        std::string_view value{};
+
+        if(vtable) {
+            vtable(operation::NAME, &value);
+        }
+
+        return value;
     }
 
     /**
@@ -218,13 +251,11 @@ public:
      * @return False if the two contents differ, true otherwise.
      */
     [[nodiscard]] bool operator==(const type_info &other) const ENTT_NOEXCEPT {
-        return hash_value == other.hash_value;
+        return hash() == other.hash();
     }
 
 private:
-    id_type seq_value;
-    id_type hash_value;
-    std::string_view name_value;
+    vtable_type *vtable;
 };
 
 
@@ -246,11 +277,7 @@ private:
  */
 template<typename Type>
 [[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
-    return type_info{
-        type_seq<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
-        type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value(),
-        type_name<std::remove_cv_t<std::remove_reference_t<Type>>>::value()
-    };
+    return type_info{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>};
 }
 
 
