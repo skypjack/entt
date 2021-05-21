@@ -197,13 +197,13 @@ class meta_any {
     template<auto Member>
     [[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> visit(const type_info &info, const internal::meta_type_node *node) {
         for(auto *curr = node->*Member; curr; curr = curr->next) {
-            if(curr->type()->info == info) {
+            if(curr->type->info == info) {
                 return curr;
             }
         }
 
         for(auto *curr = node->base; curr; curr = curr->next) {
-            if(auto *ret = visit<Member>(info, curr->type()); ret) {
+            if(auto *ret = visit<Member>(info, curr->type); ret) {
                 return ret;
             }
         }
@@ -1081,13 +1081,13 @@ class meta_type {
         }
 
         for(const auto *curr = type->conv; curr; curr = curr->next) {
-            if(curr->type()->info == info) {
+            if(curr->type->info == info) {
                 return true;
             }
         }
 
         for(const auto *curr = type->base; curr; curr = curr->next) {
-            if(can_cast_or_convert(curr->type(), info)) {
+            if(can_cast_or_convert(curr->type, info)) {
                 return true;
             }
         }
@@ -1115,7 +1115,7 @@ class meta_type {
         }
 
         for(auto *curr = node->base; curr; curr = curr->next) {
-            if(auto *ret = visit<Member>(op, curr->type()); ret) {
+            if(auto *ret = visit<Member>(op, curr->type); ret) {
                 return ret;
             }
         }
@@ -1149,7 +1149,7 @@ public:
      * @param curr The base node with which to construct the instance.
      */
     meta_type(base_node_type *curr) ENTT_NOEXCEPT
-        : node{curr ? curr->type() : nullptr}
+        : node{curr ? curr->type : nullptr}
     {}
 
     /**
@@ -1320,7 +1320,7 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const ENTT_NOEXCEPT {
-        return node->templ ? node->templ->type() : meta_type{};
+        return node->templ ? node->templ->type : meta_type{};
     }
 
     /**
@@ -1382,7 +1382,7 @@ public:
      * @return The base meta type associated with the given identifier, if any.
      */
     [[nodiscard]] meta_type base(const id_type id) const {
-        return visit<&node_type::base>([id](const auto *curr) { return curr->type()->id == id; }, node);
+        return visit<&node_type::base>([id](const auto *curr) { return curr->type->id == id; }, node);
     }
 
     /**
@@ -1711,7 +1711,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_data::type() const ENTT_NOEXCEPT {
-    return node->type();
+    return node->type;
 }
 
 
@@ -1721,7 +1721,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_type meta_func::ret() const ENTT_NOEXCEPT {
-    return node->ret();
+    return node->ret;
 }
 
 

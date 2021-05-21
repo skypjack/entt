@@ -43,7 +43,7 @@ struct meta_prop_node {
 struct meta_base_node {
     meta_type_node * const parent;
     meta_base_node * next;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_type_node * const type;
     const void *(* const cast)(const void *) ENTT_NOEXCEPT;
 };
 
@@ -51,7 +51,7 @@ struct meta_base_node {
 struct meta_conv_node {
     meta_type_node * const parent;
     meta_conv_node * next;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_type_node * const type;
     meta_any(* const conv)(const void *);
 };
 
@@ -74,7 +74,7 @@ struct meta_data_node {
     meta_prop_node * prop;
     const bool is_const;
     const bool is_static;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_type_node * const type;
     bool(* const set)(meta_handle, meta_any);
     meta_any(* const get)(meta_handle);
 };
@@ -89,7 +89,7 @@ struct meta_func_node {
     const size_type arity;
     const bool is_const;
     const bool is_static;
-    meta_type_node *(* const ret)() ENTT_NOEXCEPT;
+    meta_type_node * const ret;
     meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any * const);
 };
@@ -98,7 +98,7 @@ struct meta_func_node {
 struct meta_template_node {
     using size_type = std::size_t;
     const size_type arity;
-    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    meta_type_node * const type;
     meta_type_node *(* const arg)(const size_type) ENTT_NOEXCEPT;
 };
 
@@ -175,7 +175,7 @@ class ENTT_API meta_node {
         if constexpr(is_complete_v<meta_template_traits<Type>>) {
             static meta_template_node node{
                 meta_template_traits<Type>::args_type::size,
-                &meta_node<typename meta_template_traits<Type>::class_type>::resolve,
+                meta_node<typename meta_template_traits<Type>::class_type>::resolve(),
                 [](const std::size_t index) ENTT_NOEXCEPT {
                     return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index);
                 }

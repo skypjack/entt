@@ -218,7 +218,7 @@ struct meta_factory<Type> {
         static internal::meta_base_node node{
             type,
             nullptr,
-            &internal::meta_info<Base>::resolve,
+            internal::meta_info<Base>::resolve(),
             [](const void *instance) ENTT_NOEXCEPT -> const void * {
                 return static_cast<const Base *>(static_cast<const Type *>(instance));
             }
@@ -252,7 +252,7 @@ struct meta_factory<Type> {
         static internal::meta_conv_node node{
             type,
             nullptr,
-            &internal::meta_info<conv_type>::resolve,
+            internal::meta_info<conv_type>::resolve(),
             [](const void *instance) -> meta_any {
                 return (static_cast<const Type *>(instance)->*Candidate)();
             }
@@ -275,7 +275,7 @@ struct meta_factory<Type> {
         static internal::meta_conv_node node{
             type,
             nullptr,
-            &internal::meta_info<conv_type>::resolve,
+            internal::meta_info<conv_type>::resolve(),
             [](const void *instance) -> meta_any {
                 return Candidate(*static_cast<const Type *>(instance));
             }
@@ -306,7 +306,7 @@ struct meta_factory<Type> {
         static internal::meta_conv_node node{
             type,
             nullptr,
-            &internal::meta_info<To>::resolve,
+            internal::meta_info<To>::resolve(),
             [](const void *instance) -> meta_any {
                 return static_cast<To>(*static_cast<const Type *>(instance));
             }
@@ -444,7 +444,7 @@ struct meta_factory<Type> {
                 nullptr,
                 std::is_same_v<Type, data_type> || std::is_const_v<data_type>,
                 true,
-                &internal::meta_info<data_type>::resolve,
+                internal::meta_info<data_type>::resolve(),
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>
             };
@@ -493,7 +493,7 @@ struct meta_factory<Type> {
             nullptr,
             std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>),
             false,
-            &internal::meta_info<underlying_type>::resolve,
+            internal::meta_info<underlying_type>::resolve(),
             &meta_setter<Type, Setter>,
             &meta_getter<Type, Getter, Policy>
         };
@@ -535,7 +535,7 @@ struct meta_factory<Type> {
             descriptor::args_type::size,
             descriptor::is_const,
             descriptor::is_static,
-            &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename descriptor::return_type>>::resolve,
+            internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename descriptor::return_type>>::resolve(),
             &meta_arg<typename descriptor::args_type>,
             &meta_invoke<Type, Candidate, Policy>
         };
