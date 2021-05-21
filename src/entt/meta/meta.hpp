@@ -415,15 +415,19 @@ public:
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type * try_cast() {
-        if(node) {
-            if(const auto info = type_id<Type>(); node->info == info) {
-                return any_cast<Type>(&storage);
-            } else if(const auto *base = visit<&internal::meta_type_node::base>(info, node); base) {
-                return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
+        if constexpr(std::is_const_v<Type>) {
+            return std::as_const(*this).try_cast<Type>();
+        } else {
+            if(node) {
+                if(const auto info = type_id<Type>(); node->info == info) {
+                    return any_cast<Type>(&storage);
+                } else if(const auto *base = visit<&internal::meta_type_node::base>(info, node); base) {
+                    return const_cast<Type *>(static_cast<const Type *>(base->cast(storage.data())));
+                }
             }
-        }
 
-        return nullptr;
+            return nullptr;
+        }
     }
 
     /**
