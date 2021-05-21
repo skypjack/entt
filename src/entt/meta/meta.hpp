@@ -1177,14 +1177,6 @@ public:
     }
 
     /**
-     * @brief Checks whether a type refers to void or not.
-     * @return True if the underlying type is void, false otherwise.
-     */
-    [[nodiscard]] bool is_void() const ENTT_NOEXCEPT {
-        return node->is_void;
-    }
-
-    /**
      * @brief Checks whether a type refers to an integral type or not.
      * @return True if the underlying type is an integral type, false otherwise.
      */

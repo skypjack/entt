@@ -218,9 +218,6 @@ TEST_F(MetaType, SizeOf) {
 }
 
 TEST_F(MetaType, Traits) {
-    ASSERT_TRUE(entt::resolve<void>().is_void());
-    ASSERT_FALSE(entt::resolve<int>().is_void());
-
     ASSERT_TRUE(entt::resolve<bool>().is_integral());
     ASSERT_FALSE(entt::resolve<double>().is_integral());
 

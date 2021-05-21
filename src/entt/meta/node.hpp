@@ -110,7 +110,6 @@ struct meta_type_node {
     meta_type_node * next;
     meta_prop_node * prop;
     const size_type size_of;
-    const bool is_void;
     const bool is_integral;
     const bool is_floating_point;
     const bool is_array;
@@ -195,7 +194,6 @@ public:
             nullptr,
             nullptr,
             size_of_v<Type>,
-            std::is_void_v<Type>,
             std::is_integral_v<Type>,
             std::is_floating_point_v<Type>,
             std::is_array_v<Type>,
