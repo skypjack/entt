@@ -139,46 +139,6 @@ struct meta_type_node {
 };
 
 
-template<auto Member, typename Node>
-std::decay_t<decltype(std::declval<Node>().*Member)>
-meta_visit(const type_info &info, const Node *node) {
-    for(auto *curr = node->*Member; curr; curr = curr->next) {
-        if(curr->type()->info == info) {
-            return curr;
-        }
-    }
-
-    for(auto *curr = node->base; curr; curr = curr->next) {
-        if(auto *ret = meta_visit<Member>(info, curr->type()); ret) {
-            return ret;
-        }
-    }
-
-    return nullptr;
-}
-
-
-template<auto Member, typename Op, typename Node>
-auto meta_visit(const Op &op, const Node *node)
--> std::decay_t<decltype(node->*Member)> {
-    for(auto *curr = node->*Member; curr; curr = curr->next) {
-        if(op(curr)) {
-            return curr;
-        }
-    }
-
-    if constexpr(std::is_same_v<Node, meta_type_node>) {
-        for(auto *curr = node->base; curr; curr = curr->next) {
-            if(auto *ret = meta_visit<Member>(op, curr->type()); ret) {
-                return ret;
-            }
-        }
-    }
-
-    return nullptr;
-}
-
-
 template<typename... Args>
 meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT;
 

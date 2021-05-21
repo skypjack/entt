@@ -194,6 +194,23 @@ class meta_any {
         }
     }
 
+    template<auto Member>
+    [[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> visit(const type_info &info, const internal::meta_type_node *node) {
+        for(auto *curr = node->*Member; curr; curr = curr->next) {
+            if(curr->type()->info == info) {
+                return curr;
+            }
+        }
+
+        for(auto *curr = node->base; curr; curr = curr->next) {
+            if(auto *ret = visit<Member>(info, curr->type()); ret) {
+                return ret;
+            }
+        }
+
+        return nullptr;
+    }
+
     meta_any(const meta_any &other, any ref) ENTT_NOEXCEPT
         : storage{std::move(ref)},
           node{storage ? other.node : nullptr},
@@ -387,7 +404,7 @@ public:
         if(node) {
             if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
-            } else if(const auto *base = internal::meta_visit<&internal::meta_type_node::base>(info, node); base) {
+            } else if(const auto *base = visit<&internal::meta_type_node::base>(info, node); base) {
                 return static_cast<const Type *>(base->cast(storage.data()));
             }
         }
@@ -401,7 +418,7 @@ public:
         if(node) {
             if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
-            } else if(const auto *base = internal::meta_visit<&internal::meta_type_node::base>(info, node); base) {
+            } else if(const auto *base = visit<&internal::meta_type_node::base>(info, node); base) {
                 return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
             }
         }
@@ -447,7 +464,7 @@ public:
         if(try_cast<std::remove_reference_t<Type>>() != nullptr) {
             return as_ref();
         } else if(node) {
-            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>(type_id<Type>(), node); conv) {
+            if(const auto * const conv = visit<&internal::meta_type_node::conv>(type_id<Type>(), node); conv) {
                 return conv->conv(storage.data());
             }
         }
@@ -466,7 +483,7 @@ public:
         if(try_cast<std::remove_reference_t<const Type>>() != nullptr) {
             return true;
         } else if(node) {
-            if(const auto * const conv = internal::meta_visit<&internal::meta_type_node::conv>(type_id<Type>(), node); conv) {
+            if(const auto * const conv = visit<&internal::meta_type_node::conv>(type_id<Type>(), node); conv) {
                 *this = conv->conv(std::as_const(storage).data());
                 return true;
             }
@@ -803,7 +820,13 @@ struct meta_ctor {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->id == key; }, node);
+        for(auto curr: prop()) {
+            if(curr.key() == key) {
+                return curr;
+            }
+        }
+
+        return nullptr;
     }
 
     /**
@@ -899,7 +922,13 @@ struct meta_data {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->id == key; }, node);
+        for(auto curr: prop()) {
+            if(curr.key() == key) {
+                return curr;
+            }
+        }
+
+        return nullptr;
     }
 
     /**
@@ -1018,7 +1047,13 @@ struct meta_func {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->id == key; }, node);
+        for(auto curr: prop()) {
+            if(curr.key() == key) {
+                return curr;
+            }
+        }
+
+        return nullptr;
     }
 
     /**
@@ -1036,7 +1071,7 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
-    static bool can_cast_or_convert(const internal::meta_type_node *type, const type_info info) ENTT_NOEXCEPT {
+    [[nodiscard]] static bool can_cast_or_convert(const internal::meta_type_node *type, const type_info info) ENTT_NOEXCEPT {
         if(type->info == info) {
             return true;
         }
@@ -1061,6 +1096,23 @@ class meta_type {
         for(; curr; curr = curr->next) {
             if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index).info()) && ...)) {
                 return curr;
+            }
+        }
+
+        return nullptr;
+    }
+
+    template<auto Member, typename Op>
+    static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> visit(const Op &op, const internal::meta_type_node *node) {
+        for(auto *curr = node->*Member; curr; curr = curr->next) {
+            if(op(curr)) {
+                return curr;
+            }
+        }
+
+        for(auto *curr = node->base; curr; curr = curr->next) {
+            if(auto *ret = visit<Member>(op, curr->type()); ret) {
+                return ret;
             }
         }
 
@@ -1326,7 +1378,7 @@ public:
      * @return The base meta type associated with the given identifier, if any.
      */
     [[nodiscard]] meta_type base(const id_type id) const {
-        return internal::meta_visit<&node_type::base>([id](const auto *curr) { return curr->type()->id == id; }, node);
+        return visit<&node_type::base>([id](const auto *curr) { return curr->type()->id == id; }, node);
     }
 
     /**
@@ -1364,7 +1416,7 @@ public:
      * @return The data associated with the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        return internal::meta_visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
+        return visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
@@ -1386,7 +1438,7 @@ public:
      * @return The function associated with the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        return internal::meta_visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
+        return visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
@@ -1446,7 +1498,7 @@ public:
         size_type extent{sz + 1u};
         bool ambiguous{};
 
-        for(auto *it = internal::meta_visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->arity == sz; }, node); it && it->id == id && it->arity == sz; it = it->next) {
+        for(auto *it = visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->arity == sz; }, node); it && it->id == id && it->arity == sz; it = it->next) {
             size_type direct{};
             size_type ext{};
 
@@ -1540,7 +1592,7 @@ public:
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::meta_visit<&node_type::prop>([&key](const auto *curr) { return curr->id == key; }, node);
+        return visit<&internal::meta_type_node::prop>([&key](const auto *curr) { return curr->id == key; }, node);
     }
 
     /**
