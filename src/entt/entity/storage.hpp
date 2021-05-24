@@ -180,7 +180,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     void release_memory() {
-        if(bucket) {
+        if(packed) {
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(count) {
                     const auto sz = count > page_size ? page_size : count;
@@ -197,7 +197,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     void maybe_resize_packed(const std::size_t req) {
-        ENTT_ASSERT(req && !(req < count), "Invalid request");
+        ENTT_ASSERT(!(req < count), "Invalid request");
 
         if(const auto length = std::exchange(bucket, (req + page_size - 1u) / page_size); bucket != length) {
             const auto old = std::exchange(packed, bucket_alloc_traits::allocate(bucket_allocator, bucket));
@@ -207,7 +207,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
                     bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), old[pos]);
                     bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
                 }
-    
+
                 for(auto pos = length; pos < bucket; ++pos) {
                     bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), alloc_traits::allocate(allocator, page_size));
                 }
@@ -216,16 +216,14 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
                     bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), old[pos]);
                     bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
                 }
-    
+
                 for(auto pos = bucket; pos < length; ++pos) {
                     alloc_traits::deallocate(allocator, old[pos], page_size);
                     bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
                 }
             }
 
-            if(length) {
-                bucket_alloc_traits::deallocate(bucket_allocator, old, length);
-            }
+            bucket_alloc_traits::deallocate(bucket_allocator, old, length);
         }
     }
 
@@ -359,7 +357,7 @@ public:
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
         underlying_type::shrink_to_fit();
-        count ? maybe_resize_packed(count) : release_memory();
+        maybe_resize_packed(count);
     }
 
     /**
@@ -545,14 +543,13 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        if(const auto sz = count + std::distance(first, last); sz != count) {
-            maybe_resize_packed(sz);
-            underlying_type::reserve(sz);
+        const auto sz = count + std::distance(first, last);
+        underlying_type::reserve(sz);
+        maybe_resize_packed(sz);
 
-            for(; first != last; ++first) {
-                push_back(value);
-                underlying_type::emplace(*first);
-            }
+        for(; first != last; ++first) {
+            push_back(value);
+            underlying_type::emplace(*first);
         }
     }
 
@@ -570,14 +567,13 @@ public:
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
-        if(const auto sz = count + std::distance(first, last); sz != count) {
-            maybe_resize_packed(sz);
-            underlying_type::reserve(sz);
+        const auto sz = count + std::distance(first, last);
+        underlying_type::reserve(sz);
+        maybe_resize_packed(sz);
 
-            for(; first != last; ++first, ++from) {
-                push_back(*from);
-                underlying_type::emplace(*first);
-            }
+        for(; first != last; ++first, ++from) {
+            push_back(*from);
+            underlying_type::emplace(*first);
         }
     }
 

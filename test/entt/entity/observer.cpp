@@ -11,7 +11,6 @@ TEST(Observer, Functionalities) {
 
     ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
-    ASSERT_EQ(observer.data(), nullptr);
     ASSERT_EQ(observer.begin(), observer.end());
 
     const auto entity = registry.create();
@@ -19,7 +18,6 @@ TEST(Observer, Functionalities) {
 
     ASSERT_EQ(observer.size(), 1u);
     ASSERT_FALSE(observer.empty());
-    ASSERT_NE(observer.data(), nullptr);
     ASSERT_EQ(*observer.data(), entity);
     ASSERT_NE(observer.begin(), observer.end());
     ASSERT_EQ(++observer.begin(), observer.end());
@@ -100,7 +98,6 @@ TEST(Observer, AllOfFiltered) {
 
     ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
-    ASSERT_EQ(observer.data(), nullptr);
 
     registry.erase<int>(entity);
     registry.emplace<char>(entity);
@@ -181,7 +178,6 @@ TEST(Observer, ObserveFiltered) {
 
     ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
-    ASSERT_EQ(observer.data(), nullptr);
 
     registry.emplace<char>(entity);
     registry.emplace<double>(entity);

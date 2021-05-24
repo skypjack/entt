@@ -173,14 +173,12 @@ class basic_sparse_set {
             const auto old = std::exchange(sparse, bucket_alloc_traits::allocate(bucket_allocator, sz));
             std::uninitialized_fill(sparse + bucket, sparse + sz, alloc_pointer{});
 
-            if(const auto curr = std::exchange(bucket, sz); curr) {
-                for(size_type pos{}; pos < curr; ++pos) {
-                    bucket_alloc_traits::construct(bucket_allocator, std::addressof(sparse[pos]), std::move(old[pos]));
-                    bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
-                }
-
-                bucket_alloc_traits::deallocate(bucket_allocator, old, curr);
+            for(size_type pos{}; pos < bucket; ++pos) {
+                bucket_alloc_traits::construct(bucket_allocator, std::addressof(sparse[pos]), std::move(old[pos]));
+                bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
             }
+
+            bucket_alloc_traits::deallocate(bucket_allocator, old, std::exchange(bucket, sz));
         }
 
         if(!sparse[idx]) {
@@ -192,33 +190,33 @@ class basic_sparse_set {
     }
 
     void resize_packed(const std::size_t req) {
-        ENTT_ASSERT(req && (req != reserved) && !(req < count), "Invalid request");
+        ENTT_ASSERT((req != reserved) && !(req < count), "Invalid request");
         auto old = std::exchange(packed, alloc_traits::allocate(allocator, req));
-        
+
         for(size_type pos{}; pos < count; ++pos) {
             alloc_traits::construct(allocator, std::addressof(packed[pos]), std::move(old[pos]));
             alloc_traits::destroy(allocator, std::addressof(old[pos]));
         }
-        
+
         alloc_traits::deallocate(allocator, old, std::exchange(reserved, req));
     }
 
     void release_memory() {
-        if(reserved) {
+        if(packed) {
+            ENTT_ASSERT(sparse, "Something very wrong happened");
+
             std::destroy(packed, packed + std::exchange(count, 0u));
             alloc_traits::deallocate(allocator, std::exchange(packed, alloc_pointer{}), std::exchange(reserved, 0u));
-        }
 
-        if(bucket) {
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(sparse[pos]) {
                     std::destroy(sparse[pos], sparse[pos] + page_size);
                     alloc_traits::deallocate(allocator, sparse[pos], page_size);
                 }
-            
+
                 bucket_alloc_traits::destroy(bucket_allocator, std::addressof(sparse[pos]));
             }
-            
+
             bucket_alloc_traits::deallocate(bucket_allocator, sparse, std::exchange(bucket, 0u));
         }
     }
@@ -292,11 +290,11 @@ public:
     explicit basic_sparse_set(const allocator_type &alloc = {})
         : allocator{alloc},
           bucket_allocator{alloc},
-          sparse{},
-          packed{},
-          bucket{},
-          count{},
-          reserved{}
+          sparse{bucket_alloc_traits::allocate(bucket_allocator, 0u)},
+          packed{alloc_traits::allocate(allocator, 0u)},
+          bucket{0u},
+          count{0u},
+          reserved{0u}
     {}
 
     /**
@@ -362,9 +360,7 @@ public:
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
-        if(!count && reserved) {
-            release_memory();
-        } else if(count && count != reserved) {
+        if(count < reserved) {
             resize_packed(count);
         }
     }

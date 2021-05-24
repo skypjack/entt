@@ -123,7 +123,7 @@ TEST(SparseSet, Pagination) {
 
     set.shrink_to_fit();
 
-    ASSERT_EQ(set.extent(), 0u);
+    ASSERT_EQ(set.extent(), 2 * entt::page_size);
 }
 
 TEST(SparseSet, Insert) {

@@ -73,10 +73,8 @@ TEST(SingleComponentView, RawData) {
 
     ASSERT_EQ(view.size(), 0u);
     ASSERT_EQ(cview.size(), 0u);
-    ASSERT_EQ(view.raw(), nullptr);
-    ASSERT_EQ(cview.raw(), nullptr);
-    ASSERT_EQ(view.data(), nullptr);
-    ASSERT_EQ(cview.data(), nullptr);
+    ASSERT_EQ(view.raw(), cview.raw());
+    ASSERT_EQ(view.data(), cview.data());
 
     registry.emplace<int>(entity, 42);
 
