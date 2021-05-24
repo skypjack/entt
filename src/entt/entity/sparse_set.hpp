@@ -191,37 +191,35 @@ class basic_sparse_set {
         return sparse[idx];
     }
 
-    void maybe_release_pages() {
-        if(!count && bucket) {
+    void resize_packed(const std::size_t req) {
+        ENTT_ASSERT(req && (req != reserved) && !(req < count), "Invalid request");
+        auto old = std::exchange(packed, alloc_traits::allocate(allocator, req));
+        
+        for(size_type pos{}; pos < count; ++pos) {
+            alloc_traits::construct(allocator, std::addressof(packed[pos]), std::move(old[pos]));
+            alloc_traits::destroy(allocator, std::addressof(old[pos]));
+        }
+        
+        alloc_traits::deallocate(allocator, old, std::exchange(reserved, req));
+    }
+
+    void release_memory() {
+        if(reserved) {
+            std::destroy(packed, packed + std::exchange(count, 0u));
+            alloc_traits::deallocate(allocator, std::exchange(packed, alloc_pointer{}), std::exchange(reserved, 0u));
+        }
+
+        if(bucket) {
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(sparse[pos]) {
                     std::destroy(sparse[pos], sparse[pos] + page_size);
                     alloc_traits::deallocate(allocator, sparse[pos], page_size);
                 }
-
+            
                 bucket_alloc_traits::destroy(bucket_allocator, std::addressof(sparse[pos]));
             }
-
-            bucket_alloc_traits::deallocate(bucket_allocator, sparse, std::exchange(bucket, 0u));
-        }
-    }
-
-    void maybe_resize_packed(const std::size_t req) {
-        if(const auto length = std::exchange(reserved, req); !reserved) {
-            if(length) {
-                std::destroy(packed, packed + std::exchange(count, 0u));
-                alloc_traits::deallocate(allocator, packed, length);
-            }
-        } else if(reserved != length) {
-            ENTT_ASSERT(!(req < count), "Invalid request");
-            auto old = std::exchange(packed, alloc_traits::allocate(allocator, reserved));
-
-            for(size_type pos{}; pos < count; ++pos) {
-                alloc_traits::construct(allocator, std::addressof(packed[pos]), std::move(old[pos]));
-                alloc_traits::destroy(allocator, std::addressof(old[pos]));
-            }
             
-            alloc_traits::deallocate(allocator, old, length);
+            bucket_alloc_traits::deallocate(bucket_allocator, sparse, std::exchange(bucket, 0u));
         }
     }
 
@@ -317,8 +315,7 @@ public:
 
     /*! @brief Default destructor. */
     virtual ~basic_sparse_set() {
-        maybe_resize_packed(0u);
-        maybe_release_pages();
+        release_memory();
     }
 
     /**
@@ -327,8 +324,7 @@ public:
      * @return This sparse set.
      */
     basic_sparse_set & operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
-        maybe_resize_packed(0u);
-        maybe_release_pages();
+        release_memory();
 
         allocator = std::move(other.allocator);
         bucket_allocator = std::move(other.bucket_allocator);
@@ -351,7 +347,7 @@ public:
      */
     void reserve(const size_type cap) {
         if(cap > reserved) {
-            maybe_resize_packed(cap);
+            resize_packed(cap);
         }
     }
 
@@ -366,8 +362,11 @@ public:
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
-        maybe_resize_packed(count);
-        maybe_release_pages();
+        if(!count && reserved) {
+            release_memory();
+        } else if(count && count != reserved) {
+            resize_packed(count);
+        }
     }
 
     /**
@@ -538,7 +537,7 @@ public:
 
         if(count == reserved) {
             const size_type sz(reserved * growth_factor);
-            maybe_resize_packed(sz + !(sz > reserved));
+            resize_packed(sz + !(sz > reserved));
         }
 
         push_back(entt);
@@ -554,19 +553,15 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @return The number of elements assigned to the sparse set.
      */
     template<typename It>
-    size_type insert(It first, It last) {
-        const auto length = std::distance(first, last);
-        reserve(count + length);
+    void insert(It first, It last) {
+        reserve(count + std::distance(first, last));
 
         for(; first != last; ++first) {
             ENTT_ASSERT(!contains(*first), "Set already contains entity");
             push_back(*first);
         }
-
-        return length;
     }
 
     /**
