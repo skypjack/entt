@@ -314,11 +314,14 @@ public:
      * @return This sparse set.
      */
     basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT {
+        maybe_resize_packed(0u);
+
         allocator = std::move(other.allocator);
         bucket_allocator = std::move(other.bucket_allocator);
         packed = std::exchange(other.packed, bucket_alloc_pointer{});
         bucket = std::exchange(other.bucket, 0u);
         count = std::exchange(other.count, 0u);
+
         return *this;
     }
 

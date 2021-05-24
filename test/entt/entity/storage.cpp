@@ -91,9 +91,16 @@ TEST(Storage, Functionalities) {
 
     ASSERT_EQ(pool.capacity(), 0u);
 
-    (void)entt::storage<int>{std::move(pool)};
-    entt::storage<int> other;
+    entt::storage<int> other{std::move(pool)};
+
+    pool = std::move(other);
+
+    other = entt::storage<int>{};
+    other.emplace(entt::entity{3}, 3);
     other = std::move(pool);
+
+    ASSERT_EQ(pool.capacity(), 0u);
+    ASSERT_EQ(other.capacity(), 0u);
 }
 
 TEST(Storage, EmptyType) {
