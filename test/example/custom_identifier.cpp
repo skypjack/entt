@@ -4,7 +4,7 @@
 #include <entt/entity/registry.hpp>
 
 struct entity_id {
-    using entity_type = typename entt::entt_traits<entt::entity>::entity_type;
+    using entity_type = std::uint32_t;
     static constexpr auto null = entt::null;
 
     constexpr entity_id(entity_type value = null)
@@ -22,9 +22,6 @@ struct entity_id {
 private:
     entity_type entt;
 };
-
-template<>
-struct entt::entt_traits<entity_id>: entt::entt_traits<entt::entity> {};
 
 TEST(Example, CustomIdentifier) {
     entt::basic_registry<entity_id> registry{};

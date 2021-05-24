@@ -161,11 +161,11 @@ class basic_sparse_set {
     };
 
     [[nodiscard]] static auto page(const Entity entt) ENTT_NOEXCEPT {
-        return size_type{(to_integral(entt) & traits_type::entity_mask) / sparse_page};
+        return size_type{traits_type::to_entity(entt) / sparse_page};
     }
 
     [[nodiscard]] static auto offset(const Entity entt) ENTT_NOEXCEPT {
-        return size_type{to_integral(entt) & (sparse_page - 1)};
+        return size_type{traits_type::to_integral(entt) & (sparse_page - 1)};
     }
 
     [[nodiscard]] auto assure_page(const std::size_t idx) {
@@ -236,7 +236,7 @@ class basic_sparse_set {
         about_to_erase(entt, ud);
 
         auto &ref = sparse[page(entt)][offset(entt)];
-        const auto pos = size_type{to_integral(ref)};
+        const auto pos = size_type{traits_type::to_integral(ref)};
 
         const auto last = --count;
         packed[pos] = std::exchange(packed[last], entt);
@@ -498,7 +498,7 @@ public:
      */
     [[nodiscard]] size_type index(const entity_type entt) const {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
-        return size_type{to_integral(sparse[page(entt)][offset(entt)])};
+        return size_type{traits_type::to_integral(sparse[page(entt)][offset(entt)])};
     }
 
     /**

@@ -448,7 +448,7 @@ public:
         for(decltype(length) pos{}; pos < length; ++pos) {
             archive(entt);
 
-            if(const auto entity = (to_integral(entt) & traits_type::entity_mask); entity == pos) {
+            if(const auto entity = traits_type::to_entity(entt); entity == pos) {
                 restore(entt);
             } else {
                 destroy(entt);

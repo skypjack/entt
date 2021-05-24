@@ -126,22 +126,21 @@ class basic_registry {
     }
 
     Entity generate_identifier(const std::size_t pos) {
-        // traits_type::entity_mask is reserved to allow for null identifiers
-        ENTT_ASSERT(static_cast<typename traits_type::entity_type>(pos) < traits_type::entity_mask, "No entities available");
+        ENTT_ASSERT(pos < traits_type::to_integral(entt::null), "No entities available");
         return entity_type{static_cast<typename traits_type::entity_type>(pos)};
     }
 
     Entity recycle_identifier() {
         ENTT_ASSERT(available != null, "No entities available");
-        const auto curr = to_integral(available);
-        const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
-        available = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
-        return entities[curr] = entity_type{curr | version};
+        const auto curr = traits_type::to_integral(available);
+        const auto version = traits_type::to_version(entities[curr]);
+        available = entity_type{traits_type::to_entity(entities[curr])};
+        return entities[curr] = traits_type::to_type(curr, version);
     }
 
     void release_entity(const Entity entity, const typename traits_type::version_type version) {
-        const auto entt = to_integral(entity) & traits_type::entity_mask;
-        entities[entt] = entity_type{to_integral(available) | (typename traits_type::entity_type{version} << traits_type::entity_shift)};
+        const auto entt = traits_type::to_entity(entity);
+        entities[entt] = traits_type::to_type(traits_type::to_integral(available), version);
         available = entity_type{entt};
     }
 
@@ -161,7 +160,7 @@ public:
      * @return The entity identifier without the version.
      */
     [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return entity_type{to_integral(entity) & traits_type::entity_mask};
+        return entity_type{traits_type::to_entity(entity)};
     }
 
     /**
@@ -170,7 +169,7 @@ public:
      * @return The version stored along with the given entity identifier.
      */
     [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
-        return version_type(to_integral(entity) >> traits_type::entity_shift);
+        return traits_type::to_version(entity);
     }
 
     /*! @brief Default constructor. */
@@ -236,7 +235,7 @@ public:
         auto sz = entities.size();
 
         for(auto curr = available; curr != null; --sz) {
-            curr = entities[to_integral(curr) & traits_type::entity_mask];
+            curr = entities[traits_type::to_entity(curr)];
         }
 
         return sz;
@@ -357,7 +356,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entity) const {
-        const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
+        const auto pos = size_type(traits_type::to_entity(entity));
         return (pos < entities.size() && entities[pos] == entity);
     }
 
@@ -373,7 +372,7 @@ public:
      * @return Actual version for the given entity identifier.
      */
     [[nodiscard]] version_type current(const entity_type entity) const {
-        const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
+        const auto pos = size_type(traits_type::to_entity(entity));
         ENTT_ASSERT(pos < entities.size(), "Entity does not exist");
         return version(entities[pos]);
     }
@@ -407,7 +406,7 @@ public:
         ENTT_ASSERT(hint != null, "Null entity not available");
         const auto length = entities.size();
 
-        if(const auto req = (to_integral(hint) & traits_type::entity_mask); !(req < length)) {
+        if(const auto req = traits_type::to_entity(hint); !(req < length)) {
             entities.resize(size_type(req) + 1u, null);
 
             for(auto pos = length; pos < req; ++pos) {
@@ -415,12 +414,12 @@ public:
             }
 
             return (entities[req] = hint);
-        } else if(const auto curr = (to_integral(entities[req]) & traits_type::entity_mask); req == curr) {
+        } else if(const auto curr = traits_type::to_entity(entities[req]); req == curr) {
             return create();
         } else {
             auto *it = &available;
-            for(; (to_integral(*it) & traits_type::entity_mask) != req; it = &entities[to_integral(*it) & traits_type::entity_mask]);
-            *it = entity_type{curr | (to_integral(*it) & (traits_type::version_mask << traits_type::entity_shift))};
+            for(; traits_type::to_entity(*it) != req; it = &entities[traits_type::to_entity(*it)]);
+            *it = traits_type::to_type(curr, traits_type::to_version(*it));
             return (entities[req] = hint);
         }
     }
@@ -949,7 +948,7 @@ public:
             }
         } else {
             for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entity = entities[pos - 1]; (to_integral(entity) & traits_type::entity_mask) == (pos - 1)) {
+                if(const auto entity = entities[pos - 1]; traits_type::to_entity(entity) == (pos - 1)) {
                     func(entity);
                 }
             }

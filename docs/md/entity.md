@@ -179,11 +179,8 @@ the alias `entt::registry` for `entt::basic_registry<entt::entity>`.
 
 Entities are represented by _entity identifiers_. An entity identifier carries
 information about the entity itself and its version.<br/>
-User defined identifiers can be introduced by means of enum classes and custom
-types for which a specialization of `entt_traits` exists. For this purpose,
-`entt_traits` is also defined as a _sfinae-friendly_ class template. In theory,
-integral types can also be used as entity identifiers, even though this may
-break in future and isn't recommended in general.
+User defined identifiers can be introduced through enum classes and class types
+that define an `entity_type` member of type `std::uint32_t` or `std::uint64_t`.
 
 A registry is used both to construct and to destroy entities:
 

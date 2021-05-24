@@ -12,86 +12,128 @@ namespace entt {
 
 
 /**
- * @brief Entity traits.
- *
- * Primary template isn't defined on purpose. All the specializations give a
- * compile-time error unless the template parameter is an accepted entity type.
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
  */
+
+
+namespace internal {
+
+
 template<typename, typename = void>
 struct entt_traits;
 
 
-/**
- * @brief Entity traits for enumeration types.
- * @tparam Type The type to check.
- */
 template<typename Type>
 struct entt_traits<Type, std::enable_if_t<std::is_enum_v<Type>>>
-        : entt_traits<std::underlying_type_t<Type>>
+    : entt_traits<std::underlying_type_t<Type>>
 {};
 
 
-/**
- * @brief Entity traits for a 32 bits entity identifier.
- *
- * A 32 bits entity identifier guarantees:
- *
- * * 20 bits for the entity number (suitable for almost all the games).
- * * 12 bit for the version (resets in [0-4095]).
- */
+template<typename Type>
+struct entt_traits<Type, std::enable_if_t<std::is_class_v<Type>>>
+    : entt_traits<typename Type::entity_type>
+{};
+
+
 template<>
 struct entt_traits<std::uint32_t> {
-    /*! @brief Underlying entity type. */
     using entity_type = std::uint32_t;
-    /*! @brief Underlying version type. */
     using version_type = std::uint16_t;
-    /*! @brief Difference type. */
     using difference_type = std::int64_t;
 
-    /*! @brief Mask to use to get the entity number out of an identifier. */
     static constexpr entity_type entity_mask = 0xFFFFF;
-    /*! @brief Mask to use to get the version out of an identifier. */
     static constexpr entity_type version_mask = 0xFFF;
-    /*! @brief Extent of the entity number within an identifier. */
     static constexpr std::size_t entity_shift = 20u;
 };
 
 
-/**
- * @brief Entity traits for a 64 bits entity identifier.
- *
- * A 64 bits entity identifier guarantees:
- *
- * * 32 bits for the entity number (an indecently large number).
- * * 32 bit for the version (an indecently large number).
- */
 template<>
 struct entt_traits<std::uint64_t> {
-    /*! @brief Underlying entity type. */
     using entity_type = std::uint64_t;
-    /*! @brief Underlying version type. */
     using version_type = std::uint32_t;
-    /*! @brief Difference type. */
     using difference_type = std::int64_t;
 
-    /*! @brief Mask to use to get the entity number out of an identifier. */
     static constexpr entity_type entity_mask = 0xFFFFFFFF;
-    /*! @brief Mask to use to get the version out of an identifier. */
     static constexpr entity_type version_mask = 0xFFFFFFFF;
-    /*! @brief Extent of the entity number within an identifier. */
     static constexpr std::size_t entity_shift = 32u;
 };
 
 
+}
+
+
 /**
- * @brief Converts an entity type to its underlying type.
+* Internal details not to be documented.
+* @endcond
+*/
+
+
+/**
+ * @brief Entity traits.
+ * @tparam Type Type of identifier.
+ */
+template<typename Type>
+class entt_traits: public internal::entt_traits<Type> {
+    using traits_type = internal::entt_traits<Type>;
+
+public:
+    /*! @brief Underlying entity type. */
+    using entity_type = typename traits_type::entity_type;
+    /*! @brief Underlying version type. */
+    using version_type = typename traits_type::version_type;
+    /*! @brief Difference type. */
+    using difference_type = typename traits_type::difference_type;
+
+    /**
+     * @brief Converts an entity to its underlying type.
+     * @param value The value to convert.
+     * @return The integral representation of the given value.
+     */
+    [[nodiscard]] static constexpr auto to_integral(const Type value) ENTT_NOEXCEPT {
+        return static_cast<entity_type>(value);
+    }
+
+    /**
+     * @brief Returns the entity part once converted to the underlying type.
+     * @param value The value to convert.
+     * @return The integral representation of the entity part.
+     */
+    [[nodiscard]] static constexpr auto to_entity(const Type value) {
+        return (to_integral(value) & traits_type::entity_mask);
+    }
+
+    /**
+     * @brief Returns the version part once converted to the underlying type.
+     * @param value The value to convert.
+     * @return The integral representation of the version part.
+     */
+    [[nodiscard]] static constexpr auto to_version(const Type value) {
+        constexpr auto mask = (traits_type::version_mask << traits_type::entity_shift);
+        return ((to_integral(value) & mask) >> traits_type::entity_shift);
+    }
+
+    /**
+     * @brief Constructs an identifier from its parts.
+     * @param entity The entity part of the identifier.
+     * @param version The version part of the identifier.
+     * @return A properly constructed identifier.
+     */
+    [[nodiscard]] static constexpr auto to_type(const entity_type entity, const version_type version = {}) {
+        return Type{entity | (version << traits_type::entity_shift)};
+    }
+};
+
+
+/**
+ * @brief Converts an entity to its underlying type.
  * @tparam Entity The value type.
  * @param entity The value to convert.
  * @return The integral representation of the given value.
  */
 template<typename Entity>
 [[nodiscard]] constexpr auto to_integral(const Entity entity) ENTT_NOEXCEPT {
-    return static_cast<typename entt_traits<Entity>::entity_type>(entity);
+    return entt_traits<Entity>::to_integral(entity);
 }
 
 
@@ -131,7 +173,7 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity &entity) const ENTT_NOEXCEPT {
-        return (to_integral(entity) & entt_traits<Entity>::entity_mask) == to_integral(static_cast<Entity>(*this));
+        return entt_traits<Entity>::to_entity(entity) == static_cast<typename entt_traits<Entity>::entity_type>(*this);
     }
 
     /**
@@ -171,12 +213,6 @@ template<typename Entity>
 [[nodiscard]] constexpr bool operator!=(const Entity &entity, const null_t &other) ENTT_NOEXCEPT {
     return !(other == entity);
 }
-
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
 
 
 /**
