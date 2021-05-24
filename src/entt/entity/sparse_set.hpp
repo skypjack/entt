@@ -336,6 +336,9 @@ public:
      * @return This sparse set.
      */
     basic_sparse_set & operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
+        maybe_resize_packed(0u);
+        maybe_release_pages();
+
         allocator = std::move(other.allocator);
         bucket_allocator = std::move(other.bucket_allocator);
         sparse = std::exchange(other.sparse, bucket_alloc_pointer{});
@@ -343,6 +346,7 @@ public:
         bucket = std::exchange(other.bucket, 0u);
         count = std::exchange(other.count, 0u);
         reserved = std::exchange(other.reserved, 0u);
+
         return *this;
     }
 

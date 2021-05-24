@@ -67,6 +67,9 @@ TEST(SparseSet, Functionalities) {
     entt::sparse_set other{std::move(set)};
 
     set = std::move(other);
+
+    other = entt::sparse_set{};
+    other.emplace(entt::entity{3});
     other = std::move(set);
 
     ASSERT_TRUE(set.empty());
