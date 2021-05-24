@@ -152,8 +152,8 @@ Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
     const auto view = reg.template view<const Component>();
     const auto *addr = std::addressof(instance);
 
-    for(auto it = view.rbegin(), last = view.rend(); it < last; it += page_size) {
-        if(const auto dist = (addr - std::addressof(view.template get<const Component>(*it))); dist >= 0 && dist < page_size) {
+    for(auto it = view.rbegin(), last = view.rend(); it < last; it += ENTT_PACKED_PAGE) {
+        if(const auto dist = (addr - std::addressof(view.template get<const Component>(*it))); dist >= 0 && dist < ENTT_PACKED_PAGE) {
             return *(it + dist);
         }
     }

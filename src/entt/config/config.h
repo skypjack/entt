@@ -29,10 +29,17 @@
 #endif
 
 
-#ifdef ENTT_PAGE_SIZE
-static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
+#ifdef ENTT_SPARSE_PAGE
+	static_assert(ENTT_SPARSE_PAGE && ((ENTT_SPARSE_PAGE & (ENTT_SPARSE_PAGE - 1)) == 0), "ENTT_SPARSE_PAGE must be a power of two");
 #else
-#   define ENTT_PAGE_SIZE 4096
+#   define ENTT_SPARSE_PAGE 4096
+#endif
+
+
+#ifdef ENTT_PACKED_PAGE
+static_assert(ENTT_PACKED_PAGE && ((ENTT_PACKED_PAGE & (ENTT_PACKED_PAGE - 1)) == 0), "ENTT_PACKED_PAGE must be a power of two");
+#else
+#   define ENTT_PACKED_PAGE 1024
 #endif
 
 

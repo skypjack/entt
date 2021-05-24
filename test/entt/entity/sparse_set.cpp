@@ -96,34 +96,34 @@ TEST(SparseSet, Pagination) {
 
     ASSERT_EQ(set.extent(), 0u);
 
-    set.emplace(entt::entity{entt::page_size-1u});
+    set.emplace(entt::entity{ENTT_SPARSE_PAGE-1u});
 
-    ASSERT_EQ(set.extent(), entt::page_size);
-    ASSERT_TRUE(set.contains(entt::entity{entt::page_size-1u}));
+    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE-1u}));
 
-    set.emplace(entt::entity{entt::page_size});
+    set.emplace(entt::entity{ENTT_SPARSE_PAGE});
 
-    ASSERT_EQ(set.extent(), 2 * entt::page_size);
-    ASSERT_TRUE(set.contains(entt::entity{entt::page_size-1u}));
-    ASSERT_TRUE(set.contains(entt::entity{entt::page_size}));
-    ASSERT_FALSE(set.contains(entt::entity{entt::page_size+1u}));
+    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
+    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE-1u}));
+    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
+    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE+1u}));
 
-    set.erase(entt::entity{entt::page_size-1u});
+    set.erase(entt::entity{ENTT_SPARSE_PAGE-1u});
 
-    ASSERT_EQ(set.extent(), 2 * entt::page_size);
-    ASSERT_FALSE(set.contains(entt::entity{entt::page_size-1u}));
-    ASSERT_TRUE(set.contains(entt::entity{entt::page_size}));
-
-    set.shrink_to_fit();
-    set.erase(entt::entity{entt::page_size});
-
-    ASSERT_EQ(set.extent(), 2 * entt::page_size);
-    ASSERT_FALSE(set.contains(entt::entity{entt::page_size-1u}));
-    ASSERT_FALSE(set.contains(entt::entity{entt::page_size}));
+    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
+    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE-1u}));
+    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
 
     set.shrink_to_fit();
+    set.erase(entt::entity{ENTT_SPARSE_PAGE});
 
-    ASSERT_EQ(set.extent(), 2 * entt::page_size);
+    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
+    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE-1u}));
+    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
+
+    set.shrink_to_fit();
+
+    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
 }
 
 TEST(SparseSet, Insert) {

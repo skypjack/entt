@@ -43,6 +43,7 @@ namespace entt {
 template<typename Entity, typename Allocator>
 class basic_sparse_set {
     static constexpr auto growth_factor = 1.5;
+    static constexpr auto sparse_page = ENTT_SPARSE_PAGE;
 
     using traits_type = entt_traits<Entity>;
 
@@ -160,11 +161,11 @@ class basic_sparse_set {
     };
 
     [[nodiscard]] static auto page(const Entity entt) ENTT_NOEXCEPT {
-        return size_type{(to_integral(entt) & traits_type::entity_mask) / page_size};
+        return size_type{(to_integral(entt) & traits_type::entity_mask) / sparse_page};
     }
 
     [[nodiscard]] static auto offset(const Entity entt) ENTT_NOEXCEPT {
-        return size_type{to_integral(entt) & (page_size - 1)};
+        return size_type{to_integral(entt) & (sparse_page - 1)};
     }
 
     [[nodiscard]] auto assure_page(const std::size_t idx) {
@@ -182,8 +183,8 @@ class basic_sparse_set {
         }
 
         if(!sparse[idx]) {
-            sparse[idx] = alloc_traits::allocate(allocator, page_size);
-            std::uninitialized_fill(sparse[idx], sparse[idx] + page_size, null);
+            sparse[idx] = alloc_traits::allocate(allocator, sparse_page);
+            std::uninitialized_fill(sparse[idx], sparse[idx] + sparse_page, null);
         }
 
         return sparse[idx];
@@ -210,8 +211,8 @@ class basic_sparse_set {
 
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(sparse[pos]) {
-                    std::destroy(sparse[pos], sparse[pos] + page_size);
-                    alloc_traits::deallocate(allocator, sparse[pos], page_size);
+                    std::destroy(sparse[pos], sparse[pos] + sparse_page);
+                    alloc_traits::deallocate(allocator, sparse[pos], sparse_page);
                 }
 
                 bucket_alloc_traits::destroy(bucket_allocator, std::addressof(sparse[pos]));
@@ -376,7 +377,7 @@ public:
      * @return Extent of the sparse set.
      */
     [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
-        return bucket * page_size;
+        return bucket * sparse_page;
     }
 
     /**

@@ -51,6 +51,8 @@ template<typename Entity, typename Type, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The managed type must be at least move constructible and assignable");
 
+    static constexpr auto packed_page = ENTT_PACKED_PAGE;
+
     using underlying_type = basic_sparse_set<Entity>;
     using traits_type = entt_traits<Entity>;
 
@@ -172,23 +174,23 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     };
 
     [[nodiscard]] static auto page(const std::size_t pos) ENTT_NOEXCEPT {
-        return pos / page_size;
+        return pos / packed_page;
     }
 
     [[nodiscard]] static auto offset(const std::size_t pos) ENTT_NOEXCEPT {
-        return pos & (page_size - 1);
+        return pos & (packed_page - 1);
     }
 
     void release_memory() {
         if(packed) {
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(count) {
-                    const auto sz = count > page_size ? page_size : count;
+                    const auto sz = count > packed_page ? packed_page : count;
                     std::destroy(packed[pos], packed[pos] + sz);
                     count -= sz;
                 }
 
-                alloc_traits::deallocate(allocator, packed[pos], page_size);
+                alloc_traits::deallocate(allocator, packed[pos], packed_page);
                 bucket_alloc_traits::destroy(bucket_allocator, std::addressof(packed[pos]));
             }
 
@@ -199,7 +201,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     void maybe_resize_packed(const std::size_t req) {
         ENTT_ASSERT(!(req < count), "Invalid request");
 
-        if(const auto length = std::exchange(bucket, (req + page_size - 1u) / page_size); bucket != length) {
+        if(const auto length = std::exchange(bucket, (req + packed_page - 1u) / packed_page); bucket != length) {
             const auto old = std::exchange(packed, bucket_alloc_traits::allocate(bucket_allocator, bucket));
 
             if(bucket > length) {
@@ -209,7 +211,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
                 }
 
                 for(auto pos = length; pos < bucket; ++pos) {
-                    bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), alloc_traits::allocate(allocator, page_size));
+                    bucket_alloc_traits::construct(bucket_allocator, std::addressof(packed[pos]), alloc_traits::allocate(allocator, packed_page));
                 }
             } else if(bucket < length) {
                 for(size_type pos{}; pos < bucket; ++pos) {
@@ -218,7 +220,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
                 }
 
                 for(auto pos = bucket; pos < length; ++pos) {
-                    alloc_traits::deallocate(allocator, old[pos], page_size);
+                    alloc_traits::deallocate(allocator, old[pos], packed_page);
                     bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
                 }
             }
@@ -229,7 +231,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     template<typename... Args>
     Type & push_back(Args &&... args) {
-        ENTT_ASSERT(count < (bucket * page_size), "No more space left");
+        ENTT_ASSERT(count < (bucket * packed_page), "No more space left");
         auto &ref = packed[page(count)][offset(count)];
 
         if constexpr(std::is_aggregate_v<value_type>) {
@@ -340,7 +342,7 @@ public:
     void reserve(const size_type cap) {
         underlying_type::reserve(cap);
 
-        if(cap > (bucket * page_size)) {
+        if(cap > (bucket * packed_page)) {
             maybe_resize_packed(cap);
         }
     }
@@ -351,7 +353,7 @@ public:
      * @return Capacity of the storage.
      */
     [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
-        return bucket * page_size;
+        return bucket * packed_page;
     }
 
     /*! @brief Requests the removal of unused capacity. */

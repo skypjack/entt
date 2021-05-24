@@ -154,8 +154,8 @@ TEST(Registry, Functionalities) {
     ASSERT_TRUE(registry.empty());
 
     ASSERT_EQ(registry.capacity(), 42u);
-    ASSERT_EQ(registry.capacity<int>(), entt::page_size);
-    ASSERT_EQ(registry.capacity<char>(), entt::page_size);
+    ASSERT_EQ(registry.capacity<int>(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(registry.capacity<char>(), ENTT_PACKED_PAGE);
     ASSERT_EQ(registry.size<int>(), 0u);
     ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE((registry.empty<int, char>()));
@@ -295,8 +295,8 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE(registry.empty<int>());
 
-    ASSERT_EQ(registry.capacity<int>(), entt::page_size);
-    ASSERT_EQ(registry.capacity<char>(), entt::page_size);
+    ASSERT_EQ(registry.capacity<int>(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(registry.capacity<char>(), ENTT_PACKED_PAGE);
 
     registry.shrink_to_fit<int, char>();
 
