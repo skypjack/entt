@@ -532,7 +532,7 @@ public:
         ENTT_ASSERT(!contains(entt), "Set already contains entity");
 
         if(count == reserved) {
-            const size_type sz(reserved * growth_factor);
+            const size_type sz = static_cast<size_type>(reserved * growth_factor);
             resize_packed(sz + !(sz > reserved));
         }
 

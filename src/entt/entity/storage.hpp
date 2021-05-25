@@ -51,8 +51,6 @@ template<typename Entity, typename Type, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The managed type must be at least move constructible and assignable");
 
-    static constexpr auto growth_factor = 1.5;
-
     using underlying_type = basic_sparse_set<Entity>;
     using traits_type = entt_traits<Entity>;
 
@@ -64,7 +62,9 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using bucket_alloc_type = typename std::allocator_traits<Allocator>::template rebind_alloc<alloc_pointer>;
     using bucket_alloc_traits = std::allocator_traits<bucket_alloc_type>;
     using bucket_alloc_pointer = typename bucket_alloc_traits::pointer;
-    using bucket_alloc_const_pointer = typename std::allocator_traits<Allocator>::template rebind_alloc<alloc_const_pointer>::const_pointer;
+
+    using bucket_alloc_const_type = typename std::allocator_traits<Allocator>::template rebind_alloc<alloc_const_pointer>;
+    using bucket_alloc_const_pointer = typename std::allocator_traits<bucket_alloc_const_type>::const_pointer;
 
     using entity_alloc_type = typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>;
 
