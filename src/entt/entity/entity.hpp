@@ -120,7 +120,7 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr auto to_type(const entity_type entity, const version_type version = {}) {
-        return Type{entity | (version << traits_type::entity_shift)};
+        return Type{(entity & traits_type::entity_mask) | (version << traits_type::entity_shift)};
     }
 };
 

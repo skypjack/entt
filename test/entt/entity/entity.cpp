@@ -23,6 +23,7 @@ TEST(Entity, Traits) {
 
     ASSERT_EQ(traits_type::to_type(traits_type::to_entity(entity), traits_type::to_version(entity)), entity);
     ASSERT_EQ(traits_type::to_type(traits_type::to_entity(other), traits_type::to_version(other)), other);
+    ASSERT_NE(traits_type::to_type(traits_type::to_integral(entity)), entity);
 }
 
 TEST(Entity, Null) {
