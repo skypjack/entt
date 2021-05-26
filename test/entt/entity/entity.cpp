@@ -23,21 +23,20 @@ TEST(Entity, Traits) {
 
     ASSERT_EQ(traits_type::to_type(traits_type::to_entity(entity), traits_type::to_version(entity)), entity);
     ASSERT_EQ(traits_type::to_type(traits_type::to_entity(other), traits_type::to_version(other)), other);
-    ASSERT_NE(traits_type::to_type(traits_type::to_integral(entity)), entity);
+    ASSERT_NE(traits_type::to_type(traits_type::to_integral(entity), {}), entity);
 }
 
 TEST(Entity, Null) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     ASSERT_FALSE(entt::entity{} == entt::null);
-    ASSERT_TRUE(entt::entity{traits_type::entity_mask} == entt::null);
-    ASSERT_TRUE(entt::entity{~typename traits_type::entity_type{}} == entt::null);
+    ASSERT_TRUE(entt::entity{traits_type::reserved()} == entt::null);
 
     ASSERT_TRUE(entt::null == entt::null);
     ASSERT_FALSE(entt::null != entt::null);
 
     entt::registry registry{};
-    auto entity = registry.create();
+    const auto entity = registry.create();
 
     registry.emplace<int>(entity, 42);
 
@@ -47,6 +46,36 @@ TEST(Entity, Null) {
     ASSERT_TRUE(entity != entt::null);
     ASSERT_TRUE(entt::null != entity);
 
-    ASSERT_FALSE(registry.valid(entt::null));
-    ASSERT_DEATH((entity = registry.create(entt::null)), "");
+    const entt::entity other = entt::null;
+
+    ASSERT_FALSE(registry.valid(other));
+    ASSERT_NE(registry.create(other), other);
+}
+
+TEST(Entity, Tombstone) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    ASSERT_FALSE(entt::entity{} == entt::tombstone);
+    ASSERT_TRUE(entt::entity{traits_type::reserved()} == entt::tombstone);
+
+    ASSERT_TRUE(entt::tombstone == entt::tombstone);
+    ASSERT_FALSE(entt::tombstone != entt::tombstone);
+
+    entt::registry registry{};
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity, 42);
+
+    ASSERT_FALSE(entity == entt::tombstone);
+    ASSERT_FALSE(entt::tombstone == entity);
+
+    ASSERT_TRUE(entity != entt::tombstone);
+    ASSERT_TRUE(entt::tombstone != entity);
+
+    const auto vers = traits_type::to_version(entt::tombstone);
+    const auto other = traits_type::to_type(traits_type::to_entity(entity), vers);
+
+    ASSERT_FALSE(registry.valid(entt::tombstone));
+    ASSERT_NE(registry.destroy(entity, vers), vers);
+    ASSERT_NE(registry.create(other), other);
 }

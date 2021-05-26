@@ -286,7 +286,7 @@ TEST(Snapshot, Continuous) {
     input_archive<storage_type> input{storage};
 
     for(int i = 0; i < 10; ++i) {
-        src.create();
+        static_cast<void>(src.create());
     }
 
     src.clear();
@@ -549,8 +549,8 @@ TEST(Snapshot, SyncDataMembers) {
     output_archive<storage_type> output{storage};
     input_archive<storage_type> input{storage};
 
-    src.create();
-    src.create();
+    static_cast<void>(src.create());
+    static_cast<void>(src.create());
 
     src.clear();
 

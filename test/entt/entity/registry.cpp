@@ -535,7 +535,7 @@ TEST(Registry, VersionOverflow) {
     ASSERT_NE(registry.current(entity), registry.version(entity));
     ASSERT_NE(registry.current(entity), typename traits_type::version_type{});
 
-    registry.destroy(registry.create(), typename traits_type::version_type{traits_type::version_mask});
+    registry.destroy(registry.create(), traits_type::to_version(traits_type::reserved()) - 1u);
     registry.destroy(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));
@@ -544,9 +544,26 @@ TEST(Registry, VersionOverflow) {
 
 TEST(Registry, NullEntity) {
     entt::registry registry;
+    const entt::entity entity = entt::null;
 
-    ASSERT_FALSE(registry.valid(entt::null));
-    ASSERT_DEATH(static_cast<void>(registry.create(entt::null)), "");
+    ASSERT_FALSE(registry.valid(entity));
+    ASSERT_NE(registry.create(entity), entity);
+}
+
+TEST(Registry, TombstoneVersion) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    const entt::entity entity = entt::tombstone;
+
+    ASSERT_FALSE(registry.valid(entity));
+
+    const auto other = registry.create();
+    const auto vers = traits_type::to_version(entity);
+    const auto required = traits_type::to_type(traits_type::to_entity(other), vers);
+
+    ASSERT_NE(registry.destroy(other, vers), vers);
+    ASSERT_NE(registry.create(required), required);
 }
 
 TEST(Registry, Each) {
@@ -554,18 +571,18 @@ TEST(Registry, Each) {
     entt::registry::size_type tot;
     entt::registry::size_type match;
 
-    registry.create();
+    static_cast<void>(registry.create());
     registry.emplace<int>(registry.create());
-    registry.create();
+    static_cast<void>(registry.create());
     registry.emplace<int>(registry.create());
-    registry.create();
+    static_cast<void>(registry.create());
 
     tot = 0u;
     match = 0u;
 
     registry.each([&](auto entity) {
         if(registry.all_of<int>(entity)) { ++match; }
-        registry.create();
+        static_cast<void>(registry.create());
         ++tot;
     });
 
