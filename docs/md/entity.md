@@ -19,6 +19,7 @@
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
+    * [Tombstone](#tombstone)
     * [To entity](#to-entity)
     * [Dependencies](#dependencies)
     * [Invoke](#invoke)
@@ -621,10 +622,53 @@ const auto entity = registry.create();
 const bool null = (entity == entt::null);
 ```
 
+As for its integral form, the null entity only affects the entity part of an
+identifier and is instead completely transparent to its version.
+
 Be aware that `entt::null` and entity 0 aren't the same thing. Likewise, a zero
 initialized entity isn't the same as `entt::null`. Therefore, although
 `entt::entity{}` is in some sense an alias for entity 0, none of them can be
 used to create a null entity.
+
+### Tombstone
+
+In addition to the null entity, `EnTT` also models the concept of _tombstone_
+with the `entt::tombstone` variable.<br/>
+Once created, the integral form of the two values is the same, although they
+affect different parts of an identifier. In fact, the tombstone uses only the
+version part and is completely transparent to the entity part.
+
+Also in this case, the following expression always returns false:
+
+```cpp
+registry.valid(entt::tombstone);
+```
+
+Moreover, users cannot set set the tombstone version when deleting an entity:
+
+```
+registry.destroy(entity, entt::tombstone);
+```
+
+In this case, a different version number is implicitly generated.<br/>
+The type of a tombstone is internal and can change at any time. However, there
+exist implicit conversions from a tombstone to identifiers of any allowed type:
+
+```cpp
+entt::entity null = entt::tombstone;
+```
+
+Similarly, the tombstone can be compared to any other identifier:
+
+```cpp
+const auto entity = registry.create();
+const bool tombstone = (entity == entt::tombstone);
+```
+
+Be aware that `entt::tombstone` and entity 0 aren't the same thing. Likewise, a
+zero initialized entity isn't the same as `entt::tombstone`. Therefore, although
+`entt::entity{}` is in some sense an alias for entity 0, none of them can be
+used to create tombstones.
 
 ### To entity
 
