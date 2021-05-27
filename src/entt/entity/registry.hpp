@@ -131,17 +131,17 @@ class basic_registry {
     }
 
     auto recycle_identifier() ENTT_NOEXCEPT {
-        ENTT_ASSERT(available != null, "No entities available");
-        const auto curr = traits_type::to_entity(available);
+        ENTT_ASSERT(free_list != null, "No entities available");
+        const auto curr = traits_type::to_entity(free_list);
         const auto version = traits_type::to_version(entities[curr]);
-        available = entities[curr];
+        free_list = entities[curr];
         return entities[curr] = traits_type::to_type(curr, version);
     }
 
     auto release_entity(const Entity entity, const typename traits_type::version_type version) {
         const auto entt = traits_type::to_entity(entity);
-        entities[entt] = traits_type::to_type(traits_type::to_integral(available), version + (traits_type::to_type(null, version) == tombstone));
-        available = traits_type::to_type(entt, {});
+        entities[entt] = traits_type::to_type(traits_type::to_integral(free_list), version + (traits_type::to_type(null, version) == tombstone));
+        free_list = traits_type::to_type(entt, {});
         return traits_type::to_version(entities[entt]);
     }
 
@@ -235,7 +235,7 @@ public:
     [[nodiscard]] size_type alive() const {
         auto sz = entities.size();
 
-        for(auto curr = available; curr != null; --sz) {
+        for(auto curr = free_list; curr != null; --sz) {
             curr = entities[traits_type::to_entity(curr)];
         }
 
@@ -348,7 +348,7 @@ public:
      * @return The head of the list of destroyed entities.
      */
     [[nodiscard]] entity_type destroyed() const ENTT_NOEXCEPT {
-        return available;
+        return free_list;
     }
 
     /**
@@ -389,7 +389,7 @@ public:
      * @return A valid entity identifier.
      */
     [[nodiscard]] entity_type create() {
-        return (available == null) ? entities.emplace_back(generate_identifier(entities.size())) : recycle_identifier();
+        return (free_list == null) ? entities.emplace_back(generate_identifier(entities.size())) : recycle_identifier();
     }
 
     /**
@@ -419,7 +419,7 @@ public:
         } else if(const auto curr = traits_type::to_entity(entities[req]); req == curr) {
             return create();
         } else {
-            auto *it = &available;
+            auto *it = &free_list;
             for(; traits_type::to_entity(*it) != req; it = &entities[traits_type::to_entity(*it)]);
             *it = traits_type::to_type(curr, traits_type::to_version(*it));
             return (entities[req] = hint);
@@ -437,7 +437,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        for(; available != null && first != last; ++first) {
+        for(; free_list != null && first != last; ++first) {
             *first = recycle_identifier();
         }
 
@@ -470,7 +470,7 @@ public:
     void assign(It first, It last, const entity_type destroyed) {
         ENTT_ASSERT(!alive(), "Entities still alive");
         entities.assign(first, last);
-        available = destroyed;
+        free_list = destroyed;
     }
 
     /**
@@ -947,7 +947,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if(available == null) {
+        if(free_list == null) {
             for(auto pos = entities.size(); pos; --pos) {
                 func(entities[pos-1]);
             }
@@ -1619,7 +1619,7 @@ private:
     mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
-    entity_type available{null};
+    entity_type free_list{null};
 };
 
 
