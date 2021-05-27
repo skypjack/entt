@@ -90,17 +90,40 @@ TEST(Storage, Functionalities) {
     pool.shrink_to_fit();
 
     ASSERT_EQ(pool.capacity(), 0u);
+}
+
+TEST(Storage, Move) {
+    entt::storage<int> pool;
+    pool.emplace(entt::entity{3}, 3);
+
+    ASSERT_TRUE(std::is_move_constructible_v<decltype(pool)>);
+    ASSERT_TRUE(std::is_move_assignable_v<decltype(pool)>);
 
     entt::storage<int> other{std::move(pool)};
 
+    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(other.empty());
+    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other.at(0u), entt::entity{3});
+    ASSERT_EQ(other.get(entt::entity{3}), 3);
+
     pool = std::move(other);
 
+    ASSERT_FALSE(pool.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_EQ(pool.at(0u), entt::entity{3});
+    ASSERT_EQ(pool.get(entt::entity{3}), 3);
+    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));
+
     other = entt::storage<int>{};
-    other.emplace(entt::entity{3}, 3);
+    other.emplace(entt::entity{42}, 42);
     other = std::move(pool);
 
-    ASSERT_EQ(pool.capacity(), 0u);
-    ASSERT_EQ(other.capacity(), 0u);
+    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(other.empty());
+    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other.at(0u), entt::entity{3});
+    ASSERT_EQ(other.get(entt::entity{3}), 3);
 }
 
 TEST(Storage, EmptyType) {

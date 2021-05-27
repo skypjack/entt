@@ -61,34 +61,45 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(set[0u], entt::entity{42});
 
+    set.clear();
+
+    ASSERT_TRUE(set.empty());
+    ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
+    ASSERT_EQ(set.begin(), set.end());
+    ASSERT_FALSE(set.contains(entt::entity{0}));
+    ASSERT_FALSE(set.contains(entt::entity{42}));
+}
+
+TEST(SparseSet, Move) {
+    entt::sparse_set set;
+    set.emplace(entt::entity{42});
+
     ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
     ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
 
     entt::sparse_set other{std::move(set)};
 
+    ASSERT_TRUE(set.empty());
+    ASSERT_FALSE(other.empty());
+    ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other.at(0u), entt::entity{42});
+
     set = std::move(other);
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_EQ(set.at(0u), entt::entity{42});
+    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));
 
     other = entt::sparse_set{};
     other.emplace(entt::entity{3});
     other = std::move(set);
 
     ASSERT_TRUE(set.empty());
-    ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
-
     ASSERT_FALSE(other.empty());
-    ASSERT_EQ(other.index(entt::entity{42}), 0u);
+    ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(other.at(0u), entt::entity{42});
-    ASSERT_EQ(other.at(1u), static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(other[0u], entt::entity{42});
-
-    other.clear();
-
-    ASSERT_TRUE(other.empty());
-    ASSERT_EQ(other.size(), 0u);
-    ASSERT_EQ(std::as_const(other).begin(), std::as_const(other).end());
-    ASSERT_EQ(other.begin(), other.end());
-    ASSERT_FALSE(other.contains(entt::entity{0}));
-    ASSERT_FALSE(other.contains(entt::entity{42}));
 }
 
 TEST(SparseSet, Pagination) {

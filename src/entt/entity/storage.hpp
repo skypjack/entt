@@ -302,7 +302,8 @@ public:
      * @param other The instance to move from.
      */
     basic_storage(basic_storage &&other) ENTT_NOEXCEPT
-        : allocator{std::move(other.allocator)},
+        : basic_sparse_set<entity_type, entity_alloc_type>{std::move(other)},
+          allocator{std::move(other.allocator)},
           bucket_allocator{std::move(other.bucket_allocator)},
           packed{std::exchange(other.packed, bucket_alloc_pointer{})},
           bucket{std::exchange(other.bucket, 0u)},
@@ -320,6 +321,8 @@ public:
      * @return This sparse set.
      */
     basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT {
+        basic_sparse_set<entity_type, entity_alloc_type>::operator=(std::move(other));
+
         release_memory();
 
         allocator = std::move(other.allocator);
