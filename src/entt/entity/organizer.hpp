@@ -160,7 +160,7 @@ class basic_organizer final {
             return {};
         } else {
             type_info info[sizeof...(Type)]{type_id<Type>()...};
-            const auto length = std::min(count, sizeof...(Type));
+            const auto length = (std::min)(count, sizeof...(Type));
             std::copy_n(info, length, buffer);
             return length;
         }
