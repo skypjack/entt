@@ -10,6 +10,7 @@ WIP:
 
 WIP:
 * page size: split sparse/packed sizes, reduce comp page size, add per-pool size, allow for 0 sizes (old fully packed array)
+* make it possible to register externally managed pools with the registry (allow for system centric mode)
 * registry: switch to the udata/mixin model and get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
 * make pools available (registry/view/group), review operator| for views
 * compressed pair to exploit ebo in sparse set and the others
