@@ -7,6 +7,9 @@
 #include <gtest/gtest.h>
 #include <entt/entity/storage.hpp>
 #include <entt/entity/fwd.hpp>
+#include "throwing_allocator.hpp"
+#include "throwing_component.hpp"
+#include "throwing_entity.hpp"
 
 struct empty_type {};
 struct boxed_int { int value; };
@@ -14,15 +17,6 @@ struct boxed_int { int value; };
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
     return lhs.value == rhs.value;
 }
-
-struct throwing_component {
-    struct constructor_exception: std::exception {};
-
-    [[noreturn]] throwing_component() { throw constructor_exception{}; }
-
-    // necessary to disable the empty type optimization
-    int data;
-};
 
 struct update_from_destructor {
     ~update_from_destructor() {
@@ -760,18 +754,6 @@ TEST(Storage, MoveOnlyComponent) {
     (void)pool;
 }
 
-TEST(Storage, EmplaceStrongExceptionGuarantee) {
-    entt::storage<throwing_component> pool;
-
-    try {
-        pool.emplace(entt::entity{0});
-    } catch (const throwing_component::constructor_exception &) {
-        ASSERT_TRUE(pool.empty());
-    }
-
-    ASSERT_TRUE(pool.empty());
-}
-
 TEST(Storage, UpdateFromDestructor) {
     static constexpr auto size = 10u;
 
@@ -795,4 +777,119 @@ TEST(Storage, UpdateFromDestructor) {
     test(entt::null);
     test(entt::entity(size - 1u));
     test(entt::entity{0u});
+}
+
+TEST(Storage, ThrowingEntity) {
+    entt::basic_storage<test::throwing_entity, int> pool;
+    test::throwing_entity::trigger_on_entity = 42u;
+
+    // strong exception safety
+    ASSERT_THROW(pool.emplace(42, 0), typename test::throwing_entity::exception_type);
+    ASSERT_TRUE(pool.empty());
+
+    const test::throwing_entity entities[2u]{42, 1};
+    const int components[2u]{42, 1};
+
+    // basic exception safety
+    ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), 1), typename test::throwing_entity::exception_type);
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_FALSE(pool.contains(1));
+
+    // basic exception safety
+    ASSERT_THROW(pool.insert(std::rbegin(entities), std::rend(entities), 1), typename test::throwing_entity::exception_type);
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_TRUE(pool.contains(1));
+    ASSERT_EQ(pool.get(1), 1);
+
+    pool.clear();
+
+    // basic exception safety
+    ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), std::begin(components)), typename test::throwing_entity::exception_type);
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_FALSE(pool.contains(1));
+
+    // basic exception safety
+    ASSERT_THROW(pool.insert(std::rbegin(entities), std::rend(entities), std::rbegin(components)), typename test::throwing_entity::exception_type);
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_TRUE(pool.contains(1));
+    ASSERT_EQ(pool.get(1), 1);
+}
+
+TEST(Storage, ThrowingComponent) {
+    entt::storage<test::throwing_component> pool;
+    test::throwing_component::trigger_on_value = 42;
+
+    // strong exception safety
+    ASSERT_THROW(pool.emplace(entt::entity{0}, test::throwing_component{42}), typename test::throwing_component::exception_type);
+    ASSERT_TRUE(pool.empty());
+
+    const entt::entity entities[2u]{entt::entity{42}, entt::entity{1}};
+    const test::throwing_component components[2u]{42, 1};
+
+    // basic exception safety
+    ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), test::throwing_component{42}), typename test::throwing_component::exception_type);
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_FALSE(pool.contains(entt::entity{1}));
+
+    // basic exception safety
+    ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), std::begin(components)), typename test::throwing_component::exception_type);
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_FALSE(pool.contains(entt::entity{1}));
+
+    // basic exception safety
+    ASSERT_THROW(pool.insert(std::rbegin(entities), std::rend(entities), std::rbegin(components)), typename test::throwing_component::exception_type);
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_TRUE(pool.contains(entt::entity{1}));
+    ASSERT_EQ(pool.get(entt::entity{1}), 1);
+
+    pool.clear();
+    pool.emplace(entt::entity{1}, 1);
+    pool.emplace(entt::entity{42}, 42);
+
+    ASSERT_THROW(pool.erase(entt::entity{1}), typename test::throwing_component::exception_type);
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_TRUE(pool.contains(entt::entity{42}));
+    ASSERT_FALSE(pool.contains(entt::entity{1}));
+    ASSERT_EQ(pool.at(0u), entt::entity{42});
+    ASSERT_EQ(pool.at(1u), static_cast<entt::entity>(entt::null));
+    // basice exception safety: no-leak guarantee, stored data contain valid values which may differ from the original values
+    ASSERT_EQ(pool.get(entt::entity{42}), 1);
+}
+
+TEST(Storage, ThrowingAllocator) {
+    entt::basic_storage<entt::entity, int, test::throwing_allocator<int>> pool;
+
+    test::throwing_allocator<int>::trigger_on_allocate = true;
+
+    // strong exception safety
+    ASSERT_THROW(pool.reserve(1u), test::throwing_allocator<int>::exception_type);
+    ASSERT_EQ(pool.capacity(), 0u);
+
+    test::throwing_allocator<int>::trigger_after_allocate = true;
+
+    // strong exception safety
+    ASSERT_THROW(pool.reserve(2 * ENTT_PACKED_PAGE), test::throwing_allocator<int>::exception_type);
+    ASSERT_EQ(pool.capacity(), 0u);
+
+    test::throwing_allocator<int>::trigger_on_pointer_copy = true;
+
+    // strong exception safety
+    ASSERT_THROW(pool.reserve(1u), test::throwing_allocator<int>::exception_type);
+    ASSERT_EQ(pool.capacity(), 0u);
+
+    pool.reserve(2 * ENTT_PACKED_PAGE);
+    test::throwing_allocator<test::throwing_allocator<int>::pointer>::trigger_on_pointer_copy = true;
+
+    // strong exception safety
+    ASSERT_THROW(pool.shrink_to_fit(), test::throwing_allocator<test::throwing_allocator<int>::pointer>::exception_type);
+    ASSERT_EQ(pool.capacity(), 2 * ENTT_PACKED_PAGE);
+
+    pool.shrink_to_fit();
+    test::throwing_allocator<int>::trigger_on_allocate = true;
+
+    // strong exception safety
+    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator<int>::exception_type);
+    ASSERT_FALSE(pool.contains(entt::entity{0}));
+    ASSERT_TRUE(pool.empty());
 }

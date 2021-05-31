@@ -7,6 +7,8 @@
 #include <gtest/gtest.h>
 #include <entt/entity/sparse_set.hpp>
 #include <entt/entity/fwd.hpp>
+#include "throwing_allocator.hpp"
+#include "throwing_entity.hpp"
 
 struct empty_type {};
 struct boxed_int { int value; };
@@ -579,4 +581,79 @@ TEST(SparseSet, CanModifyDuringIteration) {
     // this should crash with asan enabled if we break the constraint
     const auto entity = *it;
     (void)entity;
+}
+
+TEST(SparseSet, ThrowingEntity) {
+    entt::basic_sparse_set<test::throwing_entity> set{};
+    test::throwing_entity::trigger_on_entity = 0u;
+
+    // strong exception safety
+    ASSERT_THROW(set.emplace(42), typename test::throwing_entity::exception_type);
+    ASSERT_TRUE(set.empty());
+
+    test::throwing_entity::trigger_on_entity = 42u;
+    const test::throwing_entity entities[2u]{42, 1};
+
+    // basic exception safety
+    ASSERT_THROW(set.insert(std::begin(entities), std::end(entities)), typename test::throwing_entity::exception_type);
+    ASSERT_EQ(set.size(), 0u);
+    ASSERT_FALSE(set.contains(1));
+
+    // basic exception safety
+    ASSERT_THROW(set.insert(std::rbegin(entities), std::rend(entities)), typename test::throwing_entity::exception_type);
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_TRUE(set.contains(1));
+}
+
+TEST(SparseSet, ThrowingAllocator) {
+    entt::basic_sparse_set<entt::entity, test::throwing_allocator<entt::entity>> set{};
+
+    test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
+
+    // strong exception safety
+    ASSERT_THROW(set.reserve(1u), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_EQ(set.capacity(), 0u);
+    ASSERT_EQ(set.extent(), 0u);
+
+    set.emplace(entt::entity{0});
+    test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
+
+    // strong exception safety
+    ASSERT_THROW(set.reserve(2u), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_EQ(set.capacity(), 1u);
+    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_TRUE(set.contains(entt::entity{0}));
+
+    test::throwing_allocator<entt::entity>::trigger_on_pointer_copy = true;
+
+    // strong exception safety
+    ASSERT_THROW(set.reserve(2u), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_EQ(set.capacity(), 1u);
+    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_TRUE(set.contains(entt::entity{0}));
+
+    set.reserve(ENTT_PACKED_PAGE);
+    test::throwing_allocator<entt::entity>::trigger_on_pointer_copy = true;
+
+    // strong exception safety
+    ASSERT_THROW(set.emplace(entt::entity{ENTT_SPARSE_PAGE + 1u}), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_EQ(set.capacity(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_TRUE(set.contains(entt::entity{0}));
+
+    // unnecessary but they test a bit of template machinery :)
+    set.clear();
+    set.shrink_to_fit();
+    set = decltype(set){};
+
+    set.reserve(ENTT_PACKED_PAGE);
+    set.emplace(entt::entity{ENTT_SPARSE_PAGE + 1u});
+    test::throwing_allocator<entt::entity>::trigger_on_pointer_copy = true;
+
+    // strong exception safety
+    ASSERT_THROW(set.emplace(entt::entity{0}), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_EQ(set.capacity(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
+    ASSERT_FALSE(set.contains(entt::entity{0}));
+    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE + 1u}));
 }

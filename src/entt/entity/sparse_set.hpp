@@ -47,20 +47,18 @@ class basic_sparse_set {
 
     using traits_type = entt_traits<Entity>;
 
-    using alloc_type = typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>;
-    using alloc_traits = std::allocator_traits<alloc_type>;
+    using alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<Entity>;
     using alloc_pointer = typename alloc_traits::pointer;
     using alloc_const_pointer = typename alloc_traits::const_pointer;
 
-    using bucket_alloc_type = typename std::allocator_traits<Allocator>::template rebind_alloc<alloc_pointer>;
-    using bucket_alloc_traits = std::allocator_traits<bucket_alloc_type>;
+    using bucket_alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<alloc_pointer>;
     using bucket_alloc_pointer = typename bucket_alloc_traits::pointer;
 
     static_assert(alloc_traits::propagate_on_container_move_assignment::value);
     static_assert(bucket_alloc_traits::propagate_on_container_move_assignment::value);
 
     class sparse_set_iterator final {
-        friend class basic_sparse_set<Entity>;
+        friend class basic_sparse_set<Entity, Allocator>;
 
         using index_type = typename traits_type::difference_type;
 
@@ -189,7 +187,7 @@ class basic_sparse_set {
 
             std::destroy(sparse, sparse + bucket);
             bucket_alloc_traits::deallocate(bucket_allocator, sparse, bucket);
-            
+
             sparse = mem;
             bucket = sz;
         }
@@ -302,7 +300,7 @@ protected:
 
 public:
     /*! @brief Allocator type. */
-    using allocator_type = alloc_type;
+    using allocator_type = typename alloc_traits::allocator_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -450,7 +448,7 @@ public:
      * @return An iterator to the first entity of the internal packed array.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{&packed, static_cast<typename traits_type::difference_type>(count)};
+        return iterator{std::addressof(packed), static_cast<typename traits_type::difference_type>(count)};
     }
 
     /**
@@ -464,7 +462,7 @@ public:
      * internal packed array.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{&packed, {}};
+        return iterator{std::addressof(packed), {}};
     }
 
     /**
@@ -785,8 +783,8 @@ public:
     }
 
 private:
-    alloc_type allocator;
-    bucket_alloc_type bucket_allocator;
+    typename alloc_traits::allocator_type allocator;
+    typename bucket_alloc_traits::allocator_type bucket_allocator;
     bucket_alloc_pointer sparse;
     alloc_pointer packed;
     std::size_t bucket;
