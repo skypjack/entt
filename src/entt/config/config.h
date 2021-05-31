@@ -2,8 +2,16 @@
 #define ENTT_CONFIG_CONFIG_H
 
 
-#ifndef ENTT_NOEXCEPT
+#if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #   define ENTT_NOEXCEPT noexcept
+#   define ENTT_THROW throw
+#   define ENTT_TRY try
+#   define ENTT_CATCH catch(...)
+#else
+#   define ENTT_NOEXCEPT
+#   define ENTT_THROW
+#   define ENTT_TRY if(true)
+#   define ENTT_CATCH if(false)
 #endif
 
 

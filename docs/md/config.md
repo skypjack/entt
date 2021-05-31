@@ -7,7 +7,7 @@
 
 * [Introduction](#introduction)
 * [Definitions](#definitions)
-  * [ENTT_NOEXCEPT](#entt_noexcept)
+  * [ENTT_NOEXCEPTION](#entt_noexcept)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
   * [ENTT_ID_TYPE](#entt_id_type)
   * [ENTT_SPARSE_PAGE](#entt_sparse_page)
@@ -38,11 +38,11 @@ Each parameter can result in internal library definitions. It's not recommended
 to try to also modify these definitions, since there is no guarantee that they
 will remain stable over time unlike the options below.
 
-## ENTT_NOEXCEPT
+## ENTT_NOEXCEPTION
 
-The purpose of this parameter is to suppress the use of `noexcept` by this
-library.<br/>
-To do this, simply define the variable without assigning any value to it.
+This parameter can be used to switch off exception handling in `EnTT`.<br/>
+To do this, simply define the variable without assigning any value to it. This
+is roughly equivalent to setting the compiler flag `-ff-noexceptions`.
 
 ## ENTT_USE_ATOMIC
 
