@@ -171,20 +171,40 @@ class basic_sparse_set {
     [[nodiscard]] auto assure_page(const std::size_t idx) {
         if(!(idx < bucket)) {
             const size_type sz = idx + 1u;
-            const auto old = std::exchange(sparse, bucket_alloc_traits::allocate(bucket_allocator, sz));
-            std::uninitialized_fill(sparse + bucket, sparse + sz, alloc_pointer{});
+            const auto mem = bucket_alloc_traits::allocate(bucket_allocator, sz);
 
-            for(size_type pos{}; pos < bucket; ++pos) {
-                bucket_alloc_traits::construct(bucket_allocator, std::addressof(sparse[pos]), std::move(old[pos]));
-                bucket_alloc_traits::destroy(bucket_allocator, std::addressof(old[pos]));
+            ENTT_TRY {
+                std::uninitialized_value_construct(mem + bucket, mem + sz);
+
+                ENTT_TRY {
+                    std::uninitialized_copy(sparse, sparse + bucket, mem);
+                } ENTT_CATCH {
+                    std::destroy(mem + bucket, mem + sz);
+                    ENTT_THROW;
+                }
+            } ENTT_CATCH {
+                bucket_alloc_traits::deallocate(bucket_allocator, mem, sz);
+                ENTT_THROW;
             }
 
-            bucket_alloc_traits::deallocate(bucket_allocator, old, std::exchange(bucket, sz));
+            std::destroy(sparse, sparse + bucket);
+            bucket_alloc_traits::deallocate(bucket_allocator, sparse, bucket);
+            
+            sparse = mem;
+            bucket = sz;
         }
 
         if(!sparse[idx]) {
-            sparse[idx] = alloc_traits::allocate(allocator, sparse_page);
-            std::uninitialized_fill(sparse[idx], sparse[idx] + sparse_page, null);
+            const auto mem = alloc_traits::allocate(allocator, sparse_page);
+
+            ENTT_TRY {
+                std::uninitialized_fill(mem, mem + sparse_page, null);
+            } ENTT_CATCH {
+                alloc_traits::deallocate(allocator, mem, sparse_page);
+                ENTT_THROW;
+            }
+
+            sparse[idx] = mem;
         }
 
         return sparse[idx];
@@ -192,41 +212,49 @@ class basic_sparse_set {
 
     void resize_packed(const std::size_t req) {
         ENTT_ASSERT((req != reserved) && !(req < count), "Invalid request");
-        auto old = std::exchange(packed, alloc_traits::allocate(allocator, req));
+        const auto mem = alloc_traits::allocate(allocator, req);
 
-        for(size_type pos{}; pos < count; ++pos) {
-            alloc_traits::construct(allocator, std::addressof(packed[pos]), std::move(old[pos]));
-            alloc_traits::destroy(allocator, std::addressof(old[pos]));
+        ENTT_TRY {
+            std::uninitialized_copy(packed, packed + count, mem);
+        } ENTT_CATCH {
+            alloc_traits::deallocate(allocator, mem, req);
+            ENTT_THROW;
         }
 
-        alloc_traits::deallocate(allocator, old, std::exchange(reserved, req));
+        std::destroy(packed, packed + count);
+        alloc_traits::deallocate(allocator, packed, reserved);
+
+        packed = mem;
+        reserved = req;
     }
 
     void release_memory() {
         if(packed) {
-            ENTT_ASSERT(sparse, "Something very wrong happened");
-
-            std::destroy(packed, packed + std::exchange(count, 0u));
-            alloc_traits::deallocate(allocator, std::exchange(packed, alloc_pointer{}), std::exchange(reserved, 0u));
-
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(sparse[pos]) {
                     std::destroy(sparse[pos], sparse[pos] + sparse_page);
                     alloc_traits::deallocate(allocator, sparse[pos], sparse_page);
                 }
-
-                bucket_alloc_traits::destroy(bucket_allocator, std::addressof(sparse[pos]));
             }
 
-            bucket_alloc_traits::deallocate(bucket_allocator, sparse, std::exchange(bucket, 0u));
+            std::destroy(packed, packed + count);
+            std::destroy(sparse, sparse + bucket);
+            alloc_traits::deallocate(allocator, packed, reserved);
+            bucket_alloc_traits::deallocate(bucket_allocator, sparse, bucket);
         }
     }
 
     void push_back(const Entity entt) {
         ENTT_ASSERT(count != reserved, "No more space left");
-        assure_page(page(entt))[offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(count)};
         alloc_traits::construct(allocator, std::addressof(packed[count]), entt);
-        // exception safety guarantee requires to update this after construction
+
+        ENTT_TRY {
+            assure_page(page(entt))[offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(count)};
+        } ENTT_CATCH {
+            alloc_traits::destroy(allocator, std::addressof(packed[count]));
+            ENTT_THROW;
+        }
+
         ++count;
     }
 
@@ -237,15 +265,17 @@ class basic_sparse_set {
 
         auto &ref = sparse[page(entt)][offset(entt)];
         const auto pos = size_type{traits_type::to_integral(ref)};
+        auto &last = packed[count - 1u];
 
-        const auto last = --count;
-        packed[pos] = std::exchange(packed[last], entt);
-        sparse[page(packed[pos])][offset(packed[pos])] = ref;
+        // basic no-leak guarantee (with invalid state) if copy assignment operators throw
+        std::swap(sparse[page(last)][offset(last)], ref);
+        // swapping with entt isn't strictly required but it prevents nasty bugs
+        std::swap(packed[pos], last);
         // no risks when pos == count, accessing packed is no longer required
-        alloc_traits::destroy(allocator, std::addressof(packed[last]));
         ref = null;
 
         // don't expect exceptions here, instead allow for nosy destructors
+        alloc_traits::destroy(allocator, std::addressof(packed[--count]));
         swap_and_pop(pos);
     }
 
@@ -635,9 +665,8 @@ public:
         const auto from = index(lhs);
         const auto to = index(rhs);
 
-        // derived classes first for a bare-minimum exception safety guarantee
+        // basic no-leak guarantee (with invalid state) if swapping throws
         swap_at(from, to);
-
         std::swap(sparse[page(lhs)][offset(lhs)], sparse[page(rhs)][offset(rhs)]);
         std::swap(packed[from], packed[to]);
     }
@@ -674,8 +703,8 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&... args) {
+        // basic no-leak guarantee (with invalid state) if sorting throws
         ENTT_ASSERT(!(length > count), "Length exceeds the number of elements");
-
         algo(std::make_reverse_iterator(packed + length), std::make_reverse_iterator(packed), std::move(compare), std::forward<Args>(args)...);
 
         for(size_type pos{}; pos < length; ++pos) {
@@ -736,6 +765,7 @@ public:
         while(pos && from != to) {
             if(contains(*from)) {
                 if(*from != packed[pos]) {
+                    // basic no-leak guarantee (with invalid state) if swapping throws
                     swap(packed[pos], *from);
                 }
 
