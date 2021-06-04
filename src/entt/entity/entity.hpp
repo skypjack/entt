@@ -124,6 +124,17 @@ public:
     }
 
     /**
+     * @brief Constructs an identifier from its parts.
+     * @param entity The entity part of the identifier.
+     * @param version The version part of the identifier.
+     * @return A properly constructed identifier.
+     */
+    [[nodiscard]] static constexpr auto to_type(const Type entity, const Type version) ENTT_NOEXCEPT {
+        constexpr auto mask = (traits_type::version_mask << traits_type::entity_shift);
+        return Type{(to_integral(entity) & traits_type::entity_mask) | (to_integral(version) & mask)};
+    }
+
+    /**
      * @brief Returns the reserved identifer.
      * @return The reserved identifier.
      */
@@ -150,7 +161,7 @@ struct null_t {
     /**
      * @brief Converts the null object to identifiers of any type.
      * @tparam Entity Type of entity identifier.
-     * @return The null representation for the given identifier.
+     * @return The null representation for the given type.
      */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
@@ -194,6 +205,17 @@ struct null_t {
     [[nodiscard]] constexpr bool operator!=(const Entity &entity) const ENTT_NOEXCEPT {
         return !(entity == *this);
     }
+
+    /**
+     * @brief Creates a null object from an entity identifier of any type.
+     * @tparam Entity Type of entity identifier.
+     * @param entity Entity identifier to turn into a null object.
+     * @return The null representation for the given identifier.
+     */
+    template<typename Entity>
+    [[nodiscard]] constexpr Entity operator|(const Entity &entity) const ENTT_NOEXCEPT {
+        return entt_traits<Entity>::to_type(*this, entity);
+    }
 };
 
 
@@ -228,7 +250,7 @@ struct tombstone_t {
     /**
      * @brief Converts the tombstone object to identifiers of any type.
      * @tparam Entity Type of entity identifier.
-     * @return The tombstone representation for the given identifier.
+     * @return The tombstone representation for the given type.
      */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
@@ -252,7 +274,7 @@ struct tombstone_t {
     }
 
     /**
-     * @brief Compares a null tombstone and an entity identifier of any type.
+     * @brief Compares a tombstone object and an entity identifier of any type.
      * @tparam Entity Type of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
@@ -269,8 +291,19 @@ struct tombstone_t {
      * @return True if the two elements differ, false otherwise.
      */
     template<typename Entity>
-        [[nodiscard]] constexpr bool operator!=(const Entity &entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(const Entity &entity) const ENTT_NOEXCEPT {
         return !(entity == *this);
+    }
+
+    /**
+     * @brief Creates a tombstone object from an entity identifier of any type.
+     * @tparam Entity Type of entity identifier.
+     * @param entity Entity identifier to turn into a tombstone object.
+     * @return The tombstone representation for the given identifier.
+     */
+    template<typename Entity>
+    [[nodiscard]] constexpr Entity operator|(const Entity &entity) const ENTT_NOEXCEPT {
+        return entt_traits<Entity>::to_type(entity, *this);
     }
 };
 
