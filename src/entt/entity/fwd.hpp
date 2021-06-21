@@ -22,7 +22,7 @@ class basic_registry;
 
 
 template<typename...>
-class basic_view;
+struct basic_view;
 
 
 template<typename>
