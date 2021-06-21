@@ -5,6 +5,14 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
 
+struct stable_type { int value; };
+
+template<>
+struct entt::component_traits<stable_type> {
+    using in_place_delete = std::true_type;
+    using ignore_if_empty = std::true_type;
+};
+
 TEST(RuntimeView, Functionalities) {
     entt::registry registry;
 
@@ -223,4 +231,44 @@ TEST(RuntimeView, ExcludedComponents) {
     view.each([e0](auto entity) {
         ASSERT_EQ(e0, entity);
     });
+}
+
+TEST(RuntimeView, StableType) {
+    entt::registry registry;
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+    const auto e2 = registry.create();
+
+    registry.emplace<int>(e0);
+    registry.emplace<int>(e1);
+    registry.emplace<int>(e2);
+
+    registry.emplace<stable_type>(e0);
+    registry.emplace<stable_type>(e1);
+
+    registry.remove<stable_type>(e1);
+
+    entt::id_type components[] = { entt::type_hash<int>::value(), entt::type_hash<stable_type>::value() };
+    auto view = registry.runtime_view(std::begin(components), std::end(components));
+
+    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_TRUE(view.contains(e0));
+    ASSERT_FALSE(view.contains(e1));
+
+    ASSERT_EQ(*view.begin(), e0);
+    ASSERT_EQ(++view.begin(), view.end());
+
+    view.each([e0](const auto entt) {
+        ASSERT_EQ(e0, entt);
+    });
+
+    for(auto entt: view) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        ASSERT_EQ(e0, entt);
+    }
+
+    registry.compact();
+
+    ASSERT_EQ(view.size_hint(), 1u);
 }

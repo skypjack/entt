@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
+#include "entity.hpp"
 #include "sparse_set.hpp"
 #include "fwd.hpp"
 
@@ -60,8 +61,11 @@ class basic_runtime_view final {
 
     class view_iterator final {
         [[nodiscard]] bool valid() const {
-            return std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) { return curr->contains(entt); })
-                    && std::none_of(filter->cbegin(), filter->cend(), [entt = *it](const auto *curr) { return curr && curr->contains(entt); });
+            const auto entt = *it;
+
+            return (!stable_storage || (entt != tombstone))
+                && std::all_of(pools->begin()++, pools->end(), [entt](const auto *curr) { return curr->contains(entt); })
+                && std::none_of(filter->cbegin(), filter->cend(), [entt](const auto *curr) { return curr && curr->contains(entt); });
         }
 
     public:
@@ -76,7 +80,8 @@ class basic_runtime_view final {
         view_iterator(const std::vector<const basic_common_type *> &cpools, const std::vector<const basic_common_type *> &ignore, underlying_iterator curr) ENTT_NOEXCEPT
             : pools{&cpools},
               filter{&ignore},
-              it{curr}
+              it{curr},
+              stable_storage{std::any_of(pools->cbegin(), pools->cend(), [](const basic_common_type *curr) { return (curr->policy() == deletion_policy::in_place); })}
         {
             if(it != (*pools)[0]->end() && !valid()) {
                 ++(*this);
@@ -123,6 +128,7 @@ class basic_runtime_view final {
         const std::vector<const basic_common_type *> *pools;
         const std::vector<const basic_common_type *> *filter;
         underlying_iterator it;
+        bool stable_storage;
     };
 
     [[nodiscard]] bool valid() const {
@@ -152,12 +158,10 @@ public:
         : pools{std::move(cpools)},
           filter{std::move(epools)}
     {
-        const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
-            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
-        });
-
         // brings the best candidate (if any) on front of the vector
-        std::rotate(pools.begin(), it, pools.end());
+        std::rotate(pools.begin(), std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
+            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
+        }), pools.end());
     }
 
     /**
