@@ -330,7 +330,7 @@ public:
           count{0u},
           reserved{0u},
           free_list{tombstone},
-          policy{pol}
+          mode{pol}
     {}
 
     /**
@@ -354,7 +354,7 @@ public:
           count{std::exchange(other.count, 0u)},
           reserved{std::exchange(other.reserved, 0u)},
           free_list{std::exchange(other.free_list, tombstone)},
-          policy{other.policy}
+          mode{other.mode}
     {}
 
     /*! @brief Default destructor. */
@@ -378,9 +378,17 @@ public:
         count = std::exchange(other.count, 0u);
         reserved = std::exchange(other.reserved, 0u);
         free_list = std::exchange(other.free_list, tombstone);
-        policy = other.policy;
+        mode = other.mode;
 
         return *this;
+    }
+
+    /**
+     * @brief Returns the deletion policy of a sparse set.
+     * @return The deletion policy of the sparse set.
+     */
+    deletion_policy policy() const ENTT_NOEXCEPT {
+        return mode;
     }
 
     /**
@@ -630,7 +638,7 @@ public:
      */
     void erase(const entity_type entt, void *ud = nullptr) {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
-        (policy == deletion_policy::in_place) ? stable_erase(entt, ud) : unstable_erase(entt, ud);
+        (mode == deletion_policy::in_place) ? stable_erase(entt, ud) : unstable_erase(entt, ud);
     }
 
     /**
@@ -854,7 +862,7 @@ private:
     std::size_t count;
     std::size_t reserved;
     entity_type free_list;
-    deletion_policy policy;
+    deletion_policy mode;
 };
 
 

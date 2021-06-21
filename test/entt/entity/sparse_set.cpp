@@ -222,6 +222,7 @@ TEST(SparseSet, Erase) {
     entities[1u] = entt::entity{42};
     entities[2u] = entt::entity{9};
 
+    ASSERT_EQ(set.policy(), entt::deletion_policy::swap_and_pop);
     ASSERT_TRUE(set.empty());
 
     ASSERT_DEATH(set.erase(std::begin(entities), std::end(entities)), "");
@@ -261,6 +262,7 @@ TEST(SparseSet, StableErase) {
     entities[1u] = entt::entity{42};
     entities[2u] = entt::entity{9};
 
+    ASSERT_EQ(set.policy(), entt::deletion_policy::in_place);
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
 
@@ -350,6 +352,7 @@ TEST(SparseSet, Remove) {
     entities[1u] = entt::entity{42};
     entities[2u] = entt::entity{9};
 
+    ASSERT_EQ(set.policy(), entt::deletion_policy::swap_and_pop);
     ASSERT_TRUE(set.empty());
 
     ASSERT_EQ(set.remove(std::begin(entities), std::end(entities)), 0u);
@@ -393,6 +396,7 @@ TEST(SparseSet, StableRemove) {
     entities[1u] = entt::entity{42};
     entities[2u] = entt::entity{9};
 
+    ASSERT_EQ(set.policy(), entt::deletion_policy::in_place);
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
 
