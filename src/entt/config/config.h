@@ -60,12 +60,12 @@ static_assert(ENTT_PACKED_PAGE && ((ENTT_PACKED_PAGE & (ENTT_PACKED_PAGE - 1)) =
 #endif
 
 
-#ifndef ENTT_NO_ETO
+#ifdef ENTT_NO_ETO
 #   include <type_traits>
-#   define ENTT_IS_EMPTY(Type) std::is_empty<Type>
+#   define ENTT_IGNORE_IF_EMPTY std::false_type
 #else
 #   include <type_traits>
-#   define ENTT_IS_EMPTY(Type) std::false_type
+#   define ENTT_IGNORE_IF_EMPTY std::true_type
 #endif
 
 

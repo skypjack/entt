@@ -567,23 +567,6 @@ inline constexpr auto is_complete_v = is_complete<Type>::value;
 
 
 /**
- * @brief Provides the member constant `value` to true if a given type is empty
- * and the empty type optimization is enabled, false otherwise.
- * @tparam Type Potential empty type.
- */
-template<typename Type, typename = void>
-struct is_empty: ENTT_IS_EMPTY(Type) {};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potential empty type.
- */
-template<typename Type>
-inline constexpr auto is_empty_v = is_empty<Type>::value;
-
-
-/**
  * @brief Transcribes the constness of a type to another type.
  * @tparam To The type to which to transcribe the constness.
  * @tparam From The type from which to transcribe the constness.

@@ -698,7 +698,7 @@ private:
 
 /*! @copydoc basic_storage */
 template<typename Entity, typename Type, typename Allocator>
-class basic_storage<Entity, Type, Allocator, std::enable_if_t<is_empty_v<Type>>>: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
+class basic_storage<Entity, Type, Allocator, std::enable_if_t<std::conjunction_v<ENTT_IGNORE_IF_EMPTY, std::is_empty<Type>>>>: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using underlying_type = basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>;
 
 public:
