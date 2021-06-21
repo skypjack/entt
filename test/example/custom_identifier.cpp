@@ -7,15 +7,15 @@ struct entity_id {
     using entity_type = std::uint32_t;
     static constexpr auto null = entt::null;
 
-    constexpr entity_id(entity_type value = null)
+    constexpr entity_id(entity_type value = null) ENTT_NOEXCEPT
         : entt{value}
     {}
 
-    constexpr entity_id(const entity_id &other)
+    constexpr entity_id(const entity_id &other) ENTT_NOEXCEPT
         : entt{other.entt}
     {}
 
-    constexpr operator entity_type() const {
+    constexpr operator entity_type() const ENTT_NOEXCEPT {
         return entt;
     }
 
