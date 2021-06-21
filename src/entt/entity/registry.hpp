@@ -16,6 +16,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
@@ -58,6 +59,7 @@ class basic_registry {
 
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
+        static_assert(!std::disjunction_v<typename component_traits<Owned>::in_place_delete...>, "Groups do not support in-place delete");
         static_assert(std::conjunction_v<std::is_same<Owned, std::remove_const_t<Owned>>..., std::is_same<Get, std::remove_const_t<Get>>..., std::is_same<Exclude, std::remove_const_t<Exclude>>...>, "One or more component types are invalid");
         std::conditional_t<sizeof...(Owned) == 0, basic_sparse_set<Entity>, std::size_t> current{};
 
@@ -133,15 +135,14 @@ class basic_registry {
     auto recycle_identifier() ENTT_NOEXCEPT {
         ENTT_ASSERT(free_list != null, "No entities available");
         const auto curr = traits_type::to_entity(free_list);
-        const auto version = traits_type::to_version(entities[curr]);
-        free_list = entities[curr];
-        return entities[curr] = traits_type::to_type(curr, version);
+        free_list = traits_type::to_type(entities[curr], tombstone);
+        return (entities[curr] = traits_type::to_type(curr, traits_type::to_version(entities[curr])));
     }
 
     auto release_entity(const Entity entity, const typename traits_type::version_type version) {
         const auto entt = traits_type::to_entity(entity);
         entities[entt] = traits_type::to_type(traits_type::to_integral(free_list), version + (traits_type::to_type(null, version) == tombstone));
-        free_list = traits_type::to_type(entt, {});
+        free_list = traits_type::to_type(entt, traits_type::to_version(tombstone));
         return traits_type::to_version(entities[entt]);
     }
 
@@ -741,6 +742,24 @@ public:
     void erase(It first, It last) {
         for(; first != last; ++first) {
             erase<Component...>(*first);
+        }
+    }
+
+    /**
+     * @brief Removes all tombstones from a registry or only the pools for the
+     * given components.
+     * @tparam Component Types of components for which to clear all tombstones.
+     */
+    template<typename... Component>
+    void compact() {
+        if constexpr(sizeof...(Component) == 0) {
+            for(auto pos = pools.size(); pos; --pos) {
+                if(auto &pdata = pools[pos-1]; pdata.pool) {
+                    pdata.pool->compact();
+                }
+            }
+        } else {
+            (assure<Component>()->compact(), ...);
         }
     }
 
@@ -1619,7 +1638,7 @@ private:
     mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
-    entity_type free_list{null};
+    entity_type free_list{tombstone};
 };
 
 
