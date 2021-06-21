@@ -7,16 +7,17 @@
 
 WIP:
 * custom allocators all over
+* improve perf for sparse_set/storage::insert/emplace/destroy/remove/...
 
 WIP:
-* page size: split sparse/packed sizes, reduce comp page size, add per-pool size, allow for 0 sizes (old fully packed array)
+* make value_type available from meta container types, otherwise we have to default construct a container to get it
 * make it possible to register externally managed pools with the registry (allow for system centric mode)
 * registry: switch to the udata/mixin model and get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
 * it's now possible to have 0 as null entity/version, so we can finally switch to it
 * make pools available (registry/view/group), review operator| for views
+* page size: add per-pool size, allow for 0 sizes (old fully packed array)
 * compressed pair to exploit ebo in sparse set and the others
 * isolate view iterator, unwrap iterators in registry ::remove/::erase/::destroy to use the faster solution for non-view iterators
-* meta: use almost always meta handles to accept arguments from eg meta_func::invoke, so as to remove the need for the user to explicitly forward references
 * remove view each<T>(F), each<T>(), make view::use return a view and remove the mutable data member
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
