@@ -10,6 +10,7 @@ class throwing_component {
 
 public:
     using exception_type = test_exception;
+    static constexpr auto moved_from_value = -1;
 
     throwing_component(int value)
         : data{value}
@@ -19,12 +20,14 @@ public:
         : data{other.data}
     {
         if(data == trigger_on_value) {
+            data = moved_from_value;
             throw exception_type{};
         }
     }
 
     throwing_component & operator=(const throwing_component &other) {
         if(other.data == trigger_on_value) {
+            data = moved_from_value;
             throw exception_type{};
         }
 

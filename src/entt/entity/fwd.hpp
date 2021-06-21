@@ -13,8 +13,8 @@ template<typename Entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 
 
-template<typename, typename Type, typename = std::allocator<Type>, typename = void>
-class basic_storage;
+template<typename, typename Type, typename = std::allocator<Type>>
+struct basic_storage;
 
 
 template<typename>

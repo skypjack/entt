@@ -13,6 +13,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
+#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "sparse_set.hpp"
@@ -47,14 +48,14 @@ namespace entt {
  * @tparam Type Type of objects assigned to the entities.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Entity, typename Type, typename Allocator, typename>
-class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
-    static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The managed type must be at least move constructible and assignable");
-
+template<typename Entity, typename Type, typename Allocator, typename = void>
+class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     static constexpr auto packed_page = ENTT_PACKED_PAGE;
 
+    using comp_traits = component_traits<Type>;
+
     using underlying_type = basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>;
-    using traits_type = entt_traits<Entity>;
+    using difference_type = typename entt_traits<Entity>::difference_type;
 
     using alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<Type>;
     using alloc_pointer = typename alloc_traits::pointer;
@@ -70,21 +71,19 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     static_assert(bucket_alloc_traits::propagate_on_container_move_assignment::value);
 
     template<typename Value>
-    class storage_iterator final {
-        friend class basic_storage<Entity, Type, Allocator>;
-
-        storage_iterator(bucket_alloc_pointer const *ref, const typename traits_type::difference_type idx) ENTT_NOEXCEPT
-            : packed{ref}, index{idx}
-        {}
-
-    public:
-        using difference_type = typename traits_type::difference_type;
+    struct storage_iterator final {
+        using difference_type = typename basic_storage_impl::difference_type;
         using value_type = Value;
         using pointer = value_type *;
         using reference = value_type &;
         using iterator_category = std::random_access_iterator_tag;
 
         storage_iterator() ENTT_NOEXCEPT = default;
+
+        storage_iterator(bucket_alloc_pointer const *ref, const typename basic_storage_impl::difference_type idx) ENTT_NOEXCEPT
+            : packed{ref},
+              index{idx}
+        {}
 
         storage_iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
@@ -179,13 +178,10 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     void release_memory() {
         if(packed) {
-            for(size_type pos{}; pos < bucket; ++pos) {
-                if(auto length = underlying_type::size(); length) {
-                    const auto sz = length > packed_page ? packed_page : length;
-                    std::destroy(packed[pos], packed[pos] + sz);
-                    length -= sz;
-                }
+            // no-throw stable erase iteration
+            underlying_type::clear();
 
+            for(size_type pos{}; pos < bucket; ++pos) {
                 alloc_traits::deallocate(allocator, packed[pos], packed_page);
                 bucket_alloc_traits::destroy(bucket_allocator, std::addressof(packed[pos]));
             }
@@ -201,31 +197,20 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             const auto mem = bucket_alloc_traits::allocate(bucket_allocator, length);
 
             if(bucket > length) {
-                ENTT_TRY {
-                    std::uninitialized_copy(packed, packed + length, mem);
-                } ENTT_CATCH {
-                    bucket_alloc_traits::deallocate(bucket_allocator, mem, length);
-                    ENTT_THROW;
-                }
+                std::uninitialized_copy(packed, packed + length, mem);
 
                 for(auto pos = length; pos < bucket; ++pos) {
                     alloc_traits::deallocate(allocator, packed[pos], packed_page);
                 }
             } else {
+                std::uninitialized_copy(packed, packed + bucket, mem);
+
                 size_type pos{};
 
                 ENTT_TRY {
-                    std::uninitialized_copy(packed, packed + bucket, mem);
-
                     for(pos = bucket; pos < length; ++pos) {
                         auto pg = alloc_traits::allocate(allocator, packed_page);
-
-                        ENTT_TRY {
-                            bucket_alloc_traits::construct(bucket_allocator, std::addressof(mem[pos]), pg);
-                        } ENTT_CATCH {
-                            alloc_traits::deallocate(allocator, pg, packed_page);
-                            ENTT_THROW;
-                        }
+                        bucket_alloc_traits::construct(bucket_allocator, std::addressof(mem[pos]), pg);
                     }
                 } ENTT_CATCH {
                     for(auto next = bucket; next < pos; ++next) {
@@ -247,7 +232,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     template<typename... Args>
-    Type & push_back(Args &&... args) {
+    auto & push_back(Args &&... args) {
         const auto length = underlying_type::size();
         ENTT_ASSERT(length < (bucket * packed_page), "No more space left");
         auto *instance = std::addressof(packed[page(length)][offset(length)]);
@@ -271,22 +256,29 @@ protected:
         std::swap(packed[page(lhs)][offset(lhs)], packed[page(rhs)][offset(rhs)]);
     }
 
+    /*! @copydoc basic_sparse_set::move_and_pop */
+    void move_and_pop(const std::size_t from, const std::size_t to) final {
+        auto *instance = std::addressof(packed[page(to)][offset(to)]);
+        auto *other = std::addressof(packed[page(from)][offset(from)]);
+        alloc_traits::construct(allocator, instance, std::move(*other));
+        alloc_traits::destroy(allocator, other);
+    }
+
     /*! @copydoc basic_sparse_set::swap_and_pop */
     void swap_and_pop(const std::size_t pos) final {
         const auto length = underlying_type::size();
         auto &&elem = packed[page(pos)][offset(pos)];
         auto &&last = packed[page(length)][offset(length)];
 
-        ENTT_TRY {
-            [[maybe_unused]] auto other = std::move(elem);
-            elem = std::move(last);
-        } ENTT_CATCH {
-            // basic no-leak guarantee (with invalid state) if swapping throws
-            alloc_traits::destroy(allocator, std::addressof(last));
-            ENTT_THROW;
-        }
-
+        // support for nosy destructors
+        [[maybe_unused]] auto unused = std::move(elem);
+        elem = std::move(last);
         alloc_traits::destroy(allocator, std::addressof(last));
+    }
+
+    /*! @copydoc basic_sparse_set::in_place_pop */
+    void in_place_pop(const std::size_t pos) final {
+        alloc_traits::destroy(allocator, std::addressof(packed[page(pos)][offset(pos)]));
     }
 
 public:
@@ -303,9 +295,9 @@ public:
     /*! @brief Constant pointer type to contained elements. */
     using const_pointer = bucket_alloc_const_pointer;
     /*! @brief Random access iterator type. */
-    using iterator = storage_iterator<Type>;
+    using iterator = storage_iterator<value_type>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = storage_iterator<const Type>;
+    using const_iterator = storage_iterator<const value_type>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
@@ -315,11 +307,11 @@ public:
      * @brief Default constructor.
      * @param alloc Allocator to use (possibly default-constructed).
      */
-    explicit basic_storage(const allocator_type &alloc = {})
-        : underlying_type{alloc},
+    explicit basic_storage_impl(const allocator_type &alloc = {})
+        : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, alloc},
           allocator{alloc},
           bucket_allocator{alloc},
-          packed{},
+          packed{bucket_alloc_traits::allocate(bucket_allocator, 0u)},
           bucket{}
     {}
 
@@ -327,7 +319,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_storage(basic_storage &&other) ENTT_NOEXCEPT
+    basic_storage_impl(basic_storage_impl &&other) ENTT_NOEXCEPT
         : underlying_type{std::move(other)},
           allocator{std::move(other.allocator)},
           bucket_allocator{std::move(other.bucket_allocator)},
@@ -336,7 +328,7 @@ public:
     {}
 
     /*! @brief Default destructor. */
-    ~basic_storage() override {
+    ~basic_storage_impl() override {
         release_memory();
     }
 
@@ -345,7 +337,7 @@ public:
      * @param other The instance to move from.
      * @return This sparse set.
      */
-    basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT {
+    basic_storage_impl & operator=(basic_storage_impl &&other) ENTT_NOEXCEPT {
         release_memory();
 
         underlying_type::operator=(std::move(other));
@@ -411,7 +403,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
-        const typename traits_type::difference_type pos = underlying_type::size();
+        const difference_type pos = underlying_type::size();
         return const_iterator{std::addressof(packed), pos};
     }
 
@@ -422,7 +414,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
-        const typename traits_type::difference_type pos = underlying_type::size();
+        const difference_type pos = underlying_type::size();
         return iterator{std::addressof(packed), pos};
     }
 
@@ -507,13 +499,13 @@ public:
      * @param entt A valid entity identifier.
      * @return The object assigned to the entity.
      */
-    [[nodiscard]] const value_type & get(const entity_type entt) const {
+    [[nodiscard]] const value_type & get(const entity_type entt) const ENTT_NOEXCEPT {
         const auto idx = underlying_type::index(entt);
         return packed[page(idx)][offset(idx)];
     }
 
     /*! @copydoc get */
-    [[nodiscard]] value_type & get(const entity_type entt) {
+    [[nodiscard]] value_type & get(const entity_type entt) ENTT_NOEXCEPT {
         return const_cast<value_type &>(std::as_const(*this).get(entt));
     }
 
@@ -696,18 +688,32 @@ private:
 };
 
 
-/*! @copydoc basic_storage */
+/*! @copydoc basic_storage_impl */
 template<typename Entity, typename Type, typename Allocator>
-class basic_storage<Entity, Type, Allocator, std::enable_if_t<std::conjunction_v<ENTT_IGNORE_IF_EMPTY, std::is_empty<Type>>>>: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
+class basic_storage_impl<Entity, Type, Allocator, std::enable_if_t<component_traits<Type>::ignore_if_empty::value && std::is_empty_v<Type>>>
+    : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>
+{
+    using comp_traits = component_traits<Type>;
     using underlying_type = basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>;
+    using alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<Type>;
 
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = typename alloc_traits::allocator_type;
     /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+
+    /**
+     * @brief Default constructor.
+     * @param alloc Allocator to use (possibly default-constructed).
+     */
+    explicit basic_storage_impl(const allocator_type &alloc = {})
+        : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, alloc}
+    {}
 
     /**
      * @brief Fake get function.
@@ -718,7 +724,7 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void get([[maybe_unused]] const entity_type entt) const {
+    void get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(underlying_type::contains(entt), "Storage does not contain entity");
     }
 
@@ -832,11 +838,11 @@ struct storage_adapter_mixin: Type {
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    /*! @copydoc basic_sparse_set::about_to_erase */
-    void about_to_erase(const typename Type::entity_type entity, void *ud) final {
+    /*! @copydoc basic_sparse_set::about_to_pop */
+    void about_to_pop(const typename Type::entity_type entity, void *ud) final {
         ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
         destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entity);
-        Type::about_to_erase(entity, ud);
+        Type::about_to_pop(entity, ud);
     }
 
 public:
@@ -973,9 +979,21 @@ private:
 
 
 /**
- * @brief Defines the component-to-storage conversion.
+ * @brief Storage implementation dispatcher.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Type Type of objects assigned to the entities.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ */
+template<typename Entity, typename Type, typename Allocator>
+struct basic_storage: basic_storage_impl<Entity, Type, Allocator> {
+    using basic_storage_impl<Entity, Type, Allocator>::basic_storage_impl;
+};
+
+
+/**
+ * @brief Provides a common way to access certain properties of storage types.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Type of objects managed by the storage class.
  */
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
