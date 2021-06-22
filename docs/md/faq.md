@@ -77,25 +77,12 @@ not different techniques depending on how the data are laid out.
 I tried to describe some of the techniques that fit well with the model of
 `EnTT`. [Here](https://skypjack.github.io/2019-06-25-ecs-baf-part-4/) is the
 first post of a series that tries to explore the problem. More will probably
-come in future.
-
-Long story short, you can always define a tree where the nodes expose implicit
-lists of children by means of the following type:
-
-```cpp
-struct relationship {
-    std::size_t children{};
-    entt::entity first{entt::null};
-    entt::entity prev{entt::null};
-    entt::entity next{entt::null};
-    entt::entity parent{entt::null};
-    // ... other data members ...
-};
-```
-
-The sort functionalities of `EnTT`, the groups and all the other features of the
-library can help then to get the best in terms of data locality and therefore
-performance from this component.
+come in future.<br/>
+In addition, `EnTT` also offers the possibility to create stable storage types
+and therefore have pointer stability for one, all or some components. This is by
+far the most convenient solution when it comes to creating hierarchies and
+whatnot. See the documentation for the ECS part of the library and in particular
+what concerns the `component_traits` class for further details.
 
 ## Custom entity identifiers: yay or nay?
 

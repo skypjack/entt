@@ -6,8 +6,9 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
-* custom allocators all over
+* remove view/storage dispatcher, add support to relax policy constraints on user request (eg view.use<T>())
 * improve perf for sparse_set/storage::insert/emplace/destroy/remove/...
+* custom allocators all over
 
 WIP:
 * make value_type available from meta container types, otherwise we have to default construct a container to get it

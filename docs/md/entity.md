@@ -27,6 +27,9 @@
     * [Organizer](#organizer)
   * [Context variables](#context-variables)
     * [Aliased properties](#aliased-properties)
+  * [In-place delete](#in-place-delete)
+    * [Pointer stability](#pointer-stability)
+    * [Hierarchies](#hierarchies)
   * [Meet the runtime](#meet-the-runtime)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
@@ -44,6 +47,7 @@
     * [Nested groups](#nested-groups)
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
+  * [Stable storage](#stable-storage)
   * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
     * [More performance, more constraints](#more-performance-more-constraints)
 * [Empty type optimization](#empty-type-optimization)
@@ -963,6 +967,123 @@ const my_type &var = registry.ctx<const my_type>();
 Aliased properties can be unset and are overwritten when `set` is invoked, as it
 happens with standard variables.
 
+## In-place delete
+
+By default, `EnTT` keeps all pools compact when a component is removed. This is
+done through a swap-and-pop between the removed item and the one occupying the
+last position in the storage.<br/>
+Unfortunately, this also inevitably leads the components to change position
+within the storage, making direct access almost impossible (be it via pointer or
+index).
+
+However, the underlying model with its independent pools helps introduce storage
+with different deletion policies, so that users can best choose type by
+type.<br/>
+In particular, the library offers out of the box support for in-place deletion,
+thus offering storage with completely stable pointers. To do so, it's required
+to specialize the `component_traits` class.<br/>
+The definition common to all components is the following:
+
+```cpp
+struct basic_component_traits {
+    using in_place_delete = std::false_type;
+    using ignore_if_empty = ENTT_IGNORE_IF_EMPTY;
+};
+```
+
+Where `in_place_delete` instructs the library on the deletion policy for a given
+type while `ignore_if_empty` selectively disables empty type optimization.<br/>
+The `component_traits` class template is _sfinae-friendly_, it supports single-
+and multi-type specializations as well as feature-based ones:
+
+```cpp
+template<>
+struct entt::component_traits<position>: basic_component_traits {
+    using in_place_delete = std::true_type;
+};
+```
+
+This will ensure in-place deletion for the `position` component without further
+user intervention.<br/>
+Pools, views and groups will adapt accordingly when they detect a storage with a
+different deletion policy than the default. No specific action is required from
+the user once in-place deletion is enabled.
+
+### Pointer stability
+
+The ability to achieve pointer stability for one, several or all components is a
+direct consequence of the design of `EnTT` and of its default storage.<br/>
+In fact, although it contains what is commonly referred to as a _packed array_,
+the default storage is paged and doesn't suffer from invalidation of references
+when it runs out of space and has to reallocate.<br/>
+However, this isn't enough to ensure pointer stability in case of deletion. For
+this reason, a _stable_ deletion method is also offered. This one is such that
+the position of the elements is preserved by creating tombstones upon deletion
+rather than trying to fill the holes that are created.
+
+For performance reasons, `EnTT` will also favor storage compaction in all cases,
+although often accessing a component occurs mostly randomly or traversing pools
+in a non-linear order on the user side (as in the case of a hierarchy).<br/>
+In other words, pointer stability is not automatic but is enabled on request. To
+have it at the project level and for all components, it's required to partially
+specialize the `component_traits` class for all possible types:
+
+```cpp
+template<typename Type>
+struct entt::component_traits<Type>: basic_component_traits {
+    using in_place_delete = std::true_type;
+};
+```
+
+Because of how C++ works, this specialization will obviously have to be visible
+every time operations are performed on a storage.
+
+### Hierarchies
+
+`EnTT` doesn't attempt in any way to offer built-in methods with hidden or
+unclear costs to facilitate the creation of hierarchies.<br/>
+There are various solutions to the problem, such as using the following class:
+
+```cpp
+struct relationship {
+    std::size_t children{};
+    entt::entity first{entt::null};
+    entt::entity prev{entt::null};
+    entt::entity next{entt::null};
+    entt::entity parent{entt::null};
+    // ... other data members ...
+};
+```
+
+However, it should be pointed out that the possibility of having stable pointers
+for one, many or all types solves the problem of hierarchies at the root in many
+cases.<br/>
+In fact, if a certain type of component is visited mainly in random order or
+according to hierarchical relationships, using direct pointers has many
+advantages:
+
+```cpp
+struct transform {
+    transform *parent;
+    // ... other data members ...
+};
+
+template<>
+struct entt::component_traits<transform>: basic_component_traits {
+    using in_place_delete = std::true_type;
+};
+```
+
+Furthermore, it's quite common for a group of elements to be created close in
+time and therefore fallback into adjacent positions, thus favoring locality even
+on random accesses. Locality that won't be sacrificed over time given the
+stability of storage positions, with undoubted performance advantages.<br/>
+Of course, the cost moves to linear iterations, where views and groups will have
+to identify (and discard) all tombstones. However, once considered the benefits,
+from performance to ease of use, and given the many optimizations that make this
+cost negligible, this is configured as one of the most convenient solutions and
+certainly something to take into consideration.
+
 ## Meet the runtime
 
 `EnTT` takes full advantage of what the language offers at compile-time.<br/>
@@ -1390,8 +1511,7 @@ registry during iterations to get the types iterated by the view itself.
 
 ### View pack
 
-Views can be combined with each other to create new and more specific
-objects.<br/>
+Views are combined with each other to create new and more specific types.<br/>
 The type returned when combining multiple views together is itself a view, more
 in general a multi component one.
 
@@ -1803,6 +1923,36 @@ In general, all these functions can result in poor performance.<br/>
 entity. For similar reasons, `orphans` can be even slower. Both functions should
 not be used frequently to avoid the risk of a performance hit.
 
+## Stable storage
+
+Since it's possible to have completely stable storage in `EnTT`, it's also
+required that all views behave accordingly.<br/>
+In general, this aspect is quite transparent to the user who doesn't have to do
+anything in the vast majority of cases. In particular:
+
+* Groups are incompatible with stable storage and will trigger a compile-time
+  error if detected.
+
+* Views detect the type of storage with the most stringent requirements when
+  built and self-configure themselves to use the correct iteration policy.
+
+* Views created as view packs adjust their policy by choosing the most stringent
+  among those available.
+
+The policy adopted doesn't emerge from the view type, although it's available
+through the `storage_policy` alias.<br/>
+However, this can affect the feature set offered by the view itself. In the case
+of storage that also support tombstones, all views (even single-component ones)
+will always behave as a multi-type views. Therefore, for example, it won't be
+possible to directly access the raw representation of entities and components.
+
+In other words, the more generic version of a view will be provided in case of
+stable storage, even for single components, always supported by an appropriate
+iteration policy.<br/>
+The latter will be such that in no case will a tombstone be returned from the
+view itself, regardless of the iteration method. Similarly, no non-existent
+components will be accessed, which could result in an UB otherwise.
+
 ## What is allowed and what is not
 
 Most of the _ECS_ available out there don't allow to create and destroy entities
@@ -1920,8 +2070,12 @@ it is assigned to.
 
 More in general, none of the features offered by the library is affected, but
 for the ones that require to return actual instances.<br/>
-This optimization can be disabled by defining the `ENTT_NO_ETO` macro. In this
-case, empty types will be treated like all other types, no matter what.
+This optimization can be disabled for the whole application by defining the
+`ENTT_NO_ETO` macro. In this case, empty types will be treated like all other
+types, no matter what.<br/>
+Otherwise, users can specialize the `component_traits` template class and in
+particular the `ignore_if_empty` alias, disabling this optimization for some
+types only.
 
 # Multithreading
 
