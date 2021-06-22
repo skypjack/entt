@@ -110,11 +110,11 @@ TEST(SparseSet, Contains) {
     ASSERT_FALSE(set.contains(entt::tombstone));
 
     // tombstones and null entities can trigger false positives
-    ASSERT_TRUE(set.contains(traits_type::to_type(entt::entity{1}, entt::null)));
-    ASSERT_TRUE(set.contains(traits_type::to_type(entt::entity{1}, entt::tombstone)));
+    ASSERT_TRUE(set.contains(traits_type::to_value(entt::entity{1}, entt::null)));
+    ASSERT_TRUE(set.contains(traits_type::to_value(entt::entity{1}, entt::tombstone)));
 
-    ASSERT_FALSE(set.contains(traits_type::to_type(entt::null, entt::entity{1})));
-    ASSERT_FALSE(set.contains(traits_type::to_type(entt::tombstone, entt::entity{1})));
+    ASSERT_FALSE(set.contains(traits_type::to_value(entt::null, entt::entity{1})));
+    ASSERT_FALSE(set.contains(traits_type::to_value(entt::tombstone, entt::entity{1})));
 }
 
 TEST(SparseSet, Move) {

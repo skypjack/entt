@@ -129,20 +129,21 @@ class basic_registry {
 
     auto generate_identifier(const std::size_t pos) ENTT_NOEXCEPT {
         ENTT_ASSERT(pos < traits_type::to_integral(null), "No entities available");
-        return traits_type::to_type(static_cast<typename traits_type::entity_type>(pos), {});
+        return traits_type::to_value(static_cast<typename traits_type::entity_type>(pos), {});
     }
 
     auto recycle_identifier() ENTT_NOEXCEPT {
         ENTT_ASSERT(free_list != null, "No entities available");
         const auto curr = traits_type::to_entity(free_list);
-        free_list = traits_type::to_type(entities[curr], tombstone);
-        return (entities[curr] = traits_type::to_type(curr, traits_type::to_version(entities[curr])));
+        const auto entt = traits_type::to_value(free_list, entities[curr]);
+        free_list = (tombstone | entities[curr]);
+        return (entities[curr] = entt);
     }
 
     auto release_entity(const Entity entity, const typename traits_type::version_type version) {
         const auto entt = traits_type::to_entity(entity);
-        entities[entt] = traits_type::to_type(traits_type::to_integral(free_list), version + (traits_type::to_type(null, version) == tombstone));
-        free_list = traits_type::to_type(entt, traits_type::to_version(tombstone));
+        entities[entt] = traits_type::to_value(traits_type::to_entity(free_list), version + (traits_type::to_value(null, version) == tombstone));
+        free_list = (tombstone | entity);
         return traits_type::to_version(entities[entt]);
     }
 
@@ -162,7 +163,7 @@ public:
      * @return The entity identifier without the version.
      */
     [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return traits_type::to_type(traits_type::to_entity(entity), {});
+        return traits_type::to_value(traits_type::to_entity(entity), {});
     }
 
     /**
@@ -417,12 +418,12 @@ public:
             }
 
             return (entities[req] = hint);
-        } else if(const auto curr = traits_type::to_entity(entities[req]); req == curr) {
+        } else if(req == traits_type::to_entity(entities[req])) {
             return create();
         } else {
             auto *it = &free_list;
             for(; traits_type::to_entity(*it) != req; it = &entities[traits_type::to_entity(*it)]);
-            *it = traits_type::to_type(curr, traits_type::to_version(*it));
+            *it = traits_type::to_value(entities[req], *it);
             return (entities[req] = hint);
         }
     }

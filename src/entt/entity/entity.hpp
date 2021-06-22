@@ -78,6 +78,8 @@ class entt_traits: private internal::entt_traits<Type> {
     using traits_type = internal::entt_traits<Type>;
 
 public:
+    /*! @brief Value type. */
+    using value_type = Type;
     /*! @brief Underlying entity type. */
     using entity_type = typename traits_type::entity_type;
     /*! @brief Underlying version type. */
@@ -90,7 +92,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the given value.
      */
-    [[nodiscard]] static constexpr auto to_integral(const Type value) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr entity_type to_integral(const value_type value) ENTT_NOEXCEPT {
         return static_cast<entity_type>(value);
     }
 
@@ -99,7 +101,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the entity part.
      */
-    [[nodiscard]] static constexpr auto to_entity(const Type value) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr entity_type to_entity(const value_type value) ENTT_NOEXCEPT {
         return (to_integral(value) & traits_type::entity_mask);
     }
 
@@ -108,7 +110,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the version part.
      */
-    [[nodiscard]] static constexpr auto to_version(const Type value) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr version_type to_version(const value_type value) ENTT_NOEXCEPT {
         constexpr auto mask = (traits_type::version_mask << traits_type::entity_shift);
         return ((to_integral(value) & mask) >> traits_type::entity_shift);
     }
@@ -119,8 +121,8 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr auto to_type(const entity_type entity, const version_type version) ENTT_NOEXCEPT {
-        return Type{(entity & traits_type::entity_mask) | (version << traits_type::entity_shift)};
+    [[nodiscard]] static constexpr value_type to_value(const entity_type entity, const version_type version) ENTT_NOEXCEPT {
+        return value_type{(entity & traits_type::entity_mask) | (version << traits_type::entity_shift)};
     }
 
     /**
@@ -129,17 +131,17 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr auto to_type(const Type entity, const Type version) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr value_type to_value(const value_type entity, const value_type version) ENTT_NOEXCEPT {
         constexpr auto mask = (traits_type::version_mask << traits_type::entity_shift);
-        return Type{(to_integral(entity) & traits_type::entity_mask) | (to_integral(version) & mask)};
+        return value_type{(to_integral(entity) & traits_type::entity_mask) | (to_integral(version) & mask)};
     }
 
     /**
      * @brief Returns the reserved identifer.
      * @return The reserved identifier.
      */
-    [[nodiscard]] static constexpr auto reserved() ENTT_NOEXCEPT {
-        return to_type(traits_type::entity_mask, traits_type::version_mask);
+    [[nodiscard]] static constexpr value_type reserved() ENTT_NOEXCEPT {
+        return value_type{traits_type::entity_mask | (traits_type::version_mask << traits_type::entity_shift)};
     }
 };
 
@@ -216,7 +218,7 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::to_type(*this, entity);
+        return entt_traits<Entity>::to_value(static_cast<Entity>(*this), entity);
     }
 };
 
@@ -307,7 +309,7 @@ struct tombstone_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::to_type(entity, *this);
+        return entt_traits<Entity>::to_value(entity, static_cast<Entity>(*this));
     }
 };
 

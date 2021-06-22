@@ -654,7 +654,7 @@ TEST(Registry, TombstoneVersion) {
 
     const auto other = registry.create();
     const auto vers = traits_type::to_version(entity);
-    const auto required = traits_type::to_type(traits_type::to_entity(other), vers);
+    const auto required = traits_type::to_value(traits_type::to_entity(other), vers);
 
     ASSERT_NE(registry.destroy(other, vers), vers);
     ASSERT_NE(registry.create(required), required);

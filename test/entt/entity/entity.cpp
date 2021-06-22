@@ -21,13 +21,13 @@ TEST(Entity, Traits) {
     ASSERT_EQ(traits_type::to_entity(other), 1u);
     ASSERT_EQ(traits_type::to_version(other), 0u);
 
-    ASSERT_EQ(traits_type::to_type(traits_type::to_entity(entity), traits_type::to_version(entity)), entity);
-    ASSERT_EQ(traits_type::to_type(traits_type::to_entity(other), traits_type::to_version(other)), other);
-    ASSERT_NE(traits_type::to_type(traits_type::to_integral(entity), {}), entity);
+    ASSERT_EQ(traits_type::to_value(traits_type::to_entity(entity), traits_type::to_version(entity)), entity);
+    ASSERT_EQ(traits_type::to_value(traits_type::to_entity(other), traits_type::to_version(other)), other);
+    ASSERT_NE(traits_type::to_value(traits_type::to_integral(entity), {}), entity);
 
-    ASSERT_EQ(traits_type::to_type(entity, entity), entity);
-    ASSERT_EQ(traits_type::to_type(other, other), other);
-    ASSERT_NE(traits_type::to_type(entity, {}), entity);
+    ASSERT_EQ(traits_type::to_value(entity, entity), entity);
+    ASSERT_EQ(traits_type::to_value(other, other), other);
+    ASSERT_NE(traits_type::to_value(entity, {}), entity);
 
     ASSERT_EQ(traits_type::reserved(), entt::tombstone | static_cast<entt::entity>(entt::null));
     ASSERT_EQ(traits_type::reserved(), entt::null | static_cast<entt::entity>(entt::tombstone));
@@ -47,7 +47,7 @@ TEST(Entity, Null) {
     entt::registry registry{};
     const auto entity = registry.create();
 
-    ASSERT_EQ((entt::null | entity), (traits_type::to_type(entt::null, entity)));
+    ASSERT_EQ((entt::null | entity), (traits_type::to_value(entt::null, entity)));
     ASSERT_EQ((entt::null | null), null);
     ASSERT_EQ((entt::null | tombstone), null);
 
@@ -79,7 +79,7 @@ TEST(Entity, Tombstone) {
     entt::registry registry{};
     const auto entity = registry.create();
 
-    ASSERT_EQ((entt::tombstone | entity), (traits_type::to_type(entity, entt::tombstone)));
+    ASSERT_EQ((entt::tombstone | entity), (traits_type::to_value(entity, entt::tombstone)));
     ASSERT_EQ((entt::tombstone | tombstone), tombstone);
     ASSERT_EQ((entt::tombstone | null), tombstone);
 
@@ -92,7 +92,7 @@ TEST(Entity, Tombstone) {
     ASSERT_TRUE(entt::tombstone != entity);
 
     const auto vers = traits_type::to_version(entt::tombstone);
-    const auto other = traits_type::to_type(traits_type::to_entity(entity), vers);
+    const auto other = traits_type::to_value(traits_type::to_entity(entity), vers);
 
     ASSERT_FALSE(registry.valid(entt::tombstone));
     ASSERT_NE(registry.destroy(entity, vers), vers);
