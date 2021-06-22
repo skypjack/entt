@@ -2,15 +2,15 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
+#include <entt/entity/component.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
 
 struct stable_type { int value; };
 
 template<>
-struct entt::component_traits<stable_type> {
+struct entt::component_traits<stable_type>: basic_component_traits {
     using in_place_delete = std::true_type;
-    using ignore_if_empty = std::true_type;
 };
 
 TEST(RuntimeView, Functionalities) {

@@ -3,6 +3,7 @@
 #include <utility>
 #include <type_traits>
 #include <gtest/gtest.h>
+#include <entt/entity/component.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
 
@@ -10,9 +11,8 @@ struct empty_type {};
 struct stable_type { int value; };
 
 template<>
-struct entt::component_traits<stable_type> {
+struct entt::component_traits<stable_type>: basic_component_traits {
     using in_place_delete = std::true_type;
-    using ignore_if_empty = std::true_type;
 };
 
 TEST(SingleComponentView, Functionalities) {

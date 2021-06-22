@@ -16,9 +16,8 @@ struct boxed_int { int value; };
 struct stable_type { int value; };
 
 template<>
-struct entt::component_traits<stable_type> {
+struct entt::component_traits<stable_type>: basic_component_traits {
     using in_place_delete = std::true_type;
-    using ignore_if_empty = std::true_type;
 };
 
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
