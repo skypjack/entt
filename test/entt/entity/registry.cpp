@@ -629,7 +629,7 @@ TEST(Registry, VersionOverflow) {
     ASSERT_NE(registry.current(entity), registry.version(entity));
     ASSERT_NE(registry.current(entity), typename traits_type::version_type{});
 
-    registry.destroy(registry.create(), traits_type::to_version(traits_type::reserved()) - 1u);
+    registry.destroy(registry.create(), traits_type::to_version(traits_type::construct()) - 1u);
     registry.destroy(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));
@@ -654,7 +654,7 @@ TEST(Registry, TombstoneVersion) {
 
     const auto other = registry.create();
     const auto vers = traits_type::to_version(entity);
-    const auto required = traits_type::to_value(traits_type::to_entity(other), vers);
+    const auto required = traits_type::construct(traits_type::to_entity(other), vers);
 
     ASSERT_NE(registry.destroy(other, vers), vers);
     ASSERT_NE(registry.create(required), required);

@@ -229,10 +229,10 @@ class basic_sparse_set {
         about_to_pop(entt, ud);
 
         auto &ref = sparse[page(entt)][offset(entt)];
-        const auto pos = size_type{traits_type::to_integral(ref)};
+        const auto pos = size_type{traits_type::to_entity(ref)};
         ENTT_ASSERT(packed[pos] == entt, "Invalid entity identifier");
 
-        packed[pos] = std::exchange(free_list, (tombstone | entity_type{static_cast<typename traits_type::entity_type>(pos)}));
+        packed[pos] = std::exchange(free_list, traits_type::construct(static_cast<typename traits_type::entity_type>(pos)));
         ref = null;
 
         // strong exception guarantee
@@ -244,7 +244,7 @@ class basic_sparse_set {
         about_to_pop(entt, ud);
 
         auto &ref = sparse[page(entt)][offset(entt)];
-        const auto pos = size_type{traits_type::to_integral(ref)};
+        const auto pos = size_type{traits_type::to_entity(ref)};
         ENTT_ASSERT(packed[pos] == entt, "Invalid entity identifier");
 
         auto &last = packed[count - 1u];
@@ -263,7 +263,7 @@ class basic_sparse_set {
             swap_and_pop(pos);
         } ENTT_CATCH {
             last = std::exchange(packed[pos], entt);
-            ref = std::exchange(sparse[page(last)][offset(last)], entity_type{static_cast<typename traits_type::entity_type>(count++)});
+            ref = std::exchange(sparse[page(last)][offset(last)], traits_type::construct(static_cast<typename traits_type::entity_type>(count++)));
             ENTT_THROW;
         }
     }
@@ -553,7 +553,7 @@ public:
      */
     [[nodiscard]] size_type index(const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
-        return size_type{traits_type::to_integral(sparse[page(entt)][offset(entt)])};
+        return size_type{traits_type::to_entity(sparse[page(entt)][offset(entt)])};
     }
 
     /**
@@ -593,12 +593,12 @@ public:
                 resize_packed(sz + !(sz > reserved));
             }
 
-            assure_page(page(entt))[offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(count)};
+            assure_page(page(entt))[offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(count));
             packed[count++] = entt;
         } else {
             const auto pos = size_type{traits_type::to_entity(free_list)};
             move_and_pop(count, pos);
-            sparse[page(entt)][offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(pos)};
+            sparse[page(entt)][offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(pos));
             free_list = std::exchange(packed[pos], entt);
         }
     }
@@ -621,7 +621,7 @@ public:
         for(; first != last; ++first) {
             const auto entt = *first;
             ENTT_ASSERT(!contains(entt), "Set already contains entity");
-            assure_page(page(entt))[offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(count)};
+            assure_page(page(entt))[offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(count));
             packed[count++] = entt;
         }
     }
@@ -702,8 +702,8 @@ public:
                 --next;
                 move_and_pop(next, pos);
                 std::swap(packed[next], packed[pos]);
-                sparse[page(packed[pos])][offset(packed[pos])] = entity_type{static_cast<const typename traits_type::entity_type>(pos)};
-                *it = (tombstone | entity_type{static_cast<typename traits_type::entity_type>(next)});
+                sparse[page(packed[pos])][offset(packed[pos])] = traits_type::construct(static_cast<const typename traits_type::entity_type>(pos));
+                *it = traits_type::construct(static_cast<typename traits_type::entity_type>(next));
                 for(; next && packed[next - 1u] == tombstone; --next);
             }
         }
@@ -782,7 +782,7 @@ public:
                 const auto entt = packed[curr];
 
                 swap_at(next, idx);
-                sparse[page(entt)][offset(entt)] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
+                sparse[page(entt)][offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(curr));
                 curr = std::exchange(next, idx);
             }
         }

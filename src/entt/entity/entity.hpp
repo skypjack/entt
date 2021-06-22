@@ -117,31 +117,16 @@ public:
 
     /**
      * @brief Constructs an identifier from its parts.
+     *
+     * If the version part is not provided, a tombstone is returned.<br/>
+     * If the entity part is not provided, a null identifier is returned.
+     *
      * @param entity The entity part of the identifier.
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type to_value(const entity_type entity, const version_type version) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr value_type construct(const entity_type entity = traits_type::entity_mask, const version_type version = traits_type::version_mask) ENTT_NOEXCEPT {
         return value_type{(entity & traits_type::entity_mask) | (version << traits_type::entity_shift)};
-    }
-
-    /**
-     * @brief Constructs an identifier from its parts.
-     * @param entity The entity part of the identifier.
-     * @param version The version part of the identifier.
-     * @return A properly constructed identifier.
-     */
-    [[nodiscard]] static constexpr value_type to_value(const value_type entity, const value_type version) ENTT_NOEXCEPT {
-        constexpr auto mask = (traits_type::version_mask << traits_type::entity_shift);
-        return value_type{(to_integral(entity) & traits_type::entity_mask) | (to_integral(version) & mask)};
-    }
-
-    /**
-     * @brief Returns the reserved identifer.
-     * @return The reserved identifier.
-     */
-    [[nodiscard]] static constexpr value_type reserved() ENTT_NOEXCEPT {
-        return value_type{traits_type::entity_mask | (traits_type::version_mask << traits_type::entity_shift)};
     }
 };
 
@@ -167,7 +152,7 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::reserved();
+        return entt_traits<Entity>::construct();
     }
 
     /**
@@ -218,7 +203,7 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::to_value(static_cast<Entity>(*this), entity);
+        return entt_traits<Entity>::construct(entt_traits<Entity>::to_entity(*this), entt_traits<Entity>::to_version(entity));
     }
 };
 
@@ -258,7 +243,7 @@ struct tombstone_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::reserved();
+        return entt_traits<Entity>::construct();
     }
 
     /**
@@ -309,7 +294,7 @@ struct tombstone_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::to_value(entity, static_cast<Entity>(*this));
+        return entt_traits<Entity>::construct(entt_traits<Entity>::to_entity(entity));
     }
 };
 
