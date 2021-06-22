@@ -10,7 +10,7 @@ struct resource_cache;
 
 
 template<typename>
-struct resource_handle;
+class resource_handle;
 
 
 template<typename, typename>

@@ -3,6 +3,7 @@
 
 
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "fwd.hpp"
@@ -24,7 +25,12 @@ namespace entt {
  * @tparam Resource Type of resource managed by a handle.
  */
 template<typename Resource>
-struct resource_handle {
+class resource_handle {
+    /*! @brief Resource handles are friends with each other. */
+    template<typename>
+    friend class resource_handle;
+
+public:
     /*! @brief Default constructor. */
     resource_handle() ENTT_NOEXCEPT = default;
 
@@ -35,6 +41,74 @@ struct resource_handle {
     resource_handle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
         : resource{std::move(res)}
     {}
+
+    /**
+     * @brief Copy constructor.
+     * @param other The instance to copy from.
+     */
+    resource_handle(const resource_handle<Resource> &other) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    resource_handle(resource_handle<Resource> &&other) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Copy constructs a handle which shares ownership of the resource.
+     * @tparam Other Type of resource managed by the received handle.
+     * @param other The handle to copy from.
+     */
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>>>
+    resource_handle(const resource_handle<Other> &other) ENTT_NOEXCEPT
+        : resource{other.resource}
+    {}
+
+    /**
+     * @brief Move constructs a handle which takes ownership of the resource.
+     * @tparam Other Type of resource managed by the received handle.
+     * @param other The handle to move from.
+     */
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>>>
+    resource_handle(resource_handle<Other> &&other) ENTT_NOEXCEPT
+        : resource{std::move(other.resource)}
+    {}
+
+    /**
+     * @brief Copy assignment operator.
+     * @param other The instance to copy from.
+     */
+    resource_handle & operator=(const resource_handle<Resource> &other) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to move from.
+     */
+    resource_handle & operator=(resource_handle<Resource> &&other) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Copy assignment operator from foreign handle.
+     * @tparam Other Type of resource managed by the received handle.
+     * @param other The handle to copy from.
+     */
+    template<typename Other>
+    std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>, resource_handle &>
+    operator=(const resource_handle<Other> &other) ENTT_NOEXCEPT {
+        resource = other.resource;
+        return *this;
+    }
+
+    /**
+     * @brief Move assignment operator from foreign handle.
+     * @tparam Other Type of resource managed by the received handle.
+     * @param other The handle to move from.
+     */
+    template<typename Other>
+    std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>, resource_handle &>
+    operator=(resource_handle<Other> &&other) ENTT_NOEXCEPT {
+        resource = std::move(other.resource);
+        return *this;
+    }
 
     /**
      * @brief Gets a reference to the managed resource.

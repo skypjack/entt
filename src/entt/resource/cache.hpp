@@ -91,8 +91,6 @@ struct resource_cache {
      */
     template<typename Loader, typename... Args>
     resource_handle<Resource> load(const id_type id, Args &&... args) {
-        static_assert(std::is_base_of_v<resource_loader<Loader, Resource>, Loader>, "Invalid loader type");
-
         if(auto it = resources.find(id); it == resources.cend()) {
             if(auto handle = temp<Loader>(std::forward<Args>(args)...); handle) {
                 return (resources[id] = std::move(handle));
