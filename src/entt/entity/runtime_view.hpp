@@ -81,7 +81,7 @@ class basic_runtime_view final {
             : pools{&cpools},
               filter{&ignore},
               it{curr},
-              stable_storage{std::any_of(pools->cbegin(), pools->cend(), [](const basic_common_type *curr) { return (curr->policy() == deletion_policy::in_place); })}
+              stable_storage{std::any_of(pools->cbegin(), pools->cend(), [](const basic_common_type *cpool) { return (cpool->policy() == deletion_policy::in_place); })}
         {
             if(it != (*pools)[0]->end() && !valid()) {
                 ++(*this);
