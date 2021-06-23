@@ -77,12 +77,14 @@ public:
     /**
      * @brief Copy assignment operator.
      * @param other The instance to copy from.
+     * @return This resource handle.
      */
     resource_handle & operator=(const resource_handle<Resource> &other) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
+     * @return This resource handle.
      */
     resource_handle & operator=(resource_handle<Resource> &&other) ENTT_NOEXCEPT = default;
 
@@ -90,6 +92,7 @@ public:
      * @brief Copy assignment operator from foreign handle.
      * @tparam Other Type of resource managed by the received handle.
      * @param other The handle to copy from.
+     * @return This resource handle.
      */
     template<typename Other>
     std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>, resource_handle &>
@@ -102,6 +105,7 @@ public:
      * @brief Move assignment operator from foreign handle.
      * @tparam Other Type of resource managed by the received handle.
      * @param other The handle to move from.
+     * @return This resource handle.
      */
     template<typename Other>
     std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>, resource_handle &>
