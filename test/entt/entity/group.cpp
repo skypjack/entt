@@ -364,6 +364,10 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(group.get({})), std::tuple<int &, const char &>>);
     static_assert(std::is_same_v<decltype(group.data()), const entt::entity *>);
 
+    static_assert(std::is_same_v<decltype(std::as_const(registry).group_if_exists(entt::get<int, char>)), decltype(std::as_const(registry).group_if_exists(entt::get<const int, const char>))>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).group_if_exists(entt::get<const int, char>)), decltype(std::as_const(registry).group_if_exists(entt::get<const int, const char>))>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).group_if_exists(entt::get<int, const char>)), decltype(std::as_const(registry).group_if_exists(entt::get<const int, const char>))>);
+
     group.each([](auto &&i, auto &&c) {
         static_assert(std::is_same_v<decltype(i), int &>);
         static_assert(std::is_same_v<decltype(c), const char &>);
@@ -1064,6 +1068,10 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(group.data()), const entt::entity *>);
     static_assert(std::is_same_v<decltype(group.raw<const char>()), const char * const *>);
     static_assert(std::is_same_v<decltype(group.raw<int>()), int **>);
+
+    static_assert(std::is_same_v<decltype(std::as_const(registry).group_if_exists<int>(entt::get<char>)), decltype(std::as_const(registry).group_if_exists<const int>(entt::get<const char>))>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).group_if_exists<const int>(entt::get<char>)), decltype(std::as_const(registry).group_if_exists<const int>(entt::get<const char>))>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).group_if_exists<int>(entt::get<const char>)), decltype(std::as_const(registry).group_if_exists<const int>(entt::get<const char>))>);
 
     group.each([](auto &&i, auto &&c, auto &&d, auto &&f) {
         static_assert(std::is_same_v<decltype(i), int &>);

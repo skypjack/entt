@@ -1120,9 +1120,8 @@ public:
      * @return A newly created view.
      */
     template<typename... Component, typename... Exclude>
-    [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, std::add_const_t<Component>...> view(exclude_t<Exclude...> = {}) const {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        static_assert((std::is_const_v<Component> && ...), "Invalid non-const type");
         return { *assure<std::remove_const_t<Component>>()..., *assure<Exclude>()... };
     }
 
@@ -1297,9 +1296,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
-        static_assert(std::conjunction_v<std::is_const<Owned>..., std::is_const<Get>...>, "Invalid non-const type");
-
+    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<std::add_const_t<Get>...>, std::add_const_t<Owned>...> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
             return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))
                 && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
@@ -1338,8 +1335,8 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group_if_exists(exclude_t<Exclude...> = {}) const {
-        return group_if_exists<Owned...>(get_t<>{}, exclude<Exclude...>);
+    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<>, std::add_const_t<Owned>...> group_if_exists(exclude_t<Exclude...> = {}) const {
+        return group_if_exists<std::add_const_t<Owned>...>(get_t<>{}, exclude<Exclude...>);
     }
 
     /**
