@@ -12,13 +12,16 @@ struct position {
     std::uint64_t y;
 };
 
-struct velocity {
-    std::uint64_t x;
-    std::uint64_t y;
-};
+struct velocity: position {};
+struct stable_position: position {};
 
 template<std::size_t>
 struct comp { int x; };
+
+template<>
+struct entt::component_traits<stable_position>: basic_component_traits {
+    using in_place_delete = std::true_type;
+};
 
 struct timer final {
     timer(): start{std::chrono::system_clock::now()} {}
@@ -72,7 +75,7 @@ TEST(Benchmark, Create) {
     timer timer;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create();
+        static_cast<void>(registry.create());
     }
 
     timer.elapsed();
@@ -201,7 +204,7 @@ TEST(Benchmark, Recycle) {
     timer timer;
 
     for(auto next = entities.size(); next; --next) {
-        registry.create();
+        static_cast<void>(registry.create());
     }
 
     timer.elapsed();
@@ -278,6 +281,27 @@ TEST(Benchmark, IterateSingleComponent1M) {
     });
 }
 
+TEST(Benchmark, IterateSingleComponentTombstonePolicy1M) {
+    entt::registry registry;
+
+    std::cout << "Iterating over 1000000 entities, one component, tombstone policy" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.emplace<stable_position>(entity);
+    }
+
+    auto test = [&](auto func) {
+        timer timer;
+        registry.view<stable_position>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
 TEST(Benchmark, IterateSingleComponentRuntime1M) {
     entt::registry registry;
 
@@ -315,6 +339,28 @@ TEST(Benchmark, IterateTwoComponents1M) {
     auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateTombstonePolicyTwoComponentsTombstonePolicy1M) {
+    entt::registry registry;
+
+    std::cout << "Iterating over 1000000 entities, two components, tombstone policy" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.emplace<stable_position>(entity);
+        registry.emplace<velocity>(entity);
+    }
+
+    auto test = [&](auto func) {
+        timer timer;
+        registry.view<stable_position, velocity>().each(func);
         timer.elapsed();
     };
 
@@ -547,6 +593,29 @@ TEST(Benchmark, IterateThreeComponents1M) {
     auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity, comp<0>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateThreeComponentsTombstonePolicy1M) {
+    entt::registry registry;
+
+    std::cout << "Iterating over 1000000 entities, three components, tombstone policy" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.emplace<stable_position>(entity);
+        registry.emplace<velocity>(entity);
+        registry.emplace<comp<0>>(entity);
+    }
+
+    auto test = [&](auto func) {
+        timer timer;
+        registry.view<stable_position, velocity, comp<0>>().each(func);
         timer.elapsed();
     };
 
@@ -795,6 +864,31 @@ TEST(Benchmark, IterateFiveComponents1M) {
     auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity, comp<0>, comp<1>, comp<2>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateFiveComponentsTombstonePolicy1M) {
+    entt::registry registry;
+
+    std::cout << "Iterating over 1000000 entities, five components, tombstone policy" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.emplace<stable_position>(entity);
+        registry.emplace<velocity>(entity);
+        registry.emplace<comp<0>>(entity);
+        registry.emplace<comp<1>>(entity);
+        registry.emplace<comp<2>>(entity);
+    }
+
+    auto test = [&](auto func) {
+        timer timer;
+        registry.view<stable_position, velocity, comp<0>, comp<1>, comp<2>>().each(func);
         timer.elapsed();
     };
 
