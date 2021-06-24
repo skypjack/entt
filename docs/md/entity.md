@@ -207,10 +207,22 @@ auto view = registry.view<a_component, another_component>();
 registry.destroy(view.begin(), view.end());
 ```
 
-When an entity is destroyed, the registry can freely reuse it internally with a
-slightly different identifier. In particular, the version of an entity is
-increased after destruction (unless the overload that forces a version is used
-instead of the default one).<br/>
+In addition to offering an overload to force the version upon destruction. Note
+that this function removes all components from an entity before releasing its
+identifier. There exists also a _lighter_ alternative that only releases the
+elements without poking in any pool, for use with orphaned entities:
+
+```cpp
+// releases an orphaned identifier
+registry.release(entity);
+```
+
+As with the `destroy` function, also in this case entity ranges are supported
+and it's possible to force the version during release.
+
+In both cases, when an identifier is released, the registry can freely reuse it
+internally. In particular, the version of an entity is increased (unless the
+overload that forces a version is used instead of the default one).<br/>
 Users can probe an identifier to know the information it carries:
 
 ```cpp
@@ -648,7 +660,7 @@ Also in this case, the following expression always returns false:
 registry.valid(entt::tombstone);
 ```
 
-Moreover, users cannot set set the tombstone version when deleting an entity:
+Moreover, users cannot set set the tombstone version when releasing an entity:
 
 ```
 registry.destroy(entity, entt::tombstone);
@@ -1169,7 +1181,7 @@ to use in which case mostly depends on the goal and there is not a golden rule
 for that.
 
 The `entities` member function makes the snapshot serialize all entities (both
-those still alive and those destroyed) along with their versions.<br/>
+those still alive and those released) along with their versions.<br/>
 On the other hand, the `component` member function is a function template the
 aim of which is to store aside components. The presence of a template parameter
 list is a consequence of a couple of design choices from the past and in the
@@ -1234,11 +1246,11 @@ The `component` member function restores all and only the components specified
 and assigns them to the right entities. Note that the template parameter list
 must be exactly the same used during the serialization.
 
-The `orphans` member function literally destroys those entities that have no
+The `orphans` member function literally releases those entities that have no
 components attached. It's usually useless if the snapshot is a full dump of the
 source. However, in case all the entities are serialized but only few components
 are saved, it could happen that some of the entities have no components once
-restored. The best the users can do to deal with them is to destroy those
+restored. The best the users can do to deal with them is to release those
 entities and thus update their versions.
 
 ### Continuous loader
@@ -1285,7 +1297,7 @@ In case the component contains entities itself (either as data members of type
 automatically. To do that, it's enough to specify the data members to update as
 shown in the example.
 
-The `orphans` member function literally destroys those entities that have no
+The `orphans` member function literally releases those entities that have no
 components after a restore. It has exactly the same purpose described in the
 previous section and works the same way.
 

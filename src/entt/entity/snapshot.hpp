@@ -99,7 +99,7 @@ public:
             archive(*first);
         }
 
-        archive(reg->destroyed());
+        archive(reg->released());
 
         return *this;
     }
@@ -273,7 +273,7 @@ public:
      */
     const basic_snapshot_loader & orphans() const {
         reg->orphans([this](const auto entt) {
-            reg->destroy(entt);
+            reg->release(entt);
         });
 
         return *this;
@@ -529,7 +529,7 @@ public:
      */
     basic_continuous_loader & orphans() {
         reg->orphans([this](const auto entt) {
-            reg->destroy(entt);
+            reg->release(entt);
         });
 
         return *this;

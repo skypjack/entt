@@ -341,15 +341,21 @@ public:
     }
 
     /**
-     * @brief Returns the head of the list of destroyed entities.
+     * @brief Returns the head of the list of released entities.
      *
      * This function is intended for use in conjunction with `assign`.<br/>
      * The returned entity has an invalid identifier in all cases.
      *
-     * @return The head of the list of destroyed entities.
+     * @return The head of the list of released entities.
      */
-    [[nodiscard]] entity_type destroyed() const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type released() const ENTT_NOEXCEPT {
         return free_list;
+    }
+
+    /*! @copydoc released */
+    [[deprecated("Use ::released instead")]]
+    [[nodiscard]] entity_type destroyed() const ENTT_NOEXCEPT {
+        return released();
     }
 
     /**
@@ -475,7 +481,55 @@ public:
     }
 
     /**
-     * @brief Destroys an entity.
+     * @brief Releases an entity identifier.
+     *
+     * The version is updated and the identifier can be recycled at any time.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.
+     *
+     * @param entity A valid entity identifier.
+     * @return The version of the recycled entity.
+     */
+    version_type release(const entity_type entity) {
+        return release(entity, version(entity) + 1u);
+    }
+
+    /**
+     * @brief Releases an entity identifier.
+     *
+     * The suggested version or the valid version closest to the suggested one
+     * is used instead of the implicitly generated version.
+     *
+     * @sa release
+     *
+     * @param entity A valid entity identifier.
+     * @param version A desired version upon destruction.
+     * @return The version actually assigned to the entity.
+     */
+    version_type release(const entity_type entity, const version_type version) {
+        ENTT_ASSERT(orphan(entity), "Non-orphan entity");
+        return release_entity(entity, version);
+    }
+
+    /**
+     * @brief Releases all entity identifiers in a range.
+     *
+     * @sa release
+     *
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename It>
+    void release(It first, It last) {
+        for(; first != last; ++first) {
+            release(*first, version(*first) + 1u);
+        }
+    }
+
+    /**
+     * @brief Destroys an entity and releases its identifier.
      *
      * The version is updated and the identifier can be recycled at any time.
      *
@@ -490,11 +544,11 @@ public:
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entity) {
-        return destroy(entity, traits_type::to_version(entity) + 1u);
+        return destroy(entity, version(entity) + 1u);
     }
 
     /**
-     * @brief Destroys an entity.
+     * @brief Destroys an entity and releases its identifier.
      *
      * The suggested version or the valid version closest to the suggested one
      * is used instead of the implicitly generated version.
@@ -516,7 +570,7 @@ public:
     }
 
     /**
-     * @brief Destroys all the entities in a range.
+     * @brief Destroys all entities in a range and releases their identifiers.
      *
      * @sa destroy
      *

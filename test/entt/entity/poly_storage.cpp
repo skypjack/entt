@@ -109,7 +109,7 @@ TEST(PolyStorage, CopyRegistry) {
     ASSERT_EQ(registry.size(), 10u);
     ASSERT_EQ(other.size(), 0u);
 
-    other.assign(registry.data(), registry.data() + registry.size(), registry.destroyed());
+    other.assign(registry.data(), registry.data() + registry.size(), registry.released());
     registry.visit([&](const auto info) { std::as_const(registry).storage(info)->copy_to(other); });
 
     ASSERT_EQ(registry.size(), other.size());

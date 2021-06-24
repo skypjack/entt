@@ -246,7 +246,9 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 0u);
+    ASSERT_DEATH(registry.release(e2), "");
     ASSERT_NO_FATAL_FAILURE(registry.destroy(e2));
+    ASSERT_DEATH(registry.destroy(e2), "");
     ASSERT_EQ(registry.version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 1u);
 
@@ -362,7 +364,7 @@ TEST(Registry, Identifiers) {
 
     ASSERT_EQ(pre, registry.entity(pre));
 
-    registry.destroy(pre);
+    registry.release(pre);
     const auto post = registry.create();
 
     ASSERT_NE(pre, post);
@@ -382,7 +384,7 @@ TEST(Registry, Data) {
     ASSERT_EQ(*std::as_const(registry).data(), entity);
 
     const auto other = registry.create();
-    registry.destroy(entity);
+    registry.release(entity);
 
     ASSERT_NE(*std::as_const(registry).data(), entity);
     ASSERT_EQ(*(std::as_const(registry).data() + 1u), other);
@@ -393,9 +395,9 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
     entt::entity entities[3];
 
     const auto entity = registry.create();
-    registry.destroy(registry.create());
-    registry.destroy(entity);
-    registry.destroy(registry.create());
+    registry.release(registry.create());
+    registry.release(entity);
+    registry.release(registry.create());
 
     registry.create(std::begin(entities), std::end(entities));
 
@@ -447,7 +449,7 @@ TEST(Registry, CreateWithHint) {
     ASSERT_FALSE(registry.valid(entt::entity{1}));
     ASSERT_EQ(e3, entt::entity{3});
 
-    registry.destroy(e2);
+    registry.release(e2);
 
     ASSERT_EQ(registry.version(e2), entt::registry::version_type{});
     ASSERT_EQ(registry.current(e2), entt::registry::version_type{1});
@@ -461,31 +463,15 @@ TEST(Registry, CreateWithHint) {
     ASSERT_EQ(registry.entity(e1), entt::entity{1});
     ASSERT_EQ(registry.version(e1), entt::registry::version_type{});
 
-    registry.destroy(e1);
-    registry.destroy(e2);
+    registry.release(e1);
+    registry.release(e2);
     auto e0 = registry.create(entt::entity{0});
 
     ASSERT_EQ(e0, entt::entity{0});
     ASSERT_EQ(registry.version(e0), entt::registry::version_type{});
 }
 
-TEST(Registry, DestroyWithVersion) {
-    entt::registry registry;
-
-    const auto e0 = registry.create();
-    const auto e1 = registry.create();
-
-    ASSERT_EQ(registry.current(e0), entt::registry::version_type{});
-    ASSERT_EQ(registry.current(e1), entt::registry::version_type{});
-
-    registry.destroy(e0);
-    registry.destroy(e1, 3);
-
-    ASSERT_EQ(registry.current(e0), entt::registry::version_type{1});
-    ASSERT_EQ(registry.current(e1), entt::registry::version_type{3});
-}
-
-TEST(Registry, CreateDestroyEntities) {
+TEST(Registry, CreateClearCycle) {
     entt::registry registry;
     entt::entity pre{}, post{};
 
@@ -516,19 +502,37 @@ TEST(Registry, CreateDestroyEntities) {
     ASSERT_EQ(registry.current(pre), registry.current(post));
 }
 
-TEST(Registry, CreateDestroyCornerCase) {
+TEST(Registry, CreateDestroyReleaseCornerCase) {
     entt::registry registry;
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
 
     registry.destroy(e0);
-    registry.destroy(e1);
+    registry.release(e1);
 
     registry.each([](auto) { FAIL(); });
 
     ASSERT_EQ(registry.current(e0), entt::registry::version_type{1});
     ASSERT_EQ(registry.current(e1), entt::registry::version_type{1});
+}
+
+TEST(Registry, DestroyVersion) {
+    entt::registry registry;
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+
+    ASSERT_EQ(registry.current(e0), entt::registry::version_type{});
+    ASSERT_EQ(registry.current(e1), entt::registry::version_type{});
+
+    registry.destroy(e0);
+    registry.destroy(e1, 3);
+
+    ASSERT_DEATH(registry.destroy(e0), "");
+    ASSERT_DEATH(registry.destroy(e1, 3), "");
+    ASSERT_EQ(registry.current(e0), entt::registry::version_type{1});
+    ASSERT_EQ(registry.current(e1), entt::registry::version_type{3});
 }
 
 TEST(Registry, RangeDestroy) {
@@ -618,19 +622,58 @@ TEST(Registry, StableDestroy) {
     ASSERT_EQ(registry.size<double>(), 0u);
 }
 
+TEST(Registry, ReleaseVersion) {
+    entt::registry registry;
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+
+    ASSERT_EQ(registry.current(e0), entt::registry::version_type{});
+    ASSERT_EQ(registry.current(e1), entt::registry::version_type{});
+
+    registry.release(e0);
+    registry.release(e1, 3);
+
+    ASSERT_DEATH(registry.release(e0), "");
+    ASSERT_DEATH(registry.release(e1, 3), "");
+    ASSERT_EQ(registry.current(e0), entt::registry::version_type{1});
+    ASSERT_EQ(registry.current(e1), entt::registry::version_type{3});
+}
+
+TEST(Registry, RangeRelease) {
+    entt::registry registry;
+    entt::entity entities[3u];
+
+    registry.create(std::begin(entities), std::end(entities));
+
+    ASSERT_TRUE(registry.valid(entities[0u]));
+    ASSERT_TRUE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entities[2u]));
+
+    registry.release(std::begin(entities), std::end(entities) - 1u);
+
+    ASSERT_FALSE(registry.valid(entities[0u]));
+    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entities[2u]));
+
+    registry.release(std::end(entities) - 1u, std::end(entities));
+
+    ASSERT_FALSE(registry.valid(entities[2u]));
+}
+
 TEST(Registry, VersionOverflow) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.destroy(entity);
+    registry.release(entity);
 
     ASSERT_NE(registry.current(entity), registry.version(entity));
     ASSERT_NE(registry.current(entity), typename traits_type::version_type{});
 
-    registry.destroy(registry.create(), traits_type::to_version(traits_type::construct()) - 1u);
-    registry.destroy(registry.create());
+    registry.release(registry.create(), traits_type::to_version(traits_type::construct()) - 1u);
+    registry.release(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));
     ASSERT_EQ(registry.current(entity), typename traits_type::version_type{});
@@ -656,7 +699,7 @@ TEST(Registry, TombstoneVersion) {
     const auto vers = traits_type::to_version(entity);
     const auto required = traits_type::construct(traits_type::to_entity(other), vers);
 
-    ASSERT_NE(registry.destroy(other, vers), vers);
+    ASSERT_NE(registry.release(other, vers), vers);
     ASSERT_NE(registry.create(required), required);
 }
 
@@ -1750,12 +1793,12 @@ TEST(Registry, AssignEntities) {
     entt::registry registry;
     entt::entity entities[3];
     registry.create(std::begin(entities), std::end(entities));
-    registry.destroy(entities[1]);
-    registry.destroy(entities[2]);
+    registry.release(entities[1]);
+    registry.release(entities[2]);
 
     entt::registry other;
     const auto *data = registry.data();
-    other.assign(data, data + registry.size(), registry.destroyed());
+    other.assign(data, data + registry.size(), registry.released());
 
     ASSERT_EQ(registry.size(), other.size());
     ASSERT_TRUE(other.valid(entities[0]));
