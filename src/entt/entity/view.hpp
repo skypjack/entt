@@ -116,6 +116,12 @@ private:
 }
 
 
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
 /*! @brief Stable storage policy, aimed at pointer stability. */
 struct stable_storage_policy {
     /**
@@ -148,12 +154,6 @@ struct packed_storage_policy {
     * @endcond
     */
 };
-
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
 
 
 /**
