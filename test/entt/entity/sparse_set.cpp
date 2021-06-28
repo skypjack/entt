@@ -103,10 +103,10 @@ TEST(SparseSet, Contains) {
     ASSERT_FALSE(set.contains(entt::entity{99}));
     ASSERT_TRUE(set.contains(entt::entity{1}));
 
-    ASSERT_DEATH(set.contains(entt::null), "");
-    ASSERT_DEATH(set.contains(entt::tombstone), "");
-    ASSERT_DEATH(set.contains(entt::tombstone | entt::entity{1u}), "");
-    ASSERT_DEATH(set.contains(entt::null | entt::entity{1u}), "");
+    ASSERT_DEATH(static_cast<void>(set.contains(entt::null)), "");
+    ASSERT_DEATH(static_cast<void>(set.contains(entt::tombstone)), "");
+    ASSERT_DEATH(static_cast<void>(set.contains(entt::tombstone | entt::entity{1u})), "");
+    ASSERT_DEATH(static_cast<void>(set.contains(entt::null | entt::entity{1u})), "");
 }
 
 TEST(SparseSet, Move) {
