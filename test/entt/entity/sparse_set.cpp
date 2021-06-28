@@ -78,9 +78,6 @@ TEST(SparseSet, Contains) {
 
     entt::sparse_set set{entt::deletion_policy::in_place};
 
-    ASSERT_FALSE(set.contains(entt::null));
-    ASSERT_FALSE(set.contains(entt::tombstone));
-
     set.emplace(entt::entity{0});
     set.emplace(entt::entity{3});
     set.emplace(entt::entity{42});
@@ -106,12 +103,10 @@ TEST(SparseSet, Contains) {
     ASSERT_FALSE(set.contains(entt::entity{99}));
     ASSERT_TRUE(set.contains(entt::entity{1}));
 
-    ASSERT_FALSE(set.contains(entt::null));
-    ASSERT_FALSE(set.contains(entt::tombstone));
-
-    // tombstones and null entities can trigger false positives
-    ASSERT_TRUE(set.contains(entt::tombstone | entt::entity{1u}));
-    ASSERT_FALSE(set.contains(entt::null | entt::entity{1u}));
+    ASSERT_DEATH(set.contains(entt::null), "");
+    ASSERT_DEATH(set.contains(entt::tombstone), "");
+    ASSERT_DEATH(set.contains(entt::tombstone | entt::entity{1u}), "");
+    ASSERT_DEATH(set.contains(entt::null | entt::entity{1u}), "");
 }
 
 TEST(SparseSet, Move) {

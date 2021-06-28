@@ -507,6 +507,7 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+        ENTT_ASSERT(entt != tombstone && entt != null, "Invalid entity");
         const auto curr = page(entt);
         // testing versions permits to avoid accessing the packed array
         return (curr < bucket && sparse[curr] && sparse[curr][offset(entt)] != null);
@@ -692,6 +693,9 @@ public:
      * @param rhs A valid entity identifier.
      */
     void swap(const entity_type lhs, const entity_type rhs) {
+        ENTT_ASSERT(contains(lhs), "Set does not contain entity");
+        ENTT_ASSERT(contains(rhs), "Set does not contain entity");
+
         auto &entt = sparse[page(lhs)][offset(lhs)];
         auto &other = sparse[page(rhs)][offset(rhs)];
 
