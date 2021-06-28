@@ -358,7 +358,7 @@ public:
      * @brief Returns the deletion policy of a sparse set.
      * @return The deletion policy of the sparse set.
      */
-    deletion_policy policy() const ENTT_NOEXCEPT {
+    [[nodiscard]] deletion_policy policy() const ENTT_NOEXCEPT {
         return mode;
     }
 
