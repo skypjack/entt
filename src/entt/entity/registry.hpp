@@ -45,13 +45,14 @@ template<typename Entity>
 class basic_registry {
     using traits_type = entt_traits<Entity>;
     using poly_storage_type = typename poly_storage_traits<Entity>::storage_type;
+    using basic_common_type = basic_sparse_set<Entity>;
 
     template<typename Component>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
     struct pool_data {
         poly_storage_type poly;
-        std::unique_ptr<basic_sparse_set<Entity>> pool{};
+        std::unique_ptr<basic_common_type> pool{};
     };
 
     template<typename...>
@@ -61,7 +62,7 @@ class basic_registry {
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         static_assert(!std::disjunction_v<typename component_traits<Owned>::in_place_delete...>, "Groups do not support in-place delete");
         static_assert(std::conjunction_v<std::is_same<Owned, std::remove_const_t<Owned>>..., std::is_same<Get, std::remove_const_t<Get>>..., std::is_same<Exclude, std::remove_const_t<Exclude>>...>, "One or more component types are invalid");
-        std::conditional_t<sizeof...(Owned) == 0, basic_sparse_set<Entity>, std::size_t> current{};
+        std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t> current{};
 
         template<typename Component>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
@@ -140,10 +141,10 @@ class basic_registry {
     }
 
     auto release_entity(const Entity entity, const typename traits_type::version_type version) {
-        const auto entt = traits_type::to_entity(entity);
-        entities[entt] = traits_type::construct(traits_type::to_entity(free_list), version + (version == traits_type::to_version(tombstone)));
+        const auto vers = version + (version == traits_type::to_version(tombstone));
+        entities[traits_type::to_entity(entity)] = traits_type::construct(traits_type::to_entity(free_list), vers);
         free_list = (tombstone | entity);
-        return traits_type::to_version(entities[entt]);
+        return vers;
     }
 
 public:
@@ -562,8 +563,8 @@ public:
     version_type destroy(const entity_type entity, const version_type version) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
-        for(auto pos = pools.size(); pos; --pos) {
-            pools[pos-1].pool && pools[pos-1].pool->remove(entity, this);
+        for(auto &&pdata: pools) {
+            pdata.pool && pdata.pool->remove(entity, this);
         }
 
         return release_entity(entity, version);
@@ -580,8 +581,16 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        for(; first != last; ++first) {
-            destroy(*first, version(*first) + 1u);
+        if constexpr(is_iterator_type_v<typename basic_common_type::iterator, It>) {
+            for(; first != last; ++first) {
+                destroy(*first, version(*first) + 1u);
+            }
+        } else {
+            for(auto &&pdata: pools) {
+                pdata.pool && pdata.pool->remove(first, last, this);
+            }
+
+            release(first, last);
         }
     }
 
@@ -756,10 +765,19 @@ public:
      */
     template<typename... Component, typename It>
     size_type remove(It first, It last) {
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
+        const auto cpools = std::make_tuple(assure<Component>()...);
         size_type count{};
 
-        for(; first != last; ++first) {
-            count += remove<Component...>(*first);
+        if constexpr(is_iterator_type_v<typename basic_common_type::iterator, It>) {
+            for(; first != last; ++first) {
+                const auto entity = *first;
+                ENTT_ASSERT(valid(entity), "Invalid entity");
+                count += (std::get<storage_type<Component> *>(cpools)->remove(entity, this) + ...);
+            }
+        } else {
+            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+            count += (std::get<storage_type<Component> *>(cpools)->remove(first, last, this) + ...);
         }
 
         return count;
@@ -794,8 +812,18 @@ public:
      */
     template<typename... Component, typename It>
     void erase(It first, It last) {
-        for(; first != last; ++first) {
-            erase<Component...>(*first);
+        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
+        const auto cpools = std::make_tuple(assure<Component>()...);
+
+        if constexpr(is_iterator_type_v<typename basic_common_type::iterator, It>) {
+            for(; first != last; ++first) {
+                const auto entity = *first;
+                ENTT_ASSERT(valid(entity), "Invalid entity");
+                (std::get<storage_type<Component> *>(cpools)->erase(entity, this), ...);
+            }
+        } else {
+            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+            (std::get<storage_type<Component> *>(cpools)->erase(first, last, this), ...);
         }
     }
 
@@ -807,10 +835,8 @@ public:
     template<typename... Component>
     void compact() {
         if constexpr(sizeof...(Component) == 0) {
-            for(auto pos = pools.size(); pos; --pos) {
-                if(auto &pdata = pools[pos-1]; pdata.pool) {
-                    pdata.pool->compact();
-                }
+            for(auto &&pdata: pools) {
+                pdata.pool && (pdata.pool->compact(), true);
             }
         } else {
             (assure<Component>()->compact(), ...);
@@ -842,8 +868,8 @@ public:
     void remove_all(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
-        for(auto pos = pools.size(); pos; --pos) {
-            pools[pos-1].pool && pools[pos-1].pool->remove(entity, this);
+        for(auto &&pdata: pools) {
+            pdata.pool && pdata.pool->remove(entity, this);
         }
     }
 
@@ -989,10 +1015,8 @@ public:
     template<typename... Component>
     void clear() {
         if constexpr(sizeof...(Component) == 0) {
-            for(auto pos = pools.size(); pos; --pos) {
-                if(auto &pdata = pools[pos-1]; pdata.pool) {
-                    pdata.pool->clear(this);
-                }
+            for(auto &&pdata: pools) {
+                pdata.pool && (pdata.pool->clear(this), true);
             }
 
             each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
@@ -1216,8 +1240,8 @@ public:
      */
     template<typename ItComp, typename ItExcl = id_type *>
     [[nodiscard]] basic_runtime_view<Entity> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
-        std::vector<const basic_sparse_set<Entity> *> component(std::distance(first, last));
-        std::vector<const basic_sparse_set<Entity> *> filter(std::distance(from, to));
+        std::vector<const basic_common_type *> component(std::distance(first, last));
+        std::vector<const basic_common_type *> filter(std::distance(from, to));
 
         std::transform(first, last, component.begin(), [this](const auto ctype) {
             const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == ctype; });
