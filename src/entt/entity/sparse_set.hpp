@@ -665,12 +665,7 @@ public:
      * @return True if the entity is actually removed, false otherwise.
      */
     bool remove(const entity_type entt, void *ud = nullptr) {
-        if(contains(entt)) {
-            erase(entt, ud);
-            return true;
-        }
-
-        return false;
+        return contains(entt) && (erase(entt, ud), true);
     }
 
     /**
