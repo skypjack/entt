@@ -42,6 +42,7 @@ class view_iterator final {
     }
 
 public:
+    using iterator_type = It;
     using difference_type = typename std::iterator_traits<It>::difference_type;
     using value_type = typename std::iterator_traits<It>::value_type;
     using pointer = typename std::iterator_traits<It>::pointer;
