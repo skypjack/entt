@@ -366,7 +366,7 @@ public:
      * @brief Returns the next slot available for insertion.
      * @return The next slot available for insertion.
      */
-    [[nodiscard]] std::size_t slot() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type slot() const ENTT_NOEXCEPT {
         return free_list == null ? count : size_type{traits_type::to_entity(free_list)};
     }
 
@@ -563,8 +563,9 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid entity identifier.
+     * @return The slot used for insertion.
      */
-    void emplace(const entity_type entt) {
+    size_type emplace(const entity_type entt) {
         ENTT_ASSERT(!contains(entt), "Set already contains entity");
 
         if(free_list == null) {
@@ -574,12 +575,16 @@ public:
             }
 
             assure_page(page(entt))[offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(count));
-            packed[count++] = entt;
+            packed[count] = entt;
+
+            return count++;
         } else {
             const auto pos = size_type{traits_type::to_entity(free_list)};
             move_and_pop(count, pos);
+            // TODO no guarantees
             sparse[page(entt)][offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(pos));
             free_list = std::exchange(packed[pos], entt);
+            return pos;
         }
     }
 
