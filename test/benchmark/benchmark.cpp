@@ -127,7 +127,7 @@ TEST(Benchmark, Erase) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Removing 1000000 components from their entities" << std::endl;
+    std::cout << "Erasing 1000000 components from their entities" << std::endl;
 
     registry.create(entities.begin(), entities.end());
     registry.insert<int>(entities.begin(), entities.end());
@@ -145,14 +145,14 @@ TEST(Benchmark, EraseMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Removing 999999 components from their entities at once" << std::endl;
+    std::cout << "Erasing 1000000 components from their entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
     registry.insert<int>(entities.begin(), entities.end());
 
     timer timer;
     auto view = registry.view<int>();
-    registry.erase<int>(++view.begin(), view.end());
+    registry.erase<int>(view.begin(), view.end());
     timer.elapsed();
 }
 
@@ -178,14 +178,28 @@ TEST(Benchmark, RemoveMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Removing 999999 components from their entities at once" << std::endl;
+    std::cout << "Removing 1000000 components from their entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
     registry.insert<int>(entities.begin(), entities.end());
 
     timer timer;
     auto view = registry.view<int>();
-    registry.remove<int>(++view.begin(), view.end());
+    registry.remove<int>(view.begin(), view.end());
+    timer.elapsed();
+}
+
+TEST(Benchmark, Clear) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Clearing 1000000 components from their entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.clear<int>();
     timer.elapsed();
 }
 
@@ -249,7 +263,7 @@ TEST(Benchmark, DestroyMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Destroying 1000000 entities" << std::endl;
+    std::cout << "Destroying 1000000 entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
     registry.insert<int>(entities.begin(), entities.end());
@@ -257,6 +271,20 @@ TEST(Benchmark, DestroyMany) {
     timer timer;
     auto view = registry.view<int>();
     registry.destroy(view.begin(), view.end());
+    timer.elapsed();
+}
+
+TEST(Benchmark, DestroyManyFastPath) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Destroying 1000000 entities at once, fast path" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.destroy(entities.begin(), entities.end());
     timer.elapsed();
 }
 

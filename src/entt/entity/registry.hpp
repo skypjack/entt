@@ -769,15 +769,10 @@ public:
         const auto cpools = std::make_tuple(assure<Component>()...);
         size_type count{};
 
-        if constexpr(is_iterator_type_v<typename basic_common_type::iterator, It>) {
-            for(; first != last; ++first) {
-                const auto entity = *first;
-                ENTT_ASSERT(valid(entity), "Invalid entity");
-                count += (std::get<storage_type<Component> *>(cpools)->remove(entity, this) + ...);
-            }
-        } else {
-            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-            count += (std::get<storage_type<Component> *>(cpools)->remove(first, last, this) + ...);
+        for(; first != last; ++first) {
+            const auto entity = *first;
+            ENTT_ASSERT(valid(entity), "Invalid entity");
+            count += (std::get<storage_type<Component> *>(cpools)->remove(entity, this) + ...);
         }
 
         return count;
@@ -815,15 +810,10 @@ public:
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
         const auto cpools = std::make_tuple(assure<Component>()...);
 
-        if constexpr(is_iterator_type_v<typename basic_common_type::iterator, It>) {
-            for(; first != last; ++first) {
-                const auto entity = *first;
-                ENTT_ASSERT(valid(entity), "Invalid entity");
-                (std::get<storage_type<Component> *>(cpools)->erase(entity, this), ...);
-            }
-        } else {
-            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-            (std::get<storage_type<Component> *>(cpools)->erase(first, last, this), ...);
+        for(; first != last; ++first) {
+            const auto entity = *first;
+            ENTT_ASSERT(valid(entity), "Invalid entity");
+            (std::get<storage_type<Component> *>(cpools)->erase(entity, this), ...);
         }
     }
 
