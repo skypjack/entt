@@ -3,8 +3,9 @@
 
 
 #include <cstddef>
-#include <utility>
+#include <iterator>
 #include <type_traits>
+#include <utility>
 #include "../config/config.h"
 #include "fwd.hpp"
 
@@ -469,7 +470,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type Potentially equality comparable type.
+ * @tparam Type The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -477,7 +478,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type Potentially equality comparable type.
+ * @tparam Type The type to test.
  */
 template<class Type>
 inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -499,11 +500,11 @@ struct is_applicable<Func, Tuple<Args...>>: std::is_invocable<Func, Args...> {};
 
 
 /**
-* @copybrief is_applicable
-* @tparam Func A valid function type.
-* @tparam Tuple Tuple-like type.
-* @tparam Args The list of arguments to use to probe the function type.
-*/
+ * @copybrief is_applicable
+ * @tparam Func A valid function type.
+ * @tparam Tuple Tuple-like type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
 template<typename Func, template<typename...> class Tuple, typename... Args>
 struct is_applicable<Func, const Tuple<Args...>>: std::is_invocable<Func, Args...> {};
 
@@ -545,10 +546,10 @@ inline constexpr auto is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 
 
 /**
-* @brief Provides the member constant `value` to true if a given type is
-* complete, false otherwise.
-* @tparam Type Potential complete type.
-*/
+ * @brief Provides the member constant `value` to true if a given type is
+ * complete, false otherwise.
+ * @tparam Type The type to test.
+ */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
 
@@ -559,11 +560,68 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 
 /**
-* @brief Helper variable template.
-* @tparam Type Potential complete type.
-*/
+ * @brief Helper variable template.
+ * @tparam Type The type to test.
+ */
 template<typename Type>
 inline constexpr auto is_complete_v = is_complete<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is an
+ * iterator, false otherwise.
+ * @tparam Type The type to test.
+ */
+template<typename Type, typename = void>
+struct is_iterator: std::false_type {};
+
+
+/*! @copydoc is_iterator */
+template<typename Type>
+struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>
+    : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type The type to test.
+ */
+template<typename Type>
+inline constexpr auto is_iterator_v = is_iterator<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is of the
+ * required iterator type, false otherwise.
+ * @tparam Type The type to test.
+ * @tparam It Required iterator type.
+ */
+template<typename Type, typename It, typename = void>
+struct is_iterator_type: std::false_type {};
+
+
+/*! @copydoc is_iterator_type */
+template<typename Type, typename It>
+struct is_iterator_type<Type, It, std::enable_if_t<is_iterator_v<Type> && std::is_same_v<Type, It>>>
+    : std::true_type
+{};
+
+
+/*! @copydoc is_iterator_type */
+template<typename Type, typename It>
+struct is_iterator_type<Type, It, std::void_t<typename It::iterator_type>>
+    : is_iterator_type<Type, typename It::iterator_type>
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type The type to test.
+ * @tparam It Required iterator type.
+ */
+template<typename Type, typename It>
+inline constexpr auto is_iterator_type_v = is_iterator_type<Type, It>::value;
 
 
 /**

@@ -1,3 +1,4 @@
+#include <iterator>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
@@ -100,14 +101,13 @@ TEST(TypeTraits, IsEqualityComparable) {
     static_assert(entt::is_equality_comparable_v<std::vector<std::vector<int>>>);
     static_assert(entt::is_equality_comparable_v<std::unordered_map<int, int>>);
     static_assert(entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, char>>>);
+    static_assert(entt::is_equality_comparable_v<nlohmann_json_like>);
 
     static_assert(!entt::is_equality_comparable_v<not_comparable>);
     static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
     static_assert(!entt::is_equality_comparable_v<std::vector<std::vector<not_comparable>>>);
     static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>);
     static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>);
-
-    static_assert(entt::is_equality_comparable_v<nlohmann_json_like>);
     static_assert(!entt::is_equality_comparable_v<void>);
 }
 
@@ -121,8 +121,28 @@ TEST(TypeTraits, IsApplicable) {
 }
 
 TEST(TypeTraits, IsComplete) {
-    static_assert(entt::is_complete_v<int>);
     static_assert(!entt::is_complete_v<void>);
+    static_assert(entt::is_complete_v<int>);
+}
+
+TEST(TypeTraits, IsIterator) {
+    static_assert(!entt::is_iterator_v<void>);
+    static_assert(!entt::is_iterator_v<int>);
+
+    static_assert(entt::is_iterator_v<int *>);
+    static_assert(entt::is_iterator_v<std::vector<int>::iterator>);
+    static_assert(entt::is_iterator_v<std::vector<int>::const_iterator>);
+    static_assert(entt::is_iterator_v<std::vector<int>::reverse_iterator>);
+}
+
+TEST(TypeTraits, IsIteratorType) {
+    static_assert(!entt::is_iterator_type_v<void, std::vector<int>::iterator>);
+    static_assert(!entt::is_iterator_type_v<std::vector<int>::iterator, std::vector<int>::const_iterator>);
+    static_assert(!entt::is_iterator_type_v<std::vector<int>::iterator, int *>);
+
+    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::vector<int>::iterator>);
+    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::reverse_iterator<std::vector<int>::iterator>>);
+    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::reverse_iterator<std::reverse_iterator<std::vector<int>::iterator>>>);
 }
 
 TEST(TypeTraits, ConstnessAs) {
