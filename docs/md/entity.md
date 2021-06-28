@@ -30,6 +30,7 @@
   * [In-place delete](#in-place-delete)
     * [Pointer stability](#pointer-stability)
     * [Hierarchies](#hierarchies)
+  * [Making the most of range-destroy](#making-the-most-of-range-destroy)
   * [Meet the runtime](#meet-the-runtime)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
@@ -1095,6 +1096,46 @@ to identify (and discard) all tombstones. However, once considered the benefits,
 from performance to ease of use, and given the many optimizations that make this
 cost negligible, this is configured as one of the most convenient solutions and
 certainly something to take into consideration.
+
+## Making the most of range-destroy
+
+The range-destroy functionality offers an improved path under the hood. To
+understand it, let's try to describe what problem it tries to solve.<br/>
+This function accepts two iterators that point to the beginning and end of a
+range of entities. If the iterators are those returned from a view, this pair
+cannot be passed to the first storage asking to remove all entities and then to
+all other storage. This is because the range may be empty when passed to the
+second pool, as not all of those entities still own all the components iterated
+from the view itself.<br/>
+As a result, only one component is removed and no entities are destroyed.
+
+To avoid this, in many cases the registry doesn't pass the range to all pools.
+Instead, it iterates the range and passes an entity at a time to all pools.<br/>
+It goes without saying that the latter is slightly slower than the former.
+
+On the other side, the `destroy` function also uses `is_iterator_type` under the
+hood to detect _dangerous_ iterators. Whenever possible, it still chooses the
+fastest path.<br/>
+This means that performance will improve if, for example, two iterators returned
+from an `std::vector` are used or, more in general, with all iterators that are
+not part of `EnTT`.
+
+Unfortunately, this risks falling into the error described above in some corner
+cases. In particular, where an iterator is used that is not defined by `EnTT`
+but which uses one of the latter _within_ it.<br/>
+It's quite unlikely to happen even in large software. However, the library
+offers a solution also in this case, so as to allow for custom iterators and
+better performance at the same time.<br/>
+In particular, it's necessary to either expose the member type `iterator_type`
+and declare that an iterator from `EnTT` is used internally or specialize the
+`is_iterator_type` class to drive the choice of the `destroy` function.<br/>
+In both cases, the aim is to not choose the optimized route if it can cause
+problems.
+
+With a good chance, the last note can be ignored and there will never be a need
+to do the above even after writing millions of lines of code.<br/>
+However, it's good to know how to exploit the `destroy` function to get the best
+out of it.
 
 ## Meet the runtime
 
