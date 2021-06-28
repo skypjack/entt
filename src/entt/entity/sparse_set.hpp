@@ -363,6 +363,14 @@ public:
     }
 
     /**
+     * @brief Returns the next slot available for insertion.
+     * @return The next slot available for insertion.
+     */
+    [[nodiscard]] std::size_t slot() const ENTT_NOEXCEPT {
+        return free_list == null ? count : size_type{traits_type::to_entity(free_list)};
+    }
+
+    /**
      * @brief Increases the capacity of a sparse set.
      *
      * If the new capacity is greater than the current capacity, new storage is

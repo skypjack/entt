@@ -272,6 +272,7 @@ TEST(SparseSet, StableErase) {
     ASSERT_TRUE(set.at(0u) == entt::tombstone);
     ASSERT_TRUE(set.at(1u) == entt::tombstone);
     ASSERT_TRUE(set.at(2u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 0u);
 
     set.insert(std::begin(entities), std::end(entities));
     set.erase(entities, entities + 2u);
@@ -281,12 +282,14 @@ TEST(SparseSet, StableErase) {
     ASSERT_EQ(*set.begin(), entities[2u]);
     ASSERT_TRUE(set.at(3u) == entt::tombstone);
     ASSERT_TRUE(set.at(4u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 4u);
 
     set.erase(entities[2u]);
 
     ASSERT_DEATH(set.erase(entities[2u]), "");
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 6u);
+    ASSERT_EQ(set.slot(), 5u);
 
     set.insert(std::begin(entities), std::end(entities));
     std::swap(entities[1u], entities[2u]);
@@ -298,21 +301,25 @@ TEST(SparseSet, StableErase) {
     ASSERT_EQ(set.at(7u), entities[2u]);
     ASSERT_EQ(*++set.begin(), entities[2u]);
     ASSERT_TRUE(set.at(8u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 8u);
 
     set.compact();
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(*set.begin(), entities[2u]);
+    ASSERT_EQ(set.slot(), 1u);
 
     set.clear();
 
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.slot(), 0u);
 
     set.insert(std::begin(entities), std::end(entities));
     set.erase(entities[2u]);
 
     ASSERT_DEATH(set.erase(entities[2u]), "");
+    ASSERT_EQ(set.slot(), 2u);
 
     set.erase(entities[0u]);
     set.erase(entities[1u]);
@@ -320,6 +327,7 @@ TEST(SparseSet, StableErase) {
     ASSERT_DEATH(set.erase(entities, entities + 2u), "");
     ASSERT_EQ(set.size(), 3u);
     ASSERT_TRUE(*set.begin() == entt::tombstone);
+    ASSERT_EQ(set.slot(), 1u);
 
     set.emplace(entities[0u]);
 
@@ -406,6 +414,7 @@ TEST(SparseSet, StableRemove) {
     ASSERT_TRUE(set.at(0u) == entt::tombstone);
     ASSERT_TRUE(set.at(1u) == entt::tombstone);
     ASSERT_TRUE(set.at(2u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 0u);
 
     set.insert(std::begin(entities), std::end(entities));
 
@@ -415,6 +424,7 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(*set.begin(), entt::entity{9});
     ASSERT_TRUE(set.at(3u) == entt::tombstone);
     ASSERT_TRUE(set.at(4u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 4u);
 
     ASSERT_EQ(set.remove(entities[2u]), 1u);
     ASSERT_EQ(set.remove(entities[2u]), 0u);
@@ -423,6 +433,7 @@ TEST(SparseSet, StableRemove) {
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 6u);
     ASSERT_TRUE(*set.begin() == entt::tombstone);
+    ASSERT_EQ(set.slot(), 5u);
 
     set.insert(entities, entities + 2u);
 
@@ -431,6 +442,7 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(set.size(), 8u);
     ASSERT_TRUE(set.at(6u) == entt::tombstone);
     ASSERT_TRUE(set.at(7u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 7u);
 
     set.insert(std::begin(entities), std::end(entities));
     std::swap(entities[1u], entities[2u]);
@@ -442,16 +454,19 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(set.at(9u), entities[2u]);
     ASSERT_EQ(*++set.begin(), entities[2u]);
     ASSERT_TRUE(set.at(10u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 10u);
 
     set.compact();
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(*set.begin(), entities[2u]);
+    ASSERT_EQ(set.slot(), 1u);
 
     set.clear();
 
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.slot(), 0u);
 
     set.insert(std::begin(entities), std::end(entities));
 
@@ -464,6 +479,7 @@ TEST(SparseSet, StableRemove) {
 
     ASSERT_EQ(set.size(), 3u);
     ASSERT_TRUE(*set.begin() == entt::tombstone);
+    ASSERT_EQ(set.slot(), 1u);
 
     set.emplace(entities[0u]);
 
