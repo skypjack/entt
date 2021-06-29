@@ -13,7 +13,7 @@
 
 struct empty_type {};
 struct boxed_int { int value; };
-struct stable_type: boxed_int {};
+struct stable_type { int value; };
 
 struct update_from_destructor {
     update_from_destructor(entt::storage<update_from_destructor> &ref, entt::entity other)
