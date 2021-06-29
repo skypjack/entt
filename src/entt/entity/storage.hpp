@@ -268,7 +268,7 @@ protected:
     }
 
     /*! @copydoc basic_sparse_set::swap_and_pop */
-    void swap_and_pop(const Entity entt, void *ud) {
+    void swap_and_pop(const Entity entt, void *ud) override {
         const auto pos = underlying_type::index(entt);
         const auto last = underlying_type::size() - 1u;
         auto &&elem = packed[page(pos)][offset(pos)];
@@ -282,7 +282,7 @@ protected:
     }
 
     /*! @copydoc basic_sparse_set::in_place_pop */
-    void in_place_pop(const Entity entt, void *ud) {
+    void in_place_pop(const Entity entt, void *ud) override {
         const auto pos = underlying_type::index(entt);
         underlying_type::in_place_pop(entt, ud);
         // support for nosy destructors
