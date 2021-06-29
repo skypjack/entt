@@ -556,6 +556,29 @@ public:
     }
 
     /**
+     * @brief Appends an entity to a sparse set.
+     *
+     * @warning
+     * Attempting to assign an entity that already belongs to the sparse set
+     * results in undefined behavior.
+     *
+     * @param entt A valid entity identifier.
+     * @return The slot used for insertion.
+     */
+    size_type emplace_back(const entity_type entt) {
+        ENTT_ASSERT(!contains(entt), "Set already contains entity");
+
+        if(count == reserved) {
+            const size_type sz = static_cast<size_type>(reserved * growth_factor);
+            resize_packed(sz + !(sz > reserved));
+        }
+
+        assure_page(page(entt))[offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(count));
+        packed[count] = entt;
+        return count++;
+    }
+
+    /**
      * @brief Assigns an entity to a sparse set.
      *
      * @warning
@@ -566,22 +589,11 @@ public:
      * @return The slot used for insertion.
      */
     size_type emplace(const entity_type entt) {
-        ENTT_ASSERT(!contains(entt), "Set already contains entity");
-
         if(free_list == null) {
-            if(count == reserved) {
-                const size_type sz = static_cast<size_type>(reserved * growth_factor);
-                resize_packed(sz + !(sz > reserved));
-            }
-
-            assure_page(page(entt))[offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(count));
-            packed[count] = entt;
-
-            return count++;
+            return emplace_back(entt);
         } else {
+            ENTT_ASSERT(!contains(entt), "Set already contains entity");
             const auto pos = size_type{traits_type::to_entity(free_list)};
-            move_and_pop(count, pos);
-            // TODO no guarantees
             sparse[page(entt)][offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(pos));
             free_list = std::exchange(packed[pos], entt);
             return pos;

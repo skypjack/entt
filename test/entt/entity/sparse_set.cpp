@@ -175,8 +175,42 @@ TEST(SparseSet, Pagination) {
     ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
 }
 
+TEST(SparseSet, Emplace) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+    entt::entity entities[2u];
+
+    entities[0u] = entt::entity{3};
+    entities[1u] = entt::entity{42};
+
+    ASSERT_TRUE(set.empty());
+
+    set.emplace(entities[0u]);
+    set.erase(entities[0u]);
+
+    set.emplace_back(entities[0u]);
+    set.emplace(entities[1u]);
+
+    ASSERT_DEATH(set.emplace_back(entities[1u]), "");
+    ASSERT_DEATH(set.emplace(entities[0u]), "");
+
+    ASSERT_EQ(set.at(0u), entities[1u]);
+    ASSERT_EQ(set.at(1u), entities[0u]);
+    ASSERT_EQ(set.index(entities[0u]), 1u);
+    ASSERT_EQ(set.index(entities[1u]), 0u);
+
+    set.erase(std::begin(entities), std::end(entities));
+    set.emplace(entities[1u]);
+    set.emplace_back(entities[0u]);
+
+    ASSERT_EQ(set.at(0u), entities[1u]);
+    ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(set.at(2u), entities[0u]);
+    ASSERT_EQ(set.index(entities[0u]), 2u);
+    ASSERT_EQ(set.index(entities[1u]), 0u);
+}
+
 TEST(SparseSet, Insert) {
-    entt::sparse_set set;
+    entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[2u];
 
     entities[0u] = entt::entity{3};
@@ -204,6 +238,17 @@ TEST(SparseSet, Insert) {
     ASSERT_EQ(set.data()[set.index(entities[0u])], entities[0u]);
     ASSERT_EQ(set.data()[set.index(entities[1u])], entities[1u]);
     ASSERT_EQ(set.data()[set.index(entt::entity{24})], entt::entity{24});
+
+    set.erase(std::begin(entities), std::end(entities));
+    set.insert(std::rbegin(entities), std::rend(entities));
+
+    ASSERT_EQ(set.size(), 6u);
+    ASSERT_TRUE(set.at(1u) == entt::tombstone);
+    ASSERT_TRUE(set.at(2u) == entt::tombstone);
+    ASSERT_EQ(set.at(4u), entities[1u]);
+    ASSERT_EQ(set.at(5u), entities[0u]);
+    ASSERT_EQ(set.index(entities[0u]), 5u);
+    ASSERT_EQ(set.index(entities[1u]), 4u);
 }
 
 TEST(SparseSet, Erase) {
