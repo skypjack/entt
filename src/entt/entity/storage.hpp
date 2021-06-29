@@ -190,8 +190,8 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
         }
     }
 
-    void assure_page(const std::size_t idx) {
-        if(!(idx < bucket)) {
+    void assure_at_least(const std::size_t last) {
+        if(const auto idx = page(last - 1u); !(idx < bucket)) {
             const size_type sz = idx + 1u;
             const auto mem = bucket_alloc_traits::allocate(bucket_allocator, sz);
             std::uninitialized_copy(packed, packed + bucket, mem);
@@ -370,7 +370,7 @@ public:
         underlying_type::reserve(cap);
 
         if(cap > underlying_type::size()) {
-            assure_page(page(cap - 1u));
+            assure_at_least(cap);
         }
     }
 
@@ -536,7 +536,7 @@ public:
     template<typename... Args>
     value_type & emplace(const entity_type entt, Args &&... args) {
         const auto pos = underlying_type::slot();
-        assure_page(page(pos));
+        assure_at_least(pos + 1u);
 
         auto &value = push_at(pos, std::forward<Args>(args)...);
 
@@ -583,7 +583,7 @@ public:
     void insert(It first, It last, const value_type &value = {}) {
         const auto cap = underlying_type::size() + std::distance(first, last);
         underlying_type::reserve(cap);
-        assure_page(cap - 1u);
+        assure_at_least(cap);
 
         for(; first != last; ++first) {
             push_at(underlying_type::size(), value);
@@ -613,7 +613,7 @@ public:
     void insert(EIt first, EIt last, CIt from) {
         const auto cap = underlying_type::size() + std::distance(first, last);
         underlying_type::reserve(cap);
-        assure_page(cap - 1u);
+        assure_at_least(cap);
 
         for(; first != last; ++first, ++from) {
             push_at(underlying_type::size(), *from);
