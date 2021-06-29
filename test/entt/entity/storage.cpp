@@ -13,7 +13,35 @@
 
 struct empty_type {};
 struct boxed_int { int value; };
-struct stable_type { int value; };
+struct stable_type: boxed_int {};
+
+struct update_from_destructor {
+    update_from_destructor(entt::storage<update_from_destructor> &ref, entt::entity other)
+        : storage{&ref},
+          target{other}
+    {}
+
+    update_from_destructor(update_from_destructor &&other) ENTT_NOEXCEPT
+        : storage{std::exchange(other.storage, nullptr)},
+          target{std::exchange(other.target, entt::null)}
+    {}
+
+    update_from_destructor & operator=(update_from_destructor &&other) ENTT_NOEXCEPT {
+        storage = std::exchange(other.storage, nullptr);
+        target = std::exchange(other.target, entt::null);
+        return *this;
+    }
+
+    ~update_from_destructor() {
+        if(target != entt::null && storage->contains(target)) {
+            storage->erase(target);
+        }
+    }
+
+private:
+    entt::storage<update_from_destructor> *storage{};
+    entt::entity target{entt::null};
+};
 
 template<>
 struct entt::component_traits<stable_type>: basic_component_traits {
@@ -23,17 +51,6 @@ struct entt::component_traits<stable_type>: basic_component_traits {
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
     return lhs.value == rhs.value;
 }
-
-struct update_from_destructor {
-    ~update_from_destructor() {
-        if(target != entt::null) {
-            storage->erase(target);
-        }
-    }
-
-    entt::storage<update_from_destructor> *storage{};
-    entt::entity target{entt::null};
-};
 
 TEST(Storage, Functionalities) {
     entt::storage<int> pool;
@@ -134,20 +151,34 @@ TEST(Storage, EmptyType) {
 }
 
 TEST(Storage, Insert) {
-    entt::storage<int> pool;
+    entt::storage<stable_type> pool;
     entt::entity entities[2u];
 
     entities[0u] = entt::entity{3};
     entities[1u] = entt::entity{42};
-    pool.insert(std::begin(entities), std::end(entities), {});
+    pool.insert(std::begin(entities), std::end(entities), stable_type{99});
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.get(entities[0u]), 0);
-    ASSERT_EQ(pool.get(entities[1u]), 0);
+    ASSERT_EQ(pool.get(entities[0u]).value, 99);
+    ASSERT_EQ(pool.get(entities[1u]).value, 99);
+
+    pool.erase(std::begin(entities), std::end(entities));
+    const stable_type values[2u] = { stable_type{42}, stable_type{3} };
+    pool.insert(std::rbegin(entities), std::rend(entities), std::begin(values));
+
+    ASSERT_EQ(pool.size(), 4u);
+    ASSERT_TRUE(pool.at(0u) == entt::tombstone);
+    ASSERT_TRUE(pool.at(1u) == entt::tombstone);
+    ASSERT_EQ(pool.at(2u), entities[1u]);
+    ASSERT_EQ(pool.at(3u), entities[0u]);
+    ASSERT_EQ(pool.index(entities[0u]), 3u);
+    ASSERT_EQ(pool.index(entities[1u]), 2u);
+    ASSERT_EQ(pool.get(entities[0u]).value, 3);
+    ASSERT_EQ(pool.get(entities[1u]).value, 42);
 }
 
 TEST(Storage, InsertEmptyType) {
@@ -1026,21 +1057,27 @@ TEST(Storage, UpdateFromDestructor) {
         entt::storage<update_from_destructor> pool;
 
         for(std::size_t next{}; next < size; ++next) {
-            pool.emplace(entt::entity(next), &pool);
+            const auto entity = entt::entity(next);
+            pool.emplace(entity, pool, entity == entt::entity(size/2) ? target : entity);
         }
 
-        for(std::size_t next{}; next < size; ++next) {
-            ASSERT_EQ(pool.get(entt::entity(next)).target, entt::entity{entt::null});
-        }
-
-        pool.get(entt::entity(size/2)).target = target;
         pool.erase(entt::entity(size/2));
 
         ASSERT_EQ(pool.size(), size - 1u - (target != entt::null));
+        ASSERT_FALSE(pool.contains(entt::entity(size/2)));
+        ASSERT_FALSE(pool.contains(target));
+
+        pool.clear();
+
+        ASSERT_TRUE(pool.empty());
+
+        for(std::size_t next{}; next < size; ++next) {
+            ASSERT_FALSE(pool.contains(entt::entity(next)));
+        }
     };
 
-    test(entt::null);
     test(entt::entity(size - 1u));
+    test(entt::entity(size - 2u));
     test(entt::entity{0u});
 }
 

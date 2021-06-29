@@ -74,8 +74,6 @@ TEST(SparseSet, Functionalities) {
 }
 
 TEST(SparseSet, Contains) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::sparse_set set{entt::deletion_policy::in_place};
 
     set.emplace(entt::entity{0});

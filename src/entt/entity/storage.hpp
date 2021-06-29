@@ -190,37 +190,43 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
         }
     }
 
-    void maybe_resize_packed(const std::size_t req) {
-        ENTT_ASSERT(!(req < underlying_type::size()), "Invalid request");
+    void assure_page(const std::size_t idx) {
+        if(!(idx < bucket)) {
+            const size_type sz = idx + 1u;
+            const auto mem = bucket_alloc_traits::allocate(bucket_allocator, sz);
+            std::uninitialized_copy(packed, packed + bucket, mem);
+            size_type pos{};
 
-        if(const auto length = (req + packed_page - 1u) / packed_page; bucket != length) {
+            ENTT_TRY {
+                for(pos = bucket; pos < sz; ++pos) {
+                    auto pg = alloc_traits::allocate(allocator, packed_page);
+                    bucket_alloc_traits::construct(bucket_allocator, std::addressof(mem[pos]), pg);
+                }
+            } ENTT_CATCH {
+                for(auto next = bucket; next < pos; ++next) {
+                    alloc_traits::deallocate(allocator, mem[next], packed_page);
+                }
+
+                std::destroy(mem, mem + pos);
+                bucket_alloc_traits::deallocate(bucket_allocator, mem, sz);
+                ENTT_THROW;
+            }
+
+            std::destroy(packed, packed + bucket);
+            bucket_alloc_traits::deallocate(bucket_allocator, packed, bucket);
+
+            packed = mem;
+            bucket = sz;
+        }
+    }
+
+    void release_unused_pages() {
+        if(const auto length = underlying_type::size() / packed_page; length < bucket) {
             const auto mem = bucket_alloc_traits::allocate(bucket_allocator, length);
+            std::uninitialized_copy(packed, packed + length, mem);
 
-            if(bucket > length) {
-                std::uninitialized_copy(packed, packed + length, mem);
-
-                for(auto pos = length; pos < bucket; ++pos) {
-                    alloc_traits::deallocate(allocator, packed[pos], packed_page);
-                }
-            } else {
-                std::uninitialized_copy(packed, packed + bucket, mem);
-
-                size_type pos{};
-
-                ENTT_TRY {
-                    for(pos = bucket; pos < length; ++pos) {
-                        auto pg = alloc_traits::allocate(allocator, packed_page);
-                        bucket_alloc_traits::construct(bucket_allocator, std::addressof(mem[pos]), pg);
-                    }
-                } ENTT_CATCH {
-                    for(auto next = bucket; next < pos; ++next) {
-                        alloc_traits::deallocate(allocator, mem[next], packed_page);
-                    }
-
-                    std::destroy(mem, mem + pos);
-                    bucket_alloc_traits::deallocate(bucket_allocator, mem, length);
-                    ENTT_THROW;
-                }
+            for(auto pos = length; pos < bucket; ++pos) {
+                alloc_traits::deallocate(allocator, packed[pos], packed_page);
             }
 
             std::destroy(packed, packed + bucket);
@@ -232,10 +238,9 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
     }
 
     template<typename... Args>
-    auto & push_back(Args &&... args) {
-        const auto length = underlying_type::size();
-        ENTT_ASSERT(length < (bucket * packed_page), "No more space left");
-        auto *instance = std::addressof(packed[page(length)][offset(length)]);
+    auto & push_at(const std::size_t pos, Args &&... args) {
+        ENTT_ASSERT(pos < (bucket * packed_page), "Out of bounds index");
+        auto *instance = std::addressof(packed[page(pos)][offset(pos)]);
 
         if constexpr(std::is_aggregate_v<value_type>) {
             alloc_traits::construct(allocator, instance, Type{std::forward<Args>(args)...});
@@ -246,8 +251,8 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
         return *instance;
     }
 
-    void pop_back() {
-        alloc_traits::destroy(allocator, std::addressof(packed[underlying_type::size()]));
+    void pop_at(const std::size_t pos) {
+        alloc_traits::destroy(allocator, std::addressof(packed[page(pos)][offset(pos)]));
     }
 
 protected:
@@ -258,33 +263,30 @@ protected:
 
     /*! @copydoc basic_sparse_set::move_and_pop */
     void move_and_pop(const std::size_t from, const std::size_t to) final {
-        auto *instance = std::addressof(packed[page(to)][offset(to)]);
-        auto *other = std::addressof(packed[page(from)][offset(from)]);
-        alloc_traits::construct(allocator, instance, std::move(*other));
-        alloc_traits::destroy(allocator, other);
+        push_at(to, std::move(packed[page(from)][offset(from)]));
+        pop_at(from);
     }
 
     /*! @copydoc basic_sparse_set::swap_and_pop */
     void swap_and_pop(const Entity entt, void *ud) {
         const auto pos = underlying_type::index(entt);
-        const auto length = underlying_type::size() - 1u;
-
+        const auto last = underlying_type::size() - 1u;
         auto &&elem = packed[page(pos)][offset(pos)];
-        auto &&last = packed[page(length)][offset(length)];
 
         // support for nosy destructors
         [[maybe_unused]] auto unused = std::move(elem);
-        elem = std::move(last);
+        elem = std::move(packed[page(last)][offset(last)]);
+        pop_at(last);
 
-        alloc_traits::destroy(allocator, std::addressof(last));
         underlying_type::swap_and_pop(entt, ud);
     }
 
     /*! @copydoc basic_sparse_set::in_place_pop */
     void in_place_pop(const Entity entt, void *ud) {
         const auto pos = underlying_type::index(entt);
-        alloc_traits::destroy(allocator, std::addressof(packed[page(pos)][offset(pos)]));
         underlying_type::in_place_pop(entt, ud);
+        // support for nosy destructors
+        pop_at(pos);
     }
 
 public:
@@ -367,8 +369,8 @@ public:
     void reserve(const size_type cap) {
         underlying_type::reserve(cap);
 
-        if(cap > (bucket * packed_page)) {
-            maybe_resize_packed(cap);
+        if(cap > underlying_type::size()) {
+            assure_page(page(cap - 1u));
         }
     }
 
@@ -384,7 +386,7 @@ public:
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
         underlying_type::shrink_to_fit();
-        maybe_resize_packed(underlying_type::size());
+        release_unused_pages();
     }
 
     /**
@@ -533,13 +535,16 @@ public:
      */
     template<typename... Args>
     value_type & emplace(const entity_type entt, Args &&... args) {
-        maybe_resize_packed(underlying_type::size() + 1u);
-        auto &value = push_back(std::forward<Args>(args)...);
+        const auto pos = underlying_type::slot();
+        assure_page(page(pos));
+
+        auto &value = push_at(pos, std::forward<Args>(args)...);
 
         ENTT_TRY {
-            underlying_type::emplace(entt);
+            [[maybe_unused]] const auto curr = underlying_type::emplace(entt);
+            ENTT_ASSERT(pos == curr, "Misplaced component");
         } ENTT_CATCH {
-            pop_back();
+            pop_at(pos);
             ENTT_THROW;
         }
 
@@ -576,17 +581,17 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        const auto sz = underlying_type::size() + std::distance(first, last);
-        underlying_type::reserve(sz);
-        maybe_resize_packed(sz);
+        const auto cap = underlying_type::size() + std::distance(first, last);
+        underlying_type::reserve(cap);
+        assure_page(cap - 1u);
 
         for(; first != last; ++first) {
-            push_back(value);
+            push_at(underlying_type::size(), value);
 
             ENTT_TRY {
-                underlying_type::emplace(*first);
+                underlying_type::emplace_back(*first);
             } ENTT_CATCH {
-                pop_back();
+                pop_at(underlying_type::size());
                 ENTT_THROW;
             }
         }
@@ -606,17 +611,17 @@ public:
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
-        const auto sz = underlying_type::size() + std::distance(first, last);
-        underlying_type::reserve(sz);
-        maybe_resize_packed(sz);
+        const auto cap = underlying_type::size() + std::distance(first, last);
+        underlying_type::reserve(cap);
+        assure_page(cap - 1u);
 
         for(; first != last; ++first, ++from) {
-            push_back(*from);
+            push_at(underlying_type::size(), *from);
 
             ENTT_TRY {
-                underlying_type::emplace(*first);
+                underlying_type::emplace_back(*first);
             } ENTT_CATCH {
-                pop_back();
+                pop_at(underlying_type::size());
                 ENTT_THROW;
             }
         }
@@ -690,7 +695,7 @@ private:
     typename alloc_traits::allocator_type allocator;
     typename bucket_alloc_traits::allocator_type bucket_allocator;
     bucket_alloc_pointer packed;
-    std::size_t bucket;
+    size_type bucket;
 };
 
 
