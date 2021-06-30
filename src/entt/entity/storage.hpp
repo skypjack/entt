@@ -227,9 +227,9 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
             for(auto pos = length; pos < bucket; ++pos) {
                 alloc_traits::deallocate(allocator, packed[pos], packed_page);
+                bucket_alloc_traits::destroy(bucket_allocator, std::addressof(packed[pos]));
             }
 
-            std::destroy(packed, packed + bucket);
             bucket_alloc_traits::deallocate(bucket_allocator, packed, bucket);
 
             packed = mem;
