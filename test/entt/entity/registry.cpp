@@ -1751,20 +1751,32 @@ TEST(Registry, GetOrEmplace) {
 TEST(Registry, Constness) {
     entt::registry registry;
 
-    ASSERT_TRUE((std::is_same_v<decltype(registry.emplace<int>({})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(registry.emplace<empty_type>({})), void>));
+    static_assert((std::is_same_v<decltype(registry.emplace<int>({})), int &>));
+    static_assert((std::is_same_v<decltype(registry.emplace<empty_type>({})), void>));
 
-    ASSERT_TRUE((std::is_same_v<decltype(registry.get<int>({})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(registry.get<int, const char>({})), std::tuple<int &, const char &>>));
+    static_assert((std::is_same_v<decltype(registry.get<int>({})), int &>));
+    static_assert((std::is_same_v<decltype(registry.get<int, const char>({})), std::tuple<int &, const char &>>));
 
-    ASSERT_TRUE((std::is_same_v<decltype(registry.try_get<int>({})), int *>));
-    ASSERT_TRUE((std::is_same_v<decltype(registry.try_get<int, const char>({})), std::tuple<int *, const char *>>));
+    static_assert((std::is_same_v<decltype(registry.try_get<int>({})), int *>));
+    static_assert((std::is_same_v<decltype(registry.try_get<int, const char>({})), std::tuple<int *, const char *>>));
 
-    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).get<int>({})), const int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).get<int, const char>({})), std::tuple<const int &, const char &>>));
+    static_assert((std::is_same_v<decltype(registry.ctx<int>()), int &>));
+    static_assert((std::is_same_v<decltype(registry.ctx<const char>()), const char &>));
 
-    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
-    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int, const char>({})), std::tuple<const int *, const char *>>));
+    static_assert((std::is_same_v<decltype(registry.try_ctx<int>()), int *>));
+    static_assert((std::is_same_v<decltype(registry.try_ctx<const char>()), const char *>));
+
+    static_assert((std::is_same_v<decltype(std::as_const(registry).get<int>({})), const int &>));
+    static_assert((std::is_same_v<decltype(std::as_const(registry).get<int, const char>({})), std::tuple<const int &, const char &>>));
+
+    static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
+    static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<int, const char>({})), std::tuple<const int *, const char *>>));
+
+    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx<int>()), const int &>));
+    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx<const char>()), const char &>));
+
+    static_assert((std::is_same_v<decltype(std::as_const(registry).try_ctx<int>()), const int *>));
+    static_assert((std::is_same_v<decltype(std::as_const(registry).try_ctx<const char>()), const char *>));
 }
 
 TEST(Registry, MoveOnlyComponent) {
