@@ -141,7 +141,7 @@ class basic_registry {
     }
 
     auto release_entity(const Entity entity, const typename traits_type::version_type version) {
-        const auto vers = version + (version == traits_type::to_version(tombstone));
+        const typename traits_type::version_type vers = version + (version == traits_type::to_version(tombstone));
         entities[traits_type::to_entity(entity)] = traits_type::construct(traits_type::to_entity(free_list), vers);
         free_list = (tombstone | entity);
         return vers;
