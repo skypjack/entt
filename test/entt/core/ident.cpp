@@ -27,6 +27,5 @@ TEST(Identifier, Uniqueness) {
 
 TEST(Identifier, SingleType) {
     using id = entt::identifier<a_type>;
-    std::integral_constant<id::identifier_type, id::type<a_type>> ic;
-    (void)ic;
+    [[maybe_unused]] std::integral_constant<id::identifier_type, id::type<a_type>> ic;
 }

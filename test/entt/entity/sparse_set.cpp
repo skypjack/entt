@@ -919,8 +919,7 @@ TEST(SparseSet, CanModifyDuringIteration) {
     ASSERT_EQ(set.capacity(), 2u);
 
     // this should crash with asan enabled if we break the constraint
-    const auto entity = *it;
-    (void)entity;
+    [[maybe_unused]] const auto entity = *it;
 }
 
 TEST(SparseSet, ThrowingAllocator) {

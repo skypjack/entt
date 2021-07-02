@@ -1002,7 +1002,7 @@ TEST(Storage, RespectUnordered) {
 
 TEST(Storage, CanModifyDuringIteration) {
     entt::storage<int> pool;
-    pool.emplace(entt::entity{0}, 42);
+    auto *ptr = &pool.emplace(entt::entity{0}, 42);
 
     ASSERT_EQ(pool.capacity(), ENTT_PACKED_PAGE);
 
@@ -1010,10 +1010,10 @@ TEST(Storage, CanModifyDuringIteration) {
     pool.reserve(ENTT_PACKED_PAGE + 1u);
 
     ASSERT_EQ(pool.capacity(), 2 * ENTT_PACKED_PAGE);
+    ASSERT_EQ(&pool.get(entt::entity{0}), ptr);
 
     // this should crash with asan enabled if we break the constraint
-    const auto entity = *it;
-    (void)entity;
+    [[maybe_unused]] const int &value = *it;
 }
 
 TEST(Storage, ReferencesGuaranteed) {
@@ -1046,8 +1046,7 @@ TEST(Storage, ReferencesGuaranteed) {
 
 TEST(Storage, MoveOnlyComponent) {
     // the purpose is to ensure that move only components are always accepted
-    entt::storage<std::unique_ptr<int>> pool;
-    (void)pool;
+    [[maybe_unused]] entt::storage<std::unique_ptr<int>> pool;
 }
 
 TEST(Storage, UpdateFromDestructor) {
