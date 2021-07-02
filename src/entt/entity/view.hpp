@@ -114,6 +114,19 @@ private:
 };
 
 
+template<bool Enable>
+struct stable_iteration {
+    template<typename Entity>
+    [[nodiscard]] static constexpr bool accept([[maybe_unused]] const Entity entity) ENTT_NOEXCEPT {
+        if constexpr(Enable) {
+            return entity != tombstone;
+        } else {
+            return true;
+        }
+    }
+};
+
+
 }
 
 
@@ -124,37 +137,11 @@ private:
 
 
 /*! @brief Stable storage policy, aimed at pointer stability. */
-struct stable_storage_policy {
-    /**
-    * @cond TURN_OFF_DOXYGEN
-    * Internal details not to be documented.
-    */
-    template<typename Entity>
-    [[nodiscard]] static constexpr bool accept(const Entity entity) ENTT_NOEXCEPT {
-        return entity != tombstone;
-    }
-    /**
-    * Internal details not to be documented.
-    * @endcond
-    */
-};
+using packed_storage_policy = internal::stable_iteration<false>;
 
 
 /*! @brief Packed storage policy, aimed at faster linear iteration. */
-struct packed_storage_policy {
-    /**
-    * @cond TURN_OFF_DOXYGEN
-    * Internal details not to be documented.
-    */
-    template<typename Entity>
-    [[nodiscard]] static constexpr bool accept(const Entity) ENTT_NOEXCEPT {
-        return true;
-    }
-    /**
-    * Internal details not to be documented.
-    * @endcond
-    */
-};
+using stable_storage_policy = internal::stable_iteration<true>;
 
 
 /**
@@ -1014,10 +1001,10 @@ private:
  */
 template<typename Entity, typename... Exclude, typename... Component>
 struct basic_view<Entity, exclude_t<Exclude...>, Component...>
-    : basic_view_impl<std::conditional_t<std::disjunction_v<typename component_traits<std::remove_const_t<Component>>::in_place_delete...>, stable_storage_policy, packed_storage_policy>, Entity, exclude_t<Exclude...>, Component...>
+    : basic_view_impl<internal::stable_iteration<(in_place_delete_v<std::remove_const_t<Component>> || ...)>, Entity, exclude_t<Exclude...>, Component...>
 {
     /*! @brief Most restrictive storage policy of all component types. */
-    using storage_policy = std::conditional_t<std::disjunction_v<typename component_traits<std::remove_const_t<Component>>::in_place_delete...>, stable_storage_policy, packed_storage_policy>;
+    using storage_policy = internal::stable_iteration<(in_place_delete_v<std::remove_const_t<Component>> || ...)>;
     using basic_view_impl<storage_policy, Entity, exclude_t<Exclude...>, Component...>::basic_view_impl;
 };
 
