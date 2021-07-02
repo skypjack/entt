@@ -1,13 +1,12 @@
 * long term feature: shared_ptr less locator and resource cache
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
-* allow to replace std:: with custom implementations
 * add examples (and credits) from @alanjfs :)
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
 * remove view/storage dispatcher, add support to relax policy constraints on user request (eg view.use<T>())
-* improve perf for sparse_set/storage::insert/emplace/destroy/remove/...
+* remove view each<T>(F), each<T>(), make view::use return a view and remove the mutable data member
 * custom allocators all over
 
 WIP:
@@ -18,8 +17,6 @@ WIP:
 * make pools available (registry/view/group), review operator| for views
 * page size: add per-pool size, allow for 0 sizes (old fully packed array)
 * compressed pair to exploit ebo in sparse set and the others
-* isolate view iterator, unwrap iterators in registry ::remove/::erase/::destroy to use the faster solution for non-view iterators
-* remove view each<T>(F), each<T>(), make view::use return a view and remove the mutable data member
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * add user data to type_info
