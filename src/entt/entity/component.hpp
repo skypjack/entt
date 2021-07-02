@@ -28,6 +28,22 @@ struct component_traits: basic_component_traits {
 };
 
 
+/**
+ * @brief Helper variable template.
+ * @tparam Type Type of component.
+ */
+template<class Type>
+inline constexpr bool in_place_delete_v = component_traits<Type>::in_place_delete::value;
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Type of component.
+ */
+template<class Type>
+inline constexpr bool ignore_if_empty_v = component_traits<Type>::ignore_if_empty::value;
+
+
 }
 
 
