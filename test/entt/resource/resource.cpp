@@ -44,6 +44,18 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(cache.load<loader<resource>>(hs1, 42));
     ASSERT_TRUE(cache.reload<loader<resource>>(hs1, 42));
 
+    ASSERT_EQ(cache.handle(hs1).use_count(), 2);
+
+    auto tmp = cache.handle(hs1);
+
+    ASSERT_EQ(cache.handle(hs1).use_count(), 3);
+    ASSERT_TRUE(static_cast<bool>(tmp));
+
+    tmp = {};
+
+    ASSERT_EQ(cache.handle(hs1).use_count(), 2);
+    ASSERT_FALSE(static_cast<bool>(tmp));
+
     ASSERT_NE(cache.size(), 0u);
     ASSERT_FALSE(cache.empty());
     ASSERT_TRUE(cache.contains(hs1));

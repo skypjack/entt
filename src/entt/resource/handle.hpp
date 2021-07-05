@@ -31,6 +31,9 @@ class resource_handle {
     friend class resource_handle;
 
 public:
+    /*! @brief Unsigned integer type. */
+    using size_type = long;
+
     /*! @brief Default constructor. */
     resource_handle() ENTT_NOEXCEPT = default;
 
@@ -176,6 +179,14 @@ public:
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return static_cast<bool>(resource);
+    }
+
+    /**
+     * @brief Returns the number of handles pointing the same resource.
+     * @return The number of handles pointing the same resource.
+     */
+    [[nodiscard]] size_type use_count() const ENTT_NOEXCEPT {
+        return resource.use_count();
     }
 
 private:
