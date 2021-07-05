@@ -563,6 +563,25 @@ inline constexpr bool is_iterator_type_v = is_iterator_type<Type, It>::value;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is both
+ * an empty and non-final class, false otherwise.
+ * @tparam Type The type to test
+ */
+template<typename Type>
+struct is_ebco_eligible
+    : std::conjunction<std::is_empty<Type>, std::negation<std::is_final<Type>>>
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type The type to test.
+ */
+template<typename Type>
+inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
+
+
+/**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */

@@ -2,6 +2,7 @@
 #include "core/algorithm.hpp"
 #include "core/any.hpp"
 #include "core/attribute.h"
+#include "core/compressed_pair.hpp"
 #include "core/family.hpp"
 #include "core/hashed_string.hpp"
 #include "core/ident.hpp"
