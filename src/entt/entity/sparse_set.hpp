@@ -9,6 +9,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -64,9 +65,6 @@ class basic_sparse_set {
     using alloc_ptr = typename allocator_traits::template rebind_alloc<alloc_pointer>;
     using alloc_ptr_traits = typename std::allocator_traits<alloc_ptr>;
     using alloc_ptr_pointer = typename alloc_ptr_traits::pointer;
-
-    // TODO using bucket_alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<alloc_pointer>;
-    // TODO using bucket_alloc_pointer = typename bucket_alloc_traits::pointer;
 
     using entity_traits = entt_traits<Entity>;
 
@@ -181,7 +179,7 @@ class basic_sparse_set {
     [[nodiscard]] auto assure_page(const std::size_t idx) {
         if(!(idx < bucket)) {
             const size_type sz = idx + 1u;
-            alloc_ptr allocator_ptr{allocator};
+            alloc_ptr allocator_ptr{reserved.first()};
             const auto mem = alloc_ptr_traits::allocate(allocator_ptr, sz);
 
             std::uninitialized_value_construct(mem + bucket, mem + sz);
@@ -195,7 +193,7 @@ class basic_sparse_set {
         }
 
         if(!sparse[idx]) {
-            sparse[idx] = alloc_traits::allocate(allocator, sparse_page);
+            sparse[idx] = alloc_traits::allocate(reserved.first(), sparse_page);
             std::uninitialized_fill(sparse[idx], sparse[idx] + sparse_page, null);
         }
 
@@ -203,21 +201,24 @@ class basic_sparse_set {
     }
 
     void resize_packed(const std::size_t req) {
-        ENTT_ASSERT((req != reserved) && !(req < count), "Invalid request");
+        auto &&[allocator, len] = reserved;
+        ENTT_ASSERT((req != len) && !(req < count), "Invalid request");
         const auto mem = alloc_traits::allocate(allocator, req);
 
         std::uninitialized_copy(packed, packed + count, mem);
         std::uninitialized_fill(mem + count, mem + req, tombstone);
 
-        std::destroy(packed, packed + reserved);
-        alloc_traits::deallocate(allocator, packed, reserved);
+        std::destroy(packed, packed + len);
+        alloc_traits::deallocate(allocator, packed, len);
 
         packed = mem;
-        reserved = req;
+        len = req;
     }
 
     void release_memory() {
         if(packed) {
+            auto &&[allocator, len] = reserved;
+
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(sparse[pos]) {
                     std::destroy(sparse[pos], sparse[pos] + sparse_page);
@@ -225,11 +226,11 @@ class basic_sparse_set {
                 }
             }
 
-            std::destroy(packed, packed + reserved);
+            std::destroy(packed, packed + len);
             std::destroy(sparse, sparse + bucket);
 
             alloc_ptr allocator_ptr{allocator};
-            alloc_traits::deallocate(allocator, packed, reserved);
+            alloc_traits::deallocate(allocator, packed, len);
             alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
         }
     }
@@ -303,12 +304,11 @@ public:
      * @param alloc Allocator to use (possibly default-constructed).
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &alloc = {})
-        : allocator{alloc},
-          sparse{alloc_ptr_traits::allocate(alloc_ptr{allocator}, 0u)},
-          packed{alloc_traits::allocate(allocator, 0u)},
+        : reserved{alloc, 0u},
+          sparse{alloc_ptr_traits::allocate(alloc_ptr{reserved.first()}, 0u)},
+          packed{alloc_traits::allocate(reserved.first(), 0u)},
           bucket{0u},
           count{0u},
-          reserved{0u},
           free_list{tombstone},
           mode{pol}
     {}
@@ -326,12 +326,11 @@ public:
      * @param other The instance to move from.
      */
     basic_sparse_set(basic_sparse_set &&other) ENTT_NOEXCEPT
-        : allocator{std::move(other.allocator)},
+        : reserved{std::move(other.reserved)},
           sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
           packed{std::exchange(other.packed, alloc_pointer{})},
           bucket{std::exchange(other.bucket, 0u)},
           count{std::exchange(other.count, 0u)},
-          reserved{std::exchange(other.reserved, 0u)},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode}
     {}
@@ -349,12 +348,11 @@ public:
     basic_sparse_set & operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
         release_memory();
 
-        allocator = std::move(other.allocator);
+        reserved = std::move(other.reserved);
         sparse = std::exchange(other.sparse, alloc_ptr_pointer{});
         packed = std::exchange(other.packed, alloc_pointer{});
         bucket = std::exchange(other.bucket, 0u);
         count = std::exchange(other.count, 0u);
-        reserved = std::exchange(other.reserved, 0u);
         free_list = std::exchange(other.free_list, tombstone);
         mode = other.mode;
 
@@ -366,7 +364,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
-        return allocator_type{allocator};
+        return allocator_type{reserved.first()};
     }
 
     /**
@@ -394,7 +392,7 @@ public:
      * @param cap Desired capacity.
      */
     void reserve(const size_type cap) {
-        if(cap > reserved) {
+        if(cap > reserved.second()) {
             resize_packed(cap);
         }
     }
@@ -405,12 +403,12 @@ public:
      * @return Capacity of the sparse set.
      */
     [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
-        return reserved;
+        return reserved.second();
     }
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
-        if(count < reserved) {
+        if(count < reserved.second()) {
             resize_packed(count);
         }
     }
@@ -583,9 +581,9 @@ public:
     size_type emplace_back(const entity_type entt) {
         ENTT_ASSERT(!contains(entt), "Set already contains entity");
 
-        if(count == reserved) {
-            const size_type sz = static_cast<size_type>(reserved * growth_factor);
-            resize_packed(sz + !(sz > reserved));
+        if(const auto len = reserved.second(); count == len) {
+            const size_type sz = static_cast<size_type>(len * growth_factor);
+            resize_packed(sz + !(sz > len));
         }
 
         assure_page(page(entt))[offset(entt)] = entity_traits::construct(static_cast<typename entity_traits::entity_type>(count));
@@ -867,12 +865,11 @@ public:
     }
 
 private:
-    alloc allocator;
+    compressed_pair<alloc, size_type> reserved;
     alloc_ptr_pointer sparse;
     alloc_pointer packed;
-    std::size_t bucket;
-    std::size_t count;
-    std::size_t reserved;
+    size_type bucket;
+    size_type count;
     entity_type free_list;
     deletion_policy mode;
 };
