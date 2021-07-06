@@ -54,17 +54,24 @@ class basic_sparse_set {
     static constexpr auto growth_factor = 1.5;
     static constexpr auto sparse_page = ENTT_SPARSE_PAGE;
 
+    using allocator_traits = std::allocator_traits<Allocator>;
+
+    using alloc = typename allocator_traits::template rebind_alloc<Entity>;
+    using alloc_traits = typename std::allocator_traits<alloc>;
+    using alloc_const_pointer = typename alloc_traits::const_pointer;
+    using alloc_pointer = typename alloc_traits::pointer;
+
+    using alloc_ptr = typename allocator_traits::template rebind_alloc<alloc_pointer>;
+    using alloc_ptr_traits = typename std::allocator_traits<alloc_ptr>;
+    using alloc_ptr_pointer = typename alloc_ptr_traits::pointer;
+
+    // TODO using bucket_alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<alloc_pointer>;
+    // TODO using bucket_alloc_pointer = typename bucket_alloc_traits::pointer;
+
     using entity_traits = entt_traits<Entity>;
 
-    using alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<Entity>;
-    using alloc_pointer = typename alloc_traits::pointer;
-    using alloc_const_pointer = typename alloc_traits::const_pointer;
-
-    using bucket_alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<alloc_pointer>;
-    using bucket_alloc_pointer = typename bucket_alloc_traits::pointer;
-
     static_assert(alloc_traits::propagate_on_container_move_assignment::value);
-    static_assert(bucket_alloc_traits::propagate_on_container_move_assignment::value);
+    static_assert(alloc_ptr_traits::propagate_on_container_move_assignment::value);
 
     struct sparse_set_iterator final {
         using difference_type = typename entity_traits::difference_type;
@@ -174,13 +181,14 @@ class basic_sparse_set {
     [[nodiscard]] auto assure_page(const std::size_t idx) {
         if(!(idx < bucket)) {
             const size_type sz = idx + 1u;
-            const auto mem = bucket_alloc_traits::allocate(bucket_allocator, sz);
+            alloc_ptr allocator_ptr{allocator};
+            const auto mem = alloc_ptr_traits::allocate(allocator_ptr, sz);
 
             std::uninitialized_value_construct(mem + bucket, mem + sz);
             std::uninitialized_copy(sparse, sparse + bucket, mem);
 
             std::destroy(sparse, sparse + bucket);
-            bucket_alloc_traits::deallocate(bucket_allocator, sparse, bucket);
+            alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
 
             sparse = mem;
             bucket = sz;
@@ -219,8 +227,10 @@ class basic_sparse_set {
 
             std::destroy(packed, packed + reserved);
             std::destroy(sparse, sparse + bucket);
+
+            alloc_ptr allocator_ptr{allocator};
             alloc_traits::deallocate(allocator, packed, reserved);
-            bucket_alloc_traits::deallocate(bucket_allocator, sparse, bucket);
+            alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
         }
     }
 
@@ -275,7 +285,7 @@ protected:
 
 public:
     /*! @brief Allocator type. */
-    using allocator_type = typename alloc_traits::allocator_type;
+    using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -294,8 +304,7 @@ public:
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &alloc = {})
         : allocator{alloc},
-          bucket_allocator{alloc},
-          sparse{bucket_alloc_traits::allocate(bucket_allocator, 0u)},
+          sparse{alloc_ptr_traits::allocate(alloc_ptr{allocator}, 0u)},
           packed{alloc_traits::allocate(allocator, 0u)},
           bucket{0u},
           count{0u},
@@ -318,8 +327,7 @@ public:
      */
     basic_sparse_set(basic_sparse_set &&other) ENTT_NOEXCEPT
         : allocator{std::move(other.allocator)},
-          bucket_allocator{std::move(other.bucket_allocator)},
-          sparse{std::exchange(other.sparse, bucket_alloc_pointer{})},
+          sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
           packed{std::exchange(other.packed, alloc_pointer{})},
           bucket{std::exchange(other.bucket, 0u)},
           count{std::exchange(other.count, 0u)},
@@ -342,8 +350,7 @@ public:
         release_memory();
 
         allocator = std::move(other.allocator);
-        bucket_allocator = std::move(other.bucket_allocator);
-        sparse = std::exchange(other.sparse, bucket_alloc_pointer{});
+        sparse = std::exchange(other.sparse, alloc_ptr_pointer{});
         packed = std::exchange(other.packed, alloc_pointer{});
         bucket = std::exchange(other.bucket, 0u);
         count = std::exchange(other.count, 0u);
@@ -352,6 +359,14 @@ public:
         mode = other.mode;
 
         return *this;
+    }
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+        return allocator_type{allocator};
     }
 
     /**
@@ -852,9 +867,8 @@ public:
     }
 
 private:
-    typename alloc_traits::allocator_type allocator;
-    typename bucket_alloc_traits::allocator_type bucket_allocator;
-    bucket_alloc_pointer sparse;
+    alloc allocator;
+    alloc_ptr_pointer sparse;
     alloc_pointer packed;
     std::size_t bucket;
     std::size_t count;
