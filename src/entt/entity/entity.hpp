@@ -75,17 +75,17 @@ struct entt_traits<std::uint64_t> {
  */
 template<typename Type>
 class entt_traits: private internal::entt_traits<Type> {
-    using traits_type = internal::entt_traits<Type>;
+    using entity_traits = internal::entt_traits<Type>;
 
 public:
     /*! @brief Value type. */
     using value_type = Type;
     /*! @brief Underlying entity type. */
-    using entity_type = typename traits_type::entity_type;
+    using entity_type = typename entity_traits::entity_type;
     /*! @brief Underlying version type. */
-    using version_type = typename traits_type::version_type;
+    using version_type = typename entity_traits::version_type;
     /*! @brief Difference type. */
-    using difference_type = typename traits_type::difference_type;
+    using difference_type = typename entity_traits::difference_type;
 
     /**
      * @brief Converts an entity to its underlying type.
@@ -102,7 +102,7 @@ public:
      * @return The integral representation of the entity part.
      */
     [[nodiscard]] static constexpr entity_type to_entity(const value_type value) ENTT_NOEXCEPT {
-        return (to_integral(value) & traits_type::entity_mask);
+        return (to_integral(value) & entity_traits::entity_mask);
     }
 
     /**
@@ -111,8 +111,8 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const value_type value) ENTT_NOEXCEPT {
-        constexpr auto mask = (traits_type::version_mask << traits_type::entity_shift);
-        return ((to_integral(value) & mask) >> traits_type::entity_shift);
+        constexpr auto mask = (entity_traits::version_mask << entity_traits::entity_shift);
+        return ((to_integral(value) & mask) >> entity_traits::entity_shift);
     }
 
     /**
@@ -125,8 +125,8 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type construct(const entity_type entity = traits_type::entity_mask, const version_type version = traits_type::version_mask) ENTT_NOEXCEPT {
-        return value_type{(entity & traits_type::entity_mask) | (static_cast<entity_type>(version) << traits_type::entity_shift)};
+    [[nodiscard]] static constexpr value_type construct(const entity_type entity = entity_traits::entity_mask, const version_type version = entity_traits::version_mask) ENTT_NOEXCEPT {
+        return value_type{(entity & entity_traits::entity_mask) | (static_cast<entity_type>(version) << entity_traits::entity_shift)};
     }
 };
 

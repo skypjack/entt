@@ -32,12 +32,12 @@ namespace entt {
  */
 template<typename Entity>
 class basic_snapshot {
-    using traits_type = entt_traits<Entity>;
+    using entity_traits = entt_traits<Entity>;
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
         const auto view = reg->template view<std::add_const_t<Component>>();
-        archive(typename traits_type::entity_type(sz));
+        archive(typename entity_traits::entity_type(sz));
 
         while(first != last) {
             const auto entt = *(first++);
@@ -93,7 +93,7 @@ public:
     const basic_snapshot & entities(Archive &archive) const {
         const auto sz = reg->size();
 
-        archive(typename traits_type::entity_type(sz));
+        archive(typename entity_traits::entity_type(sz));
 
         for(auto first = reg->data(), last = first + sz; first != last; ++first) {
             archive(*first);
@@ -164,11 +164,11 @@ private:
  */
 template<typename Entity>
 class basic_snapshot_loader {
-    using traits_type = entt_traits<Entity>;
+    using entity_traits = entt_traits<Entity>;
 
     template<typename Type, typename Archive>
     void assign(Archive &archive) const {
-        typename traits_type::entity_type length{};
+        typename entity_traits::entity_type length{};
         archive(length);
 
         entity_type entt{};
@@ -225,7 +225,7 @@ public:
      */
     template<typename Archive>
     const basic_snapshot_loader & entities(Archive &archive) const {
-        typename traits_type::entity_type length{};
+        typename entity_traits::entity_type length{};
 
         archive(length);
         std::vector<entity_type> all(length);
@@ -302,7 +302,7 @@ private:
  */
 template<typename Entity>
 class basic_continuous_loader {
-    using traits_type = entt_traits<Entity>;
+    using entity_traits = entt_traits<Entity>;
 
     void destroy(Entity entt) {
         if(const auto it = remloc.find(entt); it == remloc.cend()) {
@@ -387,7 +387,7 @@ class basic_continuous_loader {
 
     template<typename Other, typename Archive, typename... Type, typename... Member>
     void assign(Archive &archive, [[maybe_unused]] Member Type:: *... member) {
-        typename traits_type::entity_type length{};
+        typename entity_traits::entity_type length{};
         archive(length);
 
         entity_type entt{};
@@ -440,7 +440,7 @@ public:
      */
     template<typename Archive>
     basic_continuous_loader & entities(Archive &archive) {
-        typename traits_type::entity_type length{};
+        typename entity_traits::entity_type length{};
         entity_type entt{};
 
         archive(length);
@@ -448,7 +448,7 @@ public:
         for(decltype(length) pos{}; pos < length; ++pos) {
             archive(entt);
 
-            if(const auto entity = traits_type::to_entity(entt); entity == pos) {
+            if(const auto entity = entity_traits::to_entity(entt); entity == pos) {
                 restore(entt);
             } else {
                 destroy(entt);

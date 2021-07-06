@@ -62,7 +62,7 @@ struct fnv1a_traits<std::uint64_t> {
  */
 template<typename Char>
 class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<id_type>;
+    using hs_traits = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -72,10 +72,10 @@ class basic_hashed_string {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
-        auto value = traits_type::offset;
+        auto value = hs_traits::offset;
 
         while(*curr != 0) {
-            value = (value ^ static_cast<traits_type::type>(*(curr++))) * traits_type::prime;
+            value = (value ^ static_cast<hs_traits::type>(*(curr++))) * hs_traits::prime;
         }
 
         return value;
@@ -94,8 +94,8 @@ public:
      * @return The numeric representation of the string.
      */
     [[nodiscard]] static constexpr hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        id_type partial{traits_type::offset};
-        while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
+        id_type partial{hs_traits::offset};
+        while(size--) { partial = (partial ^ (str++)[0]) * hs_traits::prime; }
         return partial;
     }
 

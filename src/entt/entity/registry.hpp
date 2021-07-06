@@ -43,7 +43,7 @@ namespace entt {
  */
 template<typename Entity>
 class basic_registry {
-    using traits_type = entt_traits<Entity>;
+    using entity_traits = entt_traits<Entity>;
     using poly_storage_type = typename poly_storage_traits<Entity>::storage_type;
     using basic_common_type = basic_sparse_set<Entity>;
 
@@ -129,20 +129,20 @@ class basic_registry {
     }
 
     auto generate_identifier(const std::size_t pos) ENTT_NOEXCEPT {
-        ENTT_ASSERT(pos < traits_type::to_integral(null), "No entities available");
-        return traits_type::construct(static_cast<typename traits_type::entity_type>(pos), {});
+        ENTT_ASSERT(pos < entity_traits::to_integral(null), "No entities available");
+        return entity_traits::construct(static_cast<typename entity_traits::entity_type>(pos), {});
     }
 
     auto recycle_identifier() ENTT_NOEXCEPT {
         ENTT_ASSERT(free_list != null, "No entities available");
-        const auto curr = traits_type::to_entity(free_list);
+        const auto curr = entity_traits::to_entity(free_list);
         free_list = (tombstone | entities[curr]);
-        return (entities[curr] = traits_type::construct(curr, traits_type::to_version(entities[curr])));
+        return (entities[curr] = entity_traits::construct(curr, entity_traits::to_version(entities[curr])));
     }
 
-    auto release_entity(const Entity entity, const typename traits_type::version_type version) {
-        const typename traits_type::version_type vers = version + (version == traits_type::to_version(tombstone));
-        entities[traits_type::to_entity(entity)] = traits_type::construct(traits_type::to_entity(free_list), vers);
+    auto release_entity(const Entity entity, const typename entity_traits::version_type version) {
+        const typename entity_traits::version_type vers = version + (version == entity_traits::to_version(tombstone));
+        entities[entity_traits::to_entity(entity)] = entity_traits::construct(entity_traits::to_entity(free_list), vers);
         free_list = (tombstone | entity);
         return vers;
     }
@@ -151,7 +151,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Underlying version type. */
-    using version_type = typename traits_type::version_type;
+    using version_type = typename entity_traits::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Poly storage type. */
@@ -163,7 +163,7 @@ public:
      * @return The entity identifier without the version.
      */
     [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return traits_type::construct(traits_type::to_entity(entity), {});
+        return entity_traits::construct(entity_traits::to_entity(entity), {});
     }
 
     /**
@@ -172,7 +172,7 @@ public:
      * @return The version stored along with the given entity identifier.
      */
     [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
-        return traits_type::to_version(entity);
+        return entity_traits::to_version(entity);
     }
 
     /*! @brief Default constructor. */
@@ -238,7 +238,7 @@ public:
         auto sz = entities.size();
 
         for(auto curr = free_list; curr != null; --sz) {
-            curr = entities[traits_type::to_entity(curr)];
+            curr = entities[entity_traits::to_entity(curr)];
         }
 
         return sz;
@@ -350,7 +350,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entity) const {
-        const auto pos = size_type(traits_type::to_entity(entity));
+        const auto pos = size_type(entity_traits::to_entity(entity));
         return (pos < entities.size() && entities[pos] == entity);
     }
 
@@ -366,7 +366,7 @@ public:
      * @return Actual version for the given entity identifier.
      */
     [[nodiscard]] version_type current(const entity_type entity) const {
-        const auto pos = size_type(traits_type::to_entity(entity));
+        const auto pos = size_type(entity_traits::to_entity(entity));
         ENTT_ASSERT(pos < entities.size(), "Entity does not exist");
         return version(entities[pos]);
     }
@@ -401,7 +401,7 @@ public:
 
         if(hint == null || hint == tombstone) {
             return create();
-        } else if(const auto req = traits_type::to_entity(hint); !(req < length)) {
+        } else if(const auto req = entity_traits::to_entity(hint); !(req < length)) {
             entities.resize(size_type(req) + 1u, null);
 
             for(auto pos = length; pos < req; ++pos) {
@@ -409,12 +409,12 @@ public:
             }
 
             return (entities[req] = hint);
-        } else if(const auto curr = traits_type::to_entity(entities[req]); req == curr) {
+        } else if(const auto curr = entity_traits::to_entity(entities[req]); req == curr) {
             return create();
         } else {
             auto *it = &free_list;
-            for(; traits_type::to_entity(*it) != req; it = &entities[traits_type::to_entity(*it)]);
-            *it = traits_type::construct(curr, traits_type::to_version(*it));
+            for(; entity_traits::to_entity(*it) != req; it = &entities[entity_traits::to_entity(*it)]);
+            *it = entity_traits::construct(curr, entity_traits::to_version(*it));
             return (entities[req] = hint);
         }
     }
@@ -995,7 +995,7 @@ public:
             }
         } else {
             for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entity = entities[pos - 1]; traits_type::to_entity(entity) == (pos - 1)) {
+                if(const auto entity = entities[pos - 1]; entity_traits::to_entity(entity) == (pos - 1)) {
                     func(entity);
                 }
             }
