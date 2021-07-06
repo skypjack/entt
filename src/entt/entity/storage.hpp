@@ -10,6 +10,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
@@ -179,38 +180,38 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
     void release_memory() {
         if(packed) {
-            alloc allocator{get_allocator()};
+            auto &&[allocator, len] = bucket;
             alloc_ptr ptr_allocator{allocator};
 
             // no-throw stable erase iteration
             underlying_type::clear();
 
-            for(size_type pos{}; pos < bucket; ++pos) {
+            for(size_type pos{}; pos < len; ++pos) {
                 alloc_traits::deallocate(allocator, packed[pos], packed_page);
                 alloc_ptr_traits::destroy(ptr_allocator, std::addressof(packed[pos]));
             }
 
-            alloc_ptr_traits::deallocate(ptr_allocator, packed, bucket);
+            alloc_ptr_traits::deallocate(ptr_allocator, packed, len);
         }
     }
 
     void assure_at_least(const std::size_t last) {
-        if(const auto idx = page(last - 1u); !(idx < bucket)) {
-            alloc allocator{get_allocator()};
+        if(const auto idx = page(last - 1u); !(idx < bucket.second())) {
+            auto &&[allocator, len] = bucket;
             alloc_ptr ptr_allocator{allocator};
 
             const size_type sz = idx + 1u;
             const auto mem = alloc_ptr_traits::allocate(ptr_allocator, sz);
-            std::uninitialized_copy(packed, packed + bucket, mem);
+            std::uninitialized_copy(packed, packed + len, mem);
             size_type pos{};
 
             ENTT_TRY {
-                for(pos = bucket; pos < sz; ++pos) {
+                for(pos = len; pos < sz; ++pos) {
                     auto pg = alloc_traits::allocate(allocator, packed_page);
                     alloc_ptr_traits::construct(ptr_allocator, std::addressof(mem[pos]), pg);
                 }
             } ENTT_CATCH {
-                for(auto next = bucket; next < pos; ++next) {
+                for(auto next = len; next < pos; ++next) {
                     alloc_traits::deallocate(allocator, mem[next], packed_page);
                 }
 
@@ -219,50 +220,51 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
                 ENTT_THROW;
             }
 
-            std::destroy(packed, packed + bucket);
-            alloc_ptr_traits::deallocate(ptr_allocator, packed, bucket);
+            std::destroy(packed, packed + len);
+            alloc_ptr_traits::deallocate(ptr_allocator, packed, len);
 
             packed = mem;
-            bucket = sz;
+            len = sz;
         }
     }
 
     void release_unused_pages() {
-        if(const auto length = underlying_type::size() / packed_page; length < bucket) {
-            alloc allocator{get_allocator()};
+        if(const auto length = underlying_type::size() / packed_page; length < bucket.second()) {
+            auto &&[allocator, len] = bucket;
             alloc_ptr ptr_allocator{allocator};
 
             const auto mem = alloc_ptr_traits::allocate(ptr_allocator, length);
             std::uninitialized_copy(packed, packed + length, mem);
 
-            for(auto pos = length; pos < bucket; ++pos) {
+            for(auto pos = length; pos < len; ++pos) {
                 alloc_traits::deallocate(allocator, packed[pos], packed_page);
                 alloc_ptr_traits::destroy(ptr_allocator, std::addressof(packed[pos]));
             }
 
-            alloc_ptr_traits::deallocate(ptr_allocator, packed, bucket);
+            alloc_ptr_traits::deallocate(ptr_allocator, packed, len);
 
             packed = mem;
-            bucket = length;
+            len = length;
         }
     }
 
     template<typename... Args>
     auto & push_at(const std::size_t pos, Args &&... args) {
-        ENTT_ASSERT(pos < (bucket * packed_page), "Out of bounds index");
+        auto &&[allocator, len] = bucket;
+        ENTT_ASSERT(pos < (len * packed_page), "Out of bounds index");
         auto *elem = std::addressof(packed[page(pos)][offset(pos)]);
 
         if constexpr(std::is_aggregate_v<value_type>) {
-            alloc_traits::construct(alloc{get_allocator()}, elem, Type{std::forward<Args>(args)...});
+            alloc_traits::construct(allocator, elem, Type{std::forward<Args>(args)...});
         } else {
-            alloc_traits::construct(alloc{get_allocator()}, elem, std::forward<Args>(args)...);
+            alloc_traits::construct(allocator, elem, std::forward<Args>(args)...);
         }
 
         return *elem;
     }
 
     void pop_at(const std::size_t pos) {
-        alloc_traits::destroy(alloc{get_allocator()}, std::addressof(packed[page(pos)][offset(pos)]));
+        alloc_traits::destroy(alloc{bucket.first()}, std::addressof(packed[page(pos)][offset(pos)]));
     }
 
 protected:
@@ -327,8 +329,8 @@ public:
      */
     explicit basic_storage_impl(const allocator_type &allocator = {})
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
-          packed{alloc_ptr_traits::allocate(alloc_ptr{get_allocator()}, 0u)},
-          bucket{}
+          bucket{allocator, 0u},
+          packed{alloc_ptr_traits::allocate(alloc_ptr{bucket.first()}, 0u)}
     {}
 
     /**
@@ -337,8 +339,8 @@ public:
      */
     basic_storage_impl(basic_storage_impl &&other) ENTT_NOEXCEPT
         : underlying_type{std::move(other)},
-          packed{std::exchange(other.packed, alloc_ptr_pointer{})},
-          bucket{std::exchange(other.bucket, 0u)}
+          bucket{std::move(other.bucket)},
+          packed{std::exchange(other.packed, alloc_ptr_pointer{})}
     {}
 
     /*! @brief Default destructor. */
@@ -356,8 +358,8 @@ public:
 
         underlying_type::operator=(std::move(other));
 
+        bucket = std::move(other.bucket);
         packed = std::exchange(other.packed, alloc_ptr_pointer{});
-        bucket = std::exchange(other.bucket, 0u);
 
         return *this;
     }
@@ -367,7 +369,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
-        return allocator_type{underlying_type::get_allocator()};
+        return allocator_type{bucket.first()};
     }
 
     /**
@@ -392,7 +394,7 @@ public:
      * @return Capacity of the storage.
      */
     [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
-        return bucket * packed_page;
+        return bucket.second() * packed_page;
     }
 
     /*! @brief Requests the removal of unused capacity. */
@@ -704,8 +706,8 @@ public:
     }
 
 private:
+    compressed_pair<alloc, size_type> bucket;
     alloc_ptr_pointer packed;
-    size_type bucket;
 };
 
 
