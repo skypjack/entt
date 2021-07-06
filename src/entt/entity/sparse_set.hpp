@@ -305,13 +305,17 @@ public:
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &allocator = {})
         : reserved{allocator, 0u},
-          sparse{alloc_ptr_traits::allocate(alloc_ptr{reserved.first()}, 0u)},
-          packed{alloc_traits::allocate(reserved.first(), 0u)},
+          sparse{},
+          packed{},
           bucket{0u},
           count{0u},
           free_list{tombstone},
           mode{pol}
-    {}
+    {
+        alloc_ptr allocator_ptr{reserved.first()};
+        sparse = alloc_ptr_traits::allocate(allocator_ptr, 0u);
+        packed = alloc_traits::allocate(reserved.first(), 0u);
+    }
 
     /**
      * @brief Constructs an empty container with the given allocator.
