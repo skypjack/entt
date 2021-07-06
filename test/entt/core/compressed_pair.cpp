@@ -130,3 +130,40 @@ TEST(CompressedPair, Swap) {
     ASSERT_EQ(other.first(), 3);
     ASSERT_EQ(other.second(), 4);
 }
+
+TEST(CompressedPair, Get) {
+    entt::compressed_pair pair{1, 2};
+
+    ASSERT_EQ(pair.get<0>(), 1);
+    ASSERT_EQ(pair.get<1>(), 2);
+
+    ASSERT_EQ(&pair.get<0>(), &pair.first());
+    ASSERT_EQ(&pair.get<1>(), &pair.second());
+
+    auto &&[first, second] = pair;
+
+    ASSERT_EQ(first, 1);
+    ASSERT_EQ(second, 2);
+
+    first = 3;
+    second = 4;
+
+    ASSERT_EQ(pair.first(), 3);
+    ASSERT_EQ(pair.second(), 4);
+
+    auto &[cfirst, csecond] = std::as_const(pair);
+
+    ASSERT_EQ(cfirst, 3);
+    ASSERT_EQ(csecond, 4);
+
+    static_assert(std::is_same_v<decltype(cfirst), const int>);
+    static_assert(std::is_same_v<decltype(csecond), const int>);
+
+    auto [tfirst, tsecond] = entt::compressed_pair{9, 99};
+
+    ASSERT_EQ(tfirst, 9);
+    ASSERT_EQ(tsecond, 99);
+
+    static_assert(std::is_same_v<decltype(cfirst), const int>);
+    static_assert(std::is_same_v<decltype(csecond), const int>);
+}

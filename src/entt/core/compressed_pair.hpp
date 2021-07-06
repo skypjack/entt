@@ -209,6 +209,33 @@ public:
         swap(first(), other.first());
         swap(second(), other.second());
     }
+
+    /**
+     * @brief Extracts an element from the compressed pair.
+     * @tparam Index An integer value that is either 0 or 1.
+     * @return Returns a reference to the first element if `Index` is 0 and a
+     * reference to the second element if `Index` is 1.
+     */
+    template<std::size_t Index>
+    decltype(auto) get() ENTT_NOEXCEPT {
+        if constexpr(Index == 0u) {
+            return first();
+        } else {
+            static_assert(Index == 1u, "Index out of bounds");
+            return second();
+        }
+    }
+
+    /*! @copydoc get */
+    template<std::size_t Index>
+    decltype(auto) get() const ENTT_NOEXCEPT {
+        if constexpr(Index == 0u) {
+            return first();
+        } else {
+            static_assert(Index == 1u, "Index out of bounds");
+            return second();
+        }
+    }
 };
 
 
@@ -235,6 +262,17 @@ inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Sec
 }
 
 
+}
+
+
+namespace std {
+    template<typename First, typename Second>
+    struct tuple_size<entt::compressed_pair<First, Second>>: integral_constant<size_t, 2u> {};
+
+    template<size_t Index, typename First, typename Second>
+    struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
+        static_assert(Index < 2u, "Index out of bounds");
+    };
 }
 
 
