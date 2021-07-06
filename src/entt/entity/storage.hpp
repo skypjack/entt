@@ -179,6 +179,7 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
     void release_memory() {
         if(packed) {
+            alloc allocator{get_allocator()};
             alloc_ptr ptr_allocator{allocator};
 
             // no-throw stable erase iteration
@@ -195,6 +196,7 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
     void assure_at_least(const std::size_t last) {
         if(const auto idx = page(last - 1u); !(idx < bucket)) {
+            alloc allocator{get_allocator()};
             alloc_ptr ptr_allocator{allocator};
 
             const size_type sz = idx + 1u;
@@ -227,6 +229,7 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
     void release_unused_pages() {
         if(const auto length = underlying_type::size() / packed_page; length < bucket) {
+            alloc allocator{get_allocator()};
             alloc_ptr ptr_allocator{allocator};
 
             const auto mem = alloc_ptr_traits::allocate(ptr_allocator, length);
@@ -250,16 +253,16 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
         auto *elem = std::addressof(packed[page(pos)][offset(pos)]);
 
         if constexpr(std::is_aggregate_v<value_type>) {
-            alloc_traits::construct(allocator, elem, Type{std::forward<Args>(args)...});
+            alloc_traits::construct(alloc{get_allocator()}, elem, Type{std::forward<Args>(args)...});
         } else {
-            alloc_traits::construct(allocator, elem, std::forward<Args>(args)...);
+            alloc_traits::construct(alloc{get_allocator()}, elem, std::forward<Args>(args)...);
         }
 
         return *elem;
     }
 
     void pop_at(const std::size_t pos) {
-        alloc_traits::destroy(allocator, std::addressof(packed[page(pos)][offset(pos)]));
+        alloc_traits::destroy(alloc{get_allocator()}, std::addressof(packed[page(pos)][offset(pos)]));
     }
 
 protected:
@@ -324,8 +327,7 @@ public:
      */
     explicit basic_storage_impl(const allocator_type &alloc = {})
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, alloc},
-          allocator{alloc},
-          packed{alloc_ptr_traits::allocate(alloc_ptr{allocator}, 0u)},
+          packed{alloc_ptr_traits::allocate(alloc_ptr{get_allocator()}, 0u)},
           bucket{}
     {}
 
@@ -335,7 +337,6 @@ public:
      */
     basic_storage_impl(basic_storage_impl &&other) ENTT_NOEXCEPT
         : underlying_type{std::move(other)},
-          allocator{std::move(other.allocator)},
           packed{std::exchange(other.packed, alloc_ptr_pointer{})},
           bucket{std::exchange(other.bucket, 0u)}
     {}
@@ -355,11 +356,18 @@ public:
 
         underlying_type::operator=(std::move(other));
 
-        allocator = std::move(other.allocator);
         packed = std::exchange(other.packed, alloc_ptr_pointer{});
         bucket = std::exchange(other.bucket, 0u);
 
         return *this;
+    }
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+        return allocator_type{underlying_type::get_allocator()};
     }
 
     /**
@@ -696,7 +704,6 @@ public:
     }
 
 private:
-    allocator_type allocator;
     alloc_ptr_pointer packed;
     size_type bucket;
 };
@@ -728,6 +735,14 @@ public:
     explicit basic_storage_impl(const allocator_type &alloc = {})
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, alloc}
     {}
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+        return allocator_type{underlying_type::get_allocator()};
+    }
 
     /**
      * @brief Fake get function.
