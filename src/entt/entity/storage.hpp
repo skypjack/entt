@@ -325,8 +325,8 @@ public:
      * @brief Default constructor.
      * @param alloc Allocator to use (possibly default-constructed).
      */
-    explicit basic_storage_impl(const allocator_type &alloc = {})
-        : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, alloc},
+    explicit basic_storage_impl(const allocator_type &allocator = {})
+        : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
           packed{alloc_ptr_traits::allocate(alloc_ptr{get_allocator()}, 0u)},
           bucket{}
     {}
@@ -732,8 +732,8 @@ public:
      * @brief Default constructor.
      * @param alloc Allocator to use (possibly default-constructed).
      */
-    explicit basic_storage_impl(const allocator_type &alloc = {})
-        : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, alloc}
+    explicit basic_storage_impl(const allocator_type &allocator = {})
+        : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator}
     {}
 
     /**

@@ -303,8 +303,8 @@ public:
      * @param pol Type of deletion policy.
      * @param alloc Allocator to use (possibly default-constructed).
      */
-    explicit basic_sparse_set(deletion_policy pol, const allocator_type &alloc = {})
-        : reserved{alloc, 0u},
+    explicit basic_sparse_set(deletion_policy pol, const allocator_type &allocator = {})
+        : reserved{allocator, 0u},
           sparse{alloc_ptr_traits::allocate(alloc_ptr{reserved.first()}, 0u)},
           packed{alloc_traits::allocate(reserved.first(), 0u)},
           bucket{0u},
@@ -317,8 +317,8 @@ public:
      * @brief Constructs an empty container with the given allocator.
      * @param alloc Allocator to use (possibly default-constructed).
      */
-    explicit basic_sparse_set(const allocator_type &alloc = {})
-        : basic_sparse_set{deletion_policy::swap_and_pop, alloc}
+    explicit basic_sparse_set(const allocator_type &allocator = {})
+        : basic_sparse_set{deletion_policy::swap_and_pop, allocator}
     {}
 
     /**
