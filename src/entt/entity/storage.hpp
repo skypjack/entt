@@ -326,7 +326,7 @@ public:
 
     /**
      * @brief Default constructor.
-     * @param alloc Allocator to use (possibly default-constructed).
+     * @param allocator Allocator to use (possibly default-constructed).
      */
     explicit basic_storage_impl(const allocator_type &allocator = {})
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
@@ -733,7 +733,7 @@ public:
 
     /**
      * @brief Default constructor.
-     * @param alloc Allocator to use (possibly default-constructed).
+     * @param allocator Allocator to use (possibly default-constructed).
      */
     explicit basic_storage_impl(const allocator_type &allocator = {})
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator}
