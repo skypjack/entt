@@ -55,7 +55,7 @@ bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
 TEST(Storage, Functionalities) {
     entt::storage<int> pool;
 
-    ASSERT_NO_THROW(auto alloc = pool.get_allocator());
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
 
     pool.reserve(42);
 
@@ -149,7 +149,7 @@ TEST(Storage, EmptyType) {
     entt::storage<empty_type> pool;
     pool.emplace(entt::entity{99});
 
-    ASSERT_NO_THROW(auto alloc = pool.get_allocator());
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_TRUE(pool.contains(entt::entity{99}));
 }
 

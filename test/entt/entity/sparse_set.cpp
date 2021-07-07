@@ -16,7 +16,7 @@ struct boxed_int { int value; };
 TEST(SparseSet, Functionalities) {
     entt::sparse_set set;
 
-    ASSERT_NO_THROW(auto alloc = set.get_allocator());
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
 
     set.reserve(42);
 
