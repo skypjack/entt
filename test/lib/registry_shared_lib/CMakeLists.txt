@@ -13,6 +13,10 @@ add_executable(importing_core main.cpp)
 target_link_libraries(importing_core shared_registry GTest::gtest)
 target_compile_definitions(importing_core PRIVATE PLUGIN_PATH="$<TARGET_FILE:importing_plugin>")
 
+if (UNIX)
+    target_link_libraries(importing_core dl)
+endif()
+
 add_dependencies(importing_core importing_plugin)
 
 add_test(NAME shared_registry_lib
