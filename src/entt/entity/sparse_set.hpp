@@ -325,11 +325,11 @@ public:
      * @param allocator Allocator to use (possibly default-constructed).
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &allocator = {})
-        : reserved{allocator, 0u},
+        : reserved{allocator, size_type{}},
           sparse{},
           packed{},
-          bucket{0u},
-          count{0u},
+          bucket{},
+          count{},
           free_list{tombstone},
           mode{pol}
     {}
@@ -342,8 +342,8 @@ public:
         : reserved{std::move(other.reserved)},
           sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
           packed{std::exchange(other.packed, alloc_pointer{})},
-          bucket{std::exchange(other.bucket, 0u)},
-          count{std::exchange(other.count, 0u)},
+          bucket{std::exchange(other.bucket, size_type{})},
+          count{std::exchange(other.count, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode}
     {}
@@ -364,8 +364,8 @@ public:
         reserved = std::move(other.reserved);
         sparse = std::exchange(other.sparse, alloc_ptr_pointer{});
         packed = std::exchange(other.packed, alloc_pointer{});
-        bucket = std::exchange(other.bucket, 0u);
-        count = std::exchange(other.count, 0u);
+        bucket = std::exchange(other.bucket, size_type{});
+        count = std::exchange(other.count, size_type{});
         free_list = std::exchange(other.free_list, tombstone);
         mode = other.mode;
 
@@ -874,7 +874,7 @@ public:
         }
 
         free_list = tombstone;
-        count = 0u;
+        count = {};
     }
 
 private:

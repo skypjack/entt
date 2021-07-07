@@ -335,7 +335,7 @@ public:
      */
     explicit basic_storage(const allocator_type &allocator)
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
-          bucket{allocator, 0u},
+          bucket{allocator, size_type{}},
           packed{}
     {}
 
