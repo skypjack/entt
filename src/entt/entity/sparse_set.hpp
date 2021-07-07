@@ -183,10 +183,12 @@ class basic_sparse_set {
             const auto mem = alloc_ptr_traits::allocate(allocator_ptr, sz);
 
             std::uninitialized_value_construct(mem + bucket, mem + sz);
-            std::uninitialized_copy(sparse, sparse + bucket, mem);
 
-            std::destroy(sparse, sparse + bucket);
-            alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
+            if(sparse) {
+                std::uninitialized_copy(sparse, sparse + bucket, mem);
+                std::destroy(sparse, sparse + bucket);
+                alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
+            }
 
             sparse = mem;
             bucket = sz;
@@ -205,32 +207,38 @@ class basic_sparse_set {
         ENTT_ASSERT((req != len) && !(req < count), "Invalid request");
         const auto mem = alloc_traits::allocate(allocator, req);
 
-        std::uninitialized_copy(packed, packed + count, mem);
         std::uninitialized_fill(mem + count, mem + req, tombstone);
 
-        std::destroy(packed, packed + len);
-        alloc_traits::deallocate(allocator, packed, len);
+        if(packed) {
+            std::uninitialized_copy(packed, packed + count, mem);
+            std::destroy(packed, packed + len);
+            alloc_traits::deallocate(allocator, packed, len);
+        }
 
         packed = mem;
         len = req;
     }
 
     void release_memory() {
+        auto &&[allocator, len] = reserved;
+
         if(packed) {
-            auto &&[allocator, len] = reserved;
+            std::destroy(packed, packed + len);
+            alloc_traits::deallocate(allocator, packed, len);
+        }
+
+        if(sparse) {
+            alloc_ptr allocator_ptr{allocator};
 
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(sparse[pos]) {
                     std::destroy(sparse[pos], sparse[pos] + sparse_page);
                     alloc_traits::deallocate(allocator, sparse[pos], sparse_page);
                 }
+
+                alloc_ptr_traits::destroy(allocator_ptr, std::addressof(sparse[pos]));
             }
 
-            std::destroy(packed, packed + len);
-            std::destroy(sparse, sparse + bucket);
-
-            alloc_ptr allocator_ptr{allocator};
-            alloc_traits::deallocate(allocator, packed, len);
             alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
         }
     }
@@ -311,11 +319,7 @@ public:
           count{0u},
           free_list{tombstone},
           mode{pol}
-    {
-        alloc_ptr allocator_ptr{reserved.first()};
-        sparse = alloc_ptr_traits::allocate(allocator_ptr, 0u);
-        packed = alloc_traits::allocate(reserved.first(), 0u);
-    }
+    {}
 
     /**
      * @brief Constructs an empty container with the given allocator.

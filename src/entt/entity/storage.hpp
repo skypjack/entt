@@ -180,11 +180,11 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
     void release_memory() {
         if(packed) {
-            auto &&[allocator, len] = bucket;
-            alloc_ptr allocator_ptr{allocator};
-
             // no-throw stable erase iteration
             underlying_type::clear();
+
+            auto &&[allocator, len] = bucket;
+            alloc_ptr allocator_ptr{allocator};
 
             for(size_type pos{}; pos < len; ++pos) {
                 alloc_traits::deallocate(allocator, packed[pos], packed_page);
@@ -202,26 +202,27 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
             const size_type sz = idx + 1u;
             const auto mem = alloc_ptr_traits::allocate(allocator_ptr, sz);
-            std::uninitialized_copy(packed, packed + len, mem);
-            size_type pos{};
+            std::uninitialized_value_construct(mem + len, mem + sz);
 
             ENTT_TRY {
-                for(pos = len; pos < sz; ++pos) {
-                    auto pg = alloc_traits::allocate(allocator, packed_page);
-                    alloc_ptr_traits::construct(allocator_ptr, std::addressof(mem[pos]), pg);
+                for(auto pos = len; pos < sz; ++pos) {
+                    mem[pos] = alloc_traits::allocate(allocator, packed_page);
                 }
             } ENTT_CATCH {
-                for(auto next = len; next < pos; ++next) {
-                    alloc_traits::deallocate(allocator, mem[next], packed_page);
+                for(auto pos = len; pos < sz && mem[pos]; ++pos) {
+                    alloc_traits::deallocate(allocator, mem[pos], packed_page);
                 }
 
-                std::destroy(mem, mem + pos);
+                std::destroy(mem + len, mem + sz);
                 alloc_ptr_traits::deallocate(allocator_ptr, mem, sz);
                 ENTT_THROW;
             }
 
-            std::destroy(packed, packed + len);
-            alloc_ptr_traits::deallocate(allocator_ptr, packed, len);
+            if(packed) {
+                std::uninitialized_copy(packed, packed + len, mem);
+                std::destroy(packed, packed + len);
+                alloc_ptr_traits::deallocate(allocator_ptr, packed, len);
+            }
 
             packed = mem;
             len = sz;
@@ -238,9 +239,9 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
             for(auto pos = length; pos < len; ++pos) {
                 alloc_traits::deallocate(allocator, packed[pos], packed_page);
-                alloc_ptr_traits::destroy(allocator_ptr, std::addressof(packed[pos]));
             }
 
+            std::destroy(packed, packed + len);
             alloc_ptr_traits::deallocate(allocator_ptr, packed, len);
 
             packed = mem;
@@ -331,10 +332,7 @@ public:
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
           bucket{allocator, 0u},
           packed{}
-    {
-        alloc_ptr allocator_ptr{bucket.first()};
-        packed = alloc_ptr_traits::allocate(allocator_ptr, 0u);
-    }
+    {}
 
     /**
      * @brief Move constructor.
