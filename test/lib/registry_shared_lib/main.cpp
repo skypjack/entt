@@ -56,9 +56,9 @@ TEST(shared_registry_lib, compare_ids_across_modules)
   reinterpret_cast<void *&>(pGetId) =
       (void *)GetProcAddress(handle, "get_id");
 #else
-  auto handle = dlopen(pluginPath.string().c_str());
+  auto handle = dlopen(pluginPath.string().c_str(), RTLD_LAZY);
   ASSERT_TRUE(handle);
-  reinterpret_cast<void *&>(pIncrement) = (void *)dlsym(handle, "get_id");
+  reinterpret_cast<void *&>(pGetId) = (void *)dlsym(handle, "get_id");
 #endif
 
   ASSERT_TRUE(pGetId);
@@ -96,7 +96,7 @@ TEST(shared_registry_lib, test_increment) {
   reinterpret_cast<void *&>(pIncrement) =
       (void *)GetProcAddress(handle, "increment");
 #else
-  auto handle = dlopen(pluginPath.string().c_str());
+  auto handle = dlopen(pluginPath.string().c_str(), RTLD_LAZY);
   ASSERT_TRUE(handle);
   reinterpret_cast<void *&>(pIncrement) = (void *)dlsym(handle, "increment");
 #endif
