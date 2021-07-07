@@ -306,6 +306,19 @@ public:
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
 
+    /*! @brief Default constructor. */
+    basic_sparse_set()
+        : basic_sparse_set{allocator_type{}}
+    {}
+
+    /**
+     * @brief Constructs an empty container with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_sparse_set(const allocator_type &allocator)
+        : basic_sparse_set{deletion_policy::swap_and_pop, allocator}
+    {}
+
     /**
      * @brief Constructs an empty container with the given policy and allocator.
      * @param pol Type of deletion policy.
@@ -319,14 +332,6 @@ public:
           count{0u},
           free_list{tombstone},
           mode{pol}
-    {}
-
-    /**
-     * @brief Constructs an empty container with the given allocator.
-     * @param allocator Allocator to use (possibly default-constructed).
-     */
-    explicit basic_sparse_set(const allocator_type &allocator = {})
-        : basic_sparse_set{deletion_policy::swap_and_pop, allocator}
     {}
 
     /**

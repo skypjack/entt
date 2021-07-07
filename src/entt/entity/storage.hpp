@@ -324,11 +324,16 @@ public:
     /*! @brief Constant reverse iterator type. */
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+    /*! @brief Default constructor. */
+    basic_storage()
+        : basic_storage{allocator_type{}}
+    {}
+
     /**
-     * @brief Default constructor.
-     * @param allocator Allocator to use (possibly default-constructed).
+     * @brief Constructs an empty storage with a given allocator.
+     * @param allocator the allocator to use.
      */
-    explicit basic_storage(const allocator_type &allocator = {})
+    explicit basic_storage(const allocator_type &allocator)
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
           bucket{allocator, 0u},
           packed{}
