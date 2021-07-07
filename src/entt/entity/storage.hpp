@@ -49,8 +49,8 @@ namespace entt {
  * @tparam Type Type of objects assigned to the entities.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Entity, typename Type, typename Allocator, typename = void>
-class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
+template<typename Entity, typename Type, typename Allocator, typename>
+class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     static constexpr auto packed_page = ENTT_PACKED_PAGE;
 
     using allocator_traits = std::allocator_traits<Allocator>;
@@ -74,7 +74,7 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
     template<typename Value>
     struct storage_iterator final {
-        using difference_type = typename basic_storage_impl::difference_type;
+        using difference_type = typename basic_storage::difference_type;
         using value_type = Value;
         using pointer = value_type *;
         using reference = value_type &;
@@ -82,7 +82,7 @@ class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocato
 
         storage_iterator() ENTT_NOEXCEPT = default;
 
-        storage_iterator(alloc_ptr_pointer const *ref, const typename basic_storage_impl::difference_type idx) ENTT_NOEXCEPT
+        storage_iterator(alloc_ptr_pointer const *ref, const typename basic_storage::difference_type idx) ENTT_NOEXCEPT
             : packed{ref},
               index{idx}
         {}
@@ -328,7 +328,7 @@ public:
      * @brief Default constructor.
      * @param allocator Allocator to use (possibly default-constructed).
      */
-    explicit basic_storage_impl(const allocator_type &allocator = {})
+    explicit basic_storage(const allocator_type &allocator = {})
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
           bucket{allocator, 0u},
           packed{}
@@ -338,14 +338,14 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_storage_impl(basic_storage_impl &&other) ENTT_NOEXCEPT
+    basic_storage(basic_storage &&other) ENTT_NOEXCEPT
         : underlying_type{std::move(other)},
           bucket{std::move(other.bucket)},
           packed{std::exchange(other.packed, alloc_ptr_pointer{})}
     {}
 
     /*! @brief Default destructor. */
-    ~basic_storage_impl() override {
+    ~basic_storage() override {
         release_memory();
     }
 
@@ -354,7 +354,7 @@ public:
      * @param other The instance to move from.
      * @return This sparse set.
      */
-    basic_storage_impl & operator=(basic_storage_impl &&other) ENTT_NOEXCEPT {
+    basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT {
         release_memory();
 
         underlying_type::operator=(std::move(other));
@@ -712,9 +712,9 @@ private:
 };
 
 
-/*! @copydoc basic_storage_impl */
+/*! @copydoc basic_storage */
 template<typename Entity, typename Type, typename Allocator>
-class basic_storage_impl<Entity, Type, Allocator, std::enable_if_t<component_traits<Type>::ignore_if_empty::value && std::is_empty_v<Type>>>
+class basic_storage<Entity, Type, Allocator, std::enable_if_t<component_traits<Type>::ignore_if_empty::value && std::is_empty_v<Type>>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>
 {
     using allocator_traits = std::allocator_traits<Allocator>;
@@ -735,7 +735,7 @@ public:
      * @brief Default constructor.
      * @param allocator Allocator to use (possibly default-constructed).
      */
-    explicit basic_storage_impl(const allocator_type &allocator = {})
+    explicit basic_storage(const allocator_type &allocator = {})
         : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator}
     {}
 
@@ -1014,18 +1014,6 @@ private:
     sigh<void(basic_registry<entity_type> &, const entity_type)> construction{};
     sigh<void(basic_registry<entity_type> &, const entity_type)> destruction{};
     sigh<void(basic_registry<entity_type> &, const entity_type)> update{};
-};
-
-
-/**
- * @brief Storage implementation dispatcher.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects assigned to the entities.
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Entity, typename Type, typename Allocator>
-struct basic_storage: basic_storage_impl<Entity, Type, Allocator> {
-    using basic_storage_impl<Entity, Type, Allocator>::basic_storage_impl;
 };
 
 
