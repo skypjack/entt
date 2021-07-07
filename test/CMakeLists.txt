@@ -227,3 +227,6 @@ SETUP_BASIC_TEST(delegate entt/signal/delegate.cpp)
 SETUP_BASIC_TEST(dispatcher entt/signal/dispatcher.cpp)
 SETUP_BASIC_TEST(emitter entt/signal/emitter.cpp)
 SETUP_BASIC_TEST(sigh entt/signal/sigh.cpp)
+
+# exported symbols
+add_subdirectory(lib/registry_shared_lib)

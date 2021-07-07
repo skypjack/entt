@@ -7,6 +7,7 @@ conan/test_package/build
 .vscode
 .vs
 CMakeSettings.json
+/cmake-build*
 
 # Bazel
 /bazel-*
