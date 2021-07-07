@@ -17,7 +17,7 @@
 #include <dlfcn.h> //dlopen
 #endif
 
-#include <filesystem>
+//#include <filesystem>
 
 struct zero_component {};
 
@@ -42,21 +42,21 @@ TEST(shared_registry_lib, compare_ids_within_core) {
  * instantiated components will indirectly use imported
  * entt::internal::type_seq.
  */
-TEST(shared_registry_lib, compare_ids_across_modules)
-{
+TEST(shared_registry_lib, compare_ids_across_modules) {
   EXPECT_EQ(entt::type_seq<zero_component>(), 0);
 
-  auto pluginPath = std::filesystem::path(PLUGIN_PATH);
-  ASSERT_TRUE(std::filesystem::exists(pluginPath));
+  //  auto pluginPath = std::filesystem::path(PLUGIN_PATH);
+  //  ASSERT_TRUE(std::filesystem::exists(pluginPath));
   int (*pGetId)() = nullptr;
 
 #if _WIN32
-  auto handle = LoadLibrary(pluginPath.string().c_str());
+  //  auto handle = LoadLibrary(pluginPath.string().c_str());
+  auto handle = LoadLibrary(PLUGIN_PATH);
   ASSERT_TRUE(handle);
-  reinterpret_cast<void *&>(pGetId) =
-      (void *)GetProcAddress(handle, "get_id");
+  reinterpret_cast<void *&>(pGetId) = (void *)GetProcAddress(handle, "get_id");
 #else
-  auto handle = dlopen(pluginPath.string().c_str(), RTLD_LAZY);
+  //  auto handle = dlopen(pluginPath.string().c_str(), RTLD_LAZY);
+  auto handle = dlopen(PLUGIN_PATH, RTLD_LAZY);
   ASSERT_TRUE(handle);
   reinterpret_cast<void *&>(pGetId) = (void *)dlsym(handle, "get_id");
 #endif
@@ -81,8 +81,8 @@ TEST(shared_registry_lib, test_increment) {
 
   ASSERT_EQ(entt::type_seq<zero_component>(), 0);
 
-  auto pluginPath = std::filesystem::path(PLUGIN_PATH);
-  ASSERT_TRUE(std::filesystem::exists(pluginPath));
+  //  auto pluginPath = std::filesystem::path(PLUGIN_PATH);
+  //  ASSERT_TRUE(std::filesystem::exists(pluginPath));
 
   entt::registry registry{};
   auto testEntt = registry.create();
@@ -91,12 +91,14 @@ TEST(shared_registry_lib, test_increment) {
   void (*pIncrement)(entt::registry &) = nullptr;
 
 #if _WIN32
-  auto handle = LoadLibrary(pluginPath.string().c_str());
+  //  auto handle = LoadLibrary(pluginPath.string().c_str());
+  auto handle = LoadLibrary(PLUGIN_PATH);
   ASSERT_TRUE(handle);
   reinterpret_cast<void *&>(pIncrement) =
       (void *)GetProcAddress(handle, "increment");
 #else
-  auto handle = dlopen(pluginPath.string().c_str(), RTLD_LAZY);
+  //  auto handle = dlopen(pluginPath.string().c_str(), RTLD_LAZY);
+  auto handle = dlopen(PLUGIN_PATH, RTLD_LAZY);
   ASSERT_TRUE(handle);
   reinterpret_cast<void *&>(pIncrement) = (void *)dlsym(handle, "increment");
 #endif
