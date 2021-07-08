@@ -281,10 +281,6 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
         return other;
     }
 
-    [[nodiscard]] auto filter_to_array() const ENTT_NOEXCEPT {
-        return std::array<const basic_common_type *, sizeof...(Exclude)>{std::get<const storage_type<Exclude> *>(filter)...};
-    }
-
     template<typename Comp, typename It>
     [[nodiscard]] auto dispatch_get([[maybe_unused]] It &it, [[maybe_unused]] const Entity entt) const {
         if constexpr(std::is_same_v<typename std::iterator_traits<It>::value_type, typename storage_type<Comp>::value_type>) {
@@ -299,7 +295,7 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
         if constexpr(std::is_void_v<decltype(std::get<storage_type<Comp> *>(pools)->get({}))>) {
             for(const auto entt: static_cast<const basic_common_type &>(*std::get<storage_type<Comp> *>(pools))) {
                 if(Policy::accept(entt) && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
-                    && (!std::get<const storage_type<Exclude> *>(filter)->contains(entt) && ...))
+                    && std::apply([entt](const auto *... curr) { return (!curr->contains(entt) && ...); }, filter))
                 {
                     if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view_impl>().get({})))>) {
                         std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
@@ -313,7 +309,7 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
 
             for(const auto entt: static_cast<const basic_common_type &>(*std::get<storage_type<Comp> *>(pools))) {
                 if(Policy::accept(entt) && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
-                    && (!std::get<const storage_type<Exclude> *>(filter)->contains(entt) && ...))
+                    && std::apply([entt](const auto *... curr) { return (!curr->contains(entt) && ...); }, filter))
                 {
                     if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view_impl>().get({})))>) {
                         std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Component>(it, entt)...));
@@ -381,7 +377,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
-        return iterator{view->begin(), view->end(), view->begin(), pools_to_unchecked_array(), filter_to_array()};
+        return iterator{view->begin(), view->end(), view->begin(), pools_to_unchecked_array(), filter};
     }
 
     /**
@@ -394,7 +390,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
-        return iterator{view->begin(), view->end(), view->end(), pools_to_unchecked_array(), filter_to_array()};
+        return iterator{view->begin(), view->end(), view->end(), pools_to_unchecked_array(), filter};
     }
 
     /**
@@ -406,7 +402,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), pools_to_unchecked_array(), filter_to_array()};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), pools_to_unchecked_array(), filter};
     }
 
     /**
@@ -421,7 +417,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), pools_to_unchecked_array(), filter_to_array()};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), pools_to_unchecked_array(), filter};
     }
 
     /**
@@ -451,7 +447,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = iterator{view->begin(), view->end(), view->find(entt), pools_to_unchecked_array(), filter_to_array()};
+        const auto it = iterator{view->begin(), view->end(), view->find(entt), pools_to_unchecked_array(), filter};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -469,7 +465,8 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return (std::get<storage_type<Component> *>(pools)->contains(entt) && ...) && (!std::get<const storage_type<Exclude> *>(filter)->contains(entt) && ...);
+        return (std::get<storage_type<Component> *>(pools)->contains(entt) && ...)
+            && std::apply([entt](const auto *... curr) { return (!curr->contains(entt) && ...); }, filter);
     }
 
     /**
@@ -596,7 +593,7 @@ public:
 
 private:
     const std::tuple<storage_type<Component> *...> pools;
-    const std::tuple<const storage_type<Exclude> *...> filter;
+    const std::array<const basic_common_type *, sizeof...(Exclude)> filter;
     mutable const basic_common_type *view;
 };
 
@@ -989,7 +986,7 @@ public:
 
 private:
     const std::tuple<storage_type *> pools;
-    const std::tuple<> filter;
+    const std::array<const basic_common_type *, 0u> filter;
 };
 
 
@@ -1033,7 +1030,12 @@ basic_view(Storage &... storage)
 template<typename Entity, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
 [[nodiscard]] auto operator|(const basic_view<Entity, exclude_t<ELhs...>, CLhs...> &lhs, const basic_view<Entity, exclude_t<ERhs...>, CRhs...> &rhs) {
     using view_type = basic_view<Entity, exclude_t<ELhs..., ERhs...>, CLhs..., CRhs...>;
-    return std::apply([](auto *... storage) { return view_type{*storage...}; }, std::tuple_cat(lhs.pools, rhs.pools, lhs.filter, rhs.filter));
+    return std::make_from_tuple<view_type>(std::tuple_cat(
+        std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, lhs.pools),
+        std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, rhs.pools),
+        std::apply([](const auto *... curr) { return std::forward_as_tuple(*static_cast<const typename storage_traits<Entity, std::remove_const_t<ELhs>>::storage_type *>(curr)...); }, lhs.filter),
+        std::apply([](const auto *... curr) { return std::forward_as_tuple(*static_cast<const typename storage_traits<Entity, std::remove_const_t<ERhs>>::storage_type *>(curr)...); }, rhs.filter)
+    ));
 }
 
 
