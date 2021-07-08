@@ -274,7 +274,7 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
         });
     }
 
-    [[nodiscard]] auto pools_to_unchecked_array() const ENTT_NOEXCEPT {
+    [[nodiscard]] auto test_set() const ENTT_NOEXCEPT {
         std::size_t pos{};
         std::array<const basic_common_type *, sizeof...(Component) - 1u> other{};
         (static_cast<void>(std::get<storage_type<Component> *>(pools) == view ? void() : void(other[pos++] = std::get<storage_type<Component> *>(pools))), ...);
@@ -377,7 +377,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
-        return iterator{view->begin(), view->end(), view->begin(), pools_to_unchecked_array(), filter};
+        return iterator{view->begin(), view->end(), view->begin(), test_set(), filter};
     }
 
     /**
@@ -390,7 +390,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
-        return iterator{view->begin(), view->end(), view->end(), pools_to_unchecked_array(), filter};
+        return iterator{view->begin(), view->end(), view->end(), test_set(), filter};
     }
 
     /**
@@ -402,7 +402,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), pools_to_unchecked_array(), filter};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), test_set(), filter};
     }
 
     /**
@@ -417,7 +417,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), pools_to_unchecked_array(), filter};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), test_set(), filter};
     }
 
     /**
@@ -447,7 +447,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = iterator{view->begin(), view->end(), view->find(entt), pools_to_unchecked_array(), filter};
+        const auto it = iterator{view->begin(), view->end(), view->find(entt), test_set(), filter};
         return (it != end() && *it == entt) ? it : end();
     }
 
