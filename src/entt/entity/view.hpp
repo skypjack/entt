@@ -110,7 +110,7 @@ private:
 };
 
 
-template<typename Policy, typename It, std::size_t AllOf, std::size_t NoneOf>
+template<typename Policy, typename It, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
     using basic_common_type = basic_sparse_set<typename std::iterator_traits<It>::value_type>;
 
@@ -137,7 +137,7 @@ public:
           filter{}
     {}
 
-    view_iterator(It from, It to, It curr, std::array<const basic_common_type *, AllOf> all_of, std::array<const basic_common_type *, NoneOf> none_of) ENTT_NOEXCEPT
+    view_iterator(It from, It to, It curr, std::array<const basic_common_type *, Component> all_of, std::array<const basic_common_type *, Exclude> none_of) ENTT_NOEXCEPT
         : first{from},
           last{to},
           it{curr},
@@ -189,8 +189,8 @@ private:
     It first;
     It last;
     It it;
-    std::array<const basic_common_type *, AllOf> pools;
-    std::array<const basic_common_type *, NoneOf> filter;
+    std::array<const basic_common_type *, Component> pools;
+    std::array<const basic_common_type *, Exclude> filter;
 };
 
 
