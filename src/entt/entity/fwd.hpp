@@ -14,7 +14,7 @@ class basic_sparse_set;
 
 
 template<typename, typename Type, typename = std::allocator<Type>, typename = void>
-struct basic_storage;
+class basic_storage;
 
 
 template<typename>
