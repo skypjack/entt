@@ -399,7 +399,9 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view_impl() ENTT_NOEXCEPT
-        : view{}
+        : pools{},
+          filter{},
+          view{}
     {}
 
     /**
