@@ -35,10 +35,12 @@ class iterable_storage final {
     using basic_common_type = basic_sparse_set<Entity>;
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
+    static constexpr bool has_void_getter = std::is_void_v<decltype(std::declval<storage_type>().get({}))>;
+
     template<typename... It>
     struct iterable_storage_iterator final {
         using difference_type = std::ptrdiff_t;
-        using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<decltype(get_as_tuple(std::declval<storage_type>(), {}))>()));
+        using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<decltype(get_as_tuple(std::declval<storage_type &>(), {}))>()));
         using pointer = void;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
@@ -75,12 +77,12 @@ class iterable_storage final {
 
 public:
     using iterator = std::conditional_t<
-        std::is_void_v<decltype(std::declval<storage_type>().get({}))>,
+        has_void_getter,
         iterable_storage_iterator<typename basic_common_type::iterator>,
         iterable_storage_iterator<typename basic_common_type::iterator, decltype(std::declval<storage_type>().begin())>
     >;
     using reverse_iterator = std::conditional_t<
-        std::is_void_v<decltype(std::declval<storage_type>().get({}))>,
+        has_void_getter,
         iterable_storage_iterator<typename basic_common_type::reverse_iterator>,
         iterable_storage_iterator<typename basic_common_type::reverse_iterator, decltype(std::declval<storage_type>().rbegin())>
     >;
@@ -374,7 +376,7 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
     void traverse(Func func) const {
         for(const auto curr: internal::iterable_storage<Entity, Comp>{*std::get<storage_type<Comp> *>(pools)}) {
             if(Policy::accept(std::get<0>(curr)) && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(std::get<0>(curr))) && ...)
-                && std::apply([entt = std::get<0>(curr)](const auto *... curr) { return (!curr->contains(entt) && ...); }, filter))
+                && std::apply([entt = std::get<0>(curr)](const auto *... cpool) { return (!cpool->contains(entt) && ...); }, filter))
             {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view_impl>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(std::get<0>(curr)), dispatch_get<Comp, Component>(curr)...));
