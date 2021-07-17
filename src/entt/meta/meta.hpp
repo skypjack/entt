@@ -179,6 +179,7 @@ class meta_any {
                         static_cast<meta_any *>(to)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
                     }
                 }
+                break;
             case operation::SEQ:
                 if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
                     *static_cast<meta_sequence_container *>(to) = { std::in_place_type<Type>, std::move(const_cast<any &>(from)) };
