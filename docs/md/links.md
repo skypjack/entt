@@ -70,8 +70,12 @@ I hope this list can grow much more in the future:
     arcade game about shooting dirty rocks in space, inspired by Asteroids.
   * [Wanderer](https://github.com/albin-johansson/wanderer): a 2D exploration
     based indie game.
-  * [Spelunky® Classic remake](https://github.com/dbeef/spelunky-psp): A truly
+  * [Spelunky® Classic remake](https://github.com/dbeef/spelunky-psp): a truly
     multiplatform experience with a rewrite from scratch.
+  * [CubbyTower](https://github.com/utilForever/CubbyTower): a simple tower
+    defense game using C++ with Entity Component System (ECS).
+  * [Runeterra](https://github.com/utilForever/Runeterra): Legends of Runeterra
+    simulator using C++ with some reinforcement learning.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
@@ -118,6 +122,12 @@ I hope this list can grow much more in the future:
     native simulation layer using `EnTT` and `Unity` as a rendering engine.
   * [OverEngine](https://github.com/OverShifted/OverEngine): an over-engineered
     game engine.
+  * [Electro](https://github.com/Electro-Technologies/Electro): high performance
+    3D game engine with a high emphasis on rendering.
+  * [Kawaii](https://github.com/Mathieu-Lala/Kawaii_Engine): a modern data
+    oriented game engine.
+  * [Becketron](https://github.com/Doctor-Foxling/Becketron): a game engine
+    written mostly in C++.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
