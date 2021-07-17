@@ -44,10 +44,18 @@ I hope this list can grow much more in the future:
     by `EnTT`.
 
 * Javascript:
-  * [\@javelin/ecs](https://github.com/3mcd/javelin/tree/master/packages/ecs): an
-    archetype ECS in TypeScript.
+  * [\@javelin/ecs](https://github.com/3mcd/javelin/tree/master/packages/ecs):
+    an archetype ECS in TypeScript.
   * [ecsy](https://github.com/MozillaReality/ecsy): I haven't had the time to
     investigate the underlying design of `ecsy` but it looks cool anyway.
+
+* Perl:
+  * [Game::Entities](https://gitlab.com/jjatria/perl-game-entities): a simple
+    entity registry for ECS designs inspired by `EnTT`.
+
+* Raku:
+  * [Game::Entities](https://gitlab.com/jjatria/raku-game-entities): a simple
+    entity registry for ECS designs inspired by `EnTT`.
 
 * Rust:
   * [Legion](https://github.com/TomGillen/legion): a chunk based archetype ECS.
