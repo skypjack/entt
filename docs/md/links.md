@@ -116,6 +116,8 @@ I hope this list can grow much more in the future:
     framework in C++17 for backend development.
   * [Unity/EnTT](https://github.com/TongTungGiang/unity-entt): tech demo of a
     native simulation layer using `EnTT` and `Unity` as a rendering engine.
+  * [OverEngine](https://github.com/OverShifted/OverEngine): an over-engineered
+    game engine.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
