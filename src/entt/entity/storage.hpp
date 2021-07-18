@@ -420,7 +420,7 @@ public:
     }
 
     /*! @brief Requests the removal of unused capacity. */
-    void shrink_to_fit() {
+    void shrink_to_fit() override {
         underlying_type::shrink_to_fit();
         release_unused_pages();
     }

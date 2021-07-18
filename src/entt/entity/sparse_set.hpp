@@ -410,7 +410,7 @@ public:
     }
 
     /*! @brief Requests the removal of unused capacity. */
-    void shrink_to_fit() {
+    virtual void shrink_to_fit() {
         if(count < reserved.second()) {
             resize_packed(count);
         }
