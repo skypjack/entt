@@ -1436,7 +1436,8 @@ public:
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         ENTT_ASSERT(sortable<Component>(), "Cannot sort owned storage");
-        assure<Component>()->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        auto *cpool = assure<Component>();
+        cpool->sort_n(cpool->size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
     /**

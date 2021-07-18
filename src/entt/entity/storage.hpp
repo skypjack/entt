@@ -686,29 +686,11 @@ public:
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&... args) {
         if constexpr(std::is_invocable_v<Compare, const value_type &, const value_type &>) {
             underlying_type::sort_n(length, [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
-                const auto ilhs = underlying_type::index(lhs), irhs = underlying_type::index(rhs);
-                return compare(std::as_const(packed[page(ilhs)][offset(ilhs)]), std::as_const(packed[page(irhs)][offset(irhs)]));
+                return compare(std::as_const(get(lhs)), std::as_const(get(rhs)));
             }, std::move(algo), std::forward<Args>(args)...);
         } else {
             underlying_type::sort_n(length, std::move(compare), std::move(algo), std::forward<Args>(args)...);
         }
-    }
-
-    /**
-     * @brief Sort all elements according to the given comparison function.
-     *
-     * @sa sort_n
-     *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
-     * @tparam Args Types of arguments to forward to the sort function object.
-     * @param compare A valid comparison function object.
-     * @param algo A valid sort function object.
-     * @param args Arguments to forward to the sort function object, if any.
-     */
-    template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
-        sort_n(underlying_type::size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
 private:
