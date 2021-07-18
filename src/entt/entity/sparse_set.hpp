@@ -244,26 +244,17 @@ class basic_sparse_set {
     }
 
 protected:
-    /**
-     * @brief Swaps two entities in the internal packed array.
-     * @param lhs A valid position of an entity within storage.
-     * @param rhs A valid position of an entity within storage.
-     */
-    virtual void swap_at([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) {}
+    /*! @brief Swaps two entities in the internal packed array. */
+    virtual void swap_at(const std::size_t, const std::size_t) {}
 
-    /**
-     * @brief Moves an entity in the internal packed array.
-     * @param from A valid position of an entity within storage.
-     * @param to A valid position of an entity within storage.
-     */
-    virtual void move_and_pop([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) {}
+    /*! @brief Moves an entity in the internal packed array. */
+    virtual void move_and_pop(const std::size_t, const std::size_t) {}
 
     /**
      * @brief Attempts to erase an entity from the internal packed array.
      * @param entt A valid entity identifier.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    virtual void swap_and_pop(const Entity entt, [[maybe_unused]] void *ud) {
+    virtual void swap_and_pop(const Entity entt, void *) {
         auto &ref = sparse[page(entt)][offset(entt)];
         const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
         ENTT_ASSERT(packed[pos] == entt, "Invalid entity identifier");
@@ -280,9 +271,8 @@ protected:
     /**
      * @brief Attempts to erase an entity from the internal packed array.
      * @param entt A valid entity identifier.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    virtual void in_place_pop(const Entity entt, [[maybe_unused]] void *ud) {
+    virtual void in_place_pop(const Entity entt, void *) {
         auto &ref = sparse[page(entt)][offset(entt)];
         const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
         ENTT_ASSERT(packed[pos] == entt, "Invalid entity identifier");

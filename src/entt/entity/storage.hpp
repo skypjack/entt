@@ -269,18 +269,30 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
 protected:
-    /*! @copydoc basic_sparse_set::swap_at */
+    /**
+     * @brief Swaps two entities in the internal packed array.
+     * @param lhs A valid position of an entity within storage.
+     * @param rhs A valid position of an entity within storage.
+     */
     void swap_at(const std::size_t lhs, const std::size_t rhs) final {
         std::swap(packed[page(lhs)][offset(lhs)], packed[page(rhs)][offset(rhs)]);
     }
 
-    /*! @copydoc basic_sparse_set::move_and_pop */
+    /**
+     * @brief Moves an entity in the internal packed array.
+     * @param from A valid position of an entity within storage.
+     * @param to A valid position of an entity within storage.
+     */
     void move_and_pop(const std::size_t from, const std::size_t to) final {
         push_at(to, std::move(packed[page(from)][offset(from)]));
         pop_at(from);
     }
 
-    /*! @copydoc basic_sparse_set::swap_and_pop */
+    /**
+     * @brief Attempts to erase an entity from the internal packed array.
+     * @param entt A valid entity identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
     void swap_and_pop(const Entity entt, void *ud) override {
         const auto pos = underlying_type::index(entt);
         const auto last = underlying_type::size() - 1u;
@@ -294,7 +306,11 @@ protected:
         underlying_type::swap_and_pop(entt, ud);
     }
 
-    /*! @copydoc basic_sparse_set::in_place_pop */
+    /**
+     * @brief Attempts to erase an entity from the internal packed array.
+     * @param entt A valid entity identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
     void in_place_pop(const Entity entt, void *ud) override {
         const auto pos = underlying_type::index(entt);
         underlying_type::in_place_pop(entt, ud);
