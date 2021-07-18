@@ -1437,7 +1437,14 @@ public:
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         ENTT_ASSERT(sortable<Component>(), "Cannot sort owned storage");
         auto *cpool = assure<Component>();
-        cpool->sort_n(cpool->size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+
+        if constexpr(std::is_invocable_v<Compare, decltype(cpool->get({})), decltype(cpool->get({}))>) {
+            cpool->sort([this, cpool, compare = std::move(compare)](const auto lhs, const auto rhs) {
+                return compare(std::as_const(cpool->get(lhs)), std::as_const(cpool->get(rhs)));
+            }, std::move(algo), std::forward<Args>(args)...);
+        } else {
+            cpool->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        }
     }
 
     /**

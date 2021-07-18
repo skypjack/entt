@@ -647,52 +647,6 @@ public:
         }
     }
 
-    /**
-     * @brief Sort elements according to the given comparison function.
-     *
-     * The comparison function object must return `true` if the first element
-     * is _less_ than the second one, `false` otherwise. The signature of the
-     * comparison function should be equivalent to one of the following:
-     *
-     * @code{.cpp}
-     * bool(const Entity, const Entity);
-     * bool(const Type &, const Type &);
-     * @endcode
-     *
-     * Moreover, the comparison function object shall induce a
-     * _strict weak ordering_ on the values.
-     *
-     * The sort function oject must offer a member function template
-     * `operator()` that accepts three arguments:
-     *
-     * * An iterator to the first element of the range to sort.
-     * * An iterator past the last element of the range to sort.
-     * * A comparison function to use to compare the elements.
-     *
-     * @warning
-     * Empty types are never instantiated. Therefore, only comparison function
-     * objects that require to return entities rather than components are
-     * accepted.
-     *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
-     * @tparam Args Types of arguments to forward to the sort function object.
-     * @param length Number of elements to sort.
-     * @param compare A valid comparison function object.
-     * @param algo A valid sort function object.
-     * @param args Arguments to forward to the sort function object, if any.
-     */
-    template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&... args) {
-        if constexpr(std::is_invocable_v<Compare, const value_type &, const value_type &>) {
-            underlying_type::sort_n(length, [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
-                return compare(std::as_const(get(lhs)), std::as_const(get(rhs)));
-            }, std::move(algo), std::forward<Args>(args)...);
-        } else {
-            underlying_type::sort_n(length, std::move(compare), std::move(algo), std::forward<Args>(args)...);
-        }
-    }
-
 private:
     compressed_pair<alloc, size_type> bucket;
     alloc_ptr_pointer packed;

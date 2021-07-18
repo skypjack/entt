@@ -817,12 +817,12 @@ TEST(Storage, SortRange) {
     boxed_int values[5u]{{3}, {6}, {1}, {9}, {12}};
 
     pool.insert(std::begin(entities), std::end(entities), values);
-    pool.sort_n(0u, [](auto lhs, auto rhs) { return lhs.value < rhs.value; });
+    pool.sort_n(0u, [&pool](auto lhs, auto rhs) { return pool.get(lhs).value < pool.get(rhs).value; });
 
     ASSERT_TRUE(std::equal(std::rbegin(entities), std::rend(entities), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(values), std::rend(values), pool.begin(), pool.end()));
 
-    pool.sort_n(2u, [](auto lhs, auto rhs) { return lhs.value < rhs.value; });
+    pool.sort_n(2u, [&pool](auto lhs, auto rhs) { return pool.get(lhs).value < pool.get(rhs).value; });
 
     ASSERT_EQ(pool.raw()[0u][0u], boxed_int{6});
     ASSERT_EQ(pool.raw()[0u][1u], boxed_int{3});
@@ -832,7 +832,7 @@ TEST(Storage, SortRange) {
     ASSERT_EQ(pool.data()[1u], entt::entity{12});
     ASSERT_EQ(pool.data()[2u], entt::entity{7});
 
-    pool.sort_n(5u, [](auto lhs, auto rhs) { return lhs.value < rhs.value; });
+    pool.sort_n(5u, [&pool](auto lhs, auto rhs) { return pool.get(lhs).value < pool.get(rhs).value; });
 
     auto begin = pool.begin();
     auto end = pool.end();
