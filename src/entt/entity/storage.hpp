@@ -402,7 +402,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) {
+    void reserve(const size_type cap) override {
         underlying_type::reserve(cap);
 
         if(cap > underlying_type::size()) {

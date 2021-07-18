@@ -394,7 +394,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) {
+    virtual void reserve(const size_type cap) {
         if(cap > reserved.second()) {
             resize_packed(cap);
         }
