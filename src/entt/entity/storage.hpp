@@ -195,8 +195,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         }
     }
 
-    void assure_at_least(const std::size_t last) {
-        if(const auto idx = page(last - 1u); !(idx < bucket.second())) {
+    void assure_at_least(const std::size_t pos) {
+        if(const auto idx = page(pos); !(idx < bucket.second())) {
             auto &&[allocator, len] = bucket;
             alloc_ptr allocator_ptr{allocator};
 
@@ -406,7 +406,7 @@ public:
         underlying_type::reserve(cap);
 
         if(cap > underlying_type::size()) {
-            assure_at_least(cap);
+            assure_at_least(cap - 1u);
         }
     }
 
@@ -572,7 +572,7 @@ public:
     template<typename... Args>
     value_type & emplace(const entity_type entt, Args &&... args) {
         const auto pos = underlying_type::slot();
-        assure_at_least(pos + 1u);
+        assure_at_least(pos);
 
         auto &value = push_at(pos, std::forward<Args>(args)...);
 
@@ -617,9 +617,7 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        const auto cap = underlying_type::size() + std::distance(first, last);
-        underlying_type::reserve(cap);
-        assure_at_least(cap);
+        reserve(underlying_type::size() + std::distance(first, last));
 
         for(; first != last; ++first) {
             push_at(underlying_type::size(), value);
@@ -647,9 +645,7 @@ public:
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
-        const auto cap = underlying_type::size() + std::distance(first, last);
-        underlying_type::reserve(cap);
-        assure_at_least(cap);
+        reserve(underlying_type::size() + std::distance(first, last));
 
         for(; first != last; ++first, ++from) {
             push_at(underlying_type::size(), *from);
