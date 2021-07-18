@@ -415,7 +415,7 @@ public:
      * allocated space for.
      * @return Capacity of the storage.
      */
-    [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT override {
         return bucket.second() * packed_page;
     }
 

@@ -405,7 +405,7 @@ public:
      * allocated space for.
      * @return Capacity of the sparse set.
      */
-    [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
+    [[nodiscard]] virtual size_type capacity() const ENTT_NOEXCEPT {
         return reserved.second();
     }
 
