@@ -554,6 +554,23 @@ public:
     }
 
     /**
+     * @brief Returns the object assigned to an entity as a tuple.
+     *
+     * @sa get
+     *
+     * @param entt A valid entity identifier.
+     * @return The object assigned to the entity as a tuple.
+     */
+    [[nodiscard]] std::tuple<const value_type &> get_as_tuple(const entity_type entt) const ENTT_NOEXCEPT {
+        return std::forward_as_tuple(get(entt));
+    }
+
+    /*! @copydoc get_as_tuple */
+    [[nodiscard]] std::tuple<value_type &> get_as_tuple(const entity_type entt) ENTT_NOEXCEPT {
+        return std::forward_as_tuple(get(entt));
+    }
+
+    /**
      * @brief Assigns an entity to a storage and constructs its object.
      *
      * This version accept both types that can be constructed in place directly
@@ -698,6 +715,21 @@ public:
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
         return allocator_type{underlying_type::get_allocator()};
+    }
+
+    /**
+     * @brief Returns an empty tuple.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.
+     *
+     * @param entt A valid entity identifier.
+     * @return Returns an empty tuple.
+     */
+    [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+        ENTT_ASSERT(underlying_type::contains(entt), "Storage does not contain entity");
+        return std::tuple{};
     }
 
     /**
@@ -973,25 +1005,6 @@ struct storage_traits {
     /*! @brief Resulting type after component-to-storage conversion. */
     using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
-
-
-/**
- * @brief Gets the element assigned to an entity from a storage, if any.
- * @tparam Type Storage type.
- * @param container A valid instance of a storage class.
- * @param entt A valid entity identifier.
- * @return A possibly empty tuple containing the requested element.
- */
-template<typename Type>
-[[nodiscard]] auto get_as_tuple([[maybe_unused]] Type &container, [[maybe_unused]] const typename Type::entity_type entt) {
-    static_assert(std::is_same_v<std::remove_const_t<Type>, typename storage_traits<typename Type::entity_type, typename Type::value_type>::storage_type>, "Invalid storage");
-
-    if constexpr(ignore_as_empty_v<typename Type::value_type>) {
-        return std::make_tuple();
-    } else {
-        return std::forward_as_tuple(container.get(entt));
-    }
-}
 
 
 }

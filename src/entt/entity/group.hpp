@@ -99,7 +99,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
                 const auto entt = *it;
-                return std::tuple_cat(std::make_tuple(entt), get_as_tuple(*std::get<storage_type<Get> *>(pools), entt)...);
+                return std::tuple_cat(std::make_tuple(entt), std::get<storage_type<Get> *>(pools)->get_as_tuple(entt)...);
             }
 
             [[nodiscard]] bool operator==(const iterable_iterator &other) const ENTT_NOEXCEPT {
@@ -341,11 +341,11 @@ public:
         ENTT_ASSERT(contains(entt), "Group does not contain entity");
 
         if constexpr(sizeof...(Component) == 0) {
-            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Get> *>(pools), entt)...);
+            return std::tuple_cat(std::get<storage_type<Get> *>(pools)->get_as_tuple(entt)...);
         } else if constexpr(sizeof...(Component) == 1) {
             return (std::get<storage_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Component> *>(pools), entt)...);
+            return std::tuple_cat(std::get<storage_type<Component> *>(pools)->get_as_tuple(entt)...);
         }
     }
 
@@ -570,7 +570,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
                 return std::tuple_cat(
                     std::make_tuple(*it),
                     std::forward_as_tuple(*std::get<OIt>(owned)...),
-                    get_as_tuple(*std::get<storage_type<Get> *>(get), *it)...
+                    std::get<storage_type<Get> *>(get)->get_as_tuple(*it)...
                 );
             }
 
@@ -836,11 +836,11 @@ public:
         ENTT_ASSERT(contains(entt), "Group does not contain entity");
 
         if constexpr(sizeof...(Component) == 0) {
-            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Owned> *>(pools), entt)..., get_as_tuple(*std::get<storage_type<Get> *>(pools), entt)...);
+            return std::tuple_cat(std::get<storage_type<Owned> *>(pools)->get_as_tuple(entt)..., std::get<storage_type<Get> *>(pools)->get_as_tuple(entt)...);
         } else if constexpr(sizeof...(Component) == 1) {
             return (std::get<storage_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Component> *>(pools), entt)...);
+            return std::tuple_cat(std::get<storage_type<Component> *>(pools)->get_as_tuple(entt)...);
         }
     }
 

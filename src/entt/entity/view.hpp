@@ -38,7 +38,7 @@ class iterable_storage final {
     template<typename... It>
     struct iterable_storage_iterator final {
         using difference_type = std::ptrdiff_t;
-        using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<decltype(get_as_tuple(std::declval<storage_type &>(), {}))>()));
+        using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<decltype(std::declval<storage_type &>().get_as_tuple({}))>()));
         using pointer = void;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
@@ -366,7 +366,7 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
         if constexpr(std::is_same_v<Comp, Other>) {
             return std::forward_as_tuple(std::get<Args>(curr)...);
         } else {
-            return get_as_tuple(*std::get<storage_type<Other> *>(pools), std::get<0>(curr));
+            return std::get<storage_type<Other> *>(pools)->get_as_tuple(std::get<0>(curr));
         }
     }
 
@@ -553,11 +553,11 @@ public:
         ENTT_ASSERT(contains(entt), "View does not contain entity");
 
         if constexpr(sizeof...(Comp) == 0) {
-            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Component> *>(pools), entt)...);
+            return std::tuple_cat(std::get<storage_type<Component> *>(pools)->get_as_tuple(entt)...);
         } else if constexpr(sizeof...(Comp) == 1) {
             return (std::get<storage_type<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Comp> *>(pools), entt)...);
+            return std::tuple_cat(std::get<storage_type<Comp> *>(pools)->get_as_tuple(entt)...);
         }
     }
 
@@ -890,7 +890,7 @@ public:
         ENTT_ASSERT(contains(entt), "View does not contain entity");
 
         if constexpr(sizeof...(Comp) == 0) {
-            return get_as_tuple(*std::get<0>(pools), entt);
+            return std::get<0>(pools)->get_as_tuple(entt);
         } else {
             static_assert(std::is_same_v<Comp..., Component>, "Invalid component type");
             return std::get<0>(pools)->get(entt);
