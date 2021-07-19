@@ -6,17 +6,13 @@
 
 WIP:
 * remove view dispatcher, add support to relax policy constraints on user request (eg view.use<T>())
-* remove view each<T>(F), each<T>(), make view::use return a view and remove the mutable data member
 * custom allocators all over
 
 WIP:
 * make sparse_set/storage adhere to AllocatorAwareContainer requirements
-* make value_type available from meta container types, otherwise we have to default construct a container to get it
 * make it possible to register externally managed pools with the registry (allow for system centric mode)
 * registry: switch to the udata/mixin model and get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
-* it's now possible to have 0 as null entity/version, so we can finally switch to it
 * make pools available (registry/view/group), review operator| for views
-* page size: add per-pool size, allow for 0 sizes (old fully packed array)
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * add user data to type_info
