@@ -667,7 +667,7 @@ private:
 
 /*! @copydoc basic_storage */
 template<typename Entity, typename Type, typename Allocator>
-class basic_storage<Entity, Type, Allocator, std::enable_if_t<component_traits<Type>::ignore_if_empty::value && std::is_empty_v<Type>>>
+class basic_storage<Entity, Type, Allocator, std::enable_if_t<ignore_as_empty_v<Type>>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>
 {
     using allocator_traits = std::allocator_traits<Allocator>;
@@ -698,19 +698,6 @@ public:
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
         return allocator_type{underlying_type::get_allocator()};
-    }
-
-    /**
-     * @brief Fake get function.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the storage results in
-     * undefined behavior.
-     *
-     * @param entt A valid entity identifier.
-     */
-    void get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
-        ENTT_ASSERT(underlying_type::contains(entt), "Storage does not contain entity");
     }
 
     /**
@@ -923,7 +910,10 @@ public:
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entt, Args &&... args) {
         Type::emplace(entt, std::forward<Args>(args)...);
         construction.publish(owner, entt);
-        return this->get(entt);
+
+        if constexpr(!ignore_as_empty_v<value_type>) {
+            return this->get(entt);
+        }
     }
 
     /**
@@ -960,7 +950,10 @@ public:
     decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entt, Func &&... func) {
         Type::patch(entt, std::forward<Func>(func)...);
         update.publish(owner, entt);
-        return this->get(entt);
+
+        if constexpr(!ignore_as_empty_v<value_type>) {
+            return this->get(entt);
+        }
     }
 
 private:
@@ -993,7 +986,7 @@ template<typename Type>
 [[nodiscard]] auto get_as_tuple([[maybe_unused]] Type &container, [[maybe_unused]] const typename Type::entity_type entt) {
     static_assert(std::is_same_v<std::remove_const_t<Type>, typename storage_traits<typename Type::entity_type, typename Type::value_type>::storage_type>, "Invalid storage");
 
-    if constexpr(std::is_void_v<decltype(container.get({}))>) {
+    if constexpr(ignore_as_empty_v<typename Type::value_type>) {
         return std::make_tuple();
     } else {
         return std::forward_as_tuple(container.get(entt));

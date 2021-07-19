@@ -41,7 +41,7 @@ inline constexpr bool in_place_delete_v = component_traits<Type>::in_place_delet
  * @tparam Type Type of component.
  */
 template<class Type>
-inline constexpr bool ignore_if_empty_v = component_traits<Type>::ignore_if_empty::value;
+inline constexpr bool ignore_as_empty_v = component_traits<Type>::ignore_if_empty::value && std::is_empty_v<Type>;
 
 
 }

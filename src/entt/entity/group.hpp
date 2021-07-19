@@ -591,11 +591,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     public:
         using iterator = iterable_iterator<
             typename basic_common_type::iterator,
-            type_list_cat_t<std::conditional_t<std::is_void_v<decltype(std::declval<storage_type<Owned>>().get({}))>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
+            type_list_cat_t<std::conditional_t<ignore_as_empty_v<std::remove_const_t<Owned>>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
         >;
         using reverse_iterator = iterable_iterator<
             typename basic_common_type::reverse_iterator,
-            type_list_cat_t<std::conditional_t<std::is_void_v<decltype(std::declval<storage_type<Owned>>().get({}))>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
+            type_list_cat_t<std::conditional_t<ignore_as_empty_v<std::remove_const_t<Owned>>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
         >;
 
         iterable(std::tuple<storage_type<Owned> *..., storage_type<Get> *...> cpools, const std::size_t * const extent)

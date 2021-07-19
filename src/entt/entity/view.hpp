@@ -35,8 +35,6 @@ class iterable_storage final {
     using basic_common_type = basic_sparse_set<Entity>;
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
-    static constexpr bool has_void_getter = std::is_void_v<decltype(std::declval<storage_type>().get({}))>;
-
     template<typename... It>
     struct iterable_storage_iterator final {
         using difference_type = std::ptrdiff_t;
@@ -77,12 +75,12 @@ class iterable_storage final {
 
 public:
     using iterator = std::conditional_t<
-        has_void_getter,
+        ignore_as_empty_v<std::remove_const_t<Component>>,
         iterable_storage_iterator<typename basic_common_type::iterator>,
         iterable_storage_iterator<typename basic_common_type::iterator, decltype(std::declval<storage_type>().begin())>
     >;
     using reverse_iterator = std::conditional_t<
-        has_void_getter,
+        ignore_as_empty_v<std::remove_const_t<Component>>,
         iterable_storage_iterator<typename basic_common_type::reverse_iterator>,
         iterable_storage_iterator<typename basic_common_type::reverse_iterator, decltype(std::declval<storage_type>().rbegin())>
     >;
@@ -923,7 +921,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(std::is_void_v<decltype(std::get<0>(pools)->get({}))>) {
+        if constexpr(ignore_as_empty_v<std::remove_const_t<Component>>) {
             if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = size(); pos; --pos) {
                     func();
