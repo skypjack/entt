@@ -612,7 +612,7 @@ public:
      * @return A reference to the updated instance.
      */
     template<typename... Func>
-    decltype(auto) patch(const entity_type entt, Func &&... func) {
+    value_type & patch(const entity_type entt, Func &&... func) {
         const auto idx = underlying_type::index(entt);
         auto &&elem = packed[page(idx)][offset(idx)];
         (std::forward<Func>(func)(elem), ...);

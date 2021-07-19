@@ -80,7 +80,11 @@ TEST(Storage, Functionalities) {
     ASSERT_NE(pool.begin(), pool.end());
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_TRUE(pool.contains(entt::entity{41}));
+
     ASSERT_EQ(pool.get(entt::entity{41}), 3);
+    ASSERT_EQ(std::as_const(pool).get(entt::entity{41}), 3);
+    ASSERT_EQ(pool.get_as_tuple(entt::entity{41}), std::make_tuple(3));
+    ASSERT_EQ(std::as_const(pool).get_as_tuple(entt::entity{41}), std::make_tuple(3));
 
     pool.erase(entt::entity{41});
 
@@ -94,6 +98,9 @@ TEST(Storage, Functionalities) {
     pool.emplace(entt::entity{41}, 12);
 
     ASSERT_EQ(pool.get(entt::entity{41}), 12);
+    ASSERT_EQ(std::as_const(pool).get(entt::entity{41}), 12);
+    ASSERT_EQ(pool.get_as_tuple(entt::entity{41}), std::make_tuple(12));
+    ASSERT_EQ(std::as_const(pool).get_as_tuple(entt::entity{41}), std::make_tuple(12));
 
     pool.clear();
 
