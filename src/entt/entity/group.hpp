@@ -68,10 +68,10 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
-    using basic_common_type = basic_sparse_set<Entity>;
-
     template<typename Component>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
+
+    using basic_common_type = std::common_type_t<typename storage_type<Get>::base_type...>;
 
     class iterable final {
         template<typename It>
@@ -533,10 +533,10 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
-    using basic_common_type = basic_sparse_set<Entity>;
-
     template<typename Component>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
+
+    using basic_common_type = std::common_type_t<typename storage_type<Owned>::base_type..., typename storage_type<Get>::base_type...>;
 
     class iterable final {
         template<typename, typename>

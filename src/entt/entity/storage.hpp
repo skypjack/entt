@@ -65,7 +65,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using alloc_ptr_const_pointer = typename allocator_traits::template rebind_traits<alloc_const_pointer>::const_pointer;
     using alloc_ptr_pointer = typename alloc_ptr_traits::pointer;
 
-    using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
     using difference_type = typename entt_traits<Entity>::difference_type;
     using comp_traits = component_traits<Type>;
 
@@ -181,7 +180,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     void release_memory() {
         if(packed) {
             // no-throw stable erase iteration
-            underlying_type::clear();
+            base_type::clear();
 
             auto &&[allocator, len] = bucket;
             alloc_ptr allocator_ptr{allocator};
@@ -230,7 +229,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     void release_unused_pages() {
-        if(const auto length = underlying_type::size() / packed_page; length < bucket.second()) {
+        if(const auto length = base_type::size() / packed_page; length < bucket.second()) {
             auto &&[allocator, len] = bucket;
             alloc_ptr allocator_ptr{allocator};
 
@@ -294,8 +293,8 @@ protected:
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void swap_and_pop(const Entity entt, void *ud) override {
-        const auto pos = underlying_type::index(entt);
-        const auto last = underlying_type::size() - 1u;
+        const auto pos = base_type::index(entt);
+        const auto last = base_type::size() - 1u;
         auto &&elem = packed[page(pos)][offset(pos)];
 
         // support for nosy destructors
@@ -303,7 +302,7 @@ protected:
         elem = std::move(packed[page(last)][offset(last)]);
         pop_at(last);
 
-        underlying_type::swap_and_pop(entt, ud);
+        base_type::swap_and_pop(entt, ud);
     }
 
     /**
@@ -312,13 +311,15 @@ protected:
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void in_place_pop(const Entity entt, void *ud) override {
-        const auto pos = underlying_type::index(entt);
-        underlying_type::in_place_pop(entt, ud);
+        const auto pos = base_type::index(entt);
+        base_type::in_place_pop(entt, ud);
         // support for nosy destructors
         pop_at(pos);
     }
 
 public:
+    /*! @brief Base type. */
+    using base_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
@@ -350,7 +351,7 @@ public:
      * @param allocator the allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
+        : base_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
           bucket{allocator, size_type{}},
           packed{}
     {}
@@ -360,7 +361,7 @@ public:
      * @param other The instance to move from.
      */
     basic_storage(basic_storage &&other) ENTT_NOEXCEPT
-        : underlying_type{std::move(other)},
+        : base_type{std::move(other)},
           bucket{std::move(other.bucket)},
           packed{std::exchange(other.packed, alloc_ptr_pointer{})}
     {}
@@ -378,7 +379,7 @@ public:
     basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT {
         release_memory();
 
-        underlying_type::operator=(std::move(other));
+        base_type::operator=(std::move(other));
 
         bucket = std::move(other.bucket);
         packed = std::exchange(other.packed, alloc_ptr_pointer{});
@@ -403,9 +404,9 @@ public:
      * @param cap Desired capacity.
      */
     void reserve(const size_type cap) override {
-        underlying_type::reserve(cap);
+        base_type::reserve(cap);
 
-        if(cap > underlying_type::size()) {
+        if(cap > base_type::size()) {
             assure_at_least(cap - 1u);
         }
     }
@@ -421,7 +422,7 @@ public:
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() override {
-        underlying_type::shrink_to_fit();
+        base_type::shrink_to_fit();
         release_unused_pages();
     }
 
@@ -447,7 +448,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
-        const difference_type pos = underlying_type::size();
+        const difference_type pos = base_type::size();
         return const_iterator{std::addressof(packed), pos};
     }
 
@@ -458,7 +459,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
-        const difference_type pos = underlying_type::size();
+        const difference_type pos = base_type::size();
         return iterator{std::addressof(packed), pos};
     }
 
@@ -544,7 +545,7 @@ public:
      * @return The object assigned to the entity.
      */
     [[nodiscard]] const value_type & get(const entity_type entt) const ENTT_NOEXCEPT {
-        const auto idx = underlying_type::index(entt);
+        const auto idx = base_type::index(entt);
         return packed[page(idx)][offset(idx)];
     }
 
@@ -588,13 +589,13 @@ public:
      */
     template<typename... Args>
     value_type & emplace(const entity_type entt, Args &&... args) {
-        const auto pos = underlying_type::slot();
+        const auto pos = base_type::slot();
         assure_at_least(pos);
 
         auto &value = push_at(pos, std::forward<Args>(args)...);
 
         ENTT_TRY {
-            [[maybe_unused]] const auto curr = underlying_type::emplace(entt);
+            [[maybe_unused]] const auto curr = base_type::emplace(entt);
             ENTT_ASSERT(pos == curr, "Misplaced component");
         } ENTT_CATCH {
             pop_at(pos);
@@ -613,7 +614,7 @@ public:
      */
     template<typename... Func>
     value_type & patch(const entity_type entt, Func &&... func) {
-        const auto idx = underlying_type::index(entt);
+        const auto idx = base_type::index(entt);
         auto &&elem = packed[page(idx)][offset(idx)];
         (std::forward<Func>(func)(elem), ...);
         return elem;
@@ -634,15 +635,15 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        reserve(underlying_type::size() + std::distance(first, last));
+        reserve(base_type::size() + std::distance(first, last));
 
         for(; first != last; ++first) {
-            push_at(underlying_type::size(), value);
+            push_at(base_type::size(), value);
 
             ENTT_TRY {
-                underlying_type::emplace_back(*first);
+                base_type::emplace_back(*first);
             } ENTT_CATCH {
-                pop_at(underlying_type::size());
+                pop_at(base_type::size());
                 ENTT_THROW;
             }
         }
@@ -662,15 +663,15 @@ public:
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
-        reserve(underlying_type::size() + std::distance(first, last));
+        reserve(base_type::size() + std::distance(first, last));
 
         for(; first != last; ++first, ++from) {
-            push_at(underlying_type::size(), *from);
+            push_at(base_type::size(), *from);
 
             ENTT_TRY {
-                underlying_type::emplace_back(*first);
+                base_type::emplace_back(*first);
             } ENTT_CATCH {
-                pop_at(underlying_type::size());
+                pop_at(base_type::size());
                 ENTT_THROW;
             }
         }
@@ -688,10 +689,11 @@ class basic_storage<Entity, Type, Allocator, std::enable_if_t<ignore_as_empty_v<
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>
 {
     using allocator_traits = std::allocator_traits<Allocator>;
-    using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
     using comp_traits = component_traits<Type>;
 
 public:
+    /*! @brief Base type. */
+    using base_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
@@ -706,7 +708,7 @@ public:
      * @param allocator Allocator to use (possibly default-constructed).
      */
     explicit basic_storage(const allocator_type &allocator = {})
-        : underlying_type{deletion_policy{comp_traits::in_place_delete::value}, allocator}
+        : base_type{deletion_policy{comp_traits::in_place_delete::value}, allocator}
     {}
 
     /**
@@ -714,7 +716,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
-        return allocator_type{underlying_type::get_allocator()};
+        return allocator_type{base_type::get_allocator()};
     }
 
     /**
@@ -728,7 +730,7 @@ public:
      * @return Returns an empty tuple.
      */
     [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
-        ENTT_ASSERT(underlying_type::contains(entt), "Storage does not contain entity");
+        ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
         return std::tuple{};
     }
 
@@ -746,7 +748,7 @@ public:
     template<typename... Args>
     void emplace(const entity_type entt, Args &&... args) {
         [[maybe_unused]] value_type elem{std::forward<Args>(args)...};
-        underlying_type::emplace(entt);
+        base_type::emplace(entt);
     }
 
     /**
@@ -757,7 +759,7 @@ public:
     */
     template<typename... Func>
     void patch([[maybe_unused]] const entity_type entt, Func &&... func) {
-        ENTT_ASSERT(underlying_type::contains(entt), "Storage does not contain entity");
+        ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
         (std::forward<Func>(func)(), ...);
     }
 
@@ -774,7 +776,7 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type & = {}) {
-        underlying_type::insert(first, last);
+        base_type::insert(first, last);
     }
 };
 

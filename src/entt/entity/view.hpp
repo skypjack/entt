@@ -32,8 +32,8 @@ namespace internal {
 
 template<typename Entity, typename Component>
 class iterable_storage final {
-    using basic_common_type = basic_sparse_set<Entity>;
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
+    using basic_common_type = typename storage_type::base_type;
 
     template<typename... It>
     struct iterable_storage_iterator final {
@@ -110,10 +110,8 @@ private:
 };
 
 
-template<typename Policy, typename It, std::size_t Component, std::size_t Exclude>
+template<typename Policy, typename Type, typename It, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
-    using basic_common_type = basic_sparse_set<typename std::iterator_traits<It>::value_type>;
-
     [[nodiscard]] bool valid() const {
         const auto entt = *it;
         return Policy::accept(entt)
@@ -137,7 +135,7 @@ public:
           filter{}
     {}
 
-    view_iterator(It from, It to, It curr, std::array<const basic_common_type *, Component> all_of, std::array<const basic_common_type *, Exclude> none_of) ENTT_NOEXCEPT
+    view_iterator(It from, It to, It curr, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) ENTT_NOEXCEPT
         : first{from},
           last{to},
           it{curr},
@@ -189,8 +187,8 @@ private:
     It first;
     It last;
     It it;
-    std::array<const basic_common_type *, Component> pools;
-    std::array<const basic_common_type *, Exclude> filter;
+    std::array<const Type *, Component> pools;
+    std::array<const Type *, Exclude> filter;
 };
 
 
@@ -275,10 +273,10 @@ struct basic_view;
  */
 template<typename Policy, typename Entity, typename... Exclude, typename... Component>
 class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
-    using basic_common_type = basic_sparse_set<Entity>;
-
     template<typename Comp>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
+
+    using basic_common_type = std::common_type_t<typename storage_type<Component>::base_type...>;
 
     class iterable final {
         template<typename It>
@@ -321,8 +319,8 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
         };
 
     public:
-        using iterator = iterable_iterator<internal::view_iterator<Policy, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
-        using reverse_iterator = iterable_iterator<internal::view_iterator<Policy, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
+        using iterator = iterable_iterator<internal::view_iterator<Policy, basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
+        using reverse_iterator = iterable_iterator<internal::view_iterator<Policy, basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
 
         iterable(const basic_view_impl &parent)
             : view{parent}
@@ -391,9 +389,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<Policy, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using iterator = internal::view_iterator<Policy, basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = internal::view_iterator<Policy, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using reverse_iterator = internal::view_iterator<Policy, basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable_view = iterable;
 
@@ -695,8 +693,8 @@ private:
  */
 template<typename Entity, typename Component>
 class basic_view_impl<packed_storage_policy, Entity, exclude_t<>, Component> {
-    using basic_common_type = basic_sparse_set<Entity>;
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
+    using basic_common_type = typename storage_type::base_type;
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -923,7 +921,7 @@ public:
     void each(Func func) const {
         if constexpr(ignore_as_empty_v<std::remove_const_t<Component>>) {
             if constexpr(std::is_invocable_v<Func>) {
-                for(auto pos = size(); pos; --pos) {
+                for(size_type pos{}, last = size(); pos < last; ++pos) {
                     func();
                 }
             } else {
@@ -975,7 +973,7 @@ public:
 
 private:
     const std::tuple<storage_type *> pools;
-    const std::array<const basic_common_type *, 0u> filter;
+    const std::tuple<> filter;
 };
 
 
