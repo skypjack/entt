@@ -29,7 +29,7 @@
     * [Aliased properties](#aliased-properties)
   * [In-place delete](#in-place-delete)
     * [Pointer stability](#pointer-stability)
-    * [Hierarchies](#hierarchies)
+    * [Hierarchies and the like](#hierarchies-and-the-like)
   * [Making the most of range-destroy](#making-the-most-of-range-destroy)
   * [Meet the runtime](#meet-the-runtime)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
@@ -1051,7 +1051,7 @@ struct entt::component_traits<Type>: basic_component_traits {
 Because of how C++ works, this specialization will obviously have to be visible
 every time operations are performed on a storage.
 
-### Hierarchies
+### Hierarchies and the like
 
 `EnTT` doesn't attempt in any way to offer built-in methods with hidden or
 unclear costs to facilitate the creation of hierarchies.<br/>
@@ -2020,9 +2020,14 @@ and components during iterations, nor to have pointer stability.<br/>
   destroying them or removing their components isn't allowed and can result in
   undefined behavior.
 
+* If a type has stable pointers, it's possible to destroy any entity and any
+  component, even if not currently iterated, without the risk of invalidating
+  any references.
+
 In other terms, iterators are never invalidated. Also, component references
 aren't invalidated when a new element is added while they could be invalidated
-upon deletion, due to the _swap-and-pop_ policy.<br/>
+upon destruction due to the _swap-and-pop_ policy, unless the type leading the
+iteration undergoes in-place deletion.<br/>
 Consider the following example:
 
 ```cpp
@@ -2039,9 +2044,9 @@ Use a common range-for loop and get components directly from the view or move
 the deletion of entities and components at the end of the function to avoid
 dangling pointers.
 
-Conversely, iterators are invalidated and the behavior is undefined if an entity
-is modified or destroyed and it's not the one currently returned by the iterator
-nor a newly created one.<br/>
+For all types that don't offer stable pointers, iterators are also invalidated
+and the behavior is undefined if an entity is modified or destroyed and it's not
+the one currently returned by the iterator nor a newly created one.<br/>
 To work around it, possible approaches are:
 
 * Store aside the entities and the components to be removed and perform the
