@@ -204,12 +204,12 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             std::uninitialized_value_construct(mem + len, mem + sz);
 
             ENTT_TRY {
-                for(auto pos = len; pos < sz; ++pos) {
-                    mem[pos] = alloc_traits::allocate(allocator, packed_page);
+                for(auto next = len; next < sz; ++next) {
+                    mem[next] = alloc_traits::allocate(allocator, packed_page);
                 }
             } ENTT_CATCH {
-                for(auto pos = len; pos < sz && mem[pos]; ++pos) {
-                    alloc_traits::deallocate(allocator, mem[pos], packed_page);
+                for(auto next = len; next < sz && mem[next]; ++next) {
+                    alloc_traits::deallocate(allocator, mem[next], packed_page);
                 }
 
                 std::destroy(mem + len, mem + sz);

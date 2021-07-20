@@ -1442,7 +1442,7 @@ public:
             cpool->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
             if constexpr(std::is_invocable_v<Compare, decltype(cpool->get({})), decltype(cpool->get({}))>) {
-                cpool->sort([this, cpool, compare = std::move(compare)](const auto lhs, const auto rhs) {
+                cpool->sort([cpool, compare = std::move(compare)](const auto lhs, const auto rhs) {
                     return compare(std::as_const(cpool->get(lhs)), std::as_const(cpool->get(rhs)));
                 }, std::move(algo), std::forward<Args>(args)...);
             } else {
