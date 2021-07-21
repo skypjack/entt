@@ -49,6 +49,7 @@
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
   * [Stable storage](#stable-storage)
+    * [No policy is the best policy](#no-policy-is-the-best-policy)
   * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
     * [More performance, more constraints](#more-performance-more-constraints)
 * [Empty type optimization](#empty-type-optimization)
@@ -1979,7 +1980,7 @@ not be used frequently to avoid the risk of a performance hit.
 ## Stable storage
 
 Since it's possible to have completely stable storage in `EnTT`, it's also
-required that all views behave accordingly.<br/>
+required that all views and groups behave accordingly.<br/>
 In general, this aspect is quite transparent to the user who doesn't have to do
 anything in the vast majority of cases. In particular:
 
@@ -2005,6 +2006,47 @@ iteration policy.<br/>
 The latter will be such that in no case will a tombstone be returned from the
 view itself, regardless of the iteration method. Similarly, no non-existent
 components will be accessed, which could result in an UB otherwise.
+
+### No policy is the best policy
+
+When a view is iterated and the type leading the iteration undergoes in-place
+deletion, a dedicated policy is used to skip any tombstones.<br/>
+As negligible as it may be (and the advice is to always measure before trying to
+optimize things that don't need it), this adds a cost to the iteration itself.
+
+As for single type iterations, this check cannot be avoided. On the other hand,
+if a type is accessed mainly through linear iterations, the error is probably in
+the use of stable storage that doesn't allow to rearrange the elements in order
+to keep them tightly packed.<br/>
+On the other hand, in many cases it's possible to force the use of no policy for
+multi-type iterations. By default, a view uses the most stringent policy unless
+instructed otherwise, primarily because it does an opaque iteration over deleted
+types. However, by specifying the type to lead the iteration, it has enough
+information to choose the most suitable policy (hopefully, no policy at all).
+
+For example, if the `position` type has stable storage and the `velocity` type
+does not, the following iteration will use a policy to skip all tombstones:
+
+```cpp
+for(auto [entity, pos, vel]: registry.view<position, velocity>().each()) {
+    /* ... */
+}
+```
+
+However, by requiring `velocity` to lead the iteration, the view will be able to
+choose the most suitable policy, that is no policy at all in this case:
+
+```cpp
+for(auto [entity, pos, vel]: registry.view<position, velocity>().each<velocity>()) {
+    /* ... */
+}
+```
+
+Forcing the use of no policy means returning to the iteration logic normally
+adopted for views that don't contain types with stable storage, that is the
+iteration process that has accompanied `EnTT` since the beginning.<br/>
+The same technique can be used with all overloads of the `each` function as well
+as with the `begin`/`end` template functions of a view.
 
 ## What is allowed and what is not
 
