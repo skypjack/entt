@@ -371,7 +371,8 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
     template<typename Comp, typename Func>
     void traverse(Func func) const {
         for(const auto curr: internal::iterable_storage<Entity, Comp>{*std::get<storage_type<Comp> *>(pools)}) {
-            if(Policy::accept(std::get<0>(curr)) && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(std::get<0>(curr))) && ...)
+            if(internal::stable_iteration<in_place_delete_v<std::remove_const_t<Comp>>>::accept(std::get<0>(curr))
+                && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(std::get<0>(curr))) && ...)
                 && std::apply([entt = std::get<0>(curr)](const auto *... cpool) { return (!cpool->contains(entt) && ...); }, filter))
             {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view_impl>().get({})))>) {
