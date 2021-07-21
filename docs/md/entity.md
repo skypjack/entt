@@ -664,7 +664,7 @@ registry.valid(entt::tombstone);
 
 Moreover, users cannot set the tombstone version when releasing an entity:
 
-```
+```cpp
 registry.destroy(entity, entt::tombstone);
 ```
 
