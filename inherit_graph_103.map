@@ -1,3 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1meta__type.html" title="Opaque wrapper for types." alt="" coords="5,5,119,32"/>
+<area shape="rect" id="node1" href="$classentt_1_1process.html" title=" " alt="" coords="5,5,161,61"/>
+<area shape="rect" id="node2" href="$structentt_1_1process__adaptor.html" title="Adaptor for lambdas and functors to turn them into processes." alt="" coords="219,17,367,58"/>
+<area shape="rect" id="node3" title=" " alt="" coords="43,85,124,112"/>
+<area shape="rect" id="node4" href="$structentt_1_1overloaded.html" title="Helper type for visitors." alt="" coords="209,85,376,112"/>
 </map>

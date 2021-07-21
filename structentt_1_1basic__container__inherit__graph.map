@@ -1,0 +1,15 @@
+<map id="entt::basic_container&lt; Container &gt;" name="entt::basic_container&lt; Container &gt;">
+<area shape="rect" id="node1" title="Basic STL&#45;compatible container traits." alt="" coords="5,389,148,430"/>
+<area shape="rect" id="node2" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="199,5,476,120"/>
+<area shape="rect" id="node4" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="236,144,439,259"/>
+<area shape="rect" id="node6" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="199,283,476,397"/>
+<area shape="rect" id="node8" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="196,421,479,536"/>
+<area shape="rect" id="node10" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="243,560,431,645"/>
+<area shape="rect" id="node12" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="221,670,454,799"/>
+<area shape="rect" id="node3" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1set_3_01Key_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::sets of any type." alt="" coords="559,35,713,91"/>
+<area shape="rect" id="node5" href="$structentt_1_1meta__sequence__container__traits_3_01std_1_1vector_3_01Type_00_01Args_8_8_8_01_4_01_4.html" title="Meta sequence container traits for std::vectors of any type." alt="" coords="549,173,723,229"/>
+<area shape="rect" id="node7" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1unordered__set_3_01Key_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::unordered_sets of any type." alt="" coords="527,312,745,368"/>
+<area shape="rect" id="node9" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::maps of any type." alt="" coords="535,451,737,507"/>
+<area shape="rect" id="node11" href="$structentt_1_1meta__sequence__container__traits_3_01std_1_1array_3_01Type_00_01N_01_4_01_4.html" title="Meta sequence container traits for std::arrays of any type." alt="" coords="562,575,710,631"/>
+<area shape="rect" id="node13" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1unordered__map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::unordered_maps of any type." alt="" coords="537,699,735,770"/>
+</map>

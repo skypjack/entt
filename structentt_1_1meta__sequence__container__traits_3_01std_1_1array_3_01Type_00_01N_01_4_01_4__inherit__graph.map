@@ -1,5 +1,5 @@
 <map id="entt::meta_sequence_container_traits&lt; std::array&lt; Type, N &gt; &gt;" name="entt::meta_sequence_container_traits&lt; std::array&lt; Type, N &gt; &gt;">
-<area shape="rect" id="node1" title="Meta sequence container traits for std::arrays of any type." alt="" coords="460,20,608,76"/>
-<area shape="rect" id="node2" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="224,5,412,91"/>
-<area shape="rect" id="node3" href="$structentt_1_1basic__container.html" title=" " alt="" coords="5,27,176,69"/>
+<area shape="rect" id="node1" title="Meta sequence container traits for std::arrays of any type." alt="" coords="432,20,580,76"/>
+<area shape="rect" id="node2" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="196,5,384,91"/>
+<area shape="rect" id="node3" href="$structentt_1_1basic__container.html" title="Basic STL&#45;compatible container traits." alt="" coords="5,27,148,69"/>
 </map>

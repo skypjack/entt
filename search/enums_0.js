@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['entity_1078',['entity',['../namespaceentt.html#a0b54e231d069e8a231e14b223388808a',1,'entt']]]
+  ['deletion_5fpolicy_1128',['deletion_policy',['../namespaceentt.html#abc4d0fa77fae26e7c01793990996c581',1,'entt']]]
 ];

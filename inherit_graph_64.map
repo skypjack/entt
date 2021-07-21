@@ -1,3 +1,10 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1entt__traits.html" title="Entity traits." alt="" coords="5,5,165,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,319,108,345"/>
+<area shape="rect" id="node2" href="$structentt_1_1is__complete_3_01Type_00_01std_1_1void__t_3_01decltype_07sizeof_07Type_08_08_4_01_4.html" title="Provides the member constant value to true if a given type is complete, false otherwise." alt="" coords="163,5,336,61"/>
+<area shape="rect" id="node3" href="$structentt_1_1is__iterator_3_01Type_00_01std_1_1void__t_3_01typename_01std_1_1iterator__traits_3a2eb7dcc84dd5d3a13fb4848a9e1994c.html" title="Provides the member constant value to true if a given type is an iterator, false otherwise." alt="" coords="170,85,329,171"/>
+<area shape="rect" id="node4" href="$structentt_1_1is__iterator__type_3_01Type_00_01It_00_01std_1_1enable__if__t_3_01is__iterator__v_1c6d668122d93a8a6f6186aab47dc295.html" title="Provides the member constant value to true if a given type is of the required iterator type,..." alt="" coords="156,195,343,280"/>
+<area shape="rect" id="node5" href="$structentt_1_1is__key__only__meta__associative__container.html" title="Provides the member constant value to true if a meta associative container claims to wrap a key&#45;only ..." alt="" coords="165,304,333,360"/>
+<area shape="rect" id="node6" href="$structentt_1_1is__meta__pointer__like_3_01Type_01_5_01_4.html" title="Makes plain pointers pointer&#45;like types for the meta system." alt="" coords="177,385,321,426"/>
+<area shape="rect" id="node7" href="$structentt_1_1is__meta__pointer__like_3_01std_1_1shared__ptr_3_01Type_01_4_01_4.html" title="Makes std::shared_ptrs of any type pointer&#45;like types for the meta system." alt="" coords="175,451,323,507"/>
+<area shape="rect" id="node8" href="$structentt_1_1is__meta__pointer__like_3_01std_1_1unique__ptr_3_01Type_00_01Args_8_8_8_01_4_01_4.html" title="Makes std::unique_ptrs of any type pointer&#45;like types for the meta system." alt="" coords="176,531,323,587"/>
 </map>

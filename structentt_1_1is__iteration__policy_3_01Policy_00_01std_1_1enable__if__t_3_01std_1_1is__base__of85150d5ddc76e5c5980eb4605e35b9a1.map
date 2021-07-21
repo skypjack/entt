@@ -1,0 +1,4 @@
+<map id="entt::is_iteration_policy&lt; Policy, std::enable_if_t&lt; std::is_base_of_v&lt; basic_iteration_policy, Policy &gt; &gt; &gt;" name="entt::is_iteration_policy&lt; Policy, std::enable_if_t&lt; std::is_base_of_v&lt; basic_iteration_policy, Policy &gt; &gt; &gt;">
+<area shape="rect" id="node1" title="Tests whether a class represents an iteration policy." alt="" coords="5,80,188,165"/>
+<area shape="rect" id="node2" title=" " alt="" coords="45,5,148,32"/>
+</map>

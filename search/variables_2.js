@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['get_989',['get',['../namespaceentt.html#a8c24ecc5ab0055f9f2a4725c95afb29e',1,'entt']]]
+  ['exclude_1031',['exclude',['../namespaceentt.html#a5b73210cef43c4db35ef8ce477cc38a6',1,'entt']]]
 ];

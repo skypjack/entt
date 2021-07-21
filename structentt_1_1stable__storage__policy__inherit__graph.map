@@ -1,0 +1,4 @@
+<map id="entt::stable_storage_policy" name="entt::stable_storage_policy">
+<area shape="rect" id="node1" title="Stable storage policy, aimed at pointer stability." alt="" coords="9,5,146,47"/>
+<area shape="rect" id="node2" href="$structentt_1_1packed__storage__policy.html" title="Packed storage policy, aimed at faster linear iteration." alt="" coords="5,95,149,136"/>
+</map>
