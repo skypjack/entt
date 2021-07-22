@@ -422,70 +422,6 @@ template<typename... List>
 using value_list_cat_t = typename value_list_cat<List...>::type;
 
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-template<typename>
-[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
-
-
-template<typename Type>
-[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
--> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
-
-
-template<typename Type>
-[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
--> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
-    if constexpr(is_iterator_v<Type>) {
-        return true;
-    } else if constexpr(std::is_same_v<typename Type::value_type, Type>) {
-        return is_equality_comparable<Type>(choice<0>);
-    } else {
-        return is_equality_comparable<typename Type::value_type>(choice<2>);
-    }
-}
-
-
-template<typename Type>
-[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
--> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
-    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
-}
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is
- * equality comparable, false otherwise.
- * @tparam Type The type to test.
- */
-template<typename Type, typename = void>
-struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type The type to test.
- */
-template<class Type>
-inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
-
-
 /*! @brief Same as std::is_invocable, but with tuples. */
 template<typename, typename>
 struct is_applicable: std::false_type {};
@@ -624,6 +560,70 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
  */
 template<typename Type, typename It>
 inline constexpr bool is_iterator_type_v = is_iterator_type<Type, It>::value;
+
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+[[nodiscard]] constexpr bool is_equality_comparable(...) { return false; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
+-> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
+-> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+    if constexpr(is_iterator_v<Type>) {
+        return true;
+    } else if constexpr(std::is_same_v<typename Type::value_type, Type>) {
+        return is_equality_comparable<Type>(choice<0>);
+    } else {
+        return is_equality_comparable<typename Type::value_type>(choice<2>);
+    }
+}
+
+
+template<typename Type>
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
+-> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+    return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
+}
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * equality comparable, false otherwise.
+ * @tparam Type The type to test.
+ */
+template<typename Type, typename = void>
+struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type The type to test.
+ */
+template<class Type>
+inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
 
 
 /**
