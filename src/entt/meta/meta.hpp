@@ -3,7 +3,6 @@
 
 
 #include <cstddef>
-#include <functional>
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -239,19 +238,6 @@ public:
     {}
 
     /**
-     * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
-     * @param value An instance of an object to use to initialize the wrapper.
-     */
-    template<typename Type>
-    meta_any(std::reference_wrapper<Type> value)
-        : meta_any{}
-    {
-        // invokes deprecated assignment operator (and avoids issues with vs2017)
-        *this = value;
-    }
-
-    /**
      * @brief Constructs a wrapper from a given value.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
@@ -305,19 +291,6 @@ public:
         std::exchange(vtable, std::exchange(other.vtable, &basic_vtable<void>))(operation::DTOR, storage, node);
         storage = std::move(other.storage);
         node = std::exchange(other.node, nullptr);
-        return *this;
-    }
-
-    /**
-     * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
-     * @param value An instance of an object to use to initialize the wrapper.
-     * @return This meta any object.
-     */
-    template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_meta<T &>, emplace<Type &> or forward_as_meta instead")]]
-    meta_any & operator=(std::reference_wrapper<Type> value) {
-        emplace<Type &>(value.get());
         return *this;
     }
 

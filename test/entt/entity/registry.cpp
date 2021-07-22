@@ -156,7 +156,6 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.size(), 0u);
     ASSERT_EQ(registry.alive(), 0u);
     ASSERT_NO_FATAL_FAILURE((registry.reserve<int, char>(8)));
-    ASSERT_NO_FATAL_FAILURE(registry.reserve_pools(16));
     ASSERT_NO_FATAL_FAILURE(registry.reserve(42));
     ASSERT_TRUE(registry.empty());
 

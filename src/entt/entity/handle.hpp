@@ -213,23 +213,6 @@ struct basic_handle {
         reg->template erase<Component...>(entt);
     }
 
-    /*! @copydoc remove */
-    template<typename... Component>
-    [[deprecated("Use ::remove instead")]]
-    size_type remove_if_exists() const {
-        return remove<Component...>();
-    }
-
-    /**
-     * @brief Removes all the components from a handle and makes it orphaned.
-     * @sa basic_registry::remove_all
-     */
-    [[deprecated("No longer supported")]]
-    void remove_all() const {
-        static_assert(sizeof...(Type) == 0, "Invalid operation");
-        reg->remove_all(entt);
-    }
-
     /**
      * @brief Checks if a handle has all the given components.
      * @sa basic_registry::all_of

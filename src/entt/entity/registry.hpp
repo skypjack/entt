@@ -267,15 +267,6 @@ public:
     }
 
     /**
-     * @brief Reserves enough space to store `count` pools.
-     * @param count Number of pools to reserve space for.
-     */
-    [[deprecated("No longer supported")]]
-    void reserve_pools(const size_t count) {
-        pools.reserve(count);
-    }
-
-    /**
      * @brief Returns the capacity of the pool for the given component.
      * @tparam Component Type of component in which one is interested.
      * @return Capacity of the pool of the given component.
@@ -351,12 +342,6 @@ public:
      */
     [[nodiscard]] entity_type released() const ENTT_NOEXCEPT {
         return free_list;
-    }
-
-    /*! @copydoc released */
-    [[deprecated("Use ::released instead")]]
-    [[nodiscard]] entity_type destroyed() const ENTT_NOEXCEPT {
-        return released();
     }
 
     /**
@@ -830,36 +815,6 @@ public:
             }
         } else {
             (assure<Component>()->compact(), ...);
-        }
-    }
-
-    /*! @copydoc remove */
-    template<typename... Component>
-    [[deprecated("Use ::remove instead")]]
-    size_type remove_if_exists(const entity_type entity) {
-        return remove<Component...>(entity);
-    }
-
-    /**
-     * @brief Removes all the components from an entity and makes it orphaned.
-     *
-     * @warning
-     * In case there are listeners that observe the destruction of components
-     * and assign other components to the entity in their bodies, the result of
-     * invoking this function may not be as expected. In the worst case, it
-     * could lead to undefined behavior.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
-     *
-     * @param entity A valid entity identifier.
-     */
-    [[deprecated("Use ::destroy(entity)/::create(entity) instead")]]
-    void remove_all(const entity_type entity) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-
-        for(auto &&pdata: pools) {
-            pdata.pool && pdata.pool->remove(entity, this);
         }
     }
 

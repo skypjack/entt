@@ -3,7 +3,6 @@
 
 
 #include <cstddef>
-#include <functional>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -164,19 +163,6 @@ public:
     }
 
     /**
-     * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
-     * @param value An instance of an object to use to initialize the wrapper.
-     */
-    template<typename Type>
-    basic_any(std::reference_wrapper<Type> value) ENTT_NOEXCEPT
-        : basic_any{}
-    {
-        // invokes deprecated assignment operator (and avoids issues with vs2017)
-        *this = value;
-    }
-
-    /**
      * @brief Constructs a wrapper from a given value.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
@@ -239,19 +225,6 @@ public:
         std::exchange(vtable, other.vtable)(operation::DTOR, *this, nullptr);
         other.vtable(operation::MOVE, other, this);
         mode = other.mode;
-        return *this;
-    }
-
-    /**
-     * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
-     * @param value An instance of an object to use to initialize the wrapper.
-     * @return This any object.
-     */
-    template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Type &> or forward_as_any instead")]]
-    basic_any & operator=(std::reference_wrapper<Type> value) ENTT_NOEXCEPT {
-        emplace<Type &>(value.get());
         return *this;
     }
 
