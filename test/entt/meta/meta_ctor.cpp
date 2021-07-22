@@ -67,7 +67,6 @@ TEST_F(MetaCtor, Functionalities) {
     auto ctor = entt::resolve<clazz_t>().ctor<const int &, char>();
 
     ASSERT_TRUE(ctor);
-    ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(ctor.arity(), 2u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<int>());
     ASSERT_EQ(ctor.arg(1u), entt::resolve<char>());
@@ -102,7 +101,6 @@ TEST_F(MetaCtor, Func) {
     auto ctor = entt::resolve<clazz_t>().ctor<int>();
 
     ASSERT_TRUE(ctor);
-    ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(ctor.arity(), 1u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(ctor.arg(1u));
@@ -202,7 +200,6 @@ TEST_F(MetaCtor, ExternalMemberFunction) {
     auto ctor = entt::resolve<clazz_t>().ctor<entt::registry &, entt::entity, const int &, const char &>();
 
     ASSERT_TRUE(ctor);
-    ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(ctor.arity(), 4u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<entt::registry>());
     ASSERT_EQ(ctor.arg(1u), entt::resolve<entt::entity>());

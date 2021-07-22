@@ -41,7 +41,6 @@ struct meta_prop_node {
 
 
 struct meta_base_node {
-    meta_type_node * const parent;
     meta_base_node * next;
     meta_type_node * const type;
     const void *(* const cast)(const void *) ENTT_NOEXCEPT;
@@ -49,7 +48,6 @@ struct meta_base_node {
 
 
 struct meta_conv_node {
-    meta_type_node * const parent;
     meta_conv_node * next;
     meta_type_node * const type;
     meta_any(* const conv)(const void *);
@@ -58,7 +56,6 @@ struct meta_conv_node {
 
 struct meta_ctor_node {
     using size_type = std::size_t;
-    meta_type_node * const parent;
     meta_ctor_node * next;
     meta_prop_node * prop;
     const size_type arity;
@@ -69,7 +66,6 @@ struct meta_ctor_node {
 
 struct meta_data_node {
     id_type id;
-    meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
     const bool is_const;
@@ -83,7 +79,6 @@ struct meta_data_node {
 struct meta_func_node {
     using size_type = std::size_t;
     id_type id;
-    meta_type_node * const parent;
     meta_func_node * next;
     meta_prop_node * prop;
     const size_type arity;
@@ -156,7 +151,6 @@ class ENTT_API meta_node {
     [[nodiscard]] static meta_ctor_node * meta_default_constructor([[maybe_unused]] meta_type_node *type) ENTT_NOEXCEPT {
         if constexpr(std::is_default_constructible_v<Type>) {
             static meta_ctor_node node{
-                type,
                 nullptr,
                 nullptr,
                 0u,

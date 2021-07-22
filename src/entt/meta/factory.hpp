@@ -216,7 +216,6 @@ struct meta_factory<Type> {
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_base_node node{
-            type,
             nullptr,
             internal::meta_info<Base>::resolve(),
             [](const void *instance) ENTT_NOEXCEPT -> const void * {
@@ -250,7 +249,6 @@ struct meta_factory<Type> {
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_conv_node node{
-            type,
             nullptr,
             internal::meta_info<conv_type>::resolve(),
             [](const void *instance) -> meta_any {
@@ -273,7 +271,6 @@ struct meta_factory<Type> {
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_conv_node node{
-            type,
             nullptr,
             internal::meta_info<conv_type>::resolve(),
             [](const void *instance) -> meta_any {
@@ -304,7 +301,6 @@ struct meta_factory<Type> {
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_conv_node node{
-            type,
             nullptr,
             internal::meta_info<To>::resolve(),
             [](const void *instance) -> meta_any {
@@ -340,7 +336,6 @@ struct meta_factory<Type> {
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_ctor_node node{
-            type,
             nullptr,
             nullptr,
             descriptor::args_type::size,
@@ -372,7 +367,6 @@ struct meta_factory<Type> {
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_ctor_node node{
-            type,
             nullptr,
             nullptr,
             descriptor::args_type::size,
@@ -439,7 +433,6 @@ struct meta_factory<Type> {
 
             static internal::meta_data_node node{
                 {},
-                type,
                 nullptr,
                 nullptr,
                 std::is_same_v<Type, data_type> || std::is_const_v<data_type>,
@@ -488,7 +481,6 @@ struct meta_factory<Type> {
 
         static internal::meta_data_node node{
             {},
-            type,
             nullptr,
             nullptr,
             std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>),
@@ -529,7 +521,6 @@ struct meta_factory<Type> {
 
         static internal::meta_func_node node{
             {},
-            type,
             nullptr,
             nullptr,
             descriptor::args_type::size,

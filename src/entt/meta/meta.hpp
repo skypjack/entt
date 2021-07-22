@@ -731,12 +731,6 @@ struct meta_ctor {
     {}
 
     /**
-     * @brief Returns the type to which an object belongs.
-     * @return The type to which the object belongs.
-     */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
-
-    /**
      * @brief Returns the number of arguments accepted by a constructor.
      * @return The number of arguments accepted by the constructor.
      */
@@ -830,9 +824,6 @@ struct meta_data {
     [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
     }
-
-    /*! @copydoc meta_ctor::parent */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Indicates whether a data member is constant or not.
@@ -934,9 +925,6 @@ struct meta_func {
     [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
     }
-
-    /*! @copydoc meta_ctor::parent */
-    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the number of arguments accepted by a member function.
@@ -1682,28 +1670,13 @@ inline bool meta_any::allow_cast(const meta_type &type) {
 }
 
 
-[[nodiscard]] inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
-    return node->parent;
-}
-
-
 [[nodiscard]] inline meta_type meta_ctor::arg(const size_type index) const ENTT_NOEXCEPT {
     return index < arity() ? node->arg(index) : meta_type{};
 }
 
 
-[[nodiscard]] inline meta_type meta_data::parent() const ENTT_NOEXCEPT {
-    return node->parent;
-}
-
-
 [[nodiscard]] inline meta_type meta_data::type() const ENTT_NOEXCEPT {
     return node->type;
-}
-
-
-[[nodiscard]] inline meta_type meta_func::parent() const ENTT_NOEXCEPT {
-    return node->parent;
 }
 
 

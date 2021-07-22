@@ -109,7 +109,6 @@ TEST_F(MetaFunc, Functionalities) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "f2"_hs);
     ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
@@ -150,7 +149,6 @@ TEST_F(MetaFunc, Const) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "f1"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_TRUE(func.is_const());
@@ -189,7 +187,6 @@ TEST_F(MetaFunc, RetVoid) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "g"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
@@ -226,7 +223,6 @@ TEST_F(MetaFunc, Static) {
     func_t::value = 2;
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "h"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
@@ -264,7 +260,6 @@ TEST_F(MetaFunc, StaticRetVoid) {
     auto func = entt::resolve<func_t>().func("k"_hs);
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "k"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
@@ -405,7 +400,6 @@ TEST_F(MetaFunc, FromBase) {
     derived_t instance{};
 
     ASSERT_TRUE(type.func("func"_hs));
-    ASSERT_EQ(type.func("func"_hs).parent(), entt::resolve<base_t>());
     ASSERT_EQ(instance.value, 3);
 
     type.func("func"_hs).invoke(instance, 42);
@@ -419,7 +413,6 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     auto func = entt::resolve<func_t>().func("emplace"_hs);
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "emplace"_hs);
     ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
