@@ -61,13 +61,13 @@ public:
 
     [[nodiscard]] inline meta_type value_type() const ENTT_NOEXCEPT;
     [[nodiscard]] inline size_type size() const ENTT_NOEXCEPT;
-    inline bool resize(size_type);
+    inline bool resize(const size_type);
     inline bool clear();
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
     inline iterator insert(iterator, meta_any);
     inline iterator erase(iterator);
-    [[nodiscard]] inline meta_any operator[](size_type);
+    [[nodiscard]] inline meta_any operator[](const size_type);
     [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
 
 private:
@@ -432,21 +432,28 @@ public:
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
+     * @param type Meta type to which the cast is requested.
+     * @return A valid meta any object if there exists a viable conversion, an
+     * invalid one otherwise.
+     */
+    [[nodiscard]] meta_any allow_cast(const meta_type &type) const;
+
+    /**
+     * @brief Converts an object in such a way that a given cast becomes viable.
+     * @param type Meta type to which the cast is requested.
+     * @return True if there exists a viable conversion, false otherwise.
+     */
+    [[nodiscard]] bool allow_cast(const meta_type &type);
+
+    /**
+     * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
      * @return A valid meta any object if there exists a viable conversion, an
      * invalid one otherwise.
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        if(try_cast<std::remove_reference_t<Type>>() != nullptr) {
-            return as_ref();
-        } else if(node) {
-            if(const auto * const conv = visit<&internal::meta_type_node::conv>(type_id<Type>(), node); conv) {
-                return conv->conv(storage.data());
-            }
-        }
-
-        return {};
+        return allow_cast(internal::meta_info<Type>::resolve());
     }
 
     /**
@@ -456,17 +463,7 @@ public:
      */
     template<typename Type>
     bool allow_cast() {
-        // forces const on non-reference types to make them work also with wrappers for const references
-        if(try_cast<std::remove_reference_t<const Type>>() != nullptr) {
-            return true;
-        } else if(node) {
-            if(const auto * const conv = visit<&internal::meta_type_node::conv>(type_id<Type>(), node); conv) {
-                *this = conv->conv(std::as_const(storage).data());
-                return true;
-            }
-        }
-
-        return false;
+        return allow_cast(internal::meta_info<Type>::resolve());
     }
 
     /**
@@ -752,7 +749,7 @@ struct meta_ctor {
      * @param index Index of the argument of which to return the type.
      * @return The type of the i-th argument of a constructor.
      */
-    [[nodiscard]] meta_type arg(size_type index) const ENTT_NOEXCEPT;
+    [[nodiscard]] meta_type arg(const size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
@@ -976,7 +973,7 @@ struct meta_func {
      * @param index Index of the argument of which to return the type.
      * @return The type of the i-th argument of a member function.
      */
-    [[nodiscard]] inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type arg(const size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Invokes the underlying function, if possible.
@@ -1293,7 +1290,7 @@ public:
      * @param index Index of the template argument of which to return the type.
      * @return The type of the i-th template argument of a type.
      */
-    [[nodiscard]] inline meta_type template_arg(size_type index) const ENTT_NOEXCEPT {
+    [[nodiscard]] inline meta_type template_arg(const size_type index) const ENTT_NOEXCEPT {
         return index < template_arity() ? node->templ->arg(index) : meta_type{};
     }
 
@@ -1311,7 +1308,7 @@ public:
      * @return The number of elements along the given dimension in case of array
      * types, 0 otherwise.
      */
-    [[nodiscard]] size_type extent(size_type dim = {}) const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type extent(const size_type dim = {}) const ENTT_NOEXCEPT {
         return node->extent(dim);
     }
 
@@ -1660,12 +1657,37 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 
+[[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
+    if(node) {
+        if(node->info == type.info() || visit<&internal::meta_type_node::base>(type.info(), node)) {
+            return as_ref();
+        } else if(const auto * const conv = visit<&internal::meta_type_node::conv>(type.info(), node); conv) {
+            return conv->conv(storage.data());
+        }
+    }
+
+    return {};
+}
+
+
+inline bool meta_any::allow_cast(const meta_type &type) {
+    if(node->info == type.info() || visit<&internal::meta_type_node::base>(type.info(), node)) {
+        return true;
+    } else if(const auto * const conv = visit<&internal::meta_type_node::conv>(type.info(), node); conv) {
+        *this = conv->conv(std::as_const(storage).data());
+        return true;
+    }
+
+    return false;
+}
+
+
 [[nodiscard]] inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
     return node->parent;
 }
 
 
-[[nodiscard]] inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_ctor::arg(const size_type index) const ENTT_NOEXCEPT {
     return index < arity() ? node->arg(index) : meta_type{};
 }
 
@@ -1690,7 +1712,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 
-[[nodiscard]] inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_func::arg(const size_type index) const ENTT_NOEXCEPT {
     return index < arity() ? node->arg(index) : meta_type{};
 }
 
@@ -1823,7 +1845,7 @@ private:
  * @param sz The new size of the container.
  * @return True in case of success, false otherwise.
  */
-inline bool meta_sequence_container::resize(size_type sz) {
+inline bool meta_sequence_container::resize(const size_type sz) {
     return resize_fn(storage, sz);
 }
 
@@ -1882,7 +1904,7 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @param pos The position of the element to return.
  * @return A reference to the requested element properly wrapped.
  */
-[[nodiscard]] inline meta_any meta_sequence_container::operator[](size_type pos) {
+[[nodiscard]] inline meta_any meta_sequence_container::operator[](const size_type pos) {
     return get_fn(storage, pos);
 }
 
