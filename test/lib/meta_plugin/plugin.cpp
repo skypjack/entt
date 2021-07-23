@@ -26,8 +26,8 @@ void set_up() {
 }
 
 void tear_down() {
-    entt::resolve<position>().reset();
-    entt::resolve<velocity>().reset();
+    entt::meta_reset<position>();
+    entt::meta_reset<velocity>();
 }
 
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {

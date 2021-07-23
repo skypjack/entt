@@ -1082,14 +1082,6 @@ class meta_type {
         return nullptr;
     }
 
-    template<auto... Member, typename Node>
-    void unregister_all(Node **curr) {
-        while(*curr) {
-            (unregister_all(&((*curr)->*Member)), ...);
-            *curr = std::exchange((*curr)->next, nullptr);
-        }
-    }
-
 public:
     /*! @brief Node type. */
     using node_type = internal::meta_type_node;
@@ -1099,7 +1091,7 @@ public:
     using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
-    meta_type(node_type *curr = nullptr) ENTT_NOEXCEPT
+    meta_type(const node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -1107,7 +1099,7 @@ public:
      * @brief Constructs an instance from a given base node.
      * @param curr The base node with which to construct the instance.
      */
-    meta_type(base_node_type *curr) ENTT_NOEXCEPT
+    meta_type(const base_node_type *curr) ENTT_NOEXCEPT
         : node{curr ? curr->type : nullptr}
     {}
 
@@ -1567,38 +1559,8 @@ public:
         return (!node && !other.node) || (node && other.node && node->info == other.node->info);
     }
 
-    /**
-     * @brief Resets a type and all its parts.
-     *
-     * This function resets a type and all its data members, member functions
-     * and properties, as well as its constructors, destructors and conversion
-     * functions if any.<br/>
-     * Base classes aren't reset but the link between the two types is removed.
-     *
-     * The type is also removed from the list of searchable types.
-     */
-    void reset() ENTT_NOEXCEPT {
-        for(auto** it = internal::meta_context::global(); *it; it = &(*it)->next) {
-            if(*it == node) {
-                *it = (*it)->next;
-                break;
-            }
-        }
-
-        unregister_all(&node->prop);
-        unregister_all(&node->base);
-        unregister_all(&node->conv);
-        unregister_all<&internal::meta_ctor_node::prop>(&node->ctor);
-        unregister_all<&internal::meta_data_node::prop>(&node->data);
-        unregister_all<&internal::meta_func_node::prop>(&node->func);
-
-        node->id = {};
-        node->ctor = node->def_ctor;
-        node->dtor = nullptr;
-    }
-
 private:
-    node_type *node;
+    const node_type *node;
 };
 
 

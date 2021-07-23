@@ -44,6 +44,30 @@ template<typename Id, typename Node>
 }
 
 
+template<auto... Member, typename Node>
+void meta_reset(Node **curr) {
+    while(*curr) {
+        (meta_reset(&((*curr)->*Member)), ...);
+        *curr = std::exchange((*curr)->next, nullptr);
+    }
+}
+
+
+inline void meta_reset(internal::meta_type_node *node) ENTT_NOEXCEPT {
+    meta_reset(&node->prop);
+    meta_reset(&node->base);
+    meta_reset(&node->conv);
+    meta_reset<&internal::meta_ctor_node::prop>(&node->ctor);
+    meta_reset<&internal::meta_data_node::prop>(&node->data);
+    meta_reset<&internal::meta_func_node::prop>(&node->func);
+
+    node->id = {};
+    node->ctor = node->def_ctor;
+    node->dtor = nullptr;
+    node->next = nullptr;
+}
+
+
 }
 
 
@@ -567,6 +591,54 @@ template<typename Type>
     auto * const node = internal::meta_info<Type>::resolve();
     // extended meta factory to allow assigning properties to opaque meta types
     return meta_factory<Type, Type>{&node->prop};
+}
+
+
+/**
+ * @brief Resets a type and all its parts.
+ *
+ * Resets a type and all its data members, member functions and properties, as
+ * well as its constructors, destructors and conversion functions if any.<br/>
+ * Base classes aren't reset but the link between the two types is removed.
+ *
+ * The type is also removed from the list of searchable types.
+ */
+template<typename Type>
+void meta_reset() ENTT_NOEXCEPT {
+    meta_reset(internal::meta_info<Type>::resolve()->id);
+}
+
+
+/**
+ * @brief Resets a type and all its parts.
+ *
+ * @sa meta_reset
+ *
+ * @param id Unique identifier.
+ */
+inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
+    for(auto** it = internal::meta_context::global(); *it; it = &(*it)->next) {
+        if((*it)->id == id) {
+            internal::meta_type_node *node = *it;
+            *it = (*it)->next;
+            internal::meta_reset(node);
+            break;
+        }
+    }
+}
+
+
+/**
+ * @brief Resets all searchable types.
+ *
+ * @sa meta_reset
+ */
+inline void meta_reset() ENTT_NOEXCEPT {
+    for(auto** it = internal::meta_context::global(); *it; it = &(*it)->next) {
+        internal::meta_reset(*it);
+    }
+
+    *internal::meta_context::global() = nullptr;
 }
 
 

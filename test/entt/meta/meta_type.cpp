@@ -156,9 +156,7 @@ struct MetaType: ::testing::Test {
     }
 
     void TearDown() override {
-        for(auto type: entt::resolve()) {
-            type.reset();
-        }
+        entt::meta_reset();
     }
 };
 
@@ -488,7 +486,7 @@ TEST_F(MetaType, Reset) {
     // implicitly generated default constructor
     ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 
-    entt::resolve("clazz"_hs).reset();
+    entt::meta_reset("clazz"_hs);
 
     ASSERT_FALSE(entt::resolve("clazz"_hs));
     ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
@@ -514,11 +512,7 @@ TEST_F(MetaType, ResetAll) {
     ASSERT_TRUE(entt::resolve("overloaded_func"_hs));
     ASSERT_TRUE(entt::resolve("double"_hs));
 
-    for(auto type: entt::resolve()) {
-        // we exploit the fact that the iterators aren't invalidated
-        // because EnTT leaves a dangling ::next in the underlying node
-        type.reset();
-    }
+    entt::meta_reset();
 
     ASSERT_FALSE(entt::resolve("clazz"_hs));
     ASSERT_FALSE(entt::resolve("overloaded_func"_hs));
@@ -624,15 +618,15 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
 
     ASSERT_NE(*entt::internal::meta_context::global(), nullptr);
 
-    entt::resolve<double>().reset();
-    entt::resolve<unsigned int>().reset();
-    entt::resolve<base_t>().reset();
-    entt::resolve<derived_t>().reset();
-    entt::resolve<abstract_t>().reset();
-    entt::resolve<concrete_t>().reset();
-    entt::resolve<overloaded_func_t> ().reset ();
-    entt::resolve<property_t>().reset();
-    entt::resolve<clazz_t>().reset();
+    entt::meta_reset<double>();
+    entt::meta_reset<unsigned int>();
+    entt::meta_reset<base_t>();
+    entt::meta_reset<derived_t>();
+    entt::meta_reset<abstract_t>();
+    entt::meta_reset<concrete_t>();
+    entt::meta_reset<overloaded_func_t>();
+    entt::meta_reset<property_t>();
+    entt::meta_reset<clazz_t>();
 
     ASSERT_FALSE(entt::resolve("double"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));

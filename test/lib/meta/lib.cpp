@@ -26,8 +26,8 @@ ENTT_API void set_up() {
 }
 
 ENTT_API void tear_down() {
-    entt::resolve<position>().reset();
-    entt::resolve<velocity>().reset();
+    entt::meta_reset<position>();
+    entt::meta_reset<velocity>();
 }
 
 ENTT_API entt::meta_any wrap_int(int value) {

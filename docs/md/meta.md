@@ -942,7 +942,21 @@ objects from it and making its identifier no longer visible. The underlying node
 will remain available though, as if it were implicitly generated:
 
 ```cpp
-entt::resolve<my_type>().reset();
+entt::meta_reset<my_type>();
 ```
 
-The type can be re-registered later with a completely different name and form.
+It's also possible to reset types by their unique identifiers if required:
+
+```cpp
+entt::meta_reset("my_type"_hs);
+```
+
+Finally, there exists a non-template overload of the `meta_reset` function that
+doesn't accept argument and resets all searchable types (that is, all types that
+were assigned an unique identifier):
+
+```cpp
+entt::meta_reset();
+```
+
+All types can be re-registered later with a completely different name and form.

@@ -96,9 +96,7 @@ struct MetaFunc: ::testing::Test {
     }
 
     void TearDown() override {
-        for(auto type: entt::resolve()) {
-            type.reset();
-        }
+        entt::meta_reset();
     }
 };
 
