@@ -60,6 +60,8 @@ public:
     using node_type = Node;
     /*! @brief Input iterator type. */
     using iterator = range_iterator;
+    /*! @brief Constant input iterator type. */
+    using const_iterator = iterator;
 
     /*! @brief Default constructor. */
     meta_range() ENTT_NOEXCEPT = default;
@@ -76,8 +78,13 @@ public:
      * @brief Returns an iterator to the beginning.
      * @return An iterator to the first meta object of the range.
      */
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
         return iterator{node};
+    }
+
+    /*! @copydoc cbegin */
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
+        return cbegin();
     }
 
     /**
@@ -85,8 +92,13 @@ public:
      * @return An iterator to the element following the last meta object of the
      * range.
      */
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
         return iterator{};
+    }
+
+    /*! @copydoc cend */
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
+        return cend();
     }
 
 private:
