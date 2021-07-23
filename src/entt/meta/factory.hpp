@@ -2,6 +2,7 @@
 #define ENTT_META_FACTORY_HPP
 
 
+#include <algorithm>
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
@@ -13,68 +14,11 @@
 #include "meta.hpp"
 #include "node.hpp"
 #include "policy.hpp"
+#include "range.hpp"
 #include "utility.hpp"
 
 
 namespace entt {
-
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-template<typename Node>
-[[nodiscard]] bool find_if(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
-    return node && (node == candidate || find_if(candidate, node->next));
-}
-
-
-template<typename Id, typename Node>
-[[nodiscard]] bool find_if_not(const Id id, Node *node, const Node *owner) ENTT_NOEXCEPT {
-    if constexpr(std::is_pointer_v<Id>) {
-        return node && ((*node->id == *id && node != owner) || find_if_not(id, node->next, owner));
-    } else {
-        return node && ((node->id == id && node != owner) || find_if_not(id, node->next, owner));
-    }
-}
-
-
-template<auto... Member, typename Node>
-void meta_reset(Node **curr) {
-    while(*curr) {
-        (meta_reset(&((*curr)->*Member)), ...);
-        *curr = std::exchange((*curr)->next, nullptr);
-    }
-}
-
-
-inline void meta_reset(internal::meta_type_node *node) ENTT_NOEXCEPT {
-    meta_reset(&node->prop);
-    meta_reset(&node->base);
-    meta_reset(&node->conv);
-    meta_reset<&internal::meta_ctor_node::prop>(&node->ctor);
-    meta_reset<&internal::meta_data_node::prop>(&node->data);
-    meta_reset<&internal::meta_func_node::prop>(&node->func);
-
-    node->id = {};
-    node->ctor = node->def_ctor;
-    node->dtor = nullptr;
-    node->next = nullptr;
-}
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
 
 
 /**
@@ -139,11 +83,11 @@ private:
         };
 
         entt::meta_any instance{std::forward<Key>(key)};
-        ENTT_ASSERT(!internal::find_if_not(&instance, *curr, &node), "Duplicate key");
         property[0u] = std::move(instance);
         property[1u] = std::move(value);
 
-        if(!internal::find_if(&node, *curr)) {
+        if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*curr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&instance](const auto *curr) { return curr->id == instance; }) == range.cend(), "Duplicate identifier");
             node.next = *curr;
             *curr = &node;
         }
@@ -215,10 +159,10 @@ struct meta_factory<Type> {
     auto type(const id_type id = type_hash<Type>::value()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!internal::find_if_not(id, *internal::meta_context::global(), node), "Duplicate identifier");
         node->id = id;
 
-        if(!internal::find_if(node, *internal::meta_context::global())) {
+        if(meta_range<internal::meta_type_node *, internal::meta_type_node> range{*internal::meta_context::global()}; std::find(range.cbegin(), range.cend(), node) == range.cend()) {
+            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr->id == id; }) == range.cend(), "Duplicate identifier");
             node->next = *internal::meta_context::global();
             *internal::meta_context::global() = node;
         }
@@ -247,7 +191,7 @@ struct meta_factory<Type> {
             }
         };
 
-        if(!internal::find_if(&node, type->base)) {
+        if(meta_range<internal::meta_base_node *, internal::meta_base_node> range{type->base}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
             node.next = type->base;
             type->base = &node;
         }
@@ -280,7 +224,7 @@ struct meta_factory<Type> {
             }
         };
 
-        if(!internal::find_if(&node, type->conv)) {
+        if(meta_range<internal::meta_conv_node *, internal::meta_conv_node> range{type->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
             node.next = type->conv;
             type->conv = &node;
         }
@@ -302,7 +246,7 @@ struct meta_factory<Type> {
             }
         };
 
-        if(!internal::find_if(&node, type->conv)) {
+        if(meta_range<internal::meta_conv_node *, internal::meta_conv_node> range{type->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
             node.next = type->conv;
             type->conv = &node;
         }
@@ -332,7 +276,7 @@ struct meta_factory<Type> {
             }
         };
 
-        if(!internal::find_if(&node, type->conv)) {
+        if(meta_range<internal::meta_conv_node *, internal::meta_conv_node> range{type->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
             node.next = type->conv;
             type->conv = &node;
         }
@@ -367,7 +311,7 @@ struct meta_factory<Type> {
             &meta_construct<Type, Candidate, Policy>
         };
 
-        if(!internal::find_if(&node, type->ctor)) {
+        if(meta_range<internal::meta_ctor_node *, internal::meta_ctor_node> range{type->ctor}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
             node.next = type->ctor;
             type->ctor = &node;
         }
@@ -398,7 +342,7 @@ struct meta_factory<Type> {
             &meta_construct<Type, Args...>
         };
 
-        if(!internal::find_if(&node, type->ctor)) {
+        if(meta_range<internal::meta_ctor_node *, internal::meta_ctor_node> range{type->ctor}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
             node.next = type->ctor;
             type->ctor = &node;
         }
@@ -466,10 +410,10 @@ struct meta_factory<Type> {
                 &meta_getter<Type, Data, Policy>
             };
 
-            ENTT_ASSERT(!internal::find_if_not(id, type->data, &node), "Duplicate identifier");
             node.id = id;
 
-            if(!internal::find_if(&node, type->data)) {
+            if(meta_range<internal::meta_data_node *, internal::meta_data_node> range{type->data}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+                ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr->id == id; }) == range.cend(), "Duplicate identifier");
                 node.next = type->data;
                 type->data = &node;
             }
@@ -514,10 +458,10 @@ struct meta_factory<Type> {
             &meta_getter<Type, Getter, Policy>
         };
 
-        ENTT_ASSERT(!internal::find_if_not(id, type->data, &node), "Duplicate identifier");
         node.id = id;
 
-        if(!internal::find_if(&node, type->data)) {
+        if(meta_range<internal::meta_data_node *, internal::meta_data_node> range{type->data}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr->id == id; }) == range.cend(), "Duplicate identifier");
             node.next = type->data;
             type->data = &node;
         }
@@ -617,16 +561,33 @@ void meta_reset() ENTT_NOEXCEPT {
  * @param id Unique identifier.
  */
 inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
+    auto clear_chain = [](auto **curr, auto... member) {
+        for(; *curr; *curr = std::exchange((*curr)->next, nullptr)) {
+            if constexpr(sizeof...(member) != 0u) {
+                static_assert(sizeof...(member) == 1u, "Assert in defense of the future me");
+                for(auto **it = (&((*curr)->*member), ...); *it; *it = std::exchange((*it)->next, nullptr));
+            }
+        }
+    };
+
     for(auto** it = internal::meta_context::global(); *it; it = &(*it)->next) {
-        if((*it)->id == id) {
-            internal::meta_type_node *node = *it;
-            *it = (*it)->next;
-            internal::meta_reset(node);
+        if(auto *node = *it; node->id == id) {
+            clear_chain(&node->prop);
+            clear_chain(&node->base);
+            clear_chain(&node->conv);
+            clear_chain(&node->ctor, &internal::meta_ctor_node::prop);
+            clear_chain(&node->data, &internal::meta_data_node::prop);
+            clear_chain(&node->func, &internal::meta_func_node::prop);
+
+            node->id = {};
+            node->ctor = node->def_ctor;
+            node->dtor = nullptr;
+            *it = std::exchange(node->next, nullptr);
+
             break;
         }
     }
 }
-
 
 /**
  * @brief Resets all searchable types.
@@ -634,11 +595,9 @@ inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
  * @sa meta_reset
  */
 inline void meta_reset() ENTT_NOEXCEPT {
-    for(auto** it = internal::meta_context::global(); *it; it = &(*it)->next) {
-        internal::meta_reset(*it);
+    while(*internal::meta_context::global()) {
+        meta_reset((*internal::meta_context::global())->id);
     }
-
-    *internal::meta_context::global() = nullptr;
 }
 
 
