@@ -65,7 +65,6 @@ TEST(Helper, ToEntity) {
     ASSERT_EQ(entt::to_entity(registry, registry.get<int>(next)), next);
 
     ASSERT_EQ(&registry.get<int>(entity) + ENTT_PACKED_PAGE - 1u, &registry.get<int>(other));
-    ASSERT_NE(&registry.get<int>(entity) + ENTT_PACKED_PAGE, &registry.get<int>(next));
 
     registry.destroy(other);
 
