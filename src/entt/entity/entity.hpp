@@ -126,7 +126,7 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr value_type construct(const entity_type entity = traits_type::entity_mask, const version_type version = traits_type::version_mask) ENTT_NOEXCEPT {
-        return value_type{(entity & traits_type::entity_mask) | (version << traits_type::entity_shift)};
+        return value_type{(entity & traits_type::entity_mask) | (static_cast<entity_type>(version) << traits_type::entity_shift)};
     }
 };
 
