@@ -153,7 +153,7 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    enum class operation { DTOR, DEREF, SEQ, ASSOC };
+    enum class operation { DEREF, SEQ, ASSOC };
 
     using vtable_type = void(const operation, const any &, void *);
 
@@ -163,11 +163,6 @@ class meta_any {
 
         if constexpr(!std::is_void_v<Type>) {
             switch(op) {
-            case operation::DTOR:
-                if(auto *curr = static_cast<internal::meta_type_node *>(to); curr->dtor && from.owner()) {
-                    curr->dtor(const_cast<any &>(from).data());
-                }
-                break;
             case operation::DEREF:
                 if constexpr(is_meta_pointer_like_v<Type>) {
                     using element_type = std::remove_const_t<typename std::pointer_traits<Type>::element_type>;
@@ -209,6 +204,12 @@ class meta_any {
         }
 
         return nullptr;
+    }
+
+    void release() {
+        if(node && node->dtor && storage.owner()) {
+            node->dtor(storage.data());
+        }
     }
 
     meta_any(const meta_any &other, any ref) ENTT_NOEXCEPT
@@ -268,7 +269,7 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
-        vtable(operation::DTOR, storage, node);
+        release();
     }
 
     /**
@@ -277,7 +278,8 @@ public:
      * @return This meta any object.
      */
     meta_any & operator=(const meta_any &other) {
-        std::exchange(vtable, other.vtable)(operation::DTOR, storage, node);
+        release();
+        vtable = other.vtable;
         storage = other.storage;
         node = other.node;
         return *this;
@@ -289,7 +291,8 @@ public:
      * @return This meta any object.
      */
     meta_any & operator=(meta_any &&other) ENTT_NOEXCEPT {
-        std::exchange(vtable, std::exchange(other.vtable, &basic_vtable<void>))(operation::DTOR, storage, node);
+        release();
+        vtable = std::exchange(other.vtable, &basic_vtable<void>);
         storage = std::move(other.storage);
         node = std::exchange(other.node, nullptr);
         return *this;
@@ -475,14 +478,16 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        std::exchange(vtable, &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>)(operation::DTOR, storage, node);
+        release();
+        vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
         storage.emplace<Type>(std::forward<Args>(args)...);
         node = internal::meta_info<Type>::resolve();
     }
 
     /*! @brief Destroys contained object */
     void reset() {
-        std::exchange(vtable, &basic_vtable<void>)(operation::DTOR, storage, node);
+        release();
+        vtable = &basic_vtable<void>;
         storage.reset();
         node = nullptr;
     }
