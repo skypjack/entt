@@ -831,7 +831,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return node->is_const;
+        return (node->traits & internal::meta_trait::IS_CONST);
     }
 
     /**
@@ -839,7 +839,7 @@ struct meta_data {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
-        return node->is_static;
+        return (node->traits & internal::meta_trait::IS_STATIC);
     }
 
     /*! @copydoc meta_any::type */
@@ -940,7 +940,7 @@ struct meta_func {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return node->is_const;
+        return (node->traits & internal::meta_trait::IS_CONST);
     }
 
     /**
@@ -948,7 +948,7 @@ struct meta_func {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
-        return node->is_static;
+        return (node->traits & internal::meta_trait::IS_STATIC);
     }
 
     /**
@@ -1132,7 +1132,7 @@ public:
      * @return True if the underlying type is an integral type, false otherwise.
      */
     [[nodiscard]] bool is_integral() const ENTT_NOEXCEPT {
-        return node->is_integral;
+        return (node->traits & internal::meta_trait::IS_INTEGRAL);
     }
 
     /**
@@ -1141,7 +1141,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_floating_point() const ENTT_NOEXCEPT {
-        return node->is_floating_point;
+        return (node->traits & internal::meta_trait::IS_FLOATING_POINT);
     }
 
     /**
@@ -1149,7 +1149,7 @@ public:
      * @return True if the underlying type is an array type, false otherwise.
      */
     [[nodiscard]] bool is_array() const ENTT_NOEXCEPT {
-        return node->is_array;
+        return (node->traits & internal::meta_trait::IS_ARRAY);
     }
 
     /**
@@ -1157,7 +1157,7 @@ public:
      * @return True if the underlying type is an enum, false otherwise.
      */
     [[nodiscard]] bool is_enum() const ENTT_NOEXCEPT {
-        return node->is_enum;
+        return (node->traits & internal::meta_trait::IS_ENUM);
     }
 
     /**
@@ -1165,7 +1165,7 @@ public:
      * @return True if the underlying type is an union, false otherwise.
      */
     [[nodiscard]] bool is_union() const ENTT_NOEXCEPT {
-        return node->is_union;
+        return (node->traits & internal::meta_trait::IS_UNION);
     }
 
     /**
@@ -1173,7 +1173,7 @@ public:
      * @return True if the underlying type is a class, false otherwise.
      */
     [[nodiscard]] bool is_class() const ENTT_NOEXCEPT {
-        return node->is_class;
+        return (node->traits & internal::meta_trait::IS_CLASS);
     }
 
     /**
@@ -1181,7 +1181,7 @@ public:
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const ENTT_NOEXCEPT {
-        return node->is_pointer;
+        return (node->traits & internal::meta_trait::IS_POINTER);
     }
 
     /**
@@ -1190,7 +1190,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_function_pointer() const ENTT_NOEXCEPT {
-        return node->is_function_pointer;
+        return (node->traits & internal::meta_trait::IS_FUNCTION_POINTER);
     }
 
     /**
@@ -1199,7 +1199,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_member_object_pointer() const ENTT_NOEXCEPT {
-        return node->is_member_object_pointer;
+        return (node->traits & internal::meta_trait::IS_MEMBER_OBJECT_POINTER);
     }
 
     /**
@@ -1209,7 +1209,7 @@ public:
      * false otherwise.
      */
     [[nodiscard]] bool is_member_function_pointer() const ENTT_NOEXCEPT {
-        return node->is_member_function_pointer;
+        return (node->traits & internal::meta_trait::IS_MEMBER_FUNCTION_POINTER);
     }
 
     /**
@@ -1218,7 +1218,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_pointer_like() const ENTT_NOEXCEPT {
-        return node->is_pointer_like;
+        return (node->traits & internal::meta_trait::IS_META_POINTER_LIKE);
     }
 
     /**
@@ -1226,7 +1226,7 @@ public:
      * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const ENTT_NOEXCEPT {
-        return node->is_sequence_container;
+        return (node->traits & internal::meta_trait::IS_META_SEQUENCE_CONTAINER);
     }
 
     /**
@@ -1234,7 +1234,7 @@ public:
      * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const ENTT_NOEXCEPT {
-        return node->is_associative_container;
+        return (node->traits & internal::meta_trait::IS_META_ASSOCIATIVE_CONTAINER);
     }
 
     /**

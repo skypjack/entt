@@ -30,6 +30,26 @@ struct meta_handle;
 namespace internal {
 
 
+enum meta_trait: std::uint32_t {
+    IS_NONE = 0x0000,
+    IS_CONST = 0x0001,
+    IS_STATIC = 0x0002,
+    IS_INTEGRAL = 0x0004,
+    IS_FLOATING_POINT = 0x0008,
+    IS_ARRAY = 0x0010,
+    IS_ENUM = 0x0020,
+    IS_UNION = 0x0040,
+    IS_CLASS = 0x0080,
+    IS_POINTER = 0x0100,
+    IS_FUNCTION_POINTER = 0x0200,
+    IS_MEMBER_OBJECT_POINTER = 0x0400,
+    IS_MEMBER_FUNCTION_POINTER = 0x0800,
+    IS_META_POINTER_LIKE = 0x1000,
+    IS_META_SEQUENCE_CONTAINER = 0x2000,
+    IS_META_ASSOCIATIVE_CONTAINER = 0x4000
+};
+
+
 struct meta_type_node;
 
 
@@ -68,8 +88,7 @@ struct meta_data_node {
     id_type id;
     meta_data_node * next;
     meta_prop_node * prop;
-    const bool is_const;
-    const bool is_static;
+    std::underlying_type_t<meta_trait> traits;
     meta_type_node * const type;
     bool(* const set)(meta_handle, meta_any);
     meta_any(* const get)(meta_handle);
@@ -82,8 +101,7 @@ struct meta_func_node {
     meta_func_node * next;
     meta_prop_node * prop;
     const size_type arity;
-    const bool is_const;
-    const bool is_static;
+    std::underlying_type_t<meta_trait> traits;
     meta_type_node * const ret;
     meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any * const);
@@ -105,19 +123,7 @@ struct meta_type_node {
     meta_type_node * next;
     meta_prop_node * prop;
     const size_type size_of;
-    const bool is_integral;
-    const bool is_floating_point;
-    const bool is_array;
-    const bool is_enum;
-    const bool is_union;
-    const bool is_class;
-    const bool is_pointer;
-    const bool is_function_pointer;
-    const bool is_member_object_pointer;
-    const bool is_member_function_pointer;
-    const bool is_pointer_like;
-    const bool is_sequence_container;
-    const bool is_associative_container;
+    std::underlying_type_t<meta_trait> traits;
     const size_type rank;
     size_type(* const extent)(const size_type) ENTT_NOEXCEPT ;
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
@@ -188,19 +194,20 @@ public:
             nullptr,
             nullptr,
             size_of_v<Type>,
-            std::is_integral_v<Type>,
-            std::is_floating_point_v<Type>,
-            std::is_array_v<Type>,
-            std::is_enum_v<Type>,
-            std::is_union_v<Type>,
-            std::is_class_v<Type>,
-            std::is_pointer_v<Type>,
-            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
-            std::is_member_object_pointer_v<Type>,
-            std::is_member_function_pointer_v<Type>,
-            is_meta_pointer_like_v<Type>,
-            is_complete_v<meta_sequence_container_traits<Type>>,
-            is_complete_v<meta_associative_container_traits<Type>>,
+            internal::meta_trait::IS_NONE
+                | (std::is_integral_v<Type> ? internal::meta_trait::IS_INTEGRAL : internal::meta_trait::IS_NONE)
+                | (std::is_floating_point_v<Type> ? internal::meta_trait::IS_FLOATING_POINT : internal::meta_trait::IS_NONE)
+                | (std::is_array_v<Type> ? internal::meta_trait::IS_ARRAY : internal::meta_trait::IS_NONE)
+                | (std::is_enum_v<Type> ? internal::meta_trait::IS_ENUM : internal::meta_trait::IS_NONE)
+                | (std::is_union_v<Type> ? internal::meta_trait::IS_UNION : internal::meta_trait::IS_NONE)
+                | (std::is_class_v<Type> ? internal::meta_trait::IS_CLASS : internal::meta_trait::IS_NONE)
+                | (std::is_pointer_v<Type> ? internal::meta_trait::IS_POINTER : internal::meta_trait::IS_NONE)
+                | (std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>> ? internal::meta_trait::IS_FUNCTION_POINTER : internal::meta_trait::IS_NONE)
+                | (std::is_member_object_pointer_v<Type> ? internal::meta_trait::IS_MEMBER_OBJECT_POINTER : internal::meta_trait::IS_NONE)
+                | (std::is_member_function_pointer_v<Type> ? internal::meta_trait::IS_MEMBER_FUNCTION_POINTER : internal::meta_trait::IS_NONE)
+                | (is_meta_pointer_like_v<Type> ? internal::meta_trait::IS_META_POINTER_LIKE : internal::meta_trait::IS_NONE)
+                | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_trait::IS_META_SEQUENCE_CONTAINER : internal::meta_trait::IS_NONE)
+                | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_trait::IS_META_ASSOCIATIVE_CONTAINER : internal::meta_trait::IS_NONE),
             std::rank_v<Type>,
             [](meta_type_node::size_type dim) ENTT_NOEXCEPT { return extent(dim, std::make_index_sequence<std::rank_v<Type>>{}); },
             &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<Type>>>>::resolve,
