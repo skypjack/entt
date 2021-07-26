@@ -30,7 +30,7 @@ TEST(Entity, Traits) {
 
     ASSERT_EQ(traits_type::construct(), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(traits_type::construct(), static_cast<entt::entity>(entt::tombstone));
-    ASSERT_EQ(traits_type::construct(), entt::entity{0xFFFFFFFF});
+    ASSERT_EQ(traits_type::construct(), entt::entity{~entt::id_type{}});
 }
 
 TEST(Entity, Null) {
