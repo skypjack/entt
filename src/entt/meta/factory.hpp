@@ -86,10 +86,10 @@ private:
         property[0u] = std::move(instance);
         property[1u] = std::move(value);
 
-        if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*curr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+        if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*ref}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
             ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&instance](const auto *curr) { return curr->id == instance; }) == range.cend(), "Duplicate identifier");
-            node.next = *curr;
-            *curr = &node;
+            node.next = *ref;
+            *ref = &node;
         }
     }
 
@@ -99,7 +99,7 @@ public:
      * @param target The underlying node to which to assign the properties.
      */
     meta_factory(internal::meta_prop_node **target) ENTT_NOEXCEPT
-        : curr{target}
+        : ref{target}
     {}
 
     /**
@@ -121,7 +121,7 @@ public:
             assign(std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
         }
 
-        return meta_factory<Type, Spec..., PropertyOrKey, Value...>{curr};
+        return meta_factory<Type, Spec..., PropertyOrKey, Value...>{ref};
     }
 
     /**
@@ -137,11 +137,11 @@ public:
     template <typename... Property>
     auto props(Property... property) && {
         unroll(choice<3>, std::forward<Property>(property)...);
-        return meta_factory<Type, Spec..., Property...>{curr};
+        return meta_factory<Type, Spec..., Property...>{ref};
     }
 
 private:
-    internal::meta_prop_node **curr;
+    internal::meta_prop_node **ref;
 };
 
 
@@ -546,17 +546,6 @@ template<typename Type>
  * Base classes aren't reset but the link between the two types is removed.
  *
  * The type is also removed from the list of searchable types.
- */
-template<typename Type>
-void meta_reset() ENTT_NOEXCEPT {
-    meta_reset(internal::meta_info<Type>::resolve()->id);
-}
-
-
-/**
- * @brief Resets a type and all its parts.
- *
- * @sa meta_reset
  *
  * @param id Unique identifier.
  */
@@ -588,6 +577,19 @@ inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
         }
     }
 }
+
+/**
+ * @brief Resets a type and all its parts.
+ *
+ * @sa meta_reset
+ *
+ * @tparam Type Type to reset.
+ */
+template<typename Type>
+void meta_reset() ENTT_NOEXCEPT {
+    meta_reset(internal::meta_info<Type>::resolve()->id);
+}
+
 
 /**
  * @brief Resets all searchable types.
