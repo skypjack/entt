@@ -661,7 +661,7 @@ Also in this case, the following expression always returns false:
 registry.valid(entt::tombstone);
 ```
 
-Moreover, users cannot set set the tombstone version when releasing an entity:
+Moreover, users cannot set the tombstone version when releasing an entity:
 
 ```
 registry.destroy(entity, entt::tombstone);
