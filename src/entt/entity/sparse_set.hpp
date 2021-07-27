@@ -594,7 +594,7 @@ public:
         } else {
             ENTT_ASSERT(!contains(entt), "Set already contains entity");
             const auto pos = static_cast<size_type>(traits_type::to_entity(free_list));
-            sparse[page(entt)][offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(pos));
+            assure_page(page(entt))[offset(entt)] = traits_type::construct(static_cast<typename traits_type::entity_type>(pos));
             free_list = std::exchange(packed[pos], entt);
             return pos;
         }

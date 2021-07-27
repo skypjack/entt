@@ -207,6 +207,19 @@ TEST(SparseSet, Emplace) {
     ASSERT_EQ(set.index(entities[1u]), 0u);
 }
 
+TEST(SparseSet, EmplaceOutOfBounds) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+    entt::entity entities[2u]{entt::entity{0}, entt::entity{ENTT_SPARSE_PAGE}};
+    
+    ASSERT_EQ(set.emplace(entities[0u]), 0u);
+    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+
+    set.erase(entities[0u]);
+
+    ASSERT_EQ(set.emplace(entities[1u]), 0u);
+    ASSERT_EQ(set.extent(), 2u * ENTT_SPARSE_PAGE);
+}
+
 TEST(SparseSet, Insert) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[2u];
