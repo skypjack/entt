@@ -453,7 +453,7 @@ struct meta_factory<Type> {
             nullptr,
             nullptr,
             internal::meta_trait::IS_NONE
-                | (std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) ? internal::meta_trait::IS_CONST : internal::meta_trait::IS_NONE
+                | ((std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) ? internal::meta_trait::IS_CONST : internal::meta_trait::IS_NONE)
                 /* this is never static */,
             internal::meta_info<underlying_type>::resolve(),
             &meta_setter<Type, Setter>,
