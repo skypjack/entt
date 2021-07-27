@@ -189,23 +189,6 @@ class meta_any {
         }
     }
 
-    template<auto Member>
-    [[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> visit(const type_info &info, const internal::meta_type_node *node) {
-        for(auto *curr = node->*Member; curr; curr = curr->next) {
-            if(curr->type->info == info) {
-                return curr;
-            }
-        }
-
-        for(auto *curr = node->base; curr; curr = curr->next) {
-            if(auto *ret = visit<Member>(info, curr->type); ret) {
-                return ret;
-            }
-        }
-
-        return nullptr;
-    }
-
     void release() {
         if(node && node->dtor && storage.owner()) {
             node->dtor(storage.data());
@@ -381,7 +364,7 @@ public:
         if(node) {
             if(const auto info = type_id<Type>(); node->info == info) {
                 return any_cast<Type>(&storage);
-            } else if(const auto *base = visit<&internal::meta_type_node::base>(info, node); base) {
+            } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
                 return static_cast<const Type *>(base->cast(storage.data()));
             }
         }
@@ -398,7 +381,7 @@ public:
             if(node) {
                 if(const auto info = type_id<Type>(); node->info == info) {
                     return any_cast<Type>(&storage);
-                } else if(const auto *base = visit<&internal::meta_type_node::base>(info, node); base) {
+                } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
                     return const_cast<Type *>(static_cast<const Type *>(base->cast(storage.data())));
                 }
             }
@@ -1070,23 +1053,6 @@ class meta_type {
         return nullptr;
     }
 
-    template<auto Member, typename Op>
-    static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> visit(const Op &op, const internal::meta_type_node *node) {
-        for(auto *curr = node->*Member; curr; curr = curr->next) {
-            if(op(curr)) {
-                return curr;
-            }
-        }
-
-        for(auto *curr = node->base; curr; curr = curr->next) {
-            if(auto *ret = visit<Member>(op, curr->type); ret) {
-                return ret;
-            }
-        }
-
-        return nullptr;
-    }
-
 public:
     /*! @brief Node type. */
     using node_type = internal::meta_type_node;
@@ -1330,7 +1296,7 @@ public:
      * @return The base meta type associated with the given identifier, if any.
      */
     [[nodiscard]] meta_type base(const id_type id) const {
-        return visit<&node_type::base>([id](const auto *curr) { return curr->type->id == id; }, node);
+        return internal::visit<&node_type::base>([id](const auto *curr) { return curr->type->id == id; }, node);
     }
 
     /**
@@ -1368,7 +1334,7 @@ public:
      * @return The data associated with the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        return visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
+        return internal::visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
@@ -1390,7 +1356,7 @@ public:
      * @return The function associated with the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        return visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
+        return internal::visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
@@ -1450,7 +1416,7 @@ public:
         size_type extent{sz + 1u};
         bool ambiguous{};
 
-        for(auto *it = visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->arity == sz; }, node); it && it->id == id && it->arity == sz; it = it->next) {
+        for(auto *it = internal::visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->arity == sz; }, node); it && it->id == id && it->arity == sz; it = it->next) {
             size_type direct{};
             size_type ext{};
 
@@ -1544,7 +1510,7 @@ public:
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return visit<&internal::meta_type_node::prop>([&key](const auto *curr) { return curr->id == key; }, node);
+        return internal::visit<&internal::meta_type_node::prop>([&key](const auto *curr) { return curr->id == key; }, node);
     }
 
     /**
@@ -1615,9 +1581,9 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
     if(node) {
-        if(node->info == type.info() || visit<&internal::meta_type_node::base>(type.info(), node)) {
+        if(const auto info = type.info(); node->info == info || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
             return as_ref();
-        } else if(const auto * const conv = visit<&internal::meta_type_node::conv>(type.info(), node); conv) {
+        } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
             return conv->conv(storage.data());
         }
     }
@@ -1627,9 +1593,9 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 inline bool meta_any::allow_cast(const meta_type &type) {
-    if(node->info == type.info() || visit<&internal::meta_type_node::base>(type.info(), node)) {
+    if(const auto info = type.info(); node->info == info || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
         return true;
-    } else if(const auto * const conv = visit<&internal::meta_type_node::conv>(type.info(), node); conv) {
+    } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
         *this = conv->conv(std::as_const(storage).data());
         return true;
     }

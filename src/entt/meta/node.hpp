@@ -227,9 +227,27 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>> {};
 
 
 template<typename... Args>
-meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
+[[nodiscard]] meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
     meta_type_node *args[sizeof...(Args) + 1u]{nullptr, internal::meta_info<Args>::resolve()...};
     return args[index + 1u];
+}
+
+
+template<auto Member, typename Op>
+[[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> visit(const Op &op, const internal::meta_type_node *node) {
+    for(auto *curr = node->*Member; curr; curr = curr->next) {
+        if(op(curr)) {
+            return curr;
+        }
+    }
+
+    for(auto *curr = node->base; curr; curr = curr->next) {
+        if(auto *ret = visit<Member>(op, curr->type); ret) {
+            return ret;
+        }
+    }
+
+    return nullptr;
 }
 
 
