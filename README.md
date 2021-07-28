@@ -265,6 +265,12 @@ and can use `EnTT` from a `CMake` project without problems.
   $ vcpkg install entt
   ```
 
+  Or you can use the `experimental` feature to test the latest changes:
+
+  ```
+  vcpkg install entt[experimental] --head
+  ```
+
   The `EnTT` port in `vcpkg` is kept up to date by Microsoft team members and
   community contributors.<br/>
   If the version is out of date, please
