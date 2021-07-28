@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.0</span>
+   &#160;<span id="projectnumber">3.8.1</span>
    </div>
   </td>
  </tr>
@@ -318,14 +318,14 @@ Is applicable</h3>
  Moreover, users are also provided with <code>std::apply</code>, a tool for combining invocable elements and tuples of arguments.</p>
 <p>It would therefore be a good idea to have a variant of <code>std::is_invocable</code> that also accepts its arguments in the form of a tuple-like type, so as to complete the offer:</p>
 <div class="fragment"><div class="line">constexpr <span class="keywordtype">bool</span> result = <a class="code" href="structentt_1_1is__applicable.html">entt::is_applicable&lt;Func, std::tuple&lt;a_type, another_type&gt;</a>&gt;;</div>
-<div class="ttc" id="astructentt_1_1is__applicable_html"><div class="ttname"><a href="structentt_1_1is__applicable.html">entt::is_applicable</a></div><div class="ttdoc">Same as std::is_invocable, but with tuples.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00489">type_traits.hpp:489</a></div></div>
+<div class="ttc" id="astructentt_1_1is__applicable_html"><div class="ttname"><a href="structentt_1_1is__applicable.html">entt::is_applicable</a></div><div class="ttdoc">Same as std::is_invocable, but with tuples.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00427">type_traits.hpp:427</a></div></div>
 </div><!-- fragment --><p>This trait is built on top of <code>std::is_invocable</code> and does nothing but unpack a tuple-like type and simplify the code at the call site.</p>
 <h3><a class="anchor" id="autotoc_md30"></a>
 Constness as</h3>
 <p>An utility to easily transfer the constness of a type to another type:</p>
 <div class="fragment"><div class="line"><span class="comment">// type is const dst_type because of the constness of src_type</span></div>
 <div class="line"><span class="keyword">using</span> type = <a class="code" href="namespaceentt.html#a7b051461867d3c5c97f77f10b662c26b">entt::constness_as_t&lt;dst_type, const src_type&gt;</a>;</div>
-<div class="ttc" id="anamespaceentt_html_a7b051461867d3c5c97f77f10b662c26b"><div class="ttname"><a href="namespaceentt.html#a7b051461867d3c5c97f77f10b662c26b">entt::constness_as_t</a></div><div class="ttdeci">typename constness_as&lt; To, From &gt;::type constness_as_t</div><div class="ttdoc">Alias template to facilitate the transcription of the constness.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00653">type_traits.hpp:653</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a7b051461867d3c5c97f77f10b662c26b"><div class="ttname"><a href="namespaceentt.html#a7b051461867d3c5c97f77f10b662c26b">entt::constness_as_t</a></div><div class="ttdeci">typename constness_as&lt; To, From &gt;::type constness_as_t</div><div class="ttdoc">Alias template to facilitate the transcription of the constness.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00655">type_traits.hpp:655</a></div></div>
 </div><!-- fragment --><p>The trait is subject to the rules of the language. Therefore, for example, transferring constness between references won't give the desired effect.</p>
 <h3><a class="anchor" id="autotoc_md31"></a>
 Member class type</h3>
@@ -333,7 +333,7 @@ Member class type</h3>
  The purpose of this utility is to extract the class type in a few lines of code:</p>
 <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Member&gt;</div>
 <div class="line"><span class="keyword">using</span> clazz = <a class="code" href="namespaceentt.html#a49f19d031690e5ebfffd6c7a4f6bd364">entt::member_class_t&lt;Member&gt;</a>;</div>
-<div class="ttc" id="anamespaceentt_html_a49f19d031690e5ebfffd6c7a4f6bd364"><div class="ttname"><a href="namespaceentt.html#a49f19d031690e5ebfffd6c7a4f6bd364">entt::member_class_t</a></div><div class="ttdeci">typename member_class&lt; Member &gt;::type member_class_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00684">type_traits.hpp:684</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a49f19d031690e5ebfffd6c7a4f6bd364"><div class="ttname"><a href="namespaceentt.html#a49f19d031690e5ebfffd6c7a4f6bd364">entt::member_class_t</a></div><div class="ttdeci">typename member_class&lt; Member &gt;::type member_class_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00686">type_traits.hpp:686</a></div></div>
 </div><!-- fragment --><h3><a class="anchor" id="autotoc_md32"></a>
 Integral constant</h3>
 <p>Since <code>std::integral_constant</code> may be annoying because of its form that requires to specify both a type and a value of that type, there is a more user-friendly shortcut for the creation of integral constants.<br  />

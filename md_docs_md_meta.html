@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.0</span>
+   &#160;<span id="projectnumber">3.8.1</span>
    </div>
   </td>
  </tr>
@@ -232,7 +232,7 @@ Container support</h2>
 <div class="line">}</div>
 <div class="ttc" id="aclassentt_1_1basic__any_html_aa3306eda6289209c62103b464f9274a2"><div class="ttname"><a href="classentt_1_1basic__any.html#aa3306eda6289209c62103b464f9274a2">entt::basic_any::type</a></div><div class="ttdeci">type_info type() const</div><div class="ttdoc">Returns the type of the contained object.</div><div class="ttdef"><b>Definition:</b> <a href="any_8hpp_source.html#l00275">any.hpp:275</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a4846741b8f485584c196304f588b94ad"><div class="ttname"><a href="namespaceentt.html#a4846741b8f485584c196304f588b94ad">entt::any</a></div><div class="ttdeci">basic_any&lt;&gt; any</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00021">fwd.hpp:21</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a77c7a5a8ac08bc879abdaa00f920a996"><div class="ttname"><a href="namespaceentt.html#a77c7a5a8ac08bc879abdaa00f920a996">entt::forward_as_meta</a></div><div class="ttdeci">meta_any forward_as_meta(Type &amp;&amp;value)</div><div class="ttdoc">Forwards its argument and avoids copies for lvalue references.</div><div class="ttdef"><b>Definition:</b> <a href="meta_8hpp_source.html#l00613">meta.hpp:613</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a77c7a5a8ac08bc879abdaa00f920a996"><div class="ttname"><a href="namespaceentt.html#a77c7a5a8ac08bc879abdaa00f920a996">entt::forward_as_meta</a></div><div class="ttdeci">meta_any forward_as_meta(Type &amp;&amp;value)</div><div class="ttdoc">Forwards its argument and avoids copies for lvalue references.</div><div class="ttdef"><b>Definition:</b> <a href="meta_8hpp_source.html#l00614">meta.hpp:614</a></div></div>
 </div><!-- fragment --><p>The method to use to get a proxy object for associative containers is <code>as_associative_container</code> instead.<br  />
  It goes without saying that it's not necessary to perform a double check. Instead, it's sufficient to query the meta type or verify that the proxy object is valid. In fact, proxies are contextually convertible to bool to know if they are valid. For example, invalid proxies are returned when the wrapped object isn't a container.<br  />
  In all cases, users aren't expected to <em>reflect</em> containers explicitly. It's sufficient to assign a container for which a specialization of the traits classes exists to a <code>meta_any</code> object to be able to get its proxy object.</p>
@@ -385,7 +385,7 @@ Template information</h2>
 <div class="line">    <span class="comment">// meta type of the i-th argument</span></div>
 <div class="line">    <span class="keyword">auto</span> arg_type = type.template_arg(0u);</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassentt_1_1meta__type_html_ae7d676d99412337ef5214545e61618a6"><div class="ttname"><a href="classentt_1_1meta__type.html#ae7d676d99412337ef5214545e61618a6">entt::meta_type::is_template_specialization</a></div><div class="ttdeci">bool is_template_specialization() const</div><div class="ttdoc">Checks whether a type refers to a recognized class template specialization or not.</div><div class="ttdef"><b>Definition:</b> <a href="meta_8hpp_source.html#l01249">meta.hpp:1249</a></div></div>
+<div class="ttc" id="aclassentt_1_1meta__type_html_ae7d676d99412337ef5214545e61618a6"><div class="ttname"><a href="classentt_1_1meta__type.html#ae7d676d99412337ef5214545e61618a6">entt::meta_type::is_template_specialization</a></div><div class="ttdeci">bool is_template_specialization() const</div><div class="ttdoc">Checks whether a type refers to a recognized class template specialization or not.</div><div class="ttdef"><b>Definition:</b> <a href="meta_8hpp_source.html#l01250">meta.hpp:1250</a></div></div>
 </div><!-- fragment --><p>Typically, when template information for a type are required, what the library provides is sufficient. However, there are some cases where a user may want more details or a different set of information.<br  />
  Consider the case of a class template that is meant to wrap function types:</p>
 <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
@@ -451,7 +451,7 @@ Named constants and enums</h2>
 </div><!-- fragment --><p>It goes without saying that accessing them is trivial as well. It's a matter of doing the following, as with any other data member of a meta type:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> value = entt::resolve&lt;my_enum&gt;().<a class="code" href="classentt_1_1meta__any.html#a3c16bceaf56eda12158f4b71ef879d5c">data</a>(<span class="stringliteral">&quot;a_value&quot;</span>_hs).get({}).cast&lt;my_enum&gt;();</div>
 <div class="line"><span class="keyword">auto</span> max = entt::resolve&lt;int&gt;().data(<span class="stringliteral">&quot;max_int&quot;</span>_hs).get({}).cast&lt;int&gt;();</div>
-<div class="ttc" id="aclassentt_1_1meta__any_html_a3c16bceaf56eda12158f4b71ef879d5c"><div class="ttname"><a href="classentt_1_1meta__any.html#a3c16bceaf56eda12158f4b71ef879d5c">entt::meta_any::data</a></div><div class="ttdeci">const void * data() const</div><div class="ttdoc">Returns an opaque pointer to the contained instance.</div><div class="ttdef"><b>Definition:</b> <a href="meta_8hpp_source.html#l00332">meta.hpp:332</a></div></div>
+<div class="ttc" id="aclassentt_1_1meta__any_html_a3c16bceaf56eda12158f4b71ef879d5c"><div class="ttname"><a href="classentt_1_1meta__any.html#a3c16bceaf56eda12158f4b71ef879d5c">entt::meta_any::data</a></div><div class="ttdeci">const void * data() const</div><div class="ttdoc">Returns an opaque pointer to the contained instance.</div><div class="ttdef"><b>Definition:</b> <a href="meta_8hpp_source.html#l00333">meta.hpp:333</a></div></div>
 </div><!-- fragment --><p>As a side note, remember that all this happens behind the scenes without any allocation because of the small object optimization performed by the <code>meta_any</code> class.</p>
 <h2><a class="anchor" id="autotoc_md119"></a>
 Properties and meta objects</h2>

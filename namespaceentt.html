@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.0</span>
+   &#160;<span id="projectnumber">3.8.1</span>
    </div>
   </td>
  </tr>
@@ -198,9 +198,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1value__list__cat_3_01value__list_3_01Value_8_8_8_01_4_01_4.html">value_list_cat&lt; value_list&lt; Value... &gt; &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concatenates multiple value lists.  <a href="structentt_1_1value__list__cat_3_01value__list_3_01Value_8_8_8_01_4_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1is__equality__comparable.html">is_equality_comparable</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the member constant <code>value</code> to true if a given type is equality comparable, false otherwise.  <a href="structentt_1_1is__equality__comparable.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1is__applicable.html">is_applicable</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as std::is_invocable, but with tuples.  <a href="structentt_1_1is__applicable.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -236,6 +233,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1is__iterator__type_3_01Type_00_01It_00_01std_1_1enable__if__t_3_9std_1_1is__same__d827a14c04f195b53a7b353d4f3d2a15.html">is_iterator_type&lt; Type, It, std::enable_if_t&lt;!std::is_same_v&lt; Type, It &gt;, std::void_t&lt; typename It::iterator_type &gt; &gt; &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the member constant <code>value</code> to true if a given type is of the required iterator type, false otherwise.  <a href="structentt_1_1is__iterator__type_3_01Type_00_01It_00_01std_1_1enable__if__t_3_9std_1_1is__same__d827a14c04f195b53a7b353d4f3d2a15.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1is__equality__comparable.html">is_equality_comparable</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the member constant <code>value</code> to true if a given type is equality comparable, false otherwise.  <a href="structentt_1_1is__equality__comparable.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1constness__as.html">constness_as</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transcribes the constness of a type to another type.  <a href="structentt_1_1constness__as.html#details">More...</a><br /></td></tr>
@@ -995,10 +995,6 @@ Variables</h2></td></tr>
 <tr class="memitem:a4bbfb162708696f9c1497d61573b540f"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceentt.html#a4bbfb162708696f9c1497d61573b540f">value_list_element_v</a> = <a class="el" href="structentt_1_1value__list__element.html">value_list_element</a>&lt;Index, List&gt;::value</td></tr>
 <tr class="memdesc:a4bbfb162708696f9c1497d61573b540f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper type.  <a href="namespaceentt.html#a4bbfb162708696f9c1497d61573b540f">More...</a><br /></td></tr>
 <tr class="separator:a4bbfb162708696f9c1497d61573b540f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a068dd98a70c771935d2bf3dd96dbad6d"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
-<tr class="memitem:a068dd98a70c771935d2bf3dd96dbad6d"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceentt.html#a068dd98a70c771935d2bf3dd96dbad6d">is_equality_comparable_v</a> = <a class="el" href="structentt_1_1is__equality__comparable.html">is_equality_comparable</a>&lt;Type&gt;::value</td></tr>
-<tr class="memdesc:a068dd98a70c771935d2bf3dd96dbad6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper variable template.  <a href="namespaceentt.html#a068dd98a70c771935d2bf3dd96dbad6d">More...</a><br /></td></tr>
-<tr class="separator:a068dd98a70c771935d2bf3dd96dbad6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f238620469de3ef2bafdb28fe4657ef"><td class="memTemplParams" colspan="2">template&lt;typename Func , typename Args &gt; </td></tr>
 <tr class="memitem:a4f238620469de3ef2bafdb28fe4657ef"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceentt.html#a4f238620469de3ef2bafdb28fe4657ef">is_applicable_v</a> = <a class="el" href="structentt_1_1is__applicable.html">is_applicable</a>&lt;Func, Args&gt;::value</td></tr>
 <tr class="memdesc:a4f238620469de3ef2bafdb28fe4657ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper variable template.  <a href="namespaceentt.html#a4f238620469de3ef2bafdb28fe4657ef">More...</a><br /></td></tr>
@@ -1019,6 +1015,10 @@ Variables</h2></td></tr>
 <tr class="memitem:ac4081aa5332fcb3367063eeba93918b8"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceentt.html#ac4081aa5332fcb3367063eeba93918b8">is_iterator_type_v</a> = <a class="el" href="structentt_1_1is__iterator__type.html">is_iterator_type</a>&lt;Type, It&gt;::value</td></tr>
 <tr class="memdesc:ac4081aa5332fcb3367063eeba93918b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper variable template.  <a href="namespaceentt.html#ac4081aa5332fcb3367063eeba93918b8">More...</a><br /></td></tr>
 <tr class="separator:ac4081aa5332fcb3367063eeba93918b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a068dd98a70c771935d2bf3dd96dbad6d"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:a068dd98a70c771935d2bf3dd96dbad6d"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceentt.html#a068dd98a70c771935d2bf3dd96dbad6d">is_equality_comparable_v</a> = <a class="el" href="structentt_1_1is__equality__comparable.html">is_equality_comparable</a>&lt;Type&gt;::value</td></tr>
+<tr class="memdesc:a068dd98a70c771935d2bf3dd96dbad6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper variable template.  <a href="namespaceentt.html#a068dd98a70c771935d2bf3dd96dbad6d">More...</a><br /></td></tr>
+<tr class="separator:a068dd98a70c771935d2bf3dd96dbad6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f0c0a1c1d953ea991591748744cdd8b"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="structentt_1_1null__t.html">null_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceentt.html#a2f0c0a1c1d953ea991591748744cdd8b">null</a> {}</td></tr>
 <tr class="memdesc:a2f0c0a1c1d953ea991591748744cdd8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile-time constant for null entities.  <a href="namespaceentt.html#a2f0c0a1c1d953ea991591748744cdd8b">More...</a><br /></td></tr>
 <tr class="separator:a2f0c0a1c1d953ea991591748744cdd8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1103,7 +1103,7 @@ template&lt;typename To , typename From &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00653">653</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00655">655</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
 
 </div>
 </div>
@@ -1207,7 +1207,7 @@ template&lt;typename Member &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00684">684</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00686">686</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
 
 </div>
 </div>
@@ -2227,7 +2227,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A properly initialized and not necessarily owning wrapper. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00613">613</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00614">614</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -2401,7 +2401,7 @@ template&lt;typename Type , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A properly initialized wrapper for an object of the given type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00601">601</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00602">602</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -3086,7 +3086,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the two wrappers differ in their content, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00588">588</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00589">589</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -3134,7 +3134,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>False if the objects refer to the same node, true otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01600">1600</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01601">1601</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -4118,7 +4118,7 @@ template&lt;typename Ret , typename Func , typename Args &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00545">545</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00483">483</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
 
 </div>
 </div>
@@ -4153,7 +4153,7 @@ template&lt;typename Func , typename Args &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00518">518</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00456">456</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
 
 </div>
 </div>
@@ -4187,7 +4187,7 @@ template&lt;typename Type &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00567">567</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00505">505</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
 
 </div>
 </div>
@@ -4221,7 +4221,7 @@ template&lt;class Type &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00484">484</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00626">626</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
 
 </div>
 </div>
@@ -4256,7 +4256,7 @@ template&lt;typename Type , typename It &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00624">624</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00562">562</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
 
 </div>
 </div>
@@ -4290,7 +4290,7 @@ template&lt;typename Type &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00591">591</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="core_2type__traits_8hpp_source.html#l00529">529</a> of file <a class="el" href="core_2type__traits_8hpp_source.html">type_traits.hpp</a>.</p>
 
 </div>
 </div>

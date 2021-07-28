@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.0</span>
+   &#160;<span id="projectnumber">3.8.1</span>
    </div>
   </td>
  </tr>
@@ -117,7 +117,7 @@ $(function() {
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">while</span>(begin != last) {</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a> = *(begin++);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            ((reg-&gt;template all_of&lt;Component&gt;(<a class="code" href="namespaceentt.html">entt</a>) ? ++size[Index] : size[Index]), ...);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            ((reg-&gt;template all_of&lt;Component&gt;(<a class="code" href="namespaceentt.html">entt</a>) ? ++size[Index] : 0u), ...);</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        (get&lt;Component&gt;(archive, size[Index], first, last), ...);</div>

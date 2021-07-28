@@ -1,5 +1,0 @@
-<map id="entt::is_iterator_type&lt; Type, It, std::void_t&lt; typename It::iterator_type &gt; &gt;" name="entt::is_iterator_type&lt; Type, It, std::void_t&lt; typename It::iterator_type &gt; &gt;">
-<area shape="rect" id="node1" title="Provides the member constant value to true if a given type is of the required iterator type,..." alt="" coords="9,169,171,240"/>
-<area shape="rect" id="node2" href="$structentt_1_1is__iterator__type.html" title=" " alt="" coords="5,80,175,121"/>
-<area shape="rect" id="node3" title=" " alt="" coords="37,5,143,32"/>
-</map>
