@@ -76,6 +76,8 @@ I hope this list can grow much more in the future:
     defense game using C++ with Entity Component System (ECS).
   * [Runeterra](https://github.com/utilForever/Runeterra): Legends of Runeterra
     simulator using C++ with some reinforcement learning.
+  * [Black Sun](https://store.steampowered.com/app/1670930/Black_Sun/): fly your
+    space ship through a large 2D open world.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
