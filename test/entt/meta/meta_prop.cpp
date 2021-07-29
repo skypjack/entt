@@ -1,4 +1,4 @@
-#include <string.h>
+#include <string>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>

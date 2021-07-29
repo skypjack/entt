@@ -1,5 +1,6 @@
 #include <algorithm>
-#include <string.h>
+#include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 #include <gtest/gtest.h>
@@ -960,8 +961,17 @@ TEST_F(Any, AnyCast) {
     ASSERT_DEATH(entt::any_cast<double &>(any), "");
     ASSERT_EQ(entt::any_cast<const int &>(cany), 42);
     ASSERT_DEATH(entt::any_cast<const double &>(cany), "");
-    ASSERT_EQ(entt::any_cast<int>(entt::any{42}), 42);
+
+    not_copyable<1> instance{};
+    instance.payload[0u] = 42.;
+    entt::any ref{entt::forward_as_any(instance)};
+    entt::any cref{entt::forward_as_any(std::as_const(instance).payload[0u])};
+
+    ASSERT_EQ(entt::any_cast<not_copyable<1>>(std::move(ref)).payload[0u], 42.);
+    ASSERT_DEATH(entt::any_cast<not_copyable<1>>(std::as_const(ref).as_ref()), "");
+    ASSERT_EQ(entt::any_cast<double>(std::move(cref)), 42.);
     ASSERT_DEATH(entt::any_cast<double>(entt::any{42}), "");
+    ASSERT_EQ(entt::any_cast<int>(entt::any{42}), 42);
 }
 
 TEST_F(Any, MakeAny) {
