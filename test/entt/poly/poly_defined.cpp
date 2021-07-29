@@ -105,7 +105,7 @@ TEST(PolyDefined, Functionalities) {
     entt::poly<Defined> move = std::move(copy);
 
     ASSERT_TRUE(move);
-    ASSERT_FALSE(copy);
+    ASSERT_TRUE(copy);
     ASSERT_EQ(move->get(), 3);
 
     move.reset();
