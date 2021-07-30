@@ -328,7 +328,7 @@ Furthermore, all them are also returned by specific overloads that provide the
 caller with iterable ranges of top-level elements. As an example:
 
 ```cpp
-for(auto data = entt::resolve<my_type>().data()) {
+for(auto data: entt::resolve<my_type>().data()) {
     // ...
 }
 ```
