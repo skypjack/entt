@@ -1001,7 +1001,7 @@ struct basic_view<Entity, exclude_t<Exclude...>, Component...>
  */
 template<typename... Storage>
 basic_view(Storage &... storage)
--> basic_view<std::common_type_t<typename Storage::entity_type...>, entt::exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
+-> basic_view<std::common_type_t<typename Storage::entity_type...>, exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
 
 
 /**

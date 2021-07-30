@@ -158,7 +158,7 @@ Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
         }
     }
 
-    return entt::null;
+    return null;
 }
 
 

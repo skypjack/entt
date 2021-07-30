@@ -123,8 +123,8 @@ resource<type_list<>, type_list<Req...>> to_resource();
  */
 template<typename Entity>
 class basic_organizer final {
-    using callback_type = void(const void *, entt::basic_registry<Entity> &);
-    using prepare_type = void(entt::basic_registry<Entity> &);
+    using callback_type = void(const void *, basic_registry<Entity> &);
+    using prepare_type = void(basic_registry<Entity> &);
     using dependency_type = std::size_t(const bool, type_info *, const std::size_t);
 
     struct vertex_data final {
@@ -498,7 +498,7 @@ public:
     }
 
 private:
-    std::unordered_map<entt::id_type, std::vector<std::pair<std::size_t, bool>>> dependencies;
+    std::unordered_map<id_type, std::vector<std::pair<std::size_t, bool>>> dependencies;
     std::vector<vertex_data> vertices;
 };
 

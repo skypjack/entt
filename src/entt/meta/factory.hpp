@@ -82,7 +82,7 @@ private:
             property[1u]
         };
 
-        entt::meta_any instance{std::forward<Key>(key)};
+        meta_any instance{std::forward<Key>(key)};
         property[0u] = std::move(instance);
         property[1u] = std::move(value);
 
