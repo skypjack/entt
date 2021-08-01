@@ -175,6 +175,7 @@ if(ENTT_BUILD_TESTING)
     option(ENTT_BUILD_SNAPSHOT "Build snapshot test with Cereal." OFF)
 
     set(ENTT_ID_TYPE std::uint32_t CACHE STRING "Type of identifiers to use for the tests")
+    set(ENTT_CXX_STD cxx_std_17 CACHE STRING "C++ standard revision to use for the tests")
 
     include(CTest)
     enable_testing()

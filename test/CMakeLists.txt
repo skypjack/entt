@@ -38,6 +38,7 @@ add_compile_options($<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>)
 
 function(SETUP_TARGET TARGET_NAME)
     set_target_properties(${TARGET_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+    target_compile_features(${TARGET_NAME} PRIVATE ${ENTT_CXX_STD})
     target_link_libraries(${TARGET_NAME} PRIVATE EnTT)
 
     if(MSVC)
