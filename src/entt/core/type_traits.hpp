@@ -82,7 +82,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
  * @brief Helper variable template.
  * @tparam Type The type of which to return the size.
  */
-template<class Type>
+template<typename Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
 
 
@@ -287,7 +287,7 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
  * @tparam List Type list.
  * @tparam Type Type to look for.
  */
-template<class List, typename Type>
+template<typename List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
 
 
@@ -641,7 +641,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
  * @brief Helper variable template.
  * @tparam Type The type to test.
  */
-template<class Type>
+template<typename Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
 
 
