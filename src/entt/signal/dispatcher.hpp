@@ -54,15 +54,15 @@ class dispatcher {
         }
 
         void disconnect(void *instance) override {
-            sink().disconnect(instance);
+            bucket().disconnect(instance);
         }
 
         void clear() ENTT_NOEXCEPT override {
             events.clear();
         }
 
-        [[nodiscard]] sink_type sink() ENTT_NOEXCEPT {
-            return entt::sink{signal};
+        [[nodiscard]] sink_type bucket() ENTT_NOEXCEPT {
+            return sink_type{signal};
         }
 
         template<typename... Args>
@@ -129,7 +129,7 @@ public:
      */
     template<typename Event>
     [[nodiscard]] auto sink() {
-        return assure<Event>().sink();
+        return assure<Event>().bucket();
     }
 
     /**
