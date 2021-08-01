@@ -40,6 +40,22 @@ template<typename... Type>
 inline constexpr get_t<Type...> get{};
 
 
+/**
+ * @brief Alias for lists of owned components.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+struct owned_t: type_list<Type...>{};
+
+
+/**
+ * @brief Variable template for lists of owned components.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+inline constexpr owned_t<Type...> owned{};
+
+
 }
 
 

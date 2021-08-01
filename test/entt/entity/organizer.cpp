@@ -2,24 +2,24 @@
 #include <entt/entity/organizer.hpp>
 #include <entt/entity/registry.hpp>
 
-void ro_int_rw_char_double(entt::view<entt::exclude_t<>, const int, char>, double &) {}
-void ro_char_rw_int(entt::view<entt::exclude_t<>, int, const char>) {}
-void ro_char_rw_double(entt::view<entt::exclude_t<>, const char>, double &) {}
-void ro_int_double(entt::view<entt::exclude_t<>, const int>, const double &) {}
-void sync_point(entt::registry &, entt::view<entt::exclude_t<>, const int>) {}
+void ro_int_rw_char_double(entt::view<entt::get_t<const int, char>>, double &) {}
+void ro_char_rw_int(entt::view<entt::get_t<int, const char>>) {}
+void ro_char_rw_double(entt::view<entt::get_t<const char>>, double &) {}
+void ro_int_double(entt::view<entt::get_t<const int>>, const double &) {}
+void sync_point(entt::registry &, entt::view<entt::get_t<const int>>) {}
 
 struct clazz {
-    void ro_int_char_double(entt::view<entt::exclude_t<>, const int, const char>, const double &) {}
-    void rw_int(entt::view<entt::exclude_t<>, int>) {}
-    void rw_int_char(entt::view<entt::exclude_t<>, int, char>) {}
-    void rw_int_char_double(entt::view<entt::exclude_t<>, int, char>, double &) {}
+    void ro_int_char_double(entt::view<entt::get_t<const int, const char>>, const double &) {}
+    void rw_int(entt::view<entt::get_t<int>>) {}
+    void rw_int_char(entt::view<entt::get_t<int, char>>) {}
+    void rw_int_char_double(entt::view<entt::get_t<int, char>>, double &) {}
 
-    static void ro_int_with_payload(const clazz &, entt::view<entt::exclude_t<>, const int>) {}
-    static void ro_char_with_payload(const clazz &, entt::view<entt::exclude_t<>, const char>) {}
-    static void ro_int_char_with_payload(clazz &, entt::view<entt::exclude_t<>, const int, const char>) {}
+    static void ro_int_with_payload(const clazz &, entt::view<entt::get_t<const int>>) {}
+    static void ro_char_with_payload(const clazz &, entt::view<entt::get_t<const char>>) {}
+    static void ro_int_char_with_payload(clazz &, entt::view<entt::get_t<const int, const char>>) {}
 };
 
-void to_args_integrity(entt::view<entt::exclude_t<>, int> view, std::size_t &value, entt::registry &registry) {
+void to_args_integrity(entt::view<entt::get_t<int>> view, std::size_t &value, entt::registry &registry) {
     value = view.size();
 }
 

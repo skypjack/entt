@@ -14,19 +14,19 @@ TEST(Helper, AsView) {
     entt::registry registry;
     const entt::registry cregistry;
 
-    ([](entt::view<entt::exclude_t<>, int>) {})(entt::as_view{registry});
-    ([](entt::view<entt::exclude_t<int>, char, double>) {})(entt::as_view{registry});
-    ([](entt::view<entt::exclude_t<int>, const char, double>) {})(entt::as_view{registry});
-    ([](entt::view<entt::exclude_t<int>, const char, const double>) {})(entt::as_view{cregistry});
+    ([](entt::view<entt::get_t<int>>) {})(entt::as_view{registry});
+    ([](entt::view<entt::get_t<char, double>, entt::exclude_t<int>>) {})(entt::as_view{registry});
+    ([](entt::view<entt::get_t<const char, double>, entt::exclude_t<int>>) {})(entt::as_view{registry});
+    ([](entt::view<entt::get_t<const char, const double>, entt::exclude_t<int>>) {})(entt::as_view{cregistry});
 }
 
 TEST(Helper, AsGroup) {
     entt::registry registry;
     const entt::registry cregistry;
 
-    ([](entt::group<entt::exclude_t<int>, entt::get_t<char>, double>) {})(entt::as_group{registry});
-    ([](entt::group<entt::exclude_t<int>, entt::get_t<const char>, double>) {})(entt::as_group{registry});
-    ([](entt::group<entt::exclude_t<int>, entt::get_t<const char>, const double>) {})(entt::as_group{cregistry});
+    ([](entt::group<entt::owned_t<double>, entt::get_t<char>, entt::exclude_t<int>>) {})(entt::as_group{registry});
+    ([](entt::group<entt::owned_t<double>, entt::get_t<const char>, entt::exclude_t<int>>) {})(entt::as_group{registry});
+    ([](entt::group<entt::owned_t<const double>, entt::get_t<const char>, entt::exclude_t<int>>) {})(entt::as_group{cregistry});
 }
 
 TEST(Helper, Invoke) {

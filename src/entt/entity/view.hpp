@@ -110,7 +110,7 @@ private:
 };
 
 
-template<typename Policy, typename Type, typename It, std::size_t Component, std::size_t Exclude>
+template<typename Type, typename It, std::size_t Component, std::size_t Exclude, typename Policy>
 class view_iterator final {
     [[nodiscard]] bool valid() const {
         const auto entt = *it;
@@ -193,7 +193,7 @@ private:
 
 
 template<bool Enable>
-struct stable_iteration {
+struct policy_dispatcher {
     template<typename Entity>
     [[nodiscard]] static constexpr bool accept([[maybe_unused]] const Entity entity) ENTT_NOEXCEPT {
         if constexpr(Enable) {
@@ -214,27 +214,14 @@ struct stable_iteration {
  */
 
 
-/*! @brief Stable storage policy, aimed at pointer stability. */
-using packed_storage_policy = internal::stable_iteration<false>;
-
-
-/*! @brief Packed storage policy, aimed at faster linear iteration. */
-using stable_storage_policy = internal::stable_iteration<true>;
-
-
 /**
  * @brief View implementation.
  *
  * Primary template isn't defined on purpose. All the specializations give a
  * compile-time error, but for a few reasonable cases.
  */
-template<typename...>
-class basic_view_impl;
-
-
-/*! @brief View implementation dispatcher. */
-template<typename...>
-struct basic_view;
+template<typename, typename, typename, typename>
+class basic_view;
 
 
 /**
@@ -266,28 +253,25 @@ struct basic_view;
  * Lifetime of a view must not overcome that of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
- * @tparam Policy Common (stricter) storage policy.
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Exclude Types of components used to filter the view.
  * @tparam Component Types of components iterated by the view.
+ * @tparam Exclude Types of components used to filter the view.
  */
-template<typename Policy, typename Entity, typename... Exclude, typename... Component>
-class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
-    template<typename Comp>
-    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
-
-    using basic_common_type = std::common_type_t<typename storage_type<Component>::base_type...>;
+template<typename Entity, typename... Component, typename... Exclude>
+class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
+    using basic_common_type = std::common_type_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type::base_type...>;
+    using policy_type = internal::policy_dispatcher<(in_place_delete_v<std::remove_const_t<Component>> || ...)>;
 
     class iterable final {
         template<typename It>
         struct iterable_iterator final {
             using difference_type = std::ptrdiff_t;
-            using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_view_impl>().get({})));
+            using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_view>().get({})));
             using pointer = void;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
 
-            iterable_iterator(It from, const basic_view_impl *parent) ENTT_NOEXCEPT
+            iterable_iterator(It from, const basic_view *parent) ENTT_NOEXCEPT
                 : it{from},
                   view{parent}
             {}
@@ -315,14 +299,14 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
 
         private:
             It it;
-            const basic_view_impl *view;
+            const basic_view *view;
         };
 
     public:
-        using iterator = iterable_iterator<internal::view_iterator<Policy, basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
-        using reverse_iterator = iterable_iterator<internal::view_iterator<Policy, basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
+        using iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>>;
+        using reverse_iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>>;
 
-        iterable(const basic_view_impl &parent)
+        iterable(const basic_view &parent)
             : view{parent}
         {}
 
@@ -343,7 +327,7 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
         }
 
     private:
-        const basic_view_impl view;
+        const basic_view view;
     };
 
     [[nodiscard]] const auto * candidate() const ENTT_NOEXCEPT {
@@ -371,11 +355,11 @@ class basic_view_impl<Policy, Entity, exclude_t<Exclude...>, Component...> {
     template<typename Comp, typename Func>
     void traverse(Func func) const {
         for(const auto curr: internal::iterable_storage<Entity, Comp>{*std::get<storage_type<Comp> *>(pools)}) {
-            if(internal::stable_iteration<in_place_delete_v<std::remove_const_t<Comp>>>::accept(std::get<0>(curr))
+            if(internal::policy_dispatcher<in_place_delete_v<std::remove_const_t<Comp>>>::accept(std::get<0>(curr))
                 && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(std::get<0>(curr))) && ...)
                 && std::apply([entt = std::get<0>(curr)](const auto *... cpool) { return (!cpool->contains(entt) && ...); }, filter))
             {
-                if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view_impl>().get({})))>) {
+                if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(std::get<0>(curr)), dispatch_get<Comp, Component>(curr)...));
                 } else {
                     std::apply(func, std::tuple_cat(dispatch_get<Comp, Component>(curr)...));
@@ -390,14 +374,21 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<Policy, basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using iterator = internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = internal::view_iterator<Policy, basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using reverse_iterator = internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>;
     /*! @brief Iterable view type. */
     using iterable_view = iterable;
 
+    /**
+     * @brief Storage type associated with a given component.
+     * @tparam Type Type of component.
+     */
+    template<typename Comp>
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
+
     /*! @brief Default constructor to use to create empty, invalid views. */
-    basic_view_impl() ENTT_NOEXCEPT
+    basic_view() ENTT_NOEXCEPT
         : pools{},
           filter{},
           view{}
@@ -408,7 +399,7 @@ public:
      * @param component The storage for the types to iterate.
      * @param epool The storage for the types used to filter the view.
      */
-    basic_view_impl(storage_type<Component> &... component, const storage_type<Exclude> &... epool) ENTT_NOEXCEPT
+    basic_view(storage_type<Component> &... component, const storage_type<Exclude> &... epool) ENTT_NOEXCEPT
         : pools{&component...},
           filter{&epool...},
           view{candidate()}
@@ -645,14 +636,14 @@ public:
     /**
      * @brief Combines two views in a _more specific_ one (friend function).
      * @tparam Id A valid entity type (see entt_traits for more details).
-     * @tparam ELhs Filter list of the first view.
      * @tparam CLhs Component list of the first view.
-     * @tparam ERhs Filter list of the second view.
+     * @tparam ELhs Filter list of the first view.
      * @tparam CRhs Component list of the second view.
+     * @tparam ERhs Filter list of the second view.
      * @return A more specific view.
      */
-    template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
-    friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
+    template<typename Id, typename... CLhs, typename... ELhs, typename... CRhs, typename... ERhs>
+    friend auto operator|(const basic_view<Id, get_t<CLhs...>, exclude_t<ELhs...>> &, const basic_view<Id, get_t<CRhs...>, exclude_t<ERhs...>> &);
 
 private:
     const std::tuple<storage_type<Component> *...> pools;
@@ -693,9 +684,11 @@ private:
  * @tparam Component Type of component iterated by the view.
  */
 template<typename Entity, typename Component>
-class basic_view_impl<packed_storage_policy, Entity, exclude_t<>, Component> {
-    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
-    using basic_common_type = typename storage_type::base_type;
+class basic_view<Entity, get_t<Component>, exclude_t<>, 
+    // Yeah, there is a reason why void_t and enable_if_t were combined here. Try removing the first one and let me know. :)
+    std::void_t<std::enable_if_t<!in_place_delete_v<std::remove_const_t<Component>>>>
+> {
+    using basic_common_type = typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type::base_type;
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -708,9 +701,11 @@ public:
     using reverse_iterator = typename basic_common_type::reverse_iterator;
     /*! @brief Iterable view type. */
     using iterable_view = internal::iterable_storage<Entity, Component>;
+    /*! @brief Storage type associated with the view component. */
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
-    basic_view_impl() ENTT_NOEXCEPT
+    basic_view() ENTT_NOEXCEPT
         : pools{},
           filter{}
     {}
@@ -719,7 +714,7 @@ public:
      * @brief Constructs a single-type view from a storage class.
      * @param ref The storage for the type to iterate.
      */
-    basic_view_impl(storage_type &ref) ENTT_NOEXCEPT
+    basic_view(storage_type &ref) ENTT_NOEXCEPT
         : pools{&ref},
           filter{}
     {}
@@ -963,34 +958,18 @@ public:
     /**
      * @brief Combines two views in a _more specific_ one (friend function).
      * @tparam Id A valid entity type (see entt_traits for more details).
-     * @tparam ELhs Filter list of the first view.
      * @tparam CLhs Component list of the first view.
-     * @tparam ERhs Filter list of the second view.
+     * @tparam ELhs Filter list of the first view.
      * @tparam CRhs Component list of the second view.
+     * @tparam ERhs Filter list of the second view.
      * @return A more specific view.
      */
-    template<typename Id, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
-    friend auto operator|(const basic_view<Id, exclude_t<ELhs...>, CLhs...> &, const basic_view<Id, exclude_t<ERhs...>, CRhs...> &);
+    template<typename Id, typename... CLhs, typename... ELhs, typename... CRhs, typename... ERhs>
+    friend auto operator|(const basic_view<Id, get_t<CLhs...>, exclude_t<ELhs...>> &, const basic_view<Id, get_t<CRhs...>, exclude_t<ERhs...>> &);
 
 private:
     const std::tuple<storage_type *> pools;
     const std::tuple<> filter;
-};
-
-
-/**
- * @brief View implementation dispatcher.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Exclude Types of components used to filter the view.
- * @tparam Component Types of components iterated by the view.
- */
-template<typename Entity, typename... Exclude, typename... Component>
-struct basic_view<Entity, exclude_t<Exclude...>, Component...>
-    : basic_view_impl<internal::stable_iteration<(in_place_delete_v<std::remove_const_t<Component>> || ...)>, Entity, exclude_t<Exclude...>, Component...>
-{
-    /*! @brief Most restrictive storage policy of all component types. */
-    using storage_policy = internal::stable_iteration<(in_place_delete_v<std::remove_const_t<Component>> || ...)>;
-    using basic_view_impl<storage_policy, Entity, exclude_t<Exclude...>, Component...>::basic_view_impl;
 };
 
 
@@ -1001,23 +980,23 @@ struct basic_view<Entity, exclude_t<Exclude...>, Component...>
  */
 template<typename... Storage>
 basic_view(Storage &... storage)
--> basic_view<std::common_type_t<typename Storage::entity_type...>, exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
+-> basic_view<std::common_type_t<typename Storage::entity_type...>, get_t<constness_as_t<typename Storage::value_type, Storage>...>, exclude_t<>>;
 
 
 /**
  * @brief Combines two views in a _more specific_ one.
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam ELhs Filter list of the first view.
  * @tparam CLhs Component list of the first view.
- * @tparam ERhs Filter list of the second view.
+ * @tparam ELhs Filter list of the first view.
  * @tparam CRhs Component list of the second view.
+ * @tparam ERhs Filter list of the second view.
  * @param lhs A valid reference to the first view.
  * @param rhs A valid reference to the second view.
  * @return A more specific view.
  */
-template<typename Entity, typename... ELhs, typename... CLhs, typename... ERhs, typename... CRhs>
-[[nodiscard]] auto operator|(const basic_view<Entity, exclude_t<ELhs...>, CLhs...> &lhs, const basic_view<Entity, exclude_t<ERhs...>, CRhs...> &rhs) {
-    using view_type = basic_view<Entity, exclude_t<ELhs..., ERhs...>, CLhs..., CRhs...>;
+template<typename Entity, typename... CLhs, typename... ELhs, typename... CRhs, typename... ERhs>
+[[nodiscard]] auto operator|(const basic_view<Entity, get_t<CLhs...>, exclude_t<ELhs...>> &lhs, const basic_view<Entity, get_t<CRhs...>, exclude_t<ERhs...>> &rhs) {
+    using view_type = basic_view<Entity, get_t<CLhs..., CRhs...>, exclude_t<ELhs..., ERhs...>>;
     return std::make_from_tuple<view_type>(std::tuple_cat(
         std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, lhs.pools),
         std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, rhs.pools),

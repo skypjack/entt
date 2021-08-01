@@ -5,7 +5,6 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
-* remove view dispatcher, add support to relax policy constraints on user request (eg view.use<T>())
 * custom allocators all over
 
 WIP:

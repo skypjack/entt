@@ -23,7 +23,7 @@ namespace entt {
  * Primary template isn't defined on purpose. All the specializations give a
  * compile-time error, but for a few reasonable cases.
  */
-template<typename...>
+template<typename, typename, typename, typename>
 class basic_group;
 
 
@@ -60,11 +60,11 @@ class basic_group;
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Exclude Types of components used to filter the group.
  * @tparam Get Type of components observed by the group.
+ * @tparam Exclude Types of components used to filter the group.
  */
-template<typename Entity, typename... Exclude, typename... Get>
-class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
+template<typename Entity, typename... Get, typename... Exclude>
+class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
@@ -524,12 +524,12 @@ private:
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Exclude Types of components used to filter the group.
- * @tparam Get Types of components observed by the group.
  * @tparam Owned Types of components owned by the group.
+ * @tparam Get Types of components observed by the group.
+ * @tparam Exclude Types of components used to filter the group.
  */
-template<typename Entity, typename... Exclude, typename... Get, typename... Owned>
-class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final {
+template<typename Entity, typename... Owned, typename... Get, typename... Exclude>
+class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 

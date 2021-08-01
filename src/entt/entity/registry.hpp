@@ -1143,14 +1143,14 @@ public:
      * @return A newly created view.
      */
     template<typename... Component, typename... Exclude>
-    [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, std::add_const_t<Component>...> view(exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_view<Entity, get_t<std::add_const_t<Component>...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) const {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
         return { *assure<std::remove_const_t<Component>>()..., *assure<Exclude>()... };
     }
 
     /*! @copydoc view */
     template<typename... Component, typename... Exclude>
-    [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
+    [[nodiscard]] basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
         return { *assure<std::remove_const_t<Component>>()..., *assure<Exclude>()... };
     }
@@ -1229,7 +1229,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
+    [[nodiscard]] basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only groups are not supported");
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
 
@@ -1319,7 +1319,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<std::add_const_t<Get>...>, std::add_const_t<Owned>...> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_group<Entity, owned_t<std::add_const_t<Owned>...>, get_t<std::add_const_t<Get>...>, exclude_t<Exclude...>> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
             return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))
                 && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
@@ -1344,7 +1344,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) {
+    [[nodiscard]] basic_group<Entity, owned_t<Owned...>, get_t<>, exclude_t<Exclude...>> group(exclude_t<Exclude...> = {}) {
         return group<Owned...>(get_t<>{}, exclude<Exclude...>);
     }
 
@@ -1358,7 +1358,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<>, std::add_const_t<Owned>...> group_if_exists(exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_group<Entity, owned_t<std::add_const_t<Owned>...>, get_t<>, exclude_t<Exclude...>> group_if_exists(exclude_t<Exclude...> = {}) const {
         return group_if_exists<std::add_const_t<Owned>...>(get_t<>{}, exclude<Exclude...>);
     }
 
@@ -1381,7 +1381,7 @@ public:
      * @return True if the group can be sorted, false otherwise.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] bool sortable(const basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> &) ENTT_NOEXCEPT {
+    [[nodiscard]] bool sortable(const basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) ENTT_NOEXCEPT {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         return std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
             return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) && (size < gdata.size);

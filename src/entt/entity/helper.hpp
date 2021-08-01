@@ -38,7 +38,7 @@ struct as_view {
      * @return A newly created view.
      */
     template<typename Exclude, typename... Component>
-    operator basic_view<entity_type, Exclude, Component...>() const {
+    operator basic_view<entity_type, get_t<Component...>, Exclude>() const {
         return reg.template view<Component...>(Exclude{});
     }
 
@@ -82,13 +82,13 @@ struct as_group {
 
     /**
      * @brief Conversion function from a registry to a group.
-     * @tparam Exclude Types of components used to filter the group.
      * @tparam Get Types of components observed by the group.
+     * @tparam Exclude Types of components used to filter the group.
      * @tparam Owned Types of components owned by the group.
      * @return A newly created group.
      */
-    template<typename Exclude, typename Get, typename... Owned>
-    operator basic_group<entity_type, Exclude, Get, Owned...>() const {
+    template<typename Get, typename Exclude, typename... Owned>
+    operator basic_group<entity_type, owned_t<Owned...>, Get, Exclude>() const {
         if constexpr(std::is_const_v<registry_type>) {
             return reg.template group_if_exists<Owned...>(Get{}, Exclude{});
         } else {
