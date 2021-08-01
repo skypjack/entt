@@ -26,10 +26,6 @@ jobs:
             exe: clang++-10
           - pkg: clang
             exe: clang++
-        id_type: [uint32, uint64]
-        include:
-          - id_type: uint64
-            id_type_option: -DENTT_ID_TYPE=std::uint64_t
 
     runs-on: ubuntu-latest
 
@@ -44,7 +40,38 @@ jobs:
       env:
         CXX: ${{ matrix.compiler.exe }}
       run: |
-        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ${{ matrix.id_type_option }} ..
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
+        make -j4
+    - name: Run tests
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 10 -C Debug -j4
+
+  linux-extra:
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        compiler: [g++, clang++]
+        id_type: [uint32, uint64]
+        cxx_std: [cxx_std_17, cxx_std_20]
+        include:
+          - id_type: uint64
+            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
+          - cxx_std: cxx_std_20
+            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Compile tests
+      working-directory: build
+      env:
+        CXX: ${{ matrix.compiler }}
+      run: |
+        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
         make -j4
     - name: Run tests
       working-directory: build
@@ -59,14 +86,11 @@ jobs:
       matrix:
         os: [windows-latest, windows-2016]
         toolset: [clang-cl, default, v141]
-        id_type: [uint32, uint64]
         include:
           - toolset: clang-cl
             toolset_option: -T"ClangCl"
           - toolset: v141
             toolset_option: -T"v141"
-          - id_type: uint64
-            id_type_option: -DENTT_ID_TYPE=std::uint64_t
         exclude:
           - os: windows-2016
             toolset: clang-cl
@@ -80,7 +104,35 @@ jobs:
     - name: Compile tests
       working-directory: build
       run: |
-        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ${{ matrix.id_type_option }} ${{ matrix.toolset_option }} ..
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ${{ matrix.toolset_option }} ..
+        cmake --build . -j 4
+    - name: Run tests
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 10 -C Debug -j4
+
+  windows-extra:
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        id_type: [uint32, uint64]
+        cxx_std: [cxx_std_17, cxx_std_20]
+        include:
+          - id_type: uint64
+            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
+          - cxx_std: cxx_std_20
+            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Compile tests
+      working-directory: build
+      run: |
+        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
         cmake --build . -j 4
     - name: Run tests
       working-directory: build
@@ -90,13 +142,33 @@ jobs:
 
   macos:
     timeout-minutes: 10
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Compile tests
+      working-directory: build
+      run: |
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
+        make -j4
+    - name: Run tests
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 10 -C Debug -j4
+
+  macos-extra:
+    timeout-minutes: 10
 
     strategy:
       matrix:
         id_type: [uint32, uint64]
+        cxx_std: [cxx_std_17, cxx_std_20]
         include:
           - id_type: uint64
-            id_type_option: -DENTT_ID_TYPE=std::uint64_t
+            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
+          - cxx_std: cxx_std_20
+            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
 
     runs-on: macOS-latest
 
@@ -105,7 +177,7 @@ jobs:
     - name: Compile tests
       working-directory: build
       run: |
-        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ${{ matrix.id_type_option }} ..
+        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
         make -j4
     - name: Run tests
       working-directory: build
