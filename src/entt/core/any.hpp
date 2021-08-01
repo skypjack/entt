@@ -47,7 +47,7 @@ class basic_any {
 
     template<typename Type>
     [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
-        if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
+        if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
             return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
         } else {
             return lhs == rhs;
