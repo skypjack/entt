@@ -99,7 +99,7 @@ struct MetaType: ::testing::Test {
         entt::meta<double>()
             .type("double"_hs)
             .conv<int>()
-            .data<&set<double>, &get<double>>("var"_hs);
+            .data<set<double>, get<double>>("var"_hs);
 
         entt::meta<unsigned int>()
             .type("unsigned int"_hs)
@@ -144,7 +144,7 @@ struct MetaType: ::testing::Test {
                 .prop([]() { return property_t::key_only; })
             .data<property_t::list>("list"_hs)
                .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
-            .data<&set<property_t>, &get<property_t>>("var"_hs);
+            .data<set<property_t>, get<property_t>>("var"_hs);
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
@@ -152,7 +152,7 @@ struct MetaType: ::testing::Test {
             .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
-            .func<&clazz_t::func>("func"_hs);
+            .func<clazz_t::func>("func"_hs);
     }
 
     void TearDown() override {

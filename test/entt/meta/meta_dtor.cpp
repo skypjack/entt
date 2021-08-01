@@ -27,7 +27,7 @@ struct MetaDtor: ::testing::Test {
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
-            .dtor<&clazz_t::destroy_decr>();
+            .dtor<clazz_t::destroy_decr>();
 
         clazz_t::counter = 0;
     }
@@ -104,7 +104,7 @@ TEST_F(MetaDtor, ReRegistration) {
 
     ASSERT_NE(node->dtor, nullptr);
 
-    entt::meta<clazz_t>().dtor<&clazz_t::destroy_incr>();
+    entt::meta<clazz_t>().dtor<clazz_t::destroy_incr>();
     entt::resolve<clazz_t>().construct().reset();
 
     ASSERT_EQ(clazz_t::counter, 2);

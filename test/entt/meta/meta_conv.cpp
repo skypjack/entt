@@ -22,7 +22,7 @@ struct MetaConv: ::testing::Test {
         entt::meta<clazz_t>()
             .type("clazz"_hs)
             .conv<int>()
-            .conv<&conv_to_double>();
+            .conv<conv_to_double>();
     }
 
     void TearDown() override {

@@ -6,6 +6,7 @@
 
 struct base_t {
     virtual ~base_t() = default;
+
     static void destroy(base_t &) {
         ++counter;
     }
@@ -82,13 +83,13 @@ struct MetaData: ::testing::Test {
 
         entt::meta<base_t>()
             .type("base"_hs)
-            .dtor<&base_t::destroy>()
+            .dtor<base_t::destroy>()
             .data<&base_t::value>("value"_hs);
 
         entt::meta<derived_t>()
             .type("derived"_hs)
             .base<base_t>()
-            .dtor<&derived_t::destroy>();
+            .dtor<derived_t::destroy>();
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)

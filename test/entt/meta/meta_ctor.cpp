@@ -39,7 +39,7 @@ struct MetaCtor: ::testing::Test {
         entt::meta<double>()
             .type("double"_hs)
             .conv<int>()
-            .ctor<&double_factory>();
+            .ctor<double_factory>();
 
         entt::meta<derived_t>()
             .type("derived"_hs)
@@ -50,8 +50,8 @@ struct MetaCtor: ::testing::Test {
             .ctor<&entt::registry::emplace_or_replace<clazz_t, const int &, const char &>, entt::as_ref_t>()
             .ctor<const base_t &, int>()
             .ctor<const int &, char>().prop(3, false)
-            .ctor<entt::overload<clazz_t(int)>(&clazz_t::factory)>().prop('c', 42)
-            .ctor<entt::overload<clazz_t(base_t, int, int)>(&clazz_t::factory)>();
+            .ctor<entt::overload<clazz_t(int)>(clazz_t::factory)>().prop('c', 42)
+            .ctor<entt::overload<clazz_t(base_t, int, int)>(clazz_t::factory)>();
     }
 
     void TearDown() override {

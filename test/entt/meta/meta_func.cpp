@@ -8,6 +8,7 @@
 
 struct base_t {
     virtual ~base_t() = default;
+
     static void destroy(base_t &) {
         ++counter;
     }
@@ -71,13 +72,13 @@ struct MetaFunc: ::testing::Test {
 
         entt::meta<base_t>()
             .type("base"_hs)
-            .dtor<&base_t::destroy>()
+            .dtor<base_t::destroy>()
             .func<&base_t::func>("func"_hs);
 
         entt::meta<derived_t>()
             .type("derived"_hs)
             .base<base_t>()
-            .dtor<&derived_t::destroy>();
+            .dtor<derived_t::destroy>();
 
         entt::meta<func_t>()
             .type("func"_hs)
@@ -86,8 +87,8 @@ struct MetaFunc: ::testing::Test {
             .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs).prop(true, false)
             .func<entt::overload<int(int) const>(&func_t::f)>("f1"_hs).prop(true, false)
             .func<&func_t::g>("g"_hs).prop(true, false)
-            .func<&func_t::h>("h"_hs).prop(true, false)
-            .func<&func_t::k>("k"_hs).prop(true, false)
+            .func<func_t::h>("h"_hs).prop(true, false)
+            .func<func_t::k>("k"_hs).prop(true, false)
             .func<&func_t::v, entt::as_void_t>("v"_hs)
             .func<&func_t::a, entt::as_ref_t>("a"_hs)
             .func<&func_t::a, entt::as_cref_t>("ca"_hs);

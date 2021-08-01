@@ -66,18 +66,18 @@ struct MetaAny: ::testing::Test {
 
         entt::meta<empty_t>()
             .type("empty"_hs)
-            .dtor<&empty_t::destroy>();
+            .dtor<empty_t::destroy>();
 
         entt::meta<fat_t>()
             .type("fat"_hs)
             .base<empty_t>()
-            .dtor<&fat_t::destroy>();
+            .dtor<fat_t::destroy>();
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
-            .func<&clazz_t::func>("func"_hs);
+            .func<clazz_t::func>("func"_hs);
 
         empty_t::destroy_counter = 0;
         empty_t::destructor_counter = 0;
