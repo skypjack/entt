@@ -994,14 +994,17 @@ basic_view(Storage &... storage)
  * @param rhs A valid reference to the second view.
  * @return A more specific view.
  */
+template<typename S>
+using foobar = typename S::storage_type;
+
 template<typename Entity, typename... CLhs, typename... ELhs, typename... CRhs, typename... ERhs>
 [[nodiscard]] auto operator|(const basic_view<Entity, get_t<CLhs...>, exclude_t<ELhs...>> &lhs, const basic_view<Entity, get_t<CRhs...>, exclude_t<ERhs...>> &rhs) {
     using view_type = basic_view<Entity, get_t<CLhs..., CRhs...>, exclude_t<ELhs..., ERhs...>>;
     return std::make_from_tuple<view_type>(std::tuple_cat(
         std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, lhs.pools),
         std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, rhs.pools),
-        std::apply([](const auto *... curr) { return std::forward_as_tuple(*static_cast<const typename storage_traits<Entity, std::remove_const_t<ELhs>>::storage_type *>(curr)...); }, lhs.filter),
-        std::apply([](const auto *... curr) { return std::forward_as_tuple(*static_cast<const typename storage_traits<Entity, std::remove_const_t<ERhs>>::storage_type *>(curr)...); }, rhs.filter)
+        std::apply([](const auto *... curr) { return std::forward_as_tuple(static_cast<const typename view_type::template storage_type<ELhs> &>(*curr)...); }, lhs.filter),
+        std::apply([](const auto *... curr) { return std::forward_as_tuple(static_cast<const typename view_type::template storage_type<ERhs> &>(*curr)...); }, rhs.filter)
     ));
 }
 
