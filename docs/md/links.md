@@ -25,9 +25,6 @@ I hope this list can grow much more in the future:
     to play online.
   * [Antkeeper](https://github.com/antkeeper/antkeeper-source): an ant colony
     simulation [game](https://antkeeper.com/).
-  * [War of Rights](https://store.steampowered.com/app/424030/War_of_Rights/): a
-    multiplayer game set during the perilous days of the American Civil War, by
-    Campfire Games.
   * [Openblack](https://github.com/openblack/openblack): open source
     reimplementation of the game _Black & White_ (2001).
   * [Land of the Rair](https://github.com/LandOfTheRair/core2): the new backend
@@ -78,6 +75,8 @@ I hope this list can grow much more in the future:
     simulator using C++ with some reinforcement learning.
   * [Black Sun](https://store.steampowered.com/app/1670930/Black_Sun/): fly your
     space ship through a large 2D open world.
+  * [PokeMaster](https://github.com/utilForever/PokeMaster): Pokemon Battle
+    simulator using C++ with some reinforcement learning.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
@@ -194,6 +193,8 @@ I hope this list can grow much more in the future:
     controller emulator and renderer.
   * [Ragdoll](https://ragdolldynamics.com/): real-time physics for Autodesk Maya
     2020.
+  * [Project Lagrange](https://github.com/adobe/lagrange): a robust geometry
+    processing library by [Adobe](https://github.com/adobe).
   * [AtomicDEX](https://github.com/KomodoPlatform/atomicDEX-Desktop): a secure
     wallet and non-custodial decentralized exchange rolled into one application.
   * [Apparently](https://www.linkedin.com/in/skypjack/)
