@@ -61,18 +61,11 @@ function(SETUP_TARGET TARGET_NAME)
     target_compile_definitions(
         ${TARGET_NAME}
         PRIVATE
+            ENTT_ID_TYPE=${ENTT_ID_TYPE}
             _ENABLE_EXTENDED_ALIGNED_STORAGE
             NOMINMAX
             ${ARGN}
     )
-
-    if(ENTT_BUILD_UINT64)
-        target_compile_definitions(
-            ${TARGET_NAME}
-            PRIVATE
-                ENTT_ID_TYPE=std::uint64_t
-        )
-    endif()
 endfunction()
 
 add_library(odr OBJECT odr.cpp)

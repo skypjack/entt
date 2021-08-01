@@ -173,7 +173,8 @@ if(ENTT_BUILD_TESTING)
     option(ENTT_BUILD_EXAMPLE "Build examples." OFF)
     option(ENTT_BUILD_LIB "Build lib tests." OFF)
     option(ENTT_BUILD_SNAPSHOT "Build snapshot test with Cereal." OFF)
-    option(ENTT_BUILD_UINT64 "Build using 64b entity identifiers" OFF)
+
+    set(ENTT_ID_TYPE std::uint32_t CACHE STRING "Type of identifiers to use for the tests")
 
     include(CTest)
     enable_testing()

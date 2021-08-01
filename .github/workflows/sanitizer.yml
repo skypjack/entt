@@ -13,7 +13,7 @@ jobs:
         id_type: [uint32, uint64]
         include:
           - id_type: uint64
-            id_type_option: -DENTT_BUILD_UINT64=ON
+            id_type_option: -DENTT_ID_TYPE=std::uint64_t
 
     runs-on: ubuntu-latest
 
