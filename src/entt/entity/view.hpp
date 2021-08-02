@@ -303,8 +303,8 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         };
 
     public:
-        using iterator = iterable_iterator<typename basic_view::iterator>;
-        using reverse_iterator = iterable_iterator<typename basic_view::reverse_iterator>;
+        using iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>>;
+        using reverse_iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>>;
 
         iterable(const basic_view &parent)
             : view{parent}
