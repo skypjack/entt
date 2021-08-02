@@ -303,8 +303,8 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         };
 
     public:
-        using iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>>;
-        using reverse_iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>>;
+        using iterator = iterable_iterator<typename basic_view::iterator>;
+        using reverse_iterator = iterable_iterator<typename basic_view::reverse_iterator>;
 
         iterable(const basic_view &parent)
             : view{parent}
@@ -349,22 +349,6 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
             return std::forward_as_tuple(std::get<Args>(curr)...);
         } else {
             return std::get<storage_type<Other> *>(pools)->get_as_tuple(std::get<0>(curr));
-        }
-    }
-
-    template<typename Comp, typename Func>
-    void traverse(Func func) const {
-        for(const auto curr: internal::iterable_storage<Entity, Comp>{*std::get<storage_type<Comp> *>(pools)}) {
-            if(internal::policy_dispatcher<in_place_delete_v<std::remove_const_t<Comp>>>::accept(std::get<0>(curr))
-                && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(std::get<0>(curr))) && ...)
-                && std::apply([entt = std::get<0>(curr)](const auto *... cpool) { return (!cpool->contains(entt) && ...); }, filter))
-            {
-                if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
-                    std::apply(func, std::tuple_cat(std::make_tuple(std::get<0>(curr)), dispatch_get<Comp, Component>(curr)...));
-                } else {
-                    std::apply(func, std::tuple_cat(dispatch_get<Comp, Component>(curr)...));
-                }
-            }
         }
     }
 
@@ -575,7 +559,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        ((std::get<storage_type<Component> *>(pools) == view ? traverse<Component>(std::move(func)) : void()), ...);
+        ((std::get<storage_type<Component> *>(pools) == view ? each<Component>(std::move(func)) : void()), ...);
     }
 
     /**
@@ -594,8 +578,18 @@ public:
      */
     template<typename Comp, typename Func>
     void each(Func func) const {
-        use<Comp>();
-        traverse<Comp>(std::move(func));
+        for(const auto curr: internal::iterable_storage<Entity, Comp>{*std::get<storage_type<Comp> *>(pools)}) {
+            if(internal::policy_dispatcher<in_place_delete_v<std::remove_const_t<Comp>>>::accept(std::get<0>(curr))
+                && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(std::get<0>(curr))) && ...)
+                && std::apply([entt = std::get<0>(curr)](const auto *... cpool) { return (!cpool->contains(entt) && ...); }, filter))
+            {
+                if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+                    std::apply(func, std::tuple_cat(std::make_tuple(std::get<0>(curr)), dispatch_get<Comp, Component>(curr)...));
+                } else {
+                    std::apply(func, std::tuple_cat(dispatch_get<Comp, Component>(curr)...));
+                }
+            }
+        }
     }
 
     /**
@@ -629,8 +623,9 @@ public:
      */
     template<typename Comp>
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        use<Comp>();
-        return iterable_view{*this};
+        basic_view other{*this};
+        other.view = std::get<storage_type<Comp> *>(pools);
+        return iterable_view{std::move(other)};
     }
 
     /**
