@@ -992,9 +992,6 @@ basic_view(Storage &... storage)
  * @param rhs A valid reference to the second view.
  * @return A more specific view.
  */
-template<typename S>
-using foobar = typename S::storage_type;
-
 template<typename Entity, typename... CLhs, typename... ELhs, typename... CRhs, typename... ERhs>
 [[nodiscard]] auto operator|(const basic_view<Entity, get_t<CLhs...>, exclude_t<ELhs...>> &lhs, const basic_view<Entity, get_t<CRhs...>, exclude_t<ERhs...>> &rhs) {
     using view_type = basic_view<Entity, get_t<CLhs..., CRhs...>, exclude_t<ELhs..., ERhs...>>;
