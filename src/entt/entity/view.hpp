@@ -390,12 +390,15 @@ public:
     {}
 
     /**
-     * @brief Forces the type to use to drive iterations.
+     * @brief Creates a new view driven by a given type in its iterations.
      * @tparam Comp Type of component to use to drive the iteration.
+     * @return A new view driven by the given type in its iterations.
      */
     template<typename Comp>
-    void use() const ENTT_NOEXCEPT {
-        view = std::get<storage_type<Comp> *>(pools);
+    [[nodiscard]] basic_view use() const ENTT_NOEXCEPT {
+        basic_view other{*this};
+        other.view = std::get<storage_type<Comp> *>(pools);
+        return other;
     }
 
     /**
@@ -641,9 +644,9 @@ public:
     friend auto operator|(const basic_view<Id, get_t<CLhs...>, exclude_t<ELhs...>> &, const basic_view<Id, get_t<CRhs...>, exclude_t<ERhs...>> &);
 
 private:
-    const std::tuple<storage_type<Component> *...> pools;
-    const std::array<const basic_common_type *, sizeof...(Exclude)> filter;
-    mutable const basic_common_type *view;
+    std::tuple<storage_type<Component> *...> pools;
+    std::array<const basic_common_type *, sizeof...(Exclude)> filter;
+    const basic_common_type *view;
 };
 
 
@@ -963,8 +966,8 @@ public:
     friend auto operator|(const basic_view<Id, get_t<CLhs...>, exclude_t<ELhs...>> &, const basic_view<Id, get_t<CRhs...>, exclude_t<ERhs...>> &);
 
 private:
-    const std::tuple<storage_type *> pools;
-    const std::tuple<> filter;
+    std::tuple<storage_type *> pools;
+    std::tuple<> filter;
 };
 
 

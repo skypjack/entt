@@ -1033,7 +1033,7 @@ TEST(MultiComponentView, StableType) {
 
     ASSERT_EQ(view.size_hint(), 1u);
 
-    view.use<stable_type>();
+    view = view.use<stable_type>();
 
     ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_FALSE(view.contains(entity));
