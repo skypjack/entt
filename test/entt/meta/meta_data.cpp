@@ -465,7 +465,6 @@ TEST_F(MetaData, ArrayStatic) {
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
-    ASSERT_EQ(data.type().extent(), 3u);
     ASSERT_FALSE(data.get({}));
 }
 
@@ -481,7 +480,6 @@ TEST_F(MetaData, Array) {
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
-    ASSERT_EQ(data.type().extent(), 5u);
     ASSERT_FALSE(data.get(instance));
 }
 

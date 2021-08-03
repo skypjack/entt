@@ -403,9 +403,9 @@ struct meta_factory<Type> {
                 {},
                 nullptr,
                 nullptr,
-                internal::meta_trait::IS_NONE
-                    | ((std::is_same_v<Type, data_type> || std::is_const_v<data_type>) ? internal::meta_trait::IS_CONST : internal::meta_trait::IS_NONE)
-                    | internal::meta_trait::IS_STATIC,
+                internal::meta_traits::IS_NONE
+                    | ((std::is_same_v<Type, data_type> || std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE)
+                    | internal::meta_traits::IS_STATIC,
                 internal::meta_info<data_type>::resolve(),
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>
@@ -452,8 +452,8 @@ struct meta_factory<Type> {
             {},
             nullptr,
             nullptr,
-            internal::meta_trait::IS_NONE
-                | ((std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) ? internal::meta_trait::IS_CONST : internal::meta_trait::IS_NONE)
+            internal::meta_traits::IS_NONE
+                | ((std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE)
                 /* this is never static */,
             internal::meta_info<underlying_type>::resolve(),
             &meta_setter<Type, Setter>,
@@ -494,9 +494,9 @@ struct meta_factory<Type> {
             nullptr,
             nullptr,
             descriptor::args_type::size,
-            internal::meta_trait::IS_NONE
-                | (descriptor::is_const ? internal::meta_trait::IS_CONST : internal::meta_trait::IS_NONE)
-                | (descriptor::is_static ? internal::meta_trait::IS_STATIC : internal::meta_trait::IS_NONE),
+            internal::meta_traits::IS_NONE
+                | (descriptor::is_const ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE)
+                | (descriptor::is_static ? internal::meta_traits::IS_STATIC : internal::meta_traits::IS_NONE),
             internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename descriptor::return_type>>::resolve(),
             &meta_arg<typename descriptor::args_type>,
             &meta_invoke<Type, Candidate, Policy>

@@ -819,7 +819,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_CONST);
+        return (node->traits & internal::meta_traits::IS_CONST);
     }
 
     /**
@@ -827,7 +827,7 @@ struct meta_data {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_STATIC);
+        return (node->traits & internal::meta_traits::IS_STATIC);
     }
 
     /*! @copydoc meta_any::type */
@@ -928,7 +928,7 @@ struct meta_func {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_CONST);
+        return (node->traits & internal::meta_traits::IS_CONST);
     }
 
     /**
@@ -936,7 +936,7 @@ struct meta_func {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_STATIC);
+        return (node->traits & internal::meta_traits::IS_STATIC);
     }
 
     /**
@@ -1103,7 +1103,7 @@ public:
      * @return True if the underlying type is an integral type, false otherwise.
      */
     [[nodiscard]] bool is_integral() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_INTEGRAL);
+        return (node->traits & internal::meta_traits::IS_INTEGRAL);
     }
 
     /**
@@ -1112,7 +1112,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_floating_point() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_FLOATING_POINT);
+        return (node->traits & internal::meta_traits::IS_FLOATING_POINT);
     }
 
     /**
@@ -1120,7 +1120,7 @@ public:
      * @return True if the underlying type is an array type, false otherwise.
      */
     [[nodiscard]] bool is_array() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_ARRAY);
+        return (node->traits & internal::meta_traits::IS_ARRAY);
     }
 
     /**
@@ -1128,7 +1128,7 @@ public:
      * @return True if the underlying type is an enum, false otherwise.
      */
     [[nodiscard]] bool is_enum() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_ENUM);
+        return (node->traits & internal::meta_traits::IS_ENUM);
     }
 
     /**
@@ -1136,7 +1136,7 @@ public:
      * @return True if the underlying type is an union, false otherwise.
      */
     [[nodiscard]] bool is_union() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_UNION);
+        return (node->traits & internal::meta_traits::IS_UNION);
     }
 
     /**
@@ -1144,7 +1144,7 @@ public:
      * @return True if the underlying type is a class, false otherwise.
      */
     [[nodiscard]] bool is_class() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_CLASS);
+        return (node->traits & internal::meta_traits::IS_CLASS);
     }
 
     /**
@@ -1152,7 +1152,7 @@ public:
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_POINTER);
+        return (node->traits & internal::meta_traits::IS_POINTER);
     }
 
     /**
@@ -1161,7 +1161,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_function_pointer() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_FUNCTION_POINTER);
+        return (node->traits & internal::meta_traits::IS_FUNCTION_POINTER);
     }
 
     /**
@@ -1170,7 +1170,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_member_object_pointer() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_MEMBER_OBJECT_POINTER);
+        return (node->traits & internal::meta_traits::IS_MEMBER_OBJECT_POINTER);
     }
 
     /**
@@ -1180,7 +1180,7 @@ public:
      * false otherwise.
      */
     [[nodiscard]] bool is_member_function_pointer() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_MEMBER_FUNCTION_POINTER);
+        return (node->traits & internal::meta_traits::IS_MEMBER_FUNCTION_POINTER);
     }
 
     /**
@@ -1189,7 +1189,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_pointer_like() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_META_POINTER_LIKE);
+        return (node->traits & internal::meta_traits::IS_META_POINTER_LIKE);
     }
 
     /**
@@ -1197,7 +1197,7 @@ public:
      * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_META_SEQUENCE_CONTAINER);
+        return (node->traits & internal::meta_traits::IS_META_SEQUENCE_CONTAINER);
     }
 
     /**
@@ -1205,7 +1205,7 @@ public:
      * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_trait::IS_META_ASSOCIATIVE_CONTAINER);
+        return (node->traits & internal::meta_traits::IS_META_ASSOCIATIVE_CONTAINER);
     }
 
     /**
@@ -1244,42 +1244,6 @@ public:
      */
     [[nodiscard]] inline meta_type template_arg(const size_type index) const ENTT_NOEXCEPT {
         return index < template_arity() ? node->templ->arg(index) : meta_type{};
-    }
-
-    /**
-     * @brief Provides the number of dimensions of an array type.
-     * @return The number of dimensions in case of array types, 0 otherwise.
-     */
-    [[nodiscard]] size_type rank() const ENTT_NOEXCEPT {
-        return node->rank;
-    }
-
-    /**
-     * @brief The number of elements along the given dimension of an array type.
-     * @param dim The dimension of which to return the number of elements.
-     * @return The number of elements along the given dimension in case of array
-     * types, 0 otherwise.
-     */
-    [[nodiscard]] size_type extent(const size_type dim = {}) const ENTT_NOEXCEPT {
-        return node->extent(dim);
-    }
-
-    /**
-     * @brief Provides the type for which the pointer is defined.
-     * @return The type for which the pointer is defined or this type if it
-     * doesn't refer to a pointer type.
-     */
-    [[nodiscard]] meta_type remove_pointer() const ENTT_NOEXCEPT {
-        return node->remove_pointer();
-    }
-
-    /**
-     * @brief Provides the type for which the array is defined.
-     * @return The type for which the array is defined or this type if it
-     * doesn't refer to an array type.
-     */
-    [[nodiscard]] meta_type remove_extent() const ENTT_NOEXCEPT {
-        return node->remove_extent();
     }
 
     /**

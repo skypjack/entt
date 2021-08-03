@@ -278,7 +278,6 @@ TEST(MetaPointerLike, DereferencePointerToVoid) {
     auto test = [](entt::meta_any any) {
         ASSERT_TRUE(any.type().is_pointer());
         ASSERT_TRUE(any.type().is_pointer_like());
-        ASSERT_EQ(any.type().remove_pointer(), entt::resolve<void>());
 
         auto deref = *any;
 
@@ -308,7 +307,6 @@ TEST(MetaPointerLike, DereferencePointerToFunction) {
     auto test = [](entt::meta_any any) {
         ASSERT_TRUE(any.type().is_pointer());
         ASSERT_TRUE(any.type().is_pointer_like());
-        ASSERT_EQ(any.type().remove_pointer(), entt::resolve<int()>());
         ASSERT_NE(any.try_cast<int(*)()>(), nullptr);
         ASSERT_EQ(any.cast<int(*)()>()(), 42);
     };
