@@ -259,6 +259,9 @@ class basic_view;
  */
 template<typename Entity, typename... Component, typename... Exclude>
 class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
+    template<typename, typename, typename, typename>
+    friend class basic_view;
+
     using basic_common_type = std::common_type_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type::base_type...>;
     using policy_type = internal::policy_dispatcher<(in_place_delete_v<std::remove_const_t<Component>> || ...)>;
 
@@ -633,15 +636,22 @@ public:
 
     /**
      * @brief Combines two views in a _more specific_ one (friend function).
-     * @tparam Id A valid entity type (see entt_traits for more details).
-     * @tparam CLhs Component list of the first view.
-     * @tparam ELhs Filter list of the first view.
-     * @tparam CRhs Component list of the second view.
-     * @tparam ERhs Filter list of the second view.
+     * @tparam Get Component list of the view to combine with.
+     * @tparam Excl Filter list of the view to combine with.
+     * @param other The view to combine with.
      * @return A more specific view.
      */
-    template<typename Id, typename... CLhs, typename... ELhs, typename... CRhs, typename... ERhs>
-    friend auto operator|(const basic_view<Id, get_t<CLhs...>, exclude_t<ELhs...>> &, const basic_view<Id, get_t<CRhs...>, exclude_t<ERhs...>> &);
+    template<typename... Get, typename... Excl>
+    [[nodiscard]] auto operator|(const basic_view<Entity, get_t<Get...>, exclude_t<Excl...>> &other) const ENTT_NOEXCEPT {
+        using view_type = basic_view<Entity, get_t<Component..., Get...>, exclude_t<Exclude..., Excl...>>;
+        return std::make_from_tuple<view_type>(std::tuple_cat(
+            std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, pools),
+            std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, other.pools),
+            std::apply([](const auto *... curr) { return std::forward_as_tuple(static_cast<const storage_type<Exclude> &>(*curr)...); }, filter),
+            std::apply([](const auto *... curr) { return std::forward_as_tuple(static_cast<const storage_type<Excl> &>(*curr)...); }, other.filter)
+        ));
+    }
+
 
 private:
     std::tuple<storage_type<Component> *...> pools;
@@ -686,6 +696,9 @@ class basic_view<Entity, get_t<Component>, exclude_t<>,
     // Yeah, there is a reason why void_t and enable_if_t were combined here. Try removing the first one and let me know. :)
     std::void_t<std::enable_if_t<!in_place_delete_v<std::remove_const_t<Component>>>>
 > {
+    template<typename, typename, typename, typename>
+    friend class basic_view;
+
     using basic_common_type = typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type::base_type;
 
 public:
@@ -955,15 +968,20 @@ public:
 
     /**
      * @brief Combines two views in a _more specific_ one (friend function).
-     * @tparam Id A valid entity type (see entt_traits for more details).
-     * @tparam CLhs Component list of the first view.
-     * @tparam ELhs Filter list of the first view.
-     * @tparam CRhs Component list of the second view.
-     * @tparam ERhs Filter list of the second view.
+     * @tparam Get Component list of the view to combine with.
+     * @tparam Excl Filter list of the view to combine with.
+     * @param other The view to combine with.
      * @return A more specific view.
      */
-    template<typename Id, typename... CLhs, typename... ELhs, typename... CRhs, typename... ERhs>
-    friend auto operator|(const basic_view<Id, get_t<CLhs...>, exclude_t<ELhs...>> &, const basic_view<Id, get_t<CRhs...>, exclude_t<ERhs...>> &);
+    template<typename... Get, typename... Excl>
+    [[nodiscard]] auto operator|(const basic_view<Entity, get_t<Get...>, exclude_t<Excl...>> &other) const ENTT_NOEXCEPT {
+        using view_type = basic_view<Entity, get_t<Component, Get...>, exclude_t<Excl...>>;
+        return std::make_from_tuple<view_type>(std::tuple_cat(
+            std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, pools),
+            std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, other.pools),
+            std::apply([](const auto *... curr) { return std::forward_as_tuple(static_cast<const typename view_type::template storage_type<Excl> &>(*curr)...); }, other.filter)
+        ));
+    }
 
 private:
     std::tuple<storage_type *> pools;
@@ -979,29 +997,6 @@ private:
 template<typename... Storage>
 basic_view(Storage &... storage)
 -> basic_view<std::common_type_t<typename Storage::entity_type...>, get_t<constness_as_t<typename Storage::value_type, Storage>...>, exclude_t<>>;
-
-
-/**
- * @brief Combines two views in a _more specific_ one.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam CLhs Component list of the first view.
- * @tparam ELhs Filter list of the first view.
- * @tparam CRhs Component list of the second view.
- * @tparam ERhs Filter list of the second view.
- * @param lhs A valid reference to the first view.
- * @param rhs A valid reference to the second view.
- * @return A more specific view.
- */
-template<typename Entity, typename... CLhs, typename... ELhs, typename... CRhs, typename... ERhs>
-[[nodiscard]] auto operator|(const basic_view<Entity, get_t<CLhs...>, exclude_t<ELhs...>> &lhs, const basic_view<Entity, get_t<CRhs...>, exclude_t<ERhs...>> &rhs) {
-    using view_type = basic_view<Entity, get_t<CLhs..., CRhs...>, exclude_t<ELhs..., ERhs...>>;
-    return std::make_from_tuple<view_type>(std::tuple_cat(
-        std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, lhs.pools),
-        std::apply([](auto *... curr) { return std::forward_as_tuple(*curr...); }, rhs.pools),
-        std::apply([](const auto *... curr) { return std::forward_as_tuple(static_cast<const typename view_type::template storage_type<ELhs> &>(*curr)...); }, lhs.filter),
-        std::apply([](const auto *... curr) { return std::forward_as_tuple(static_cast<const typename view_type::template storage_type<ERhs> &>(*curr)...); }, rhs.filter)
-    ));
-}
 
 
 }

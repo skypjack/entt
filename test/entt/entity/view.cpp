@@ -1087,13 +1087,13 @@ TEST(View, Pipe) {
 
     static_assert(std::is_same_v<entt::basic_view<entt::entity, entt::get_t<int, const char>, entt::exclude_t<double, float>>, decltype(view1 | view2)>);
     static_assert(std::is_same_v<entt::basic_view<entt::entity, entt::get_t<const char, int>, entt::exclude_t<float, double>>, decltype(view2 | view1)>);
-    static_assert(std::is_same_v<decltype((view1 | view2) | view3), decltype(view1 | (view2 | view3))>);
+    static_assert(std::is_same_v<decltype((view3 | view2) | view1), decltype(view3 | (view2 | view1))>);
 
     ASSERT_FALSE((view1 | view2).contains(entity));
     ASSERT_TRUE((view1 | view2).contains(other));
 
-    ASSERT_TRUE((view2 | view3).contains(entity));
-    ASSERT_FALSE((view2 | view3).contains(other));
+    ASSERT_TRUE((view3 | view2).contains(entity));
+    ASSERT_FALSE((view3 | view2).contains(other));
 
     ASSERT_FALSE((view1 | view2 | view3).contains(entity));
     ASSERT_FALSE((view1 | view2 | view3).contains(other));
