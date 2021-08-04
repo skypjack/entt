@@ -41,7 +41,6 @@ enum meta_traits: std::uint32_t {
     IS_UNION = 0x0040,
     IS_CLASS = 0x0080,
     IS_POINTER = 0x0100,
-    IS_FUNCTION_POINTER = 0x0200,
     IS_MEMBER_OBJECT_POINTER = 0x0400,
     IS_MEMBER_FUNCTION_POINTER = 0x0800,
     IS_META_POINTER_LIKE = 0x1000,
@@ -191,7 +190,6 @@ public:
                 | (std::is_union_v<Type> ? internal::meta_traits::IS_UNION : internal::meta_traits::IS_NONE)
                 | (std::is_class_v<Type> ? internal::meta_traits::IS_CLASS : internal::meta_traits::IS_NONE)
                 | (std::is_pointer_v<Type> ? internal::meta_traits::IS_POINTER : internal::meta_traits::IS_NONE)
-                | (std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>> ? internal::meta_traits::IS_FUNCTION_POINTER : internal::meta_traits::IS_NONE)
                 | (std::is_member_object_pointer_v<Type> ? internal::meta_traits::IS_MEMBER_OBJECT_POINTER : internal::meta_traits::IS_NONE)
                 | (std::is_member_function_pointer_v<Type> ? internal::meta_traits::IS_MEMBER_FUNCTION_POINTER : internal::meta_traits::IS_NONE)
                 | (is_meta_pointer_like_v<Type> ? internal::meta_traits::IS_META_POINTER_LIKE : internal::meta_traits::IS_NONE)

@@ -1156,15 +1156,6 @@ public:
     }
 
     /**
-     * @brief Checks whether a type refers to a function pointer or not.
-     * @return True if the underlying type is a function pointer, false
-     * otherwise.
-     */
-    [[nodiscard]] bool is_function_pointer() const ENTT_NOEXCEPT {
-        return (node->traits & internal::meta_traits::IS_FUNCTION_POINTER);
-    }
-
-    /**
      * @brief Checks whether a type refers to a pointer to data member or not.
      * @return True if the underlying type is a pointer to data member, false
      * otherwise.

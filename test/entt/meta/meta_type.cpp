@@ -238,9 +238,6 @@ TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<int *>().is_pointer());
     ASSERT_FALSE(entt::resolve<int>().is_pointer());
 
-    ASSERT_TRUE(entt::resolve<decltype(&clazz_t::func)>().is_function_pointer());
-    ASSERT_FALSE(entt::resolve<decltype(&clazz_t::member)>().is_function_pointer());
-
     ASSERT_TRUE(entt::resolve<decltype(&clazz_t::value)>().is_member_object_pointer());
     ASSERT_FALSE(entt::resolve<decltype(&clazz_t::member)>().is_member_object_pointer());
 
