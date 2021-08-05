@@ -7,6 +7,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/attribute.h"
+#include "../core/enum.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
@@ -30,7 +31,7 @@ struct meta_handle;
 namespace internal {
 
 
-enum meta_traits: std::uint32_t {
+enum class meta_traits: std::uint32_t {
     IS_NONE = 0x0000,
     IS_CONST = 0x0001,
     IS_STATIC = 0x0002,
@@ -41,11 +42,12 @@ enum meta_traits: std::uint32_t {
     IS_UNION = 0x0040,
     IS_CLASS = 0x0080,
     IS_POINTER = 0x0100,
-    IS_MEMBER_OBJECT_POINTER = 0x0400,
-    IS_MEMBER_FUNCTION_POINTER = 0x0800,
-    IS_META_POINTER_LIKE = 0x1000,
-    IS_META_SEQUENCE_CONTAINER = 0x2000,
-    IS_META_ASSOCIATIVE_CONTAINER = 0x4000
+    IS_MEMBER_OBJECT_POINTER = 0x0200,
+    IS_MEMBER_FUNCTION_POINTER = 0x0400,
+    IS_META_POINTER_LIKE = 0x0800,
+    IS_META_SEQUENCE_CONTAINER = 0x1000,
+    IS_META_ASSOCIATIVE_CONTAINER = 0x2000,
+    _entt_enum_as_bitmask
 };
 
 
@@ -87,7 +89,7 @@ struct meta_data_node {
     id_type id;
     meta_data_node * next;
     meta_prop_node * prop;
-    std::underlying_type_t<meta_traits> traits;
+    meta_traits traits;
     meta_type_node * const type;
     bool(* const set)(meta_handle, meta_any);
     meta_any(* const get)(meta_handle);
@@ -100,7 +102,7 @@ struct meta_func_node {
     meta_func_node * next;
     meta_prop_node * prop;
     const size_type arity;
-    std::underlying_type_t<meta_traits> traits;
+    meta_traits traits;
     meta_type_node * const ret;
     meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any * const);
@@ -122,7 +124,7 @@ struct meta_type_node {
     meta_type_node * next;
     meta_prop_node * prop;
     const size_type size_of;
-    std::underlying_type_t<meta_traits> traits;
+    meta_traits traits;
     const meta_template_node *const templ;
     meta_ctor_node * const def_ctor;
     meta_ctor_node *ctor{nullptr};
