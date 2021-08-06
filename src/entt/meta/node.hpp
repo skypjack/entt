@@ -39,7 +39,6 @@ enum class meta_traits: std::uint32_t {
     IS_FLOATING_POINT = 0x0008,
     IS_ARRAY = 0x0010,
     IS_ENUM = 0x0020,
-    IS_UNION = 0x0040,
     IS_CLASS = 0x0080,
     IS_POINTER = 0x0100,
     IS_MEMBER_OBJECT_POINTER = 0x0200,
@@ -189,7 +188,6 @@ public:
                 | (std::is_floating_point_v<Type> ? internal::meta_traits::IS_FLOATING_POINT : internal::meta_traits::IS_NONE)
                 | (std::is_array_v<Type> ? internal::meta_traits::IS_ARRAY : internal::meta_traits::IS_NONE)
                 | (std::is_enum_v<Type> ? internal::meta_traits::IS_ENUM : internal::meta_traits::IS_NONE)
-                | (std::is_union_v<Type> ? internal::meta_traits::IS_UNION : internal::meta_traits::IS_NONE)
                 | (std::is_class_v<Type> ? internal::meta_traits::IS_CLASS : internal::meta_traits::IS_NONE)
                 | (std::is_pointer_v<Type> ? internal::meta_traits::IS_POINTER : internal::meta_traits::IS_NONE)
                 | (std::is_member_object_pointer_v<Type> ? internal::meta_traits::IS_MEMBER_OBJECT_POINTER : internal::meta_traits::IS_NONE)

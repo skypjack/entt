@@ -1132,14 +1132,6 @@ public:
     }
 
     /**
-     * @brief Checks whether a type refers to an union or not.
-     * @return True if the underlying type is an union, false otherwise.
-     */
-    [[nodiscard]] bool is_union() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_UNION);
-    }
-
-    /**
      * @brief Checks whether a type refers to a class or not.
      * @return True if the underlying type is a class, false otherwise.
      */

@@ -87,11 +87,6 @@ enum class property_t {
     list
 };
 
-union union_t {
-    int i;
-    double d;
-};
-
 struct MetaType: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
@@ -229,11 +224,8 @@ TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<property_t>().is_enum());
     ASSERT_FALSE(entt::resolve<char>().is_enum());
 
-    ASSERT_TRUE(entt::resolve<union_t>().is_union());
-    ASSERT_FALSE(entt::resolve<derived_t>().is_union());
-
     ASSERT_TRUE(entt::resolve<derived_t>().is_class());
-    ASSERT_FALSE(entt::resolve<union_t>().is_class());
+    ASSERT_FALSE(entt::resolve<double>().is_class());
 
     ASSERT_TRUE(entt::resolve<int *>().is_pointer());
     ASSERT_FALSE(entt::resolve<int>().is_pointer());
