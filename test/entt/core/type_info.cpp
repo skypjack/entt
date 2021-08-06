@@ -29,6 +29,7 @@ TEST(TypeHash, Functionalities) {
 
 TEST(TypeName, Functionalities) {
     ASSERT_EQ(entt::type_name<int>::value(), std::string_view{"int"});
+    ASSERT_EQ(entt::type_name<float>{}.value(), std::string_view{""});
 
     ASSERT_TRUE((entt::type_name<entt::integral_constant<3>>::value() == std::string_view{"std::integral_constant<int, 3>"})
         || (entt::type_name<entt::integral_constant<3>>::value() == std::string_view{"std::__1::integral_constant<int, 3>"})
@@ -51,7 +52,7 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_NE(entt::type_id<int>(), entt::type_info{});
     ASSERT_NE(entt::type_id<int>(), entt::type_id<char>());
 
-    const auto info = entt::type_id<int>();
+    auto info = entt::type_id<int>();
     const auto unnamed = entt::type_id<float>();
     entt::type_info empty{};
 
