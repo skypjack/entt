@@ -211,11 +211,9 @@ TEST_F(MetaType, SizeOf) {
 }
 
 TEST_F(MetaType, Traits) {
-    ASSERT_TRUE(entt::resolve<bool>().is_integral());
-    ASSERT_FALSE(entt::resolve<double>().is_integral());
-
-    ASSERT_TRUE(entt::resolve<double>().is_floating_point());
-    ASSERT_FALSE(entt::resolve<int>().is_floating_point());
+    ASSERT_TRUE(entt::resolve<bool>().is_arithmetic());
+    ASSERT_TRUE(entt::resolve<double>().is_arithmetic());
+    ASSERT_FALSE(entt::resolve<clazz_t>().is_arithmetic());
 
     ASSERT_TRUE(entt::resolve<int[5]>().is_array());
     ASSERT_TRUE(entt::resolve<int[5][3]>().is_array());

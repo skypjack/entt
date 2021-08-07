@@ -5,6 +5,7 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
+* runtime components (registry), runtime events (dispatcher/emitter), ...
 * add constrained type policy to iterable view
 * add constrained type policy to view iterators
 * custom allocators all over

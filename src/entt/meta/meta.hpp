@@ -1099,20 +1099,12 @@ public:
     }
 
     /**
-     * @brief Checks whether a type refers to an integral type or not.
-     * @return True if the underlying type is an integral type, false otherwise.
-     */
-    [[nodiscard]] bool is_integral() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_INTEGRAL);
-    }
-
-    /**
-     * @brief Checks whether a type refers to a floating-point type or not.
-     * @return True if the underlying type is a floating-point type, false
+     * @brief Checks whether a type refers to an arithmetic type or not.
+     * @return True if the underlying type is an arithmetic type, false
      * otherwise.
      */
-    [[nodiscard]] bool is_floating_point() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_FLOATING_POINT);
+    [[nodiscard]] bool is_arithmetic() const ENTT_NOEXCEPT {
+        return !!(node->traits & internal::meta_traits::IS_ARITHMETIC);
     }
 
     /**

@@ -35,17 +35,16 @@ enum class meta_traits: std::uint32_t {
     IS_NONE = 0x0000,
     IS_CONST = 0x0001,
     IS_STATIC = 0x0002,
-    IS_INTEGRAL = 0x0004,
-    IS_FLOATING_POINT = 0x0008,
-    IS_ARRAY = 0x0010,
-    IS_ENUM = 0x0020,
-    IS_CLASS = 0x0080,
-    IS_POINTER = 0x0100,
-    IS_MEMBER_OBJECT_POINTER = 0x0200,
-    IS_MEMBER_FUNCTION_POINTER = 0x0400,
-    IS_META_POINTER_LIKE = 0x0800,
-    IS_META_SEQUENCE_CONTAINER = 0x1000,
-    IS_META_ASSOCIATIVE_CONTAINER = 0x2000,
+    IS_ARITHMETIC = 0x0004,
+    IS_ARRAY = 0x0008,
+    IS_ENUM = 0x0010,
+    IS_CLASS = 0x0020,
+    IS_POINTER = 0x0040,
+    IS_MEMBER_OBJECT_POINTER = 0x0080,
+    IS_MEMBER_FUNCTION_POINTER = 0x0100,
+    IS_META_POINTER_LIKE = 0x0200,
+    IS_META_SEQUENCE_CONTAINER = 0x0400,
+    IS_META_ASSOCIATIVE_CONTAINER = 0x0800,
     _entt_enum_as_bitmask
 };
 
@@ -184,8 +183,7 @@ public:
             nullptr,
             size_of_v<Type>,
             internal::meta_traits::IS_NONE
-                | (std::is_integral_v<Type> ? internal::meta_traits::IS_INTEGRAL : internal::meta_traits::IS_NONE)
-                | (std::is_floating_point_v<Type> ? internal::meta_traits::IS_FLOATING_POINT : internal::meta_traits::IS_NONE)
+                | (std::is_arithmetic_v<Type> ? internal::meta_traits::IS_ARITHMETIC : internal::meta_traits::IS_NONE)
                 | (std::is_array_v<Type> ? internal::meta_traits::IS_ARRAY : internal::meta_traits::IS_NONE)
                 | (std::is_enum_v<Type> ? internal::meta_traits::IS_ENUM : internal::meta_traits::IS_NONE)
                 | (std::is_class_v<Type> ? internal::meta_traits::IS_CLASS : internal::meta_traits::IS_NONE)
