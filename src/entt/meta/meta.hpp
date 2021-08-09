@@ -333,8 +333,8 @@ public:
     /**
      * @brief Sets the value of a given variable.
      *
-     * The type of the value must be such that a cast or conversion to the type
-     * of the variable is possible. Otherwise, invoking the setter does nothing.
+     * The type of the value is such that a cast or conversion to the type of
+     * the variable is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
      * @param id Unique identifier.
@@ -737,8 +737,8 @@ struct meta_ctor {
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * Parameters must be such that a cast or conversion to the required types
-     * is possible. Otherwise, an empty and thus invalid wrapper is returned.
+     * Parameters are such that a cast or conversion to the required types is
+     * possible. Otherwise, an empty and thus invalid wrapper is returned.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
@@ -764,17 +764,17 @@ struct meta_ctor {
     }
 
     /**
-     * @brief Returns a range to use to visit all properties.
-     * @return An iterable range to use to visit all properties.
+     * @brief Returns a range to visit registered meta properties.
+     * @return An iterable range to visit registered meta properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
     }
 
     /**
-     * @brief Returns the property associated with a given key.
+     * @brief Lookup function for registered meta properties.
      * @param key The key to use to search for a property.
-     * @return The property associated with the given key, if any.
+     * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
         for(auto curr: prop()) {
@@ -839,8 +839,8 @@ struct meta_data {
      * It must be possible to cast the instance to the parent type of the data
      * member. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
-     * The type of the value must be such that a cast or conversion to the type
-     * of the variable is possible. Otherwise, invoking the setter does nothing.
+     * The type of the value is such that a cast or conversion to the type of
+     * the variable is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
      * @param instance An opaque instance of the underlying type.
@@ -871,9 +871,9 @@ struct meta_data {
     }
 
     /**
-     * @brief Returns the property associated with a given key.
+     * @brief Lookup function for registered meta properties.
      * @param key The key to use to search for a property.
-     * @return The property associated with the given key, if any.
+     * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
         for(auto curr: prop()) {
@@ -993,9 +993,9 @@ struct meta_func {
     }
 
     /**
-     * @brief Returns the property associated with a given key.
+     * @brief Lookup function for registered meta properties.
      * @param key The key to use to search for a property.
-     * @return The property associated with the given key, if any.
+     * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
         for(auto curr: prop()) {
@@ -1194,8 +1194,8 @@ public:
     }
 
     /**
-     * @brief Returns the number of template arguments, if any.
-     * @return The number of template arguments, if any.
+     * @brief Returns the number of template arguments.
+     * @return The number of template arguments.
      */
     [[nodiscard]] size_type template_arity() const ENTT_NOEXCEPT {
         return node->templ ? node->templ->arity : size_type{};
@@ -1222,34 +1222,34 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level base meta types.
-     * @return An iterable range to use to visit top-level base meta types.
+     * @brief Returns a range to visit registered top-level base meta types.
+     * @return An iterable range to visit registered top-level base meta types.
      */
     [[nodiscard]] meta_range<meta_type, internal::meta_base_node> base() const ENTT_NOEXCEPT {
         return node->base;
     }
 
     /**
-     * @brief Returns the base meta type associated with a given identifier.
+     * @brief Lookup function for registered base meta types.
      * @param id Unique identifier.
-     * @return The base meta type associated with the given identifier, if any.
+     * @return The registered base meta type for the given identifier, if any.
      */
     [[nodiscard]] meta_type base(const id_type id) const {
         return internal::visit<&node_type::base>([id](const auto *curr) { return curr->type->id == id; }, node);
     }
 
     /**
-     * @brief Returns a range to use to visit top-level constructors.
-     * @return An iterable range to use to visit top-level constructors.
+     * @brief Returns a range to visit registered top-level constructors.
+     * @return An iterable range to visit registered top-level constructors.
      */
     [[nodiscard]] meta_range<meta_ctor> ctor() const ENTT_NOEXCEPT {
         return node->ctor;
     }
 
     /**
-     * @brief Returns a constructor for a given list of types of arguments.
+     * @brief Lookup function for registered meta constructors.
      * @tparam Args Constructor arguments.
-     * @return The requested constructor, if any.
+     * @return The registered meta constructor for the given arguments, if any.
      */
     template<typename... Args>
     [[nodiscard]] meta_ctor ctor() const {
@@ -1257,42 +1257,42 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level data.
-     * @return An iterable range to use to visit top-level data.
+     * @brief Returns a range to visit registered top-level meta data.
+     * @return An iterable range to visit registered top-level meta data.
      */
     [[nodiscard]] meta_range<meta_data> data() const ENTT_NOEXCEPT {
         return node->data;
     }
 
     /**
-     * @brief Returns the data associated with a given identifier.
+     * @brief Lookup function for registered meta data.
      *
-     * The data of the base classes will also be visited, if any.
+     * Registered meta data of base classes will also be visited.
      *
      * @param id Unique identifier.
-     * @return The data associated with the given identifier, if any.
+     * @return The registered meta data for the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
         return internal::visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
     }
 
     /**
-     * @brief Returns a range to use to visit top-level functions.
-     * @return An iterable range to use to visit top-level functions.
+     * @brief Returns a range to visit registered top-level functions.
+     * @return An iterable range to visit registered top-level functions.
      */
     [[nodiscard]] meta_range<meta_func> func() const ENTT_NOEXCEPT {
         return node->func;
     }
 
     /**
-     * @brief Returns the function associated with a given identifier.
+     * @brief Lookup function for registered meta functions.
      *
-     * The functions of the base classes will also be visited, if any.<br/>
-     * In the case of overloaded functions, the first one with the required
+     * Registered meta functions of base classes will also be visited.<br/>
+     * In case of overloaded functions, the first one with the required
      * identifier will be returned.
      *
      * @param id Unique identifier.
-     * @return The function associated with the given identifier, if any.
+     * @return The registered meta function for the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
         return internal::visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
@@ -1301,8 +1301,9 @@ public:
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * Parameters must be such that a cast or conversion to the required types
-     * is possible. Otherwise, an empty and thus invalid wrapper is returned.
+     * Parameters are such that a cast or conversion to the required types is
+     * possible. Otherwise, an empty and thus invalid wrapper is returned.<br/>
+     * If suitable, the implicitly generated default constructor is used.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
@@ -1317,7 +1318,7 @@ public:
             }
         }
 
-        return {};
+        return (!sz && node->factory) ? node->factory() : meta_any{};
     }
 
     /**
@@ -1402,8 +1403,8 @@ public:
      * It must be possible to cast the instance to the parent type of the data
      * member. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
-     * The type of the value must be such that a cast or conversion to the type
-     * of the variable is possible. Otherwise, invoking the setter does nothing.
+     * The type of the value is such that a cast or conversion to the type of
+     * the variable is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
      * @param id Unique identifier.
@@ -1433,20 +1434,20 @@ public:
     }
 
     /**
-     * @brief Returns a range to use to visit top-level properties.
-     * @return An iterable range to use to visit top-level properties.
+     * @brief Returns a range to visit registered top-level meta properties.
+     * @return An iterable range to visit registered top-level meta properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
     }
 
     /**
-     * @brief Returns the property associated with a given key.
+     * @brief Lookup function for meta properties.
      *
-     * Properties of the base classes will also be visited, if any.
+     * Properties of base classes are also visited.
      *
      * @param key The key to use to search for a property.
-     * @return The property associated with the given key, if any.
+     * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
         return internal::visit<&internal::meta_type_node::prop>([&key](const auto *curr) { return curr->id == key; }, node);

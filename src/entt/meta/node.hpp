@@ -123,8 +123,8 @@ struct meta_type_node {
     meta_prop_node * prop;
     const size_type size_of;
     meta_traits traits;
+    meta_any(* const factory)();
     const meta_template_node *const templ;
-    meta_ctor_node * const def_ctor;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
@@ -142,17 +142,9 @@ template<typename Type>
 class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
-    [[nodiscard]] static meta_ctor_node * meta_default_constructor([[maybe_unused]] meta_type_node *type) ENTT_NOEXCEPT {
+    [[nodiscard]] static decltype(meta_type_node::factory) meta_default_constructor() ENTT_NOEXCEPT {
         if constexpr(std::is_default_constructible_v<Type>) {
-            static meta_ctor_node node{
-                nullptr,
-                nullptr,
-                0u,
-                nullptr,
-                [](meta_any * const) { return meta_any{std::in_place_type<Type>}; }
-            };
-
-            return &node;
+            return +[]() { return meta_any{std::in_place_type<Type>}; };
         } else {
             return nullptr;
         }
@@ -193,9 +185,8 @@ public:
                 | (is_meta_pointer_like_v<Type> ? internal::meta_traits::IS_META_POINTER_LIKE : internal::meta_traits::IS_NONE)
                 | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::IS_META_SEQUENCE_CONTAINER : internal::meta_traits::IS_NONE)
                 | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::IS_META_ASSOCIATIVE_CONTAINER : internal::meta_traits::IS_NONE),
-            meta_template_info(),
-            meta_default_constructor(&node),
-            meta_default_constructor(&node)
+            meta_default_constructor(),
+            meta_template_info()
         };
 
         return &node;

@@ -742,11 +742,18 @@ entt::resolve<int>().construct();
 Where the meta type can be for example the one returned from a meta container,
 useful for building keys without knowing or having to register the actual types.
 
-In all cases, when users register custom defaul constructors, they are preferred
-both during searches and when the `construct` member function is invoked.<br/>
-However, the implicitly generated default constructor will always be returned,
-either if one is not explicitly specified or if all constructors are iterated
-for some reason (in this case, it will always be the last element).
+In all cases, when users register default constructors, they are preferred both
+during searches and when the `construct` member function is invoked.<br/>
+Moreover, implicitly generated default constructors are never returned when
+iterating registered constructors nor when looking up constructors from meta
+types:
+
+```cpp
+entt::meta_ctor ctor = entt::resolve<int>().ctor<>();
+```
+
+In other terms, `ctor` is an invalid meta object unless users explicitly
+registered a meta constructor that takes no arguments for the `int` type.
 
 ## Policies: the more, the less
 

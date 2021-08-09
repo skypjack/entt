@@ -220,19 +220,12 @@ TEST_F(MetaCtor, ExternalMemberFunction) {
 
 TEST_F(MetaCtor, ImplicitlyGeneratedDefaultConstructor) {
     auto type = entt::resolve<int>();
-    int counter{};
 
-    for([[maybe_unused]] auto curr: type.ctor()) {
-        ++counter;
-    }
+    // implicitly generated default constructor is not listed among registered
+    ASSERT_EQ(type.ctor().begin(), type.ctor().end());
+    ASSERT_FALSE(type.ctor<>());
 
-    // default constructor is implicitly generated
-    ASSERT_EQ(counter, 1);
-    ASSERT_TRUE(type.ctor<>());
-    ASSERT_EQ(type.ctor<>().arity(), 0u);
-    ASSERT_EQ(type.ctor<>().arg(0), entt::meta_type{});
-
-    auto any = type.ctor<>().invoke();
+    auto any = type.construct();
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -241,15 +234,12 @@ TEST_F(MetaCtor, ImplicitlyGeneratedDefaultConstructor) {
 
 TEST_F(MetaCtor, OverrideImplicitlyGeneratedDefaultConstructor) {
     auto type = entt::resolve<double>();
-    int counter{};
 
-    for([[maybe_unused]] auto curr: type.ctor()) {
-        ++counter;
-    }
-
-    // default constructor is implicitly generated
-    ASSERT_EQ(counter, 2);
+    // implicitly generated default constructor is not listed among registered
+    ASSERT_EQ(++type.ctor().begin(), type.ctor().end());
     ASSERT_TRUE(type.ctor<>());
+    ASSERT_EQ(type.ctor<>().arity(), 0u);
+    ASSERT_EQ(type.ctor<>().arg(0), entt::meta_type{});
 
     auto any = type.ctor<>().invoke();
 
@@ -260,15 +250,8 @@ TEST_F(MetaCtor, OverrideImplicitlyGeneratedDefaultConstructor) {
 
 TEST_F(MetaCtor, NonDefaultConstructibleType) {
     auto type = entt::resolve<clazz_t>();
-    int counter{};
-
-    for([[maybe_unused]] auto curr: type.ctor()) {
-        ++counter;
-    }
-
-    // the implicitly generated default constructor doesn't exist
-    ASSERT_EQ(counter, 5);
-    ASSERT_FALSE(type.ctor<>());
+    // no implicitly generated default constructor
+    ASSERT_FALSE(type.construct());
 }
 
 TEST_F(MetaCtor, ReRegistration) {
@@ -277,7 +260,6 @@ TEST_F(MetaCtor, ReRegistration) {
     auto *node = entt::internal::meta_info<double>::resolve();
 
     ASSERT_NE(node->ctor, nullptr);
-    // default constructor is implicitly generated
-    ASSERT_NE(node->ctor->next, nullptr);
-    ASSERT_EQ(node->ctor->next->next, nullptr);
+    // implicitly generated default constructor is not cleared
+    ASSERT_NE(node->factory, nullptr);
 }

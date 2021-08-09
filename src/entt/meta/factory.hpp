@@ -572,7 +572,6 @@ inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
             clear_chain(&node->func, &internal::meta_func_node::prop);
 
             node->id = {};
-            node->ctor = node->def_ctor;
             node->dtor = nullptr;
             *it = std::exchange(node->next, nullptr);
 

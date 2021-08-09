@@ -284,9 +284,8 @@ TEST_F(MetaType, Ctor) {
         ++counter;
     }
 
-    // we only register a constructor, the default one is implicitly generated for us
-    ASSERT_EQ(counter, 2);
-    ASSERT_TRUE((type.ctor<>()));
+    ASSERT_EQ(counter, 1);
+    ASSERT_FALSE((type.ctor<>()));
     ASSERT_TRUE((type.ctor<const base_t &, int>()));
     ASSERT_TRUE((type.ctor<const derived_t &, double>()));
 
@@ -452,7 +451,7 @@ TEST_F(MetaType, Reset) {
     ASSERT_TRUE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_TRUE((entt::resolve<clazz_t>().ctor<const base_t &, int>()));
     // implicitly generated default constructor
-    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
+    ASSERT_TRUE(entt::resolve<clazz_t>().construct());
 
     entt::meta_reset("clazz"_hs);
 
@@ -461,14 +460,12 @@ TEST_F(MetaType, Reset) {
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_FALSE((entt::resolve<clazz_t>().ctor<const base_t &, int>()));
-    // the implicitly generated default constructor is there after a reset
-    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
+    // implicitly generated default constructor is not cleared
+    ASSERT_TRUE(entt::resolve<clazz_t>().construct());
 
     entt::meta<clazz_t>().type("clazz"_hs);
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
-    // the implicitly generated default constructor must be there in any case
-    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
 }
 
 TEST_F(MetaType, ResetAll) {
@@ -604,8 +601,8 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
 
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
-    // the implicitly generated default constructor is there after a reset
-    ASSERT_TRUE(entt::resolve<clazz_t>().ctor<>());
+    // implicitly generated default constructor is not cleared
+    ASSERT_TRUE(entt::resolve<clazz_t>().construct());
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_FALSE(entt::resolve<clazz_t>().func("member"_hs));
 
