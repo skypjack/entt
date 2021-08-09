@@ -63,11 +63,6 @@ struct setter_getter_t {
     int value;
 };
 
-struct array_t {
-    static inline int global[3];
-    int local[5];
-};
-
 enum class property_t {
     random,
     value
@@ -109,11 +104,6 @@ struct MetaData: ::testing::Test {
             .data<&setter_getter_t::setter_with_ref, &setter_getter_t::getter_with_ref>("w"_hs)
             .data<nullptr, &setter_getter_t::getter>("z_ro"_hs)
             .data<nullptr, &setter_getter_t::value>("value"_hs);
-
-        entt::meta<array_t>()
-            .type("array"_hs)
-            .data<&array_t::global>("global"_hs)
-            .data<&array_t::local>("local"_hs);
 
         base_t::counter = 0;
     }
@@ -452,35 +442,6 @@ TEST_F(MetaData, ConstInstance) {
     ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs).set(instance, 3));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs).get(std::as_const(instance)));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs).set(std::as_const(instance), 3));
-}
-
-TEST_F(MetaData, ArrayStatic) {
-    using namespace entt::literals;
-
-    auto data = entt::resolve<array_t>().data("global"_hs);
-
-    ASSERT_TRUE(data);
-    ASSERT_EQ(data.type(), entt::resolve<int[3]>());
-    ASSERT_EQ(data.id(), "global"_hs);
-    ASSERT_FALSE(data.is_const());
-    ASSERT_TRUE(data.is_static());
-    ASSERT_TRUE(data.type().is_array());
-    ASSERT_FALSE(data.get({}));
-}
-
-TEST_F(MetaData, Array) {
-    using namespace entt::literals;
-
-    auto data = entt::resolve<array_t>().data("local"_hs);
-    array_t instance{};
-
-    ASSERT_TRUE(data);
-    ASSERT_EQ(data.type(), entt::resolve<int[5]>());
-    ASSERT_EQ(data.id(), "local"_hs);
-    ASSERT_FALSE(data.is_const());
-    ASSERT_FALSE(data.is_static());
-    ASSERT_TRUE(data.type().is_array());
-    ASSERT_FALSE(data.get(instance));
 }
 
 TEST_F(MetaData, AsVoid) {

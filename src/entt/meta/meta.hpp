@@ -1108,14 +1108,6 @@ public:
     }
 
     /**
-     * @brief Checks whether a type refers to an array type or not.
-     * @return True if the underlying type is an array type, false otherwise.
-     */
-    [[nodiscard]] bool is_array() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_ARRAY);
-    }
-
-    /**
      * @brief Checks whether a type refers to an enum or not.
      * @return True if the underlying type is an enum, false otherwise.
      */
