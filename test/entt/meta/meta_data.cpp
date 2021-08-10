@@ -515,3 +515,16 @@ TEST_F(MetaData, ReRegistration) {
     ASSERT_FALSE(type.data("value"_hs));
     ASSERT_TRUE(type.data("field"_hs));
 }
+
+TEST_F(MetaData, NameCollision) {
+    using namespace entt::literals;
+
+    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().data<&clazz_t::j>("j"_hs));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs));
+
+    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().data<&clazz_t::j>("cj"_hs));
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("cj"_hs));
+
+    ASSERT_DEATH(entt::meta<clazz_t>().data<&clazz_t::j>("i"_hs), "");
+}

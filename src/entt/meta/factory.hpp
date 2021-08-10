@@ -159,10 +159,11 @@ struct meta_factory<Type> {
     auto type(const id_type id = type_hash<Type>::value()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
+        meta_range<internal::meta_type_node *, internal::meta_type_node> range{*internal::meta_context::global()};
+        ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id, node](const auto *curr) { return curr != node && curr->id == id; }) == range.cend(), "Duplicate identifier");
         node->id = id;
 
-        if(meta_range<internal::meta_type_node *, internal::meta_type_node> range{*internal::meta_context::global()}; std::find(range.cbegin(), range.cend(), node) == range.cend()) {
-            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr->id == id; }) == range.cend(), "Duplicate identifier");
+        if(std::find(range.cbegin(), range.cend(), node) == range.cend()) {
             node->next = *internal::meta_context::global();
             *internal::meta_context::global() = node;
         }
@@ -411,10 +412,11 @@ struct meta_factory<Type> {
                 &meta_getter<Type, Data, Policy>
             };
 
+            meta_range<internal::meta_data_node *, internal::meta_data_node> range{type->data};
+            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr != &node && curr->id == id; }) == range.cend(), "Duplicate identifier");
             node.id = id;
 
-            if(meta_range<internal::meta_data_node *, internal::meta_data_node> range{type->data}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-                ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr->id == id; }) == range.cend(), "Duplicate identifier");
+            if(std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
                 node.next = type->data;
                 type->data = &node;
             }
@@ -460,10 +462,11 @@ struct meta_factory<Type> {
             &meta_getter<Type, Getter, Policy>
         };
 
+        meta_range<internal::meta_data_node *, internal::meta_data_node> range{type->data};
+        ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr != &node && curr->id == id; }) == range.cend(), "Duplicate identifier");
         node.id = id;
 
-        if(meta_range<internal::meta_data_node *, internal::meta_data_node> range{type->data}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr->id == id; }) == range.cend(), "Duplicate identifier");
+        if(std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
             node.next = type->data;
             type->data = &node;
         }

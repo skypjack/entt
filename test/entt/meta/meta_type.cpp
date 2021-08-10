@@ -640,3 +640,16 @@ TEST_F(MetaType, ReRegistration) {
     ASSERT_TRUE(entt::resolve("real"_hs));
     ASSERT_TRUE(entt::resolve("real"_hs).data("var"_hs));
 }
+
+TEST_F(MetaType, NameCollision) {
+    using namespace entt::literals;
+
+    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().type("clazz"_hs));
+    ASSERT_TRUE(entt::resolve("clazz"_hs));
+
+    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().type("quux"_hs));
+    ASSERT_FALSE(entt::resolve("clazz"_hs));
+    ASSERT_TRUE(entt::resolve("quux"_hs));
+
+    ASSERT_DEATH(entt::meta<clazz_t>().type("abstract"_hs), "");
+}
