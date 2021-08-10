@@ -1132,25 +1132,6 @@ public:
     }
 
     /**
-     * @brief Checks whether a type refers to a pointer to data member or not.
-     * @return True if the underlying type is a pointer to data member, false
-     * otherwise.
-     */
-    [[nodiscard]] bool is_member_object_pointer() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_MEMBER_OBJECT_POINTER);
-    }
-
-    /**
-     * @brief Checks whether a type refers to a pointer to member function or
-     * not.
-     * @return True if the underlying type is a pointer to member function,
-     * false otherwise.
-     */
-    [[nodiscard]] bool is_member_function_pointer() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_MEMBER_FUNCTION_POINTER);
-    }
-
-    /**
      * @brief Checks whether a type is a pointer-like type or not.
      * @return True if the underlying type is a pointer-like one, false
      * otherwise.

@@ -39,8 +39,6 @@ enum class meta_traits: std::uint32_t {
     IS_ENUM = 0x0008,
     IS_CLASS = 0x0010,
     IS_POINTER = 0x0020,
-    IS_MEMBER_OBJECT_POINTER = 0x0040,
-    IS_MEMBER_FUNCTION_POINTER = 0x0080,
     IS_META_POINTER_LIKE = 0x0100,
     IS_META_SEQUENCE_CONTAINER = 0x0200,
     IS_META_ASSOCIATIVE_CONTAINER = 0x0400,
@@ -178,8 +176,6 @@ public:
                 | (std::is_enum_v<Type> ? internal::meta_traits::IS_ENUM : internal::meta_traits::IS_NONE)
                 | (std::is_class_v<Type> ? internal::meta_traits::IS_CLASS : internal::meta_traits::IS_NONE)
                 | (std::is_pointer_v<Type> ? internal::meta_traits::IS_POINTER : internal::meta_traits::IS_NONE)
-                | (std::is_member_object_pointer_v<Type> ? internal::meta_traits::IS_MEMBER_OBJECT_POINTER : internal::meta_traits::IS_NONE)
-                | (std::is_member_function_pointer_v<Type> ? internal::meta_traits::IS_MEMBER_FUNCTION_POINTER : internal::meta_traits::IS_NONE)
                 | (is_meta_pointer_like_v<Type> ? internal::meta_traits::IS_META_POINTER_LIKE : internal::meta_traits::IS_NONE)
                 | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::IS_META_SEQUENCE_CONTAINER : internal::meta_traits::IS_NONE)
                 | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::IS_META_ASSOCIATIVE_CONTAINER : internal::meta_traits::IS_NONE),
