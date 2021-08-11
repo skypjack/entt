@@ -19,8 +19,7 @@ struct MetaProp: ::testing::Test {
 
         entt::meta<base_2_t>()
             .type("base_2"_hs)
-            .prop("bool"_hs, false)
-            .prop("char[]"_hs, "char[]");
+            .props(std::make_pair("bool"_hs, false), std::make_pair("char[]"_hs, "char[]"));
 
         entt::meta<derived_t>()
             .type("derived"_hs)

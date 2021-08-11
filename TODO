@@ -6,6 +6,7 @@
 
 WIP:
 * runtime components (registry), runtime events (dispatcher/emitter), ...
+* single prop call with operator() for meta factories (to cut down instantiations)
 * add constrained type policy to iterable view
 * add constrained type policy to view iterators
 * custom allocators all over

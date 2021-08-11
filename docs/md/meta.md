@@ -897,29 +897,15 @@ Multiple formats are supported when it comes to defining a property:
   An annotation is an invocable object that returns one or more properties. All
   of them are treated individually.
 
-It's possible to invoke the `prop` function several times if needed, one for
-each property to associate with the last meta object created:
-
-```cpp
-entt::meta<my_type>()
-    .type("reflected_type"_hs)
-        .prop(entt::hashed_string{"Name"}, "Reflected Type")
-    .data<&my_type::data_member>("member"_hs)
-        .prop(std::make_pair("tooltip"_hs, "Member"))
-        .prop(my_enum::a_value, 42);
-```
-
-Alternatively, the `props` function is available to associate several properties
-at a time. However, in this case properties in the key/value form aren't
-allowed, since they would be interpreted as two different properties rather than
-a single one.
+Note that it's not possible to invoke `prop` multiple times for the same meta
+object and trying to do that will result in a compilation error.<br/>
+However, the `props` function is available to associate several properties at
+once. In this case, properties in the key/value form aren't allowed, since they
+would be interpreted as two different properties rather than a single one.
 
 The meta objects for which properties are supported are currently the meta
-types, meta constructors, meta data and meta functions. It's not possible to
-attach properties to other types of meta objects and the factory returned as a
-result of their construction won't allow such an operation.
-
-These types offer a couple of member functions named `prop` to iterate all
+types, meta constructors, meta data and meta functions.<br/>
+These types also offer a couple of member functions named `prop` to iterate all
 properties at once or to search a specific property by key:
 
 ```cpp

@@ -1,5 +1,6 @@
 #include <map>
 #include <memory>
+#include <utility>
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
@@ -130,15 +131,13 @@ struct MetaType: ::testing::Test {
         entt::meta<property_t>()
             .type("property"_hs)
             .data<property_t::random>("random"_hs)
-                .prop(property_t::random, 0)
-                .prop(property_t::value, 3)
+                .props(std::make_pair(property_t::random, 0), std::make_pair(property_t::value, 3))
             .data<property_t::value>("value"_hs)
-                .prop(std::make_tuple(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only))
-                .prop(property_t::list)
+                .props(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only, property_t::list)
             .data<property_t::key_only>("key_only"_hs)
                 .prop([]() { return property_t::key_only; })
             .data<property_t::list>("list"_hs)
-               .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
+                .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
             .data<set<property_t>, get<property_t>>("var"_hs);
 
         entt::meta<clazz_t>()
@@ -609,8 +608,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::meta<property_t>()
         .type("property"_hs)
         .data<property_t::random>("rand"_hs)
-            .prop(property_t::value, 42)
-            .prop(property_t::random, 3);
+            .props(std::make_pair(property_t::value, 42), std::make_pair(property_t::random, 3));
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::value));
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::random));
