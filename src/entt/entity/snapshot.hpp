@@ -93,13 +93,12 @@ public:
     const basic_snapshot & entities(Archive &archive) const {
         const auto sz = reg->size();
 
-        archive(typename entity_traits::entity_type(sz));
+        archive(typename entity_traits::entity_type(sz + 1u));
+        archive(reg->released());
 
         for(auto first = reg->data(), last = first + sz; first != last; ++first) {
             archive(*first);
         }
-
-        archive(reg->released());
 
         return *this;
     }
@@ -230,14 +229,11 @@ public:
         archive(length);
         std::vector<entity_type> all(length);
 
-        for(decltype(length) pos{}; pos < length; ++pos) {
+        for(std::size_t pos{}; pos < length; ++pos) {
             archive(all[pos]);
         }
 
-        entity_type destroyed;
-        archive(destroyed);
-
-        reg->assign(all.cbegin(), all.cend(), destroyed);
+        reg->assign(++all.cbegin(), all.cend(), all[0u]);
 
         return *this;
     }
@@ -444,8 +440,10 @@ public:
         entity_type entt{};
 
         archive(length);
+        // discards the head of the list of destroyed entities
+        archive(entt);
 
-        for(decltype(length) pos{}; pos < length; ++pos) {
+        for(std::size_t pos{}, last = length - 1u; pos < last; ++pos) {
             archive(entt);
 
             if(const auto entity = entity_traits::to_entity(entt); entity == pos) {
@@ -454,9 +452,6 @@ public:
                 destroy(entt);
             }
         }
-
-        // discards the head of the list of destroyed entities
-        archive(entt);
 
         return *this;
     }
