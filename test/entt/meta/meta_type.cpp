@@ -135,7 +135,7 @@ struct MetaType: ::testing::Test {
             .data<property_t::value>("value"_hs)
                 .props(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only, property_t::list)
             .data<property_t::key_only>("key_only"_hs)
-                .prop([]() { return property_t::key_only; })
+                .prop(property_t::key_only)
             .data<property_t::list>("list"_hs)
                 .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
             .data<set<property_t>, get<property_t>>("var"_hs);

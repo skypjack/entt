@@ -42,27 +42,21 @@ template<typename Type, typename... Spec>
 struct meta_factory<Type, Spec...>: public meta_factory<Type> {
 private:
     template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<3>, std::tuple<Property...> property, Other &&... other) {
-        std::apply([this](auto &&... property) { (unroll<Step>(choice<3>, std::forward<Property>(property)), ...); }, property);
-        unroll<Step + sizeof...(Property)>(choice<3>, std::forward<Other>(other)...);
+    void unroll(choice_t<2>, std::tuple<Property...> property, Other &&... other) {
+        std::apply([this](auto &&... curr) { (unroll<Step>(choice<2>, std::forward<Property>(curr)), ...); }, property);
+        unroll<Step + sizeof...(Property)>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<2>, std::pair<Property...> property, Other &&... other) {
+    void unroll(choice_t<1>, std::pair<Property...> property, Other &&... other) {
         assign<Step>(std::move(property.first), std::move(property.second));
-        unroll<Step+1>(choice<3>, std::forward<Other>(other)...);
+        unroll<Step+1>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t Step = 0, typename Property, typename... Other>
-    std::enable_if_t<!std::is_invocable_v<Property>>
-    unroll(choice_t<1>, Property &&property, Other &&... other) {
+    void unroll(choice_t<0>, Property &&property, Other &&... other) {
         assign<Step>(std::forward<Property>(property));
-        unroll<Step+1>(choice<3>, std::forward<Other>(other)...);
-    }
-
-    template<std::size_t Step = 0, typename Func, typename... Other>
-    void unroll(choice_t<0>, Func &&invocable, Other &&... other) {
-        unroll<Step>(choice<3>, std::forward<Func>(invocable)(), std::forward<Other>(other)...);
+        unroll<Step+1>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t>
@@ -123,8 +117,7 @@ public:
     /**
      * @brief Assigns properties to the last meta object created.
      *
-     * Both the keys and the values (if any) must be at least copy
-     * constructible.
+     * Both key and value (if any) must be at least copy constructible.
      *
      * @tparam Property Types of the properties.
      * @param property Properties to assign to the last meta object created.

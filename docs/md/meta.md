@@ -888,23 +888,14 @@ Multiple formats are supported when it comes to defining a property:
 
   A tuple contains one or more properties. All of them are treated individually.
 
-* Annotations:
-
-  ```cpp
-  entt::meta<my_type>().type("reflected_type"_hs).prop(&property_generator);
-  ```
-
-  An annotation is an invocable object that returns one or more properties. All
-  of them are treated individually.
-
 Note that it's not possible to invoke `prop` multiple times for the same meta
 object and trying to do that will result in a compilation error.<br/>
 However, the `props` function is available to associate several properties at
 once. In this case, properties in the key/value form aren't allowed, since they
 would be interpreted as two different properties rather than a single one.
 
-The meta objects for which properties are supported are currently the meta
-types, meta constructors, meta data and meta functions.<br/>
+The meta objects for which properties are supported are currently meta types,
+meta constructors, meta data and meta functions.<br/>
 These types also offer a couple of member functions named `prop` to iterate all
 properties at once or to search a specific property by key:
 
