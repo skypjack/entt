@@ -41,14 +41,10 @@ struct meta_factory;
 template<typename Type, typename... Spec>
 struct meta_factory<Type, Spec...>: public meta_factory<Type> {
 private:
-    template<std::size_t Step = 0, std::size_t... Index, typename... Property, typename... Other>
-    void unpack(std::index_sequence<Index...>, std::tuple<Property...> property, Other &&... other) {
-        unroll<Step>(choice<3>, std::move(std::get<Index>(property))..., std::forward<Other>(other)...);
-    }
-
     template<std::size_t Step = 0, typename... Property, typename... Other>
     void unroll(choice_t<3>, std::tuple<Property...> property, Other &&... other) {
-        unpack<Step>(std::index_sequence_for<Property...>{}, std::move(property), std::forward<Other>(other)...);
+        std::apply([this](auto &&... property) { (unroll<Step>(choice<3>, std::forward<Property>(property)), ...); }, property);
+        unroll<Step + sizeof...(Property)>(choice<3>, std::forward<Other>(other)...);
     }
 
     template<std::size_t Step = 0, typename... Property, typename... Other>
