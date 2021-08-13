@@ -7,12 +7,13 @@
 WIP:
 * runtime components (registry), runtime events (dispatcher/emitter), ...
 * single prop call with operator() for meta factories (to cut down instantiations)
-* add constrained type policy to iterable view
-* add constrained type policy to view iterators
+* remove the tombstone check (version check + null version)
+* dedicated entity storage, in-place O(1) release/destroy
+* general purpose paged vector container
 * custom allocators all over
 
 WIP:
-* payload traking destroy mixin for pools
+* payload tracking destroy mixin for pools
 * make sparse_set/storage adhere to AllocatorAwareContainer requirements
 * make it possible to register externally managed pools with the registry (allow for system centric mode)
 * registry: switch to the udata/mixin model and get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
