@@ -74,7 +74,7 @@ struct entt_traits<std::uint64_t> {
  * @tparam Type Type of identifier.
  */
 template<typename Type>
-class entt_traits: private internal::entt_traits<Type> {
+class entt_traits {
     using entity_traits = internal::entt_traits<Type>;
 
 public:
@@ -181,7 +181,8 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::to_entity(entity) == entt_traits<Entity>::to_entity(*this);
+        using entity_traits = entt_traits<Entity>;
+        return entity_traits::to_entity(entity) == entity_traits::to_entity(*this);
     }
 
     /**
@@ -203,7 +204,8 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::construct(entt_traits<Entity>::to_entity(*this), entt_traits<Entity>::to_version(entity));
+        using entity_traits = entt_traits<Entity>;
+        return entity_traits::construct(entity_traits::to_entity(*this), entity_traits::to_version(entity));
     }
 };
 
@@ -272,7 +274,8 @@ struct tombstone_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::to_version(entity) == entt_traits<Entity>::to_version(*this);
+        using entity_traits = entt_traits<Entity>;
+        return entity_traits::to_version(entity) == entity_traits::to_version(*this);
     }
 
     /**
@@ -294,7 +297,8 @@ struct tombstone_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::construct(entt_traits<Entity>::to_entity(entity));
+        using entity_traits = entt_traits<Entity>;
+        return entity_traits::construct(entity_traits::to_entity(entity));
     }
 };
 
