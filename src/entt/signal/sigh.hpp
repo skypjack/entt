@@ -208,6 +208,14 @@ struct scoped_connection {
     /*! @brief Default copy constructor, deleted on purpose. */
     scoped_connection(const scoped_connection &) = delete;
 
+    /**
+     * @brief Move constructor.
+     * @param other The scoped connection to move from.
+     */
+    scoped_connection(scoped_connection &&other) ENTT_NOEXCEPT
+        : conn{std::exchange(other.conn, {})}
+    {}
+
     /*! @brief Automatically breaks the link on destruction. */
     ~scoped_connection() {
         conn.release();
@@ -218,6 +226,16 @@ struct scoped_connection {
      * @return This scoped connection.
      */
     scoped_connection & operator=(const scoped_connection &) = delete;
+
+    /**
+     * @brief Move assignment operator.
+     * @param other The scoped connection to move from.
+     * @return This scoped connection.
+     */
+    scoped_connection & operator=(scoped_connection &&other) ENTT_NOEXCEPT {
+        conn = std::exchange(other.conn, {});
+        return *this;
+    }
 
     /**
      * @brief Acquires a connection.

@@ -11,7 +11,7 @@ struct sigh_listener {
 
     void i() {}
     // useless definition just because msvc does weird things if both are empty
-    void l() { k = k && k; }
+    void l() { k = true && k; }
 
     bool k{false};
 };
@@ -275,6 +275,55 @@ TEST_F(SigH, ScopedConnection) {
 
     ASSERT_TRUE(sigh.empty());
     ASSERT_TRUE(listener.k);
+}
+
+TEST_F(SigH, ScopedConnectionMove) {
+    sigh_listener listener;
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+
+    entt::scoped_connection outer{sink.connect<&sigh_listener::g>(listener)};
+
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_TRUE(outer);
+
+    {
+        entt::scoped_connection inner{std::move(outer)};
+
+        ASSERT_FALSE(listener.k);
+        ASSERT_FALSE(outer);
+        ASSERT_TRUE(inner);
+
+        sigh.publish(42);
+
+        ASSERT_TRUE(listener.k);
+    }
+
+    ASSERT_TRUE(sigh.empty());
+
+    outer = sink.connect<&sigh_listener::g>(listener);
+
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_TRUE(outer);
+
+    {
+        entt::scoped_connection inner{};
+
+        ASSERT_TRUE(listener.k);
+        ASSERT_TRUE(outer);
+        ASSERT_FALSE(inner);
+
+        inner = std::move(outer);
+
+        ASSERT_FALSE(outer);
+        ASSERT_TRUE(inner);
+
+        sigh.publish(42);
+
+        ASSERT_FALSE(listener.k);
+    }
+
+    ASSERT_TRUE(sigh.empty());
 }
 
 TEST_F(SigH, ScopedConnectionConstructorsAndOperators) {
