@@ -136,14 +136,14 @@ class basic_registry {
     auto recycle_identifier() ENTT_NOEXCEPT {
         ENTT_ASSERT(free_list != null, "No entities available");
         const auto curr = entity_traits::to_entity(free_list);
-        free_list = (tombstone | entities[curr]);
+        free_list = entity_traits::combine(entity_traits::to_integral(entities[curr]), tombstone);
         return (entities[curr] = entity_traits::combine(curr, entity_traits::to_integral(entities[curr])));
     }
 
     auto release_entity(const Entity entity, const typename entity_traits::version_type version) {
         const typename entity_traits::version_type vers = version + (version == entity_traits::to_version(tombstone));
         entities[entity_traits::to_entity(entity)] = entity_traits::construct(entity_traits::to_integral(free_list), vers);
-        free_list = (tombstone | entity);
+        free_list = entity_traits::combine(entity_traits::to_integral(entity), tombstone);
         return vers;
     }
 

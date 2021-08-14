@@ -6,6 +6,8 @@
 
 TEST(Entity, Traits) {
     using traits_type = entt::entt_traits<entt::entity>;
+    constexpr entt::entity tombstone = entt::tombstone;
+    constexpr entt::entity null = entt::null;
     entt::registry registry{};
 
     registry.destroy(registry.create());
@@ -27,13 +29,12 @@ TEST(Entity, Traits) {
 
     ASSERT_EQ(traits_type::construct(traits_type::to_entity(other), traits_type::to_version(entity)), traits_type::combine(traits_type::to_integral(other), traits_type::to_integral(entity)));
 
-    ASSERT_EQ(traits_type::combine(entt::tombstone, entt::null), entt::tombstone | static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(traits_type::combine(entt::null, entt::tombstone), entt::null | static_cast<entt::entity>(entt::tombstone));
+    ASSERT_EQ(traits_type::combine(entt::tombstone, entt::null), tombstone);
+    ASSERT_EQ(traits_type::combine(entt::null, entt::tombstone), null);
 }
 
 TEST(Entity, Null) {
     using traits_type = entt::entt_traits<entt::entity>;
-    constexpr entt::entity tombstone = entt::tombstone;
     constexpr entt::entity null = entt::null;
 
     ASSERT_FALSE(entt::entity{} == entt::null);
@@ -43,9 +44,9 @@ TEST(Entity, Null) {
     entt::registry registry{};
     const auto entity = registry.create();
 
-    ASSERT_EQ((entt::null | entity), (traits_type::construct(traits_type::to_entity(null), traits_type::to_version(entity))));
-    ASSERT_EQ((entt::null | null), null);
-    ASSERT_EQ((entt::null | tombstone), null);
+    ASSERT_EQ(traits_type::combine(entt::null, traits_type::to_integral(entity)), (traits_type::construct(traits_type::to_entity(null), traits_type::to_version(entity))));
+    ASSERT_EQ(traits_type::combine(entt::null, traits_type::to_integral(null)), null);
+    ASSERT_EQ(traits_type::combine(entt::null, entt::tombstone), null);
 
     registry.emplace<int>(entity, 42);
 
@@ -64,7 +65,6 @@ TEST(Entity, Null) {
 TEST(Entity, Tombstone) {
     using traits_type = entt::entt_traits<entt::entity>;
     constexpr entt::entity tombstone = entt::tombstone;
-    constexpr entt::entity null = entt::null;
 
     ASSERT_FALSE(entt::entity{} == entt::tombstone);
     ASSERT_TRUE(entt::tombstone == entt::tombstone);
@@ -73,9 +73,9 @@ TEST(Entity, Tombstone) {
     entt::registry registry{};
     const auto entity = registry.create();
 
-    ASSERT_EQ((entt::tombstone | entity), (traits_type::construct(traits_type::to_entity(entity), traits_type::to_version(tombstone))));
-    ASSERT_EQ((entt::tombstone | tombstone), tombstone);
-    ASSERT_EQ((entt::tombstone | null), tombstone);
+    ASSERT_EQ(traits_type::combine(traits_type::to_integral(entity), entt::tombstone), (traits_type::construct(traits_type::to_entity(entity), traits_type::to_version(tombstone))));
+    ASSERT_EQ(traits_type::combine(entt::tombstone, traits_type::to_integral(tombstone)), tombstone);
+    ASSERT_EQ(traits_type::combine(entt::tombstone, entt::null), tombstone);
 
     registry.emplace<int>(entity, 42);
 

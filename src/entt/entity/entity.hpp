@@ -213,18 +213,6 @@ struct null_t {
     [[nodiscard]] constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
         return !(entity == *this);
     }
-
-    /**
-     * @brief Creates a null object from an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
-     * @param entity Entity identifier to turn into a null object.
-     * @return The null representation for the given identifier.
-     */
-    template<typename Entity>
-    [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
-        using entity_traits = entt_traits<Entity>;
-        return entity_traits::combine(entity_traits::reserved, entity_traits::to_integral(entity));
-    }
 };
 
 
@@ -306,18 +294,6 @@ struct tombstone_t {
     template<typename Entity>
     [[nodiscard]] constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
         return !(entity == *this);
-    }
-
-    /**
-     * @brief Creates a tombstone object from an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
-     * @param entity Entity identifier to turn into a tombstone object.
-     * @return The tombstone representation for the given identifier.
-     */
-    template<typename Entity>
-    [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
-        using entity_traits = entt_traits<Entity>;
-        return entity_traits::combine(entity_traits::to_integral(entity), entity_traits::reserved);
     }
 };
 
