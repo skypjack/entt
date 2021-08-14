@@ -23,13 +23,12 @@ TEST(Entity, Traits) {
 
     ASSERT_EQ(traits_type::construct(traits_type::to_entity(entity), traits_type::to_version(entity)), entity);
     ASSERT_EQ(traits_type::construct(traits_type::to_entity(other), traits_type::to_version(other)), other);
+    ASSERT_EQ(traits_type::construct(traits_type::to_entity(other), traits_type::to_version(entity)), traits_type::combine(other, entity));
     ASSERT_NE(traits_type::construct(traits_type::to_entity(entity), {}), entity);
 
-    ASSERT_EQ(traits_type::construct(), entt::tombstone | static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(traits_type::construct(), entt::null | static_cast<entt::entity>(entt::tombstone));
+    ASSERT_EQ(traits_type::combine(entt::tombstone, entt::null), entt::tombstone | static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(traits_type::combine(entt::null, entt::tombstone), entt::null | static_cast<entt::entity>(entt::tombstone));
 
-    ASSERT_EQ(traits_type::construct(), static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(traits_type::construct(), static_cast<entt::entity>(entt::tombstone));
     ASSERT_EQ(traits_type::construct(), entt::entity{~entt::id_type{}});
 }
 
@@ -39,8 +38,6 @@ TEST(Entity, Null) {
     constexpr entt::entity null = entt::null;
 
     ASSERT_FALSE(entt::entity{} == entt::null);
-    ASSERT_TRUE(entt::entity{traits_type::construct()} == entt::null);
-
     ASSERT_TRUE(entt::null == entt::null);
     ASSERT_FALSE(entt::null != entt::null);
 
@@ -71,8 +68,6 @@ TEST(Entity, Tombstone) {
     constexpr entt::entity null = entt::null;
 
     ASSERT_FALSE(entt::entity{} == entt::tombstone);
-    ASSERT_TRUE(entt::entity{traits_type::construct()} == entt::tombstone);
-
     ASSERT_TRUE(entt::tombstone == entt::tombstone);
     ASSERT_FALSE(entt::tombstone != entt::tombstone);
 

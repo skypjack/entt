@@ -111,8 +111,8 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const value_type value) ENTT_NOEXCEPT {
-        constexpr auto mask = (entity_traits::version_mask << entity_traits::entity_shift);
-        return ((to_integral(value) & mask) >> entity_traits::entity_shift);
+        constexpr auto version_mask = (entity_traits::version_mask << entity_traits::entity_shift);
+        return ((to_integral(value) & version_mask) >> entity_traits::entity_shift);
     }
 
     /**
@@ -127,6 +127,21 @@ public:
      */
     [[nodiscard]] static constexpr value_type construct(const entity_type entity = entity_traits::entity_mask, const version_type version = entity_traits::version_mask) ENTT_NOEXCEPT {
         return value_type{(entity & entity_traits::entity_mask) | (static_cast<entity_type>(version) << entity_traits::entity_shift)};
+    }
+
+    /**
+     * @brief Combines two identifiers in a single one.
+     *
+     * The returned identifier is a copy of the first element except for its
+     * version, which is taken from the second element.
+     *
+     * @param lhs The identifier from which to take the entity part.
+     * @param rhs The identifier from which to take the version part.
+     * @return A properly constructed identifier.
+     */
+    [[nodiscard]] static constexpr value_type combine(const value_type lhs, const value_type rhs) ENTT_NOEXCEPT {
+        constexpr auto version_mask = (entity_traits::version_mask << entity_traits::entity_shift);
+        return value_type{to_entity(lhs) | (to_integral(rhs) & version_mask)};
     }
 };
 
