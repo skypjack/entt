@@ -86,6 +86,8 @@ public:
     using version_type = typename entity_traits::version_type;
     /*! @brief Difference type. */
     using difference_type = typename entity_traits::difference_type;
+    /*! @brief Reserved identifier. */
+    static constexpr entity_type reserved = entity_traits::entity_mask | (entity_traits::version_mask << entity_traits::entity_shift);
 
     /**
      * @brief Converts an entity to its underlying type.
@@ -125,7 +127,7 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type construct(const entity_type entity = entity_traits::entity_mask, const version_type version = entity_traits::version_mask) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr value_type construct(const entity_type entity, const version_type version) ENTT_NOEXCEPT {
         return value_type{(entity & entity_traits::entity_mask) | (static_cast<entity_type>(version) << entity_traits::entity_shift)};
     }
 
@@ -139,9 +141,9 @@ public:
      * @param rhs The identifier from which to take the version part.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type combine(const value_type lhs, const value_type rhs) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr value_type combine(const entity_type lhs, const entity_type rhs) ENTT_NOEXCEPT {
         constexpr auto version_mask = (entity_traits::version_mask << entity_traits::entity_shift);
-        return value_type{to_entity(lhs) | (to_integral(rhs) & version_mask)};
+        return value_type{(lhs & entity_traits::entity_mask) | (rhs & version_mask)};
     }
 };
 
@@ -167,7 +169,8 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::construct();
+        using entity_traits = entt_traits<Entity>;
+        return entity_traits::combine(entity_traits::reserved, entity_traits::reserved);
     }
 
     /**
@@ -220,7 +223,7 @@ struct null_t {
     template<typename Entity>
     [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
         using entity_traits = entt_traits<Entity>;
-        return entity_traits::construct(entity_traits::to_entity(*this), entity_traits::to_version(entity));
+        return entity_traits::combine(entity_traits::reserved, entity_traits::to_integral(entity));
     }
 };
 
@@ -260,7 +263,8 @@ struct tombstone_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
-        return entt_traits<Entity>::construct();
+        using entity_traits = entt_traits<Entity>;
+        return entity_traits::combine(entity_traits::reserved, entity_traits::reserved);
     }
 
     /**
@@ -313,7 +317,7 @@ struct tombstone_t {
     template<typename Entity>
     [[nodiscard]] constexpr Entity operator|(const Entity entity) const ENTT_NOEXCEPT {
         using entity_traits = entt_traits<Entity>;
-        return entity_traits::construct(entity_traits::to_entity(entity));
+        return entity_traits::combine(entity_traits::to_integral(entity), entity_traits::reserved);
     }
 };
 

@@ -130,19 +130,19 @@ class basic_registry {
 
     auto generate_identifier(const std::size_t pos) ENTT_NOEXCEPT {
         ENTT_ASSERT(pos < entity_traits::to_integral(null), "No entities available");
-        return entity_traits::construct(static_cast<typename entity_traits::entity_type>(pos), {});
+        return entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), {});
     }
 
     auto recycle_identifier() ENTT_NOEXCEPT {
         ENTT_ASSERT(free_list != null, "No entities available");
         const auto curr = entity_traits::to_entity(free_list);
         free_list = (tombstone | entities[curr]);
-        return (entities[curr] = entity_traits::construct(curr, entity_traits::to_version(entities[curr])));
+        return (entities[curr] = entity_traits::combine(curr, entity_traits::to_integral(entities[curr])));
     }
 
     auto release_entity(const Entity entity, const typename entity_traits::version_type version) {
         const typename entity_traits::version_type vers = version + (version == entity_traits::to_version(tombstone));
-        entities[entity_traits::to_entity(entity)] = entity_traits::construct(entity_traits::to_entity(free_list), vers);
+        entities[entity_traits::to_entity(entity)] = entity_traits::construct(entity_traits::to_integral(free_list), vers);
         free_list = (tombstone | entity);
         return vers;
     }
@@ -163,7 +163,7 @@ public:
      * @return The entity identifier without the version.
      */
     [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return entity_traits::construct(entity_traits::to_entity(entity), {});
+        return entity_traits::combine(entity_traits::to_integral(entity), {});
     }
 
     /**
@@ -414,7 +414,7 @@ public:
         } else {
             auto *it = &free_list;
             for(; entity_traits::to_entity(*it) != req; it = &entities[entity_traits::to_entity(*it)]);
-            *it = entity_traits::construct(curr, entity_traits::to_version(*it));
+            *it = entity_traits::combine(curr, entity_traits::to_integral(*it));
             return (entities[req] = hint);
         }
     }

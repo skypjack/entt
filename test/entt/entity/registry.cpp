@@ -685,7 +685,7 @@ TEST(Registry, VersionOverflow) {
     ASSERT_NE(registry.current(entity), registry.version(entity));
     ASSERT_NE(registry.current(entity), typename traits_type::version_type{});
 
-    registry.release(registry.create(), traits_type::to_version(traits_type::construct()) - 1u);
+    registry.release(registry.create(), traits_type::to_version(entt::tombstone) - 1u);
     registry.release(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));

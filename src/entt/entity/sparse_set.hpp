@@ -277,7 +277,7 @@ protected:
         const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
         ENTT_ASSERT(packed[pos] == entt, "Invalid entity identifier");
 
-        packed[pos] = std::exchange(free_list, entity_traits::construct(static_cast<typename entity_traits::entity_type>(pos)));
+        packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
         // lazy self-assignment guard
         ref = null;
     }
@@ -589,7 +589,7 @@ public:
             resize_packed(sz + !(sz > len));
         }
 
-        assure_page(page(entt))[offset(entt)] = entity_traits::construct(static_cast<typename entity_traits::entity_type>(count));
+        assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), {});
         packed[count] = entt;
         return count++;
     }
@@ -610,7 +610,7 @@ public:
         } else {
             ENTT_ASSERT(!contains(entt), "Set already contains entity");
             const auto pos = static_cast<size_type>(entity_traits::to_entity(free_list));
-            assure_page(page(entt))[offset(entt)] = entity_traits::construct(static_cast<typename entity_traits::entity_type>(pos));
+            assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), {});
             free_list = std::exchange(packed[pos], entt);
             return pos;
         }
@@ -634,7 +634,7 @@ public:
         for(; first != last; ++first) {
             const auto entt = *first;
             ENTT_ASSERT(!contains(entt), "Set already contains entity");
-            assure_page(page(entt))[offset(entt)] = entity_traits::construct(static_cast<typename entity_traits::entity_type>(count));
+            assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), {});
             packed[count++] = entt;
         }
     }
@@ -710,8 +710,8 @@ public:
                 --next;
                 move_and_pop(next, pos);
                 std::swap(packed[next], packed[pos]);
-                sparse[page(packed[pos])][offset(packed[pos])] = entity_traits::construct(static_cast<const typename entity_traits::entity_type>(pos));
-                *it = entity_traits::construct(static_cast<typename entity_traits::entity_type>(next));
+                sparse[page(packed[pos])][offset(packed[pos])] = entity_traits::combine(static_cast<const typename entity_traits::entity_type>(pos), {});
+                *it = entity_traits::combine(static_cast<typename entity_traits::entity_type>(next), entity_traits::reserved);
                 for(; next && packed[next - 1u] == tombstone; --next);
             }
         }
@@ -796,7 +796,7 @@ public:
                 const auto entt = packed[curr];
 
                 swap_at(next, idx);
-                sparse[page(entt)][offset(entt)] = entity_traits::construct(static_cast<typename entity_traits::entity_type>(curr));
+                sparse[page(entt)][offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(curr), {});
                 curr = std::exchange(next, idx);
             }
         }
