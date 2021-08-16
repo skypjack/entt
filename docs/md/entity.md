@@ -27,8 +27,8 @@
     * [Organizer](#organizer)
   * [Context variables](#context-variables)
     * [Aliased properties](#aliased-properties)
-  * [In-place delete](#in-place-delete)
-    * [Pointer stability](#pointer-stability)
+  * [Pointer stability](#pointer-stability)
+    * [In-place delete](#in-place-delete)
     * [Hierarchies and the like](#hierarchies-and-the-like)
   * [Making the most of range-destroy](#making-the-most-of-range-destroy)
   * [Meet the runtime](#meet-the-runtime)
@@ -48,8 +48,6 @@
     * [Nested groups](#nested-groups)
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
-  * [Stable storage](#stable-storage)
-    * [No policy is the best policy](#no-policy-is-the-best-policy)
   * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
     * [More performance, more constraints](#more-performance-more-constraints)
 * [Empty type optimization](#empty-type-optimization)
@@ -981,7 +979,24 @@ const my_type &var = registry.ctx<const my_type>();
 Aliased properties can be unset and are overwritten when `set` is invoked, as it
 happens with standard variables.
 
-## In-place delete
+## Pointer stability
+
+The ability to achieve pointer stability for one, several or all components is a
+direct consequence of the design of `EnTT` and of its default storage.<br/>
+In fact, although it contains what is commonly referred to as a _packed array_,
+the default storage is paged and doesn't suffer from invalidation of references
+when it runs out of space and has to reallocate.<br/>
+However, this isn't enough to ensure pointer stability in case of deletion. For
+this reason, a _stable_ deletion method is also offered. This one is such that
+the position of the elements is preserved by creating tombstones upon deletion
+rather than trying to fill the holes that are created.
+
+For performance reasons, `EnTT` will also favor storage compaction in all cases,
+although often accessing a component occurs mostly randomly or traversing pools
+in a non-linear order on the user side (as in the case of a hierarchy).<br/>
+In other words, pointer stability is not automatic but is enabled on request.
+
+### In-place delete
 
 By default, `EnTT` keeps all pools compact when a component is removed. This is
 done through a swap-and-pop between the removed item and the one occupying the
@@ -1008,7 +1023,7 @@ struct basic_component_traits {
 Where `in_place_delete` instructs the library on the deletion policy for a given
 type while `ignore_if_empty` selectively disables empty type optimization.<br/>
 The `component_traits` class template is _sfinae-friendly_, it supports single-
-and multi-type specializations as well as feature-based ones:
+and multi type specializations as well as feature-based ones:
 
 ```cpp
 template<>
@@ -1019,38 +1034,25 @@ struct entt::component_traits<position>: basic_component_traits {
 
 This will ensure in-place deletion for the `position` component without further
 user intervention.<br/>
-Pools, views and groups will adapt accordingly when they detect a storage with a
-different deletion policy than the default. No specific action is required from
-the user once in-place deletion is enabled.
+Views and groups adapt accordingly when they detect a storage with a different
+deletion policy than the default. No specific action is required from the user
+once in-place deletion is enabled. In particular:
 
-### Pointer stability
+* Groups are incompatible with stable storage and will trigger a compile-time
+  error if detected.
 
-The ability to achieve pointer stability for one, several or all components is a
-direct consequence of the design of `EnTT` and of its default storage.<br/>
-In fact, although it contains what is commonly referred to as a _packed array_,
-the default storage is paged and doesn't suffer from invalidation of references
-when it runs out of space and has to reallocate.<br/>
-However, this isn't enough to ensure pointer stability in case of deletion. For
-this reason, a _stable_ deletion method is also offered. This one is such that
-the position of the elements is preserved by creating tombstones upon deletion
-rather than trying to fill the holes that are created.
+* Multi type views are completely transparent to storage policies.
 
-For performance reasons, `EnTT` will also favor storage compaction in all cases,
-although often accessing a component occurs mostly randomly or traversing pools
-in a non-linear order on the user side (as in the case of a hierarchy).<br/>
-In other words, pointer stability is not automatic but is enabled on request. To
-have it at the project level and for all components, it's required to partially
-specialize the `component_traits` class for all possible types:
+* Single type views for stable storage types offer the same interface of multi
+  type views. For example, only `size_hint` is available and it's not possible
+  to directly access the raw representation of entities and components.
 
-```cpp
-template<typename Type>
-struct entt::component_traits<Type>: basic_component_traits {
-    using in_place_delete = std::true_type;
-};
-```
-
-Because of how C++ works, this specialization will obviously have to be visible
-every time operations are performed on a storage.
+In other words, the more generic version of a view will be provided in case of
+stable storage, even for single components, always supported by an appropriate
+iteration policy if required.<br/>
+The latter will be such that in no case will a tombstone be returned from the
+view itself, regardless of the iteration method. Similarly, no non-existent
+components will be accessed, which could result in an UB otherwise.
 
 ### Hierarchies and the like
 
@@ -1464,24 +1466,24 @@ A view behaves differently if it's constructed for a single component or if it
 has been created to iterate multiple components. Even the API is slightly
 different in the two cases.
 
-Single component views are specialized in order to give a boost in terms of
-performance in all the situations. This kind of views can access the underlying
-data structures directly and avoid superfluous checks. There is nothing as fast
-as a single component view. In fact, they walk through a packed (actually paged)
-array of components and return them one at a time.<br/>
-Single component views also offer a bunch of functionalities to get the number
-of entities they are going to return and a raw access to the entity list as well
-as to the component list. It's also possible to ask a view if it contains a
-given entity.<br/>
+Single type views are specialized to give a boost in terms of performance in all
+the situations. This kind of views can access the underlying data structures
+directly and avoid superfluous checks. There is nothing as fast as a single type
+view. In fact, they walk through a packed (actually paged) array of components
+and return them one at a time.<br/>
+Single type views also offer a bunch of functionalities to get the number of
+entities they are going to return and a raw access to the entity list as well as
+to the component list. It's also possible to ask a view if it contains a given
+entity.<br/>
 Refer to the inline documentation for all the details.
 
-Multi component views iterate entities that have at least all the given
-components in their bags. During construction, these views look at the number of
-entities available for each component and pick up a reference to the smallest
-set of candidates in order to speed up iterations.<br/>
-They offer fewer functionalities than single component views. In particular,
-a multi component view exposes utility functions to get the estimated number of
-entities it is going to return and to know if it contains a given entity.<br/>
+Multi type views iterate entities that have at least all the given components in
+their bags. During construction, these views look at the number of entities
+available for each component and pick up a reference to the smallest set of
+candidates in order to speed up iterations.<br/>
+They offer fewer functionalities than single type views. In particular, a multi
+type view exposes utility functions to get the estimated number of entities it
+is going to return and to know if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
 There is no need to store views aside for they are extremely cheap to construct,
@@ -1492,10 +1494,10 @@ Views also return newly created and correctly initialized iterators whenever
 Views share the way they are created by means of a registry:
 
 ```cpp
-// single component view
+// single type view
 auto single = registry.view<position>();
 
-// multi component view
+// multi type view
 auto multi = registry.view<position, velocity>();
 ```
 
@@ -1546,9 +1548,9 @@ iterations.<br/>
 Since they aren't explicitly instantiated, empty components aren't returned in
 any case.
 
-As a side note, in the case of single component views, `get` accepts but doesn't
+As a side note, in the case of single type views, `get` accepts but doesn't
 strictly require a template parameter, since the type is implicitly defined.
-However, when the type isn't specified, for consistency with the multi component
+However, when the type isn't specified, for consistency with the multi type
 view, the instance will be returned using a tuple:
 
 ```cpp
@@ -1590,12 +1592,12 @@ Runtime views iterate entities that have at least all the given components in
 their bags. During construction, these views look at the number of entities
 available for each component and pick up a reference to the smallest set of
 candidates in order to speed up iterations.<br/>
-They offer more or less the same functionalities of a multi component view.
-However, they don't expose a `get` member function and users should refer to the
-registry that generated the view to access components. In particular, a runtime
-view exposes utility functions to get the estimated number of entities it is
-going to return and to know whether it's empty or not. It's also possible to ask
-a runtime view if it contains a given entity.<br/>
+They offer more or less the same functionalities of a multi type view. However,
+they don't expose a `get` member function and users should refer to the registry
+that generated the view to access components. In particular, a runtime view
+exposes utility functions to get the estimated number of entities it is going to
+return and to know whether it's empty or not. It's also possible to ask a
+runtime view if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
 Runtime views are pretty cheap to construct and should not be stored aside in
@@ -1638,7 +1640,7 @@ use runtime views as their performance are inferior to those of the other views.
 ## Groups
 
 Groups are meant to iterate multiple components at once and to offer a faster
-alternative to multi component views.<br/>
+alternative to multi type views.<br/>
 Groups overcome the performance of the other tools available but require to get
 the ownership of components and this sets some constraints on pools. On the
 other side, groups aren't an automatism that increases memory consumption,
@@ -1977,77 +1979,6 @@ In general, all these functions can result in poor performance.<br/>
 entity. For similar reasons, `orphans` can be even slower. Both functions should
 not be used frequently to avoid the risk of a performance hit.
 
-## Stable storage
-
-Since it's possible to have completely stable storage in `EnTT`, it's also
-required that all views and groups behave accordingly.<br/>
-In general, this aspect is quite transparent to the user who doesn't have to do
-anything in the vast majority of cases. In particular:
-
-* Groups are incompatible with stable storage and will trigger a compile-time
-  error if detected.
-
-* Views detect the type of storage with the most stringent requirements when
-  built and self-configure themselves to use the correct iteration policy.
-
-* Views created as view packs adjust their policy by choosing the most stringent
-  among those available.
-
-The policy adopted doesn't emerge from the view type, although it's available
-through the `storage_policy` alias.<br/>
-However, this can affect the feature set offered by the view itself. In the case
-of storage that also support tombstones, all views (even single-component ones)
-will always behave as a multi-type views. Therefore, for example, it won't be
-possible to directly access the raw representation of entities and components.
-
-In other words, the more generic version of a view will be provided in case of
-stable storage, even for single components, always supported by an appropriate
-iteration policy.<br/>
-The latter will be such that in no case will a tombstone be returned from the
-view itself, regardless of the iteration method. Similarly, no non-existent
-components will be accessed, which could result in an UB otherwise.
-
-### No policy is the best policy
-
-When a view is iterated and the type leading the iteration undergoes in-place
-deletion, a dedicated policy is used to skip any tombstones.<br/>
-As negligible as it may be (and the advice is to always measure before trying to
-optimize things that don't need it), this adds a cost to the iteration itself.
-
-As for single type iterations, this check cannot be avoided. On the other hand,
-if a type is accessed mainly through linear iterations, the error is probably in
-the use of stable storage that doesn't allow to rearrange the elements in order
-to keep them tightly packed.<br/>
-On the other hand, in many cases it's possible to force the use of no policy for
-multi-type iterations. By default, a view uses the most stringent policy unless
-instructed otherwise, primarily because it does an opaque iteration over deleted
-types. However, by specifying the type to lead the iteration, it has enough
-information to choose the most suitable policy (hopefully, no policy at all).
-
-For example, if the `position` type has stable storage and the `velocity` type
-does not, the following iteration will use a policy to skip all tombstones:
-
-```cpp
-for(auto [entity, pos, vel]: registry.view<position, velocity>().each()) {
-    /* ... */
-}
-```
-
-However, by requiring `velocity` to lead the iteration, the view will be able to
-choose the most suitable policy, that is no policy at all in this case:
-
-```cpp
-for(auto [entity, pos, vel]: registry.view<position, velocity>().each<velocity>()) {
-    /* ... */
-}
-```
-
-Forcing the use of no policy means returning to the iteration logic normally
-adopted for views that don't contain types with stable storage, that is the
-iteration process that has accompanied `EnTT` since the beginning.<br/>
-The same technique can be used with all overloads of the `each` function as well
-as with the `begin`/`end` template functions of a view.
-
 ## What is allowed and what is not
 
 Most of the _ECS_ available out there don't allow to create and destroy entities
@@ -2122,24 +2053,24 @@ limitations to the destruction of components and entities.<br/>
 Fortunately, this isn't always true. In fact, it almost never is and this
 happens only under certain conditions. In particular:
 
-* Iterating a type of component that is part of a group with a single component
-  view and adding to an entity all the components required to get it into the
-  group may invalidate the iterators.
+* Iterating a type of component that is part of a group with a single type view
+  and adding to an entity all the components required to get it into the group
+  may invalidate the iterators.
 
-* Iterating a type of component that is part of a group with a multi component
-  view and adding to an entity all the components required to get it into the
-  group can invalidate the iterators, unless users specify another type of
-  component to use to induce the order of iteration of the view (in this case,
-  the former is treated as a free type and isn't affected by the limitation).
+* Iterating a type of component that is part of a group with a multi type view
+  and adding to an entity all the components required to get it into the group
+  can invalidate the iterators, unless users specify another type of component
+  to use to induce the order of iteration of the view (in this case, the former
+  is treated as a free type and isn't affected by the limitation).
 
 In other words, the limitation doesn't exist as long as a type is treated as a
-free type (as an example with multi component views and partial- or non-owning
+free type (as an example with multi type views and partial- or non-owning
 groups) or iterated with its own group, but it can occur if the type is used as
 a main type to rule on an iteration.<br/>
 This happens because groups own the pools of their components and organize the
 data internally to maximize performance. Because of that, full consistency for
 owned components is guaranteed only when they are iterated as part of their
-groups or as free types with multi component views and groups in general.
+groups or as free types with multi type views and groups in general.
 
 # Empty type optimization
 

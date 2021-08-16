@@ -110,13 +110,14 @@ private:
 };
 
 
-template<typename Type, typename It, std::size_t Component, std::size_t Exclude, typename Policy>
+template<typename Type, typename It, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
+    static constexpr auto is_multi_type_v = ((Component + Exclude) != 0u);
+
     [[nodiscard]] bool valid() const {
-        const auto entt = *it;
-        return Policy::accept(entt)
-            && std::apply([entt](const auto *... curr) { return (curr->contains(entt) && ...); }, pools)
-            && std::apply([entt](const auto *... curr) { return (!curr->contains(entt) && ...); }, filter);
+        return (is_multi_type_v || (*it != tombstone))
+            && std::apply([entt = *it](const auto *... curr) { return (curr->contains(entt) && ...); }, pools)
+            && std::apply([entt = *it](const auto *... curr) { return (!curr->contains(entt) && ...); }, filter);
     }
 
 public:
@@ -192,19 +193,6 @@ private:
 };
 
 
-template<bool Enable>
-struct policy_dispatcher {
-    template<typename Entity>
-    [[nodiscard]] static constexpr bool accept([[maybe_unused]] const Entity entity) ENTT_NOEXCEPT {
-        if constexpr(Enable) {
-            return entity != tombstone;
-        } else {
-            return true;
-        }
-    }
-};
-
-
 }
 
 
@@ -262,8 +250,8 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     template<typename, typename, typename, typename>
     friend class basic_view;
 
+    static constexpr auto is_multi_type_v = ((sizeof...(Component) + sizeof...(Exclude)) != 1u);
     using basic_common_type = std::common_type_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type::base_type...>;
-    using policy_type = internal::policy_dispatcher<(in_place_delete_v<std::remove_const_t<Component>> || ...)>;
 
     class iterable final {
         template<typename It>
@@ -306,8 +294,8 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         };
 
     public:
-        using iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>>;
-        using reverse_iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>>;
+        using iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
+        using reverse_iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
 
         iterable(const basic_view &parent)
             : view{parent}
@@ -361,9 +349,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>;
+    using iterator = internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude), policy_type>;
+    using reverse_iterator = internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable_view = iterable;
 
@@ -486,7 +474,7 @@ public:
 
     /**
      * @brief Finds an entity.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
@@ -505,7 +493,7 @@ public:
 
     /**
      * @brief Checks if a view contains an entity.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
@@ -525,7 +513,7 @@ public:
      * results in undefined behavior.
      *
      * @tparam Comp Types of components to get.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return The components assigned to the entity.
      */
     template<typename... Comp>
@@ -585,7 +573,7 @@ public:
     template<typename Comp, typename Func>
     void each(Func func) const {
         for(const auto curr: internal::iterable_storage<Entity, Comp>{*std::get<storage_type<Comp> *>(pools)}) {
-            if(internal::policy_dispatcher<in_place_delete_v<std::remove_const_t<Comp>>>::accept(std::get<0>(curr))
+            if((is_multi_type_v || (std::get<0>(curr) != tombstone))
                 && ((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(std::get<0>(curr))) && ...)
                 && std::apply([entt = std::get<0>(curr)](const auto *... cpool) { return (!cpool->contains(entt) && ...); }, filter))
             {
@@ -840,7 +828,7 @@ public:
 
     /**
      * @brief Finds an entity.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
@@ -868,7 +856,7 @@ public:
 
     /**
      * @brief Checks if a view contains an entity.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
@@ -887,7 +875,7 @@ public:
      * results in undefined behavior.
      *
      * @tparam Comp Types of components to get.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return The component assigned to the entity.
      */
     template<typename... Comp>

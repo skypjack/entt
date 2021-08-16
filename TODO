@@ -5,19 +5,20 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
+* fast-contains for sparse sets (low prio but nice-to-have)
 * runtime components (registry), runtime events (dispatcher/emitter), ...
-* single prop call with operator() for meta factories (to cut down instantiations)
-* remove the tombstone check (version check + null version)
+* runtime_view/registry, remove reference to basic_sparse_set<E>
+* make pools available (registry/view/group), review operator| for views, make views accept registry to ctor
+* make view.lead() or similar available to return leading pool (useful for mt)
 * dedicated entity storage, in-place O(1) release/destroy
+* deprecate registry::entity, registry::version (use entt_traits)
 * general purpose paged vector container
 * custom allocators all over
 
 WIP:
-* payload tracking destroy mixin for pools
 * make sparse_set/storage adhere to AllocatorAwareContainer requirements
 * make it possible to register externally managed pools with the registry (allow for system centric mode)
 * registry: switch to the udata/mixin model and get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
-* make pools available (registry/view/group), review operator| for views
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * add user data to type_info
