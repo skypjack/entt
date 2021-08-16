@@ -11,7 +11,6 @@ WIP:
 * make pools available (registry/view/group), review operator| for views, make views accept registry to ctor
 * make view.lead() or similar available to return leading pool (useful for mt)
 * dedicated entity storage, in-place O(1) release/destroy
-* deprecate registry::entity, registry::version (use entt_traits)
 * general purpose paged vector container
 * custom allocators all over
 

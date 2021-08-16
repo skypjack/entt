@@ -1,6 +1,7 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/entity/entity.hpp>
 #include <entt/entity/handle.hpp>
 #include <entt/entity/registry.hpp>
 
@@ -64,6 +65,8 @@ TEST(BasicHandle, Invalidation) {
 }
 
 TEST(BasicHandle, Destruction) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::registry registry;
     const auto entity = registry.create();
     entt::handle handle{registry, entity};
@@ -73,7 +76,7 @@ TEST(BasicHandle, Destruction) {
     ASSERT_NE(handle.registry(), nullptr);
     ASSERT_EQ(handle.entity(), entity);
 
-    handle.destroy(registry.version(entity));
+    handle.destroy(traits_type::to_version(entity));
 
     ASSERT_FALSE(handle);
     ASSERT_FALSE(handle.valid());

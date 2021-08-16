@@ -157,24 +157,6 @@ public:
     /*! @brief Poly storage type. */
     using poly_storage = typename poly_storage_traits<Entity>::storage_type;
 
-    /**
-     * @brief Returns the identifier without the version.
-     * @param entity An identifier, either valid or not.
-     * @return The identifier without the version.
-     */
-    [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return entity_traits::combine(entity_traits::to_integral(entity), {});
-    }
-
-    /**
-     * @brief Returns the version stored along with an identifier.
-     * @param entity An identifier, either valid or not.
-     * @return The version stored along with the given identifier.
-     */
-    [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
-        return entity_traits::to_version(entity);
-    }
-
     /*! @brief Default constructor. */
     basic_registry() = default;
 
@@ -362,7 +344,7 @@ public:
      */
     [[nodiscard]] version_type current(const entity_type entity) const {
         const auto pos = size_type(entity_traits::to_entity(entity));
-        return pos < entities.size() ? version(entities[pos]) : entity_traits::to_version(tombstone);
+        return entity_traits::to_version(pos < entities.size() ? entities[pos] : tombstone);
     }
 
     /**
@@ -472,7 +454,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type release(const entity_type entity) {
-        return release(entity, version(entity) + 1u);
+        return release(entity, entity_traits::to_version(entity) + 1u);
     }
 
     /**
@@ -504,7 +486,7 @@ public:
     template<typename It>
     void release(It first, It last) {
         for(; first != last; ++first) {
-            release(*first, version(*first) + 1u);
+            release(*first, entity_traits::to_version(*first) + 1u);
         }
     }
 
@@ -524,7 +506,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entity) {
-        return destroy(entity, version(entity) + 1u);
+        return destroy(entity, entity_traits::to_version(entity) + 1u);
     }
 
     /**
@@ -562,7 +544,7 @@ public:
     void destroy(It first, It last) {
         if constexpr(is_iterator_type_v<typename basic_common_type::iterator, It>) {
             for(; first != last; ++first) {
-                destroy(*first, version(*first) + 1u);
+                destroy(*first, entity_traits::to_version(*first) + 1u);
             }
         } else {
             for(auto &&pdata: pools) {
@@ -958,7 +940,7 @@ public:
                 pdata.pool && (pdata.pool->clear(this), true);
             }
 
-            each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
+            each([this](const auto entity) { release_entity(entity, entity_traits::to_version(entity) + 1u); });
         } else {
             (assure<Component>()->clear(this), ...);
         }
