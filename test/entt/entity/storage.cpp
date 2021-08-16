@@ -162,10 +162,7 @@ TEST(Storage, EmptyType) {
 
 TEST(Storage, Insert) {
     entt::storage<stable_type> pool;
-    entt::entity entities[2u];
-
-    entities[0u] = entt::entity{3};
-    entities[1u] = entt::entity{42};
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
     pool.insert(std::begin(entities), std::end(entities), stable_type{99});
 
     ASSERT_TRUE(pool.contains(entities[0u]));
@@ -193,10 +190,7 @@ TEST(Storage, Insert) {
 
 TEST(Storage, InsertEmptyType) {
     entt::storage<empty_type> pool;
-    entt::entity entities[2u];
-
-    entities[0u] = entt::entity{3};
-    entities[1u] = entt::entity{42};
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
     pool.insert(std::begin(entities), std::end(entities));
 
@@ -209,11 +203,7 @@ TEST(Storage, InsertEmptyType) {
 
 TEST(Storage, Erase) {
     entt::storage<int> pool;
-    entt::entity entities[3u];
-
-    entities[0u] = entt::entity{3};
-    entities[1u] = entt::entity{42};
-    entities[2u] = entt::entity{9};
+    entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
 
     pool.emplace(entities[0u]);
     pool.emplace(entities[1u]);
@@ -248,14 +238,10 @@ TEST(Storage, Erase) {
 
 TEST(Storage, StableErase) {
     entt::storage<stable_type> pool;
-    entt::entity entities[3u];
+    entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
 
     ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entt::tombstone), "");
     ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entt::null), "");
-
-    entities[0u] = entt::entity{3};
-    entities[1u] = entt::entity{42};
-    entities[2u] = entt::entity{9};
 
     pool.emplace(entities[0u], stable_type{0});
     pool.emplace(entities[1u], stable_type{1});
@@ -357,11 +343,7 @@ TEST(Storage, StableErase) {
 
 TEST(Storage, Remove) {
     entt::storage<int> pool;
-    entt::entity entities[3u];
-
-    entities[0u] = entt::entity{3};
-    entities[1u] = entt::entity{42};
-    entities[2u] = entt::entity{9};
+    entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
 
     pool.emplace(entities[0u]);
     pool.emplace(entities[1u]);
@@ -395,11 +377,7 @@ TEST(Storage, Remove) {
 
 TEST(Storage, StableRemove) {
     entt::storage<stable_type> pool;
-    entt::entity entities[3u];
-
-    entities[0u] = entt::entity{3};
-    entities[1u] = entt::entity{42};
-    entities[2u] = entt::entity{9};
+    entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
 
     pool.emplace(entities[0u], stable_type{0});
     pool.emplace(entities[1u], stable_type{1});
@@ -804,18 +782,18 @@ TEST(Storage, SortUnordered) {
     auto begin = pool.begin();
     auto end = pool.end();
 
-    ASSERT_EQ(*(begin++), boxed_int{1});
-    ASSERT_EQ(*(begin++), boxed_int{3});
-    ASSERT_EQ(*(begin++), boxed_int{6});
-    ASSERT_EQ(*(begin++), boxed_int{9});
-    ASSERT_EQ(*(begin++), boxed_int{12});
+    ASSERT_EQ(*(begin++), values[2u]);
+    ASSERT_EQ(*(begin++), values[1u]);
+    ASSERT_EQ(*(begin++), values[0u]);
+    ASSERT_EQ(*(begin++), values[3u]);
+    ASSERT_EQ(*(begin++), values[4u]);
     ASSERT_EQ(begin, end);
 
-    ASSERT_EQ(pool.data()[0u], entt::entity{9});
-    ASSERT_EQ(pool.data()[1u], entt::entity{3});
-    ASSERT_EQ(pool.data()[2u], entt::entity{12});
-    ASSERT_EQ(pool.data()[3u], entt::entity{42});
-    ASSERT_EQ(pool.data()[4u], entt::entity{7});
+    ASSERT_EQ(pool.data()[0u], entities[4u]);
+    ASSERT_EQ(pool.data()[1u], entities[3u]);
+    ASSERT_EQ(pool.data()[2u], entities[0u]);
+    ASSERT_EQ(pool.data()[3u], entities[1u]);
+    ASSERT_EQ(pool.data()[4u], entities[2u]);
 }
 
 TEST(Storage, SortRange) {
@@ -831,31 +809,31 @@ TEST(Storage, SortRange) {
 
     pool.sort_n(2u, [&pool](auto lhs, auto rhs) { return pool.get(lhs).value < pool.get(rhs).value; });
 
-    ASSERT_EQ(pool.raw()[0u][0u], boxed_int{6});
-    ASSERT_EQ(pool.raw()[0u][1u], boxed_int{3});
-    ASSERT_EQ(pool.raw()[0u][2u], boxed_int{1});
+    ASSERT_EQ(pool.raw()[0u][0u], values[1u]);
+    ASSERT_EQ(pool.raw()[0u][1u], values[0u]);
+    ASSERT_EQ(pool.raw()[0u][2u], values[2u]);
 
-    ASSERT_EQ(pool.data()[0u], entt::entity{42});
-    ASSERT_EQ(pool.data()[1u], entt::entity{12});
-    ASSERT_EQ(pool.data()[2u], entt::entity{7});
+    ASSERT_EQ(pool.data()[0u], entities[1u]);
+    ASSERT_EQ(pool.data()[1u], entities[0u]);
+    ASSERT_EQ(pool.data()[2u], entities[2u]);
 
     pool.sort_n(5u, [&pool](auto lhs, auto rhs) { return pool.get(lhs).value < pool.get(rhs).value; });
 
     auto begin = pool.begin();
     auto end = pool.end();
 
-    ASSERT_EQ(*(begin++), boxed_int{1});
-    ASSERT_EQ(*(begin++), boxed_int{3});
-    ASSERT_EQ(*(begin++), boxed_int{6});
-    ASSERT_EQ(*(begin++), boxed_int{9});
-    ASSERT_EQ(*(begin++), boxed_int{12});
+    ASSERT_EQ(*(begin++), values[2u]);
+    ASSERT_EQ(*(begin++), values[0u]);
+    ASSERT_EQ(*(begin++), values[1u]);
+    ASSERT_EQ(*(begin++), values[3u]);
+    ASSERT_EQ(*(begin++), values[4u]);
     ASSERT_EQ(begin, end);
 
-    ASSERT_EQ(pool.data()[0u], entt::entity{9});
-    ASSERT_EQ(pool.data()[1u], entt::entity{3});
-    ASSERT_EQ(pool.data()[2u], entt::entity{42});
-    ASSERT_EQ(pool.data()[3u], entt::entity{12});
-    ASSERT_EQ(pool.data()[4u], entt::entity{7});
+    ASSERT_EQ(pool.data()[0u], entities[4u]);
+    ASSERT_EQ(pool.data()[1u], entities[3u]);
+    ASSERT_EQ(pool.data()[2u], entities[1u]);
+    ASSERT_EQ(pool.data()[3u], entities[0u]);
+    ASSERT_EQ(pool.data()[4u], entities[2u]);
 }
 
 TEST(Storage, RespectDisjoint) {
@@ -898,14 +876,14 @@ TEST(Storage, RespectOverlap) {
     auto begin = lhs.begin();
     auto end = lhs.end();
 
-    ASSERT_EQ(*(begin++), 6);
-    ASSERT_EQ(*(begin++), 9);
-    ASSERT_EQ(*(begin++), 3);
+    ASSERT_EQ(*(begin++), lhs_values[1u]);
+    ASSERT_EQ(*(begin++), lhs_values[2u]);
+    ASSERT_EQ(*(begin++), lhs_values[0u]);
     ASSERT_EQ(begin, end);
 
-    ASSERT_EQ(lhs.data()[0u], entt::entity{3});
-    ASSERT_EQ(lhs.data()[1u], entt::entity{42});
-    ASSERT_EQ(lhs.data()[2u], entt::entity{12});
+    ASSERT_EQ(lhs.data()[0u], lhs_entities[0u]);
+    ASSERT_EQ(lhs.data()[1u], lhs_entities[2u]);
+    ASSERT_EQ(lhs.data()[2u], lhs_entities[1u]);
 }
 
 TEST(Storage, RespectOrdered) {
@@ -955,20 +933,20 @@ TEST(Storage, RespectReverse) {
     auto begin = rhs.begin();
     auto end = rhs.end();
 
-    ASSERT_EQ(*(begin++), 5);
-    ASSERT_EQ(*(begin++), 4);
-    ASSERT_EQ(*(begin++), 3);
-    ASSERT_EQ(*(begin++), 2);
-    ASSERT_EQ(*(begin++), 1);
-    ASSERT_EQ(*(begin++), 6);
+    ASSERT_EQ(*(begin++), rhs_values[0u]);
+    ASSERT_EQ(*(begin++), rhs_values[1u]);
+    ASSERT_EQ(*(begin++), rhs_values[2u]);
+    ASSERT_EQ(*(begin++), rhs_values[3u]);
+    ASSERT_EQ(*(begin++), rhs_values[4u]);
+    ASSERT_EQ(*(begin++), rhs_values[5u]);
     ASSERT_EQ(begin, end);
 
-    ASSERT_EQ(rhs.data()[0u], entt::entity{6});
-    ASSERT_EQ(rhs.data()[1u], entt::entity{1});
-    ASSERT_EQ(rhs.data()[2u], entt::entity{2});
-    ASSERT_EQ(rhs.data()[3u], entt::entity{3});
-    ASSERT_EQ(rhs.data()[4u], entt::entity{4});
-    ASSERT_EQ(rhs.data()[5u], entt::entity{5});
+    ASSERT_EQ(rhs.data()[0u], rhs_entities[5u]);
+    ASSERT_EQ(rhs.data()[1u], rhs_entities[4u]);
+    ASSERT_EQ(rhs.data()[2u], rhs_entities[3u]);
+    ASSERT_EQ(rhs.data()[3u], rhs_entities[2u]);
+    ASSERT_EQ(rhs.data()[4u], rhs_entities[1u]);
+    ASSERT_EQ(rhs.data()[5u], rhs_entities[0u]);
 }
 
 TEST(Storage, RespectUnordered) {
@@ -994,20 +972,20 @@ TEST(Storage, RespectUnordered) {
     auto begin = rhs.begin();
     auto end = rhs.end();
 
-    ASSERT_EQ(*(begin++), 5);
-    ASSERT_EQ(*(begin++), 4);
-    ASSERT_EQ(*(begin++), 3);
-    ASSERT_EQ(*(begin++), 2);
-    ASSERT_EQ(*(begin++), 1);
-    ASSERT_EQ(*(begin++), 6);
+    ASSERT_EQ(*(begin++), rhs_values[5u]);
+    ASSERT_EQ(*(begin++), rhs_values[4u]);
+    ASSERT_EQ(*(begin++), rhs_values[0u]);
+    ASSERT_EQ(*(begin++), rhs_values[1u]);
+    ASSERT_EQ(*(begin++), rhs_values[3u]);
+    ASSERT_EQ(*(begin++), rhs_values[2u]);
     ASSERT_EQ(begin, end);
 
-    ASSERT_EQ(rhs.data()[0u], entt::entity{6});
-    ASSERT_EQ(rhs.data()[1u], entt::entity{1});
-    ASSERT_EQ(rhs.data()[2u], entt::entity{2});
-    ASSERT_EQ(rhs.data()[3u], entt::entity{3});
-    ASSERT_EQ(rhs.data()[4u], entt::entity{4});
-    ASSERT_EQ(rhs.data()[5u], entt::entity{5});
+    ASSERT_EQ(rhs.data()[0u], rhs_entities[2u]);
+    ASSERT_EQ(rhs.data()[1u], rhs_entities[3u]);
+    ASSERT_EQ(rhs.data()[2u], rhs_entities[1u]);
+    ASSERT_EQ(rhs.data()[3u], rhs_entities[0u]);
+    ASSERT_EQ(rhs.data()[4u], rhs_entities[4u]);
+    ASSERT_EQ(rhs.data()[5u], rhs_entities[5u]);
 }
 
 TEST(Storage, CanModifyDuringIteration) {

@@ -289,7 +289,7 @@ protected:
 
     /**
      * @brief Attempts to erase an entity from the internal packed array.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void swap_and_pop(const Entity entt, void *ud) override {
@@ -307,7 +307,7 @@ protected:
 
     /**
      * @brief Attempts to erase an entity from the internal packed array.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void in_place_pop(const Entity entt, void *ud) override {
@@ -541,7 +541,7 @@ public:
      * Attempting to use an entity that doesn't belong to the storage results in
      * undefined behavior.
      *
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return The object assigned to the entity.
      */
     [[nodiscard]] const value_type & get(const entity_type entt) const ENTT_NOEXCEPT {
@@ -559,7 +559,7 @@ public:
      *
      * @sa get
      *
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return The object assigned to the entity as a tuple.
      */
     [[nodiscard]] std::tuple<const value_type &> get_as_tuple(const entity_type entt) const ENTT_NOEXCEPT {
@@ -583,7 +583,7 @@ public:
      * in undefined behavior.
      *
      * @tparam Args Types of arguments to use to construct the object.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param args Parameters to use to construct an object for the entity.
      * @return A reference to the newly created object.
      */
@@ -608,7 +608,7 @@ public:
     /**
      * @brief Updates the instance assigned to a given entity in-place.
      * @tparam Func Types of the function objects to invoke.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param func Valid function objects.
      * @return A reference to the updated instance.
      */
@@ -726,7 +726,7 @@ public:
      * Attempting to use an entity that doesn't belong to the storage results in
      * undefined behavior.
      *
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @return Returns an empty tuple.
      */
     [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
@@ -742,7 +742,7 @@ public:
      * in undefined behavior.
      *
      * @tparam Args Types of arguments to use to construct the object.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param args Parameters to use to construct an object for the entity.
      */
     template<typename... Args>
@@ -754,7 +754,7 @@ public:
     /**
     * @brief Updates the instance assigned to a given entity in-place.
     * @tparam Func Types of the function objects to invoke.
-    * @param entt A valid entity identifier.
+    * @param entt A valid identifier.
     * @param func Valid function objects.
     */
     template<typename... Func>
@@ -800,7 +800,7 @@ struct storage_adapter_mixin: Type {
     /**
      * @brief Assigns entities to a storage.
      * @tparam Args Types of arguments to use to construct the object.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param args Parameters to use to initialize the object.
      * @return A reference to the newly created object.
      */
@@ -827,7 +827,7 @@ struct storage_adapter_mixin: Type {
     /**
      * @brief Patches the given instance for an entity.
      * @tparam Func Types of the function objects to invoke.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param func Valid function objects.
      * @return A reference to the patched instance.
      */
@@ -936,7 +936,7 @@ public:
      * @brief Assigns entities to a storage.
      * @tparam Args Types of arguments to use to construct the object.
      * @param owner The registry that issued the request.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param args Parameters to use to initialize the object.
      * @return A reference to the newly created object.
      */
@@ -976,7 +976,7 @@ public:
      * @brief Patches the given instance for an entity.
      * @tparam Func Types of the function objects to invoke.
      * @param owner The registry that issued the request.
-     * @param entt A valid entity identifier.
+     * @param entt A valid identifier.
      * @param func Valid function objects.
      * @return A reference to the patched instance.
      */

@@ -532,7 +532,7 @@ public:
 
     /**
      * @brief Tests if a loader knows about a given entity.
-     * @param entt An entity identifier.
+     * @param entt A valid identifier.
      * @return True if `entity` is managed by the loader, false otherwise.
      */
     [[nodiscard]] bool contains(entity_type entt) const ENTT_NOEXCEPT {
@@ -541,7 +541,7 @@ public:
 
     /**
      * @brief Returns the identifier to which an entity refers.
-     * @param entt An entity identifier.
+     * @param entt A valid identifier.
      * @return The local identifier if any, the null entity otherwise.
      */
     [[nodiscard]] entity_type map(entity_type entt) const ENTT_NOEXCEPT {

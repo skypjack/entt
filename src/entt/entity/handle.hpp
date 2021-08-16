@@ -41,7 +41,7 @@ struct basic_handle {
     /**
      * @brief Constructs a handle from a given registry and entity.
      * @param ref An instance of the registry class.
-     * @param value An entity identifier.
+     * @param value A valid identifier.
      */
     basic_handle(registry_type &ref, entity_type value) ENTT_NOEXCEPT
         : reg{&ref}, entt{value}
@@ -79,7 +79,7 @@ struct basic_handle {
 
     /**
      * @brief Converts a handle to its underlying entity.
-     * @return An entity identifier.
+     * @return The contained identifier.
      */
     [[nodiscard]] operator entity_type() const ENTT_NOEXCEPT {
         return entity();

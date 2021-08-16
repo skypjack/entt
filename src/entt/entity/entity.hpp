@@ -160,11 +160,11 @@ template<typename Entity>
 }
 
 
-/*! @brief Null object for all entity identifiers.  */
+/*! @brief Null object for all identifiers.  */
 struct null_t {
     /**
      * @brief Converts the null object to identifiers of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Type of identifier.
      * @return The null representation for the given type.
      */
     template<typename Entity>
@@ -192,9 +192,9 @@ struct null_t {
     }
 
     /**
-     * @brief Compares a null object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
-     * @param entity Entity identifier with which to compare.
+     * @brief Compares a null object and an identifier of any type.
+     * @tparam Entity Type of identifier.
+     * @param entity Identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
     template<typename Entity>
@@ -204,9 +204,9 @@ struct null_t {
     }
 
     /**
-     * @brief Compares a null object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
-     * @param entity Entity identifier with which to compare.
+     * @brief Compares a null object and an identifier of any type.
+     * @tparam Entity Type of identifier.
+     * @param entity Identifier with which to compare.
      * @return True if the two elements differ, false otherwise.
      */
     template<typename Entity>
@@ -217,9 +217,9 @@ struct null_t {
 
 
 /**
- * @brief Compares a null object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
- * @param entity Entity identifier with which to compare.
+ * @brief Compares a null object and an identifier of any type.
+ * @tparam Entity Type of identifier.
+ * @param entity Identifier with which to compare.
  * @param other A null object yet to be converted.
  * @return False if the two elements differ, true otherwise.
  */
@@ -230,9 +230,9 @@ template<typename Entity>
 
 
 /**
- * @brief Compares a null object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
- * @param entity Entity identifier with which to compare.
+ * @brief Compares a null object and an identifier of any type.
+ * @tparam Entity Type of identifier.
+ * @param entity Identifier with which to compare.
  * @param other A null object yet to be converted.
  * @return True if the two elements differ, false otherwise.
  */
@@ -242,11 +242,11 @@ template<typename Entity>
 }
 
 
-/*! @brief Tombstone object for all entity identifiers.  */
+/*! @brief Tombstone object for all identifiers.  */
 struct tombstone_t {
     /**
      * @brief Converts the tombstone object to identifiers of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Type of identifier.
      * @return The tombstone representation for the given type.
      */
     template<typename Entity>
@@ -274,9 +274,9 @@ struct tombstone_t {
     }
 
     /**
-     * @brief Compares a tombstone object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
-     * @param entity Entity identifier with which to compare.
+     * @brief Compares a tombstone object and an identifier of any type.
+     * @tparam Entity Type of identifier.
+     * @param entity Identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
     template<typename Entity>
@@ -286,9 +286,9 @@ struct tombstone_t {
     }
 
     /**
-     * @brief Compares a tombstone object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
-     * @param entity Entity identifier with which to compare.
+     * @brief Compares a tombstone object and an identifier of any type.
+     * @tparam Entity Type of identifier.
+     * @param entity Identifier with which to compare.
      * @return True if the two elements differ, false otherwise.
      */
     template<typename Entity>
@@ -299,9 +299,9 @@ struct tombstone_t {
 
 
 /**
- * @brief Compares a tombstone object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
- * @param entity Entity identifier with which to compare.
+ * @brief Compares a tombstone object and an identifier of any type.
+ * @tparam Entity Type of identifier.
+ * @param entity Identifier with which to compare.
  * @param other A tombstone object yet to be converted.
  * @return False if the two elements differ, true otherwise.
  */
@@ -312,9 +312,9 @@ template<typename Entity>
 
 
 /**
- * @brief Compares a tombstone object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
- * @param entity Entity identifier with which to compare.
+ * @brief Compares a tombstone object and an identifier of any type.
+ * @tparam Entity Type of identifier.
+ * @param entity Identifier with which to compare.
  * @param other A tombstone object yet to be converted.
  * @return True if the two elements differ, false otherwise.
  */
@@ -327,9 +327,9 @@ template<typename Entity>
 /**
  * @brief Compile-time constant for null entities.
  *
- * There exist implicit conversions from this variable to entity identifiers of
- * any allowed type. Similarly, there exist comparision operators between the
- * null entity and any other entity identifier.
+ * There exist implicit conversions from this variable to identifiers of any
+ * allowed type. Similarly, there exist comparision operators between the null
+ * entity and any other identifier.
  */
 inline constexpr null_t null{};
 
@@ -337,9 +337,9 @@ inline constexpr null_t null{};
 /**
  * @brief Compile-time constant for tombstone entities.
  *
- * There exist implicit conversions from this variable to entity identifiers of
- * any allowed type. Similarly, there exist comparision operators between the
- * tombstone entity and any other entity identifier.
+ * There exist implicit conversions from this variable to identifiers of any
+ * allowed type. Similarly, there exist comparision operators between the
+ * tombstone entity and any other identifier.
  */
 inline constexpr tombstone_t tombstone{};
 
