@@ -158,18 +158,18 @@ public:
     using poly_storage = typename poly_storage_traits<Entity>::storage_type;
 
     /**
-     * @brief Returns the entity identifier without the version.
-     * @param entity An entity identifier, either valid or not.
-     * @return The entity identifier without the version.
+     * @brief Returns the identifier without the version.
+     * @param entity An identifier, either valid or not.
+     * @return The identifier without the version.
      */
     [[nodiscard]] static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
         return entity_traits::combine(entity_traits::to_integral(entity), {});
     }
 
     /**
-     * @brief Returns the version stored along with an entity identifier.
-     * @param entity An entity identifier, either valid or not.
-     * @return The version stored along with the given entity identifier.
+     * @brief Returns the version stored along with an identifier.
+     * @param entity An identifier, either valid or not.
+     * @return The version stored along with the given identifier.
      */
     [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
         return entity_traits::to_version(entity);
@@ -345,8 +345,8 @@ public:
     }
 
     /**
-     * @brief Checks if an entity identifier refers to a valid entity.
-     * @param entity An entity identifier, either valid or not.
+     * @brief Checks if an identifier refers to a valid entity.
+     * @param entity An identifier, either valid or not.
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entity) const {
@@ -355,31 +355,25 @@ public:
     }
 
     /**
-     * @brief Returns the actual version for an entity identifier.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the registry results
-     * in undefined behavior. An entity belongs to the registry even if it has
-     * been previously destroyed and/or recycled.
-     *
-     * @param entity A valid entity identifier.
-     * @return Actual version for the given entity identifier.
+     * @brief Returns the actual version for an identifier.
+     * @param entity A valid identifier.
+     * @return The version for the given identifier if valid, the tombstone
+     * version otherwise.
      */
     [[nodiscard]] version_type current(const entity_type entity) const {
         const auto pos = size_type(entity_traits::to_entity(entity));
-        ENTT_ASSERT(pos < entities.size(), "Entity does not exist");
-        return version(entities[pos]);
+        return pos < entities.size() ? version(entities[pos]) : entity_traits::to_version(tombstone);
     }
 
     /**
      * @brief Creates a new entity and returns it.
      *
-     * There are two kinds of possible entity identifiers:
+     * There are two kinds of possible identifiers:
      *
      * * Newly created ones in case no entities have been previously destroyed.
      * * Recycled ones with updated versions.
      *
-     * @return A valid entity identifier.
+     * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
         return (free_list == null) ? entities.emplace_back(generate_identifier(entities.size())) : recycle_identifier();
@@ -393,8 +387,8 @@ public:
      * If the requested entity isn't in use, the suggested identifier is created
      * and returned. Otherwise, a new identifier is generated.
      *
-     * @param hint Required entity identifier.
-     * @return A valid entity identifier.
+     * @param hint Required identifier.
+     * @return A valid identifier.
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
         const auto length = entities.size();
@@ -467,14 +461,14 @@ public:
     }
 
     /**
-     * @brief Releases an entity identifier.
+     * @brief Releases an identifier.
      *
      * The version is updated and the identifier can be recycled at any time.
      *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @return The version of the recycled entity.
      */
     version_type release(const entity_type entity) {
@@ -482,14 +476,14 @@ public:
     }
 
     /**
-     * @brief Releases an entity identifier.
+     * @brief Releases an identifier.
      *
      * The suggested version or the valid version closest to the suggested one
      * is used instead of the implicitly generated version.
      *
      * @sa release
      *
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @param version A desired version upon destruction.
      * @return The version actually assigned to the entity.
      */
@@ -499,7 +493,7 @@ public:
     }
 
     /**
-     * @brief Releases all entity identifiers in a range.
+     * @brief Releases all identifiers in a range.
      *
      * @sa release
      *
@@ -526,7 +520,7 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entity) {
@@ -541,7 +535,7 @@ public:
      *
      * @sa destroy
      *
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @param version A desired version upon destruction.
      * @return The version actually assigned to the entity.
      */
@@ -592,7 +586,7 @@ public:
      *
      * @tparam Component Type of component to create.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
@@ -654,7 +648,7 @@ public:
      *
      * @tparam Component Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
@@ -688,7 +682,7 @@ public:
      *
      * @tparam Component Type of component to patch.
      * @tparam Func Types of the function objects to invoke.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @param func Valid function objects.
      * @return A reference to the patched component.
      */
@@ -711,7 +705,7 @@ public:
      *
      * @tparam Component Type of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the component being replaced.
      */
@@ -727,7 +721,7 @@ public:
      * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Types of components to remove.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @return The number of components actually removed.
      */
     template<typename... Component>
@@ -771,7 +765,7 @@ public:
      * entity that doesn't own it results in undefined behavior.
      *
      * @tparam Component Types of components to erase.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      */
     template<typename... Component>
     void erase(const entity_type entity) {
@@ -825,7 +819,7 @@ public:
      * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Components for which to perform the check.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @return True if the entity has all the components, false otherwise.
      */
     template<typename... Component>
@@ -841,7 +835,7 @@ public:
      * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Components for which to perform the check.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @return True if the entity has at least one of the given components,
      * false otherwise.
      */
@@ -859,7 +853,7 @@ public:
      * that doesn't own it results in undefined behavior.
      *
      * @tparam Component Types of components to get.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @return References to the components owned by the entity.
      */
     template<typename... Component>
@@ -905,7 +899,7 @@ public:
      *
      * @tparam Component Type of component to get.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return Reference to the component owned by the entity.
      */
@@ -926,7 +920,7 @@ public:
      * The registry retains ownership of the pointed-to components.
      *
      * @tparam Component Types of components to get.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @return Pointers to the components owned by the entity.
      */
     template<typename... Component>
@@ -1004,7 +998,7 @@ public:
 
     /**
      * @brief Checks if an entity has components assigned.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @return True if the entity has no components assigned, false otherwise.
      */
     [[nodiscard]] bool orphan(const entity_type entity) const {
@@ -1508,7 +1502,7 @@ public:
      * given entity during the visit is returned or not to the caller.
      *
      * @tparam Func Type of the function object to invoke.
-     * @param entity A valid entity identifier.
+     * @param entity A valid identifier.
      * @param func A valid function object.
      */
     template<typename Func>

@@ -358,6 +358,8 @@ TEST(Registry, EmplaceOrReplaceAggregate) {
 }
 
 TEST(Registry, Identifiers) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::registry registry;
     const auto pre = registry.create();
 
@@ -371,6 +373,11 @@ TEST(Registry, Identifiers) {
     ASSERT_NE(entt::registry::version(pre), entt::registry::version(post));
     ASSERT_NE(registry.version(pre), registry.current(pre));
     ASSERT_EQ(registry.version(post), registry.current(post));
+
+    const auto invalid = traits_type::combine(traits_type::to_entity(post) + 1u, {});
+
+    ASSERT_EQ(registry.version(invalid), typename traits_type::version_type{});
+    ASSERT_EQ(registry.current(invalid), traits_type::to_version(entt::tombstone));
 }
 
 TEST(Registry, Data) {
