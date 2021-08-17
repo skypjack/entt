@@ -79,7 +79,7 @@ class basic_runtime_view final {
             : pools{&cpools},
               filter{&ignore},
               it{curr},
-              no_tombstone_check{!((cpools.size() + ignore.size()) == 1u) || std::all_of(pools->cbegin(), pools->cend(), [](const basic_common_type *cpool) { return (cpool->policy() == deletion_policy::swap_and_pop); })}
+              no_tombstone_check{std::all_of(pools->cbegin(), pools->cend(), [](const basic_common_type *cpool) { return (cpool->policy() == deletion_policy::swap_and_pop); })}
         {
             if(it != (*pools)[0]->end() && !valid()) {
                 ++(*this);
