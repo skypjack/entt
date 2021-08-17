@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <type_traits>
 #include "../config/config.h"
+#include "long_lived_versions.hpp"
 
 
 namespace entt {
@@ -30,12 +31,6 @@ struct entt_traits<Type, std::enable_if_t<std::is_enum_v<Type>>>
 {};
 
 
-template<typename Type>
-struct entt_traits<Type, std::enable_if_t<std::is_class_v<Type>>>
-    : entt_traits<typename Type::entity_type>
-{};
-
-
 template<>
 struct entt_traits<std::uint32_t> {
     using entity_type = std::uint32_t;
@@ -45,6 +40,29 @@ struct entt_traits<std::uint32_t> {
     static constexpr entity_type entity_mask = 0xFFFFF;
     static constexpr entity_type version_mask = 0xFFF;
     static constexpr std::size_t entity_shift = 20u;
+    inline static const version_type default_version() {
+      return version_mask;
+    }
+
+    template<typename CastFromType>
+    inline static entity_type to_integral(CastFromType v) { return static_cast<entity_type>(v); }
+    template<typename CastFromType>
+    inline static entity_type to_entity(CastFromType v) { return static_cast<entity_type>(v) & entity_mask; }
+    template<typename CastFromType>
+    inline static version_type to_version(const CastFromType value) {
+      constexpr auto mask = (version_mask << entity_shift);
+      return ((to_integral(value) & mask) >> entity_shift);
+    }
+    template<typename  CastFromType>
+    inline static version_type to_next_version(const CastFromType value) {
+      return to_version(value) + 1u;
+    }
+    inline static version_type first_nonzero_version() { return 1u; }
+    inline static version_type inc_version(const version_type version) { return version + 1u; }
+    template<typename CastToType>
+    inline static constexpr CastToType construct(const entity_type entity, const version_type version) {
+        return CastToType{(entity & entity_mask) | (static_cast<entity_type>(version) << entity_shift)};
+    }
 };
 
 
@@ -57,8 +75,96 @@ struct entt_traits<std::uint64_t> {
     static constexpr entity_type entity_mask = 0xFFFFFFFF;
     static constexpr entity_type version_mask = 0xFFFFFFFF;
     static constexpr std::size_t entity_shift = 32u;
+    inline static const version_type default_version() {
+      return version_mask;
+    }
+
+    template<typename CastFromType>
+    inline static entity_type to_integral(CastFromType v) { return static_cast<entity_type>(v); }
+    template<typename CastFromType>
+    inline static entity_type to_entity(CastFromType v) { return static_cast<entity_type>(v) & entity_mask; }
+    template<typename CastFromType>
+    inline static version_type to_version(const CastFromType value) {
+      constexpr auto mask = (version_mask << entity_shift);
+      return ((to_integral(value) & mask) >> entity_shift);
+    }
+    template<typename  CastFromType>
+    inline static version_type to_next_version(const CastFromType value) {
+      return to_version(value) + 1u;
+    }
+    inline static version_type first_nonzero_version() { return 1u; }
+    inline static version_type inc_version(const version_type version) { return version + 1u; }
+    template<typename CastToType>
+    inline static constexpr CastToType construct(const entity_type entity, const version_type version) {
+        return CastToType{(entity & entity_mask) | (static_cast<entity_type>(version) << entity_shift)};
+    }
 };
 
+
+template <typename Type>
+struct entt_traits<Type, std::enable_if_t<(std::is_same_v<LongLivedVersionIdRef, typename Type::version_type>)>>
+{
+  using entity_type = typename Type::entity_type;
+  using version_type = typename Type::version_type;
+  static constexpr entity_type entity_mask = ~((entity_type)0);
+  static const typename Type::version_type version_mask;
+  using difference_type = std::int64_t;
+  static const version_type default_version() {
+    return Type::default_version();
+  }
+
+  template<typename CastFromType>
+  inline static typename Type::entity_type to_integral(CastFromType v) { return v.entity_id; }
+  template<typename CastFromType>
+  inline static typename Type::entity_type to_entity(CastFromType v) { return to_integral<CastFromType>(v); }
+  template<typename CastFromType>
+  inline static LongLivedVersionIdRef to_version(const CastFromType v) {
+    return v.version_id;
+  }
+  template<typename  CastFromType>
+  inline static version_type to_next_version(const CastFromType value) {
+    LongLivedVersionIdRef c_vid = to_version(value);
+    return inc_version(c_vid);
+  }
+  inline static version_type first_nonzero_version() { return default_version(); }
+  inline static version_type inc_version(const version_type version) {
+    if (version == version_mask)
+      return default_version();
+    return version_type(version).upgrade_lookahead();
+  }
+  template<typename CastToType>
+  inline static constexpr CastToType construct(const entity_type entity, const version_type version) {
+      return CastToType(entity, version);
+  }
+};
+
+template <typename Type>
+const typename Type::version_type entt_traits<Type, std::enable_if_t<(std::is_same_v<LongLivedVersionIdRef, typename Type::version_type>)>>::version_mask = typename Type::version_type{};
+
+/*
+// need to figure out a way for this more general specialization can coexist with the type-specific specialization for LL versions
+template<typename Type>
+struct entt_traits<Type, std::enable_if_t<std::is_class_v<Type>>>
+    : entt_traits<typename Type::entity_type>
+{
+  inline static const typename Type::version_type default_version() {
+    return Type::version_mask;
+  }
+  static constexpr typename Type::version_type version_mask = nullptr;
+  template<typename CastFromType>
+  inline static typename Type::entity_type to_integral(const CastFromType v) { return static_cast<typename Type::entity_type>(v); }
+  template<typename CastFromType>
+  inline static typename Type::entity_type to_entity(const CastFromType v) { return (to_integral<CastFromType>(v)) & Type::entity_mask; }
+  template<typename CastFromType>
+  inline static typename Type::version_type to_version(const CastFromType value) {
+    constexpr auto mask = (Type::version_mask << Type::entity_shift);
+    return ((to_integral(value) & mask) >> Type::entity_shift);
+  }
+  template<typename CastToType>
+  inline static constexpr CastToType construct(const typename Type::entity_type entity, const typename Type::version_type version) {
+      return CastToType{(entity & Type::entity_mask) | (static_cast<typename Type::entity_type>(version) << Type::entity_shift)};
+  }
+};*/
 
 }
 
@@ -93,7 +199,7 @@ public:
      * @return The integral representation of the given value.
      */
     [[nodiscard]] static constexpr entity_type to_integral(const value_type value) ENTT_NOEXCEPT {
-        return static_cast<entity_type>(value);
+        return traits_type::template to_integral<value_type>(value);
     }
 
     /**
@@ -102,7 +208,7 @@ public:
      * @return The integral representation of the entity part.
      */
     [[nodiscard]] static constexpr entity_type to_entity(const value_type value) ENTT_NOEXCEPT {
-        return (to_integral(value) & traits_type::entity_mask);
+        return traits_type::template to_entity<value_type>(value);
     }
 
     /**
@@ -111,8 +217,29 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const value_type value) ENTT_NOEXCEPT {
-        constexpr auto mask = (traits_type::version_mask << traits_type::entity_shift);
-        return ((to_integral(value) & mask) >> traits_type::entity_shift);
+        return traits_type::template to_version<value_type>(value);
+    }
+
+    /**
+     * @brief Returns the next version of the underlying type.
+     * @param value The value to convert.
+     * @return The representation of the version part.
+     */
+    [[nodiscard]] static version_type to_next_version(const value_type value) ENTT_NOEXCEPT {
+        return traits_type::template to_next_version<value_type>(value);
+    }
+
+    /**
+     * @brief Returns the next version of the underlying version.
+     * @param version The version to increment.
+     * @return The representation of the incremented version.
+     */
+    [[nodiscard]] static version_type inc_version(const version_type version) ENTT_NOEXCEPT {
+        return traits_type::inc_version(version);
+    }
+
+    [[nodiscard]] static version_type first_nonzero_version() ENTT_NOEXCEPT {
+        return traits_type::first_nonzero_version();
     }
 
     /**
@@ -126,7 +253,8 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr value_type construct(const entity_type entity = traits_type::entity_mask, const version_type version = traits_type::version_mask) ENTT_NOEXCEPT {
-        return value_type{(entity & traits_type::entity_mask) | (static_cast<entity_type>(version) << traits_type::entity_shift)};
+        return traits_type::template construct<value_type>(entity, version);
+        //return value_type{(entity & traits_type::entity_mask) | (static_cast<entity_type>(version) << traits_type::entity_shift)};
     }
 };
 
