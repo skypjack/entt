@@ -141,7 +141,7 @@ class basic_registry {
     }
 
     auto release_entity(const Entity entity, const typename traits_type::version_type version) {
-        const typename traits_type::version_type vers = version + (version == traits_type::to_version(tombstone));
+        const typename traits_type::version_type vers = (version == traits_type::to_version(tombstone)) ? inc_version(version) : version;
         entities[traits_type::to_entity(entity)] = traits_type::construct(traits_type::to_entity(free_list), vers);
         free_list = (tombstone | entity);
         return vers;
@@ -173,6 +173,28 @@ public:
      */
     [[nodiscard]] static version_type version(const entity_type entity) ENTT_NOEXCEPT {
         return traits_type::to_version(entity);
+    }
+
+    [[nodiscard]] static version_type first_nonzero_version() ENTT_NOEXCEPT {
+      return traits_type::first_nonzero_version();
+    }
+
+    /**
+     * @brief Upgrades the version stored along with an entity identifier.
+     * @param entity An entity identifier, either valid or not.
+     * @return The upgraded version associated with the given entity identifier.
+     */
+    [[nodiscard]] static version_type version_upgrade(const entity_type entity) ENTT_NOEXCEPT {
+        return traits_type::to_next_version(entity);
+    }
+
+    /**
+     * @brief Upgrades the version stored along with an entity identifier.
+     * @param entity An entity identifier, either valid or not.
+     * @return The upgraded version associated with the given entity identifier.
+     */
+    [[nodiscard]] static version_type inc_version(const version_type version) ENTT_NOEXCEPT {
+        return traits_type::inc_version(version);
     }
 
     /*! @brief Default constructor. */
@@ -478,7 +500,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type release(const entity_type entity) {
-        return release(entity, version(entity) + 1u);
+        return release(entity, version_upgrade(entity));
     }
 
     /**
@@ -510,7 +532,7 @@ public:
     template<typename It>
     void release(It first, It last) {
         for(; first != last; ++first) {
-            release(*first, version(*first) + 1u);
+            release(*first, version_upgrade(*first));
         }
     }
 
@@ -530,7 +552,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entity) {
-        return destroy(entity, version(entity) + 1u);
+        return destroy(entity, version_upgrade(entity));
     }
 
     /**
@@ -568,7 +590,7 @@ public:
     void destroy(It first, It last) {
         if constexpr(is_iterator_type_v<typename basic_common_type::iterator, It>) {
             for(; first != last; ++first) {
-                destroy(*first, version(*first) + 1u);
+                destroy(*first, version_upgrade(*first));
             }
         } else {
             for(auto &&pdata: pools) {
@@ -964,7 +986,7 @@ public:
                 pdata.pool && (pdata.pool->clear(this), true);
             }
 
-            each([this](const auto entity) { release_entity(entity, version(entity) + 1u); });
+            each([this](const auto entity) { release_entity(entity, version_upgrade(entity)); });
         } else {
             (assure<Component>()->clear(this), ...);
         }

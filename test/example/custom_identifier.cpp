@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/long_lived_versions.hpp>
+
 
 struct entity_id {
     using entity_type = std::uint32_t;
@@ -52,4 +54,12 @@ TEST(Example, CustomIdentifier) {
 
     ASSERT_TRUE(registry.valid(entity));
     ASSERT_TRUE(entity != entt::null);
+}
+
+TEST(Example, CustomIdentifierWithLLVersions) {
+    entt::LongLivedVersionIdType ll_root;
+    using LVEntityId_t = entt::EntTypeWithLongTermVersionId;
+    //using traits_type = entt::entt_traits<LVEntityId_t>;
+    using Registry_t = entt::basic_registry<LVEntityId_t>;
+    Registry_t registry;
 }
