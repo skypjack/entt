@@ -1,5 +1,5 @@
-#ifndef ENTT_ENTITY_THROWING_ALLOCATOR_HPP
-#define ENTT_ENTITY_THROWING_ALLOCATOR_HPP
+#ifndef ENTT_ENTITY_CUSTOM_ALLOCATOR_HPP
+#define ENTT_ENTITY_CUSTOM_ALLOCATOR_HPP
 
 
 #include <cstddef>
@@ -11,12 +11,11 @@ namespace test {
 
 
 template<typename Type>
-class throwing_allocator: std::allocator<Type> {
+class custom_allocator: std::allocator<Type> {
     template<typename Other>
-    friend class throwing_allocator;
+    friend class custom_allocator;
 
     using base = std::allocator<Type>;
-    struct test_exception {};
 
 public:
     using value_type = Type;
@@ -26,24 +25,15 @@ public:
     using const_void_pointer = const void *;
     using propagate_on_container_move_assignment = std::true_type;
     using propagate_on_container_swap = std::true_type;
-    using exception_type = test_exception;
 
-    throwing_allocator() = default;
+    custom_allocator() = default;
 
     template<class Other>
-    throwing_allocator(const throwing_allocator<Other> &other)
-        : base{other}
+    custom_allocator(const custom_allocator<Other> &other)
+        : base{static_cast<const std::allocator<Other> &>(other)}
     {}
 
     pointer allocate(std::size_t length) {
-        if(trigger_on_allocate) {
-            trigger_on_allocate = false;
-            throw test_exception{};
-        }
-
-        trigger_on_allocate = trigger_after_allocate;
-        trigger_after_allocate = false;
-
         return base::allocate(length);
     }
 
@@ -51,8 +41,13 @@ public:
         base::deallocate(mem, length);
     }
 
-    static inline bool trigger_on_allocate{};
-    static inline bool trigger_after_allocate{};
+    bool operator==(const custom_allocator<Type> &) const {
+        return true;
+    }
+
+    bool operator!=(const custom_allocator<Type> &) const {
+        return false;
+    }
 };
 
 

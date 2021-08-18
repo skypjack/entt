@@ -8,6 +8,7 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
 #include <entt/entity/fwd.hpp>
+#include "custom_allocator.hpp"
 #include "throwing_allocator.hpp"
 
 struct empty_type {};
@@ -184,6 +185,28 @@ TEST(SparseSet, Move) {
     ASSERT_TRUE(set.empty());
     ASSERT_FALSE(other.empty());
     ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other.at(0u), entt::entity{42});
+}
+
+TEST(SparseSet, Swap) {
+    entt::sparse_set set;
+    entt::sparse_set other{entt::deletion_policy::in_place};
+
+    set.emplace(entt::entity{42});
+
+    other.emplace(entt::entity{9});
+    other.emplace(entt::entity{3});
+    other.erase(entt::entity{9});
+
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_EQ(other.size(), 2u);
+
+    set.swap(other);
+
+    ASSERT_EQ(set.size(), 2u);
+    ASSERT_EQ(other.size(), 1u);
+
+    ASSERT_EQ(set.at(1u), entt::entity{3});
     ASSERT_EQ(other.at(0u), entt::entity{42});
 }
 
@@ -710,7 +733,7 @@ TEST(SparseSet, Compact) {
     ASSERT_TRUE(set.empty());
 }
 
-TEST(SparseSet, Swap) {
+TEST(SparseSet, SwapEntity) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::sparse_set set;
@@ -1099,6 +1122,54 @@ TEST(SparseSet, CanModifyDuringIteration) {
     [[maybe_unused]] const auto entity = *it;
 }
 
+TEST(SparseSet, CustomAllocator) {
+    test::custom_allocator<entt::entity> allocator{};
+    entt::basic_sparse_set<entt::entity, test::custom_allocator<entt::entity>> set{allocator};
+
+    ASSERT_EQ(set.get_allocator(), allocator);
+
+    set.reserve(1u);
+
+    ASSERT_EQ(set.capacity(), 1u);
+
+    set.emplace(entt::entity{0});
+    set.emplace(entt::entity{1});
+
+    entt::basic_sparse_set<entt::entity, test::custom_allocator<entt::entity>> other{std::move(set), allocator};
+
+    ASSERT_TRUE(set.empty());
+    ASSERT_FALSE(other.empty());
+    ASSERT_EQ(set.capacity(), 0u);
+    ASSERT_EQ(other.capacity(), 2u);
+    ASSERT_EQ(other.size(), 2u);
+
+    set = std::move(other);
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_EQ(other.capacity(), 0u);
+    ASSERT_EQ(set.capacity(), 2u);
+    ASSERT_EQ(set.size(), 2u);
+
+    set.swap(other);
+    set = std::move(other);
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_EQ(other.capacity(), 0u);
+    ASSERT_EQ(set.capacity(), 2u);
+    ASSERT_EQ(set.size(), 2u);
+
+    set.clear();
+
+    ASSERT_EQ(set.capacity(), 2u);
+    ASSERT_EQ(set.size(), 0u);
+
+    set.shrink_to_fit();
+
+    ASSERT_EQ(set.capacity(), 0u);
+}
+
 TEST(SparseSet, ThrowingAllocator) {
     entt::basic_sparse_set<entt::entity, test::throwing_allocator<entt::entity>> set{};
 
@@ -1140,9 +1211,4 @@ TEST(SparseSet, ThrowingAllocator) {
     set.emplace(entities[1u]);
 
     ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
-
-    // unnecessary but they test a bit of template machinery :)
-    set.clear();
-    set.shrink_to_fit();
-    set = decltype(set){};
 }
