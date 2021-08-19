@@ -7,8 +7,6 @@
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
-#include <entt/entity/fwd.hpp>
-#include "custom_allocator.hpp"
 #include "throwing_allocator.hpp"
 
 struct empty_type {};
@@ -1131,8 +1129,8 @@ TEST(SparseSet, CanModifyDuringIteration) {
 }
 
 TEST(SparseSet, CustomAllocator) {
-    test::custom_allocator<entt::entity> allocator{};
-    entt::basic_sparse_set<entt::entity, test::custom_allocator<entt::entity>> set{allocator};
+    test::throwing_allocator<entt::entity> allocator{};
+    entt::basic_sparse_set<entt::entity, test::throwing_allocator<entt::entity>> set{allocator};
 
     ASSERT_EQ(set.get_allocator(), allocator);
 
@@ -1143,7 +1141,7 @@ TEST(SparseSet, CustomAllocator) {
     set.emplace(entt::entity{0});
     set.emplace(entt::entity{1});
 
-    entt::basic_sparse_set<entt::entity, test::custom_allocator<entt::entity>> other{std::move(set), allocator};
+    entt::basic_sparse_set<entt::entity, test::throwing_allocator<entt::entity>> other{std::move(set), allocator};
 
     ASSERT_TRUE(set.empty());
     ASSERT_FALSE(other.empty());

@@ -28,6 +28,10 @@ public:
     using propagate_on_container_swap = std::true_type;
     using exception_type = test_exception;
 
+    template<class Other> struct rebind {
+        using other = throwing_allocator<Other>;
+    };
+
     throwing_allocator() = default;
 
     template<class Other>
@@ -49,6 +53,14 @@ public:
 
     void deallocate(pointer mem, std::size_t length) {
         base::deallocate(mem, length);
+    }
+
+    bool operator==(const throwing_allocator<Type> &) const {
+        return true;
+    }
+
+    bool operator!=(const throwing_allocator<Type> &) const {
+        return false;
     }
 
     static inline bool trigger_on_allocate{};
