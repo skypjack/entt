@@ -11,7 +11,7 @@
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "../core/compressed_pair.hpp"
-#include "../core/fwd.hpp"
+#include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
 #include "component.hpp"
@@ -245,14 +245,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
             packed = mem;
             len = length;
-        }
-    }
-
-    Type * unfancy(alloc_pointer ptr) const {
-        if constexpr(std::is_pointer_v<alloc_pointer>) {
-            return ptr;
-        } else {
-            return std::addressof(*ptr);
         }
     }
 

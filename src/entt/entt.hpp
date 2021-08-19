@@ -7,6 +7,7 @@
 #include "core/family.hpp"
 #include "core/hashed_string.hpp"
 #include "core/ident.hpp"
+#include "core/memory.hpp"
 #include "core/monostate.hpp"
 #include "core/type_info.hpp"
 #include "core/type_traits.hpp"
