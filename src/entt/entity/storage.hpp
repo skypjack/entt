@@ -248,23 +248,25 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         }
     }
 
-    template<typename... Args>
-    auto & push_at(const std::size_t pos, Args &&... args) {
-        auto &&[allocator, len] = bucket;
-        ENTT_ASSERT(pos < (len * packed_page), "Out of bounds index");
-        auto *elem = std::addressof(packed[page(pos)][offset(pos)]);
-
-        if constexpr(std::is_aggregate_v<value_type>) {
-            alloc_traits::construct(allocator, elem, Type{std::forward<Args>(args)...});
+    Type * unfancy(alloc_pointer ptr) const {
+        if constexpr(std::is_pointer_v<alloc_pointer>) {
+            return ptr;
         } else {
-            alloc_traits::construct(allocator, elem, std::forward<Args>(args)...);
+            return std::addressof(*ptr);
         }
-
-        return *elem;
     }
 
-    void pop_at(const std::size_t pos) {
-        alloc_traits::destroy(bucket.first(), std::addressof(packed[page(pos)][offset(pos)]));
+    template<typename... Args>
+    void construct(alloc_pointer ptr, Args &&... args) {
+        if constexpr(std::is_aggregate_v<value_type>) {
+            alloc_traits::construct(bucket.first(), unfancy(ptr), Type{std::forward<Args>(args)...});
+        } else {
+            alloc_traits::construct(bucket.first(), unfancy(ptr), std::forward<Args>(args)...);
+        }
+    }
+
+    void destroy(Type &elem) {
+        alloc_traits::destroy(bucket.first(), std::addressof(elem));
     }
 
 protected:
@@ -283,8 +285,9 @@ protected:
      * @param to A valid position of an entity within storage.
      */
     void move_and_pop(const std::size_t from, const std::size_t to) final {
-        push_at(to, std::move(packed[page(from)][offset(from)]));
-        pop_at(from);
+        auto &&elem = packed[page(from)][offset(from)];
+        construct(packed[page(to)] + offset(to), std::move(elem));
+        destroy(elem);
     }
 
     /**
@@ -295,12 +298,14 @@ protected:
     void swap_and_pop(const Entity entt, void *ud) override {
         const auto pos = base_type::index(entt);
         const auto last = base_type::size() - 1u;
-        auto &&elem = packed[page(pos)][offset(pos)];
+
+        auto &&target = packed[page(pos)][offset(pos)];
+        auto &&elem = packed[page(last)][offset(last)];
 
         // support for nosy destructors
-        [[maybe_unused]] auto unused = std::move(elem);
-        elem = std::move(packed[page(last)][offset(last)]);
-        pop_at(last);
+        [[maybe_unused]] auto unused = std::move(target);
+        target = std::move(elem);
+        destroy(elem);
 
         base_type::swap_and_pop(entt, ud);
     }
@@ -314,7 +319,7 @@ protected:
         const auto pos = base_type::index(entt);
         base_type::in_place_pop(entt, ud);
         // support for nosy destructors
-        pop_at(pos);
+        destroy(packed[page(pos)][offset(pos)]);
     }
 
 public:
@@ -594,17 +599,18 @@ public:
         const auto pos = base_type::slot();
         assure_at_least(pos);
 
-        auto &value = push_at(pos, std::forward<Args>(args)...);
+        alloc_pointer elem = packed[page(pos)] + offset(pos);
+        construct(elem, std::forward<Args>(args)...);
 
         ENTT_TRY {
             [[maybe_unused]] const auto curr = base_type::emplace(entt);
             ENTT_ASSERT(pos == curr, "Misplaced component");
         } ENTT_CATCH {
-            pop_at(pos);
+            destroy(packed[page(pos)][offset(pos)]);
             ENTT_THROW;
         }
 
-        return value;
+        return *elem;
     }
 
     /**
@@ -640,12 +646,13 @@ public:
         reserve(base_type::size() + std::distance(first, last));
 
         for(; first != last; ++first) {
-            push_at(base_type::size(), value);
+            const auto pos = base_type::size();
+            construct(packed[page(pos)] + offset(pos), value);
 
             ENTT_TRY {
                 base_type::emplace_back(*first);
             } ENTT_CATCH {
-                pop_at(base_type::size());
+                destroy(packed[page(pos)][offset(pos)]);
                 ENTT_THROW;
             }
         }
@@ -668,12 +675,13 @@ public:
         reserve(base_type::size() + std::distance(first, last));
 
         for(; first != last; ++first, ++from) {
-            push_at(base_type::size(), *from);
+            const auto pos = base_type::size();
+            construct(packed[page(pos)] + offset(pos), *from);
 
             ENTT_TRY {
                 base_type::emplace_back(*first);
             } ENTT_CATCH {
-                pop_at(base_type::size());
+                destroy(packed[page(pos)][offset(pos)]);
                 ENTT_THROW;
             }
         }
