@@ -306,6 +306,10 @@ TEST(Storage, StableErase) {
 
     pool.clear();
 
+    ASSERT_EQ(pool.size(), 1u);
+
+    pool.compact();
+
     ASSERT_EQ(pool.size(), 0u);
 
     pool.emplace(entities[0u], stable_type{0});
@@ -439,6 +443,10 @@ TEST(Storage, StableRemove) {
     ASSERT_EQ(pool.begin()->value, 1);
 
     pool.clear();
+
+    ASSERT_EQ(pool.size(), 1u);
+
+    pool.compact();
 
     ASSERT_EQ(pool.size(), 0u);
 

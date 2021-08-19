@@ -5,6 +5,7 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
+* review pop_at/push_at to avoid multiple calls to page/offset
 * make sparse_set/storage adhere to AllocatorAwareContainer requirements
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime components (registry), runtime events (dispatcher/emitter), ...

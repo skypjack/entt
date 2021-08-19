@@ -454,9 +454,13 @@ TEST(SparseSet, StableErase) {
 
     set.clear();
 
-    ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.slot(), 0u);
+
+    set.compact();
+
+    ASSERT_EQ(set.size(), 0u);
 
     set.insert(std::begin(entities), std::end(entities));
     set.erase(entities[2u]);
@@ -645,9 +649,13 @@ TEST(SparseSet, StableRemove) {
 
     set.clear();
 
-    ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.slot(), 0u);
+
+    set.compact();
+
+    ASSERT_EQ(set.size(), 0u);
 
     set.insert(std::begin(entities), std::end(entities));
 

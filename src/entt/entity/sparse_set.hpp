@@ -920,13 +920,9 @@ public:
      */
     void clear(void *ud = nullptr) {
         for(auto &&entity: *this) {
-            if(entity != tombstone) {
-                in_place_pop(entity, ud);
-            }
+            // honor the modality and filter all tombstones
+            remove(entity, ud);
         }
-
-        free_list = tombstone;
-        count = {};
     }
 
 private:
