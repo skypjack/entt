@@ -343,7 +343,9 @@ public:
 
     /*! @brief Default constructor. */
     basic_storage()
-        : basic_storage{allocator_type{}}
+        : base_type{deletion_policy{comp_traits::in_place_delete::value}},
+          bucket{allocator_type{}, size_type{}},
+          packed{}
     {}
 
     /**
@@ -374,7 +376,7 @@ public:
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
-     * @return This sparse set.
+     * @return This storage.
      */
     basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT {
         release_memory();
@@ -705,7 +707,7 @@ public:
 
     /*! @brief Default constructor. */
     basic_storage()
-        : basic_storage{allocator_type{}}
+        : base_type{deletion_policy{comp_traits::in_place_delete::value}}
     {}
 
     /**
@@ -715,6 +717,19 @@ public:
     explicit basic_storage(const allocator_type &allocator)
         : base_type{deletion_policy{comp_traits::in_place_delete::value}, allocator}
     {}
+
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    basic_storage(basic_storage &&other) ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to move from.
+     * @return This storage.
+     */
+    basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Returns the associated allocator.
