@@ -251,9 +251,9 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     template<typename... Args>
     void construct(alloc_pointer ptr, Args &&... args) {
         if constexpr(std::is_aggregate_v<value_type>) {
-            alloc_traits::construct(bucket.first(), unfancy(ptr), Type{std::forward<Args>(args)...});
+            alloc_traits::construct(bucket.first(), to_address(ptr), Type{std::forward<Args>(args)...});
         } else {
-            alloc_traits::construct(bucket.first(), unfancy(ptr), std::forward<Args>(args)...);
+            alloc_traits::construct(bucket.first(), to_address(ptr), std::forward<Args>(args)...);
         }
     }
 
