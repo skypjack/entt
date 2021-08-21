@@ -750,15 +750,15 @@ TEST(SparseSet, SwapEntity) {
     ASSERT_EQ(set.index(traits_type::construct(3, 5)), 0u);
     ASSERT_EQ(set.index(traits_type::construct(42, 99)), 1u);
 
-    ASSERT_DEATH(set.swap(traits_type::construct(3, 5), traits_type::construct(42, 98)), "");
-    ASSERT_DEATH(set.swap(traits_type::construct(3, 6), traits_type::construct(42, 99)), "");
+    ASSERT_DEATH(set.swap_elements(traits_type::construct(3, 5), traits_type::construct(42, 98)), "");
+    ASSERT_DEATH(set.swap_elements(traits_type::construct(3, 6), traits_type::construct(42, 99)), "");
 
-    set.swap(traits_type::construct(3, 5), traits_type::construct(42, 99));
+    set.swap_elements(traits_type::construct(3, 5), traits_type::construct(42, 99));
 
     ASSERT_EQ(set.index(traits_type::construct(3, 5)), 1u);
     ASSERT_EQ(set.index(traits_type::construct(42, 99)), 0u);
 
-    set.swap(traits_type::construct(3, 5), traits_type::construct(42, 99));
+    set.swap_elements(traits_type::construct(3, 5), traits_type::construct(42, 99));
 
     ASSERT_EQ(set.index(traits_type::construct(3, 5)), 0u);
     ASSERT_EQ(set.index(traits_type::construct(42, 99)), 1u);

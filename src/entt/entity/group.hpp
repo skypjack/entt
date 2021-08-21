@@ -952,7 +952,7 @@ public:
             for(auto next = *length; next; --next) {
                 const auto pos = next - 1;
                 [[maybe_unused]] const auto entt = head->data()[pos];
-                (other->swap(other->data()[pos], entt), ...);
+                (other->swap_elements(other->data()[pos], entt), ...);
             }
         }(std::get<storage_type<Owned> *>(pools)...);
     }

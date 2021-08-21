@@ -79,7 +79,7 @@ class basic_registry {
             } else {
                 if(is_valid && !(std::get<0>(cpools)->index(entt) < current)) {
                     const auto pos = current++;
-                    (std::get<storage_type<Owned> *>(cpools)->swap(std::get<storage_type<Owned> *>(cpools)->data()[pos], entt), ...);
+                    (std::get<storage_type<Owned> *>(cpools)->swap_elements(std::get<storage_type<Owned> *>(cpools)->data()[pos], entt), ...);
                 }
             }
         }
@@ -90,7 +90,7 @@ class basic_registry {
             } else {
                 if(const auto cpools = std::make_tuple(owner.assure<Owned>()...); std::get<0>(cpools)->contains(entt) && (std::get<0>(cpools)->index(entt) < current)) {
                     const auto pos = --current;
-                    (std::get<storage_type<Owned> *>(cpools)->swap(std::get<storage_type<Owned> *>(cpools)->data()[pos], entt), ...);
+                    (std::get<storage_type<Owned> *>(cpools)->swap_elements(std::get<storage_type<Owned> *>(cpools)->data()[pos], entt), ...);
                 }
             }
         }

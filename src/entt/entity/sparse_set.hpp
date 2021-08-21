@@ -786,7 +786,7 @@ public:
      * @param lhs A valid identifier.
      * @param rhs A valid identifier.
      */
-    void swap(const entity_type lhs, const entity_type rhs) {
+    void swap_elements(const entity_type lhs, const entity_type rhs) {
         ENTT_ASSERT(contains(lhs) && contains(rhs), "Set does not contain entities");
 
         auto &entt = sparse_array[page(lhs)][offset(lhs)];
@@ -898,7 +898,7 @@ public:
             if(contains(*from)) {
                 if(*from != packed_array[pos]) {
                     // basic no-leak guarantee (with invalid state) if swapping throws
-                    swap(packed_array[pos], *from);
+                    swap_elements(packed_array[pos], *from);
                 }
 
                 --pos;
