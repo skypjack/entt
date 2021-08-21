@@ -352,7 +352,7 @@ public:
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode}
     {
-        ENTT_ASSERT(alloc_traits::is_always_equal{} || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
     }
 
     /*! @brief Default destructor. */
@@ -368,7 +368,7 @@ public:
     basic_sparse_set & operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
         release_memory();
         propagate_on_container_move_assignment(reserved.first(), other.reserved.first());
-        ENTT_ASSERT(alloc_traits::is_always_equal{} || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
         reserved.second() = std::exchange(other.reserved.second(), size_type{});
         sparse_array = std::exchange(other.sparse_array, alloc_ptr_pointer{});
         packed_array = std::exchange(other.packed_array, alloc_pointer{});

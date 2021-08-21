@@ -63,7 +63,7 @@ constexpr void propagate_on_container_move_assignment([[maybe_unused]] Allocator
  */
 template<typename Allocator>
 constexpr void propagate_on_container_swap(Allocator &lhs, Allocator &rhs) ENTT_NOEXCEPT {
-    static constexpr auto pocs = std::allocator_traits<Allocator>::propagate_on_container_swap::value;
+    constexpr auto pocs = std::allocator_traits<Allocator>::propagate_on_container_swap::value;
     ENTT_ASSERT(pocs || lhs == rhs, "Cannot swap the containers");
 
     if constexpr(pocs) {
