@@ -10,7 +10,7 @@
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "../core/compressed_pair.hpp"
-#include "../core/fwd.hpp"
+#include "../core/memory.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -67,8 +67,6 @@ class basic_sparse_set {
     using alloc_ptr_pointer = typename alloc_ptr_traits::pointer;
 
     using entity_traits = entt_traits<Entity>;
-
-    static_assert(alloc_traits::is_always_equal::value, "Unequal allocators not supported");
 
     struct sparse_set_iterator final {
         using difference_type = typename entity_traits::difference_type;
@@ -353,7 +351,9 @@ public:
           count{std::exchange(other.count, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode}
-    {}
+    {
+        ENTT_ASSERT(alloc_traits::is_always_equal{} || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
+    }
 
     /*! @brief Default destructor. */
     virtual ~basic_sparse_set() {
@@ -367,11 +367,8 @@ public:
      */
     basic_sparse_set & operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
         release_memory();
-
-        if constexpr(alloc_traits::propagate_on_container_move_assignment::value) {
-            reserved.first() = std::move(other.reserved.first());
-        }
-
+        propagate_on_container_move_assignment(reserved.first(), other.reserved.first());
+        ENTT_ASSERT(alloc_traits::is_always_equal{} || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
         reserved.second() = std::exchange(other.reserved.second(), size_type{});
         sparse_array = std::exchange(other.sparse_array, alloc_ptr_pointer{});
         packed_array = std::exchange(other.packed_array, alloc_pointer{});
@@ -379,7 +376,6 @@ public:
         count = std::exchange(other.count, size_type{});
         free_list = std::exchange(other.free_list, tombstone);
         mode = other.mode;
-
         return *this;
     }
 
@@ -389,11 +385,7 @@ public:
      */
     void swap(basic_sparse_set &other) {
         using std::swap;
-
-        if constexpr(alloc_traits::propagate_on_container_swap::value) {
-            swap(reserved.first(), other.reserved.first());
-        }
-
+        propagate_on_container_swap(reserved.first(), other.reserved.first());
         swap(reserved.second(), other.reserved.second());
         swap(sparse_array, other.sparse_array);
         swap(packed_array, other.packed_array);

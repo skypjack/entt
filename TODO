@@ -5,13 +5,13 @@
 * custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
-* make sparse_set/storage adhere to AllocatorAwareContainer requirements
+* make storage adhere to AllocatorAwareContainer requirements
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime components (registry), runtime events (dispatcher/emitter), ...
 * runtime_view/registry, remove reference to basic_sparse_set<E>
 * make pools available (registry/view/group), review operator| for views, make views accept registry to ctor
 * make view.lead() or similar available to return leading pool (useful for mt)
-* dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities
+* dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
 * non-throwing sparse set emplace (see previous line)
 * custom allocators all over
 
