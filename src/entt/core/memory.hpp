@@ -27,6 +27,52 @@ constexpr auto to_address(Type &&ptr) ENTT_NOEXCEPT {
 }
 
 
+/**
+ * @brief Utility function to design allocation-aware containers.
+ * @tparam Allocator Type of allocator.
+ * @param lhs A valid allocator.
+ * @param rhs Another valid allocator.
+ */
+template<typename Allocator>
+constexpr void propagate_on_container_copy_assignment([[maybe_unused]] Allocator &lhs, [[maybe_unused]] Allocator &rhs) ENTT_NOEXCEPT {
+    if constexpr(std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value) {
+        lhs = rhs;
+    }
+}
+
+
+/**
+ * @brief Utility function to design allocation-aware containers.
+ * @tparam Allocator Type of allocator.
+ * @param lhs A valid allocator.
+ * @param rhs Another valid allocator.
+ */
+template<typename Allocator>
+constexpr void propagate_on_container_move_assignment([[maybe_unused]] Allocator &lhs, [[maybe_unused]] Allocator &rhs) ENTT_NOEXCEPT {
+    if constexpr(std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value) {
+        lhs = std::move(rhs);
+    }
+}
+
+
+/**
+ * @brief Utility function to design allocation-aware containers.
+ * @tparam Allocator Type of allocator.
+ * @param lhs A valid allocator.
+ * @param rhs Another valid allocator.
+ */
+template<typename Allocator>
+constexpr void propagate_on_container_swap(Allocator &lhs, Allocator &rhs) ENTT_NOEXCEPT {
+    static constexpr auto pocs = std::allocator_traits<Allocator>::propagate_on_container_swap::value;
+    ENTT_ASSERT(pocs || lhs == rhs, "Cannot swap the containers");
+
+    if constexpr(pocs) {
+        using std::swap;
+        swap(lhs, rhs);
+    }
+}
+
+
 }
 
 
