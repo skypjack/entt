@@ -266,7 +266,7 @@ protected:
      * @brief Exchanges the contents with those of a given storage.
      * @param base Reference to base storage to exchange the content with.
      */
-    void swap_contents(basic_sparse_set &base) override {
+    void swap_contents(basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>> &base) override {
         using std::swap;
         auto &other = static_cast<basic_storage &>(base);
         propagate_on_container_swap(bucket.first(), other.bucket.first());
@@ -316,7 +316,7 @@ protected:
 
     /**
      * @brief Erases an element from the internal packed array.
-     * @param pos A valid position of an element within the storage.
+     * @param entt A valid identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void in_place_pop(const Entity entt, void *ud) override {
