@@ -708,6 +708,7 @@ public:
     void erase(const entity_type entt, void *ud = nullptr) {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
         (mode == deletion_policy::in_place) ? in_place_pop(entt, ud) : swap_and_pop(entt, ud);
+        ENTT_ASSERT(!contains(entt), "Destruction did not take place");
     }
 
     /**
