@@ -241,6 +241,9 @@ class basic_sparse_set {
     }
 
 protected:
+    /*! @brief Exchanges the contents with those of a given sparse set. */
+    virtual void swap_contents(basic_sparse_set &) {}
+
     /*! @brief Swaps two entities in the internal packed array. */
     virtual void swap_at(const std::size_t, const std::size_t) {}
 
@@ -385,6 +388,7 @@ public:
      */
     void swap(basic_sparse_set &other) {
         using std::swap;
+        swap_contents(other);
         propagate_on_container_swap(reserved.first(), other.reserved.first());
         swap(reserved.second(), other.reserved.second());
         swap(sparse_array, other.sparse_array);

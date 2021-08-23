@@ -263,18 +263,30 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
 protected:
     /**
-     * @brief Swaps two entities in the internal packed array.
-     * @param lhs A valid position of an entity within storage.
-     * @param rhs A valid position of an entity within storage.
+     * @brief Exchanges the contents with those of a given storage.
+     * @param base Reference to base storage to exchange the content with.
+     */
+    void swap_contents(basic_sparse_set &base) override {
+        using std::swap;
+        auto &other = static_cast<basic_storage &>(base);
+        propagate_on_container_swap(bucket.first(), other.bucket.first());
+        swap(bucket.second(), other.bucket.second());
+        swap(packed, other.packed);
+    }
+
+    /**
+     * @brief Swaps two elements in the internal packed array.
+     * @param lhs A valid position of an element within storage.
+     * @param rhs A valid position of an element within storage.
      */
     void swap_at(const std::size_t lhs, const std::size_t rhs) final {
         std::swap(packed[page(lhs)][offset(lhs)], packed[page(rhs)][offset(rhs)]);
     }
 
     /**
-     * @brief Moves an entity in the internal packed array.
-     * @param from A valid position of an entity within storage.
-     * @param to A valid position of an entity within storage.
+     * @brief Moves an element in the internal packed array.
+     * @param from A valid position of an element within storage.
+     * @param to A valid position of an element within storage.
      */
     void move_and_pop(const std::size_t from, const std::size_t to) final {
         auto &&elem = packed[page(from)][offset(from)];
@@ -283,7 +295,7 @@ protected:
     }
 
     /**
-     * @brief Attempts to erase an entity from the internal packed array.
+     * @brief Attempts to erase an element from the internal packed array.
      * @param entt A valid identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
@@ -303,8 +315,8 @@ protected:
     }
 
     /**
-     * @brief Attempts to erase an entity from the internal packed array.
-     * @param entt A valid identifier.
+     * @brief Erases an element from the internal packed array.
+     * @param pos A valid position of an element within the storage.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     void in_place_pop(const Entity entt, void *ud) override {
@@ -361,9 +373,22 @@ public:
      */
     basic_storage(basic_storage &&other) ENTT_NOEXCEPT
         : base_type{std::move(other)},
-          bucket{std::move(other.bucket)},
+          bucket{std::move(other.bucket.first()), std::exchange(other.bucket.second(), size_type{})},
           packed{std::exchange(other.packed, alloc_ptr_pointer{})}
     {}
+
+    /**
+     * @brief Allocator-extended move constructor.
+     * @param other The instance to move from.
+     * @param allocator The allocator to use.
+     */
+    basic_storage(basic_storage &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+        : base_type{std::move(other), allocator},
+          bucket{allocator, std::exchange(other.bucket.second(), size_type{})},
+          packed{std::exchange(other.packed, alloc_ptr_pointer{})}
+    {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || bucket.first() == other.bucket.first(), "Copying a storage is not allowed");
+    }
 
     /*! @brief Default destructor. */
     ~basic_storage() override {
@@ -377,12 +402,10 @@ public:
      */
     basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT {
         release_memory();
-
         base_type::operator=(std::move(other));
-
-        bucket = std::move(other.bucket);
+        propagate_on_container_move_assignment(bucket.first(), other.bucket.first());
+        bucket.second() = std::exchange(other.bucket.second(), size_type{});
         packed = std::exchange(other.packed, alloc_ptr_pointer{});
-
         return *this;
     }
 

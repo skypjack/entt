@@ -152,6 +152,56 @@ TEST(Storage, Move) {
     ASSERT_EQ(other.get(entt::entity{3}), 3);
 }
 
+TEST(Storage, Swap) {
+    entt::storage<int> pool;
+    entt::storage<int> other;
+
+    pool.emplace(entt::entity{42}, 41);
+
+    other.emplace(entt::entity{9}, 8);
+    other.emplace(entt::entity{3}, 2);
+    other.erase(entt::entity{9});
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(other.size(), 1u);
+
+    pool.swap(other);
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(other.size(), 1u);
+
+    ASSERT_EQ(pool.at(0u), entt::entity{3});
+    ASSERT_EQ(pool.get(entt::entity{3}), 2);
+
+    ASSERT_EQ(other.at(0u), entt::entity{42});
+    ASSERT_EQ(other.get(entt::entity{42}), 41);
+}
+
+TEST(Storage, StableSwap) {
+    entt::storage<stable_type> pool;
+    entt::storage<stable_type> other;
+
+    pool.emplace(entt::entity{42}, 41);
+
+    other.emplace(entt::entity{9}, 8);
+    other.emplace(entt::entity{3}, 2);
+    other.erase(entt::entity{9});
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(other.size(), 2u);
+
+    pool.swap(other);
+
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(other.size(), 1u);
+
+    ASSERT_EQ(pool.at(1u), entt::entity{3});
+    ASSERT_EQ(pool.get(entt::entity{3}).value, 2);
+
+    ASSERT_EQ(other.at(0u), entt::entity{42});
+    ASSERT_EQ(other.get(entt::entity{42}).value, 41);
+}
+
 TEST(Storage, EmptyType) {
     entt::storage<empty_type> pool;
     pool.emplace(entt::entity{99});
@@ -1126,6 +1176,54 @@ TEST(Storage, ThrowingComponent) {
     ASSERT_FALSE(pool.contains(entt::entity{1}));
     ASSERT_EQ(pool.at(0u), entt::entity{42});
     ASSERT_EQ(pool.get(entt::entity{42}), 42);
+}
+
+TEST(Storage, CustomAllocator) {
+    test::throwing_allocator<entt::entity> allocator{};
+    entt::basic_storage<entt::entity, int, test::throwing_allocator<entt::entity>> pool{allocator};
+
+    ASSERT_EQ(pool.get_allocator(), allocator);
+
+    pool.reserve(1u);
+
+    ASSERT_EQ(pool.capacity(), ENTT_PACKED_PAGE);
+
+    pool.emplace(entt::entity{0}, 3);
+    pool.emplace(entt::entity{1}, 42);
+
+    entt::basic_storage<entt::entity, int, test::throwing_allocator<entt::entity>> other{std::move(pool), allocator};
+
+    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(other.empty());
+    ASSERT_EQ(pool.capacity(), 0u);
+    ASSERT_EQ(other.capacity(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(other.size(), 2u);
+
+    pool = std::move(other);
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_EQ(other.capacity(), 0u);
+    ASSERT_EQ(pool.capacity(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(pool.size(), 2u);
+
+    pool.swap(other);
+    pool = std::move(other);
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_EQ(other.capacity(), 0u);
+    ASSERT_EQ(pool.capacity(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(pool.size(), 2u);
+
+    pool.clear();
+
+    ASSERT_EQ(pool.capacity(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(pool.size(), 0u);
+
+    pool.shrink_to_fit();
+
+    ASSERT_EQ(pool.capacity(), 0u);
 }
 
 TEST(Storage, ThrowingAllocator) {
