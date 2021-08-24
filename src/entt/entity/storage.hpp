@@ -184,7 +184,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             // no-throw stable erase iteration
             base_type::clear();
 
-            auto &&[allocator, len] = bucket;
+            auto &allocator = bucket.first();
+            auto &len = bucket.second();
             alloc_ptr allocator_ptr{allocator};
 
             for(size_type pos{}; pos < len; ++pos) {
@@ -198,7 +199,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     void assure_at_least(const std::size_t pos) {
         if(const auto idx = page(pos); !(idx < bucket.second())) {
-            auto &&[allocator, len] = bucket;
+            auto &allocator = bucket.first();
+            auto &len = bucket.second();
             alloc_ptr allocator_ptr{allocator};
 
             const size_type sz = idx + 1u;
@@ -232,7 +234,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     void release_unused_pages() {
         if(const auto length = base_type::size() / packed_page; length < bucket.second()) {
-            auto &&[allocator, len] = bucket;
+            auto &allocator = bucket.first();
+            auto &len = bucket.second();
             alloc_ptr allocator_ptr{allocator};
 
             const auto mem = alloc_ptr_traits::allocate(allocator_ptr, length);

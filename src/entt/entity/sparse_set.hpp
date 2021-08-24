@@ -200,7 +200,8 @@ class basic_sparse_set {
     }
 
     void resize_packed_array(const std::size_t req) {
-        auto &&[allocator, len] = reserved;
+        auto &allocator = reserved.first();
+        auto &len = reserved.second();
         ENTT_ASSERT((req != len) && !(req < count), "Invalid request");
         const auto mem = alloc_traits::allocate(allocator, req);
 
@@ -217,7 +218,8 @@ class basic_sparse_set {
     }
 
     void release_memory() {
-        auto &&[allocator, len] = reserved;
+        auto &allocator = reserved.first();
+        auto &len = reserved.second();
 
         if(packed_array) {
             std::destroy(packed_array, packed_array + len);

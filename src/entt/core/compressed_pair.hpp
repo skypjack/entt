@@ -266,6 +266,8 @@ inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Sec
 
 
 namespace std {
+// disable structured binding support for clang 6, it messes when specializing tuple_size
+#if !defined __clang_major__ || __clang_major__ > 6
     template<typename First, typename Second>
     struct tuple_size<entt::compressed_pair<First, Second>>: integral_constant<size_t, 2u> {};
 
@@ -273,6 +275,7 @@ namespace std {
     struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
         static_assert(Index < 2u, "Index out of bounds");
     };
+#endif
 }
 
 
