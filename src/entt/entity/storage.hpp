@@ -68,6 +68,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using difference_type = typename entt_traits<Entity>::difference_type;
     using comp_traits = component_traits<Type>;
 
+    using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
+
     static_assert(alloc_traits::propagate_on_container_move_assignment::value);
     static_assert(alloc_ptr_traits::propagate_on_container_move_assignment::value);
 
@@ -266,7 +268,7 @@ protected:
      * @brief Exchanges the contents with those of a given storage.
      * @param base Reference to base storage to exchange the content with.
      */
-    void swap_contents(basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>> &base) override {
+    void swap_contents(underlying_type &base) override {
         using std::swap;
         auto &other = static_cast<basic_storage &>(base);
         propagate_on_container_swap(bucket.first(), other.bucket.first());
@@ -328,7 +330,7 @@ protected:
 
 public:
     /*! @brief Base type. */
-    using base_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
+    using base_type = underlying_type;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
