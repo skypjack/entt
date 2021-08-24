@@ -36,12 +36,13 @@ enum class meta_traits: std::uint32_t {
     IS_CONST = 0x0001,
     IS_STATIC = 0x0002,
     IS_ARITHMETIC = 0x0004,
-    IS_ENUM = 0x0008,
-    IS_CLASS = 0x0010,
-    IS_POINTER = 0x0020,
-    IS_META_POINTER_LIKE = 0x0100,
-    IS_META_SEQUENCE_CONTAINER = 0x0200,
-    IS_META_ASSOCIATIVE_CONTAINER = 0x0400,
+    IS_ARRAY = 0x0008,
+    IS_ENUM = 0x0010,
+    IS_CLASS = 0x0020,
+    IS_POINTER = 0x0040,
+    IS_META_POINTER_LIKE = 0x0080,
+    IS_META_SEQUENCE_CONTAINER = 0x0100,
+    IS_META_ASSOCIATIVE_CONTAINER = 0x0200,
     _entt_enum_as_bitmask
 };
 
@@ -173,6 +174,7 @@ public:
             size_of_v<Type>,
             internal::meta_traits::IS_NONE
                 | (std::is_arithmetic_v<Type> ? internal::meta_traits::IS_ARITHMETIC : internal::meta_traits::IS_NONE)
+                | (std::is_array_v<Type> ? internal::meta_traits::IS_ARRAY : internal::meta_traits::IS_NONE)
                 | (std::is_enum_v<Type> ? internal::meta_traits::IS_ENUM : internal::meta_traits::IS_NONE)
                 | (std::is_class_v<Type> ? internal::meta_traits::IS_CLASS : internal::meta_traits::IS_NONE)
                 | (std::is_pointer_v<Type> ? internal::meta_traits::IS_POINTER : internal::meta_traits::IS_NONE)

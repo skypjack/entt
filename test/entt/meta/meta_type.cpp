@@ -214,6 +214,10 @@ TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<double>().is_arithmetic());
     ASSERT_FALSE(entt::resolve<clazz_t>().is_arithmetic());
 
+    ASSERT_TRUE(entt::resolve<int[5]>().is_array());
+    ASSERT_TRUE(entt::resolve<int[5][3]>().is_array());
+    ASSERT_FALSE(entt::resolve<int>().is_array());
+
     ASSERT_TRUE(entt::resolve<property_t>().is_enum());
     ASSERT_FALSE(entt::resolve<char>().is_enum());
 
