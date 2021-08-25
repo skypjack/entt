@@ -768,6 +768,19 @@ public:
     }
 
     /**
+     * @brief Returns the object assigned to an entity, that is `void`.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.
+     *
+     * @param entt A valid identifier.
+     */
+    void get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+        ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
+    }
+
+    /**
      * @brief Returns an empty tuple.
      *
      * @warning
@@ -992,10 +1005,7 @@ public:
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entt, Args &&... args) {
         Type::emplace(entt, std::forward<Args>(args)...);
         construction.publish(owner, entt);
-
-        if constexpr(!ignore_as_empty_v<value_type>) {
-            return this->get(entt);
-        }
+        return this->get(entt);
     }
 
     /**
@@ -1032,10 +1042,7 @@ public:
     decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entt, Func &&... func) {
         Type::patch(entt, std::forward<Func>(func)...);
         update.publish(owner, entt);
-
-        if constexpr(!ignore_as_empty_v<value_type>) {
-            return this->get(entt);
-        }
+        return this->get(entt);
     }
 
 private:

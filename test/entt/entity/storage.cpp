@@ -208,6 +208,7 @@ TEST(Storage, EmptyType) {
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_TRUE(pool.contains(entt::entity{99}));
+    ASSERT_DEATH(pool.get(entt::entity{}), "");
 }
 
 TEST(Storage, Insert) {
