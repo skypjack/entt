@@ -228,13 +228,11 @@ TEST(Storage, Insert) {
     const stable_type values[2u] = { stable_type{42}, stable_type{3} };
     pool.insert(std::rbegin(entities), std::rend(entities), std::begin(values));
 
-    ASSERT_EQ(pool.size(), 4u);
-    ASSERT_TRUE(pool.at(0u) == entt::tombstone);
-    ASSERT_TRUE(pool.at(1u) == entt::tombstone);
-    ASSERT_EQ(pool.at(2u), entities[1u]);
-    ASSERT_EQ(pool.at(3u), entities[0u]);
-    ASSERT_EQ(pool.index(entities[0u]), 3u);
-    ASSERT_EQ(pool.index(entities[1u]), 2u);
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.at(0u), entities[0u]);
+    ASSERT_EQ(pool.at(1u), entities[1u]);
+    ASSERT_EQ(pool.index(entities[0u]), 0u);
+    ASSERT_EQ(pool.index(entities[1u]), 1u);
     ASSERT_EQ(pool.get(entities[0u]).value, 3);
     ASSERT_EQ(pool.get(entities[1u]).value, 42);
 }

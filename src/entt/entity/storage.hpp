@@ -270,6 +270,31 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         alloc_traits::destroy(bucket.first(), std::addressof(elem));
     }
 
+    template<typename It, typename Generator>
+    void recycle_or_append(It first, It last, Generator generator) {
+        if constexpr(comp_traits::in_place_delete::value) {
+            for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
+                emplace(*first, generator());
+            }
+        }
+
+        const auto req = base_type::size() + std::distance(first, last);
+        base_type::reserve(req);
+        reserve(req);
+
+        for(; first != last; ++first) {
+            const auto pos = base_type::size();
+            construct(packed[page(pos)] + offset(pos), generator());
+
+            ENTT_TRY {
+                base_type::emplace_back(*first);
+            } ENTT_CATCH {
+                destroy(packed[page(pos)][offset(pos)]);
+                ENTT_THROW;
+            }
+        }
+    }
+
 protected:
     /**
      * @brief Exchanges the contents with those of a given storage.
@@ -665,19 +690,7 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        reserve(base_type::size() + std::distance(first, last));
-
-        for(; first != last; ++first) {
-            const auto pos = base_type::size();
-            construct(packed[page(pos)] + offset(pos), value);
-
-            ENTT_TRY {
-                base_type::emplace_back(*first);
-            } ENTT_CATCH {
-                destroy(packed[page(pos)][offset(pos)]);
-                ENTT_THROW;
-            }
-        }
+        recycle_or_append(std::move(first), std::move(last), [&value]() -> decltype(auto) { return value; });
     }
 
     /**
@@ -694,19 +707,7 @@ public:
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
-        reserve(base_type::size() + std::distance(first, last));
-
-        for(; first != last; ++first, ++from) {
-            const auto pos = base_type::size();
-            construct(packed[page(pos)] + offset(pos), *from);
-
-            ENTT_TRY {
-                base_type::emplace_back(*first);
-            } ENTT_CATCH {
-                destroy(packed[page(pos)][offset(pos)]);
-                ENTT_THROW;
-            }
-        }
+        recycle_or_append(std::move(first), std::move(last), [&from]() -> decltype(auto) { return *(from++); });
     }
 
 private:
