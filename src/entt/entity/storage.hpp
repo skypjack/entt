@@ -197,8 +197,10 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         }
     }
 
-    void assure_at_least(const std::size_t pos) {
-        if(const auto idx = page(pos); !(idx < bucket.second())) {
+    auto assure_at_least(const std::size_t pos) {
+        const auto idx = page(pos);
+
+        if(!(idx < bucket.second())) {
             auto &allocator = bucket.first();
             auto &len = bucket.second();
             alloc_ptr allocator_ptr{allocator};
@@ -230,6 +232,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             packed = mem;
             len = sz;
         }
+
+        return packed[idx];
     }
 
     void release_unused_pages() {
@@ -617,9 +621,7 @@ public:
     template<typename... Args>
     value_type & emplace(const entity_type entt, Args &&... args) {
         const auto pos = base_type::slot();
-        assure_at_least(pos);
-
-        alloc_pointer elem = packed[page(pos)] + offset(pos);
+        alloc_pointer elem = assure_at_least(pos) + offset(pos);
         construct(elem, std::forward<Args>(args)...);
 
         ENTT_TRY {
