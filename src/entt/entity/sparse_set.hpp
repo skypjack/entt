@@ -242,19 +242,6 @@ class basic_sparse_set {
         }
     }
 
-    void append(const Entity entt) {
-        ENTT_ASSERT(count != reserved.second(), "Not enough space left");
-        ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
-        assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), entity_traits::to_integral(entt));
-        packed_array[count++] = entt;
-    }
-
-    void recycle(const Entity entt) {
-        ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
-        assure_page(page(entt))[offset(entt)] = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
-        free_list = std::exchange(packed_array[static_cast<size_type>(entity_traits::to_entity(free_list))], entt);
-    }
-
 protected:
     /*! @brief Exchanges the contents with those of a given sparse set. */
     virtual void swap_contents(basic_sparse_set &) {}
@@ -296,6 +283,27 @@ protected:
         packed_array[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
         // lazy self-assignment guard
         ref = null;
+    }
+
+    /**
+     * @brief Assigns an entity to a sparse set.
+     * @param entt A valid identifier.
+     */
+    virtual void try_emplace(const Entity entt, void *) {
+        ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
+
+        if(free_list == null) {
+            if(const auto len = reserved.second(); count == len) {
+                const size_type sz = static_cast<size_type>(len * growth_factor_v);
+                resize_packed_array(sz + !(sz > len));
+            }
+
+            assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), entity_traits::to_integral(entt));
+            packed_array[count++] = entt;
+        } else {
+            assure_page(page(entt))[offset(entt)] = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
+            free_list = std::exchange(packed_array[static_cast<size_type>(entity_traits::to_entity(free_list))], entt);
+        }
     }
 
 public:
@@ -648,18 +656,11 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void emplace(const entity_type entt) {
-        if(free_list == null) {
-            if(const auto len = reserved.second(); count == len) {
-                const size_type sz = static_cast<size_type>(len * growth_factor_v);
-                resize_packed_array(sz + !(sz > len));
-            }
-
-            append(entt);
-        } else {
-            recycle(entt);
-        }
+    void emplace(const entity_type entt, void *ud = nullptr) {
+        try_emplace(entt, ud);
+        ENTT_ASSERT(contains(entt), "Emplace did not take place");
     }
 
     /**
@@ -672,17 +673,18 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     template<typename It>
-    void insert(It first, It last) {
+    void insert(It first, It last, void *ud = nullptr) {
         for(; first != last && free_list != null; ++first) {
-            recycle(*first);
+            emplace(*first, ud);
         }
 
         reserve(count + std::distance(first, last));
 
         for(; first != last; ++first) {
-            append(*first);
+            emplace(*first, ud);
         }
     }
 

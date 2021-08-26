@@ -352,6 +352,26 @@ protected:
         destroy(packed[page(pos)][offset(pos)]);
     }
 
+    /**
+     * @brief Assigns an entity to a storage.
+     * @param entt A valid identifier.
+     * @param ud Optional user data that are forwarded as-is to derived classes.
+     */
+    void try_emplace(const Entity entt, void *ud) override {
+        if constexpr(std::is_default_constructible_v<value_type>) {
+            const auto pos = base_type::slot();
+            construct(assure_at_least(pos) + offset(pos));
+
+            ENTT_TRY {
+                base_type::try_emplace(entt, nullptr);
+                ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
+            } ENTT_CATCH {
+                destroy(packed[page(pos)][offset(pos)]);
+                ENTT_THROW;
+            }
+        }
+    }
+
 public:
     /*! @brief Base type. */
     using base_type = underlying_type;
@@ -642,7 +662,7 @@ public:
         construct(elem, std::forward<Args>(args)...);
 
         ENTT_TRY {
-            base_type::emplace(entt);
+            base_type::try_emplace(entt, nullptr);
             ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
         } ENTT_CATCH {
             destroy(packed[page(pos)][offset(pos)]);
@@ -803,8 +823,8 @@ public:
      */
     template<typename... Args>
     void emplace(const entity_type entt, Args &&... args) {
-        [[maybe_unused]] value_type elem{std::forward<Args>(args)...};
-        base_type::emplace(entt);
+        [[maybe_unused]] const value_type elem{std::forward<Args>(args)...};
+        base_type::try_emplace(entt, nullptr);
     }
 
     /**
@@ -828,7 +848,17 @@ public:
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...) {
-        base_type::insert(std::move(first), std::move(last));
+        if constexpr(comp_traits::in_place_delete::value) {
+            for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
+                emplace(*first);
+            }
+        }
+
+        base_type::reserve(base_type::size() + std::distance(first, last));
+
+        for(; first != last; ++first) {
+            emplace(*first);
+        }
     }
 };
 
@@ -862,6 +892,18 @@ struct storage_adapter_mixin: Type {
     }
 
     /**
+     * @brief Patches the given instance for an entity.
+     * @tparam Func Types of the function objects to invoke.
+     * @param entt A valid identifier.
+     * @param func Valid function objects.
+     * @return A reference to the patched instance.
+     */
+    template<typename... Func>
+    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entt, Func &&... func) {
+        return Type::patch(entt, std::forward<Func>(func)...);
+    }
+
+    /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the objects assigned
@@ -874,18 +916,6 @@ struct storage_adapter_mixin: Type {
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
         Type::insert(std::move(first), std::move(last), std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Patches the given instance for an entity.
-     * @tparam Func Types of the function objects to invoke.
-     * @param entt A valid identifier.
-     * @param func Valid function objects.
-     * @return A reference to the patched instance.
-     */
-    template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entt, Func &&... func) {
-        return Type::patch(entt, std::forward<Func>(func)...);
     }
 };
 
@@ -908,6 +938,13 @@ class sigh_storage_mixin final: public Type {
         ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
         destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entt);
         Type::in_place_pop(entt, ud);
+    }
+
+    /*! @copydoc basic_sparse_set::try_emplace */
+    void try_emplace(const typename Type::entity_type entt, void *ud) final {
+        ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
+        Type::try_emplace(entt, ud);
+        construction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entt);
     }
 
 public:
@@ -1000,6 +1037,21 @@ public:
     }
 
     /**
+     * @brief Patches the given instance for an entity.
+     * @tparam Func Types of the function objects to invoke.
+     * @param owner The registry that issued the request.
+     * @param entt A valid identifier.
+     * @param func Valid function objects.
+     * @return A reference to the patched instance.
+     */
+    template<typename... Func>
+    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entt, Func &&... func) {
+        Type::patch(entt, std::forward<Func>(func)...);
+        update.publish(owner, entt);
+        return this->get(entt);
+    }
+
+    /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the objects assigned
@@ -1019,21 +1071,6 @@ public:
                 construction.publish(owner, *first);
             }
         }
-    }
-
-    /**
-     * @brief Patches the given instance for an entity.
-     * @tparam Func Types of the function objects to invoke.
-     * @param owner The registry that issued the request.
-     * @param entt A valid identifier.
-     * @param func Valid function objects.
-     * @return A reference to the patched instance.
-     */
-    template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entt, Func &&... func) {
-        Type::patch(entt, std::forward<Func>(func)...);
-        update.publish(owner, entt);
-        return this->get(entt);
     }
 
 private:
