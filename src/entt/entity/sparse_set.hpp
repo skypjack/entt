@@ -688,6 +688,10 @@ public:
      */
     template<typename It>
     void insert(It first, It last) {
+        for(; first != last && free_list != null; ++first) {
+            recycle(*first);
+        }
+
         reserve(count + std::distance(first, last));
 
         for(; first != last; ++first) {

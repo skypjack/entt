@@ -282,11 +282,13 @@ TEST(SparseSet, EmplaceOutOfBounds) {
     
     ASSERT_EQ(set.emplace(entities[0u]), 0u);
     ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.index(entities[0u]), 0u);
 
     set.erase(entities[0u]);
 
     ASSERT_EQ(set.emplace(entities[1u]), 0u);
     ASSERT_EQ(set.extent(), 2u * ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.index(entities[1u]), 0u);
 }
 
 TEST(SparseSet, Insert) {
@@ -319,13 +321,11 @@ TEST(SparseSet, Insert) {
     set.erase(std::begin(entities), std::end(entities));
     set.insert(std::rbegin(entities), std::rend(entities));
 
-    ASSERT_EQ(set.size(), 6u);
-    ASSERT_TRUE(set.at(1u) == entt::tombstone);
-    ASSERT_TRUE(set.at(2u) == entt::tombstone);
-    ASSERT_EQ(set.at(4u), entities[1u]);
-    ASSERT_EQ(set.at(5u), entities[0u]);
-    ASSERT_EQ(set.index(entities[0u]), 5u);
-    ASSERT_EQ(set.index(entities[1u]), 4u);
+    ASSERT_EQ(set.size(), 4u);
+    ASSERT_EQ(set.at(1u), entities[0u]);
+    ASSERT_EQ(set.at(2u), entities[1u]);
+    ASSERT_EQ(set.index(entities[0u]), 1u);
+    ASSERT_EQ(set.index(entities[1u]), 2u);
 }
 
 TEST(SparseSet, Erase) {
@@ -410,35 +410,35 @@ TEST(SparseSet, StableErase) {
     set.erase(entities, entities + 2u);
 
     ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 6u);
+    ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entities[2u]));
     ASSERT_EQ(*set.begin(), entities[2u]);
-    ASSERT_TRUE(set.at(3u) == entt::tombstone);
-    ASSERT_TRUE(set.at(4u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 4u);
+    ASSERT_TRUE(set.at(0u) == entt::tombstone);
+    ASSERT_TRUE(set.at(1u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 1u);
 
     set.erase(entities[2u]);
 
     ASSERT_DEATH(set.erase(entities[2u]), "");
     ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 6u);
+    ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.slot(), 5u);
+    ASSERT_EQ(set.slot(), 2u);
 
     set.insert(std::begin(entities), std::end(entities));
     std::swap(entities[1u], entities[2u]);
     set.erase(entities, entities + 2u);
 
     ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 9u);
+    ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entities[2u]));
-    ASSERT_TRUE(set.at(6u) == entt::tombstone);
-    ASSERT_EQ(set.at(7u), entities[2u]);
+    ASSERT_TRUE(set.at(0u) == entt::tombstone);
+    ASSERT_EQ(set.at(1u), entities[2u]);
+    ASSERT_TRUE(set.at(2u) == entt::tombstone);
     ASSERT_EQ(*++set.begin(), entities[2u]);
-    ASSERT_TRUE(set.at(8u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 8u);
+    ASSERT_EQ(set.slot(), 0u);
 
     set.compact();
 
@@ -447,6 +447,7 @@ TEST(SparseSet, StableErase) {
     ASSERT_EQ(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entities[2u]));
+    ASSERT_TRUE(set.at(0u) == entities[2u]);
     ASSERT_EQ(*set.begin(), entities[2u]);
     ASSERT_EQ(set.slot(), 1u);
 
@@ -454,6 +455,7 @@ TEST(SparseSet, StableErase) {
 
     ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
+    ASSERT_TRUE(set.at(0u) == entt::tombstone);
     ASSERT_EQ(set.slot(), 0u);
 
     set.compact();
@@ -577,6 +579,8 @@ TEST(SparseSet, StableRemove) {
     set.insert(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(set.remove(set.begin(), set.end()), 3u);
+    ASSERT_EQ(set.remove(set.begin(), set.end()), 0u);
+
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
@@ -590,50 +594,40 @@ TEST(SparseSet, StableRemove) {
     set.insert(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(set.remove(entities, entities + 2u), 2u);
+    ASSERT_EQ(set.remove(entities, entities + 2u), 0u);
+
     ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 6u);
+    ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entities[2u]));
     ASSERT_EQ(*set.begin(), entities[2u]);
-    ASSERT_TRUE(set.at(3u) == entt::tombstone);
-    ASSERT_TRUE(set.at(4u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 4u);
+    ASSERT_TRUE(set.at(0u) == entt::tombstone);
+    ASSERT_TRUE(set.at(1u) == entt::tombstone);
+    ASSERT_EQ(set.slot(), 1u);
 
     ASSERT_EQ(set.remove(entities[2u]), 1u);
     ASSERT_EQ(set.remove(entities[2u]), 0u);
-    ASSERT_EQ(set.remove(entities[2u]), 0u);
-    ASSERT_EQ(set.remove(entities[2u]), 0u);
-    ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 6u);
-    ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_TRUE(*set.begin() == entt::tombstone);
-    ASSERT_EQ(set.slot(), 5u);
 
-    set.insert(entities, entities + 2u);
-
-    ASSERT_EQ(set.remove(std::begin(entities), std::end(entities)), 2u);
     ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 8u);
-    ASSERT_EQ(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
+    ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_TRUE(set.at(6u) == entt::tombstone);
-    ASSERT_TRUE(set.at(7u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 7u);
+    ASSERT_EQ(set.slot(), 2u);
 
     set.insert(std::begin(entities), std::end(entities));
     std::swap(entities[1u], entities[2u]);
 
     ASSERT_EQ(set.remove(entities, entities + 2u), 2u);
+    ASSERT_EQ(set.remove(entities, entities + 2u), 0u);
+
     ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 11u);
+    ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entities[2u]));
-    ASSERT_TRUE(set.at(8u) == entt::tombstone);
-    ASSERT_EQ(set.at(9u), entities[2u]);
+    ASSERT_TRUE(set.at(0u) == entt::tombstone);
+    ASSERT_EQ(set.at(1u), entities[2u]);
+    ASSERT_TRUE(set.at(2u) == entt::tombstone);
     ASSERT_EQ(*++set.begin(), entities[2u]);
-    ASSERT_TRUE(set.at(10u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 10u);
+    ASSERT_EQ(set.slot(), 0u);
 
     set.compact();
 
@@ -642,6 +636,7 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entities[2u]));
+    ASSERT_TRUE(set.at(0u) == entities[2u]);
     ASSERT_EQ(*set.begin(), entities[2u]);
     ASSERT_EQ(set.slot(), 1u);
 
@@ -649,6 +644,7 @@ TEST(SparseSet, StableRemove) {
 
     ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
+    ASSERT_TRUE(set.at(0u) == entt::tombstone);
     ASSERT_EQ(set.slot(), 0u);
 
     set.compact();
@@ -663,6 +659,7 @@ TEST(SparseSet, StableRemove) {
     ASSERT_NE(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
     ASSERT_NE(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
+    ASSERT_EQ(set.slot(), 2u);
 
     ASSERT_EQ(set.remove(entities[0u]), 1u);
     ASSERT_EQ(set.remove(entities[1u]), 1u);
@@ -693,7 +690,6 @@ TEST(SparseSet, StableRemove) {
     ASSERT_NE(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
 
     ASSERT_EQ(set.remove(traits_type::construct(9, 0)), 0u);
-    ASSERT_EQ(set.remove(entt::tombstone), 0u);
     ASSERT_EQ(set.remove(entt::null), 0u);
 }
 
