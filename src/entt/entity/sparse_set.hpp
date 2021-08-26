@@ -243,11 +243,7 @@ class basic_sparse_set {
     }
 
     std::size_t append(const Entity entt) {
-        if(const auto len = reserved.second(); count == len) {
-            const size_type sz = static_cast<size_type>(len * growth_factor_v);
-            resize_packed_array(sz + !(sz > len));
-        }
-
+        ENTT_ASSERT(count != reserved.second(), "Not enough space left");
         ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
         assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), entity_traits::to_integral(entt));
         packed_array[count] = entt;
@@ -648,20 +644,6 @@ public:
     }
 
     /**
-     * @brief Appends an entity to a sparse set.
-     *
-     * @warning
-     * Attempting to assign an entity that already belongs to the sparse set
-     * results in undefined behavior.
-     *
-     * @param entt A valid identifier.
-     * @return The slot used for insertion.
-     */
-    size_type emplace_back(const entity_type entt) {
-        return append(entt);
-    }
-
-    /**
      * @brief Assigns an entity to a sparse set.
      *
      * @warning
@@ -672,7 +654,16 @@ public:
      * @return The slot used for insertion.
      */
     size_type emplace(const entity_type entt) {
-        return (free_list == null) ? append(entt) : recycle(entt);
+        if(free_list == null) {
+            if(const auto len = reserved.second(); count == len) {
+                const size_type sz = static_cast<size_type>(len * growth_factor_v);
+                resize_packed_array(sz + !(sz > len));
+            }
+
+            return append(entt);
+        } else {
+            return recycle(entt);
+        }
     }
 
     /**

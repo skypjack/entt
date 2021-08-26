@@ -254,11 +254,11 @@ TEST(SparseSet, Emplace) {
     set.emplace(entities[0u]);
     set.erase(entities[0u]);
 
-    set.emplace_back(entities[0u]);
     set.emplace(entities[1u]);
+    set.emplace(entities[0u]);
 
     ASSERT_DEATH(set.emplace(traits_type::combine(3, 1)), "");
-    ASSERT_DEATH(set.emplace_back(entities[1u]), "");
+    ASSERT_DEATH(set.emplace(entities[1u]), "");
     
     ASSERT_EQ(set.at(0u), entities[1u]);
     ASSERT_EQ(set.at(1u), entities[0u]);
@@ -267,12 +267,11 @@ TEST(SparseSet, Emplace) {
 
     set.erase(std::begin(entities), std::end(entities));
     set.emplace(entities[1u]);
-    set.emplace_back(entities[0u]);
+    set.emplace(entities[0u]);
 
     ASSERT_EQ(set.at(0u), entities[1u]);
-    ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(set.at(2u), entities[0u]);
-    ASSERT_EQ(set.index(entities[0u]), 2u);
+    ASSERT_EQ(set.at(1u), entities[0u]);
+    ASSERT_EQ(set.index(entities[0u]), 1u);
     ASSERT_EQ(set.index(entities[1u]), 0u);
 }
 

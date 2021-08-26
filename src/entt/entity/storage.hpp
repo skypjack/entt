@@ -283,15 +283,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         reserve(req);
 
         for(; first != last; ++first) {
-            const auto pos = base_type::size();
-            construct(packed[page(pos)] + offset(pos), generator());
-
-            ENTT_TRY {
-                base_type::emplace_back(*first);
-            } ENTT_CATCH {
-                destroy(packed[page(pos)][offset(pos)]);
-                ENTT_THROW;
-            }
+            emplace(*first, generator());
         }
     }
 
