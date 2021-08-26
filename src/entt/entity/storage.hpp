@@ -820,19 +820,15 @@ public:
     }
 
     /**
-     * @brief Assigns one or more entities to a storage.
-     *
-     * @warning
-     * Attempting to assign an entity that already belongs to the storage
-     * results in undefined behavior.
-     *
+     * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
+     * @tparam Args Types of optional arguments.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename It>
-    void insert(It first, It last, const value_type & = {}) {
-        base_type::insert(first, last);
+    template<typename It, typename... Args>
+    void insert(It first, It last, Args &&...) {
+        base_type::insert(std::move(first), std::move(last));
     }
 };
 
@@ -877,7 +873,7 @@ struct storage_adapter_mixin: Type {
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
-        Type::insert(first, last, std::forward<Args>(args)...);
+        Type::insert(std::move(first), std::move(last), std::forward<Args>(args)...);
     }
 
     /**

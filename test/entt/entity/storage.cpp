@@ -248,6 +248,16 @@ TEST(Storage, InsertEmptyType) {
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
+
+    pool.erase(std::begin(entities), std::end(entities));
+    const empty_type values[2u]{};
+    pool.insert(std::rbegin(entities), std::rend(entities), std::begin(values));
+
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.at(0u), entities[1u]);
+    ASSERT_EQ(pool.at(1u), entities[0u]);
+    ASSERT_EQ(pool.index(entities[0u]), 1u);
+    ASSERT_EQ(pool.index(entities[1u]), 0u);
 }
 
 TEST(Storage, Erase) {
