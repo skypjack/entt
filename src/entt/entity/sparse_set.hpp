@@ -246,14 +246,14 @@ protected:
     /*! @brief Exchanges the contents with those of a given sparse set. */
     virtual void swap_contents(basic_sparse_set &) {}
 
-    /*! @brief Swaps two entities in the internal packed array. */
+    /*! @brief Swaps two entities in a sparse set. */
     virtual void swap_at(const std::size_t, const std::size_t) {}
 
-    /*! @brief Moves an entity in the internal packed array. */
+    /*! @brief Moves an entity in a sparse set. */
     virtual void move_and_pop(const std::size_t, const std::size_t) {}
 
     /**
-     * @brief Attempts to erase an entity from the internal packed array.
+     * @brief Erase an entity from a sparse set.
      * @param entt A valid identifier.
      */
     virtual void swap_and_pop(const Entity entt, void *) {
@@ -272,7 +272,7 @@ protected:
     }
 
     /**
-     * @brief Attempts to erase an entity from the internal packed array.
+     * @brief Erase an entity from a sparse set.
      * @param entt A valid identifier.
      */
     virtual void in_place_pop(const Entity entt, void *) {
@@ -506,7 +506,7 @@ public:
      * array. If the sparse set is empty, the returned iterator will be equal to
      * `end()`.
      *
-     * @return An iterator to the first entity of the internal packed array.
+     * @return An iterator to the first entity of the sparse set.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return iterator{std::addressof(packed_array), static_cast<typename entity_traits::difference_type>(count)};
@@ -516,11 +516,11 @@ public:
      * @brief Returns an iterator to the end.
      *
      * The returned iterator points to the element following the last entity in
-     * the internal packed array. Attempting to dereference the returned
-     * iterator results in undefined behavior.
+     * a sparse set. Attempting to dereference the returned iterator results in
+     * undefined behavior.
      *
-     * @return An iterator to the element following the last entity of the
-     * internal packed array.
+     * @return An iterator to the element following the last entity of a sparse
+     * set.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return iterator{std::addressof(packed_array), {}};
@@ -544,11 +544,11 @@ public:
      * @brief Returns a reverse iterator to the end.
      *
      * The returned iterator points to the element following the last entity in
-     * the reversed internal packed array. Attempting to dereference the
-     * returned iterator results in undefined behavior.
+     * the reversed sparse set. Attempting to dereference the returned iterator
+     * results in undefined behavior.
      *
      * @return An iterator to the element following the last entity of the
-     * reversed internal packed array.
+     * reversed sparse set.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
         return std::make_reverse_iterator(begin());

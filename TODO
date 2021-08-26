@@ -2,31 +2,24 @@
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * add examples (and credits) from @alanjfs :)
-* custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
-* make storage adhere to AllocatorAwareContainer requirements
 * fast-contains for sparse sets (low prio but nice-to-have)
-* runtime components (registry), runtime events (dispatcher/emitter), ...
+* runtime components (registry), runtime events (dispatcher/emitter), runtime context variables ...
 * runtime_view/registry, remove reference to basic_sparse_set<E>
 * make pools available (registry/view/group), review operator| for views, make views accept registry to ctor
 * make view.lead() or similar available to return leading pool (useful for mt)
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
-* non-throwing sparse set emplace (see previous line)
 * custom allocators all over
 
 WIP:
 * customizable any_vtable, sfinae-friendly definition and op::custom for user-def
-* remove Entity from views and groups
 * registry: fake vtable (mixin injected) to get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
 * general purpose paged vector container
-* make it possible to register externally managed pools with the registry (allow for system centric mode)
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * add user data to type_info
-* any_vector for context variables
 * make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
-* weak reference wrapper example with custom storage
 * headless (sparse set only) view
 * write documentation for custom storages and views!!
 * make runtime views use opaque storage and therefore return also elements.
@@ -34,4 +27,3 @@ WIP:
 * entity-aware observer, add observer functions aside observer class
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * snapshot: support for range-based archives
-* add example: 64 bit ids with 32 bits reserved for users' purposes

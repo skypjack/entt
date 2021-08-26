@@ -284,18 +284,18 @@ protected:
     }
 
     /**
-     * @brief Swaps two elements in the internal packed array.
-     * @param lhs A valid position of an element within storage.
-     * @param rhs A valid position of an element within storage.
+     * @brief Swaps two elements in a storage.
+     * @param lhs A valid position of an element within a storage.
+     * @param rhs A valid position of an element within a storage.
      */
     void swap_at(const std::size_t lhs, const std::size_t rhs) final {
         std::swap(packed[page(lhs)][offset(lhs)], packed[page(rhs)][offset(rhs)]);
     }
 
     /**
-     * @brief Moves an element in the internal packed array.
-     * @param from A valid position of an element within storage.
-     * @param to A valid position of an element within storage.
+     * @brief Moves an element within a storage.
+     * @param from A valid position of an element within a storage.
+     * @param to A valid position of an element within a storage.
      */
     void move_and_pop(const std::size_t from, const std::size_t to) final {
         auto &&elem = packed[page(from)][offset(from)];
@@ -304,7 +304,7 @@ protected:
     }
 
     /**
-     * @brief Attempts to erase an element from the internal packed array.
+     * @brief Erase an element from a storage.
      * @param entt A valid identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
@@ -324,7 +324,7 @@ protected:
     }
 
     /**
-     * @brief Erases an element from the internal packed array.
+     * @brief Erases an element from a storage.
      * @param entt A valid identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
