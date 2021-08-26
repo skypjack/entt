@@ -242,20 +242,17 @@ class basic_sparse_set {
         }
     }
 
-    std::size_t append(const Entity entt) {
+    void append(const Entity entt) {
         ENTT_ASSERT(count != reserved.second(), "Not enough space left");
         ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
         assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), entity_traits::to_integral(entt));
-        packed_array[count] = entt;
-        return count++;
+        packed_array[count++] = entt;
     }
 
-    std::size_t recycle(const Entity entt) ENTT_NOEXCEPT {
+    void recycle(const Entity entt) {
         ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
-        const auto pos = static_cast<size_type>(entity_traits::to_entity(free_list));
         assure_page(page(entt))[offset(entt)] = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
-        free_list = std::exchange(packed_array[pos], entt);
-        return pos;
+        free_list = std::exchange(packed_array[static_cast<size_type>(entity_traits::to_entity(free_list))], entt);
     }
 
 protected:
@@ -651,18 +648,17 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid identifier.
-     * @return The slot used for insertion.
      */
-    size_type emplace(const entity_type entt) {
+    void emplace(const entity_type entt) {
         if(free_list == null) {
             if(const auto len = reserved.second(); count == len) {
                 const size_type sz = static_cast<size_type>(len * growth_factor_v);
                 resize_packed_array(sz + !(sz > len));
             }
 
-            return append(entt);
+            append(entt);
         } else {
-            return recycle(entt);
+            recycle(entt);
         }
     }
 

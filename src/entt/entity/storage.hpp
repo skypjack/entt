@@ -271,7 +271,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     template<typename It, typename Generator>
-    void recycle_or_append(It first, It last, Generator generator) {
+    void consume_range(It first, It last, Generator generator) {
         if constexpr(comp_traits::in_place_delete::value) {
             for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
                 emplace(*first, generator());
@@ -642,8 +642,8 @@ public:
         construct(elem, std::forward<Args>(args)...);
 
         ENTT_TRY {
-            [[maybe_unused]] const auto curr = base_type::emplace(entt);
-            ENTT_ASSERT(pos == curr, "Misplaced component");
+            base_type::emplace(entt);
+            ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
         } ENTT_CATCH {
             destroy(packed[page(pos)][offset(pos)]);
             ENTT_THROW;
@@ -682,7 +682,7 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        recycle_or_append(std::move(first), std::move(last), [&value]() -> decltype(auto) { return value; });
+        consume_range(std::move(first), std::move(last), [&value]() -> decltype(auto) { return value; });
     }
 
     /**
@@ -699,7 +699,7 @@ public:
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
-        recycle_or_append(std::move(first), std::move(last), [&from]() -> decltype(auto) { return *(from++); });
+        consume_range(std::move(first), std::move(last), [&from]() -> decltype(auto) { return *(from++); });
     }
 
 private:

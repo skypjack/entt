@@ -32,7 +32,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.capacity(), 42u);
     ASSERT_TRUE(set.empty());
 
-    ASSERT_EQ(set.emplace(entt::entity{42}), 0u);
+    set.emplace(entt::entity{42});
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
@@ -56,7 +56,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
 
-    ASSERT_EQ(set.emplace(entt::entity{42}), 0u);
+    set.emplace(entt::entity{42});
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.index(entt::entity{42}), 0u);
@@ -279,13 +279,14 @@ TEST(SparseSet, EmplaceOutOfBounds) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[2u]{entt::entity{0}, entt::entity{ENTT_SPARSE_PAGE}};
     
-    ASSERT_EQ(set.emplace(entities[0u]), 0u);
+    set.emplace(entities[0u]);
+
     ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
     ASSERT_EQ(set.index(entities[0u]), 0u);
 
     set.erase(entities[0u]);
+    set.emplace(entities[1u]);
 
-    ASSERT_EQ(set.emplace(entities[1u]), 0u);
     ASSERT_EQ(set.extent(), 2u * ENTT_SPARSE_PAGE);
     ASSERT_EQ(set.index(entities[1u]), 0u);
 }
@@ -481,12 +482,13 @@ TEST(SparseSet, StableErase) {
     ASSERT_TRUE(*set.begin() == entt::tombstone);
     ASSERT_EQ(set.slot(), 1u);
 
-    ASSERT_EQ(set.emplace(entities[0u]), 1u);
+    set.emplace(entities[0u]);
+
     ASSERT_EQ(*++set.begin(), entities[0u]);
 
-    ASSERT_EQ(set.emplace(entities[1u]), 0u);
-    ASSERT_EQ(set.emplace(entities[2u]), 2u);
-    ASSERT_EQ(set.emplace(entt::entity{0}), 3u);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
+    set.emplace(entt::entity{0});
 
     ASSERT_EQ(set.size(), 4u);
     ASSERT_EQ(*set.begin(), entt::entity{0});
@@ -671,12 +673,13 @@ TEST(SparseSet, StableRemove) {
     ASSERT_TRUE(*set.begin() == entt::tombstone);
     ASSERT_EQ(set.slot(), 1u);
 
-    ASSERT_EQ(set.emplace(entities[0u]), 1u);
+    set.emplace(entities[0u]);
+
     ASSERT_EQ(*++set.begin(), entities[0u]);
 
-    ASSERT_EQ(set.emplace(entities[1u]), 0u);
-    ASSERT_EQ(set.emplace(entities[2u]), 2u);
-    ASSERT_EQ(set.emplace(entt::entity{0}), 3u);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
+    set.emplace(entt::entity{0});
 
     ASSERT_EQ(set.size(), 4u);
     ASSERT_EQ(*set.begin(), entt::entity{0});
