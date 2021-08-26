@@ -242,6 +242,26 @@ class basic_sparse_set {
         }
     }
 
+    std::size_t append(const Entity entt) {
+        if(const auto len = reserved.second(); count == len) {
+            const size_type sz = static_cast<size_type>(len * growth_factor_v);
+            resize_packed_array(sz + !(sz > len));
+        }
+
+        ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
+        assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), entity_traits::to_integral(entt));
+        packed_array[count] = entt;
+        return count++;
+    }
+
+    std::size_t recycle(const Entity entt) ENTT_NOEXCEPT {
+        ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
+        const auto pos = static_cast<size_type>(entity_traits::to_entity(free_list));
+        assure_page(page(entt))[offset(entt)] = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
+        free_list = std::exchange(packed_array[pos], entt);
+        return pos;
+    }
+
 protected:
     /*! @brief Exchanges the contents with those of a given sparse set. */
     virtual void swap_contents(basic_sparse_set &) {}
@@ -638,17 +658,7 @@ public:
      * @return The slot used for insertion.
      */
     size_type emplace_back(const entity_type entt) {
-        ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
-
-        if(const auto len = reserved.second(); count == len) {
-            const size_type sz = static_cast<size_type>(len * growth_factor_v);
-            resize_packed_array(sz + !(sz > len));
-        }
-
-        const auto entity = static_cast<typename entity_traits::entity_type>(count);
-        assure_page(page(entt))[offset(entt)] = entity_traits::combine(entity, entity_traits::to_integral(entt));
-        packed_array[count] = entt;
-        return count++;
+        return append(entt);
     }
 
     /**
@@ -662,15 +672,7 @@ public:
      * @return The slot used for insertion.
      */
     size_type emplace(const entity_type entt) {
-        if(free_list == null) {
-            return emplace_back(entt);
-        } else {
-            ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
-            assure_page(page(entt))[offset(entt)] = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
-            const auto pos = static_cast<size_type>(entity_traits::to_entity(free_list));
-            free_list = std::exchange(packed_array[pos], entt);
-            return pos;
-        }
+        return (free_list == null) ? append(entt) : recycle(entt);
     }
 
     /**
@@ -689,11 +691,7 @@ public:
         reserve(count + std::distance(first, last));
 
         for(; first != last; ++first) {
-            const auto entt = *first;
-            ENTT_ASSERT(current(entt) == entity_traits::to_version(tombstone), "Slot not available");
-            const auto entity = static_cast<typename entity_traits::entity_type>(count);
-            assure_page(page(entt))[offset(entt)] = entity_traits::combine(entity, entity_traits::to_integral(entt));
-            packed_array[count++] = entt;
+            append(*first);
         }
     }
 
