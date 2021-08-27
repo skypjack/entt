@@ -6,7 +6,6 @@
 #include <unordered_set>
 #include <gtest/gtest.h>
 #include <entt/entity/component.hpp>
-#include <entt/entity/fwd.hpp>
 #include <entt/entity/storage.hpp>
 #include "throwing_allocator.hpp"
 #include "throwing_component.hpp"
@@ -14,6 +13,12 @@
 struct empty_type {};
 struct boxed_int { int value; };
 struct stable_type { int value; };
+
+struct non_default_constructible {
+    non_default_constructible() = delete;
+    non_default_constructible(int v): value{v} {}
+    int value;
+};
 
 struct update_from_destructor {
     update_from_destructor(entt::storage<update_from_destructor> &ref, entt::entity other)
@@ -540,6 +545,90 @@ TEST(Storage, StableRemove) {
     ASSERT_EQ(pool.get(entities[0u]).value, 99);
     ASSERT_EQ(pool.get(entities[1u]).value, 2);
     ASSERT_EQ(pool.get(entities[2u]).value, 1);
+}
+
+TEST(Storage, TypeFromBase) {
+    entt::storage<int> pool;
+    entt::sparse_set &base = pool;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    ASSERT_FALSE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+
+    base.emplace(entities[0u]);
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(pool.get(entities[0u]), 0);
+
+    base.erase(entities[0u]);
+    base.insert(std::begin(entities), std::end(entities));
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_TRUE(pool.contains(entities[1u]));
+    ASSERT_EQ(pool.get(entities[1u]), 0);
+
+    base.erase(std::begin(entities), std::end(entities));
+
+    ASSERT_TRUE(pool.empty());
+}
+
+TEST(Storage, EmptyTypeFromBase) {
+    entt::storage<empty_type> pool;
+    entt::sparse_set &base = pool;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    ASSERT_FALSE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+
+    base.emplace(entities[0u]);
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+
+    base.erase(entities[0u]);
+    base.insert(std::begin(entities), std::end(entities));
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_TRUE(pool.contains(entities[1u]));
+
+    base.erase(std::begin(entities), std::end(entities));
+
+    ASSERT_TRUE(pool.empty());
+}
+
+TEST(Storage, NonDefaultConstructibleTypeFromBase) {
+    entt::storage<non_default_constructible> pool;
+    entt::sparse_set &base = pool;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    ASSERT_FALSE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+
+    ASSERT_DEATH(base.emplace(entities[0u]), "");
+
+    ASSERT_FALSE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(base.find(entities[0u]), base.end());
+    ASSERT_TRUE(pool.empty());
+
+    pool.emplace(entities[0u], 3);
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+
+    base.erase(entities[0u]);
+
+    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(pool.contains(entities[0u]));
+
+    ASSERT_DEATH(base.insert(std::begin(entities), std::end(entities)), "");
+
+    ASSERT_FALSE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(base.find(entities[0u]), base.end());
+    ASSERT_EQ(base.find(entities[1u]), base.end());
+    ASSERT_TRUE(pool.empty());
 }
 
 TEST(Storage, Compact) {
