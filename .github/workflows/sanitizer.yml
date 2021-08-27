@@ -33,4 +33,4 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 10 -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4
