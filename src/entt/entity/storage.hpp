@@ -272,10 +272,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     template<typename It, typename Generator>
     void consume_range(It first, It last, Generator generator) {
-        if constexpr(comp_traits::in_place_delete::value) {
-            for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
-                emplace(*first, generator());
-            }
+        for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
+            emplace(*first, generator());
         }
 
         const auto req = base_type::size() + std::distance(first, last);
@@ -848,10 +846,8 @@ public:
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...) {
-        if constexpr(comp_traits::in_place_delete::value) {
-            for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
-                emplace(*first);
-            }
+        for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
+            emplace(*first);
         }
 
         base_type::reserve(base_type::size() + std::distance(first, last));
