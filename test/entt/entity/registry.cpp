@@ -1757,7 +1757,10 @@ TEST(Registry, GetOrEmplace) {
     entt::registry registry;
     const auto entity = registry.create();
     const auto value = registry.get_or_emplace<int>(entity, 3);
-    ASSERT_TRUE(registry.all_of<int>(entity));
+    // get_or_emplace must work for empty types
+    registry.get_or_emplace<empty_type>(entity);
+
+    ASSERT_TRUE((registry.all_of<int, empty_type>(entity)));
     ASSERT_EQ(registry.get<int>(entity), value);
     ASSERT_EQ(registry.get<int>(entity), 3);
 }
