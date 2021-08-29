@@ -51,7 +51,7 @@ namespace entt {
  */
 template<typename Entity, typename Type, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
-    static constexpr auto packed_page = ENTT_PACKED_PAGE;
+    static constexpr auto packed_page_v = ENTT_PACKED_PAGE;
 
     using allocator_traits = std::allocator_traits<Allocator>;
 
@@ -167,12 +167,12 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         difference_type index;
     };
 
-    [[nodiscard]] static auto page(const std::size_t pos) ENTT_NOEXCEPT {
-        return pos / packed_page;
+    [[nodiscard]] static constexpr std::size_t page(const std::size_t pos) ENTT_NOEXCEPT {
+        return pos / packed_page_v;
     }
 
-    [[nodiscard]] static auto offset(const std::size_t pos) ENTT_NOEXCEPT {
-        return pos & (packed_page - 1);
+    [[nodiscard]] static constexpr std::size_t offset(const std::size_t pos) ENTT_NOEXCEPT {
+        return fast_mod<packed_page_v>(pos);
     }
 
     void release_memory() {
@@ -185,7 +185,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             alloc_ptr allocator_ptr{allocator};
 
             for(size_type pos{}; pos < len; ++pos) {
-                alloc_traits::deallocate(allocator, packed[pos], packed_page);
+                alloc_traits::deallocate(allocator, packed[pos], packed_page_v);
                 alloc_ptr_traits::destroy(allocator_ptr, std::addressof(packed[pos]));
             }
 
@@ -207,11 +207,11 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
             ENTT_TRY {
                 for(auto next = len; next < sz; ++next) {
-                    mem[next] = alloc_traits::allocate(allocator, packed_page);
+                    mem[next] = alloc_traits::allocate(allocator, packed_page_v);
                 }
             } ENTT_CATCH {
                 for(auto next = len; next < sz && mem[next]; ++next) {
-                    alloc_traits::deallocate(allocator, mem[next], packed_page);
+                    alloc_traits::deallocate(allocator, mem[next], packed_page_v);
                 }
 
                 std::destroy(mem + len, mem + sz);
@@ -233,7 +233,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     void release_unused_pages() {
-        if(const auto length = base_type::size() / packed_page; length < bucket.second()) {
+        if(const auto length = base_type::size() / packed_page_v; length < bucket.second()) {
             auto &allocator = bucket.first();
             auto &len = bucket.second();
             alloc_ptr allocator_ptr{allocator};
@@ -242,7 +242,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             std::uninitialized_copy(packed, packed + length, mem);
 
             for(auto pos = length; pos < len; ++pos) {
-                alloc_traits::deallocate(allocator, packed[pos], packed_page);
+                alloc_traits::deallocate(allocator, packed[pos], packed_page_v);
             }
 
             std::destroy(packed, packed + len);
@@ -479,7 +479,7 @@ public:
      * @return Capacity of the storage.
      */
     [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT override {
-        return bucket.second() * packed_page;
+        return bucket.second() * packed_page_v;
     }
 
     /*! @brief Requests the removal of unused capacity. */

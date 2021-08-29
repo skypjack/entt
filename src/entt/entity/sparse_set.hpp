@@ -185,12 +185,12 @@ class basic_sparse_set {
 
     using entity_traits = entt_traits<Entity>;
 
-    [[nodiscard]] static constexpr auto page(const Entity entt) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr std::size_t page(const Entity entt) ENTT_NOEXCEPT {
         return static_cast<size_type>(entity_traits::to_entity(entt) / sparse_page_v);
     }
 
-    [[nodiscard]] static constexpr auto offset(const Entity entt) ENTT_NOEXCEPT {
-        return static_cast<size_type>(entity_traits::to_entity(entt) & (sparse_page_v - 1));
+    [[nodiscard]] static constexpr std::size_t offset(const Entity entt) ENTT_NOEXCEPT {
+        return fast_mod<sparse_page_v>(static_cast<size_type>(entity_traits::to_entity(entt)));
     }
 
     [[nodiscard]] auto assure_page(const std::size_t idx) {

@@ -37,16 +37,12 @@
 #endif
 
 
-#ifdef ENTT_SPARSE_PAGE
-	static_assert(ENTT_SPARSE_PAGE && ((ENTT_SPARSE_PAGE & (ENTT_SPARSE_PAGE - 1)) == 0), "ENTT_SPARSE_PAGE must be a power of two");
-#else
+#ifndef ENTT_SPARSE_PAGE
 #   define ENTT_SPARSE_PAGE 4096
 #endif
 
 
-#ifdef ENTT_PACKED_PAGE
-static_assert(ENTT_PACKED_PAGE && ((ENTT_PACKED_PAGE & (ENTT_PACKED_PAGE - 1)) == 0), "ENTT_PACKED_PAGE must be a power of two");
-#else
+#ifndef ENTT_PACKED_PAGE
 #   define ENTT_PACKED_PAGE 1024
 #endif
 
