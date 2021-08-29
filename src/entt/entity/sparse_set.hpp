@@ -18,6 +18,123 @@
 namespace entt {
 
 
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename Traits>
+struct sparse_set_iterator final {
+    using value_type = typename Traits::value_type;
+    using pointer = typename Traits::pointer;
+    using reference = typename Traits::reference;
+    using difference_type = typename entt_traits<value_type>::difference_type;
+    using iterator_category = std::random_access_iterator_tag;
+
+    sparse_set_iterator() ENTT_NOEXCEPT = default;
+
+    sparse_set_iterator(const pointer *ref, const difference_type idx) ENTT_NOEXCEPT
+        : packed_array{ref},
+          index{idx}
+    {}
+
+    sparse_set_iterator & operator++() ENTT_NOEXCEPT {
+        return --index, *this;
+    }
+
+    sparse_set_iterator operator++(int) ENTT_NOEXCEPT {
+        sparse_set_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    sparse_set_iterator & operator--() ENTT_NOEXCEPT {
+        return ++index, *this;
+    }
+
+    sparse_set_iterator operator--(int) ENTT_NOEXCEPT {
+        sparse_set_iterator orig = *this;
+        return operator--(), orig;
+    }
+
+    sparse_set_iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
+        index -= value;
+        return *this;
+    }
+
+    sparse_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+        sparse_set_iterator copy = *this;
+        return (copy += value);
+    }
+
+    sparse_set_iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+        return (*this += -value);
+    }
+
+    sparse_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+        return (*this + -value);
+    }
+
+    difference_type operator-(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        return other.index - index;
+    }
+
+    [[nodiscard]] reference operator[](const difference_type value) const {
+        const auto pos = index - value - 1;
+        return (*packed_array)[pos];
+    }
+
+    [[nodiscard]] bool operator==(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        return other.index == index;
+    }
+
+    [[nodiscard]] bool operator!=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
+    }
+
+    [[nodiscard]] bool operator<(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        return index > other.index;
+    }
+
+    [[nodiscard]] bool operator>(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        return index < other.index;
+    }
+
+    [[nodiscard]] bool operator<=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this > other);
+    }
+
+    [[nodiscard]] bool operator>=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this < other);
+    }
+
+    [[nodiscard]] pointer operator->() const {
+        const auto pos = index - 1;
+        return (*packed_array) + pos;
+    }
+
+    [[nodiscard]] reference operator*() const {
+        return *operator->();
+    }
+
+private:
+    const pointer *packed_array;
+    difference_type index;
+};
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
 /*! @brief Sparse set deletion policy. */
 enum class deletion_policy: std::uint8_t {
     /*! @brief Swap-and-pop deletion policy. */
@@ -67,103 +184,6 @@ class basic_sparse_set {
     using alloc_ptr_pointer = typename alloc_ptr_traits::pointer;
 
     using entity_traits = entt_traits<Entity>;
-
-    struct sparse_set_iterator final {
-        using difference_type = typename entity_traits::difference_type;
-        using value_type = Entity;
-        using pointer = const value_type *;
-        using reference = const value_type &;
-        using iterator_category = std::random_access_iterator_tag;
-
-        sparse_set_iterator() ENTT_NOEXCEPT = default;
-
-        sparse_set_iterator(const alloc_const_pointer *ref, const difference_type idx) ENTT_NOEXCEPT
-            : packed_array{ref},
-              index{idx}
-        {}
-
-        sparse_set_iterator & operator++() ENTT_NOEXCEPT {
-            return --index, *this;
-        }
-
-        sparse_set_iterator operator++(int) ENTT_NOEXCEPT {
-            iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        sparse_set_iterator & operator--() ENTT_NOEXCEPT {
-            return ++index, *this;
-        }
-
-        sparse_set_iterator operator--(int) ENTT_NOEXCEPT {
-            sparse_set_iterator orig = *this;
-            return operator--(), orig;
-        }
-
-        sparse_set_iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
-            index -= value;
-            return *this;
-        }
-
-        sparse_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
-            sparse_set_iterator copy = *this;
-            return (copy += value);
-        }
-
-        sparse_set_iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
-            return (*this += -value);
-        }
-
-        sparse_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
-            return (*this + -value);
-        }
-
-        difference_type operator-(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-            return other.index - index;
-        }
-
-        [[nodiscard]] reference operator[](const difference_type value) const {
-            const auto pos = size_type(index-value-1u);
-            return (*packed_array)[pos];
-        }
-
-        [[nodiscard]] bool operator==(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-            return other.index == index;
-        }
-
-        [[nodiscard]] bool operator!=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-        [[nodiscard]] bool operator<(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-            return index > other.index;
-        }
-
-        [[nodiscard]] bool operator>(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-            return index < other.index;
-        }
-
-        [[nodiscard]] bool operator<=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this > other);
-        }
-
-        [[nodiscard]] bool operator>=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this < other);
-        }
-
-        [[nodiscard]] pointer operator->() const {
-            const auto pos = size_type(index-1u);
-            return std::addressof((*packed_array)[pos]);
-        }
-
-        [[nodiscard]] reference operator*() const {
-            return *operator->();
-        }
-
-    private:
-        const alloc_const_pointer *packed_array;
-        difference_type index;
-    };
 
     [[nodiscard]] static constexpr auto page(const Entity entt) ENTT_NOEXCEPT {
         return static_cast<size_type>(entity_traits::to_entity(entt) / sparse_page_v);
@@ -318,7 +338,7 @@ public:
     /*! @brief Pointer type to contained entities. */
     using pointer = alloc_const_pointer;
     /*! @brief Random access iterator type. */
-    using iterator = sparse_set_iterator;
+    using iterator = internal::sparse_set_iterator<std::iterator_traits<alloc_const_pointer>>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
 
