@@ -41,3 +41,9 @@ TEST(Memory, IsPowerOfTwo) {
     ASSERT_TRUE(entt::is_power_of_two_v<128u>);
     ASSERT_FALSE(entt::is_power_of_two_v<200u>);
 }
+
+TEST(Memory, FastMod) {
+    ASSERT_EQ(entt::fast_mod<8u>(0u), 0u);
+    ASSERT_EQ(entt::fast_mod<8u>(7u), 7u);
+    ASSERT_EQ(entt::fast_mod<8u>(8u), 0u);
+}

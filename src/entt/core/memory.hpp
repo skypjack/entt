@@ -89,6 +89,19 @@ template<std::size_t Value>
 inline constexpr bool is_power_of_two_v = is_power_of_two<Value>::value;
 
 
+/**
+ * @brief Fast module utility function (powers of two only).
+ * @tparam Value Compile-time page size, it must be a power of two.
+ * @param value A value for which to calculate the modulus.
+ * @return Remainder of division.
+ */
+template<std::size_t Value>
+[[nodiscard]] constexpr std::size_t fast_mod(const std::size_t value) ENTT_NOEXCEPT {
+    static_assert(is_power_of_two_v<Value>, "Value must be a power of two");
+    return value & (Value - 1u);
+}
+
+
 }
 
 
