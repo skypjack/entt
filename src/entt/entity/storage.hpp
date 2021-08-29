@@ -70,9 +70,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
 
-    static_assert(alloc_traits::propagate_on_container_move_assignment::value);
-    static_assert(alloc_ptr_traits::propagate_on_container_move_assignment::value);
-
     template<typename Value>
     struct storage_iterator final {
         using difference_type = typename basic_storage::difference_type;
