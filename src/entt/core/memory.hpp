@@ -73,6 +73,22 @@ constexpr void propagate_on_container_swap(Allocator &lhs, Allocator &rhs) ENTT_
 }
 
 
+/**
+ * @brief Utility class to check whether a value is a power of two or not.
+ * @tparam Value A value that may or may not be a power of two.
+ */
+template<std::size_t Value>
+using is_power_of_two = std::bool_constant<Value && ((Value & (Value - 1)) == 0)>;
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Value A value that may or may not be a power of two.
+ */
+template<std::size_t Value>
+inline constexpr bool is_power_of_two_v = is_power_of_two<Value>::value;
+
+
 }
 
 

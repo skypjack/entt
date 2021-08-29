@@ -31,3 +31,13 @@ TEST(Memory, PoccaPocmaAndPocs) {
     entt::propagate_on_container_move_assignment(lhs, rhs);
     entt::propagate_on_container_swap(lhs, rhs);
 }
+
+TEST(Memory, IsPowerOfTwo) {
+    ASSERT_FALSE(entt::is_power_of_two_v<0u>);
+    ASSERT_TRUE(entt::is_power_of_two_v<1u>);
+    ASSERT_TRUE(entt::is_power_of_two_v<2u>);
+    ASSERT_TRUE(entt::is_power_of_two_v<4u>);
+    ASSERT_FALSE(entt::is_power_of_two_v<7u>);
+    ASSERT_TRUE(entt::is_power_of_two_v<128u>);
+    ASSERT_FALSE(entt::is_power_of_two_v<200u>);
+}
