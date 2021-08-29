@@ -65,14 +65,13 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using alloc_ptr_const_pointer = typename allocator_traits::template rebind_traits<alloc_const_pointer>::const_pointer;
     using alloc_ptr_pointer = typename alloc_ptr_traits::pointer;
 
-    using difference_type = typename entt_traits<Entity>::difference_type;
+    using entity_traits = entt_traits<Entity>;
     using comp_traits = component_traits<Type>;
-
     using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
 
     template<typename Value>
     struct storage_iterator final {
-        using difference_type = typename basic_storage::difference_type;
+        using difference_type = typename entity_traits::difference_type;
         using value_type = Value;
         using pointer = value_type *;
         using reference = value_type &;
@@ -80,7 +79,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
         storage_iterator() ENTT_NOEXCEPT = default;
 
-        storage_iterator(alloc_ptr_pointer const *ref, const typename basic_storage::difference_type idx) ENTT_NOEXCEPT
+        storage_iterator(alloc_ptr_pointer const *ref, difference_type idx) ENTT_NOEXCEPT
             : packed{ref},
               index{idx}
         {}
@@ -511,7 +510,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
-        const difference_type pos = base_type::size();
+        const auto pos = static_cast<typename entity_traits::difference_type>(base_type::size());
         return const_iterator{std::addressof(packed), pos};
     }
 
@@ -522,7 +521,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
-        const difference_type pos = base_type::size();
+        const auto pos = static_cast<typename entity_traits::difference_type>(base_type::size());
         return iterator{std::addressof(packed), pos};
     }
 
