@@ -40,7 +40,6 @@ template<>
 struct entt_traits<std::uint32_t> {
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
-    using difference_type = std::int64_t;
 
     static constexpr entity_type entity_mask = 0xFFFFF;
     static constexpr entity_type version_mask = 0xFFF;
@@ -52,7 +51,6 @@ template<>
 struct entt_traits<std::uint64_t> {
     using entity_type = std::uint64_t;
     using version_type = std::uint32_t;
-    using difference_type = std::int64_t;
 
     static constexpr entity_type entity_mask = 0xFFFFFFFF;
     static constexpr entity_type version_mask = 0xFFFFFFFF;
@@ -84,8 +82,6 @@ public:
     using entity_type = typename entity_traits::entity_type;
     /*! @brief Underlying version type. */
     using version_type = typename entity_traits::version_type;
-    /*! @brief Difference type. */
-    using difference_type = typename entity_traits::difference_type;
     /*! @brief Reserved identifier. */
     static constexpr entity_type reserved = entity_traits::entity_mask | (entity_traits::version_mask << entity_traits::entity_shift);
 

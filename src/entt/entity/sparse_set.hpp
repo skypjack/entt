@@ -550,7 +550,7 @@ public:
      * @return An iterator to the first entity of the sparse set.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        const auto pos = static_cast<typename entity_traits::difference_type>(count);
+        const auto pos = static_cast<typename iterator::difference_type>(count);
         return iterator{std::addressof(packed), pos};
     }
 

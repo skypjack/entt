@@ -71,7 +71,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     template<typename Value>
     struct storage_iterator final {
-        using difference_type = typename entity_traits::difference_type;
+        using difference_type = std::ptrdiff_t;
         using value_type = Value;
         using pointer = value_type *;
         using reference = value_type &;
@@ -510,7 +510,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
-        const auto pos = static_cast<typename entity_traits::difference_type>(base_type::size());
+        const auto pos = static_cast<typename iterator::difference_type>(base_type::size());
         return const_iterator{std::addressof(packed), pos};
     }
 
@@ -521,7 +521,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
-        const auto pos = static_cast<typename entity_traits::difference_type>(base_type::size());
+        const auto pos = static_cast<typename iterator::difference_type>(base_type::size());
         return iterator{std::addressof(packed), pos};
     }
 
