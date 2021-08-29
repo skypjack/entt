@@ -4,6 +4,7 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
+* decouple storage iterator from allocator
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime components (registry), runtime events (dispatcher/emitter), runtime context variables ...
 * runtime_view/registry, remove reference to basic_sparse_set<E>

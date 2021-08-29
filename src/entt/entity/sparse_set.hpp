@@ -32,13 +32,13 @@ struct sparse_set_iterator final {
     using value_type = typename Traits::value_type;
     using pointer = typename Traits::pointer;
     using reference = typename Traits::reference;
-    using difference_type = typename entt_traits<value_type>::difference_type;
+    using difference_type = typename Traits::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
     sparse_set_iterator() ENTT_NOEXCEPT = default;
 
     sparse_set_iterator(const pointer *ref, const difference_type idx) ENTT_NOEXCEPT
-        : packed_array{ref},
+        : packed{ref},
           index{idx}
     {}
 
@@ -84,7 +84,7 @@ struct sparse_set_iterator final {
 
     [[nodiscard]] reference operator[](const difference_type value) const {
         const auto pos = index - value - 1;
-        return (*packed_array)[pos];
+        return (*packed)[pos];
     }
 
     [[nodiscard]] bool operator==(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
@@ -113,7 +113,7 @@ struct sparse_set_iterator final {
 
     [[nodiscard]] pointer operator->() const {
         const auto pos = index - 1;
-        return (*packed_array) + pos;
+        return (*packed) + pos;
     }
 
     [[nodiscard]] reference operator*() const {
@@ -121,7 +121,7 @@ struct sparse_set_iterator final {
     }
 
 private:
-    const pointer *packed_array;
+    const pointer *packed;
     difference_type index;
 };
 
@@ -201,25 +201,25 @@ class basic_sparse_set {
 
             std::uninitialized_value_construct(mem + bucket, mem + sz);
 
-            if(sparse_array) {
-                std::uninitialized_copy(sparse_array, sparse_array + bucket, mem);
-                std::destroy(sparse_array, sparse_array + bucket);
-                alloc_ptr_traits::deallocate(allocator_ptr, sparse_array, bucket);
+            if(sparse) {
+                std::uninitialized_copy(sparse, sparse + bucket, mem);
+                std::destroy(sparse, sparse + bucket);
+                alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
             }
 
-            sparse_array = mem;
+            sparse = mem;
             bucket = sz;
         }
 
-        if(!sparse_array[idx]) {
-            sparse_array[idx] = alloc_traits::allocate(reserved.first(), sparse_page_v);
-            std::uninitialized_fill(sparse_array[idx], sparse_array[idx] + sparse_page_v, null);
+        if(!sparse[idx]) {
+            sparse[idx] = alloc_traits::allocate(reserved.first(), sparse_page_v);
+            std::uninitialized_fill(sparse[idx], sparse[idx] + sparse_page_v, null);
         }
 
-        return sparse_array[idx];
+        return sparse[idx];
     }
 
-    void resize_packed_array(const std::size_t req) {
+    void resize_packed(const std::size_t req) {
         auto &allocator = reserved.first();
         auto &len = reserved.second();
         ENTT_ASSERT((req != len) && !(req < count), "Invalid request");
@@ -227,13 +227,13 @@ class basic_sparse_set {
 
         std::uninitialized_fill(mem + count, mem + req, tombstone);
 
-        if(packed_array) {
-            std::uninitialized_copy(packed_array, packed_array + count, mem);
-            std::destroy(packed_array, packed_array + len);
-            alloc_traits::deallocate(allocator, packed_array, len);
+        if(packed) {
+            std::uninitialized_copy(packed, packed + count, mem);
+            std::destroy(packed, packed + len);
+            alloc_traits::deallocate(allocator, packed, len);
         }
 
-        packed_array = mem;
+        packed = mem;
         len = req;
     }
 
@@ -241,24 +241,24 @@ class basic_sparse_set {
         auto &allocator = reserved.first();
         auto &len = reserved.second();
 
-        if(packed_array) {
-            std::destroy(packed_array, packed_array + len);
-            alloc_traits::deallocate(allocator, packed_array, len);
+        if(packed) {
+            std::destroy(packed, packed + len);
+            alloc_traits::deallocate(allocator, packed, len);
         }
 
-        if(sparse_array) {
+        if(sparse) {
             alloc_ptr allocator_ptr{allocator};
 
             for(size_type pos{}; pos < bucket; ++pos) {
-                if(sparse_array[pos]) {
-                    std::destroy(sparse_array[pos], sparse_array[pos] + sparse_page_v);
-                    alloc_traits::deallocate(allocator, sparse_array[pos], sparse_page_v);
+                if(sparse[pos]) {
+                    std::destroy(sparse[pos], sparse[pos] + sparse_page_v);
+                    alloc_traits::deallocate(allocator, sparse[pos], sparse_page_v);
                 }
 
-                alloc_ptr_traits::destroy(allocator_ptr, std::addressof(sparse_array[pos]));
+                alloc_ptr_traits::destroy(allocator_ptr, std::addressof(sparse[pos]));
             }
 
-            alloc_ptr_traits::deallocate(allocator_ptr, sparse_array, bucket);
+            alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
         }
     }
 
@@ -277,13 +277,13 @@ protected:
      * @param entt A valid identifier.
      */
     virtual void swap_and_pop(const Entity entt, void *) {
-        auto &ref = sparse_array[page(entt)][offset(entt)];
+        auto &ref = sparse[page(entt)][offset(entt)];
         const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
-        ENTT_ASSERT(packed_array[pos] == entt, "Invalid identifier");
-        auto &last = packed_array[--count];
+        ENTT_ASSERT(packed[pos] == entt, "Invalid identifier");
+        auto &last = packed[--count];
 
-        packed_array[pos] = last;
-        auto &elem = sparse_array[page(last)][offset(last)];
+        packed[pos] = last;
+        auto &elem = sparse[page(last)][offset(last)];
         elem = entity_traits::combine(entity_traits::to_integral(ref), entity_traits::to_integral(elem));
         // lazy self-assignment guard
         ref = null;
@@ -296,11 +296,11 @@ protected:
      * @param entt A valid identifier.
      */
     virtual void in_place_pop(const Entity entt, void *) {
-        auto &ref = sparse_array[page(entt)][offset(entt)];
+        auto &ref = sparse[page(entt)][offset(entt)];
         const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
-        ENTT_ASSERT(packed_array[pos] == entt, "Invalid identifier");
+        ENTT_ASSERT(packed[pos] == entt, "Invalid identifier");
 
-        packed_array[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
+        packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
         // lazy self-assignment guard
         ref = null;
     }
@@ -315,14 +315,14 @@ protected:
         if(free_list == null) {
             if(const auto len = reserved.second(); count == len) {
                 const size_type sz = static_cast<size_type>(len * growth_factor_v);
-                resize_packed_array(sz + !(sz > len));
+                resize_packed(sz + !(sz > len));
             }
 
             assure_page(page(entt))[offset(entt)] = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), entity_traits::to_integral(entt));
-            packed_array[count++] = entt;
+            packed[count++] = entt;
         } else {
             assure_page(page(entt))[offset(entt)] = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
-            free_list = std::exchange(packed_array[static_cast<size_type>(entity_traits::to_entity(free_list))], entt);
+            free_list = std::exchange(packed[static_cast<size_type>(entity_traits::to_entity(free_list))], entt);
         }
     }
 
@@ -362,8 +362,8 @@ public:
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &allocator = {})
         : reserved{allocator, size_type{}},
-          sparse_array{},
-          packed_array{},
+          sparse{},
+          packed{},
           bucket{},
           count{},
           free_list{tombstone},
@@ -376,8 +376,8 @@ public:
      */
     basic_sparse_set(basic_sparse_set &&other) ENTT_NOEXCEPT
         : reserved{std::move(other.reserved.first()), std::exchange(other.reserved.second(), size_type{})},
-          sparse_array{std::exchange(other.sparse_array, alloc_ptr_pointer{})},
-          packed_array{std::exchange(other.packed_array, alloc_pointer{})},
+          sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
+          packed{std::exchange(other.packed, alloc_pointer{})},
           bucket{std::exchange(other.bucket, size_type{})},
           count{std::exchange(other.count, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
@@ -391,8 +391,8 @@ public:
      */
     basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) ENTT_NOEXCEPT
         : reserved{allocator, std::exchange(other.reserved.second(), size_type{})},
-          sparse_array{std::exchange(other.sparse_array, alloc_ptr_pointer{})},
-          packed_array{std::exchange(other.packed_array, alloc_pointer{})},
+          sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
+          packed{std::exchange(other.packed, alloc_pointer{})},
           bucket{std::exchange(other.bucket, size_type{})},
           count{std::exchange(other.count, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
@@ -416,8 +416,8 @@ public:
         propagate_on_container_move_assignment(reserved.first(), other.reserved.first());
         ENTT_ASSERT(alloc_traits::is_always_equal::value || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
         reserved.second() = std::exchange(other.reserved.second(), size_type{});
-        sparse_array = std::exchange(other.sparse_array, alloc_ptr_pointer{});
-        packed_array = std::exchange(other.packed_array, alloc_pointer{});
+        sparse = std::exchange(other.sparse, alloc_ptr_pointer{});
+        packed = std::exchange(other.packed, alloc_pointer{});
         bucket = std::exchange(other.bucket, size_type{});
         count = std::exchange(other.count, size_type{});
         free_list = std::exchange(other.free_list, tombstone);
@@ -434,8 +434,8 @@ public:
         swap_contents(other);
         propagate_on_container_swap(reserved.first(), other.reserved.first());
         swap(reserved.second(), other.reserved.second());
-        swap(sparse_array, other.sparse_array);
-        swap(packed_array, other.packed_array);
+        swap(sparse, other.sparse);
+        swap(packed, other.packed);
         swap(bucket, other.bucket);
         swap(count, other.count);
         swap(free_list, other.free_list);
@@ -476,7 +476,7 @@ public:
      */
     virtual void reserve(const size_type cap) {
         if(cap > reserved.second()) {
-            resize_packed_array(cap);
+            resize_packed(cap);
         }
     }
 
@@ -492,7 +492,7 @@ public:
     /*! @brief Requests the removal of unused capacity. */
     virtual void shrink_to_fit() {
         if(count < reserved.second()) {
-            resize_packed_array(count);
+            resize_packed(count);
         }
     }
 
@@ -537,7 +537,7 @@ public:
      * @return A pointer to the internal packed array.
      */
     [[nodiscard]] pointer data() const ENTT_NOEXCEPT {
-        return packed_array;
+        return packed;
     }
 
     /**
@@ -550,7 +550,8 @@ public:
      * @return An iterator to the first entity of the sparse set.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{std::addressof(packed_array), static_cast<typename entity_traits::difference_type>(count)};
+        const auto pos = static_cast<typename entity_traits::difference_type>(count);
+        return iterator{std::addressof(packed), pos};
     }
 
     /**
@@ -564,7 +565,7 @@ public:
      * set.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{std::addressof(packed_array), {}};
+        return iterator{std::addressof(packed), {}};
     }
 
     /**
@@ -611,10 +612,10 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
-        if(const auto curr = page(entt); curr < bucket && sparse_array[curr]) {
+        if(const auto curr = page(entt); curr < bucket && sparse[curr]) {
             constexpr auto cap = entity_traits::to_entity(entt::null);
             // testing versions permits to avoid accessing the packed array
-            return (((~cap & entity_traits::to_integral(entt)) ^ entity_traits::to_integral(sparse_array[curr][offset(entt)])) < cap);
+            return (((~cap & entity_traits::to_integral(entt)) ^ entity_traits::to_integral(sparse[curr][offset(entt)])) < cap);
         }
 
         return false;
@@ -627,8 +628,8 @@ public:
      * version otherwise.
      */
     [[nodiscard]] version_type current(const entity_type entt) const {
-        if(const auto curr = page(entt); curr < bucket && sparse_array[curr]) {
-            return entity_traits::to_version(sparse_array[curr][offset(entt)]);
+        if(const auto curr = page(entt); curr < bucket && sparse[curr]) {
+            return entity_traits::to_version(sparse[curr][offset(entt)]);
         }
 
         return entity_traits::to_version(tombstone);
@@ -646,7 +647,7 @@ public:
      */
     [[nodiscard]] size_type index(const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
-        return static_cast<size_type>(entity_traits::to_entity(sparse_array[page(entt)][offset(entt)]));
+        return static_cast<size_type>(entity_traits::to_entity(sparse[page(entt)][offset(entt)]));
     }
 
     /**
@@ -655,7 +656,7 @@ public:
      * @return The entity at specified location if any, a null entity otherwise.
      */
     [[nodiscard]] entity_type at(const size_type pos) const ENTT_NOEXCEPT {
-        return pos < count ? packed_array[pos] : null;
+        return pos < count ? packed[pos] : null;
     }
 
     /**
@@ -665,7 +666,7 @@ public:
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
         ENTT_ASSERT(pos < count, "Position is out of bounds");
-        return packed_array[pos];
+        return packed[pos];
     }
 
     /**
@@ -773,17 +774,17 @@ public:
     /*! @brief Removes all tombstones from the packed array of a sparse set. */
     void compact() {
         size_type next = count;
-        for(; next && packed_array[next - 1u] == tombstone; --next);
+        for(; next && packed[next - 1u] == tombstone; --next);
 
-        for(auto *it = &free_list; *it != null && next; it = std::addressof(packed_array[entity_traits::to_entity(*it)])) {
+        for(auto *it = &free_list; *it != null && next; it = std::addressof(packed[entity_traits::to_entity(*it)])) {
             if(const size_type pos = entity_traits::to_entity(*it); pos < next) {
                 --next;
                 move_and_pop(next, pos);
-                std::swap(packed_array[next], packed_array[pos]);
+                std::swap(packed[next], packed[pos]);
                 const auto entity = static_cast<typename entity_traits::entity_type>(pos);
-                sparse_array[page(packed_array[pos])][offset(packed_array[pos])] = entity_traits::combine(entity, entity_traits::to_integral(packed_array[pos]));
+                sparse[page(packed[pos])][offset(packed[pos])] = entity_traits::combine(entity, entity_traits::to_integral(packed[pos]));
                 *it = entity_traits::combine(static_cast<typename entity_traits::entity_type>(next), entity_traits::reserved);
-                for(; next && packed_array[next - 1u] == tombstone; --next);
+                for(; next && packed[next - 1u] == tombstone; --next);
             }
         }
 
@@ -807,17 +808,17 @@ public:
     void swap_elements(const entity_type lhs, const entity_type rhs) {
         ENTT_ASSERT(contains(lhs) && contains(rhs), "Set does not contain entities");
 
-        auto &entt = sparse_array[page(lhs)][offset(lhs)];
-        auto &other = sparse_array[page(rhs)][offset(rhs)];
+        auto &entt = sparse[page(lhs)][offset(lhs)];
+        auto &other = sparse[page(rhs)][offset(rhs)];
 
         const auto from = entity_traits::to_entity(entt);
         const auto to = entity_traits::to_entity(other);
 
         // basic no-leak guarantee (with invalid state) if swapping throws
         swap_at(static_cast<size_type>(from), static_cast<size_type>(to));
-        entt = entity_traits::combine(to, entity_traits::to_integral(packed_array[from]));
-        other = entity_traits::combine(from, entity_traits::to_integral(packed_array[to]));
-        std::swap(packed_array[from], packed_array[to]);
+        entt = entity_traits::combine(to, entity_traits::to_integral(packed[from]));
+        other = entity_traits::combine(from, entity_traits::to_integral(packed[to]));
+        std::swap(packed[from], packed[to]);
     }
 
     /**
@@ -856,19 +857,19 @@ public:
         ENTT_ASSERT(!(length > count), "Length exceeds the number of elements");
         compact();
 
-        algo(std::make_reverse_iterator(packed_array + length), std::make_reverse_iterator(packed_array), std::move(compare), std::forward<Args>(args)...);
+        algo(std::make_reverse_iterator(packed + length), std::make_reverse_iterator(packed), std::move(compare), std::forward<Args>(args)...);
 
         for(size_type pos{}; pos < length; ++pos) {
             auto curr = pos;
-            auto next = index(packed_array[curr]);
+            auto next = index(packed[curr]);
 
             while(curr != next) {
-                const auto idx = index(packed_array[next]);
-                const auto entt = packed_array[curr];
+                const auto idx = index(packed[next]);
+                const auto entt = packed[curr];
 
                 swap_at(next, idx);
                 const auto entity = static_cast<typename entity_traits::entity_type>(curr);
-                sparse_array[page(entt)][offset(entt)] = entity_traits::combine(entity, entity_traits::to_integral(packed_array[curr]));
+                sparse[page(entt)][offset(entt)] = entity_traits::combine(entity, entity_traits::to_integral(packed[curr]));
                 curr = std::exchange(next, idx);
             }
         }
@@ -914,9 +915,9 @@ public:
 
         for(size_type pos = count - 1; pos && from != to; ++from) {
             if(contains(*from)) {
-                if(*from != packed_array[pos]) {
+                if(*from != packed[pos]) {
                     // basic no-leak guarantee (with invalid state) if swapping throws
-                    swap_elements(packed_array[pos], *from);
+                    swap_elements(packed[pos], *from);
                 }
 
                 --pos;
@@ -937,8 +938,8 @@ public:
 
 private:
     compressed_pair<alloc, size_type> reserved;
-    alloc_ptr_pointer sparse_array;
-    alloc_pointer packed_array;
+    alloc_ptr_pointer sparse;
+    alloc_pointer packed;
     size_type bucket;
     size_type count;
     entity_type free_list;
