@@ -53,6 +53,11 @@ struct entt::component_traits<stable_type>: basic_component_traits {
     using in_place_delete = std::true_type;
 };
 
+template<>
+struct entt::component_traits<empty_type>: basic_component_traits {
+    using in_place_delete = std::true_type;
+};
+
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
     return lhs.value == rhs.value;
 }
@@ -259,10 +264,10 @@ TEST(Storage, InsertEmptyType) {
     pool.insert(std::rbegin(entities), std::rend(entities), std::begin(values));
 
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.at(0u), entities[1u]);
-    ASSERT_EQ(pool.at(1u), entities[0u]);
-    ASSERT_EQ(pool.index(entities[0u]), 1u);
-    ASSERT_EQ(pool.index(entities[1u]), 0u);
+    ASSERT_EQ(pool.at(0u), entities[0u]);
+    ASSERT_EQ(pool.at(1u), entities[1u]);
+    ASSERT_EQ(pool.index(entities[0u]), 0u);
+    ASSERT_EQ(pool.index(entities[1u]), 1u);
 }
 
 TEST(Storage, Erase) {
@@ -594,7 +599,10 @@ TEST(Storage, EmptyTypeFromBase) {
 
     base.erase(std::begin(entities), std::end(entities));
 
-    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_TRUE(*base.begin() == entt::tombstone);
+    ASSERT_TRUE(*(++base.begin()) == entt::tombstone);
 }
 
 TEST(Storage, NonDefaultConstructibleTypeFromBase) {

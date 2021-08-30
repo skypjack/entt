@@ -123,6 +123,9 @@ TEST(SparseSet, Current) {
 
     entt::sparse_set set{entt::deletion_policy::in_place};
 
+    ASSERT_EQ(set.current(traits_type::construct(0, 0)), traits_type::to_version(entt::tombstone));
+    ASSERT_EQ(set.current(traits_type::construct(3, 3)), traits_type::to_version(entt::tombstone));
+
     set.emplace(traits_type::construct(0, 0));
     set.emplace(traits_type::construct(3, 3));
 
@@ -130,6 +133,7 @@ TEST(SparseSet, Current) {
     ASSERT_NE(set.current(traits_type::construct(3, 3)), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(traits_type::construct(3, 0)), traits_type::to_version(traits_type::construct(3, 3)));
     ASSERT_EQ(set.current(traits_type::construct(42, 1)), traits_type::to_version(entt::tombstone));
+    ASSERT_EQ(set.current(traits_type::construct(ENTT_SPARSE_PAGE, 1)), traits_type::to_version(entt::tombstone));
 
     set.remove(entt::entity{0});
 
