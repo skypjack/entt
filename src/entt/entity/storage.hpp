@@ -199,36 +199,33 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         const auto idx = pos / packed_page_v;
 
         if(!(idx < bucket.second())) {
-            auto &allocator = bucket.first();
-            auto &len = bucket.second();
-            alloc_ptr allocator_ptr{allocator};
-
             const size_type sz = idx + 1u;
+            alloc_ptr allocator_ptr{bucket.first()};
             const auto mem = alloc_ptr_traits::allocate(allocator_ptr, sz);
-            std::uninitialized_value_construct(mem + len, mem + sz);
+            std::uninitialized_value_construct(mem + bucket.second(), mem + sz);
 
             ENTT_TRY {
-                for(auto next = len; next < sz; ++next) {
-                    mem[next] = alloc_traits::allocate(allocator, packed_page_v);
+                for(auto next = bucket.second(); next < sz; ++next) {
+                    mem[next] = alloc_traits::allocate(bucket.first(), packed_page_v);
                 }
             } ENTT_CATCH {
-                for(auto next = len; next < sz && mem[next]; ++next) {
-                    alloc_traits::deallocate(allocator, mem[next], packed_page_v);
+                for(auto next = bucket.second(); next < sz && mem[next]; ++next) {
+                    alloc_traits::deallocate(bucket.first(), mem[next], packed_page_v);
                 }
 
-                std::destroy(mem + len, mem + sz);
+                std::destroy(mem + bucket.second(), mem + sz);
                 alloc_ptr_traits::deallocate(allocator_ptr, mem, sz);
                 ENTT_THROW;
             }
 
             if(packed) {
-                std::uninitialized_copy(packed, packed + len, mem);
-                std::destroy(packed, packed + len);
-                alloc_ptr_traits::deallocate(allocator_ptr, packed, len);
+                std::uninitialized_copy(packed, packed + bucket.second(), mem);
+                std::destroy(packed, packed + bucket.second());
+                alloc_ptr_traits::deallocate(allocator_ptr, packed, bucket.second());
             }
 
             packed = mem;
-            len = sz;
+            bucket.second() = sz;
         }
 
         return packed[idx] + fast_mod<packed_page_v>(pos);
@@ -236,22 +233,19 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     void release_unused_pages() {
         if(const auto length = base_type::size() / packed_page_v; length < bucket.second()) {
-            auto &allocator = bucket.first();
-            auto &len = bucket.second();
-            alloc_ptr allocator_ptr{allocator};
-
+            alloc_ptr allocator_ptr{bucket.first()};
             const auto mem = alloc_ptr_traits::allocate(allocator_ptr, length);
             std::uninitialized_copy(packed, packed + length, mem);
 
-            for(auto pos = length; pos < len; ++pos) {
-                alloc_traits::deallocate(allocator, packed[pos], packed_page_v);
+            for(auto pos = length, last = bucket.second(); pos < last; ++pos) {
+                alloc_traits::deallocate(bucket.first(), packed[pos], packed_page_v);
             }
 
-            std::destroy(packed, packed + len);
-            alloc_ptr_traits::deallocate(allocator_ptr, packed, len);
+            std::destroy(packed, packed + bucket.second());
+            alloc_ptr_traits::deallocate(allocator_ptr, packed, bucket.second());
 
             packed = mem;
-            len = length;
+            bucket.second() = length;
         }
     }
 
@@ -262,20 +256,17 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
                 base_type::clear();
             } else {
                 for(size_type pos{}, last = base_type::size(); pos < last; ++pos) {
-                    destroy(element_at(pos));
+                    std::destroy_at(std::addressof(element_at(pos)));
                 }
             }
 
-            auto &allocator = bucket.first();
-            auto &len = bucket.second();
-            alloc_ptr allocator_ptr{allocator};
-
-            for(size_type pos{}; pos < len; ++pos) {
-                alloc_traits::deallocate(allocator, packed[pos], packed_page_v);
-                alloc_ptr_traits::destroy(allocator_ptr, std::addressof(packed[pos]));
+            for(size_type pos{}, last = bucket.second(); pos < last; ++pos) {
+                alloc_traits::deallocate(bucket.first(), packed[pos], packed_page_v);
+                std::destroy_at(std::addressof(packed[pos]));
             }
 
-            alloc_ptr_traits::deallocate(allocator_ptr, packed, len);
+            alloc_ptr allocator_ptr{bucket.first()};
+            alloc_ptr_traits::deallocate(allocator_ptr, packed, bucket.second());
         }
     }
 
@@ -286,10 +277,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         } else {
             alloc_traits::construct(bucket.first(), to_address(ptr), std::forward<Args>(args)...);
         }
-    }
-
-    void destroy(Type &elem) {
-        alloc_traits::destroy(bucket.first(), std::addressof(elem));
     }
 
     template<typename It, typename Generator>
@@ -337,7 +324,7 @@ protected:
     void move_and_pop(const std::size_t from, const std::size_t to) final {
         auto &elem = element_at(from);
         construct(assure_at_least(to), std::move(elem));
-        destroy(elem);
+        std::destroy_at(std::addressof(elem));
     }
 
     /**
@@ -355,7 +342,7 @@ protected:
         // support for nosy destructors
         [[maybe_unused]] auto unused = std::move(target);
         target = std::move(elem);
-        destroy(elem);
+        std::destroy_at(std::addressof(elem));
 
         base_type::swap_and_pop(entt, ud);
     }
@@ -369,7 +356,7 @@ protected:
         const auto pos = base_type::index(entt);
         base_type::in_place_pop(entt, ud);
         // support for nosy destructors
-        destroy(element_at(pos));
+        std::destroy_at(std::addressof(element_at(pos)));
     }
 
     /**
@@ -386,7 +373,7 @@ protected:
                 base_type::try_emplace(entt, nullptr);
                 ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
             } ENTT_CATCH {
-                destroy(element_at(pos));
+                std::destroy_at(std::addressof(element_at(pos)));
                 ENTT_THROW;
             }
         }
@@ -684,7 +671,7 @@ public:
             base_type::try_emplace(entt, nullptr);
             ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
         } ENTT_CATCH {
-            destroy(element_at(pos));
+            std::destroy_at(std::addressof(element_at(pos)));
             ENTT_THROW;
         }
 

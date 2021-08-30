@@ -197,44 +197,38 @@ class basic_sparse_set {
     }
 
     void resize_packed(const std::size_t req) {
-        auto &allocator = reserved.first();
-        auto &len = reserved.second();
-        ENTT_ASSERT((req != len) && !(req < count), "Invalid request");
-        const auto mem = alloc_traits::allocate(allocator, req);
+        ENTT_ASSERT((req != reserved.second()) && !(req < count), "Invalid request");
+        const auto mem = alloc_traits::allocate(reserved.first(), req);
 
         std::uninitialized_fill(mem + count, mem + req, tombstone);
 
         if(packed) {
             std::uninitialized_copy(packed, packed + count, mem);
-            std::destroy(packed, packed + len);
-            alloc_traits::deallocate(allocator, packed, len);
+            std::destroy(packed, packed + reserved.second());
+            alloc_traits::deallocate(reserved.first(), packed, reserved.second());
         }
 
         packed = mem;
-        len = req;
+        reserved.second() = req;
     }
 
     void release_memory() {
-        auto &allocator = reserved.first();
-        auto &len = reserved.second();
-
         if(packed) {
-            std::destroy(packed, packed + len);
-            alloc_traits::deallocate(allocator, packed, len);
+            std::destroy(packed, packed + reserved.second());
+            alloc_traits::deallocate(reserved.first(), packed, reserved.second());
         }
 
         if(sparse) {
-            alloc_ptr allocator_ptr{allocator};
-
             for(size_type pos{}; pos < bucket; ++pos) {
                 if(sparse[pos]) {
                     std::destroy(sparse[pos], sparse[pos] + sparse_page_v);
-                    alloc_traits::deallocate(allocator, sparse[pos], sparse_page_v);
+                    alloc_traits::deallocate(reserved.first(), sparse[pos], sparse_page_v);
                 }
 
-                alloc_ptr_traits::destroy(allocator_ptr, std::addressof(sparse[pos]));
+                std::destroy_at(std::addressof(sparse[pos]));
             }
 
+            alloc_ptr allocator_ptr{reserved.first()};
             alloc_ptr_traits::deallocate(allocator_ptr, sparse, bucket);
         }
     }
@@ -316,9 +310,9 @@ protected:
         ENTT_ASSERT(entity_traits::to_version(elem) == entity_traits::to_version(tombstone), "Slot not available");
 
         if(free_list == null) {
-            if(const auto len = reserved.second(); count == len) {
-                const size_type sz = static_cast<size_type>(len * growth_factor_v);
-                resize_packed(sz + !(sz > len));
+            if(count == reserved.second()) {
+                const size_type sz = static_cast<size_type>(reserved.second() * growth_factor_v);
+                resize_packed(sz + !(sz > reserved.second()));
             }
 
             elem = entity_traits::combine(static_cast<typename entity_traits::entity_type>(count), entity_traits::to_integral(entt));
