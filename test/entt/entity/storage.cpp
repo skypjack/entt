@@ -722,6 +722,10 @@ TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
 TEST(Storage, Iterator) {
     using iterator = typename entt::storage<boxed_int>::iterator;
 
+    static_assert(std::is_same_v<iterator::value_type, boxed_int>);
+    static_assert(std::is_same_v<iterator::pointer, boxed_int *>);
+    static_assert(std::is_same_v<iterator::reference, boxed_int &>);
+
     entt::storage<boxed_int> pool;
     pool.emplace(entt::entity{3}, 42);
 
@@ -763,6 +767,10 @@ TEST(Storage, Iterator) {
 
 TEST(Storage, ConstIterator) {
     using iterator = typename entt::storage<boxed_int>::const_iterator;
+
+    static_assert(std::is_same_v<iterator::value_type, boxed_int>);
+    static_assert(std::is_same_v<iterator::pointer, const boxed_int *>);
+    static_assert(std::is_same_v<iterator::reference, const boxed_int &>);
 
     entt::storage<boxed_int> pool;
     pool.emplace(entt::entity{3}, 42);
@@ -806,6 +814,10 @@ TEST(Storage, ConstIterator) {
 TEST(Storage, ReverseIterator) {
     using reverse_iterator = typename entt::storage<boxed_int>::reverse_iterator;
 
+    static_assert(std::is_same_v<reverse_iterator::value_type, boxed_int>);
+    static_assert(std::is_same_v<reverse_iterator::pointer, boxed_int *>);
+    static_assert(std::is_same_v<reverse_iterator::reference, boxed_int &>);
+
     entt::storage<boxed_int> pool;
     pool.emplace(entt::entity{3}, 42);
 
@@ -847,6 +859,10 @@ TEST(Storage, ReverseIterator) {
 
 TEST(Storage, ConstReverseIterator) {
     using const_reverse_iterator = typename entt::storage<boxed_int>::const_reverse_iterator;
+
+    static_assert(std::is_same_v<const_reverse_iterator::value_type, boxed_int>);
+    static_assert(std::is_same_v<const_reverse_iterator::pointer, const boxed_int *>);
+    static_assert(std::is_same_v<const_reverse_iterator::reference, const boxed_int &>);
 
     entt::storage<boxed_int> pool;
     pool.emplace(entt::entity{3}, 42);

@@ -24,6 +24,128 @@ namespace entt {
 
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename Traits>
+class storage_iterator final {
+    static constexpr auto packed_page_v = ENTT_PACKED_PAGE;
+
+    using internal_traits = std::iterator_traits<typename Traits::value_type>;
+    using data_pointer = typename Traits::pointer;
+
+public:
+    using difference_type = typename internal_traits::difference_type;
+    using value_type = typename internal_traits::value_type;
+    using pointer = typename internal_traits::pointer;
+    using reference = typename internal_traits::reference;
+    using iterator_category = std::random_access_iterator_tag;
+
+    storage_iterator() ENTT_NOEXCEPT = default;
+
+    storage_iterator(const data_pointer *ref, difference_type idx) ENTT_NOEXCEPT
+        : packed{ref},
+          index{idx}
+    {}
+
+    storage_iterator & operator++() ENTT_NOEXCEPT {
+        return --index, *this;
+    }
+
+    storage_iterator operator++(int) ENTT_NOEXCEPT {
+        storage_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    storage_iterator & operator--() ENTT_NOEXCEPT {
+        return ++index, *this;
+    }
+
+    storage_iterator operator--(int) ENTT_NOEXCEPT {
+        storage_iterator orig = *this;
+        return operator--(), orig;
+    }
+
+    storage_iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
+        index -= value;
+        return *this;
+    }
+
+    storage_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+        storage_iterator copy = *this;
+        return (copy += value);
+    }
+
+    storage_iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+        return (*this += -value);
+    }
+
+    storage_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+        return (*this + -value);
+    }
+
+    difference_type operator-(const storage_iterator &other) const ENTT_NOEXCEPT {
+        return other.index - index;
+    }
+
+    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+        return *operator+(value);
+    }
+
+    [[nodiscard]] bool operator==(const storage_iterator &other) const ENTT_NOEXCEPT {
+        return other.index == index;
+    }
+
+    [[nodiscard]] bool operator!=(const storage_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
+    }
+
+    [[nodiscard]] bool operator<(const storage_iterator &other) const ENTT_NOEXCEPT {
+        return index > other.index;
+    }
+
+    [[nodiscard]] bool operator>(const storage_iterator &other) const ENTT_NOEXCEPT {
+        return index < other.index;
+    }
+
+    [[nodiscard]] bool operator<=(const storage_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this > other);
+    }
+
+    [[nodiscard]] bool operator>=(const storage_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this < other);
+    }
+
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+        const auto pos = index - 1;
+        return (*packed)[pos / packed_page_v] + fast_mod<packed_page_v>(pos);
+    }
+
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+        return *operator->();
+    }
+
+private:
+    const data_pointer *packed;
+    difference_type index;
+};
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+
+/**
  * @brief Basic storage implementation.
  *
  * This class is a refinement of a sparse set that associates an object to an
@@ -69,132 +191,12 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using comp_traits = component_traits<Type>;
     using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
 
-    template<typename Value>
-    struct storage_iterator final {
-        using difference_type = std::ptrdiff_t;
-        using value_type = Value;
-        using pointer = value_type *;
-        using reference = value_type &;
-        using iterator_category = std::random_access_iterator_tag;
-
-        storage_iterator() ENTT_NOEXCEPT = default;
-
-        storage_iterator(alloc_ptr_pointer const *ref, difference_type idx) ENTT_NOEXCEPT
-            : packed{ref},
-              index{idx}
-        {}
-
-        storage_iterator & operator++() ENTT_NOEXCEPT {
-            return --index, *this;
-        }
-
-        storage_iterator operator++(int) ENTT_NOEXCEPT {
-            storage_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        storage_iterator & operator--() ENTT_NOEXCEPT {
-            return ++index, *this;
-        }
-
-        storage_iterator operator--(int) ENTT_NOEXCEPT {
-            storage_iterator orig = *this;
-            return operator--(), orig;
-        }
-
-        storage_iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
-            index -= value;
-            return *this;
-        }
-
-        storage_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
-            storage_iterator copy = *this;
-            return (copy += value);
-        }
-
-        storage_iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
-            return (*this += -value);
-        }
-
-        storage_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
-            return (*this + -value);
-        }
-
-        difference_type operator-(const storage_iterator &other) const ENTT_NOEXCEPT {
-            return other.index - index;
-        }
-
-        [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-            const auto pos = size_type(index-value-1);
-            return (*packed)[page(pos)][offset(pos)];
-        }
-
-        [[nodiscard]] bool operator==(const storage_iterator &other) const ENTT_NOEXCEPT {
-            return other.index == index;
-        }
-
-        [[nodiscard]] bool operator!=(const storage_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-        [[nodiscard]] bool operator<(const storage_iterator &other) const ENTT_NOEXCEPT {
-            return index > other.index;
-        }
-
-        [[nodiscard]] bool operator>(const storage_iterator &other) const ENTT_NOEXCEPT {
-            return index < other.index;
-        }
-
-        [[nodiscard]] bool operator<=(const storage_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this > other);
-        }
-
-        [[nodiscard]] bool operator>=(const storage_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this < other);
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            const auto pos = size_type(index-1u);
-            return std::addressof((*packed)[page(pos)][offset(pos)]);
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return *operator->();
-        }
-
-    private:
-        alloc_ptr_pointer const *packed;
-        difference_type index;
-    };
-
-    [[nodiscard]] static constexpr std::size_t page(const std::size_t pos) ENTT_NOEXCEPT {
-        return pos / packed_page_v;
-    }
-
-    [[nodiscard]] static constexpr std::size_t offset(const std::size_t pos) ENTT_NOEXCEPT {
-        return fast_mod<packed_page_v>(pos);
-    }
-
-    void release_memory() {
-        if(packed) {
-            // no-throw stable erase iteration
-            base_type::clear();
-
-            auto &allocator = bucket.first();
-            auto &len = bucket.second();
-            alloc_ptr allocator_ptr{allocator};
-
-            for(size_type pos{}; pos < len; ++pos) {
-                alloc_traits::deallocate(allocator, packed[pos], packed_page_v);
-                alloc_ptr_traits::destroy(allocator_ptr, std::addressof(packed[pos]));
-            }
-
-            alloc_ptr_traits::deallocate(allocator_ptr, packed, len);
-        }
+    [[nodiscard]] auto & element_at(const std::size_t pos) const {
+        return packed[pos/packed_page_v][fast_mod<packed_page_v>(pos)];
     }
 
     auto assure_at_least(const std::size_t pos) {
-        const auto idx = page(pos);
+        const auto idx = pos / packed_page_v;
 
         if(!(idx < bucket.second())) {
             auto &allocator = bucket.first();
@@ -229,7 +231,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             len = sz;
         }
 
-        return packed[idx];
+        return packed[idx] + fast_mod<packed_page_v>(pos);
     }
 
     void release_unused_pages() {
@@ -250,6 +252,24 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
             packed = mem;
             len = length;
+        }
+    }
+
+    void release_memory() {
+        if(packed) {
+            // no-throw stable erase iteration
+            base_type::clear();
+
+            auto &allocator = bucket.first();
+            auto &len = bucket.second();
+            alloc_ptr allocator_ptr{allocator};
+
+            for(size_type pos{}; pos < len; ++pos) {
+                alloc_traits::deallocate(allocator, packed[pos], packed_page_v);
+                alloc_ptr_traits::destroy(allocator_ptr, std::addressof(packed[pos]));
+            }
+
+            alloc_ptr_traits::deallocate(allocator_ptr, packed, len);
         }
     }
 
@@ -300,7 +320,7 @@ protected:
      * @param rhs A valid position of an element within a storage.
      */
     void swap_at(const std::size_t lhs, const std::size_t rhs) final {
-        std::swap(packed[page(lhs)][offset(lhs)], packed[page(rhs)][offset(rhs)]);
+        std::swap(element_at(lhs), element_at(rhs));
     }
 
     /**
@@ -309,8 +329,8 @@ protected:
      * @param to A valid position of an element within a storage.
      */
     void move_and_pop(const std::size_t from, const std::size_t to) final {
-        auto &&elem = packed[page(from)][offset(from)];
-        construct(packed[page(to)] + offset(to), std::move(elem));
+        auto &elem = element_at(from);
+        construct(assure_at_least(to), std::move(elem));
         destroy(elem);
     }
 
@@ -323,8 +343,8 @@ protected:
         const auto pos = base_type::index(entt);
         const auto last = base_type::size() - 1u;
 
-        auto &&target = packed[page(pos)][offset(pos)];
-        auto &&elem = packed[page(last)][offset(last)];
+        auto &target = element_at(pos);
+        auto &elem = element_at(last);
 
         // support for nosy destructors
         [[maybe_unused]] auto unused = std::move(target);
@@ -343,7 +363,7 @@ protected:
         const auto pos = base_type::index(entt);
         base_type::in_place_pop(entt, ud);
         // support for nosy destructors
-        destroy(packed[page(pos)][offset(pos)]);
+        destroy(element_at(pos));
     }
 
     /**
@@ -354,13 +374,13 @@ protected:
     void try_emplace(const Entity entt, void *ud) override {
         if constexpr(std::is_default_constructible_v<value_type>) {
             const auto pos = base_type::slot();
-            construct(assure_at_least(pos) + offset(pos));
+            construct(assure_at_least(pos));
 
             ENTT_TRY {
                 base_type::try_emplace(entt, nullptr);
                 ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
             } ENTT_CATCH {
-                destroy(packed[page(pos)][offset(pos)]);
+                destroy(element_at(pos));
                 ENTT_THROW;
             }
         }
@@ -382,9 +402,9 @@ public:
     /*! @brief Constant pointer type to contained elements. */
     using const_pointer = alloc_ptr_const_pointer;
     /*! @brief Random access iterator type. */
-    using iterator = storage_iterator<value_type>;
+    using iterator = internal::storage_iterator<std::iterator_traits<pointer>>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = storage_iterator<const value_type>;
+    using const_iterator = internal::storage_iterator<std::iterator_traits<const_pointer>>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
@@ -607,8 +627,7 @@ public:
      * @return The object assigned to the entity.
      */
     [[nodiscard]] const value_type & get(const entity_type entt) const ENTT_NOEXCEPT {
-        const auto idx = base_type::index(entt);
-        return packed[page(idx)][offset(idx)];
+        return element_at(base_type::index(entt));
     }
 
     /*! @copydoc get */
@@ -652,14 +671,14 @@ public:
     template<typename... Args>
     value_type & emplace(const entity_type entt, Args &&... args) {
         const auto pos = base_type::slot();
-        alloc_pointer elem = assure_at_least(pos) + offset(pos);
+        alloc_pointer elem = assure_at_least(pos);
         construct(elem, std::forward<Args>(args)...);
 
         ENTT_TRY {
             base_type::try_emplace(entt, nullptr);
             ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
         } ENTT_CATCH {
-            destroy(packed[page(pos)][offset(pos)]);
+            destroy(element_at(pos));
             ENTT_THROW;
         }
 
@@ -676,7 +695,7 @@ public:
     template<typename... Func>
     value_type & patch(const entity_type entt, Func &&... func) {
         const auto idx = base_type::index(entt);
-        auto &&elem = packed[page(idx)][offset(idx)];
+        auto &elem = element_at(idx);
         (std::forward<Func>(func)(elem), ...);
         return elem;
     }
