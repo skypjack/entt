@@ -257,8 +257,14 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     void release_memory() {
         if(packed) {
-            // no-throw stable erase iteration
-            base_type::clear();
+            if constexpr(comp_traits::in_place_delete::value) {
+                // no-throw stable erase iteration
+                base_type::clear();
+            } else {
+                for(size_type pos{}, last = base_type::size(); pos < last; ++pos) {
+                    destroy(element_at(pos));
+                }
+            }
 
             auto &allocator = bucket.first();
             auto &len = bucket.second();
