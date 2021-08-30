@@ -779,6 +779,10 @@ TEST(SparseSet, Clear) {
 TEST(SparseSet, Iterator) {
     using iterator = typename entt::sparse_set::iterator;
 
+    static_assert(std::is_same_v<iterator::value_type, entt::entity>);
+    static_assert(std::is_same_v<iterator::pointer, const entt::entity *>);
+    static_assert(std::is_same_v<iterator::reference, const entt::entity &>);
+
     entt::sparse_set set;
     set.emplace(entt::entity{3});
 
@@ -823,6 +827,10 @@ TEST(SparseSet, Iterator) {
 
 TEST(SparseSet, ReverseIterator) {
     using reverse_iterator = typename entt::sparse_set::reverse_iterator;
+
+    static_assert(std::is_same_v<reverse_iterator::value_type, entt::entity>);
+    static_assert(std::is_same_v<reverse_iterator::pointer, const entt::entity *>);
+    static_assert(std::is_same_v<reverse_iterator::reference, const entt::entity &>);
 
     entt::sparse_set set;
     set.emplace(entt::entity{3});
@@ -1188,29 +1196,29 @@ TEST(SparseSet, ThrowingAllocator) {
 
     // strong exception safety
     ASSERT_THROW(set.emplace(entt::entity{0}), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
     ASSERT_EQ(set.capacity(), 0u);
-    ASSERT_EQ(set.extent(), 0u);
 
     set.emplace(entt::entity{0});
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
     // strong exception safety
     ASSERT_THROW(set.reserve(2u), test::throwing_allocator<entt::entity>::exception_type);
-    ASSERT_EQ(set.capacity(), 1u);
     ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
     ASSERT_TRUE(set.contains(entt::entity{0}));
+    ASSERT_EQ(set.capacity(), 1u);
 
     entt::entity entities[2u]{entt::entity{1}, entt::entity{ENTT_SPARSE_PAGE}};
     test::throwing_allocator<entt::entity>::trigger_after_allocate = true;
 
     // basic exception safety
     ASSERT_THROW(set.insert(std::begin(entities), std::end(entities)), test::throwing_allocator<entt::entity>::exception_type);
-    ASSERT_EQ(set.capacity(), 3u);
-    ASSERT_EQ(set.size(), 2u);
     ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
     ASSERT_TRUE(set.contains(entt::entity{0}));
     ASSERT_TRUE(set.contains(entt::entity{1}));
     ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
+    ASSERT_EQ(set.capacity(), 3u);
+    ASSERT_EQ(set.size(), 2u);
 
     set.emplace(entities[1u]);
 
