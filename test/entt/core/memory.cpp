@@ -33,13 +33,13 @@ TEST(Memory, PoccaPocmaAndPocs) {
 }
 
 TEST(Memory, IsPowerOfTwo) {
-    ASSERT_FALSE(entt::is_power_of_two_v<0u>);
-    ASSERT_TRUE(entt::is_power_of_two_v<1u>);
-    ASSERT_TRUE(entt::is_power_of_two_v<2u>);
-    ASSERT_TRUE(entt::is_power_of_two_v<4u>);
-    ASSERT_FALSE(entt::is_power_of_two_v<7u>);
-    ASSERT_TRUE(entt::is_power_of_two_v<128u>);
-    ASSERT_FALSE(entt::is_power_of_two_v<200u>);
+    ASSERT_FALSE(entt::is_power_of_two(0u));
+    ASSERT_TRUE(entt::is_power_of_two(1u));
+    ASSERT_TRUE(entt::is_power_of_two(2u));
+    ASSERT_TRUE(entt::is_power_of_two(4u));
+    ASSERT_FALSE(entt::is_power_of_two(7u));
+    ASSERT_TRUE(entt::is_power_of_two(128u));
+    ASSERT_FALSE(entt::is_power_of_two(200u));
 }
 
 TEST(Memory, FastMod) {
