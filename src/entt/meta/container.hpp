@@ -48,7 +48,7 @@ struct basic_meta_sequence_container_traits {
         return any_cast<const Type &>(container).size();
     }
 
-    [[nodiscard]] static bool resize(any &container, size_type sz) {
+    [[nodiscard]] static bool resize([[maybe_unused]] any &container, [[maybe_unused]] size_type sz) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto * const cont = any_cast<Type>(&container); cont) {
                 cont->resize(sz);
@@ -59,7 +59,7 @@ struct basic_meta_sequence_container_traits {
         return false;
     }
 
-    [[nodiscard]] static bool clear(any &container) {
+    [[nodiscard]] static bool clear([[maybe_unused]] any &container) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto * const cont = any_cast<Type>(&container); cont) {
                 cont->clear();
@@ -86,7 +86,7 @@ struct basic_meta_sequence_container_traits {
         return iterator{std::end(any_cast<const Type &>(container))};
     }
 
-    [[nodiscard]] static iterator insert(any &container, iterator it, meta_any &value) {
+    [[nodiscard]] static iterator insert([[maybe_unused]] any &container, [[maybe_unused]] iterator it, [[maybe_unused]] meta_any &value) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto * const cont = any_cast<Type>(&container); cont) {
                 // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
@@ -100,7 +100,7 @@ struct basic_meta_sequence_container_traits {
         return {};
     }
 
-    [[nodiscard]] static iterator erase(any &container, iterator it) {
+    [[nodiscard]] static iterator erase([[maybe_unused]] any &container, [[maybe_unused]] iterator it) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto * const cont = any_cast<Type>(&container); cont) {
                 return iterator{cont->erase(any_cast<const typename Type::iterator &>(it.base()))};
@@ -158,7 +158,7 @@ struct basic_meta_associative_container_traits {
         return iterator{std::integral_constant<bool, key_only()>{}, std::end(any_cast<const Type &>(container))};
     }
 
-    [[nodiscard]] static bool insert(any &container, meta_any &key, meta_any &value) {
+    [[nodiscard]] static bool insert(any &container, meta_any &key, [[maybe_unused]] meta_any &value) {
         if(auto * const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
             if constexpr(is_key_only_meta_associative_container<Type>::value) {
                 return cont->insert(key.cast<const typename Type::key_type &>()).second;
