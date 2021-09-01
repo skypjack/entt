@@ -107,7 +107,7 @@ public:
      * characters.<br/>
      * Example of use:
      * @code{.cpp}
-     * const auto value = basic_hashed_string<char>::to_value("my.png");
+     * const auto value = basic_hashed_string<char>::value("my.png");
      * @endcode
      *
      * @tparam N Number of characters of the identifier.
