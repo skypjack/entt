@@ -130,15 +130,18 @@ TEST(SingleComponentView, ElementAccess) {
     auto cview = std::as_const(registry).view<const int>();
 
     const auto e0 = registry.create();
-    registry.emplace<int>(e0);
+    registry.emplace<int>(e0, 42);
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1);
+    registry.emplace<int>(e1, 3);
 
     for(auto i = 0u; i < view.size(); ++i) {
         ASSERT_EQ(view[i], i ? e0 : e1);
         ASSERT_EQ(cview[i], i ? e0 : e1);
     }
+
+    ASSERT_EQ(view[e0], 42);
+    ASSERT_EQ(view[e1], 3);
 }
 
 TEST(SingleComponentView, Contains) {
@@ -599,6 +602,23 @@ TEST(MultiComponentView, ReverseIterator) {
 
     ASSERT_EQ(*begin, entity);
     ASSERT_EQ(*begin.operator->(), entity);
+}
+
+TEST(MultiComponentView, ElementAccess) {
+    entt::registry registry;
+    auto view = registry.view<int, char>();
+    auto cview = std::as_const(registry).view<const int, const char>();
+
+    const auto e0 = registry.create();
+    registry.emplace<int>(e0, 42);
+    registry.emplace<char>(e0, '0');
+
+    const auto e1 = registry.create();
+    registry.emplace<int>(e1, 3);
+    registry.emplace<char>(e1, '1');
+
+    ASSERT_EQ(view[e0], std::make_tuple(42, '0'));
+    ASSERT_EQ(view[e1], std::make_tuple(3, '1'));
 }
 
 TEST(MultiComponentView, Contains) {

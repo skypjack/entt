@@ -484,6 +484,15 @@ public:
     }
 
     /**
+     * @brief Returns the components assigned to the given entity.
+     * @param entt A valid identifier.
+     * @return The components assigned to the given entity.
+     */
+    [[nodiscard]] decltype(auto) operator[](const entity_type entt) const {
+        return get<Component...>(entt);
+    }
+
+    /**
      * @brief Checks if a view is properly initialized.
      * @return True if the view is properly initialized, false otherwise.
      */
@@ -844,6 +853,15 @@ public:
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
         return begin()[pos];
+    }
+
+    /**
+     * @brief Returns the component assigned to the given entity.
+     * @param entt A valid identifier.
+     * @return The component assigned to the given entity.
+     */
+    [[nodiscard]] decltype(auto) operator[](const entity_type entt) const {
+        return get<Component>(entt);
     }
 
     /**
