@@ -9,6 +9,7 @@
 #include "core/ident.hpp"
 #include "core/memory.hpp"
 #include "core/monostate.hpp"
+#include "core/tuple.hpp"
 #include "core/type_info.hpp"
 #include "core/type_traits.hpp"
 #include "core/utility.hpp"
