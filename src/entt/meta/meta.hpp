@@ -361,12 +361,12 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type * try_cast() const {
-        if(node) {
-            if(const auto info = type_id<Type>(); node->info == info) {
-                return any_cast<Type>(&storage);
-            } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
-                return static_cast<const Type *>(base->cast(storage.data()));
-            }
+        if(!node) { return nullptr; }
+
+        if(const auto info = type_id<Type>(); node->info == info) {
+            return any_cast<Type>(&storage);
+        } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
+            return static_cast<const Type *>(base->cast(storage.data()));
         }
 
         return nullptr;
@@ -378,12 +378,12 @@ public:
         if constexpr(std::is_const_v<Type>) {
             return std::as_const(*this).try_cast<Type>();
         } else {
-            if(node) {
-                if(const auto info = type_id<Type>(); node->info == info) {
-                    return any_cast<Type>(&storage);
-                } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
-                    return const_cast<Type *>(static_cast<const Type *>(base->cast(storage.data())));
-                }
+            if(!node) { return nullptr; }
+
+            if(const auto info = type_id<Type>(); node->info == info) {
+                return any_cast<Type>(&storage);
+            } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
+                return const_cast<Type *>(static_cast<const Type *>(base->cast(storage.data())));
             }
 
             return nullptr;
@@ -1299,7 +1299,7 @@ public:
             }
         }
 
-        return (!sz && node->factory) ? node->factory() : meta_any{};
+        return (!sz && node->default_constructor) ? node->default_constructor() : meta_any{};
     }
 
     /**
@@ -1501,12 +1501,12 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    if(node) {
-        if(const auto info = type.info(); node->info == info || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
-            return as_ref();
-        } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
-            return conv->conv(storage.data());
-        }
+    if(!node) { return {}; }
+
+    if(const auto info = type.info(); node->info == info || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
+        return as_ref();
+    } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
+        return conv->conv(storage.data());
     }
 
     return {};
@@ -1514,11 +1514,12 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 inline bool meta_any::allow_cast(const meta_type &type) {
+    if(!node) { return false; }
+
     if(const auto info = type.info(); node->info == info || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
         return true;
     } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
-        *this = conv->conv(std::as_const(storage).data());
-        return true;
+        return static_cast<bool>(*this = conv->conv(std::as_const(storage).data()));
     }
 
     return false;

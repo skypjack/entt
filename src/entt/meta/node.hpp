@@ -121,7 +121,7 @@ struct meta_type_node {
     meta_prop_node * prop;
     const size_type size_of;
     meta_traits traits;
-    meta_any(* const factory)();
+    meta_any(* const default_constructor)();
     const meta_template_node *const templ;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
@@ -140,7 +140,7 @@ template<typename Type>
 class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
-    [[nodiscard]] static decltype(meta_type_node::factory) meta_default_constructor() ENTT_NOEXCEPT {
+    [[nodiscard]] static decltype(meta_type_node::default_constructor) meta_default_constructor() ENTT_NOEXCEPT {
         if constexpr(std::is_default_constructible_v<Type>) {
             return +[]() { return meta_any{std::in_place_type<Type>}; };
         } else {
@@ -203,6 +203,10 @@ template<typename... Args>
 
 template<auto Member, typename Op>
 [[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> visit(const Op &op, const internal::meta_type_node *node) {
+    if(!node) {
+        return nullptr;
+    }
+
     for(auto *curr = node->*Member; curr; curr = curr->next) {
         if(op(curr)) {
             return curr;

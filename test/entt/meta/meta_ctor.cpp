@@ -261,5 +261,5 @@ TEST_F(MetaCtor, ReRegistration) {
 
     ASSERT_NE(node->ctor, nullptr);
     // implicitly generated default constructor is not cleared
-    ASSERT_NE(node->factory, nullptr);
+    ASSERT_NE(node->default_constructor, nullptr);
 }
