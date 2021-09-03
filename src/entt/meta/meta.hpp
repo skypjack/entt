@@ -1520,9 +1520,9 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 inline bool meta_any::allow_cast(const meta_type &type) {
-    if(auto any = std::as_const(*this).allow_cast(type); any) {
-        if(any.storage.owner()) {
-            *this = std::move(any);
+    if(auto other = std::as_const(*this).allow_cast(type); other) {
+        if(other.storage.owner()) {
+            *this = std::move(other);
         }
 
         return true;
