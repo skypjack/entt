@@ -122,6 +122,7 @@ struct meta_type_node {
     const size_type size_of;
     meta_traits traits;
     meta_any(* const default_constructor)();
+    double(* const conversion_helper)(const any &, const double *);
     const meta_template_node *const templ;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
@@ -143,6 +144,16 @@ class ENTT_API meta_node {
     [[nodiscard]] static decltype(meta_type_node::default_constructor) meta_default_constructor() ENTT_NOEXCEPT {
         if constexpr(std::is_default_constructible_v<Type>) {
             return +[]() { return meta_any{std::in_place_type<Type>}; };
+        } else {
+            return nullptr;
+        }
+    }
+
+    [[nodiscard]] static decltype(meta_type_node::conversion_helper) meta_conversion_helper() ENTT_NOEXCEPT {
+        if constexpr(std::is_arithmetic_v<Type>) {
+            return +[](const any &storage, const double *value) {
+                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(*value)) : static_cast<double>(any_cast<const Type &>(storage));
+            };
         } else {
             return nullptr;
         }
@@ -182,6 +193,7 @@ public:
                 | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::IS_META_SEQUENCE_CONTAINER : internal::meta_traits::IS_NONE)
                 | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::IS_META_ASSOCIATIVE_CONTAINER : internal::meta_traits::IS_NONE),
             meta_default_constructor(),
+            meta_conversion_helper(),
             meta_template_info()
         };
 

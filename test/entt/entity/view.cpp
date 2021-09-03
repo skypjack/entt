@@ -141,7 +141,7 @@ TEST(SingleComponentView, ElementAccess) {
     }
 
     ASSERT_EQ(view[e0], 42);
-    ASSERT_EQ(view[e1], 3);
+    ASSERT_EQ(cview[e1], 3);
 }
 
 TEST(SingleComponentView, Contains) {
@@ -618,7 +618,7 @@ TEST(MultiComponentView, ElementAccess) {
     registry.emplace<char>(e1, '1');
 
     ASSERT_EQ(view[e0], std::make_tuple(42, '0'));
-    ASSERT_EQ(view[e1], std::make_tuple(3, '1'));
+    ASSERT_EQ(cview[e1], std::make_tuple(3, '1'));
 }
 
 TEST(MultiComponentView, Contains) {

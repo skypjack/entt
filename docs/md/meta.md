@@ -14,6 +14,7 @@
   * [Pointer-like types](#pointer-like-types)
   * [Template information](#template-information)
   * [Implicitly generated default constructor](#implicitly-generated-default-constructor)
+  * [Automatic arithmetic conversions](#automatic-arithmetic-conversions)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
   * [Properties and meta objects](#properties-and-meta-objects)
@@ -754,6 +755,47 @@ entt::meta_ctor ctor = entt::resolve<int>().ctor<>();
 
 In other terms, `ctor` is an invalid meta object unless users explicitly
 registered a meta constructor that takes no arguments for the `int` type.
+
+## Automatic arithmetic conversions
+
+In C++, there are a number of conversions allowed between arithmetic types that
+make it convenient to work with this kind of data.<br/>
+If this were to be translated into explicit registrations with the reflection
+system, it would result in a long series of instructions such as the following:
+
+```cpp
+entt::meta<int>()
+    .conv<bool>()
+    .conv<char>()
+    // ...
+    .conv<double>();
+```
+
+Repeated for each type eligible to undergo this type of conversions. This is
+both error prone and repetitive.<br/>
+Fortunately, all of this can also be avoided. `EnTT` offers implicit support for
+these types of conversions:
+
+```cpp
+entt::meta_any any{42};
+any.allow_cast<double>();
+double value = any.cast<double>();
+```
+
+With no need for registration, the conversion takes place automatically under
+the hood. The same goes for a call to `allow_cast` involving a meta type:
+
+```cpp
+entt::meta_type type = entt::resolve<double>();
+
+entt::meta_any any{42};
+any.allow_cast(type);
+double value = any.cast<double>();
+```
+
+This should make working with arithmetic types as easy as it is in C++.<br/>
+It's also worth noting that it's still possible to set up conversion functions
+manually and these will always be preferred over the automatic ones.
 
 ## Policies: the more, the less
 

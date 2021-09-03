@@ -6,8 +6,14 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct base_t { base_t(): value{'c'} {} char value; };
-struct derived_t: base_t { derived_t(): base_t{} {} };
+struct base_t {
+    base_t(): value{'c'} {}
+    char value;
+};
+
+struct derived_t: base_t {
+    derived_t(): base_t{} {}
+};
 
 struct clazz_t {
     clazz_t(const base_t &other, int iv)
@@ -18,12 +24,14 @@ struct clazz_t {
         : i{iv}, c{cv}
     {}
 
+    operator int() const { return i; }
+
     static clazz_t factory(int value) {
-        return {value, 'c'};
+        return { value, 'c' };
     }
 
     static clazz_t factory(base_t other, int value, int mul) {
-        return {value * mul, other.value};
+        return { value * mul, other.value };
     }
 
     int i{};
@@ -38,7 +46,6 @@ struct MetaCtor: ::testing::Test {
 
         entt::meta<double>()
             .type("double"_hs)
-            .conv<int>()
             .ctor<double_factory>();
 
         entt::meta<derived_t>()
@@ -51,7 +58,8 @@ struct MetaCtor: ::testing::Test {
             .ctor<const base_t &, int>()
             .ctor<const int &, char>().prop(3, false)
             .ctor<entt::overload<clazz_t(int)>(clazz_t::factory)>().prop('c', 42)
-            .ctor<entt::overload<clazz_t(base_t, int, int)>(clazz_t::factory)>();
+            .ctor<entt::overload<clazz_t(base_t, int, int)>(clazz_t::factory)>()
+            .conv<int>();
     }
 
     void TearDown() override {
@@ -136,15 +144,23 @@ TEST_F(MetaCtor, MetaAnyArgs) {
 
 TEST_F(MetaCtor, InvalidArgs) {
     auto ctor = entt::resolve<clazz_t>().ctor<int, char>();
-    ASSERT_FALSE(ctor.invoke('c', 42));
+    ASSERT_FALSE(ctor.invoke(entt::meta_any{}, derived_t{}));
 }
 
 TEST_F(MetaCtor, CastAndConvert) {
-    auto any = entt::resolve<clazz_t>().ctor<const base_t &, int>().invoke(derived_t{}, 42.);
+    auto any = entt::resolve<clazz_t>().ctor<const base_t &, int>().invoke(derived_t{}, clazz_t{42, 'd'});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+}
+
+TEST_F(MetaCtor, ArithmeticConversion) {
+    auto any = entt::resolve<clazz_t>().ctor<int, char>().invoke(true, 4.2);
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<clazz_t>().i, 1);
+    ASSERT_EQ(any.cast<clazz_t>().c, char{4});
 }
 
 TEST_F(MetaCtor, ConstNonConstRefArgs) {
@@ -168,14 +184,22 @@ TEST_F(MetaCtor, FuncMetaAnyArgs) {
 
 TEST_F(MetaCtor, FuncInvalidArgs) {
     auto ctor = entt::resolve<clazz_t>().ctor<int>();
-    ASSERT_FALSE(ctor.invoke('c'));
+    ASSERT_FALSE(ctor.invoke(derived_t{}));
 }
 
 TEST_F(MetaCtor, FuncCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().ctor<base_t, int, int>().invoke(derived_t{}, 3., 3);
+    auto any = entt::resolve<clazz_t>().ctor<base_t, int, int>().invoke(derived_t{}, 3., clazz_t{3, 'd'});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 9);
+    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+}
+
+TEST_F(MetaCtor, FuncArithmeticConversion) {
+    auto any = entt::resolve<clazz_t>().ctor<int>().invoke(4.2);
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<clazz_t>().i, 4);
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
 }
 

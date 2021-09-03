@@ -22,7 +22,7 @@ struct base_t {
 };
 
 struct derived_t: base_t {
-    derived_t() {}
+    derived_t(): base_t{} {}
 };
 
 struct func_t {
@@ -59,6 +59,10 @@ struct func_t {
         return value;
     }
 
+    operator int() const {
+        return value;
+    }
+
     inline static int value = 0;
 };
 
@@ -67,8 +71,7 @@ struct MetaFunc: ::testing::Test {
         using namespace entt::literals;
 
         entt::meta<double>()
-            .type("double"_hs)
-            .conv<int>();
+            .type("double"_hs);
 
         entt::meta<base_t>()
             .type("base"_hs)
@@ -91,7 +94,8 @@ struct MetaFunc: ::testing::Test {
             .func<func_t::k>("k"_hs).prop(true, false)
             .func<&func_t::v, entt::as_void_t>("v"_hs)
             .func<&func_t::a, entt::as_ref_t>("a"_hs)
-            .func<&func_t::a, entt::as_cref_t>("ca"_hs);
+            .func<&func_t::a, entt::as_cref_t>("ca"_hs)
+            .conv<int>();
 
         base_t::counter = 0;
     }
@@ -157,7 +161,7 @@ TEST_F(MetaFunc, Const) {
     ASSERT_FALSE(func.arg(1u));
 
     auto any = func.invoke(instance, 4);
-    auto empty = func.invoke(instance, 'c');
+    auto empty = func.invoke(instance, derived_t{});
 
     ASSERT_FALSE(empty);
     ASSERT_TRUE(any);
@@ -231,7 +235,7 @@ TEST_F(MetaFunc, Static) {
     ASSERT_FALSE(func.arg(1u));
 
     auto any = func.invoke({}, 3);
-    auto empty = func.invoke({}, 'c');
+    auto empty = func.invoke({}, derived_t{});
 
     ASSERT_FALSE(empty);
     ASSERT_TRUE(any);
@@ -311,11 +315,25 @@ TEST_F(MetaFunc, CastAndConvert) {
     using namespace entt::literals;
 
     func_t instance;
-    auto any = entt::resolve<func_t>().func("f3"_hs).invoke(instance, derived_t{}, 0, 3.);
+    instance.value = 3;
+    auto any = entt::resolve<func_t>().func("f3"_hs).invoke(instance, derived_t{}, 0, instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
     ASSERT_EQ(any.cast<int>(), 9);
+    ASSERT_EQ(instance.value, 0);
+}
+
+TEST_F(MetaFunc, ArithmeticConversion) {
+    using namespace entt::literals;
+
+    func_t instance;
+    auto any = entt::resolve<func_t>().func("f2"_hs).invoke(instance, true, 4.2);
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+    ASSERT_EQ(any.cast<int>(), 16);
+    ASSERT_EQ(instance.value, 1);
 }
 
 TEST_F(MetaFunc, ArgsByRef) {

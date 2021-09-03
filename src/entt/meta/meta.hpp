@@ -1022,30 +1022,30 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
-    [[nodiscard]] static bool can_cast_or_convert(const internal::meta_type_node *type, const type_info info) ENTT_NOEXCEPT {
-        if(type->info == info) {
+    [[nodiscard]] static bool can_cast_or_convert(const internal::meta_type_node *type, const meta_type other) ENTT_NOEXCEPT {
+        if(type->info == other.info()) {
             return true;
         }
 
         for(const auto *curr = type->conv; curr; curr = curr->next) {
-            if(curr->type->info == info) {
+            if(curr->type->info == other.info()) {
                 return true;
             }
         }
 
         for(const auto *curr = type->base; curr; curr = curr->next) {
-            if(can_cast_or_convert(curr->type, info)) {
+            if(can_cast_or_convert(curr->type, other)) {
                 return true;
             }
         }
 
-        return false;
+        return (type->conversion_helper && other.is_arithmetic());
     }
 
     template<typename... Args, auto... Index>
     [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node *curr, std::index_sequence<Index...>) {
         for(; curr; curr = curr->next) {
-            if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index).info()) && ...)) {
+            if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index)) && ...)) {
                 return curr;
             }
         }
@@ -1343,8 +1343,8 @@ public:
 
             for(size_type next{}; next < sz && next == (direct + ext); ++next) {
                 const auto type = args[next].type();
-                const auto req = it->arg(next).info();
-                type.info() == req ? ++direct : (ext += can_cast_or_convert(type.node, req));
+                const auto other = it->arg(next);
+                type.info() == other.info() ? ++direct : (ext += can_cast_or_convert(type.node, other));
             }
 
             if((direct + ext) == sz) {
@@ -1507,6 +1507,12 @@ bool meta_any::set(const id_type id, Type &&value) {
         return as_ref();
     } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
         return conv->conv(storage.data());
+    } else if(type.is_arithmetic() && node->conversion_helper) {
+        // exploits the fact that arithmetic types are also default constructibles in all cases
+        auto other = type.construct();
+        const double value = node->conversion_helper(storage, nullptr);
+        other.node->conversion_helper(other.storage, &value);
+        return other;
     }
 
     return {};
@@ -1514,12 +1520,12 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 inline bool meta_any::allow_cast(const meta_type &type) {
-    if(!node) { return false; }
+    if(auto any = std::as_const(*this).allow_cast(type); any) {
+        if(any.storage.owner()) {
+            *this = std::move(any);
+        }
 
-    if(const auto info = type.info(); node->info == info || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
         return true;
-    } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
-        return static_cast<bool>(*this = conv->conv(std::as_const(storage).data()));
     }
 
     return false;

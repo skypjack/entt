@@ -47,6 +47,7 @@ struct clazz_t {
 
     void member() {}
     static void func() {}
+    operator int() const { return value; }
 
     int value;
 };
@@ -94,7 +95,6 @@ struct MetaType: ::testing::Test {
 
         entt::meta<double>()
             .type("double"_hs)
-            .conv<int>()
             .data<set<double>, get<double>>("var"_hs);
 
         entt::meta<unsigned int>()
@@ -146,7 +146,8 @@ struct MetaType: ::testing::Test {
             .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
-            .func<clazz_t::func>("func"_hs);
+            .func<clazz_t::func>("func"_hs)
+            .conv<int>();
     }
 
     void TearDown() override {
@@ -334,9 +335,6 @@ TEST_F(MetaType, Invoke) {
 TEST_F(MetaType, OverloadedFunc) {
     using namespace entt::literals;
 
-    entt::meta<float>().conv<int>();
-    entt::meta<double>().conv<float>();
-
     const auto type = entt::resolve<overloaded_func_t>();
     overloaded_func_t instance{};
 
@@ -421,7 +419,7 @@ TEST_F(MetaType, ConstructMetaAnyArgs) {
 }
 
 TEST_F(MetaType, ConstructInvalidArgs) {
-    ASSERT_FALSE(entt::resolve<clazz_t>().construct(base_t{}, 'c'));
+    ASSERT_FALSE(entt::resolve<clazz_t>().construct('c', base_t{}));
 }
 
 TEST_F(MetaType, LessArgs) {
@@ -429,10 +427,17 @@ TEST_F(MetaType, LessArgs) {
 }
 
 TEST_F(MetaType, ConstructCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, 42.);
+    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, 42});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
+}
+
+TEST_F(MetaType, ConstructArithmeticConversion) {
+    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, true});
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<clazz_t>().value, 1);
 }
 
 TEST_F(MetaType, Reset) {
@@ -599,11 +604,11 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_FALSE(entt::resolve<clazz_t>().func("member"_hs));
 
-    entt::meta<double>().type("double"_hs).conv<float>();
+    entt::meta<double>().type("double"_hs);
     entt::meta_any any{42.};
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE(any.allow_cast<int>());
+    ASSERT_TRUE(any.allow_cast<int>());
     ASSERT_TRUE(any.allow_cast<float>());
 
     ASSERT_FALSE(entt::resolve("derived"_hs));

@@ -26,6 +26,8 @@ struct clazz_t {
           base{}
     {}
 
+    operator int() const { return h; }
+
     int i{0};
     const int j{1};
     base_t base{};
@@ -78,8 +80,7 @@ struct MetaData: ::testing::Test {
         using namespace entt::literals;
 
         entt::meta<double>()
-            .type("double"_hs)
-            .conv<int>();
+            .type("double"_hs);
 
         entt::meta<base_t>()
             .type("base"_hs)
@@ -99,7 +100,8 @@ struct MetaData: ::testing::Test {
             .data<&clazz_t::h>("h"_hs).prop(property_t::random, 2)
             .data<&clazz_t::k>("k"_hs).prop(property_t::value, 3)
             .data<&clazz_t::base>("base"_hs)
-            .data<&clazz_t::i, entt::as_void_t>("void"_hs);
+            .data<&clazz_t::i, entt::as_void_t>("void"_hs)
+            .conv<int>();
 
         entt::meta<setter_getter_t>()
             .type("setter_getter"_hs)
@@ -291,10 +293,11 @@ TEST_F(MetaData, SetConvert) {
     using namespace entt::literals;
 
     clazz_t instance{};
+    instance.h = 42;
 
     ASSERT_EQ(instance.i, 0);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(instance, 3.));
-    ASSERT_EQ(instance.i, 3);
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(instance, instance));
+    ASSERT_EQ(instance.i, 42);
 }
 
 TEST_F(MetaData, SetByRef) {
