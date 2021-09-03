@@ -150,7 +150,7 @@ class ENTT_API meta_node {
     }
 
     [[nodiscard]] static decltype(meta_type_node::conversion_helper) meta_conversion_helper() ENTT_NOEXCEPT {
-        if constexpr(std::is_arithmetic_v<Type>) {
+        if constexpr(std::is_arithmetic_v<Type> || std::is_enum_v<Type>) {
             return +[](const any &storage, const double *value) {
                 return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(*value)) : static_cast<double>(any_cast<const Type &>(storage));
             };

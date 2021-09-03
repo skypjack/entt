@@ -46,6 +46,11 @@ struct fat_t: empty_t {
     double value[4];
 };
 
+enum class enum_class: unsigned short int {
+    foo = 0u,
+    bar = 42u
+};
+
 struct not_comparable_t {
     bool operator==(const not_comparable_t &) const = delete;
 };
@@ -852,7 +857,7 @@ TEST_F(MetaAny, ArithmeticConversion) {
 
     any = 3.1;
 
-    ASSERT_TRUE(any.allow_cast<int>());
+    ASSERT_TRUE(any.allow_cast(entt::resolve<int>()));
     ASSERT_EQ(any.type(), entt::resolve<int>());
     ASSERT_EQ(any.cast<int>(), 3);
 
@@ -865,6 +870,33 @@ TEST_F(MetaAny, ArithmeticConversion) {
     ASSERT_TRUE(any.allow_cast<char>());
     ASSERT_EQ(any.type(), entt::resolve<char>());
     ASSERT_EQ(any.cast<char>(), 'c');
+}
+
+TEST_F(MetaAny, EnumConversion) {
+    entt::meta_any any{enum_class::foo};
+
+    ASSERT_EQ(any.type(), entt::resolve<enum_class>());
+    ASSERT_EQ(any.cast<enum_class>(), enum_class::foo);
+
+    ASSERT_TRUE(any.allow_cast<double>());
+    ASSERT_EQ(any.type(), entt::resolve<double>());
+    ASSERT_EQ(any.cast<double>(), 0.);
+
+    any = enum_class::bar;
+
+    ASSERT_TRUE(any.allow_cast(entt::resolve<int>()));
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_TRUE(any.allow_cast<enum_class>());
+    ASSERT_EQ(any.type(), entt::resolve<enum_class>());
+    ASSERT_EQ(any.cast<enum_class>(), enum_class::bar);
+
+    any = 0;
+
+    ASSERT_TRUE(any.allow_cast(entt::resolve<enum_class>()));
+    ASSERT_EQ(any.type(), entt::resolve<enum_class>());
+    ASSERT_EQ(any.cast<enum_class>(), enum_class::foo);
 }
 
 TEST_F(MetaAny, UnmanageableType) {

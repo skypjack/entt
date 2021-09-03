@@ -1039,7 +1039,7 @@ class meta_type {
             }
         }
 
-        return (type->conversion_helper && other.is_arithmetic());
+        return (type->conversion_helper && other.node->conversion_helper);
     }
 
     template<typename... Args, auto... Index>
@@ -1507,8 +1507,8 @@ bool meta_any::set(const id_type id, Type &&value) {
         return as_ref();
     } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
         return conv->conv(storage.data());
-    } else if(type.is_arithmetic() && node->conversion_helper) {
-        // exploits the fact that arithmetic types are also default constructibles in all cases
+    } else if((type.is_arithmetic() || type.is_enum()) && node->conversion_helper) {
+        // exploits the fact that arithmetic types and enums are also default constructible
         auto other = type.construct();
         const double value = node->conversion_helper(storage, nullptr);
         other.node->conversion_helper(other.storage, &value);
