@@ -78,6 +78,10 @@ include(GNUInstallDirs)
 add_library(EnTT INTERFACE)
 add_library(EnTT::EnTT ALIAS EnTT)
 
+file(GLOB_RECURSE EnTT_H_FILES CONFIGURE_DEPENDS $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>/*.h)
+file(GLOB_RECURSE EnTT_HPP_FILES CONFIGURE_DEPENDS $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>/*.hpp)
+target_sources(EnTT INTERFACE "${EnTT_H_FILES}" "${EnTT_HPP_FILES}")
+
 target_include_directories(
     EnTT
     INTERFACE
