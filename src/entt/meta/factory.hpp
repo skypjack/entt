@@ -211,7 +211,7 @@ struct meta_factory<Type> {
             nullptr,
             internal::meta_info<conv_type>::resolve(),
             [](const void *instance) -> meta_any {
-                return (static_cast<const Type *>(instance)->*Candidate)();
+                return forward_as_meta(static_cast<const Type *>(instance)->*Candidate)();
             }
         };
 
@@ -232,7 +232,7 @@ struct meta_factory<Type> {
             nullptr,
             internal::meta_info<conv_type>::resolve(),
             [](const void *instance) -> meta_any {
-                return Candidate(*static_cast<const Type *>(instance));
+                return forward_as_meta(Candidate(*static_cast<const Type *>(instance)));
             }
         };
 
@@ -261,7 +261,7 @@ struct meta_factory<Type> {
             nullptr,
             internal::meta_info<To>::resolve(),
             [](const void *instance) -> meta_any {
-                return static_cast<To>(*static_cast<const Type *>(instance));
+                return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)));
             }
         };
 
