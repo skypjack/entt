@@ -85,7 +85,7 @@ struct meta_data_node {
     id_type id;
     meta_data_node * next;
     meta_prop_node * prop;
-    meta_traits traits;
+    const meta_traits traits;
     meta_type_node * const type;
     bool(* const set)(meta_handle, meta_any);
     meta_any(* const get)(meta_handle);
@@ -98,7 +98,7 @@ struct meta_func_node {
     meta_func_node * next;
     meta_prop_node * prop;
     const size_type arity;
-    meta_traits traits;
+    const meta_traits traits;
     meta_type_node * const ret;
     meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any * const);
@@ -120,7 +120,7 @@ struct meta_type_node {
     meta_type_node * next;
     meta_prop_node * prop;
     const size_type size_of;
-    meta_traits traits;
+    const meta_traits traits;
     meta_any(* const default_constructor)();
     double(* const conversion_helper)(const any &, const double *);
     const meta_template_node *const templ;
