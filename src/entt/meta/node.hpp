@@ -156,7 +156,7 @@ class ENTT_API meta_node {
             };
         } else if constexpr(std::is_enum_v<Type>) {
             return +[](const any &storage, const any &value) {
-                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = Type{static_cast<std::underlying_type_t<Type>>(any_cast<double>(value))}) : static_cast<double>(any_cast<const Type &>(storage));
+                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(any_cast<double>(value)))) : static_cast<double>(any_cast<const Type &>(storage));
             };
         } else {
             return nullptr;
