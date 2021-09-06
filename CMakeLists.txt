@@ -78,10 +78,81 @@ include(GNUInstallDirs)
 add_library(EnTT INTERFACE)
 add_library(EnTT::EnTT ALIAS EnTT)
 
+target_sources(
+    EnTT
+    INTERFACE
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/config.h>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/version.h>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_hash_map.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/fwd.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/algorithm.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/any.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/attribute.h>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/compressed_pair.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/enum.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/family.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/fwd.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/hashed_string.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/ident.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/memory.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/monostate.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/tuple.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/type_info.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/type_traits.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/utility.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/component.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/entity.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/fwd.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/group.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/handle.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/helper.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/observer.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/organizer.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/poly_storage.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/registry.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/runtime_view.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/snapshot.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/sparse_set.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/storage.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/utility.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/view.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/locator/locator.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/adl_pointer.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/container.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/ctx.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/factory.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/fwd.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/meta.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/node.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/pointer.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/policy.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/range.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/resolve.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/template.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/type_traits.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/utility.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/platform/android-ndk-r17.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/fwd.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/poly.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/process.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/scheduler.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/cache.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/fwd.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/handle.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/loader.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/delegate.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/dispatcher.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/emitter.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/fwd.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/sigh.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entt.hpp>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/fwd.hpp>
+)
+
 target_include_directories(
     EnTT
     INTERFACE
-        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}>/src
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
