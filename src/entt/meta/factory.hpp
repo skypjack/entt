@@ -142,7 +142,7 @@ template<typename Type>
 struct meta_factory<Type> {
     /*! @brief Default constructor. */
     meta_factory()
-        : owner{internal::meta_info<Type>::resolve()}
+        : owner{internal::meta_node<Type>::resolve()}
     {}
 
     /**
@@ -177,7 +177,7 @@ struct meta_factory<Type> {
 
         static internal::meta_base_node node{
             nullptr,
-            internal::meta_info<Base>::resolve(),
+            internal::meta_node<Base>::resolve(),
             [](const void *instance) ENTT_NOEXCEPT -> const void * {
                 return static_cast<const Base *>(static_cast<const Type *>(instance));
             }
@@ -205,11 +205,11 @@ struct meta_factory<Type> {
      */
     template<auto Candidate>
     std::enable_if_t<std::is_member_function_pointer_v<decltype(Candidate)>, meta_factory<Type>> conv() ENTT_NOEXCEPT {
-        using conv_type = std::invoke_result_t<decltype(Candidate), Type &>;
+        using conv_type = std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
         static internal::meta_conv_node node{
             nullptr,
-            internal::meta_info<conv_type>::resolve(),
+            internal::meta_node<conv_type>::resolve(),
             [](const void *instance) -> meta_any {
                 return forward_as_meta(static_cast<const Type *>(instance)->*Candidate)();
             }
@@ -226,11 +226,11 @@ struct meta_factory<Type> {
     /*! @copydoc conv */
     template<auto Candidate>
     std::enable_if_t<!std::is_member_function_pointer_v<decltype(Candidate)>, meta_factory<Type>> conv() ENTT_NOEXCEPT {
-        using conv_type = std::invoke_result_t<decltype(Candidate), Type &>;
+        using conv_type = std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
         static internal::meta_conv_node node{
             nullptr,
-            internal::meta_info<conv_type>::resolve(),
+            internal::meta_node<conv_type>::resolve(),
             [](const void *instance) -> meta_any {
                 return forward_as_meta(Candidate(*static_cast<const Type *>(instance)));
             }
@@ -259,7 +259,7 @@ struct meta_factory<Type> {
 
         static internal::meta_conv_node node{
             nullptr,
-            internal::meta_info<To>::resolve(),
+            internal::meta_node<std::remove_const_t<std::remove_reference_t<To>>>::resolve(),
             [](const void *instance) -> meta_any {
                 return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)));
             }
@@ -391,7 +391,7 @@ struct meta_factory<Type> {
                 internal::meta_traits::IS_NONE
                     | ((std::is_same_v<Type, data_type> || std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE)
                     | internal::meta_traits::IS_STATIC,
-                internal::meta_info<data_type>::resolve(),
+                internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>
             };
@@ -431,16 +431,16 @@ struct meta_factory<Type> {
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) ENTT_NOEXCEPT {
-        using underlying_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
+        using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
 
         static internal::meta_data_node node{
             {},
             nullptr,
             nullptr,
             internal::meta_traits::IS_NONE
-                | ((std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE)
+                | ((std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<data_type>)) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE)
                 /* this is never static */,
-            internal::meta_info<underlying_type>::resolve(),
+            internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
             &meta_setter<Type, Setter>,
             &meta_getter<Type, Getter, Policy>
         };
@@ -482,7 +482,7 @@ struct meta_factory<Type> {
             internal::meta_traits::IS_NONE
                 | (descriptor::is_const ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE)
                 | (descriptor::is_static ? internal::meta_traits::IS_STATIC : internal::meta_traits::IS_NONE),
-            internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename descriptor::return_type>>::resolve(),
+            internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve(),
             &meta_arg<typename descriptor::args_type>,
             &meta_invoke<Type, Candidate, Policy>
         };
@@ -523,7 +523,7 @@ private:
  */
 template<typename Type>
 [[nodiscard]] auto meta() ENTT_NOEXCEPT {
-    auto * const node = internal::meta_info<Type>::resolve();
+    auto * const node = internal::meta_node<Type>::resolve();
     // extended meta factory to allow assigning properties to opaque meta types
     return meta_factory<Type, Type>{&node->prop};
 }
@@ -577,7 +577,7 @@ inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
  */
 template<typename Type>
 void meta_reset() ENTT_NOEXCEPT {
-    meta_reset(internal::meta_info<Type>::resolve()->id);
+    meta_reset(internal::meta_node<Type>::resolve()->id);
 }
 
 

@@ -122,7 +122,7 @@ struct meta_type_node {
     const size_type size_of;
     const meta_traits traits;
     meta_any(* const default_constructor)();
-    double(* const conversion_helper)(const any &, const double *);
+    double(* const conversion_helper)(const any &, const any &);
     const meta_template_node *const templ;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
@@ -151,12 +151,12 @@ class ENTT_API meta_node {
 
     [[nodiscard]] static decltype(meta_type_node::conversion_helper) meta_conversion_helper() ENTT_NOEXCEPT {
         if constexpr(std::is_arithmetic_v<Type>) {
-            return +[](const any &storage, const double *value) {
-                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(*value)) : static_cast<double>(any_cast<const Type &>(storage));
+            return +[](const any &storage, const any &value) {
+                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(any_cast<double>(value))) : static_cast<double>(any_cast<const Type &>(storage));
             };
         } else if constexpr(std::is_enum_v<Type>) {
-            return +[](const any &storage, const double *value) {
-                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = Type{static_cast<std::underlying_type_t<Type>>(*value)}) : static_cast<double>(any_cast<const Type &>(storage));
+            return +[](const any &storage, const any &value) {
+                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = Type{static_cast<std::underlying_type_t<Type>>(any_cast<double>(value))}) : static_cast<double>(any_cast<const Type &>(storage));
             };
         } else {
             return nullptr;
@@ -206,13 +206,9 @@ public:
 };
 
 
-template<typename Type>
-struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>> {};
-
-
 template<typename... Args>
 [[nodiscard]] meta_type_node * meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
-    meta_type_node *args[sizeof...(Args) + 1u]{nullptr, internal::meta_info<Args>::resolve()...};
+    meta_type_node *args[sizeof...(Args) + 1u]{nullptr, internal::meta_node<std::remove_const_t<std::remove_reference_t<Args>>>::resolve()...};
     return args[index + 1u];
 }
 

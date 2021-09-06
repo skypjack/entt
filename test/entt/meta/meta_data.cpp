@@ -543,7 +543,7 @@ TEST_F(MetaData, ReRegistration) {
 
     SetUp();
 
-    auto *node = entt::internal::meta_info<base_t>::resolve();
+    auto *node = entt::internal::meta_node<base_t>::resolve();
     auto type = entt::resolve<base_t>();
 
     ASSERT_NE(node->data, nullptr);

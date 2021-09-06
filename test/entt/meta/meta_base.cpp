@@ -48,7 +48,7 @@ TEST_F(MetaBase, Functionalities) {
 TEST_F(MetaBase, ReRegistration) {
     SetUp();
 
-    auto *node = entt::internal::meta_info<derived_t>::resolve();
+    auto *node = entt::internal::meta_node<derived_t>::resolve();
 
     ASSERT_NE(node->base, nullptr);
     ASSERT_EQ(node->base->next, nullptr);

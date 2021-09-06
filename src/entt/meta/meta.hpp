@@ -47,7 +47,7 @@ public:
      */
     template<typename Type>
     meta_sequence_container(std::in_place_type_t<Type>, any instance) ENTT_NOEXCEPT
-        : value_type_node{internal::meta_info<typename Type::value_type>::resolve()},
+        : value_type_node{internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::value_type>>>::resolve()},
           size_fn{&meta_sequence_container_traits<Type>::size},
           resize_fn{&meta_sequence_container_traits<Type>::resize},
           clear_fn{&meta_sequence_container_traits<Type>::clear},
@@ -105,9 +105,9 @@ public:
     template<typename Type>
     meta_associative_container(std::in_place_type_t<Type>, any instance) ENTT_NOEXCEPT
         : key_only_container{meta_associative_container_traits<Type>::key_only()},
-          key_type_node{internal::meta_info<typename Type::key_type>::resolve()},
+          key_type_node{internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::key_type>>>::resolve()},
           mapped_type_node{nullptr},
-          value_type_node{internal::meta_info<typename Type::value_type>::resolve()},
+          value_type_node{internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::value_type>>>::resolve()},
           size_fn{&meta_associative_container_traits<Type>::size},
           clear_fn{&meta_associative_container_traits<Type>::clear},
           begin_fn{&meta_associative_container_traits<Type>::begin},
@@ -118,7 +118,7 @@ public:
           storage{std::move(instance)}
     {
         if constexpr(!meta_associative_container_traits<Type>::key_only()) {
-            mapped_type_node = internal::meta_info<typename Type::mapped_type>::resolve();
+            mapped_type_node = internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::mapped_type>>>::resolve();
         }
     }
 
@@ -218,7 +218,7 @@ public:
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&... args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          node{internal::meta_info<Type>::resolve()},
+          node{internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve()},
           vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>}
     {}
 
@@ -230,8 +230,8 @@ public:
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(Type &&value)
         : storage{std::forward<Type>(value)},
-          node{internal::meta_info<std::decay_t<Type>>::resolve()},
-          vtable{&basic_vtable<std::decay_t<Type>>}
+          node{internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve()},
+          vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>}
     {}
 
     /**
@@ -361,9 +361,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type * try_cast() const {
-        if(!node) { return nullptr; }
-
-        if(const auto info = type_id<Type>(); node->info == info) {
+        if(const auto info = type_id<Type>(); node && node->info == info) {
             return any_cast<Type>(&storage);
         } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
             return static_cast<const Type *>(base->cast(storage.data()));
@@ -375,19 +373,13 @@ public:
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type * try_cast() {
-        if constexpr(std::is_const_v<Type>) {
-            return std::as_const(*this).try_cast<Type>();
-        } else {
-            if(!node) { return nullptr; }
-
-            if(const auto info = type_id<Type>(); node->info == info) {
-                return any_cast<Type>(&storage);
-            } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
-                return const_cast<Type *>(static_cast<const Type *>(base->cast(storage.data())));
-            }
-
-            return nullptr;
+        if(const auto info = type_id<Type>(); node && node->info == info) {
+            return any_cast<Type>(&storage);
+        } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
+            return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
         }
+        
+        return nullptr;
     }
 
     /**
@@ -440,7 +432,13 @@ public:
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        return allow_cast(internal::meta_info<Type>::resolve());
+        const auto other = allow_cast(internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve());
+
+        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
+            return other.storage.owner() ? other : meta_any{};
+        } else {
+            return other;
+        }
     }
 
     /**
@@ -450,7 +448,20 @@ public:
      */
     template<typename Type>
     bool allow_cast() {
-        return allow_cast(internal::meta_info<Type>::resolve());
+        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
+            if(auto other = std::as_const(*this).allow_cast(internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve()); other) {
+                if(other.storage.owner()) {
+                    std::swap(*this, other);
+                    return true;
+                }
+
+                return (storage.data() != nullptr);
+            }
+
+            return false;
+        } else {
+            return allow_cast(internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve());
+        }
     }
 
     /**
@@ -464,7 +475,7 @@ public:
         release();
         vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
         storage.emplace<Type>(std::forward<Args>(args)...);
-        node = internal::meta_info<Type>::resolve();
+        node = internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve();
     }
 
     /*! @brief Destroys contained object */
@@ -1045,7 +1056,7 @@ class meta_type {
     template<typename... Args, auto... Index>
     [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node *curr, std::index_sequence<Index...>) {
         for(; curr; curr = curr->next) {
-            if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_info<Args>::resolve(), curr->arg(Index)) && ...)) {
+            if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_node<std::remove_const_t<std::remove_reference_t<Args>>>::resolve(), curr->arg(Index)) && ...)) {
                 return curr;
             }
         }
@@ -1501,18 +1512,15 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    if(!node) { return {}; }
-
-    if(const auto info = type.info(); node->info == info || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
+    if(const auto info = type.info(); (node && node->info == info) || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
         return as_ref();
     } else if(const auto * const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
         return conv->conv(storage.data());
-    } else if((type.is_arithmetic() || type.is_enum()) && node->conversion_helper) {
+    } else if(node && node->conversion_helper && (type.is_arithmetic() || type.is_enum())) {
         // exploits the fact that arithmetic types and enums are also default constructible
         auto other = type.construct();
-        const double value = node->conversion_helper(storage, nullptr);
         ENTT_ASSERT(other.node->conversion_helper, "Conversion helper not found");
-        other.node->conversion_helper(other.storage, &value);
+        other.node->conversion_helper(other.storage, node->conversion_helper(storage, {}));
         return other;
     }
 
@@ -1523,7 +1531,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 inline bool meta_any::allow_cast(const meta_type &type) {
     if(auto other = std::as_const(*this).allow_cast(type); other) {
         if(other.storage.owner()) {
-            *this = std::move(other);
+            std::swap(*this, other);
         }
 
         return true;
