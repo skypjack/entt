@@ -364,7 +364,7 @@ protected:
      * @param entt A valid identifier.
      * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void try_emplace(const Entity entt, void *ud) override {
+    void try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] void *ud) override {
         if constexpr(std::is_default_constructible_v<value_type>) {
             const auto pos = base_type::slot();
             construct(assure_at_least(pos));
