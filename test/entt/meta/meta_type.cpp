@@ -447,7 +447,7 @@ TEST_F(MetaType, Reset) {
     ASSERT_EQ(entt::resolve<clazz_t>().id(), "clazz"_hs);
     ASSERT_TRUE(entt::resolve<clazz_t>().prop(property_t::value));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("value"_hs));
-    ASSERT_TRUE((entt::resolve<clazz_t>().ctor<const base_t &, int>()));
+    ASSERT_TRUE((entt::resolve<clazz_t>().ctor<const base_t &, clazz_t>()));
     // implicitly generated default constructor
     ASSERT_TRUE(entt::resolve<clazz_t>().construct());
 
@@ -457,7 +457,7 @@ TEST_F(MetaType, Reset) {
     ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
-    ASSERT_FALSE((entt::resolve<clazz_t>().ctor<const base_t &, int>()));
+    ASSERT_FALSE((entt::resolve<clazz_t>().ctor<const base_t &, clazz_t>()));
     // implicitly generated default constructor is not cleared
     ASSERT_TRUE(entt::resolve<clazz_t>().construct());
 
