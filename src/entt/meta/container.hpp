@@ -125,9 +125,7 @@ struct basic_meta_associative_container_traits {
     using iterator = meta_associative_container::iterator;
     using size_type = std::size_t;
 
-    [[nodiscard]] static constexpr bool key_only() ENTT_NOEXCEPT {
-        return is_key_only_meta_associative_container<Type>::value;
-    }
+    static constexpr auto key_only = is_key_only_meta_associative_container<Type>::value;
 
     [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
         return any_cast<const Type &>(container).size();
@@ -144,18 +142,18 @@ struct basic_meta_associative_container_traits {
 
     [[nodiscard]] static iterator begin(any &container) {
         if(auto * const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::integral_constant<bool, key_only()>{}, cont->begin()};
+            return iterator{std::integral_constant<bool, key_only>{}, cont->begin()};
         }
 
-        return iterator{std::integral_constant<bool, key_only()>{}, std::begin(any_cast<const Type &>(container))};
+        return iterator{std::integral_constant<bool, key_only>{}, std::begin(any_cast<const Type &>(container))};
     }
 
     [[nodiscard]] static iterator end(any &container) {
         if(auto * const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::integral_constant<bool, key_only()>{}, cont->end()};
+            return iterator{std::integral_constant<bool, key_only>{}, cont->end()};
         }
 
-        return iterator{std::integral_constant<bool, key_only()>{}, std::end(any_cast<const Type &>(container))};
+        return iterator{std::integral_constant<bool, key_only>{}, std::end(any_cast<const Type &>(container))};
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, [[maybe_unused]] meta_any &value) {
@@ -183,10 +181,10 @@ struct basic_meta_associative_container_traits {
     [[nodiscard]] static iterator find(any &container, meta_any &key) {
         if(key.allow_cast<const typename Type::key_type &>()) {
             if(auto * const cont = any_cast<Type>(&container); cont) {
-                return iterator{std::integral_constant<bool, key_only()>{}, cont->find(key.cast<const typename Type::key_type &>())};
+                return iterator{std::integral_constant<bool, key_only>{}, cont->find(key.cast<const typename Type::key_type &>())};
             }
 
-            return iterator{std::integral_constant<bool, key_only()>{}, any_cast<const Type &>(container).find(key.cast<const typename Type::key_type &>())};
+            return iterator{std::integral_constant<bool, key_only>{}, any_cast<const Type &>(container).find(key.cast<const typename Type::key_type &>())};
         }
 
         return {};

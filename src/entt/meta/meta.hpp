@@ -104,7 +104,7 @@ public:
      */
     template<typename Type>
     meta_associative_container(std::in_place_type_t<Type>, any instance) ENTT_NOEXCEPT
-        : key_only_container{meta_associative_container_traits<Type>::key_only()},
+        : key_only_container{meta_associative_container_traits<Type>::key_only},
           key_type_node{internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::key_type>>>::resolve()},
           mapped_type_node{nullptr},
           value_type_node{internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::value_type>>>::resolve()},
@@ -117,7 +117,7 @@ public:
           find_fn{&meta_associative_container_traits<Type>::find},
           storage{std::move(instance)}
     {
-        if constexpr(!meta_associative_container_traits<Type>::key_only()) {
+        if constexpr(!meta_associative_container_traits<Type>::key_only) {
             mapped_type_node = internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::mapped_type>>>::resolve();
         }
     }
