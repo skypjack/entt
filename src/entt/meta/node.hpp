@@ -141,15 +141,15 @@ template<typename Type>
 class ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
-    [[nodiscard]] static decltype(meta_type_node::default_constructor) meta_default_constructor() ENTT_NOEXCEPT {
+    [[nodiscard]] static auto * meta_default_constructor() ENTT_NOEXCEPT {
         if constexpr(std::is_default_constructible_v<Type>) {
             return +[]() { return meta_any{std::in_place_type<Type>}; };
         } else {
-            return nullptr;
+            return static_cast<decltype(meta_type_node::default_constructor)>(nullptr);
         }
     }
 
-    [[nodiscard]] static decltype(meta_type_node::conversion_helper) meta_conversion_helper() ENTT_NOEXCEPT {
+    [[nodiscard]] static auto * meta_conversion_helper() ENTT_NOEXCEPT {
         if constexpr(std::is_arithmetic_v<Type>) {
             return +[](const any &storage, const any &value) {
                 return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(any_cast<double>(value))) : static_cast<double>(any_cast<const Type &>(storage));
@@ -159,7 +159,7 @@ class ENTT_API meta_node {
                 return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(any_cast<double>(value)))) : static_cast<double>(any_cast<const Type &>(storage));
             };
         } else {
-            return nullptr;
+            return static_cast<decltype(meta_type_node::conversion_helper)>(nullptr);
         }
     }
 
