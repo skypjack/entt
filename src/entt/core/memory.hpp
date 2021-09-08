@@ -2,6 +2,7 @@
 #define ENTT_CORE_MEMORY_HPP
 
 
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>

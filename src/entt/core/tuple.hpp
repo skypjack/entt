@@ -4,6 +4,7 @@
 
 #include <tuple>
 #include <type_traits>
+#include <utility>
 #include "../config/config.h"
 
 
@@ -19,11 +20,11 @@ namespace entt {
  */
 template<typename Type>
 constexpr decltype(auto) unwrap_tuple(Type && value) ENTT_NOEXCEPT {
-	if constexpr(std::tuple_size_v<std::remove_reference_t<Type>> == 1u) {
-		return std::get<0>(std::forward<Type>(value));
-	} else {
-		return std::forward<Type>(value);
-	}
+    if constexpr(std::tuple_size_v<std::remove_reference_t<Type>> == 1u) {
+        return std::get<0>(std::forward<Type>(value));
+    } else {
+        return std::forward<Type>(value);
+    }
 }
 
 
