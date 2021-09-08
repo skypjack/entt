@@ -149,9 +149,6 @@ struct type_name final {
 
 /*! @brief Implementation specific information about a type. */
 class type_info final {
-    template<typename>
-    friend type_info type_id() ENTT_NOEXCEPT;
-
     enum class operation { SEQ, HASH, NAME };
 
     using vtable_type = id_type(const operation, void *);
