@@ -148,98 +148,72 @@ struct type_name final {
 
 
 /*! @brief Implementation specific information about a type. */
-class type_info final {
-    enum class operation { SEQ, HASH, NAME };
-
-    using vtable_type = id_type(const operation, void *);
-
-    template<typename Type>
-    static id_type basic_vtable(const operation op, void *to) {
-        static_assert(std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
-
-        switch(op) {
-        case operation::SEQ:
-            return type_seq<Type>::value();
-            break;
-        case operation::HASH:
-            return type_hash<Type>::value();
-            break;
-        case operation::NAME:
-            *static_cast<std::string_view *>(to) = type_name<Type>::value();
-            break;
-        }
-
-        return {};
-    }
-
-public:
+struct type_info final {
     /*! @brief Default constructor. */
     constexpr type_info() ENTT_NOEXCEPT
-        : vtable{}
+        : index{},
+          identifier{},
+          alias{}
     {}
 
     /*! @brief Default copy constructor. */
-    type_info(const type_info &) ENTT_NOEXCEPT = default;
+    constexpr type_info(const type_info &) ENTT_NOEXCEPT = default;
     /*! @brief Default move constructor. */
-    type_info(type_info &&) ENTT_NOEXCEPT = default;
+    constexpr type_info(type_info &&) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Creates a type info object for a given type.
      * @tparam Type Type for which to generate a type info object.
      */
     template<typename Type>
-    type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
-        : vtable{&basic_vtable<Type>}
+    constexpr type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
+        : index{&type_seq<std::remove_reference_t<std::remove_const_t<Type>>>::value},
+          identifier{type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
+          alias{type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value()}
     {}
 
     /**
      * @brief Default copy assignment operator.
      * @return This type info object.
      */
-    type_info & operator=(const type_info &) ENTT_NOEXCEPT = default;
+    constexpr type_info & operator=(const type_info &) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Default move assignment operator.
      * @return This type info object.
      */
-    type_info & operator=(type_info &&) ENTT_NOEXCEPT = default;
+    constexpr type_info & operator=(type_info &&) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Checks if a type info object is properly initialized.
      * @return True if the object is properly initialized, false otherwise.
      */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return vtable != nullptr;
+    [[nodiscard]] constexpr explicit operator bool() const ENTT_NOEXCEPT {
+        return alias.data() != nullptr;
     }
 
     /**
      * @brief Type sequential identifier.
      * @return Type sequential identifier.
      */
-    [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
-        return vtable ? vtable(operation::SEQ, nullptr) : id_type{};
+    [[nodiscard]] constexpr id_type seq() const ENTT_NOEXCEPT {
+        return index();
     }
 
     /**
      * @brief Type hash.
      * @return Type hash.
      */
-    [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
-        return vtable ? vtable(operation::HASH, nullptr) : id_type{};
+    [[nodiscard]] constexpr id_type hash() const ENTT_NOEXCEPT {
+        return identifier;
     }
 
     /**
      * @brief Type name.
      * @return Type name.
      */
-    [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
-        std::string_view value{};
-
-        if(vtable) {
-            vtable(operation::NAME, &value);
-        }
-
-        return value;
+    [[nodiscard]] constexpr std::string_view name() const ENTT_NOEXCEPT {
+        return alias;
     }
 
     /**
@@ -247,12 +221,14 @@ public:
      * @param other Object with which to compare.
      * @return False if the two contents differ, true otherwise.
      */
-    [[nodiscard]] bool operator==(const type_info &other) const ENTT_NOEXCEPT {
-        return hash() == other.hash();
+    [[nodiscard]] constexpr bool operator==(const type_info &other) const ENTT_NOEXCEPT {
+        return identifier == other.identifier;
     }
 
 private:
-    vtable_type *vtable;
+    id_type(* index)();
+    id_type identifier;
+    std::string_view alias;
 };
 
 
@@ -262,7 +238,7 @@ private:
  * @param rhs A type info object.
  * @return True if the two contents differ, false otherwise.
  */
-[[nodiscard]] inline bool operator!=(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] inline constexpr bool operator!=(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -273,7 +249,7 @@ private:
  * @return The type info object for the given type.
  */
 template<typename Type>
-[[nodiscard]] type_info type_id() ENTT_NOEXCEPT {
+[[nodiscard]] constexpr type_info type_id() ENTT_NOEXCEPT {
     return type_info{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>};
 }
 
