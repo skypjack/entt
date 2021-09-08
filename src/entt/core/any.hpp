@@ -23,7 +23,7 @@ namespace entt {
  */
 template<std::size_t Len, std::size_t Align>
 class basic_any {
-    enum class operation: std::uint8_t { COPY, MOVE, DTOR, COMP, ADDR, CADDR, TYPE };
+    enum class operation: std::uint8_t { COPY, MOVE, DTOR, COMP, ADDR, TYPE };
     enum class policy: std::uint8_t { OWNER, REF, CREF };
 
     using storage_type = std::aligned_storage_t<Len + !Len, Align>;
@@ -78,24 +78,17 @@ class basic_any {
 
                 return (static_cast<basic_any *>(to)->instance = std::exchange(const_cast<basic_any &>(from).instance, nullptr));
             case operation::DTOR:
-                if(from.mode == policy::OWNER) {
-                    if constexpr(in_situ<Type>) {
-                        instance->~Type();
-                    } else if constexpr(std::is_array_v<Type>) {
-                        delete[] instance;
-                    } else {
-                        delete instance;
-                    }
+                if constexpr(in_situ<Type>) {
+                    instance->~Type();
+                } else if constexpr(std::is_array_v<Type>) {
+                    delete[] instance;
+                } else {
+                    delete instance;
                 }
                 break;
             case operation::COMP:
                 return compare<Type>(instance, (*static_cast<const basic_any **>(to))->data()) ? to : nullptr;
             case operation::ADDR:
-                if(from.mode == policy::CREF) {
-                    return nullptr;
-                }
-                [[fallthrough]];
-            case operation::CADDR:
                 return instance;
             case operation::TYPE:
                 *static_cast<type_info *>(to) = type_id<Type>();
@@ -104,6 +97,12 @@ class basic_any {
         }
 
         return nullptr;
+    }
+
+    void destroy_if_owner() {
+        if(mode == policy::OWNER) {
+            vtable(operation::DTOR, *this, nullptr);
+        }
     }
 
     template<typename Type, typename... Args>
@@ -202,7 +201,7 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
-        vtable(operation::DTOR, *this, nullptr);
+        destroy_if_owner();
     }
 
     /**
@@ -222,8 +221,9 @@ public:
      * @return This any object.
      */
     basic_any & operator=(basic_any &&other) ENTT_NOEXCEPT {
-        std::exchange(vtable, other.vtable)(operation::DTOR, *this, nullptr);
+        destroy_if_owner();
         other.vtable(operation::MOVE, other, this);
+        vtable = other.vtable;
         mode = other.mode;
         return *this;
     }
@@ -256,12 +256,12 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
-        return vtable(operation::CADDR, *this, nullptr);
+        return vtable(operation::ADDR, *this, nullptr);
     }
 
     /*! @copydoc data */
     [[nodiscard]] void * data() ENTT_NOEXCEPT {
-        return const_cast<void *>(vtable(operation::ADDR, *this, nullptr));
+        return mode == policy::CREF ? nullptr : const_cast<void *>(vtable(operation::ADDR, *this, nullptr));
     }
 
     /**
@@ -272,14 +272,16 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        std::exchange(vtable, &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>)(operation::DTOR, *this, nullptr);
-        mode = type_to_policy<Type>();
+        destroy_if_owner();
         initialize<Type>(std::forward<Args>(args)...);
+        vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
+        mode = type_to_policy<Type>();
     }
 
     /*! @brief Destroys contained object */
     void reset() {
-        std::exchange(vtable, &basic_vtable<void>)(operation::DTOR, *this, nullptr);
+        destroy_if_owner();
+        vtable = &basic_vtable<void>;
         mode = policy::OWNER;
     }
 
@@ -288,7 +290,7 @@ public:
      * @return False if the wrapper is empty, true otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(vtable(operation::CADDR, *this, nullptr) == nullptr);
+        return !(vtable(operation::ADDR, *this, nullptr) == nullptr);
     }
 
     /**
