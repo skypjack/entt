@@ -79,7 +79,7 @@ TEST(Registry, Context) {
     auto count = 0;
 
     registry.ctx([&count](auto info) {
-        ASSERT_EQ(info.hash(), entt::type_hash<char>::value());
+        ASSERT_EQ(info.hash_code(), entt::type_hash<char>::value());
         ++count;
     });
 
@@ -1881,9 +1881,9 @@ TEST(Registry, Visit) {
     bool hasType[3]{};
 
     registry.visit([&hasType](auto info) {
-        hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
-        hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
-        hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());
+        hasType[0] = hasType[0] || (info.hash_code() == entt::type_hash<int>::value());
+        hasType[1] = hasType[1] || (info.hash_code() == entt::type_hash<double>::value());
+        hasType[2] = hasType[2] || (info.hash_code() == entt::type_hash<char>::value());
     });
 
     ASSERT_TRUE(hasType[0] && hasType[1] && hasType[2]);
@@ -1891,9 +1891,9 @@ TEST(Registry, Visit) {
     hasType[0] = hasType[1] = hasType[2] = false;
 
     registry.visit(entity, [&hasType](auto info) {
-        hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
-        hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
-        hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());
+        hasType[0] = hasType[0] || (info.hash_code() == entt::type_hash<int>::value());
+        hasType[1] = hasType[1] || (info.hash_code() == entt::type_hash<double>::value());
+        hasType[2] = hasType[2] || (info.hash_code() == entt::type_hash<char>::value());
     });
 
     ASSERT_TRUE(hasType[0] && !hasType[1] && hasType[2]);
@@ -1901,9 +1901,9 @@ TEST(Registry, Visit) {
     hasType[0] = hasType[2] = false;
 
     registry.visit(other, [&hasType](auto info) {
-        hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
-        hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
-        hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());
+        hasType[0] = hasType[0] || (info.hash_code() == entt::type_hash<int>::value());
+        hasType[1] = hasType[1] || (info.hash_code() == entt::type_hash<double>::value());
+        hasType[2] = hasType[2] || (info.hash_code() == entt::type_hash<char>::value());
     });
 
     ASSERT_TRUE(!hasType[0] && hasType[1] && !hasType[2]);

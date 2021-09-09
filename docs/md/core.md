@@ -17,7 +17,8 @@
   * [Small buffer optimization](#small-buffer-optimization)
   * [Alignment requirement](#alignment-requirement)
 * [Type support](#type-support)
-  * [Type info](#type-info)
+  * [Built-in RTTI support](#built-in-rtti-support)
+    * [Type info](#type-info)
     * [Almost unique identifiers](#almost-unique-identifiers)
   * [Type traits](#type-traits)
     * [Size of](#size-of)
@@ -369,30 +370,19 @@ that won't be able to interoperate with each other.
 It also offers additional features that are not yet available in the standard
 library or that will never be.
 
-## Type info
+## Built-in RTTI support
 
-The `type_info` class isn't a drop-in replacement for `std::type_info` but can
-provide similar information which are not implementation defined and don't
-require to enable RTTI.<br/>
-Therefore, they can sometimes be even more reliable than those obtained
-otherwise.
+Runtime type identification support (or RTTI) is one of the most frequently
+disabled features in the C++ world, especially in the gaming sector. Regardless
+of the reasons for this, it's often a shame not to be able to rely on opaque
+type information at runtime.<br/>
+The library tries to fill this gap by offering a built-in system that doesn't
+serve as a replacement but comes very close to being one and offers similar
+information to that provided by its counterpart.
 
-A type info object is an opaque class that is also copy and move constructible.
-This class is returned by the `type_id` function template:
+Basically, the whole system relies on a handful of classes. In particular:
 
-```cpp
-auto info = entt::type_id<a_type>();
-```
-
-These are the information made available by this object:
-
-* The unique, sequential identifier associated with a given type:
-
-  ```cpp
-  auto index = entt::type_id<a_type>().seq();
-  ```
-
-  This is also an alias for the following:
+* An unique, sequential identifier associated with a given type:
 
   ```cpp
   auto index = entt::type_seq<a_type>::value();
@@ -426,13 +416,7 @@ These are the information made available by this object:
   The tool is widely used within `EnTT`. Generating indices not sequentially
   would break an assumption and would likely lead to undesired behaviors.
 
-* The hash value associated with a given type:
-
-  ```cpp
-  auto hash = entt::type_id<a_type>().hash();
-  ```
-
-  This is also an alias for the following:
+* A hash value associated with a given type:
 
   ```cpp
   auto hash = entt::type_hash<a_type>::value();
@@ -440,9 +424,7 @@ These are the information made available by this object:
 
   In general, the `value` function exposed by `type_hash` is also `constexpr`
   but this isn't guaranteed for all compilers and platforms (although it's valid
-  with the most well-known and popular ones).<br/>
-  The `hash` function offered by the type info object isn't `constexpr` in any
-  case instead.
+  with the most well-known and popular ones).
 
   This function **can** use non-standard features of the language for its own
   purposes. This makes it possible to provide compile-time identifiers that
@@ -456,13 +438,7 @@ These are the information made available by this object:
   specialized in order to customize its behavior globally or on a per-type or
   per-traits basis.
 
-* The name associated with a given type:
-
-  ```cpp
-  auto name = entt::type_id<my_type>().name();
-  ```
-
-  This is also an alias for the following:
+* A name associated with a given type:
 
   ```cpp
   auto name = entt::type_name<a_type>::value();
@@ -494,6 +470,55 @@ These are the information made available by this object:
   As for `type_seq`, also `type_name` is a _sfinae-friendly_ class that can be
   specialized in order to customize its behavior globally or on a per-type or
   per-traits basis.
+
+These are then combined into utilities that aim to offer an API that is somewhat
+similar to that offered by the language.
+
+### Type info
+
+The `type_info` class isn't a drop-in replacement for `std::type_info` but can
+provide similar information which are not implementation defined and don't
+require to enable RTTI.<br/>
+Therefore, they can sometimes be even more reliable than those obtained
+otherwise.
+
+A type info object is an opaque class that is also copy and move constructible.
+This class is returned by the `type_id` function template:
+
+```cpp
+auto info = entt::type_id<a_type>();
+```
+
+These are the information made available by this object:
+
+* An unique, sequential identifier associated with a given type:
+
+  ```cpp
+  auto index = entt::type_id<a_type>().seq();
+  ```
+
+  This is also an alias for the following:
+
+  ```cpp
+  auto index = entt::type_seq<a_type>::value();
+  ```
+
+* A hash value associated with a given type:
+
+  ```cpp
+  auto hash = entt::type_id<a_type>().hash_code();
+  ```
+
+  This is also an alias for the following:
+
+  ```cpp
+  auto hash = entt::type_hash<a_type>::value();
+  ```
+
+Where all accessed features are available at compile-time, the `type_info` class
+is also fully `constexpr`. However, this cannot be guaranteed in advance and
+depends mainly on the compiler in use and any specializations of the classes
+described above.
 
 ### Almost unique identifiers
 

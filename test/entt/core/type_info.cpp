@@ -62,8 +62,7 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_TRUE(info == info);
     ASSERT_FALSE(info != info);
 
-    ASSERT_EQ(info.seq(), entt::type_seq<int>::value());
-    ASSERT_EQ(info.hash(), entt::type_hash<int>::value());
+    ASSERT_EQ(info.hash_code(), entt::type_hash<int>::value());
     ASSERT_EQ(info.name(), entt::type_name<int>::value());
 
     ASSERT_TRUE(info);
@@ -73,15 +72,15 @@ TEST(TypeInfo, Functionalities) {
     empty = info;
 
     ASSERT_TRUE(empty);
-    ASSERT_EQ(empty.hash(), info.hash());
+    ASSERT_EQ(empty.hash_code(), info.hash_code());
 
     empty = {};
 
     ASSERT_FALSE(empty);
-    ASSERT_NE(empty.hash(), info.hash());
+    ASSERT_NE(empty.hash_code(), info.hash_code());
 
     empty = std::move(info);
 
     ASSERT_TRUE(empty);
-    ASSERT_EQ(empty.hash(), info.hash());
+    ASSERT_EQ(empty.hash_code(), info.hash_code());
 }
