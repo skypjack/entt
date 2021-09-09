@@ -8,7 +8,7 @@
 #include "types.h"
 
 template<typename Type>
-struct entt::type_seq<Type> {
+struct entt::type_index<Type> {
     [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
         static const entt::id_type value = type_context::instance()->value(entt::type_hash<Type>::value());
         return value;

@@ -12,12 +12,12 @@ struct entt::type_name<float> final {
     }
 };
 
-TEST(TypeSeq, Functionalities) {
-    ASSERT_EQ(entt::type_seq<int>::value(), entt::type_seq<int>::value());
-    ASSERT_NE(entt::type_seq<int>::value(), entt::type_seq<char>::value());
-    ASSERT_NE(entt::type_seq<int>::value(), entt::type_seq<int &&>::value());
-    ASSERT_NE(entt::type_seq<int &>::value(), entt::type_seq<const int &>::value());
-    ASSERT_EQ(static_cast<entt::id_type>(entt::type_seq<int>{}), entt::type_seq<int>::value());
+TEST(TypeIndex, Functionalities) {
+    ASSERT_EQ(entt::type_index<int>::value(), entt::type_index<int>::value());
+    ASSERT_NE(entt::type_index<int>::value(), entt::type_index<char>::value());
+    ASSERT_NE(entt::type_index<int>::value(), entt::type_index<int &&>::value());
+    ASSERT_NE(entt::type_index<int &>::value(), entt::type_index<const int &>::value());
+    ASSERT_EQ(static_cast<entt::id_type>(entt::type_index<int>{}), entt::type_index<int>::value());
 }
 
 TEST(TypeHash, Functionalities) {

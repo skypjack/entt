@@ -23,7 +23,7 @@ namespace entt {
 namespace internal {
 
 
-struct ENTT_API type_seq final {
+struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
         return value++;
@@ -89,13 +89,13 @@ template<typename Type>
  * @tparam Type Type for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
-struct ENTT_API type_seq final {
+struct ENTT_API type_index final {
     /**
      * @brief Returns the sequential identifier of a given type.
      * @return The sequential identifier of a given type.
      */
     [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
-        static const id_type value = internal::type_seq::next();
+        static const id_type value = internal::type_index::next();
         return value;
     }
 
@@ -119,7 +119,7 @@ struct type_hash final {
         return internal::type_hash<Type>(0);
 #else
     [[nodiscard]] static constexpr id_type value() ENTT_NOEXCEPT {
-        return type_seq<Type>::value();
+        return type_index<Type>::value();
 #endif
     }
 

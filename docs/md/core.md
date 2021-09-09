@@ -382,10 +382,10 @@ information to that provided by its counterpart.
 
 Basically, the whole system relies on a handful of classes. In particular:
 
-* An unique, sequential identifier associated with a given type:
+* The unique, sequential identifier associated with a given type:
 
   ```cpp
-  auto index = entt::type_seq<a_type>::value();
+  auto index = entt::type_index<a_type>::value();
   ```
 
   The returned value isn't guaranteed to be stable across different runs.
@@ -399,13 +399,13 @@ Basically, the whole system relies on a handful of classes. In particular:
   and therefore the generation of custom runtime sequences of indices for their
   own purposes, if necessary.
   
-  An external generator can also be used if needed. In fact, `type_seq` can be
+  An external generator can also be used if needed. In fact, `type_index` can be
   specialized by type and is also _sfinae-friendly_ in order to allow more
   refined specializations such as:
   
   ```cpp
   template<typename Type>
-  struct entt::type_seq<Type, std::void_d<decltype(Type::index())>> {
+  struct entt::type_index<Type, std::void_d<decltype(Type::index())>> {
       static entt::id_type value() ENTT_NOEXCEPT {
           return Type::index();
       }
@@ -416,7 +416,7 @@ Basically, the whole system relies on a handful of classes. In particular:
   The tool is widely used within `EnTT`. Generating indices not sequentially
   would break an assumption and would likely lead to undesired behaviors.
 
-* A hash value associated with a given type:
+* The hash value associated with a given type:
 
   ```cpp
   auto hash = entt::type_hash<a_type>::value();
@@ -434,11 +434,11 @@ Basically, the whole system relies on a handful of classes. In particular:
   that identifiers remain stable across executions. Moreover, they are generated
   at runtime and are no longer a compile-time thing.
 
-  As for `type_seq`, also `type_hash` is a _sfinae-friendly_ class that can be
+  As for `type_index`, also `type_hash` is a _sfinae-friendly_ class that can be
   specialized in order to customize its behavior globally or on a per-type or
   per-traits basis.
 
-* A name associated with a given type:
+* The name associated with a given type:
 
   ```cpp
   auto name = entt::type_name<a_type>::value();
@@ -467,7 +467,7 @@ Basically, the whole system relies on a handful of classes. In particular:
   means of the `ENTT_STANDARD_CPP` definition. In this case, the name will be
   empty by default.
 
-  As for `type_seq`, also `type_name` is a _sfinae-friendly_ class that can be
+  As for `type_index`, also `type_name` is a _sfinae-friendly_ class that can be
   specialized in order to customize its behavior globally or on a per-type or
   per-traits basis.
 
@@ -491,19 +491,7 @@ auto info = entt::type_id<a_type>();
 
 These are the information made available by this object:
 
-* An unique, sequential identifier associated with a given type:
-
-  ```cpp
-  auto index = entt::type_id<a_type>().seq();
-  ```
-
-  This is also an alias for the following:
-
-  ```cpp
-  auto index = entt::type_seq<a_type>::value();
-  ```
-
-* A hash value associated with a given type:
+* The hash value associated with a given type:
 
   ```cpp
   auto hash = entt::type_id<a_type>().hash_code();
@@ -513,6 +501,18 @@ These are the information made available by this object:
 
   ```cpp
   auto hash = entt::type_hash<a_type>::value();
+  ```
+
+* The name associated with a given type:
+
+  ```cpp
+  auto name = entt::type_id<my_type>().name();
+  ```
+
+  This is also an alias for the following:
+
+  ```cpp
+  auto name = entt::type_name<a_type>::value();
   ```
 
 Where all accessed features are available at compile-time, the `type_info` class
