@@ -494,7 +494,7 @@ These are the information made available by this object:
 * The hash value associated with a given type:
 
   ```cpp
-  auto hash = entt::type_id<a_type>().hash_code();
+  auto hash = entt::type_id<a_type>().hash();
   ```
 
   This is also an alias for the following:

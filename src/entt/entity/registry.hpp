@@ -183,14 +183,14 @@ public:
      * empty and thus invalid element otherwise.
      */
     poly_storage & storage(const type_info info) {
-        auto it = std::find_if(pools.begin(), pools.end(), [info](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash_code() == info.hash_code(); });
+        auto it = std::find_if(pools.begin(), pools.end(), [info](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == info.hash(); });
         ENTT_ASSERT(it != pools.end(), "Storage not available");
         return it->poly;
     }
 
     /*! @copydoc storage */
     const poly_storage & storage(const type_info info) const {
-        auto it = std::find_if(pools.cbegin(), pools.cend(), [info](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash_code() == info.hash_code(); });
+        auto it = std::find_if(pools.cbegin(), pools.cend(), [info](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == info.hash(); });
         ENTT_ASSERT(it != pools.cend(), "Storage not available");
         return it->poly;
     }
@@ -1167,12 +1167,12 @@ public:
         std::vector<const basic_common_type *> filter(std::distance(from, to));
 
         std::transform(first, last, component.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash_code() == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
         std::transform(from, to, filter.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash_code() == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 

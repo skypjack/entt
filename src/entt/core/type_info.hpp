@@ -194,7 +194,7 @@ struct type_info final {
      * @brief Type hash.
      * @return Type hash.
      */
-    [[nodiscard]] constexpr id_type hash_code() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr id_type hash() const ENTT_NOEXCEPT {
         return identifier;
     }
 
