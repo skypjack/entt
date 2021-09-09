@@ -371,7 +371,7 @@ TEST_F(Any, NoSBOMoveConstruction) {
     entt::any any{instance};
     entt::any other{std::move(any)};
 
-    ASSERT_FALSE(any);
+    ASSERT_TRUE(any);
     ASSERT_TRUE(other);
     ASSERT_TRUE(any.owner());
     ASSERT_TRUE(other.owner());
@@ -389,7 +389,7 @@ TEST_F(Any, NoSBOMoveAssignment) {
 
     other = std::move(any);
 
-    ASSERT_FALSE(any);
+    ASSERT_TRUE(any);
     ASSERT_TRUE(other);
     ASSERT_TRUE(any.owner());
     ASSERT_TRUE(other.owner());
@@ -497,8 +497,8 @@ TEST_F(Any, NoSBOMoveValidButUnspecifiedState) {
     entt::any other{std::move(any)};
     entt::any valid = std::move(other);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(other);
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(other);
     ASSERT_TRUE(valid);
 }
 
@@ -1077,7 +1077,7 @@ TEST_F(Any, CopyMoveReference) {
         entt::any move = std::move(any);
         entt::any copy = move;
 
-        ASSERT_FALSE(any);
+        ASSERT_TRUE(any);
         ASSERT_TRUE(move);
         ASSERT_TRUE(copy);
 
