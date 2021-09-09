@@ -62,7 +62,7 @@ TEST(PolyDefined, Functionalities) {
     ASSERT_TRUE(alias);
     ASSERT_TRUE(value);
 
-    ASSERT_EQ(empty.type(), entt::type_info{});
+    ASSERT_EQ(empty.type(), entt::type_id<void>());
     ASSERT_EQ(in_place.type(), entt::type_id<impl>());
     ASSERT_EQ(alias.type(), entt::type_id<impl>());
     ASSERT_EQ(value.type(), entt::type_id<impl>());
@@ -111,7 +111,7 @@ TEST(PolyDefined, Functionalities) {
     move.reset();
 
     ASSERT_FALSE(move);
-    ASSERT_EQ(move.type(), entt::type_info{});
+    ASSERT_EQ(move.type(), entt::type_id<void>());
 }
 
 TEST(PolyDefined, Owned) {

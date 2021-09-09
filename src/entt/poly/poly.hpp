@@ -235,8 +235,8 @@ public:
     {}
 
     /**
-     * @brief Returns the type of the contained object.
-     * @return The type of the contained object, if any.
+     * @brief Returns the object type if any, `type_id<void>()` otherwise.
+     * @return The object type if any, `type_id<void>()` otherwise.
      */
     [[nodiscard]] type_info type() const ENTT_NOEXCEPT {
         return storage.type();

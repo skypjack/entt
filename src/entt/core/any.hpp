@@ -23,7 +23,7 @@ namespace entt {
  */
 template<std::size_t Len, std::size_t Align>
 class basic_any {
-    enum class operation: std::uint8_t { COPY, MOVE, DTOR, COMP, ADDR, TYPE };
+    enum class operation: std::uint8_t { COPY, MOVE, DTOR, COMP, ADDR };
     enum class policy: std::uint8_t { OWNER, REF, CREF };
 
     using storage_type = std::aligned_storage_t<Len + !Len, Align>;
@@ -90,9 +90,6 @@ class basic_any {
                 return compare<Type>(instance, (*static_cast<const basic_any **>(to))->data()) ? to : nullptr;
             case operation::ADDR:
                 return instance;
-            case operation::TYPE:
-                *static_cast<type_info *>(to) = type_id<Type>();
-                break;
             }
         }
 
@@ -130,6 +127,7 @@ class basic_any {
     basic_any(const basic_any &other, const policy pol) ENTT_NOEXCEPT
         : instance{other.data()},
           vtable{other.vtable},
+          descriptor{other.descriptor},
           mode{pol}
     {}
 
@@ -143,6 +141,7 @@ public:
     basic_any() ENTT_NOEXCEPT
         : instance{},
           vtable{&basic_vtable<void>},
+          descriptor{type_id<void>()},
           mode{policy::OWNER}
     {}
 
@@ -156,6 +155,7 @@ public:
     explicit basic_any(std::in_place_type_t<Type>, Args &&... args)
         : instance{},
           vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>},
+          descriptor{type_id<std::remove_const_t<std::remove_reference_t<Type>>>()},
           mode{type_to_policy<Type>()}
     {
         initialize<Type>(std::forward<Args>(args)...);
@@ -170,6 +170,7 @@ public:
     basic_any(Type &&value)
         : instance{},
           vtable{&basic_vtable<std::decay_t<Type>>},
+          descriptor{type_id<std::decay_t<Type>>()},
           mode{policy::OWNER}
     {
         initialize<std::decay_t<Type>>(std::forward<Type>(value));
@@ -180,9 +181,7 @@ public:
      * @param other The instance to copy from.
      */
     basic_any(const basic_any &other)
-        : instance{},
-          vtable{&basic_vtable<void>},
-          mode{policy::OWNER}
+        : basic_any{}
     {
         other.vtable(operation::COPY, other, this);
     }
@@ -194,6 +193,7 @@ public:
     basic_any(basic_any &&other) ENTT_NOEXCEPT
         : instance{},
           vtable{other.vtable},
+          descriptor{other.descriptor},
           mode{other.mode}
     {
         vtable(operation::MOVE, other, this);
@@ -224,6 +224,7 @@ public:
         destroy_if_owner();
         other.vtable(operation::MOVE, other, this);
         vtable = other.vtable;
+        descriptor = other.descriptor;
         mode = other.mode;
         return *this;
     }
@@ -242,13 +243,11 @@ public:
     }
 
     /**
-     * @brief Returns the type of the contained object.
-     * @return The type of the contained object, if any.
+     * @brief Returns the object type if any, `type_id<void>()` otherwise.
+     * @return The object type if any, `type_id<void>()` otherwise.
      */
     [[nodiscard]] type_info type() const ENTT_NOEXCEPT {
-        type_info info{};
-        vtable(operation::TYPE, *this, &info);
-        return info;
+        return descriptor;
     }
 
     /**
@@ -275,6 +274,7 @@ public:
         destroy_if_owner();
         initialize<Type>(std::forward<Args>(args)...);
         vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
+        descriptor = type_id<Type>();
         mode = type_to_policy<Type>();
     }
 
@@ -282,6 +282,7 @@ public:
     void reset() {
         destroy_if_owner();
         vtable = &basic_vtable<void>;
+        descriptor = type_id<void>();
         mode = policy::OWNER;
     }
 
@@ -300,7 +301,7 @@ public:
      */
     bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
         const basic_any *trampoline = &other;
-        return type() == other.type() && (vtable(operation::COMP, *this, &trampoline) || !other.data());
+        return descriptor == other.descriptor && (vtable(operation::COMP, *this, &trampoline) || !other.data());
     }
 
     /**
@@ -327,6 +328,7 @@ public:
 private:
     union { const void *instance; storage_type storage; };
     vtable_type *vtable;
+    type_info descriptor;
     policy mode;
 };
 
@@ -391,7 +393,7 @@ Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    if(const auto hash = type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(); hash == data->type().hash_code()) {
+    if(constexpr auto hash = type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(); hash == data->type().hash_code()) {
         return static_cast<const Type *>(data->data());
     }
 
@@ -402,7 +404,7 @@ const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    if(const auto hash = type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(); hash == data->type().hash_code()) {
+    if(constexpr auto hash = type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(); hash == data->type().hash_code()) {
         // last attempt to make wrappers for const references return their values
         return static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data());
     }

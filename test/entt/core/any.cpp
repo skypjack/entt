@@ -75,7 +75,7 @@ TEST_F(Any, Empty) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(any.owner());
-    ASSERT_FALSE(any.type());
+    ASSERT_EQ(any.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(any.data(), nullptr);
 }
@@ -417,7 +417,7 @@ TEST_F(Any, VoidInPlaceTypeConstruction) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(any.owner());
-    ASSERT_FALSE(any.type());
+    ASSERT_EQ(any.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
 }
 
@@ -429,8 +429,8 @@ TEST_F(Any, VoidCopyConstruction) {
     ASSERT_FALSE(other);
     ASSERT_TRUE(any.owner());
     ASSERT_TRUE(other.owner());
-    ASSERT_FALSE(any.type());
-    ASSERT_FALSE(other.type());
+    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(other.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
 }
@@ -445,8 +445,8 @@ TEST_F(Any, VoidCopyAssignment) {
     ASSERT_FALSE(other);
     ASSERT_TRUE(any.owner());
     ASSERT_TRUE(other.owner());
-    ASSERT_FALSE(any.type());
-    ASSERT_FALSE(other.type());
+    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(other.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
 }
@@ -459,8 +459,8 @@ TEST_F(Any, VoidMoveConstruction) {
     ASSERT_FALSE(other);
     ASSERT_TRUE(any.owner());
     ASSERT_TRUE(other.owner());
-    ASSERT_FALSE(any.type());
-    ASSERT_FALSE(other.type());
+    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(other.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
 }
@@ -475,8 +475,8 @@ TEST_F(Any, VoidMoveAssignment) {
     ASSERT_FALSE(other);
     ASSERT_TRUE(any.owner());
     ASSERT_TRUE(other.owner());
-    ASSERT_FALSE(any.type());
-    ASSERT_FALSE(other.type());
+    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(other.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
 }
@@ -558,7 +558,7 @@ TEST_F(Any, EmplaceVoid) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(any.owner());
-    ASSERT_FALSE(any.type());
+    ASSERT_EQ(any.type(), entt::type_id<void>());
  }
 
 TEST_F(Any, Reset) {
@@ -572,7 +572,7 @@ TEST_F(Any, Reset) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(any.owner());
-    ASSERT_EQ(any.type(), entt::type_info{});
+    ASSERT_EQ(any.type(), entt::type_id<void>());
 
     int value = 42;
     any.emplace<int &>(value);
@@ -585,7 +585,7 @@ TEST_F(Any, Reset) {
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(any.owner());
-    ASSERT_EQ(any.type(), entt::type_info{});
+    ASSERT_EQ(any.type(), entt::type_id<void>());
 }
 
 TEST_F(Any, SBOSwap) {
