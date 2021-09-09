@@ -233,9 +233,14 @@ private:
 
 
 /**
- * @brief Returns the type info object for a given type.
+ * @brief Returns the type info object associated to a given type.
+ *
+ * The type doesn't need to be a complete type. If the type is a reference, the
+ * result refers to the referenced type. In all cases, top-level cv-qualifiers
+ * are ignored.
+ *
  * @tparam Type Type for which to generate a type info object.
- * @return The type info object for the given type.
+ * @return A properly initialized type info object.
  */
 template<typename Type>
 [[nodiscard]] constexpr type_info type_id() ENTT_NOEXCEPT {

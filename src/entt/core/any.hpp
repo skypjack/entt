@@ -196,7 +196,7 @@ public:
           descriptor{other.descriptor},
           mode{other.mode}
     {
-        vtable(operation::MOVE, other, this);
+        other.vtable(operation::MOVE, other, this);
     }
 
     /*! @brief Frees the internal storage, whatever it means. */
