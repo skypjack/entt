@@ -374,7 +374,7 @@ Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
-    if constexpr(std::is_copy_constructible_v<std::decay_t<Type>>) {
+    if constexpr(std::is_copy_constructible_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
         if(auto * const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(std::move(*instance));
         } else {
@@ -391,15 +391,23 @@ Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
+    if(const auto hash = type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(); hash == data->type().hash_code()) {
+        return static_cast<const Type *>(data->data());
+    }
+
+    return nullptr;
 }
 
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    // last attempt to make wrappers for const references return their values
-    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
+    if(const auto hash = type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(); hash == data->type().hash_code()) {
+        // last attempt to make wrappers for const references return their values
+        return static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data());
+    }
+
+    return nullptr;
 }
 
 
