@@ -151,7 +151,8 @@ struct type_name final {
 struct type_info final {
     /*! @brief Default constructor. */
     constexpr type_info() ENTT_NOEXCEPT
-        : identifier{},
+        : seq{},
+          identifier{},
           alias{}
     {}
 
@@ -166,7 +167,8 @@ struct type_info final {
      */
     template<typename Type>
     constexpr type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
-        : identifier{type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
+        : seq{type_index<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
+          identifier{type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
           alias{type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value()}
     {}
 
@@ -188,6 +190,14 @@ struct type_info final {
      */
     [[nodiscard]] constexpr explicit operator bool() const ENTT_NOEXCEPT {
         return alias.data() != nullptr;
+    }
+
+    /**
+     * @brief Type index.
+     * @return Type index.
+     */
+    [[nodiscard]] constexpr id_type index() const ENTT_NOEXCEPT {
+        return seq;
     }
 
     /**
@@ -216,6 +226,7 @@ struct type_info final {
     }
 
 private:
+    id_type seq;
     id_type identifier;
     std::string_view alias;
 };

@@ -183,16 +183,14 @@ public:
      * empty and thus invalid element otherwise.
      */
     poly_storage & storage(const type_info info) {
-        auto it = std::find_if(pools.begin(), pools.end(), [info](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == info.hash(); });
-        ENTT_ASSERT(it != pools.end(), "Storage not available");
-        return it->poly;
+        ENTT_ASSERT(info.index() < pools.size() && pools[info.index()].poly, "Storage not available");
+        return pools[info.index()].poly;
     }
 
     /*! @copydoc storage */
     const poly_storage & storage(const type_info info) const {
-        auto it = std::find_if(pools.cbegin(), pools.cend(), [info](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == info.hash(); });
-        ENTT_ASSERT(it != pools.cend(), "Storage not available");
-        return it->poly;
+        ENTT_ASSERT(info.index() < pools.size() && pools[info.index()].poly, "Storage not available");
+        return pools[info.index()].poly;
     }
 
     /**

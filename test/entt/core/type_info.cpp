@@ -54,7 +54,7 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int &&>());
     ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int>());
 
-    auto info = entt::type_id<int>();
+    auto info = entt::type_id<const int &>();
     const auto unnamed = entt::type_id<float>();
     entt::type_info empty{};
 
@@ -62,6 +62,7 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_TRUE(info == info);
     ASSERT_FALSE(info != info);
 
+    ASSERT_EQ(info.index(), entt::type_index<int>::value());
     ASSERT_EQ(info.hash(), entt::type_hash<int>::value());
     ASSERT_EQ(info.name(), entt::type_name<int>::value());
 
