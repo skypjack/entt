@@ -23,27 +23,14 @@ namespace entt {
  */
 template<std::size_t Len, std::size_t Align>
 class basic_any {
-    enum class operation: std::uint8_t { COPY, MOVE, DTOR, COMP, ADDR };
+    enum class operation: std::uint8_t { COPY, MOVE, DTOR, COMP, GET, TYPE };
     enum class policy: std::uint8_t { OWNER, REF, CREF };
 
     using storage_type = std::aligned_storage_t<Len + !Len, Align>;
-    using vtable_type = const void *(const operation, const basic_any &, void *);
+    using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
     static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
-
-    template<typename Type>
-    [[nodiscard]] static constexpr policy type_to_policy() {
-        if constexpr(std::is_lvalue_reference_v<Type>) {
-            if constexpr(std::is_const_v<std::remove_reference_t<Type>>) {
-                return policy::CREF;
-            } else {
-                return policy::REF;
-            }
-        } else {
-            return policy::OWNER;
-        }
-    }
 
     template<typename Type>
     [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
@@ -55,58 +42,63 @@ class basic_any {
     }
 
     template<typename Type>
-    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] void *to) {
-        static_assert(std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
+    static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] const void *to) {
+        static_assert(!std::is_same_v<Type, void> && std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
+        const Type *instance = nullptr;
 
-        if constexpr(!std::is_void_v<Type>) {
-            const Type *instance = (in_situ<Type> && from.mode == policy::OWNER)
-                ? ENTT_LAUNDER(reinterpret_cast<const Type *>(&from.storage))
-                : static_cast<const Type *>(from.instance);
-
-            switch(op) {
-            case operation::COPY:
-                if constexpr(std::is_copy_constructible_v<Type>) {
-                    static_cast<basic_any *>(to)->emplace<Type>(*instance);
-                }
-                break;
-            case operation::MOVE:
-                if constexpr(in_situ<Type>) {
-                    if(from.mode == policy::OWNER) {
-                        return new (&static_cast<basic_any *>(to)->storage) Type{std::move(*const_cast<Type *>(instance))};
-                    }
-                }
-
-                return (static_cast<basic_any *>(to)->instance = std::exchange(const_cast<basic_any &>(from).instance, nullptr));
-            case operation::DTOR:
-                if constexpr(in_situ<Type>) {
-                    instance->~Type();
-                } else if constexpr(std::is_array_v<Type>) {
-                    delete[] instance;
-                } else {
-                    delete instance;
-                }
-                break;
-            case operation::COMP:
-                return compare<Type>(instance, (*static_cast<const basic_any **>(to))->data()) ? to : nullptr;
-            case operation::ADDR:
-                return instance;
+        if constexpr(in_situ<Type>) {
+            instance = (from.mode == policy::OWNER) ? ENTT_LAUNDER(reinterpret_cast<const Type *>(&from.storage)) : static_cast<const Type *>(from.instance);
+        } else {
+            instance = static_cast<const Type *>(from.instance);
+        }
+        
+        switch(op) {
+        case operation::COPY:
+            if constexpr(std::is_copy_constructible_v<Type>) {
+                static_cast<basic_any *>(const_cast<void *>(to))->initialize<Type>(*instance);
             }
+            break;
+        case operation::MOVE:
+            if constexpr(in_situ<Type>) {
+                if(from.mode == policy::OWNER) {
+                    return new (&static_cast<basic_any *>(const_cast<void *>(to))->storage) Type{std::move(*const_cast<Type *>(instance))};
+                }
+            }
+        
+            return (static_cast<basic_any *>(const_cast<void *>(to))->instance = std::exchange(const_cast<basic_any &>(from).instance, nullptr));
+        case operation::DTOR:
+            if constexpr(in_situ<Type>) {
+                instance->~Type();
+            } else if constexpr(std::is_array_v<Type>) {
+                delete[] instance;
+            } else {
+                delete instance;
+            }
+            break;
+        case operation::COMP:
+        {
+            const auto info = type_id<Type>();
+            auto *value = static_cast<const basic_any *>(to)->data(&info);
+            return (value && compare<Type>(instance, value)) ? to : nullptr;
+        }
+        case operation::GET:
+            return (!to || (*static_cast<const type_info *>(to) == type_id<Type>())) ? instance : nullptr;
+        case operation::TYPE:
+            *static_cast<type_info *>(const_cast<void *>(to)) = type_id<Type>();
+            break;
         }
 
         return nullptr;
     }
 
-    void destroy_if_owner() {
-        if(mode == policy::OWNER) {
-            vtable(operation::DTOR, *this, nullptr);
-        }
-    }
-
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&... args) {
         if constexpr(!std::is_void_v<Type>) {
+            vtable = basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
+
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
+                mode = std::is_const_v<std::remove_reference_t<Type>> ? policy::CREF : policy::REF;
                 instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<Type>) {
                 if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<Type>) {
@@ -127,7 +119,6 @@ class basic_any {
     basic_any(const basic_any &other, const policy pol) ENTT_NOEXCEPT
         : instance{other.data()},
           vtable{other.vtable},
-          descriptor{other.descriptor},
           mode{pol}
     {}
 
@@ -140,8 +131,7 @@ public:
     /*! @brief Default constructor. */
     basic_any() ENTT_NOEXCEPT
         : instance{},
-          vtable{&basic_vtable<void>},
-          descriptor{type_id<void>()},
+          vtable{},
           mode{policy::OWNER}
     {}
 
@@ -153,10 +143,7 @@ public:
      */
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, Args &&... args)
-        : instance{},
-          vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>},
-          descriptor{type_id<std::remove_const_t<std::remove_reference_t<Type>>>()},
-          mode{type_to_policy<Type>()}
+        : basic_any{}
     {
         initialize<Type>(std::forward<Args>(args)...);
     }
@@ -168,10 +155,7 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
     basic_any(Type &&value)
-        : instance{},
-          vtable{&basic_vtable<std::decay_t<Type>>},
-          descriptor{type_id<std::decay_t<Type>>()},
-          mode{policy::OWNER}
+        : basic_any{}
     {
         initialize<std::decay_t<Type>>(std::forward<Type>(value));
     }
@@ -183,7 +167,9 @@ public:
     basic_any(const basic_any &other)
         : basic_any{}
     {
-        other.vtable(operation::COPY, other, this);
+        if(other.vtable) {
+            other.vtable(operation::COPY, other, this);
+        }
     }
 
     /**
@@ -193,15 +179,18 @@ public:
     basic_any(basic_any &&other) ENTT_NOEXCEPT
         : instance{},
           vtable{other.vtable},
-          descriptor{other.descriptor},
           mode{other.mode}
     {
-        other.vtable(operation::MOVE, other, this);
+        if(other.vtable) {
+            other.vtable(operation::MOVE, other, this);
+        }
     }
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
-        destroy_if_owner();
+        if(vtable && mode == policy::OWNER) {
+            vtable(operation::DTOR, *this, nullptr);
+        }
     }
 
     /**
@@ -211,7 +200,11 @@ public:
      */
     basic_any & operator=(const basic_any &other) {
         reset();
-        other.vtable(operation::COPY, other, this);
+
+        if(other.vtable) {
+            other.vtable(operation::COPY, other, this);
+        }
+
         return *this;
     }
 
@@ -221,11 +214,14 @@ public:
      * @return This any object.
      */
     basic_any & operator=(basic_any &&other) ENTT_NOEXCEPT {
-        destroy_if_owner();
-        other.vtable(operation::MOVE, other, this);
-        vtable = other.vtable;
-        descriptor = other.descriptor;
-        mode = other.mode;
+        reset();
+
+        if(other.vtable) {
+            other.vtable(operation::MOVE, other, this);
+            vtable = other.vtable;
+            mode = other.mode;
+        }
+
         return *this;
     }
 
@@ -247,20 +243,27 @@ public:
      * @return The object type if any, `type_id<void>()` otherwise.
      */
     [[nodiscard]] type_info type() const ENTT_NOEXCEPT {
-        return descriptor;
+        if(vtable) {
+            type_info info{};
+            vtable(operation::TYPE, *this, &info);
+            return info;
+        }
+
+        return type_id<void>();
     }
 
     /**
      * @brief Returns an opaque pointer to the contained instance.
+     * @param req Optional expected type.
      * @return An opaque pointer the contained instance, if any.
      */
-    [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
-        return vtable(operation::ADDR, *this, nullptr);
+    [[nodiscard]] const void * data(const type_info *req = nullptr) const ENTT_NOEXCEPT {
+        return vtable ? vtable(operation::GET, *this, req) : nullptr;
     }
 
     /*! @copydoc data */
-    [[nodiscard]] void * data() ENTT_NOEXCEPT {
-        return mode == policy::CREF ? nullptr : const_cast<void *>(vtable(operation::ADDR, *this, nullptr));
+    [[nodiscard]] void * data(const type_info *req = nullptr) ENTT_NOEXCEPT {
+        return (!vtable || mode == policy::CREF) ? nullptr : const_cast<void *>(vtable(operation::GET, *this, req));
     }
 
     /**
@@ -271,18 +274,17 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        destroy_if_owner();
+        reset();
         initialize<Type>(std::forward<Args>(args)...);
-        vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
-        descriptor = type_id<Type>();
-        mode = type_to_policy<Type>();
     }
 
     /*! @brief Destroys contained object */
     void reset() {
-        destroy_if_owner();
-        vtable = &basic_vtable<void>;
-        descriptor = type_id<void>();
+        if(vtable && mode == policy::OWNER) {
+            vtable(operation::DTOR, *this, nullptr);
+        }
+
+        vtable = nullptr;
         mode = policy::OWNER;
     }
 
@@ -291,7 +293,7 @@ public:
      * @return False if the wrapper is empty, true otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return descriptor != type_id<void>();
+        return vtable != nullptr;
     }
 
     /**
@@ -300,8 +302,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
-        const basic_any *trampoline = &other;
-        return descriptor == other.descriptor && (vtable(operation::COMP, *this, &trampoline) || !other.data());
+        return (!vtable && !other.vtable) || (vtable && other.vtable && vtable(operation::COMP, *this, &other));
     }
 
     /**
@@ -328,7 +329,6 @@ public:
 private:
     union { const void *instance; storage_type storage; };
     vtable_type *vtable;
-    type_info descriptor;
     policy mode;
 };
 
@@ -393,23 +393,17 @@ Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    if(data->type() == type_id<std::remove_const_t<std::remove_reference_t<Type>>>()) {
-        return static_cast<const Type *>(data->data());
-    }
-
-    return nullptr;
+    const auto info = type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
+    return static_cast<const Type *>(data->data(&info));
 }
 
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    if(data->type() == type_id<std::remove_const_t<std::remove_reference_t<Type>>>()) {
-        // last attempt to make wrappers for const references return their values
-        return static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data());
-    }
-
-    return nullptr;
+    const auto info = type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
+    // last attempt to make wrappers for const references return their values
+    return static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data(&info));
 }
 
 
