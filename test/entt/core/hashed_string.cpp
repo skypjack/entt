@@ -79,6 +79,21 @@ TEST(HashedString, Correctness) {
     ASSERT_EQ(entt::hashed_string::value(view.data(), view.size()), foobar_v);
 }
 
+TEST(HashedString, Order) {
+    using namespace entt::literals;
+    const entt::hashed_string lhs = "foo"_hs;
+    const entt::hashed_string rhs = "bar"_hs;
+
+    ASSERT_FALSE(lhs < lhs);
+    ASSERT_FALSE(rhs < rhs);
+
+    ASSERT_LT(rhs, lhs);
+    ASSERT_LE(rhs, lhs);
+
+    ASSERT_GT(lhs, rhs);
+    ASSERT_GE(lhs, rhs);
+}
+
 TEST(HashedString, Constexprness) {
     using namespace entt::literals;
     constexpr std::string_view view{"foobar__", 6};
@@ -91,6 +106,12 @@ TEST(HashedString, Constexprness) {
 
     static_assert(entt::hashed_string::value("quux", 4) == "quux"_hs);
     static_assert(entt::hashed_string::value(view.data(), view.size()) == foobar_v);
+
+    static_assert(entt::hashed_string{"bar"} < "foo"_hs);
+    static_assert(entt::hashed_string{"bar"} <= "bar"_hs);
+
+    static_assert(entt::hashed_string{"foo"} > "bar"_hs);
+    static_assert(entt::hashed_string{"foo"} >= "foo"_hs);
 }
 
 TEST(HashedWString, Functionalities) {
@@ -138,6 +159,21 @@ TEST(HashedWString, Correctness) {
     ASSERT_EQ(entt::hashed_wstring::value(view.data(), view.size()), foobar_v);
 }
 
+TEST(HashedWString, Order) {
+    using namespace entt::literals;
+    const entt::hashed_wstring lhs = L"foo"_hws;
+    const entt::hashed_wstring rhs = L"bar"_hws;
+
+    ASSERT_FALSE(lhs < lhs);
+    ASSERT_FALSE(rhs < rhs);
+
+    ASSERT_LT(rhs, lhs);
+    ASSERT_LE(rhs, lhs);
+
+    ASSERT_GT(lhs, rhs);
+    ASSERT_GE(lhs, rhs);
+}
+
 TEST(HashedWString, Constexprness) {
     using namespace entt::literals;
     constexpr std::wstring_view view{L"foobar__", 6};
@@ -150,4 +186,10 @@ TEST(HashedWString, Constexprness) {
 
     static_assert(entt::hashed_wstring::value(L"quux", 4) == L"quux"_hws);
     static_assert(entt::hashed_wstring::value(view.data(), view.size()) == foobar_v);
+
+    static_assert(entt::hashed_wstring{L"bar"} < L"foo"_hws);
+    static_assert(entt::hashed_wstring{L"bar"} <= L"bar"_hws);
+
+    static_assert(entt::hashed_wstring{L"foo"} > L"bar"_hws);
+    static_assert(entt::hashed_wstring{L"foo"} >= L"foo"_hws);
 }
