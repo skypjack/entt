@@ -289,28 +289,30 @@ private:
 
 /**
  * @brief Compares two handles.
- * @tparam Args Template parameters of the handles to compare.
+ * @tparam Args Scope of the first handle.
+ * @tparam Other Scope of the second handle.
  * @param lhs A valid handle.
  * @param rhs A valid handle.
  * @return True if both handles refer to the same registry and the same
  * entity, false otherwise.
  */
-template<typename... Args>
-[[nodiscard]] bool operator==(const basic_handle<Args...> &lhs, const basic_handle<Args...> &rhs) ENTT_NOEXCEPT {
+template<typename... Args, typename... Other>
+[[nodiscard]] bool operator==(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) ENTT_NOEXCEPT {
     return lhs.registry() == rhs.registry() && lhs.entity() == rhs.entity();
 }
 
 
 /**
  * @brief Compares two handles.
- * @tparam Args Template parameters of the handles to compare.
+ * @tparam Args Scope of the first handle.
+ * @tparam Other Scope of the second handle.
  * @param lhs A valid handle.
  * @param rhs A valid handle.
  * @return False if both handles refer to the same registry and the same
  * entity, true otherwise.
  */
-template<typename... Args>
-[[nodiscard]] bool operator!=(const basic_handle<Args...> &lhs, const basic_handle<Args...> &rhs) ENTT_NOEXCEPT {
+template<typename... Args, typename... Other>
+[[nodiscard]] bool operator!=(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
