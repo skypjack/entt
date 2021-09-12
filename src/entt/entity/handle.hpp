@@ -48,18 +48,6 @@ struct basic_handle {
     {}
 
     /**
-     * @brief Compares two handles.
-     * @tparam Args Template parameters of the handle with which to compare.
-     * @param other Handle with which to compare.
-     * @return True if both handles refer to the same registry and the same
-     * entity, false otherwise.
-     */
-    template<typename... Args>
-    [[nodiscard]] bool operator==(const basic_handle<Args...> &other) const ENTT_NOEXCEPT {
-        return reg == other.registry() && entt == other.entity();
-    }
-
-    /**
      * @brief Constructs a const handle from a non-const one.
      * @tparam Other A valid entity type (see entt_traits for more details).
      * @tparam Args Scope of the handle to construct.
@@ -301,15 +289,28 @@ private:
 
 /**
  * @brief Compares two handles.
- * @tparam Type A valid entity type (see entt_traits for more details).
- * @tparam Other A valid entity type (see entt_traits for more details).
+ * @tparam Args Template parameters of the handles to compare.
+ * @param lhs A valid handle.
+ * @param rhs A valid handle.
+ * @return True if both handles refer to the same registry and the same
+ * entity, false otherwise.
+ */
+template<typename... Args>
+[[nodiscard]] bool operator==(const basic_handle<Args...> &lhs, const basic_handle<Args...> &rhs) ENTT_NOEXCEPT {
+    return lhs.registry() == rhs.registry() && lhs.entity() == rhs.entity();
+}
+
+
+/**
+ * @brief Compares two handles.
+ * @tparam Args Template parameters of the handles to compare.
  * @param lhs A valid handle.
  * @param rhs A valid handle.
  * @return False if both handles refer to the same registry and the same
  * entity, true otherwise.
  */
-template<typename Type, typename Other>
-bool operator!=(const basic_handle<Type> &lhs, const basic_handle<Other> &rhs) ENTT_NOEXCEPT {
+template<typename... Args>
+[[nodiscard]] bool operator!=(const basic_handle<Args...> &lhs, const basic_handle<Args...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

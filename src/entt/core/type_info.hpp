@@ -216,15 +216,6 @@ struct type_info final {
         return alias;
     }
 
-    /**
-     * @brief Compares the contents of two type info objects.
-     * @param other Object with which to compare.
-     * @return False if the two contents differ, true otherwise.
-     */
-    [[nodiscard]] constexpr bool operator==(const type_info &other) const ENTT_NOEXCEPT {
-        return identifier == other.identifier;
-    }
-
 private:
     id_type seq;
     id_type identifier;
@@ -236,7 +227,18 @@ private:
  * @brief Compares the contents of two type info objects.
  * @param lhs A type info object.
  * @param rhs A type info object.
- * @return True if the two contents differ, false otherwise.
+ * @return True if the two type info objects are identical, false otherwise.
+ */
+[[nodiscard]] inline constexpr bool operator==(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
+    return lhs.hash() == rhs.hash();
+}
+
+
+/**
+ * @brief Compares the contents of two type info objects.
+ * @param lhs A type info object.
+ * @param rhs A type info object.
+ * @return True if the two type info objects differ, false otherwise.
  */
 [[nodiscard]] inline constexpr bool operator!=(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);

@@ -186,15 +186,6 @@ public:
      */
     [[nodiscard]] constexpr operator hash_type() const ENTT_NOEXCEPT { return value(); }
 
-    /**
-     * @brief Compares two hashed strings.
-     * @param other Hashed string with which to compare.
-     * @return True if the two hashed strings are identical, false otherwise.
-     */
-    [[nodiscard]] constexpr bool operator==(const basic_hashed_string &other) const ENTT_NOEXCEPT {
-        return hash == other.hash;
-    }
-
 private:
     const value_type *str;
     hash_type hash;
@@ -222,6 +213,19 @@ basic_hashed_string(const Char (&str)[N])
  * @param lhs A valid hashed string.
  * @param rhs A valid hashed string.
  * @return True if the two hashed strings are identical, false otherwise.
+ */
+template<typename Char>
+[[nodiscard]] constexpr bool operator==(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
+    return lhs.value() == rhs.value();
+}
+
+
+/**
+ * @brief Compares two hashed strings.
+ * @tparam Char Character type.
+ * @param lhs A valid hashed string.
+ * @param rhs A valid hashed string.
+ * @return True if the two hashed strings differ, false otherwise.
  */
 template<typename Char>
 [[nodiscard]] constexpr bool operator!=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
