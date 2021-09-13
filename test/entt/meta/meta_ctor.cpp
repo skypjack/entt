@@ -16,7 +16,7 @@ struct derived_t: base_t {
 };
 
 struct clazz_t {
-    clazz_t(const base_t &other, int iv)
+    clazz_t(const base_t &other, int &iv)
         : clazz_t{iv, other.value}
     {}
 
@@ -55,7 +55,7 @@ struct MetaCtor: ::testing::Test {
         entt::meta<clazz_t>()
             .type("clazz"_hs)
             .ctor<&entt::registry::emplace_or_replace<clazz_t, const int &, const char &>, entt::as_ref_t>()
-            .ctor<const base_t &, int>()
+            .ctor<const base_t &, int &>()
             .ctor<const int &, char>()
             .ctor<entt::overload<clazz_t(int)>(clazz_t::factory)>()
             .ctor<entt::overload<clazz_t(base_t, int, int)>(clazz_t::factory)>()
@@ -114,10 +114,20 @@ TEST_F(MetaCtor, ArithmeticConversion) {
 TEST_F(MetaCtor, ConstNonConstRefArgs) {
     int ivalue = 42;
     const char cvalue = 'c';
-
     auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(ivalue), entt::forward_as_meta(cvalue));
 
     ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<clazz_t>().i, 42);
+    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+}
+
+TEST_F(MetaCtor, WrongConstness) {
+    int value = 42;
+    auto any = entt::resolve<clazz_t>().construct(derived_t{}, entt::forward_as_meta(value));
+    auto other = entt::resolve<clazz_t>().construct(derived_t{}, entt::forward_as_meta(std::as_const(value)));
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(other);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
 }

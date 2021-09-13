@@ -298,7 +298,7 @@ template<typename Type, typename... Args, std::size_t... Index>
         return Type{(args+Index)->cast<Args>()...};
     }
 
-    return {};
+    return meta_any{};
 }
 
 
@@ -390,7 +390,7 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
 [[nodiscard]] meta_any meta_construct(meta_any * const args) {
-    return meta_construct<Type, Policy>(Candidate, args);
+    return meta_invoke<Type, Policy>({}, Candidate, args);
 }
 
 
