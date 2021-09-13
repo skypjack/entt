@@ -74,7 +74,6 @@ struct meta_conv_node {
 struct meta_ctor_node {
     using size_type = std::size_t;
     meta_ctor_node * next;
-    meta_prop_node * prop;
     const size_type arity;
     meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_any * const);

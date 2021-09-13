@@ -20,9 +20,6 @@ struct meta_handle;
 struct meta_prop;
 
 
-struct meta_ctor;
-
-
 struct meta_data;
 
 

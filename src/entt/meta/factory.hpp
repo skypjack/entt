@@ -320,14 +320,13 @@ public:
 
         static internal::meta_ctor_node node{
             nullptr,
-            nullptr,
             descriptor::args_type::size,
             &meta_arg<typename descriptor::args_type>,
             &meta_construct<Type, Candidate, Policy>
         };
 
         link_ctor_if_required(node);
-        return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
+        return meta_factory<Type>{};
     }
 
     /**
@@ -346,14 +345,13 @@ public:
 
         static internal::meta_ctor_node node{
             nullptr,
-            nullptr,
             descriptor::args_type::size,
             &meta_arg<typename descriptor::args_type>,
             &meta_construct<Type, Args...>
         };
 
         link_ctor_if_required(node);
-        return meta_factory<Type, Type(Args...)>{&node.prop};
+        return meta_factory<Type>{};
     }
 
     /**
@@ -535,7 +533,7 @@ inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
             clear_chain(&node->prop);
             clear_chain(&node->base);
             clear_chain(&node->conv);
-            clear_chain(&node->ctor, &internal::meta_ctor_node::prop);
+            clear_chain(&node->ctor);
             clear_chain(&node->data, &internal::meta_data_node::prop);
             clear_chain(&node->func, &internal::meta_func_node::prop);
 

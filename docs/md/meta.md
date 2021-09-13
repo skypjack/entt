@@ -268,19 +268,6 @@ Refer to the inline documentation for all the details.
 
 The meta objects that compose a meta type are accessed in the following ways:
 
-* _Meta constructors_. They are accessed by types of arguments:
-
-  ```cpp
-  auto ctor = entt::resolve<my_type>().ctor<int, char>();
-  ```
-
-  The returned type is `meta_ctor` and may be invalid if there is no constructor
-  that accepts the supplied arguments or at least some types from which they are
-  derived or to which they can be converted.<br/>
-  A meta constructor offers an API to know the number of its arguments and their
-  expected meta types. Furthermor, it's possible to invoke it and therefore to
-  construct new instances of the underlying type.
-
 * _Meta data_. They are accessed by _name_:
 
   ```cpp
@@ -777,14 +764,7 @@ them.
 For this reason and only for default constructible types, default constructors
 are automatically defined and associated with their meta types, whether they are
 explicitly or implicitly generated.<br/>
-Therefore, it won't be necessary to do this in order to construct an integer
-from its meta type:
-
-```cpp
-entt::meta<int>().ctor<>();
-```
-
-Instead, just do this:
+Therefore, this is all is needed to construct an integer from its meta type:
 
 ```cpp
 entt::resolve<int>().construct();
@@ -794,17 +774,7 @@ Where the meta type can be for example the one returned from a meta container,
 useful for building keys without knowing or having to register the actual types.
 
 In all cases, when users register default constructors, they are preferred both
-during searches and when the `construct` member function is invoked.<br/>
-Moreover, implicitly generated default constructors are never returned when
-iterating registered constructors nor when looking up constructors from meta
-types:
-
-```cpp
-entt::meta_ctor ctor = entt::resolve<int>().ctor<>();
-```
-
-In other terms, `ctor` is an invalid meta object unless users explicitly
-registered a meta constructor that takes no arguments for the `int` type.
+during searches and when the `construct` member function is invoked.
 
 ## Policies: the more, the less
 
@@ -829,9 +799,11 @@ There are a few alternatives available at the moment:
 * The _as-void_ policy, associated with the type `entt::as_void_t`.<br/>
   Its purpose is to discard the return value of a meta object, whatever it is,
   thus making it appear as if its type were `void`:
+
   ```cpp
   entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
   ```
+
   If the use with functions is obvious, it must be said that it's also possible
   to use this policy with constructors and data members. In the first case, the
   constructor will be invoked but the returned wrapper will actually be empty.
@@ -843,9 +815,11 @@ There are a few alternatives available at the moment:
   Accessing the object contained in the wrapper for which the _reference_ was
   requested will make it possible to directly access the instance used to
   initialize the wrapper itself:
+
   ```cpp
   entt::meta<my_type>().data<&my_type::data_member, entt::as_ref_t>("member"_hs);
   ```
+
   These policies work with constructors (for example, when objects are taken
   from an external container rather than created on demand), data members and
   functions in general.<br/>
@@ -946,7 +920,7 @@ once. In this case, properties in the key/value form aren't allowed, since they
 would be interpreted as two different properties rather than a single one.
 
 The meta objects for which properties are supported are currently meta types,
-meta constructors, meta data and meta functions.<br/>
+meta data and meta functions.<br/>
 These types also offer a couple of member functions named `prop` to iterate all
 properties at once or to search a specific property by key:
 

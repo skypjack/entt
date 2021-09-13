@@ -724,98 +724,6 @@ private:
 };
 
 
-/*! @brief Opaque wrapper for constructors. */
-struct meta_ctor {
-    /*! @brief Node type. */
-    using node_type = internal::meta_ctor_node;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename node_type::size_type;
-
-    /*! @copydoc meta_prop::meta_prop */
-    meta_ctor(const node_type *curr = nullptr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-    /**
-     * @brief Returns the number of arguments accepted by a constructor.
-     * @return The number of arguments accepted by the constructor.
-     */
-    [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
-        return node->arity;
-    }
-
-    /**
-     * @brief Returns the type of the i-th argument of a constructor.
-     * @param index Index of the argument of which to return the type.
-     * @return The type of the i-th argument of a constructor.
-     */
-    [[nodiscard]] meta_type arg(const size_type index) const ENTT_NOEXCEPT;
-
-    /**
-     * @brief Creates an instance of the underlying type, if possible.
-     *
-     * Parameters are such that a cast or conversion to the required types is
-     * possible. Otherwise, an empty and thus invalid wrapper is returned.
-     *
-     * @param args Parameters to use to construct the instance.
-     * @param sz Number of parameters to use to construct the instance.
-     * @return A wrapper containing the new instance, if any.
-     */
-    [[nodiscard]] meta_any invoke(meta_any * const args, const size_type sz) const {
-        return sz == arity() ? node->invoke(args) : meta_any{};
-    }
-
-    /**
-     * @copybrief invoke
-     *
-     * @sa invoke
-     *
-     * @tparam Args Types of arguments to use to construct the instance.
-     * @param args Parameters to use to construct the instance.
-     * @return A wrapper containing the new instance, if any.
-     */
-    template<typename... Args>
-    [[nodiscard]] meta_any invoke([[maybe_unused]] Args &&... args) const {
-        meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
-        return invoke(arguments, sizeof...(Args));
-    }
-
-    /**
-     * @brief Returns a range to visit registered meta properties.
-     * @return An iterable range to visit registered meta properties.
-     */
-    [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
-        return node->prop;
-    }
-
-    /**
-     * @brief Lookup function for registered meta properties.
-     * @param key The key to use to search for a property.
-     * @return The registered meta property for the given key, if any.
-     */
-    [[nodiscard]] meta_prop prop(meta_any key) const {
-        for(auto curr: prop()) {
-            if(curr.key() == key) {
-                return curr;
-            }
-        }
-
-        return nullptr;
-    }
-
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(node == nullptr);
-    }
-
-private:
-    const node_type *node;
-};
-
-
 /*! @brief Opaque wrapper for data members. */
 struct meta_data {
     /*! @brief Node type. */
@@ -882,7 +790,10 @@ struct meta_data {
         return node->get(std::move(instance));
     }
 
-    /*! @copydoc meta_ctor::prop */
+    /**
+     * @brief Returns a range to visit registered meta properties.
+     * @return An iterable range to visit registered meta properties.
+     */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
     }
@@ -1004,7 +915,7 @@ struct meta_func {
         return invoke(std::move(instance), arguments, sizeof...(Args));
     }
 
-    /*! @copydoc meta_ctor::prop */
+    /*! @copydoc meta_data::prop */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
     }
@@ -1039,17 +950,6 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
-    template<typename... Args, auto... Index>
-    [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node *curr, std::index_sequence<Index...>) {
-        for(; curr; curr = curr->next) {
-            if(curr->arity == sizeof...(Args) && (internal::can_cast_or_convert(internal::meta_node<std::remove_const_t<std::remove_reference_t<Args>>>::resolve(), curr->arg(Index).node) && ...)) {
-                return curr;
-            }
-        }
-
-        return nullptr;
-    }
-
     template<auto Member, typename Pred>
     const auto * lookup(meta_any * const args, const typename internal::meta_type_node::size_type sz, Pred pred) const {
         std::decay_t<decltype(node->*Member)> candidate{};
@@ -1061,7 +961,7 @@ class meta_type {
                 size_type direct{};
                 size_type ext{};
 
-                for(size_type next{}; next < sz && next == (direct + ext); ++next) {
+                for(size_type next{}; next < sz && next == (direct + ext) && args[next]; ++next) {
                     const auto type = args[next].type();
                     const auto other = curr->arg(next);
                     type.info() == other.info() ? ++direct : (ext += internal::can_cast_or_convert(type.node, other.node));
@@ -1246,24 +1146,6 @@ public:
      */
     [[nodiscard]] meta_type base(const id_type id) const {
         return internal::visit<&node_type::base>([id](const auto *curr) { return curr->type->id == id; }, node);
-    }
-
-    /**
-     * @brief Returns a range to visit registered top-level constructors.
-     * @return An iterable range to visit registered top-level constructors.
-     */
-    [[nodiscard]] meta_range<meta_ctor> ctor() const ENTT_NOEXCEPT {
-        return node->ctor;
-    }
-
-    /**
-     * @brief Lookup function for registered meta constructors.
-     * @tparam Args Constructor arguments.
-     * @return The registered meta constructor for the given arguments, if any.
-     */
-    template<typename... Args>
-    [[nodiscard]] meta_ctor ctor() const {
-        return ctor<Args...>(node->ctor, std::make_index_sequence<sizeof...(Args)>{});
     }
 
     /**
@@ -1512,11 +1394,6 @@ bool meta_any::set(const id_type id, Type &&value) {
     }
 
     return {};
-}
-
-
-[[nodiscard]] inline meta_type meta_ctor::arg(const size_type index) const ENTT_NOEXCEPT {
-    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 

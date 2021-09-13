@@ -271,17 +271,12 @@ TEST_F(MetaType, Base) {
 }
 
 TEST_F(MetaType, Ctor) {
+    derived_t derived;
+    base_t &base = derived;
     auto type = entt::resolve<clazz_t>();
-    int counter{};
 
-    for([[maybe_unused]] auto curr: type.ctor()) {
-        ++counter;
-    }
-
-    ASSERT_EQ(counter, 1);
-    ASSERT_FALSE((type.ctor<>()));
-    ASSERT_TRUE((type.ctor<const base_t &, int>()));
-    ASSERT_TRUE((type.ctor<const derived_t &, double>()));
+    ASSERT_TRUE((type.construct(entt::forward_as_meta(derived), 42)));
+    ASSERT_TRUE((type.construct(entt::forward_as_meta(base), 42)));
 
     // use the implicitly generated default constructor
     auto any = type.construct();
@@ -382,21 +377,6 @@ TEST_F(MetaType, OverloadedFunc) {
     ASSERT_FALSE(ambiguous);
 }
 
-TEST_F(MetaType, SetGet) {
-    using namespace entt::literals;
-
-    auto type = entt::resolve<clazz_t>();
-    clazz_t instance{};
-
-    ASSERT_TRUE(type.set("value"_hs, instance, 42));
-    ASSERT_FALSE(type.set("eulav"_hs, instance, 3));
-    ASSERT_EQ(instance.value, 42);
-
-    ASSERT_FALSE(type.get("eulav"_hs, instance));
-    ASSERT_TRUE(type.get("value"_hs, instance));
-    ASSERT_EQ(type.get("value"_hs, instance).cast<int>(), 42);
-}
-
 TEST_F(MetaType, Construct) {
     auto any = entt::resolve<clazz_t>().construct(base_t{}, 42);
 
@@ -447,7 +427,7 @@ TEST_F(MetaType, Reset) {
     ASSERT_EQ(entt::resolve<clazz_t>().id(), "clazz"_hs);
     ASSERT_TRUE(entt::resolve<clazz_t>().prop(property_t::value));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("value"_hs));
-    ASSERT_TRUE((entt::resolve<clazz_t>().ctor<const base_t &, clazz_t>()));
+    ASSERT_TRUE((entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{})));
     // implicitly generated default constructor
     ASSERT_TRUE(entt::resolve<clazz_t>().construct());
 
@@ -457,7 +437,7 @@ TEST_F(MetaType, Reset) {
     ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
-    ASSERT_FALSE((entt::resolve<clazz_t>().ctor<const base_t &, clazz_t>()));
+    ASSERT_FALSE((entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{})));
     // implicitly generated default constructor is not cleared
     ASSERT_TRUE(entt::resolve<clazz_t>().construct());
 
