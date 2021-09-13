@@ -165,9 +165,7 @@ class meta_any {
             switch(op) {
             case operation::DEREF:
                 if constexpr(is_meta_pointer_like_v<Type>) {
-                    using element_type = std::remove_const_t<typename std::pointer_traits<Type>::element_type>;
-
-                    if constexpr(std::is_function_v<element_type>) {
+                    if constexpr(std::is_function_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
                         *static_cast<meta_any *>(to) = any_cast<Type>(from);
                     } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
                         using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(from)));
@@ -229,9 +227,7 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(Type &&value)
-        : storage{std::forward<Type>(value)},
-          node{internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve()},
-          vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>}
+        : meta_any{std::in_place_type<std::remove_const_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
     {}
 
     /**
@@ -422,7 +418,17 @@ public:
      * @param type Meta type to which the cast is requested.
      * @return True if there exists a viable conversion, false otherwise.
      */
-    [[nodiscard]] bool allow_cast(const meta_type &type);
+    [[nodiscard]] bool allow_cast(const meta_type &type) {
+        if(auto other = std::as_const(*this).allow_cast(type); other) {
+            if(other.storage.owner()) {
+                std::swap(*this, other);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
@@ -1505,19 +1511,6 @@ bool meta_any::set(const id_type id, Type &&value) {
     }
 
     return {};
-}
-
-
-inline bool meta_any::allow_cast(const meta_type &type) {
-    if(auto other = std::as_const(*this).allow_cast(type); other) {
-        if(other.storage.owner()) {
-            std::swap(*this, other);
-        }
-
-        return true;
-    }
-
-    return false;
 }
 
 
