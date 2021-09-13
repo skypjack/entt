@@ -1050,6 +1050,38 @@ class meta_type {
         return nullptr;
     }
 
+    template<auto Member, typename Pred>
+    const auto * lookup(meta_any * const args, const typename internal::meta_type_node::size_type sz, Pred pred) const {
+        std::decay_t<decltype(node->*Member)> candidate{};
+        size_type extent{sz + 1u};
+        bool ambiguous{};
+
+        for(auto *curr = (node->*Member); curr; curr = curr->next) {
+            if(pred(curr) && curr->arity == sz) {
+                size_type direct{};
+                size_type ext{};
+
+                for(size_type next{}; next < sz && next == (direct + ext); ++next) {
+                    const auto type = args[next].type();
+                    const auto other = curr->arg(next);
+                    type.info() == other.info() ? ++direct : (ext += internal::can_cast_or_convert(type.node, other.node));
+                }
+
+                if((direct + ext) == sz) {
+                    if(ext < extent) {
+                        candidate = curr;
+                        extent = ext;
+                        ambiguous = false;
+                    } else if(ext == extent) {
+                        ambiguous = true;
+                    }
+                }
+            }
+        }
+
+        return (candidate && !ambiguous) ? candidate : decltype(candidate){};
+    }
+
 public:
     /*! @brief Node type. */
     using node_type = internal::meta_type_node;
@@ -1288,15 +1320,8 @@ public:
      * @return A wrapper containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
-        for(auto *curr = node->ctor; curr; curr = curr->next) {
-            if(curr->arity == sz) {
-                if(auto ret = curr->invoke(args); ret) {
-                    return ret;
-                }
-            }
-        }
-
-        return (!sz && node->default_constructor) ? node->default_constructor() : meta_any{};
+        const auto *candidate = lookup<&node_type::ctor>(args, sz, [](const auto *) { return true; });
+        return candidate ? candidate->invoke(args) : ((!sz && node->default_constructor) ? node->default_constructor() : meta_any{});
     }
 
     /**
@@ -1330,32 +1355,8 @@ public:
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any * const args, const size_type sz) const {
-        const internal::meta_func_node* candidate{};
-        size_type extent{sz + 1u};
-        bool ambiguous{};
-
-        for(auto *it = internal::visit<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->arity == sz; }, node); it && it->id == id && it->arity == sz; it = it->next) {
-            size_type direct{};
-            size_type ext{};
-
-            for(size_type next{}; next < sz && next == (direct + ext); ++next) {
-                const auto type = args[next].type();
-                const auto other = it->arg(next);
-                type.info() == other.info() ? ++direct : (ext += internal::can_cast_or_convert(type.node, other.node));
-            }
-
-            if((direct + ext) == sz) {
-                if(ext < extent) {
-                    candidate = it;
-                    extent = ext;
-                    ambiguous = false;
-                } else if(ext == extent) {
-                    ambiguous = true;
-                }
-            }
-        }
-
-        return (candidate && !ambiguous) ? candidate->invoke(std::move(instance), args) : meta_any{};
+        const auto *candidate = lookup<&node_type::func>(args, sz, [id](const auto *curr) { return curr->id == id; });
+        return candidate ? candidate->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**

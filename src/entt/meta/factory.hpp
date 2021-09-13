@@ -174,20 +174,12 @@ class meta_factory<Type> {
     }
 
     void link_func_if_required(const id_type id, internal::meta_func_node &node) {
-        for(auto *it = &owner->func; *it; it = &(*it)->next) {
-            if(*it == &node) {
-                *it = node.next;
-                break;
-            }
-        }
-
-        internal::meta_func_node **it = &owner->func;
-        for(; *it && (*it)->id != id; it = &(*it)->next);
-        for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
-
         node.id = id;
-        node.next = *it;
-        *it = &node;
+
+        if(meta_range<internal::meta_func_node *, internal::meta_func_node> range{owner->func}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+            node.next = owner->func;
+            owner->func = &node;
+        }
     }
 
 public:
