@@ -30,7 +30,7 @@ namespace entt {
  * there are no subtle errors at runtime.
  */
 template<typename...>
-struct meta_factory;
+class meta_factory;
 
 
 /**
@@ -39,8 +39,15 @@ struct meta_factory;
  * @tparam Spec Property specialization pack used to disambiguate overloads.
  */
 template<typename Type, typename... Spec>
-struct meta_factory<Type, Spec...>: public meta_factory<Type> {
-private:
+class meta_factory<Type, Spec...>: public meta_factory<Type> {
+    void link_prop_if_required(internal::meta_prop_node &node, const meta_any &instance) {
+        if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*ref}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&instance](const auto *curr) { return curr->id == instance; }) == range.cend(), "Duplicate identifier");
+            node.next = *ref;
+            *ref = &node;
+        }
+    }
+
     template<std::size_t Step = 0, typename... Property, typename... Other>
     void unroll(choice_t<2>, std::tuple<Property...> property, Other &&... other) {
         std::apply([this](auto &&... curr) { (unroll<Step>(choice<2>, std::forward<Property>(curr)), ...); }, property);
@@ -62,8 +69,8 @@ private:
     template<std::size_t>
     void unroll(choice_t<0>) {}
 
-    template<std::size_t = 0, typename Key>
-    void assign(Key &&key, meta_any value = {}) {
+    template<std::size_t = 0>
+    void assign(meta_any key, meta_any value = {}) {
         static meta_any property[2u]{};
 
         static internal::meta_prop_node node{
@@ -72,15 +79,9 @@ private:
             property[1u]
         };
 
-        meta_any instance{std::forward<Key>(key)};
-        property[0u] = std::move(instance);
+        property[0u] = std::move(key);
         property[1u] = std::move(value);
-
-        if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*ref}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&instance](const auto *curr) { return curr->id == instance; }) == range.cend(), "Duplicate identifier");
-            node.next = *ref;
-            *ref = &node;
-        }
+        link_prop_if_required(node, property[0u]);
     }
 
 public:
@@ -139,7 +140,57 @@ private:
  * @tparam Type Reflected type for which the factory was created.
  */
 template<typename Type>
-struct meta_factory<Type> {
+class meta_factory<Type> {
+    void link_base_if_required(internal::meta_base_node &node) {
+        if(meta_range<internal::meta_base_node *, internal::meta_base_node> range{owner->base}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+            node.next = owner->base;
+            owner->base = &node;
+        }
+    }
+
+    void link_conv_if_required(internal::meta_conv_node &node) {
+        if(meta_range<internal::meta_conv_node *, internal::meta_conv_node> range{owner->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+            node.next = owner->conv;
+            owner->conv = &node;
+        }
+    }
+
+    void link_ctor_if_required(internal::meta_ctor_node &node) {
+        if(meta_range<internal::meta_ctor_node *, internal::meta_ctor_node> range{owner->ctor}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+            node.next = owner->ctor;
+            owner->ctor = &node;
+        }
+    }
+
+    void link_data_if_required(const id_type id, internal::meta_data_node &node) {
+        meta_range<internal::meta_data_node *, internal::meta_data_node> range{owner->data};
+        ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id, &node](const auto *curr) { return curr != &node && curr->id == id; }) == range.cend(), "Duplicate identifier");
+        node.id = id;
+
+        if(std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+            node.next = owner->data;
+            owner->data = &node;
+        }
+    }
+
+    void link_func_if_required(const id_type id, internal::meta_func_node &node) {
+        for(auto *it = &owner->func; *it; it = &(*it)->next) {
+            if(*it == &node) {
+                *it = node.next;
+                break;
+            }
+        }
+
+        internal::meta_func_node **it = &owner->func;
+        for(; *it && (*it)->id != id; it = &(*it)->next);
+        for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
+
+        node.id = id;
+        node.next = *it;
+        *it = &node;
+    }
+
+public:
     /*! @brief Default constructor. */
     meta_factory()
         : owner{internal::meta_node<Type>::resolve()}
@@ -183,11 +234,7 @@ struct meta_factory<Type> {
             }
         };
 
-        if(meta_range<internal::meta_base_node *, internal::meta_base_node> range{owner->base}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            node.next = owner->base;
-            owner->base = &node;
-        }
-
+        link_base_if_required(node);
         return meta_factory<Type>{};
     }
 
@@ -215,11 +262,7 @@ struct meta_factory<Type> {
             }
         };
 
-        if(meta_range<internal::meta_conv_node *, internal::meta_conv_node> range{owner->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            node.next = owner->conv;
-            owner->conv = &node;
-        }
-
+        link_conv_if_required(node);
         return meta_factory<Type>{};
     }
 
@@ -236,11 +279,7 @@ struct meta_factory<Type> {
             }
         };
 
-        if(meta_range<internal::meta_conv_node *, internal::meta_conv_node> range{owner->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            node.next = owner->conv;
-            owner->conv = &node;
-        }
-
+        link_conv_if_required(node);
         return meta_factory<Type>{};
     }
 
@@ -265,11 +304,7 @@ struct meta_factory<Type> {
             }
         };
 
-        if(meta_range<internal::meta_conv_node *, internal::meta_conv_node> range{owner->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            node.next = owner->conv;
-            owner->conv = &node;
-        }
-
+        link_conv_if_required(node);
         return meta_factory<Type>{};
     }
 
@@ -299,11 +334,7 @@ struct meta_factory<Type> {
             &meta_construct<Type, Candidate, Policy>
         };
 
-        if(meta_range<internal::meta_ctor_node *, internal::meta_ctor_node> range{owner->ctor}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            node.next = owner->ctor;
-            owner->ctor = &node;
-        }
-
+        link_ctor_if_required(node);
         return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
 
@@ -329,11 +360,7 @@ struct meta_factory<Type> {
             &meta_construct<Type, Args...>
         };
 
-        if(meta_range<internal::meta_ctor_node *, internal::meta_ctor_node> range{owner->ctor}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            node.next = owner->ctor;
-            owner->ctor = &node;
-        }
-
+        link_ctor_if_required(node);
         return meta_factory<Type, Type(Args...)>{&node.prop};
     }
 
@@ -356,11 +383,7 @@ struct meta_factory<Type> {
     template<auto Func>
     auto dtor() ENTT_NOEXCEPT {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
-
-        owner->dtor = [](void *instance) {
-            Func(*static_cast<Type *>(instance));
-        };
-
+        owner->dtor = [](void *instance) { Func(*static_cast<Type *>(instance)); };
         return meta_factory<Type>{};
     }
 
@@ -396,15 +419,7 @@ struct meta_factory<Type> {
                 &meta_getter<Type, Data, Policy>
             };
 
-            meta_range<internal::meta_data_node *, internal::meta_data_node> range{owner->data};
-            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr != &node && curr->id == id; }) == range.cend(), "Duplicate identifier");
-            node.id = id;
-
-            if(std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-                node.next = owner->data;
-                owner->data = &node;
-            }
-
+            link_data_if_required(id, node);
             return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&node.prop};
         }
     }
@@ -445,15 +460,7 @@ struct meta_factory<Type> {
             &meta_getter<Type, Getter, Policy>
         };
 
-        meta_range<internal::meta_data_node *, internal::meta_data_node> range{owner->data};
-        ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id](const auto *curr) { return curr != &node && curr->id == id; }) == range.cend(), "Duplicate identifier");
-        node.id = id;
-
-        if(std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            node.next = owner->data;
-            owner->data = &node;
-        }
-
+        link_data_if_required(id, node);
         return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
     }
 
@@ -487,21 +494,7 @@ struct meta_factory<Type> {
             &meta_invoke<Type, Candidate, Policy>
         };
 
-        for(auto *it = &owner->func; *it; it = &(*it)->next) {
-            if(*it == &node) {
-                *it = node.next;
-                break;
-            }
-        }
-
-        internal::meta_func_node **it = &owner->func;
-        for(; *it && (*it)->id != id; it = &(*it)->next);
-        for(; *it && (*it)->id == id && (*it)->arity < node.arity; it = &(*it)->next);
-
-        node.id = id;
-        node.next = *it;
-        *it = &node;
-
+        link_func_if_required(id, node);
         return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
 
