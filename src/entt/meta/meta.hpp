@@ -1033,30 +1033,10 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
-    [[nodiscard]] static bool can_cast_or_convert(const internal::meta_type_node *type, const meta_type other) ENTT_NOEXCEPT {
-        if(type->info == other.info()) {
-            return true;
-        }
-
-        for(const auto *curr = type->conv; curr; curr = curr->next) {
-            if(curr->type->info == other.info()) {
-                return true;
-            }
-        }
-
-        for(const auto *curr = type->base; curr; curr = curr->next) {
-            if(can_cast_or_convert(curr->type, other)) {
-                return true;
-            }
-        }
-
-        return (type->conversion_helper && other.node->conversion_helper);
-    }
-
     template<typename... Args, auto... Index>
     [[nodiscard]] static const internal::meta_ctor_node * ctor(const internal::meta_ctor_node *curr, std::index_sequence<Index...>) {
         for(; curr; curr = curr->next) {
-            if(curr->arity == sizeof...(Args) && (can_cast_or_convert(internal::meta_node<std::remove_const_t<std::remove_reference_t<Args>>>::resolve(), curr->arg(Index)) && ...)) {
+            if(curr->arity == sizeof...(Args) && (internal::can_cast_or_convert(internal::meta_node<std::remove_const_t<std::remove_reference_t<Args>>>::resolve(), curr->arg(Index).node) && ...)) {
                 return curr;
             }
         }
@@ -1355,7 +1335,7 @@ public:
             for(size_type next{}; next < sz && next == (direct + ext); ++next) {
                 const auto type = args[next].type();
                 const auto other = it->arg(next);
-                type.info() == other.info() ? ++direct : (ext += can_cast_or_convert(type.node, other));
+                type.info() == other.info() ? ++direct : (ext += internal::can_cast_or_convert(type.node, other.node));
             }
 
             if((direct + ext) == sz) {

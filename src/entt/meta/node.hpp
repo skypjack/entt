@@ -235,6 +235,27 @@ template<auto Member, typename Op>
 }
 
 
+[[nodiscard]] inline bool can_cast_or_convert(const internal::meta_type_node *type, const internal::meta_type_node *other) ENTT_NOEXCEPT {
+    if(type->info == other->info) {
+        return true;
+    }
+
+    for(const auto *curr = type->conv; curr; curr = curr->next) {
+        if(curr->type->info == other->info) {
+            return true;
+        }
+    }
+
+    for(const auto *curr = type->base; curr; curr = curr->next) {
+        if(can_cast_or_convert(curr->type, other)) {
+            return true;
+        }
+    }
+
+    return (type->conversion_helper && other->conversion_helper);
+}
+
+
 }
 
 
