@@ -33,15 +33,6 @@ class basic_any {
     static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
-    [[nodiscard]] static bool compare(const void *lhs, const void *rhs) {
-        if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
-            return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
-        } else {
-            return lhs == rhs;
-        }
-    }
-
-    template<typename Type>
     static const void * basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] const void *to) {
         static_assert(!std::is_same_v<Type, void> && std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
         const Type *instance = nullptr;
@@ -79,7 +70,12 @@ class basic_any {
         {
             const auto info = type_id<Type>();
             auto *value = static_cast<const basic_any *>(to)->data(&info);
-            return (value && compare<Type>(instance, value)) ? to : nullptr;
+
+            if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
+                return value && (*static_cast<const Type *>(instance) == *static_cast<const Type *>(value)) ? to : nullptr;
+            } else {
+                return (instance == value) ? to : nullptr;
+            }
         }
         case operation::GET:
             return (!to || (*static_cast<const type_info *>(to) == type_id<Type>())) ? instance : nullptr;
@@ -302,7 +298,11 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
-        return (!vtable && !other.vtable) || (vtable && other.vtable && vtable(operation::COMP, *this, &other));
+        if(vtable && other.vtable) {
+            return (vtable(operation::COMP, *this, &other) != nullptr);
+        }
+
+        return (!vtable && !other.vtable);
     }
 
     /**
