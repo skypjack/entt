@@ -401,8 +401,10 @@ public:
                 {},
                 nullptr,
                 nullptr,
+                1u,
                 ((std::is_same_v<Type, data_type> || std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE) | internal::meta_traits::IS_STATIC,
                 internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
+                &meta_arg<type_list<data_type>>,
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>
             };
@@ -436,19 +438,41 @@ public:
     auto data(const id_type id) ENTT_NOEXCEPT {
         using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
 
-        static internal::meta_data_node node{
-            {},
-            nullptr,
-            nullptr,
-            /* this is never static */
-            ((std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<data_type>)) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE),
-            internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
-            &meta_setter<Type, Setter>,
-            &meta_getter<Type, Getter, Policy>
-        };
+        if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
+            static internal::meta_data_node node{
+                {},
+                nullptr,
+                nullptr,
+                0u,
+                /* this is never static */
+                internal::meta_traits::IS_CONST,
+                internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
+                &meta_arg<type_list<>>,
+                &meta_setter<Type, Setter>,
+                &meta_getter<Type, Getter, Policy>
+            };
 
-        link_data_if_required(id, node);
-        return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
+            link_data_if_required(id, node);
+            return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
+        } else {
+            using descriptor = meta_function_helper_t<Type, decltype(Setter)>;
+
+            static internal::meta_data_node node{
+                {},
+                nullptr,
+                nullptr,
+                1u,
+                /* this is never static */
+                (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE,
+                internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
+                &meta_arg<type_list<type_list_element_t<descriptor::args_type::size != 1u, typename descriptor::args_type>>>,
+                &meta_setter<Type, Setter>,
+                &meta_getter<Type, Getter, Policy>
+            };
+
+            link_data_if_required(id, node);
+            return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
+        }
     }
 
     /**

@@ -728,6 +728,8 @@ private:
 struct meta_data {
     /*! @brief Node type. */
     using node_type = internal::meta_data_node;
+    /*! @brief Unsigned integer type. */
+    using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
     meta_data(const node_type *curr = nullptr) ENTT_NOEXCEPT
@@ -737,6 +739,14 @@ struct meta_data {
     /*! @copydoc meta_type::id */
     [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
+    }
+
+    /**
+     * @brief Returns the number of setters available.
+     * @return The number of arguments accepted by the member function.
+     */
+    [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
+        return node->arity;
     }
 
     /**
@@ -789,6 +799,13 @@ struct meta_data {
     [[nodiscard]] meta_any get(meta_handle instance) const {
         return node->get(std::move(instance));
     }
+
+    /**
+     * @brief Returns the type accepted by the i-th setter.
+     * @param index Index of the setter of which to return the accepted type.
+     * @return The type accepted by the i-th setter.
+     */
+    [[nodiscard]] inline meta_type arg(const size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns a range to visit registered meta properties.
@@ -1404,6 +1421,11 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 [[nodiscard]] inline meta_type meta_func::ret() const ENTT_NOEXCEPT {
     return node->ret;
+}
+
+
+[[nodiscard]] inline meta_type meta_data::arg(const size_type index) const ENTT_NOEXCEPT {
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 

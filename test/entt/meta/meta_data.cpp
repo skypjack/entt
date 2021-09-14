@@ -38,7 +38,7 @@ struct clazz_t {
 struct setter_getter_t {
     setter_getter_t(): value{0} {}
 
-    int setter(int val) {
+    int setter(double val) {
         return value = val;
     }
 
@@ -132,7 +132,9 @@ TEST_F(MetaData, Functionalities) {
     clazz_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.id(), "i"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
@@ -162,7 +164,9 @@ TEST_F(MetaData, Const) {
     clazz_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.id(), "j"_hs);
     ASSERT_TRUE(data.is_const());
     ASSERT_FALSE(data.is_static());
@@ -191,7 +195,9 @@ TEST_F(MetaData, Static) {
     auto data = entt::resolve<clazz_t>().data("h"_hs);
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.id(), "h"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
@@ -220,7 +226,9 @@ TEST_F(MetaData, ConstStatic) {
     auto data = entt::resolve<clazz_t>().data("k"_hs);
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.id(), "k"_hs);
     ASSERT_TRUE(data.is_const());
     ASSERT_TRUE(data.is_static());
@@ -341,7 +349,9 @@ TEST_F(MetaData, SetterGetterAsFreeFunctions) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.id(), "x"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
@@ -357,13 +367,17 @@ TEST_F(MetaData, SetterGetterAsMemberFunctions) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<double>());
     ASSERT_EQ(data.id(), "y"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
-    ASSERT_TRUE(data.set(instance, 42));
+    ASSERT_TRUE(data.set(instance, 42.));
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
+    ASSERT_TRUE(data.set(instance, 3));
+    ASSERT_EQ(data.get(instance).cast<int>(), 3);
 }
 
 TEST_F(MetaData, SetterGetterWithRefAsMemberFunctions) {
@@ -373,7 +387,9 @@ TEST_F(MetaData, SetterGetterWithRefAsMemberFunctions) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.id(), "w"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
@@ -389,7 +405,9 @@ TEST_F(MetaData, SetterGetterMixed) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.id(), "z"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
@@ -405,7 +423,9 @@ TEST_F(MetaData, SetterGetterReadOnly) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 0u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::meta_type{});
     ASSERT_EQ(data.id(), "z_ro"_hs);
     ASSERT_TRUE(data.is_const());
     ASSERT_FALSE(data.is_static());
@@ -421,7 +441,9 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 0u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::meta_type{});
     ASSERT_EQ(data.id(), "value"_hs);
     ASSERT_TRUE(data.is_const());
     ASSERT_FALSE(data.is_static());
@@ -463,7 +485,9 @@ TEST_F(MetaData, ArrayStatic) {
     auto data = entt::resolve<array_t>().data("global"_hs);
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int[3]>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int[3]>());
     ASSERT_EQ(data.id(), "global"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
@@ -478,7 +502,9 @@ TEST_F(MetaData, Array) {
     array_t instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int[5]>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int[5]>());
     ASSERT_EQ(data.id(), "local"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
@@ -492,6 +518,10 @@ TEST_F(MetaData, AsVoid) {
     auto data = entt::resolve<clazz_t>().data("void"_hs);
     clazz_t instance{};
 
+    ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_TRUE(data.set(instance, 42));
     ASSERT_EQ(instance.i, 42);
     ASSERT_EQ(data.get(instance), entt::meta_any{std::in_place_type<void>});
@@ -503,8 +533,11 @@ TEST_F(MetaData, AsRef) {
     clazz_t instance{};
     auto data = entt::resolve<clazz_t>().data("i"_hs);
 
-    ASSERT_EQ(instance.i, 0);
+    ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
+    ASSERT_EQ(instance.i, 0);
 
     data.get(instance).cast<int &>() = 3;
 
@@ -518,7 +551,9 @@ TEST_F(MetaData, AsConstRef) {
     auto data = entt::resolve<clazz_t>().data("ci"_hs);
 
     ASSERT_EQ(instance.i, 0);
+    ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_DEATH(data.get(instance).cast<int &>() = 3, "");
     ASSERT_EQ(data.get(instance).cast<const int &>(), 0);
     ASSERT_EQ(data.get(instance).cast<int>(), 0);

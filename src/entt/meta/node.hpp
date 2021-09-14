@@ -81,11 +81,14 @@ struct meta_ctor_node {
 
 
 struct meta_data_node {
+    using size_type = std::size_t;
     id_type id;
     meta_data_node * next;
     meta_prop_node * prop;
+    const size_type arity;
     const meta_traits traits;
     meta_type_node * const type;
+    meta_type(* const arg)(const size_type) ENTT_NOEXCEPT;
     bool(* const set)(meta_handle, meta_any);
     meta_any(* const get)(meta_handle);
 };
