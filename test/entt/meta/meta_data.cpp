@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include <string>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -65,6 +67,20 @@ struct setter_getter_t {
     int value;
 };
 
+struct multi_setter_t {
+    multi_setter_t(): value{0} {}
+
+    void from_double(double val) {
+        value = val;
+    }
+
+    void from_string(const char *val) {
+        value = std::atoi(val);
+    }
+
+    int value;
+};
+
 struct array_t {
     static inline int global[3];
     int local[5];
@@ -111,6 +127,10 @@ struct MetaData: ::testing::Test {
             .data<&setter_getter_t::setter_with_ref, &setter_getter_t::getter_with_ref>("w"_hs)
             .data<nullptr, &setter_getter_t::getter>("z_ro"_hs)
             .data<nullptr, &setter_getter_t::value>("value"_hs);
+
+        entt::meta<multi_setter_t>()
+            .type("multi_setter"_hs)
+            .data<entt::value_list<&multi_setter_t::from_double, &multi_setter_t::from_string>, &multi_setter_t::value>("value"_hs);
 
         entt::meta<array_t>()
             .type("array"_hs)
@@ -450,6 +470,31 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
     ASSERT_FALSE(data.set(instance, 42));
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
+}
+
+TEST_F(MetaData, MultiSetter) {
+    using namespace entt::literals;
+
+    auto data = entt::resolve<multi_setter_t>().data("value"_hs);
+    multi_setter_t instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 2u);
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<double>());
+    ASSERT_EQ(data.arg(1u), entt::resolve<const char *>());
+    ASSERT_EQ(data.arg(2u), entt::meta_type{});
+    ASSERT_EQ(data.id(), "value"_hs);
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_TRUE(data.set(instance, 42));
+    ASSERT_EQ(data.get(instance).cast<int>(), 42);
+    ASSERT_TRUE(data.set(instance, 3.));
+    ASSERT_EQ(data.get(instance).cast<int>(), 3);
+    ASSERT_FALSE(data.set(instance, std::string{"99"}));
+    ASSERT_TRUE(data.set(instance, std::string{"99"}.c_str()));
+    ASSERT_EQ(data.get(instance).cast<int>(), 99);
 }
 
 TEST_F(MetaData, ConstInstance) {

@@ -182,6 +182,28 @@ class meta_factory<Type> {
         }
     }
 
+    template<typename Setter, auto Getter, typename Policy, auto... Index>
+    auto data(const id_type id, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
+        using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
+
+        static internal::meta_data_node node{
+            {},
+            nullptr,
+            nullptr,
+            Setter::size,
+            /* this is never static */
+            (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE,
+            internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
+            &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
+            [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value) || ...); },
+            &meta_getter<Type, Getter, Policy>
+        };
+
+        link_data_if_required(id, node);
+        return meta_factory<Type, Setter, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
+    }
+
 public:
     /*! @brief Default constructor. */
     meta_factory()
@@ -455,7 +477,7 @@ public:
             link_data_if_required(id, node);
             return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
         } else {
-            using descriptor = meta_function_helper_t<Type, decltype(Setter)>;
+            using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
             static internal::meta_data_node node{
                 {},
@@ -465,7 +487,7 @@ public:
                 /* this is never static */
                 (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE,
                 internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
-                &meta_arg<type_list<type_list_element_t<descriptor::args_type::size != 1u, typename descriptor::args_type>>>,
+                &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>
             };
@@ -473,6 +495,28 @@ public:
             link_data_if_required(id, node);
             return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
         }
+    }
+
+    /**
+     * @brief Assigns a meta data to a meta type by means of its setters and
+     * getter.
+     *
+     * Multi-setter support for meta data members. All setters are tried in the
+     * order of definition before returning to the caller.<br/>
+     * Setters can be either free functions, member functions or a mix of them
+     * and are provided via a `value_list` type.
+     *
+     * @sa data
+     *
+     * @tparam Setter The actual functions to use as setters.
+     * @tparam Getter The actual getter function.
+     * @tparam Policy Optional policy (no policy set by default).
+     * @param id Unique identifier.
+     * @return An extended meta factory for the parent type.
+     */
+    template<typename Setter, auto Getter, typename Policy = as_is_t>
+    auto data(const id_type id) ENTT_NOEXCEPT {
+        return data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
     }
 
     /**

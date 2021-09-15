@@ -147,6 +147,12 @@ decorated version of it. This object can be used to add the following:
   entt::meta<my_type>().data<nullptr, &my_type::data_member>("member"_hs);
   ```
 
+  Multiple setters are also supported by means of a `value_list` object:
+
+  ```cpp
+  entt::meta<my_type>().data<entt::value_list<&from_int, &from_string>, &my_type::data_member>("member"_hs);
+  ```
+
   Refer to the inline documentation for all the details.
 
 * _Member functions_. Both real member functions of the underlying type and free
