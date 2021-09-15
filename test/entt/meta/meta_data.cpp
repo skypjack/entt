@@ -41,7 +41,7 @@ struct setter_getter_t {
     setter_getter_t(): value{0} {}
 
     int setter(double val) {
-        return value = val;
+        return value = static_cast<int>(val);
     }
 
     int getter() {

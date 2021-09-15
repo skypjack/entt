@@ -40,9 +40,9 @@ class meta_factory;
  */
 template<typename Type, typename... Spec>
 class meta_factory<Type, Spec...>: public meta_factory<Type> {
-    void link_prop_if_required(internal::meta_prop_node &node, const meta_any &instance) {
+    void link_prop_if_required(internal::meta_prop_node &node) {
         if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*ref}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&instance](const auto *curr) { return curr->id == instance; }) == range.cend(), "Duplicate identifier");
+            ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&node](const auto *curr) { return curr->id == node.id; }) == range.cend(), "Duplicate identifier");
             node.next = *ref;
             *ref = &node;
         }
@@ -81,7 +81,8 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
 
         property[0u] = std::move(key);
         property[1u] = std::move(value);
-        link_prop_if_required(node, property[0u]);
+
+        link_prop_if_required(node);
     }
 
 public:
@@ -182,7 +183,7 @@ class meta_factory<Type> {
         }
     }
 
-    template<typename Setter, auto Getter, typename Policy, auto... Index>
+    template<typename Setter, auto Getter, typename Policy, std::size_t... Index>
     auto data(const id_type id, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
         using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
