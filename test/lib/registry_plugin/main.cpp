@@ -1,7 +1,7 @@
 #define CR_HOST
 
-#include <cr.h>
 #include <gtest/gtest.h>
+#include <cr.h>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/registry.hpp>
 #include "type_context.h"

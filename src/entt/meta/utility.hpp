@@ -1,7 +1,6 @@
 #ifndef ENTT_META_UTILITY_HPP
 #define ENTT_META_UTILITY_HPP
 
-
 #include <cstddef>
 #include <functional>
 #include <type_traits>
@@ -12,14 +11,11 @@
 #include "node.hpp"
 #include "policy.hpp"
 
-
 namespace entt {
-
 
 /*! @brief Primary template isn't defined on purpose. */
 template<typename, typename>
 struct meta_function_descriptor;
-
 
 /**
  * @brief Meta function descriptor.
@@ -29,7 +25,7 @@ struct meta_function_descriptor;
  * @tparam Args Function arguments.
  */
 template<typename Type, typename Ret, typename Class, typename... Args>
-struct meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> {
+struct meta_function_descriptor<Type, Ret (Class::*)(Args...) const> {
     /*! @brief Meta function return type. */
     using return_type = Ret;
     /*! @brief Meta function arguments. */
@@ -41,7 +37,6 @@ struct meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> {
     static constexpr auto is_static = !std::is_same_v<Type, Class>;
 };
 
-
 /**
  * @brief Meta function descriptor.
  * @tparam Type Reflected type to which the meta function is associated.
@@ -50,7 +45,7 @@ struct meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> {
  * @tparam Args Function arguments.
  */
 template<typename Type, typename Ret, typename Class, typename... Args>
-struct meta_function_descriptor<Type, Ret(Class:: *)(Args...)> {
+struct meta_function_descriptor<Type, Ret (Class::*)(Args...)> {
     /*! @brief Meta function return type. */
     using return_type = Ret;
     /*! @brief Meta function arguments. */
@@ -62,7 +57,6 @@ struct meta_function_descriptor<Type, Ret(Class:: *)(Args...)> {
     static constexpr auto is_static = !std::is_same_v<Type, Class>;
 };
 
-
 /**
  * @brief Meta function descriptor.
  * @tparam Type Reflected type to which the meta data is associated.
@@ -70,7 +64,7 @@ struct meta_function_descriptor<Type, Ret(Class:: *)(Args...)> {
  * @tparam Ret Data member type.
  */
 template<typename Type, typename Ret, typename Class>
-struct meta_function_descriptor<Type, Ret Class:: *> {
+struct meta_function_descriptor<Type, Ret Class::*> {
     /*! @brief Meta data return type. */
     using return_type = Ret;
     /*! @brief Meta data arguments. */
@@ -82,7 +76,6 @@ struct meta_function_descriptor<Type, Ret Class:: *> {
     static constexpr auto is_static = false;
 };
 
-
 /**
  * @brief Meta function descriptor.
  * @tparam Type Reflected type to which the meta function is associated.
@@ -90,7 +83,7 @@ struct meta_function_descriptor<Type, Ret Class:: *> {
  * @tparam Args Function arguments.
  */
 template<typename Type, typename Ret, typename... Args>
-struct meta_function_descriptor<Type, Ret(*)(Args...)> {
+struct meta_function_descriptor<Type, Ret (*)(Args...)> {
     /*! @brief Meta function return type. */
     using return_type = Ret;
     /*! @brief Meta function arguments. */
@@ -101,7 +94,6 @@ struct meta_function_descriptor<Type, Ret(*)(Args...)> {
     /*! @brief True if the meta function is static, false otherwise. */
     static constexpr auto is_static = true;
 };
-
 
 /**
  * @brief Meta function helper.
@@ -115,16 +107,16 @@ struct meta_function_descriptor<Type, Ret(*)(Args...)> {
 template<typename Type, typename Candidate>
 class meta_function_helper {
     template<typename Ret, typename... Args, typename Class>
-    static constexpr meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> get_rid_of_noexcept(Ret(Class:: *)(Args...) const);
+    static constexpr meta_function_descriptor<Type, Ret (Class::*)(Args...) const> get_rid_of_noexcept(Ret (Class::*)(Args...) const);
 
     template<typename Ret, typename... Args, typename Class>
-    static constexpr meta_function_descriptor<Type, Ret(Class:: *)(Args...)> get_rid_of_noexcept(Ret(Class:: *)(Args...));
+    static constexpr meta_function_descriptor<Type, Ret (Class::*)(Args...)> get_rid_of_noexcept(Ret (Class::*)(Args...));
 
     template<typename Ret, typename Class>
-    static constexpr meta_function_descriptor<Type, Ret Class:: *> get_rid_of_noexcept(Ret Class:: *);
+    static constexpr meta_function_descriptor<Type, Ret Class::*> get_rid_of_noexcept(Ret Class::*);
 
     template<typename Ret, typename... Args>
-    static constexpr meta_function_descriptor<Type, Ret(*)(Args...)> get_rid_of_noexcept(Ret(*)(Args...));
+    static constexpr meta_function_descriptor<Type, Ret (*)(Args...)> get_rid_of_noexcept(Ret (*)(Args...));
 
     template<typename Class>
     static constexpr meta_function_descriptor<Class, decltype(&Class::operator())> get_rid_of_noexcept(Class);
@@ -134,7 +126,6 @@ public:
     using type = decltype(get_rid_of_noexcept(std::declval<Candidate>()));
 };
 
-
 /**
  * @brief Helper type.
  * @tparam Type Reflected type to which the meta function is associated.
@@ -142,7 +133,6 @@ public:
  */
 template<typename Type, typename Candidate>
 using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::type;
-
 
 /**
  * @brief Wraps a value depending on the given policy.
@@ -166,7 +156,6 @@ meta_any meta_dispatch([[maybe_unused]] Type &&value) {
     }
 }
 
-
 /**
  * @brief Returns the meta type of the i-th element of a list of arguments.
  * @tparam Type Type list of the actual types of arguments.
@@ -176,7 +165,6 @@ template<typename Type>
 [[nodiscard]] static meta_type meta_arg(const std::size_t index) ENTT_NOEXCEPT {
     return internal::meta_arg_node(Type{}, index);
 }
-
 
 /**
  * @brief Sets the value of a given variable.
@@ -192,14 +180,14 @@ template<typename Type, auto Data>
         if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
             using data_type = type_list_element_t<1u, typename meta_function_helper_t<Type, decltype(Data)>::args_type>;
 
-            if(auto * const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
+            if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
                 Data(*clazz, value.cast<data_type>());
                 return true;
             }
         } else if constexpr(std::is_member_function_pointer_v<decltype(Data)>) {
             using data_type = type_list_element_t<0u, typename meta_function_helper_t<Type, decltype(Data)>::args_type>;
 
-            if(auto * const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
+            if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
                 (clazz->*Data)(value.cast<data_type>());
                 return true;
             }
@@ -207,7 +195,7 @@ template<typename Type, auto Data>
             using data_type = std::remove_reference_t<decltype(std::declval<Type>().*Data)>;
 
             if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
-                if(auto * const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
+                if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
                     clazz->*Data = value.cast<data_type>();
                     return true;
                 }
@@ -227,7 +215,6 @@ template<typename Type, auto Data>
     return false;
 }
 
-
 /**
  * @brief Gets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
@@ -239,16 +226,16 @@ template<typename Type, auto Data>
 template<typename Type, auto Data, typename Policy = as_is_t>
 [[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance) {
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
-        auto * const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type &>, const Type, Type>>();
+        auto *const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type &>, const Type, Type>>();
         return clazz ? meta_dispatch<Policy>(Data(*clazz)) : meta_any{};
     } else if constexpr(std::is_member_function_pointer_v<decltype(Data)>) {
-        auto * const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type &>, const Type, Type>>();
+        auto *const clazz = instance->try_cast<std::conditional_t<std::is_invocable_v<decltype(Data), const Type &>, const Type, Type>>();
         return clazz ? meta_dispatch<Policy>((clazz->*Data)()) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         if constexpr(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
-            if(auto * clazz = instance->try_cast<Type>(); clazz) {
+            if(auto *clazz = instance->try_cast<Type>(); clazz) {
                 return meta_dispatch<Policy>(clazz->*Data);
-            } else if(auto * fallback = instance->try_cast<const Type>(); fallback) {
+            } else if(auto *fallback = instance->try_cast<const Type>(); fallback) {
                 return meta_dispatch<Policy>(fallback->*Data);
             }
         }
@@ -265,21 +252,18 @@ template<typename Type, auto Data, typename Policy = as_is_t>
     }
 }
 
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
-
 namespace internal {
-
 
 template<typename Type, typename Policy = as_is_t, typename Candidate, std::size_t... Index>
 [[nodiscard]] meta_any meta_invoke([[maybe_unused]] meta_handle instance, Candidate &&candidate, meta_any *args, std::index_sequence<Index...>) {
     using descriptor = meta_function_helper_t<Type, Candidate>;
 
-    const auto invoke = [&candidate](auto &&maybe_clazz, auto &&... other) {
+    const auto invoke = [&candidate](auto &&maybe_clazz, auto &&...other) {
         if constexpr(std::is_member_function_pointer_v<std::remove_reference_t<Candidate>>) {
             if constexpr(std::is_void_v<typename descriptor::return_type>) {
                 (std::forward<decltype(maybe_clazz)>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<decltype(other)>(other)...);
@@ -298,41 +282,37 @@ template<typename Type, typename Policy = as_is_t, typename Candidate, std::size
     };
 
     if constexpr(std::is_invocable_v<std::remove_reference_t<Candidate>, const Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
-        if(const auto * const clazz = instance->try_cast<const Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return invoke(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        if(const auto *const clazz = instance->try_cast<const Type>(); clazz && ((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return invoke(*clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else if constexpr(std::is_invocable_v<std::remove_reference_t<Candidate>, Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
-        if(auto * const clazz = instance->try_cast<Type>(); clazz && ((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return invoke(*clazz, (args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        if(auto *const clazz = instance->try_cast<Type>(); clazz && ((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return invoke(*clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else {
-        if(((args+Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return invoke((args+Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+        if(((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
+            return invoke((args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     }
 
     return meta_any{};
 }
 
-
 template<typename Type, typename... Args, std::size_t... Index>
-[[nodiscard]] meta_any meta_construct(meta_any * const args, std::index_sequence<Index...>) {
-    if(((args+Index)->allow_cast<Args>() && ...)) {
-        return Type{(args+Index)->cast<Args>()...};
+[[nodiscard]] meta_any meta_construct(meta_any *const args, std::index_sequence<Index...>) {
+    if(((args + Index)->allow_cast<Args>() && ...)) {
+        return Type{(args + Index)->cast<Args>()...};
     }
 
     return meta_any{};
 }
 
-
-}
-
+} // namespace internal
 
 /**
  * Internal details not to be documented.
  * @endcond
  */
-
 
 /**
  * @brief Invokes a callable object given a list of erased parameters, if
@@ -346,7 +326,7 @@ template<typename Type, typename... Args, std::size_t... Index>
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, typename Policy = as_is_t, typename Candidate>
-[[nodiscard]] meta_any meta_invoke([[maybe_unused]] meta_handle instance, Candidate &&candidate, [[maybe_unused]] meta_any * const args) {
+[[nodiscard]] meta_any meta_invoke([[maybe_unused]] meta_handle instance, Candidate &&candidate, [[maybe_unused]] meta_any *const args) {
     if constexpr(std::is_invocable_v<std::remove_reference_t<Candidate>>) {
         if constexpr(std::is_void_v<decltype(std::forward<Candidate>(candidate)())>) {
             std::forward<Candidate>(candidate)();
@@ -359,7 +339,6 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
     }
 }
 
-
 /**
  * @brief Invokes a function given a list of erased parameters, if possible.
  * @tparam Type Reflected type to which the function is associated.
@@ -370,10 +349,9 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_invoke(meta_handle instance, meta_any * const args) {
+[[nodiscard]] meta_any meta_invoke(meta_handle instance, meta_any *const args) {
     return meta_invoke<Type, Policy>(std::move(instance), Candidate, args);
 }
-
 
 /**
  * @brief Constructs an instance given a list of erased parameters, if possible.
@@ -383,10 +361,9 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
  * @return A meta any containing the new instance, if any.
  */
 template<typename Type, typename... Args>
-[[nodiscard]] meta_any meta_construct(meta_any * const args) {
+[[nodiscard]] meta_any meta_construct(meta_any *const args) {
     return internal::meta_construct<Type, Args...>(args, std::index_sequence_for<Args...>{});
 }
-
 
 /**
  * @brief Constructs an instance given a list of erased parameters, if possible.
@@ -398,10 +375,9 @@ template<typename Type, typename... Args>
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, typename Policy = as_is_t, typename Candidate>
-[[nodiscard]] meta_any meta_construct(Candidate &&candidate, meta_any * const args) {
+[[nodiscard]] meta_any meta_construct(Candidate &&candidate, meta_any *const args) {
     return meta_invoke<Type, Policy>({}, std::forward<Candidate>(candidate), args);
 }
-
 
 /**
  * @brief Constructs an instance given a list of erased parameters, if possible.
@@ -412,12 +388,10 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_construct(meta_any * const args) {
+[[nodiscard]] meta_any meta_construct(meta_any *const args) {
     return meta_invoke<Type, Policy>({}, Candidate, args);
 }
 
-
-}
-
+} // namespace entt
 
 #endif

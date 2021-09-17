@@ -22,13 +22,15 @@ Type get(Type &prop) {
 }
 
 struct base_t {
-    base_t(): value{'c'} {};
+    base_t()
+        : value{'c'} {};
 
     char value;
 };
 
 struct derived_t: base_t {
-    derived_t(): base_t{} {}
+    derived_t()
+        : base_t{} {}
 };
 
 struct abstract_t {
@@ -50,13 +52,14 @@ struct clazz_t {
     clazz_t() = default;
 
     clazz_t(const base_t &, int v)
-        : value{v}
-    {}
+        : value{v} {}
 
     void member() {}
     static void func() {}
 
-    operator int() const { return value; }
+    operator int() const {
+        return value;
+    }
 
     int value;
 };
@@ -130,28 +133,28 @@ struct MetaType: ::testing::Test {
 
         entt::meta<overloaded_func_t>()
             .type("overloaded_func"_hs)
-            .func<&overloaded_func_t::e> ("e"_hs)
+            .func<&overloaded_func_t::e>("e"_hs)
             .func<entt::overload<int(const base_t &, int, int)>(&overloaded_func_t::f)>("f"_hs)
             .func<entt::overload<int(int, int)>(&overloaded_func_t::f)>("f"_hs)
             .func<entt::overload<int(int) const>(&overloaded_func_t::f)>("f"_hs)
-            .func<entt::overload<float(int, float)> (&overloaded_func_t::f)> ("f"_hs)
-            .func<&overloaded_func_t::g> ("g"_hs);
+            .func<entt::overload<float(int, float)>(&overloaded_func_t::f)>("f"_hs)
+            .func<&overloaded_func_t::g>("g"_hs);
 
         entt::meta<property_t>()
             .type("property"_hs)
             .data<property_t::random>("random"_hs)
-                .props(std::make_pair(property_t::random, 0), std::make_pair(property_t::value, 3))
+            .props(std::make_pair(property_t::random, 0), std::make_pair(property_t::value, 3))
             .data<property_t::value>("value"_hs)
-                .props(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only, property_t::list)
+            .props(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only, property_t::list)
             .data<property_t::key_only>("key_only"_hs)
-                .prop(property_t::key_only)
+            .prop(property_t::key_only)
             .data<property_t::list>("list"_hs)
-                .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
+            .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
             .data<set<property_t>, get<property_t>>("var"_hs);
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
-                .prop(property_t::value, 42)
+            .prop(property_t::value, 42)
             .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
@@ -606,7 +609,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::meta<property_t>()
         .type("property"_hs)
         .data<property_t::random>("rand"_hs)
-            .props(std::make_pair(property_t::value, 42), std::make_pair(property_t::random, 3));
+        .props(std::make_pair(property_t::value, 42), std::make_pair(property_t::random, 3));
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::value));
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::random));

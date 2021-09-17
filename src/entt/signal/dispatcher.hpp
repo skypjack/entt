@@ -1,7 +1,6 @@
 #ifndef ENTT_SIGNAL_DISPATCHER_HPP
 #define ENTT_SIGNAL_DISPATCHER_HPP
 
-
 #include <cstddef>
 #include <memory>
 #include <type_traits>
@@ -12,9 +11,7 @@
 #include "../core/type_info.hpp"
 #include "sigh.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Basic dispatcher implementation.
@@ -50,7 +47,7 @@ class dispatcher {
                 signal.publish(events[pos]);
             }
 
-            events.erase(events.cbegin(), events.cbegin()+length);
+            events.erase(events.cbegin(), events.cbegin() + length);
         }
 
         void disconnect(void *instance) override {
@@ -66,13 +63,13 @@ class dispatcher {
         }
 
         template<typename... Args>
-        void trigger(Args &&... args) {
+        void trigger(Args &&...args) {
             Event instance{std::forward<Args>(args)...};
             signal.publish(instance);
         }
 
         template<typename... Args>
-        void enqueue(Args &&... args) {
+        void enqueue(Args &&...args) {
             if constexpr(std::is_aggregate_v<Event>) {
                 events.push_back(Event{std::forward<Args>(args)...});
             } else {
@@ -86,11 +83,11 @@ class dispatcher {
     };
 
     template<typename Event>
-    [[nodiscard]] pool_handler<Event> & assure() {
+    [[nodiscard]] pool_handler<Event> &assure() {
         const auto index = type_index<Event>::value();
 
         if(!(index < pools.size())) {
-            pools.resize(std::size_t(index)+1u);
+            pools.resize(std::size_t(index) + 1u);
         }
 
         if(!pools[index]) {
@@ -108,7 +105,7 @@ public:
     dispatcher(dispatcher &&) = default;
 
     /*! @brief Default move assignment operator. @return This dispatcher. */
-    dispatcher & operator=(dispatcher &&) = default;
+    dispatcher &operator=(dispatcher &&) = default;
 
     /**
      * @brief Returns a sink object for the given event.
@@ -143,7 +140,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
-    void trigger(Args &&... args) {
+    void trigger(Args &&...args) {
         assure<Event>().trigger(std::forward<Args>(args)...);
     }
 
@@ -172,7 +169,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
-    void enqueue(Args &&... args) {
+    void enqueue(Args &&...args) {
         assure<Event>().enqueue(std::forward<Args>(args)...);
     }
 
@@ -260,7 +257,7 @@ public:
      */
     void update() const {
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &&cpool = pools[pos-1]; cpool) {
+            if(auto &&cpool = pools[pos - 1]; cpool) {
                 cpool->publish();
             }
         }
@@ -270,8 +267,6 @@ private:
     std::vector<std::unique_ptr<basic_pool>> pools;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

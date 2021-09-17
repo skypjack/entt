@@ -7,16 +7,22 @@ struct an_event {};
 struct another_event {};
 
 // makes the type non-aggregate
-struct one_more_event { one_more_event(int) {} };
+struct one_more_event {
+    one_more_event(int) {}
+};
 
 struct receiver {
     static void forward(entt::dispatcher &dispatcher, an_event &event) {
         dispatcher.enqueue(event);
     }
 
-    void receive(const an_event &) { ++cnt; }
+    void receive(const an_event &) {
+        ++cnt;
+    }
 
-    void reset() { cnt = 0; }
+    void reset() {
+        cnt = 0;
+    }
 
     int cnt{0};
 };

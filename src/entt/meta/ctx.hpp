@@ -1,51 +1,42 @@
 #ifndef ENTT_META_CTX_HPP
 #define ENTT_META_CTX_HPP
 
-
-#include "../core/attribute.h"
 #include "../config/config.h"
-
+#include "../core/attribute.h"
 
 namespace entt {
-
 
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
-
 namespace internal {
 
-
 struct meta_type_node;
-
 
 struct ENTT_API meta_context {
     // we could use the lines below but VS2017 returns with an ICE if combined with ENTT_API despite the code being valid C++
     //     inline static meta_type_node *local = nullptr;
     //     inline static meta_type_node **global = &local;
 
-    [[nodiscard]] static meta_type_node * & local() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_type_node *&local() ENTT_NOEXCEPT {
         static meta_type_node *chain = nullptr;
         return chain;
     }
 
-    [[nodiscard]] static meta_type_node ** & global() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_type_node **&global() ENTT_NOEXCEPT {
         static meta_type_node **chain = &local();
         return chain;
     }
 };
 
-
-}
-
+} // namespace internal
 
 /**
  * Internal details not to be documented.
  * @endcond
  */
-
 
 /*! @brief Opaque container for a meta context. */
 struct meta_ctx {
@@ -61,8 +52,6 @@ private:
     internal::meta_type_node **ctx{&internal::meta_context::local()};
 };
 
-
-}
-
+} // namespace entt
 
 #endif

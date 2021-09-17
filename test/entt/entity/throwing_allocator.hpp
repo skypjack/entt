@@ -1,14 +1,11 @@
 #ifndef ENTT_ENTITY_THROWING_ALLOCATOR_HPP
 #define ENTT_ENTITY_THROWING_ALLOCATOR_HPP
 
-
 #include <cstddef>
 #include <memory>
 #include <type_traits>
 
-
 namespace test {
-
 
 template<typename Type>
 class throwing_allocator: std::allocator<Type> {
@@ -28,7 +25,8 @@ public:
     using propagate_on_container_swap = std::true_type;
     using exception_type = test_exception;
 
-    template<class Other> struct rebind {
+    template<class Other>
+    struct rebind {
         using other = throwing_allocator<Other>;
     };
 
@@ -36,8 +34,7 @@ public:
 
     template<class Other>
     throwing_allocator(const throwing_allocator<Other> &other)
-        : base{other}
-    {}
+        : base{other} {}
 
     pointer allocate(std::size_t length) {
         if(trigger_on_allocate) {
@@ -67,8 +64,6 @@ public:
     static inline bool trigger_after_allocate{};
 };
 
-
-}
-
+} // namespace test
 
 #endif

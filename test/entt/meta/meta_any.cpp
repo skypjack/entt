@@ -7,13 +7,20 @@
 #include <entt/meta/resolve.hpp>
 
 struct clazz_t {
-    clazz_t(): value{0} {}
+    clazz_t()
+        : value{0} {}
 
-    void member(int i) { value = i; }
+    void member(int i) {
+        value = i;
+    }
 
-    static void func() { c = 'd'; }
+    static void func() {
+        c = 'd';
+    }
 
-    operator int() const { return value; }
+    operator int() const {
+        return value;
+    }
 
     static inline char c = 'c';
     int value;
@@ -34,12 +41,10 @@ struct empty_t {
 
 struct fat_t: empty_t {
     fat_t()
-        : value{.0, .0, .0, .0}
-    {}
+        : value{.0, .0, .0, .0} {}
 
     fat_t(double v1, double v2, double v3, double v4)
-        : value{v1, v2, v3, v4}
-    {}
+        : value{v1, v2, v3, v4} {}
 
     bool operator==(const fat_t &other) const {
         return std::equal(std::begin(value), std::end(value), std::begin(other.value), std::end(other.value));
@@ -48,7 +53,7 @@ struct fat_t: empty_t {
     double value[4];
 };
 
-enum class enum_class: unsigned short int {
+enum class enum_class : unsigned short int {
     foo = 0u,
     bar = 42u
 };
@@ -61,8 +66,8 @@ struct unmanageable_t {
     unmanageable_t() = default;
     unmanageable_t(const unmanageable_t &) = delete;
     unmanageable_t(unmanageable_t &&) = delete;
-    unmanageable_t & operator=(const unmanageable_t &) = delete;
-    unmanageable_t & operator=(unmanageable_t &&) = delete;
+    unmanageable_t &operator=(const unmanageable_t &) = delete;
+    unmanageable_t &operator=(unmanageable_t &&) = delete;
 };
 
 struct MetaAny: ::testing::Test {
@@ -525,7 +530,7 @@ TEST_F(MetaAny, SBODestruction) {
     }
 
     ASSERT_EQ(empty_t::destroy_counter, 3);
-    ASSERT_EQ(empty_t::destructor_counter,6);
+    ASSERT_EQ(empty_t::destructor_counter, 6);
 }
 
 TEST_F(MetaAny, NoSBODestruction) {

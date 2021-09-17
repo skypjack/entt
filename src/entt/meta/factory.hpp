@@ -1,7 +1,6 @@
 #ifndef ENTT_META_FACTORY_HPP
 #define ENTT_META_FACTORY_HPP
 
-
 #include <algorithm>
 #include <cstddef>
 #include <tuple>
@@ -17,9 +16,7 @@
 #include "range.hpp"
 #include "utility.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Meta factory to be used for reflection purposes.
@@ -31,7 +28,6 @@ namespace entt {
  */
 template<typename...>
 class meta_factory;
-
 
 /**
  * @brief Extended meta factory to be used for reflection purposes.
@@ -49,21 +45,21 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
     }
 
     template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<2>, std::tuple<Property...> property, Other &&... other) {
-        std::apply([this](auto &&... curr) { (unroll<Step>(choice<2>, std::forward<Property>(curr)), ...); }, property);
+    void unroll(choice_t<2>, std::tuple<Property...> property, Other &&...other) {
+        std::apply([this](auto &&...curr) { (unroll<Step>(choice<2>, std::forward<Property>(curr)), ...); }, property);
         unroll<Step + sizeof...(Property)>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<1>, std::pair<Property...> property, Other &&... other) {
+    void unroll(choice_t<1>, std::pair<Property...> property, Other &&...other) {
         assign<Step>(std::move(property.first), std::move(property.second));
-        unroll<Step+1>(choice<2>, std::forward<Other>(other)...);
+        unroll<Step + 1>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t Step = 0, typename Property, typename... Other>
-    void unroll(choice_t<0>, Property &&property, Other &&... other) {
+    void unroll(choice_t<0>, Property &&property, Other &&...other) {
         assign<Step>(std::forward<Property>(property));
-        unroll<Step+1>(choice<2>, std::forward<Other>(other)...);
+        unroll<Step + 1>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t>
@@ -92,8 +88,7 @@ public:
      * @param target The underlying node to which to assign the properties.
      */
     meta_factory(internal::meta_prop_node **target) ENTT_NOEXCEPT
-        : ref{target}
-    {}
+        : ref{target} {}
 
     /**
      * @brief Assigns a property to the last meta object created.
@@ -107,7 +102,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename PropertyOrKey, typename... Value>
-    meta_factory<Type> prop(PropertyOrKey &&property_or_key, Value &&... value) && {
+    meta_factory<Type> prop(PropertyOrKey &&property_or_key, Value &&...value) && {
         if constexpr(sizeof...(Value) == 0) {
             unroll(choice<3>, std::forward<PropertyOrKey>(property_or_key));
         } else {
@@ -126,7 +121,7 @@ public:
      * @param property Properties to assign to the last meta object created.
      * @return A meta factory for the parent type.
      */
-    template <typename... Property>
+    template<typename... Property>
     meta_factory<Type> props(Property... property) && {
         unroll(choice<3>, std::forward<Property>(property)...);
         return {};
@@ -135,7 +130,6 @@ public:
 private:
     internal::meta_prop_node **ref;
 };
-
 
 /**
  * @brief Basic meta factory to be used for reflection purposes.
@@ -210,8 +204,7 @@ class meta_factory<Type> {
 public:
     /*! @brief Default constructor. */
     meta_factory()
-        : owner{internal::meta_node<Type>::resolve()}
-    {}
+        : owner{internal::meta_node<Type>::resolve()} {}
 
     /**
      * @brief Makes a meta type _searchable_.
@@ -363,7 +356,7 @@ public:
      */
     template<typename... Args>
     auto ctor() ENTT_NOEXCEPT {
-        using descriptor = meta_function_helper_t<Type, Type(*)(Args...)>;
+        using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
 
         static internal::meta_ctor_node node{
             nullptr,
@@ -560,7 +553,6 @@ private:
     internal::meta_type_node *owner;
 };
 
-
 /**
  * @brief Utility function to use for reflection.
  *
@@ -574,11 +566,10 @@ private:
  */
 template<typename Type>
 [[nodiscard]] auto meta() ENTT_NOEXCEPT {
-    auto * const node = internal::meta_node<Type>::resolve();
+    auto *const node = internal::meta_node<Type>::resolve();
     // extended meta factory to allow assigning properties to opaque meta types
     return meta_factory<Type, Type>{&node->prop};
 }
-
 
 /**
  * @brief Resets a type and all its parts.
@@ -596,12 +587,12 @@ inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
         for(; *curr; *curr = std::exchange((*curr)->next, nullptr)) {
             if constexpr(sizeof...(member) != 0u) {
                 static_assert(sizeof...(member) == 1u, "Assert in defense of the future me");
-                for(auto **sub = (&((*curr)->*member), ...); *sub; *sub = std::exchange((*sub)->next, nullptr));
+                for(auto **sub = (&((*curr)->*member), ...); *sub; *sub = std::exchange((*sub)->next, nullptr)) { continue; }
             }
         }
     };
 
-    for(auto** it = internal::meta_context::global(); *it; it = &(*it)->next) {
+    for(auto **it = internal::meta_context::global(); *it; it = &(*it)->next) {
         if(auto *node = *it; node->id == id) {
             clear_chain(&node->prop);
             clear_chain(&node->base);
@@ -631,7 +622,6 @@ void meta_reset() ENTT_NOEXCEPT {
     meta_reset(internal::meta_node<Type>::resolve()->id);
 }
 
-
 /**
  * @brief Resets all searchable types.
  *
@@ -643,8 +633,6 @@ inline void meta_reset() ENTT_NOEXCEPT {
     }
 }
 
-
-}
-
+} // namespace entt
 
 #endif

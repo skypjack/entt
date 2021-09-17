@@ -9,7 +9,7 @@ struct test_allocator: std::allocator<int> {
 
     using std::allocator<int>::allocator;
 
-    test_allocator & operator=(const test_allocator &other) {
+    test_allocator &operator=(const test_allocator &other) {
         // necessary to avoid call suppression
         base::operator=(other);
         return *this;

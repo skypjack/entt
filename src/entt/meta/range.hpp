@@ -1,13 +1,10 @@
 #ifndef ENTT_META_RANGE_HPP
 #define ENTT_META_RANGE_HPP
 
-
 #include <cstddef>
 #include <iterator>
 
-
 namespace entt {
-
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
@@ -27,10 +24,9 @@ class meta_range {
         range_iterator() ENTT_NOEXCEPT = default;
 
         range_iterator(node_type *head) ENTT_NOEXCEPT
-            : it{head}
-        {}
+            : it{head} {}
 
-        range_iterator & operator++() ENTT_NOEXCEPT {
+        range_iterator &operator++() ENTT_NOEXCEPT {
             return (it = it->next), *this;
         }
 
@@ -71,8 +67,7 @@ public:
      * @param head The underlying node with which to construct the range.
      */
     meta_range(node_type *head)
-        : node{head}
-    {}
+        : node{head} {}
 
     /**
      * @brief Returns an iterator to the beginning.
@@ -105,8 +100,6 @@ private:
     node_type *node{nullptr};
 };
 
-
-}
-
+} // namespace entt
 
 #endif

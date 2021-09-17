@@ -1,12 +1,9 @@
 #ifndef ENTT_ENTITY_UTILITY_HPP
 #define ENTT_ENTITY_UTILITY_HPP
 
-
 #include "../core/type_traits.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Alias for exclusion lists.
@@ -15,7 +12,6 @@ namespace entt {
 template<typename... Type>
 struct exclude_t: type_list<Type...> {};
 
-
 /**
  * @brief Variable template for exclusion lists.
  * @tparam Type List of types.
@@ -23,14 +19,12 @@ struct exclude_t: type_list<Type...> {};
 template<typename... Type>
 inline constexpr exclude_t<Type...> exclude{};
 
-
 /**
  * @brief Alias for lists of observed components.
  * @tparam Type List of types.
  */
 template<typename... Type>
-struct get_t: type_list<Type...>{};
-
+struct get_t: type_list<Type...> {};
 
 /**
  * @brief Variable template for lists of observed components.
@@ -39,14 +33,12 @@ struct get_t: type_list<Type...>{};
 template<typename... Type>
 inline constexpr get_t<Type...> get{};
 
-
 /**
  * @brief Alias for lists of owned components.
  * @tparam Type List of types.
  */
 template<typename... Type>
-struct owned_t: type_list<Type...>{};
-
+struct owned_t: type_list<Type...> {};
 
 /**
  * @brief Variable template for lists of owned components.
@@ -55,8 +47,6 @@ struct owned_t: type_list<Type...>{};
 template<typename... Type>
 inline constexpr owned_t<Type...> owned{};
 
-
-}
-
+} // namespace entt
 
 #endif

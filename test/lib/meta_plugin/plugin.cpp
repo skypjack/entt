@@ -13,16 +13,16 @@ void set_up() {
     using namespace entt::literals;
 
     entt::meta<position>()
-            .type("position"_hs)
-            .ctor<&create_position>()
-            .data<&position::x>("x"_hs)
-            .data<&position::y>("y"_hs);
+        .type("position"_hs)
+        .ctor<&create_position>()
+        .data<&position::x>("x"_hs)
+        .data<&position::y>("y"_hs);
 
     entt::meta<velocity>()
-            .type("velocity"_hs)
-            .ctor<>()
-            .data<&velocity::dx>("dx"_hs)
-            .data<&velocity::dy>("dy"_hs);
+        .type("velocity"_hs)
+        .ctor<>()
+        .data<&velocity::dx>("dx"_hs)
+        .data<&velocity::dy>("dy"_hs);
 }
 
 void tear_down() {
@@ -31,7 +31,7 @@ void tear_down() {
 }
 
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
-    switch (operation) {
+    switch(operation) {
     case CR_LOAD:
         entt::meta_ctx::bind(static_cast<userdata *>(ctx->userdata)->ctx);
         set_up();

@@ -1,9 +1,9 @@
-#include <cstdint>
-#include <utility>
-#include <iterator>
 #include <algorithm>
+#include <cstdint>
 #include <functional>
+#include <iterator>
 #include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
@@ -11,7 +11,9 @@
 
 struct empty_type {};
 
-struct boxed_int { int value; };
+struct boxed_int {
+    int value;
+};
 
 TEST(SparseSet, Functionalities) {
     entt::sparse_set set;
@@ -218,29 +220,29 @@ TEST(SparseSet, Pagination) {
 
     ASSERT_EQ(set.extent(), 0u);
 
-    set.emplace(entt::entity{ENTT_SPARSE_PAGE-1u});
+    set.emplace(entt::entity{ENTT_SPARSE_PAGE - 1u});
 
     ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
-    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE-1u}));
+    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE - 1u}));
 
     set.emplace(entt::entity{ENTT_SPARSE_PAGE});
 
     ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
-    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE-1u}));
+    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE - 1u}));
     ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
-    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE+1u}));
+    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE + 1u}));
 
-    set.erase(entt::entity{ENTT_SPARSE_PAGE-1u});
+    set.erase(entt::entity{ENTT_SPARSE_PAGE - 1u});
 
     ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
-    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE-1u}));
+    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE - 1u}));
     ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
 
     set.shrink_to_fit();
     set.erase(entt::entity{ENTT_SPARSE_PAGE});
 
     ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
-    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE-1u}));
+    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE - 1u}));
     ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
 
     set.shrink_to_fit();
@@ -264,7 +266,7 @@ TEST(SparseSet, Emplace) {
 
     ASSERT_DEATH(set.emplace(traits_type::combine(3, 1)), "");
     ASSERT_DEATH(set.emplace(entities[1u]), "");
-    
+
     ASSERT_EQ(set.at(0u), entities[1u]);
     ASSERT_EQ(set.at(1u), entities[0u]);
     ASSERT_EQ(set.index(entities[0u]), 1u);
@@ -283,7 +285,7 @@ TEST(SparseSet, Emplace) {
 TEST(SparseSet, EmplaceOutOfBounds) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[2u]{entt::entity{0}, entt::entity{ENTT_SPARSE_PAGE}};
-    
+
     set.emplace(entities[0u]);
 
     ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
@@ -803,8 +805,8 @@ TEST(SparseSet, Iterator) {
     ASSERT_EQ(begin++, set.begin());
     ASSERT_EQ(begin--, set.end());
 
-    ASSERT_EQ(begin+1, set.end());
-    ASSERT_EQ(end-1, set.begin());
+    ASSERT_EQ(begin + 1, set.end());
+    ASSERT_EQ(end - 1, set.begin());
 
     ASSERT_EQ(++begin, set.end());
     ASSERT_EQ(--begin, set.begin());
@@ -852,8 +854,8 @@ TEST(SparseSet, ReverseIterator) {
     ASSERT_EQ(begin++, set.rbegin());
     ASSERT_EQ(begin--, set.rend());
 
-    ASSERT_EQ(begin+1, set.rend());
-    ASSERT_EQ(end-1, set.rbegin());
+    ASSERT_EQ(begin + 1, set.rend());
+    ASSERT_EQ(end - 1, set.rbegin());
 
     ASSERT_EQ(++begin, set.rend());
     ASSERT_EQ(--begin, set.rbegin());

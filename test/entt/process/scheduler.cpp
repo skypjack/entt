@@ -1,16 +1,19 @@
 #include <functional>
 #include <gtest/gtest.h>
-#include <entt/process/scheduler.hpp>
 #include <entt/process/process.hpp>
+#include <entt/process/scheduler.hpp>
 
 struct foo_process: entt::process<foo_process, int> {
     foo_process(std::function<void()> upd, std::function<void()> abort)
-        : on_update{upd}, on_aborted{abort}
-    {}
+        : on_update{upd}, on_aborted{abort} {}
 
-    void update(delta_type, void *) { on_update(); }
+    void update(delta_type, void *) {
+        on_update();
+    }
 
-    void aborted() { on_aborted(); }
+    void aborted() {
+        on_aborted();
+    }
 
     std::function<void()> on_update;
     std::function<void()> on_aborted;
@@ -50,9 +53,8 @@ TEST(Scheduler, Functionalities) {
     ASSERT_TRUE(scheduler.empty());
 
     scheduler.attach<foo_process>(
-        [&updated](){ updated = true; },
-        [&aborted](){ aborted = true; }
-    );
+        [&updated]() { updated = true; },
+        [&aborted]() { aborted = true; });
 
     ASSERT_NE(scheduler.size(), 0u);
     ASSERT_FALSE(scheduler.empty());

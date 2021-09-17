@@ -1,7 +1,6 @@
 #ifndef ENTT_META_RESOLVE_HPP
 #define ENTT_META_RESOLVE_HPP
 
-
 #include <algorithm>
 #include "../core/type_info.hpp"
 #include "ctx.hpp"
@@ -9,9 +8,7 @@
 #include "node.hpp"
 #include "range.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Returns the meta type associated with a given type.
@@ -23,7 +20,6 @@ template<typename Type>
     return internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve();
 }
 
-
 /**
  * @brief Returns a range to use to visit all meta types.
  * @return An iterable range to use to visit all meta types.
@@ -31,7 +27,6 @@ template<typename Type>
 [[nodiscard]] inline meta_range<meta_type> resolve() {
     return *internal::meta_context::global();
 }
-
 
 /**
  * @brief Returns the meta type associated with a given identifier, if any.
@@ -47,7 +42,6 @@ template<typename Type>
 
     return {};
 }
-
 
 /**
  * @brief Returns the meta type associated with a given type info object, if
@@ -65,8 +59,6 @@ template<typename Type>
     return {};
 }
 
-
-}
-
+} // namespace entt
 
 #endif

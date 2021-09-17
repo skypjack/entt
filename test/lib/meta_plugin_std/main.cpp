@@ -1,7 +1,7 @@
 #define CR_HOST
 
-#include <cr.h>
 #include <gtest/gtest.h>
+#include <cr.h>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>

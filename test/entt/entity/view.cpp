@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <tuple>
-#include <utility>
 #include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/component.hpp>
 #include <entt/entity/registry.hpp>
@@ -9,7 +9,9 @@
 
 struct empty_type {};
 
-struct stable_type { int value; };
+struct stable_type {
+    int value;
+};
 
 template<>
 struct entt::component_traits<stable_type>: basic_component_traits {
@@ -236,14 +238,14 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(cview.size(), 1u);
 
     static_assert(std::is_same_v<decltype(view.raw()), int **>);
-    static_assert(std::is_same_v<decltype(cview.raw()), const int * const *>);
+    static_assert(std::is_same_v<decltype(cview.raw()), const int *const *>);
 
     static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(view.get({})), std::tuple<int &>>);
     static_assert(std::is_same_v<decltype(view.raw()), int **>);
     static_assert(std::is_same_v<decltype(cview.get<const int>({})), const int &>);
     static_assert(std::is_same_v<decltype(cview.get({})), std::tuple<const int &>>);
-    static_assert(std::is_same_v<decltype(cview.raw()), const int * const *>);
+    static_assert(std::is_same_v<decltype(cview.raw()), const int *const *>);
 
     static_assert(std::is_same_v<decltype(std::as_const(registry).view<int>()), decltype(cview)>);
 

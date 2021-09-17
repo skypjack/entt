@@ -8,7 +8,9 @@
 struct clazz_t {
     clazz_t() = default;
 
-    operator int() const { return value; }
+    operator int() const {
+        return value;
+    }
 
     int value;
 };

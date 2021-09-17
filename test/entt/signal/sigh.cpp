@@ -4,28 +4,45 @@
 #include <entt/signal/sigh.hpp>
 
 struct sigh_listener {
-    static void f(int &v) { v = 42; }
+    static void f(int &v) {
+        v = 42;
+    }
 
-    bool g(int) { k = !k; return true; }
+    bool g(int) {
+        k = !k;
+        return true;
+    }
 
-    bool h(const int &) { return k; }
+    bool h(const int &) {
+        return k;
+    }
 
     void i() {}
 
     // useless definition just because msvc does weird things if both are empty
-    void l() { k = true && k; }
+    void l() {
+        k = true && k;
+    }
 
     bool k{false};
 };
 
 struct before_after {
-    void add(int v) { value += v; }
+    void add(int v) {
+        value += v;
+    }
 
-    void mul(int v) { value *= v; }
+    void mul(int v) {
+        value *= v;
+    }
 
-    static void static_add(int v) { before_after::value += v; }
+    static void static_add(int v) {
+        before_after::value += v;
+    }
 
-    static void static_mul(before_after &instance, int v) { instance.value *= v; }
+    static void static_mul(before_after &instance, int v) {
+        instance.value *= v;
+    }
 
     static inline int value{};
 };
@@ -37,13 +54,21 @@ struct SigH: ::testing::Test {
 };
 
 struct const_nonconst_noexcept {
-    void f() { ++cnt; }
+    void f() {
+        ++cnt;
+    }
 
-    void g() noexcept { ++cnt; }
+    void g() noexcept {
+        ++cnt;
+    }
 
-    void h() const { ++cnt; }
+    void h() const {
+        ++cnt;
+    }
 
-    void i() const noexcept { ++cnt; }
+    void i() const noexcept {
+        ++cnt;
+    }
 
     mutable int cnt{0};
 };

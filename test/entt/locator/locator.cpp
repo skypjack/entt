@@ -10,9 +10,12 @@ struct another_service {
 };
 
 struct derived_service: another_service {
-    derived_service(int): another_service{} {}
+    derived_service(int)
+        : another_service{} {}
 
-    void f(bool b) override { check = b; }
+    void f(bool b) override {
+        check = b;
+    }
 };
 
 TEST(ServiceLocator, Functionalities) {

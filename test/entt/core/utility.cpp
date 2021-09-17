@@ -19,11 +19,11 @@ TEST(Utility, Identity) {
 }
 
 TEST(Utility, Overload) {
-    ASSERT_EQ(entt::overload<void(int)>(&functions::foo), static_cast<void(*)(int)>(&functions::foo));
-    ASSERT_EQ(entt::overload<void()>(&functions::foo), static_cast<void(*)()>(&functions::foo));
+    ASSERT_EQ(entt::overload<void(int)>(&functions::foo), static_cast<void (*)(int)>(&functions::foo));
+    ASSERT_EQ(entt::overload<void()>(&functions::foo), static_cast<void (*)()>(&functions::foo));
 
-    ASSERT_EQ(entt::overload<void(int)>(&functions::bar), static_cast<void(functions:: *)(int)>(&functions::bar));
-    ASSERT_EQ(entt::overload<void()>(&functions::bar), static_cast<void(functions:: *)()>(&functions::bar));
+    ASSERT_EQ(entt::overload<void(int)>(&functions::bar), static_cast<void (functions::*)(int)>(&functions::bar));
+    ASSERT_EQ(entt::overload<void()>(&functions::bar), static_cast<void (functions::*)()>(&functions::bar));
 
     functions instance;
 
@@ -40,8 +40,7 @@ TEST(Utility, Overloaded) {
 
     entt::overloaded func{
         [&iv](int value) { iv = value; },
-        [&cv](char value) { cv = value; }
-    };
+        [&cv](char value) { cv = value; }};
 
     func(42);
     func('c');
@@ -52,9 +51,9 @@ TEST(Utility, Overloaded) {
 
 TEST(Utility, YCombinator) {
     entt::y_combinator gauss([](const auto &self, auto value) -> unsigned int {
-        return value ? (value + self(value-1u)) : 0;
+        return value ? (value + self(value - 1u)) : 0;
     });
 
-    ASSERT_EQ(gauss(3u), 3u*4u/2u);
-    ASSERT_EQ(std::as_const(gauss)(7u), 7u*8u/2u);
+    ASSERT_EQ(gauss(3u), 3u * 4u / 2u);
+    ASSERT_EQ(std::as_const(gauss)(7u), 7u * 8u / 2u);
 }

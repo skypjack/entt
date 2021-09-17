@@ -1,13 +1,10 @@
 #ifndef ENTT_CORE_FAMILY_HPP
 #define ENTT_CORE_FAMILY_HPP
 
-
 #include "../config/config.h"
 #include "fwd.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Dynamic identifier generator.
@@ -30,8 +27,6 @@ public:
     inline static const family_type type = identifier++;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

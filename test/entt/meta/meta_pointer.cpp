@@ -8,9 +8,12 @@
 
 template<typename Type>
 struct wrapped_shared_ptr {
-    wrapped_shared_ptr(Type init): ptr{new Type {init}} {}
+    wrapped_shared_ptr(Type init)
+        : ptr{new Type{init}} {}
 
-    Type & deref() const { return *ptr; }
+    Type &deref() const {
+        return *ptr;
+    }
 
 private:
     std::shared_ptr<Type> ptr;
@@ -19,9 +22,12 @@ private:
 struct self_ptr {
     using element_type = self_ptr;
 
-    self_ptr(int v): value{v} {}
+    self_ptr(int v)
+        : value{v} {}
 
-    const self_ptr & operator*() const { return *this; }
+    const self_ptr &operator*() const {
+        return *this;
+    }
 
     int value;
 };
@@ -29,9 +35,12 @@ struct self_ptr {
 struct proxy_ptr {
     using element_type = proxy_ptr;
 
-    proxy_ptr(int &v): value{&v} {}
+    proxy_ptr(int &v)
+        : value{&v} {}
 
-    proxy_ptr operator*() const { return *this; }
+    proxy_ptr operator*() const {
+        return *this;
+    }
 
     int *value;
 };
@@ -62,18 +71,20 @@ struct entt::adl_meta_pointer_like<spec_wrapped_shared_ptr<Type>> {
 };
 
 template<typename Type>
-Type & dereference_meta_pointer_like(const adl_wrapped_shared_ptr<Type> &ptr) {
+Type &dereference_meta_pointer_like(const adl_wrapped_shared_ptr<Type> &ptr) {
     return ptr.deref();
 }
 
-int test_function() { return 42; }
+int test_function() {
+    return 42;
+}
 
 struct not_copyable_t {
     not_copyable_t() = default;
     not_copyable_t(const not_copyable_t &) = delete;
     not_copyable_t(not_copyable_t &&) = default;
-    not_copyable_t & operator=(const not_copyable_t &) = delete;
-    not_copyable_t & operator=(not_copyable_t &&) = default;
+    not_copyable_t &operator=(const not_copyable_t &) = delete;
+    not_copyable_t &operator=(not_copyable_t &&) = default;
 };
 
 TEST(MetaPointerLike, DereferenceOperatorInvalidType) {
@@ -199,7 +210,7 @@ TEST(MetaPointerLike, PointerToConstMoveOnlyType) {
 
 TEST(MetaPointerLike, AsRef) {
     int value = 0;
-    int * ptr = &value;
+    int *ptr = &value;
     entt::meta_any any{entt::forward_as_meta(ptr)};
 
     ASSERT_TRUE(any.type().is_pointer());
@@ -221,7 +232,7 @@ TEST(MetaPointerLike, AsRef) {
 
 TEST(MetaPointerLike, AsConstRef) {
     int value = 42;
-    int * const ptr = &value;
+    int *const ptr = &value;
     entt::meta_any any{entt::forward_as_meta(ptr)};
 
     ASSERT_TRUE(any.type().is_pointer());
@@ -307,15 +318,15 @@ TEST(MetaPointerLike, DereferenceSmartPointerToVoid) {
     };
 
     test(std::shared_ptr<void>{});
-    test(std::unique_ptr<void, void(*)(void *)>{nullptr, nullptr});
+    test(std::unique_ptr<void, void (*)(void *)>{nullptr, nullptr});
 }
 
 TEST(MetaPointerLike, DereferencePointerToFunction) {
     auto test = [](entt::meta_any any) {
         ASSERT_TRUE(any.type().is_pointer());
         ASSERT_TRUE(any.type().is_pointer_like());
-        ASSERT_NE(any.try_cast<int(*)()>(), nullptr);
-        ASSERT_EQ(any.cast<int(*)()>()(), 42);
+        ASSERT_NE(any.try_cast<int (*)()>(), nullptr);
+        ASSERT_EQ(any.cast<int (*)()>()(), 42);
     };
 
     entt::meta_any func{&test_function};

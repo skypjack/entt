@@ -1,22 +1,25 @@
 #include <map>
-#include <tuple>
 #include <queue>
-#include <vector>
+#include <tuple>
 #include <type_traits>
+#include <vector>
 #include <gtest/gtest.h>
+#include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
-#include <entt/entity/entity.hpp>
 
 struct noncopyable_component {
-    noncopyable_component(): value{} {}
-    explicit noncopyable_component(int v): value{v} {}
+    noncopyable_component()
+        : value{} {}
+
+    explicit noncopyable_component(int v)
+        : value{v} {}
 
     noncopyable_component(const noncopyable_component &) = delete;
     noncopyable_component(noncopyable_component &&) = default;
 
-    noncopyable_component& operator=(const noncopyable_component &) = delete;
-    noncopyable_component& operator=(noncopyable_component &&) = default;
+    noncopyable_component &operator=(const noncopyable_component &) = delete;
+    noncopyable_component &operator=(noncopyable_component &&) = default;
 
     int value;
 };
@@ -24,11 +27,10 @@ struct noncopyable_component {
 template<typename Storage>
 struct output_archive {
     output_archive(Storage &instance)
-        : storage{instance}
-    {}
+        : storage{instance} {}
 
     template<typename... Value>
-    void operator()(const Value &... value) {
+    void operator()(const Value &...value) {
         (std::get<std::queue<Value>>(storage).push(value), ...);
     }
 
@@ -43,11 +45,10 @@ private:
 template<typename Storage>
 struct input_archive {
     input_archive(Storage &instance)
-        : storage{instance}
-    {}
+        : storage{instance} {}
 
     template<typename... Value>
-    void operator()(Value &... value) {
+    void operator()(Value &...value) {
         auto assign = [this](auto &val) {
             auto &queue = std::get<std::queue<std::decay_t<decltype(val)>>>(storage);
             val = queue.front();
@@ -112,8 +113,7 @@ TEST(Snapshot, Dump) {
         std::queue<char>,
         std::queue<double>,
         std::queue<a_component>,
-        std::queue<another_component>
-    >;
+        std::queue<another_component>>;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -175,8 +175,7 @@ TEST(Snapshot, Partial) {
         std::queue<entt::entity>,
         std::queue<int>,
         std::queue<char>,
-        std::queue<double>
-    >;
+        std::queue<double>>;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -239,8 +238,7 @@ TEST(Snapshot, Iterator) {
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<another_component>,
-        std::queue<int>
-    >;
+        std::queue<int>>;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -278,8 +276,7 @@ TEST(Snapshot, Continuous) {
         std::queue<what_a_component>,
         std::queue<map_component>,
         std::queue<int>,
-        std::queue<double>
-    >;
+        std::queue<double>>;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -332,8 +329,8 @@ TEST(Snapshot, Continuous) {
             &what_a_component::quux,
             &map_component::keys,
             &map_component::values,
-            &map_component::both
-        ).orphans();
+            &map_component::both)
+        .orphans();
 
     decltype(dst.size()) a_component_cnt{};
     decltype(dst.size()) another_component_cnt{};
@@ -398,8 +395,8 @@ TEST(Snapshot, Continuous) {
             &what_a_component::quux,
             &map_component::keys,
             &map_component::values,
-            &map_component::both
-        ).orphans();
+            &map_component::both)
+        .orphans();
 
     ASSERT_EQ(size, dst.size());
 
@@ -428,8 +425,8 @@ TEST(Snapshot, Continuous) {
             &what_a_component::quux,
             &map_component::keys,
             &map_component::values,
-            &map_component::both
-        ).orphans();
+            &map_component::both)
+        .orphans();
 
     dst.view<what_a_component>().each([&loader, entity](auto, auto &component) {
         ASSERT_EQ(component.bar, loader.map(entity));
@@ -452,8 +449,9 @@ TEST(Snapshot, Continuous) {
             &what_a_component::quux,
             &map_component::keys,
             &map_component::values,
-            &map_component::both
-        ).orphans().shrink();
+            &map_component::both)
+        .orphans()
+        .shrink();
 
     dst.view<what_a_component>().each([&dst](auto, auto &component) {
         ASSERT_FALSE(dst.valid(component.bar));
@@ -479,8 +477,8 @@ TEST(Snapshot, Continuous) {
             &what_a_component::quux,
             &map_component::keys,
             &map_component::values,
-            &map_component::both
-        ).orphans();
+            &map_component::both)
+        .orphans();
 
     ASSERT_EQ(dst.size<a_component>(), a_component_cnt);
 
@@ -496,8 +494,8 @@ TEST(Snapshot, Continuous) {
             &what_a_component::quux,
             &map_component::keys,
             &map_component::values,
-            &map_component::both
-        ).orphans();
+            &map_component::both)
+        .orphans();
 
     ASSERT_EQ(dst.size<a_component>(), a_component_cnt);
 }
@@ -512,8 +510,7 @@ TEST(Snapshot, MoreOnShrink) {
 
     using storage_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
-        std::queue<entt::entity>
-        >;
+        std::queue<entt::entity>>;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -542,8 +539,7 @@ TEST(Snapshot, SyncDataMembers) {
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<what_a_component>,
-        std::queue<map_component>
-    >;
+        std::queue<map_component>>;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -557,16 +553,14 @@ TEST(Snapshot, SyncDataMembers) {
     auto parent = src.create();
     auto child = src.create();
 
-
     src.emplace<what_a_component>(parent, entt::null);
     src.emplace<what_a_component>(child, parent).quux.push_back(child);
 
     src.emplace<map_component>(
         child,
-        decltype(map_component::keys){{{ child, 10 }}},
-        decltype(map_component::values){{{ 10, child }}},
-        decltype(map_component::both){{{ child, child }}}
-    );
+        decltype(map_component::keys){{{child, 10}}},
+        decltype(map_component::values){{{10, child}}},
+        decltype(map_component::both){{{child, child}}});
 
     entt::snapshot{src}.entities(output).component<what_a_component, map_component>(output);
 
@@ -576,8 +570,7 @@ TEST(Snapshot, SyncDataMembers) {
         &what_a_component::quux,
         &map_component::keys,
         &map_component::values,
-        &map_component::both
-    );
+        &map_component::both);
 
     ASSERT_FALSE(dst.valid(parent));
     ASSERT_FALSE(dst.valid(child));

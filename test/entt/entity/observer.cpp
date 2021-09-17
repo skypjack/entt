@@ -1,5 +1,5 @@
-#include <tuple>
 #include <cstddef>
+#include <tuple>
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/observer.hpp>
@@ -88,7 +88,8 @@ TEST(Observer, AllOf) {
 TEST(Observer, AllOfFiltered) {
     constexpr auto collector =
         entt::collector
-            .group<int>().where<char>(entt::exclude<double>);
+            .group<int>()
+            .where<char>(entt::exclude<double>);
 
     entt::registry registry;
     entt::observer observer{registry, collector};
@@ -168,7 +169,8 @@ TEST(Observer, Observe) {
 TEST(Observer, ObserveFiltered) {
     constexpr auto collector =
         entt::collector
-            .update<int>().where<char>(entt::exclude<double>);
+            .update<int>()
+            .where<char>(entt::exclude<double>);
 
     entt::registry registry;
     entt::observer observer{registry, collector};
@@ -287,8 +289,10 @@ TEST(Observer, Each) {
 TEST(Observer, MultipleFilters) {
     constexpr auto collector =
         entt::collector
-            .update<int>().where<char>()
-            .update<double>().where<float>();
+            .update<int>()
+            .where<char>()
+            .update<double>()
+            .where<float>();
 
     entt::registry registry;
     entt::observer observer{registry, collector};

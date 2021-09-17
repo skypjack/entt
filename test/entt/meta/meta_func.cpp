@@ -22,7 +22,8 @@ struct base_t {
 };
 
 struct derived_t: base_t {
-    derived_t(): base_t{} {}
+    derived_t()
+        : base_t{} {}
 };
 
 struct func_t {
@@ -32,15 +33,15 @@ struct func_t {
 
     int f(int a, int b) {
         value = a;
-        return b*b;
+        return b * b;
     }
 
     int f(int v) const {
-        return v*v;
+        return v * v;
     }
 
     void g(int v) {
-        value = v*v;
+        value = v * v;
     }
 
     static int h(int &v) {
@@ -55,7 +56,7 @@ struct func_t {
         return (value = v);
     }
 
-    int & a() const {
+    int &a() const {
         return value;
     }
 
@@ -87,11 +88,16 @@ struct MetaFunc: ::testing::Test {
             .type("func"_hs)
             .func<&entt::registry::emplace_or_replace<func_t>, entt::as_ref_t>("emplace"_hs)
             .func<entt::overload<int(const base_t &, int, int)>(&func_t::f)>("f3"_hs)
-            .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs).prop(true, false)
-            .func<entt::overload<int(int) const>(&func_t::f)>("f1"_hs).prop(true, false)
-            .func<&func_t::g>("g"_hs).prop(true, false)
-            .func<func_t::h>("h"_hs).prop(true, false)
-            .func<func_t::k>("k"_hs).prop(true, false)
+            .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs)
+            .prop(true, false)
+            .func<entt::overload<int(int) const>(&func_t::f)>("f1"_hs)
+            .prop(true, false)
+            .func<&func_t::g>("g"_hs)
+            .prop(true, false)
+            .func<func_t::h>("h"_hs)
+            .prop(true, false)
+            .func<func_t::k>("k"_hs)
+            .prop(true, false)
             .func<&func_t::v, entt::as_void_t>("v"_hs)
             .func<&func_t::a, entt::as_ref_t>("a"_hs)
             .func<&func_t::a, entt::as_cref_t>("ca"_hs)

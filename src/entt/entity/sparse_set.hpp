@@ -1,7 +1,6 @@
 #ifndef ENTT_ENTITY_SPARSE_SET_HPP
 #define ENTT_ENTITY_SPARSE_SET_HPP
 
-
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -14,18 +13,14 @@
 #include "entity.hpp"
 #include "fwd.hpp"
 
-
 namespace entt {
-
 
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
-
 namespace internal {
-
 
 template<typename Traits>
 struct sparse_set_iterator final {
@@ -39,10 +34,9 @@ struct sparse_set_iterator final {
 
     sparse_set_iterator(const pointer *ref, const difference_type idx) ENTT_NOEXCEPT
         : packed{ref},
-          index{idx}
-    {}
+          index{idx} {}
 
-    sparse_set_iterator & operator++() ENTT_NOEXCEPT {
+    sparse_set_iterator &operator++() ENTT_NOEXCEPT {
         return --index, *this;
     }
 
@@ -51,7 +45,7 @@ struct sparse_set_iterator final {
         return ++(*this), orig;
     }
 
-    sparse_set_iterator & operator--() ENTT_NOEXCEPT {
+    sparse_set_iterator &operator--() ENTT_NOEXCEPT {
         return ++index, *this;
     }
 
@@ -60,7 +54,7 @@ struct sparse_set_iterator final {
         return operator--(), orig;
     }
 
-    sparse_set_iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
+    sparse_set_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
         index -= value;
         return *this;
     }
@@ -70,7 +64,7 @@ struct sparse_set_iterator final {
         return (copy += value);
     }
 
-    sparse_set_iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+    sparse_set_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
         return (*this += -value);
     }
 
@@ -124,24 +118,20 @@ private:
     difference_type index;
 };
 
-
-}
-
+} // namespace internal
 
 /**
  * Internal details not to be documented.
  * @endcond
  */
 
-
 /*! @brief Sparse set deletion policy. */
-enum class deletion_policy: std::uint8_t {
+enum class deletion_policy : std::uint8_t {
     /*! @brief Swap-and-pop deletion policy. */
     swap_and_pop = 0u,
     /*! @brief In-place deletion policy. */
     in_place = 1u
 };
-
 
 /**
  * @brief Basic sparse set implementation.
@@ -190,7 +180,7 @@ class basic_sparse_set {
         return (page < bucket && sparse[page]) ? (sparse[page] + fast_mod<sparse_page_v>(pos)) : alloc_pointer{};
     }
 
-    [[nodiscard]] auto & sparse_ref(const Entity entt) const {
+    [[nodiscard]] auto &sparse_ref(const Entity entt) const {
         ENTT_ASSERT(sparse_ptr(entt), "Invalid element");
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
         return sparse[pos / sparse_page_v][fast_mod<sparse_page_v>(pos)];
@@ -341,16 +331,14 @@ public:
 
     /*! @brief Default constructor. */
     basic_sparse_set()
-        : basic_sparse_set{allocator_type{}}
-    {}
+        : basic_sparse_set{allocator_type{}} {}
 
     /**
      * @brief Constructs an empty container with a given allocator.
      * @param allocator The allocator to use.
      */
     explicit basic_sparse_set(const allocator_type &allocator)
-        : basic_sparse_set{deletion_policy::swap_and_pop, allocator}
-    {}
+        : basic_sparse_set{deletion_policy::swap_and_pop, allocator} {}
 
     /**
      * @brief Constructs an empty container with the given policy and allocator.
@@ -364,8 +352,7 @@ public:
           bucket{},
           count{},
           free_list{tombstone},
-          mode{pol}
-    {}
+          mode{pol} {}
 
     /**
      * @brief Move constructor.
@@ -378,8 +365,7 @@ public:
           bucket{std::exchange(other.bucket, size_type{})},
           count{std::exchange(other.count, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
-          mode{other.mode}
-    {}
+          mode{other.mode} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -393,8 +379,7 @@ public:
           bucket{std::exchange(other.bucket, size_type{})},
           count{std::exchange(other.count, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
-          mode{other.mode}
-    {
+          mode{other.mode} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
     }
 
@@ -408,7 +393,7 @@ public:
      * @param other The instance to move from.
      * @return This sparse set.
      */
-    basic_sparse_set & operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
+    basic_sparse_set &operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
         release_memory();
         propagate_on_container_move_assignment(reserved.first(), other.reserved.first());
         ENTT_ASSERT(alloc_traits::is_always_equal::value || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
@@ -849,7 +834,7 @@ public:
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&... args) {
+    void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&...args) {
         // basic no-leak guarantee (with invalid state) if sorting throws
         ENTT_ASSERT(!(length > count), "Length exceeds the number of elements");
         compact();
@@ -885,7 +870,7 @@ public:
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
+    void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
         sort_n(count, std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
@@ -943,8 +928,6 @@ private:
     deletion_policy mode;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

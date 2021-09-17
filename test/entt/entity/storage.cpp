@@ -1,9 +1,9 @@
-#include <memory>
-#include <utility>
-#include <iterator>
 #include <exception>
+#include <iterator>
+#include <memory>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/component.hpp>
 #include <entt/entity/storage.hpp>
@@ -12,14 +12,19 @@
 
 struct empty_type {};
 
-struct boxed_int { int value; };
+struct boxed_int {
+    int value;
+};
 
-struct stable_type { int value; };
+struct stable_type {
+    int value;
+};
 
 struct non_default_constructible {
     non_default_constructible() = delete;
 
-    non_default_constructible(int v): value{v} {}
+    non_default_constructible(int v)
+        : value{v} {}
 
     int value;
 };
@@ -27,15 +32,13 @@ struct non_default_constructible {
 struct update_from_destructor {
     update_from_destructor(entt::storage<update_from_destructor> &ref, entt::entity other)
         : storage{&ref},
-          target{other}
-    {}
+          target{other} {}
 
     update_from_destructor(update_from_destructor &&other) ENTT_NOEXCEPT
         : storage{std::exchange(other.storage, nullptr)},
-          target{std::exchange(other.target, entt::null)}
-    {}
+          target{std::exchange(other.target, entt::null)} {}
 
-    update_from_destructor & operator=(update_from_destructor &&other) ENTT_NOEXCEPT {
+    update_from_destructor &operator=(update_from_destructor &&other) ENTT_NOEXCEPT {
         storage = std::exchange(other.storage, nullptr);
         target = std::exchange(other.target, entt::null);
         return *this;
@@ -239,7 +242,7 @@ TEST(Storage, Insert) {
     ASSERT_EQ(pool.get(entities[1u]).value, 99);
 
     pool.erase(std::begin(entities), std::end(entities));
-    const stable_type values[2u] = { stable_type{42}, stable_type{3} };
+    const stable_type values[2u] = {stable_type{42}, stable_type{3}};
     pool.insert(std::rbegin(entities), std::rend(entities), std::begin(values));
 
     ASSERT_EQ(pool.size(), 2u);
@@ -719,7 +722,9 @@ TEST(Storage, ShrinkToFit) {
 }
 
 TEST(Storage, AggregatesMustWork) {
-    struct aggregate_type { int value; };
+    struct aggregate_type {
+        int value;
+    };
 
     // the goal of this test is to enforce the requirements for aggregate types
     entt::storage<aggregate_type>{}.emplace(entt::entity{0}, 42);
@@ -754,8 +759,8 @@ TEST(Storage, Iterator) {
     ASSERT_EQ(begin++, pool.begin());
     ASSERT_EQ(begin--, pool.end());
 
-    ASSERT_EQ(begin+1, pool.end());
-    ASSERT_EQ(end-1, pool.begin());
+    ASSERT_EQ(begin + 1, pool.end());
+    ASSERT_EQ(end - 1, pool.begin());
 
     ASSERT_EQ(++begin, pool.end());
     ASSERT_EQ(--begin, pool.begin());
@@ -800,8 +805,8 @@ TEST(Storage, ConstIterator) {
     ASSERT_EQ(cbegin++, pool.cbegin());
     ASSERT_EQ(cbegin--, pool.cend());
 
-    ASSERT_EQ(cbegin+1, pool.cend());
-    ASSERT_EQ(cend-1, pool.cbegin());
+    ASSERT_EQ(cbegin + 1, pool.cend());
+    ASSERT_EQ(cend - 1, pool.cbegin());
 
     ASSERT_EQ(++cbegin, pool.cend());
     ASSERT_EQ(--cbegin, pool.cbegin());
@@ -846,8 +851,8 @@ TEST(Storage, ReverseIterator) {
     ASSERT_EQ(begin++, pool.rbegin());
     ASSERT_EQ(begin--, pool.rend());
 
-    ASSERT_EQ(begin+1, pool.rend());
-    ASSERT_EQ(end-1, pool.rbegin());
+    ASSERT_EQ(begin + 1, pool.rend());
+    ASSERT_EQ(end - 1, pool.rbegin());
 
     ASSERT_EQ(++begin, pool.rend());
     ASSERT_EQ(--begin, pool.rbegin());
@@ -892,8 +897,8 @@ TEST(Storage, ConstReverseIterator) {
     ASSERT_EQ(cbegin++, pool.crbegin());
     ASSERT_EQ(cbegin--, pool.crend());
 
-    ASSERT_EQ(cbegin+1, pool.crend());
-    ASSERT_EQ(cend-1, pool.crbegin());
+    ASSERT_EQ(cbegin + 1, pool.crend());
+    ASSERT_EQ(cend - 1, pool.crbegin());
 
     ASSERT_EQ(++cbegin, pool.crend());
     ASSERT_EQ(--cbegin, pool.crbegin());
@@ -1230,13 +1235,13 @@ TEST(Storage, UpdateFromDestructor) {
 
         for(std::size_t next{}; next < size; ++next) {
             const auto entity = entt::entity(next);
-            pool.emplace(entity, pool, entity == entt::entity(size/2) ? target : entity);
+            pool.emplace(entity, pool, entity == entt::entity(size / 2) ? target : entity);
         }
 
-        pool.erase(entt::entity(size/2));
+        pool.erase(entt::entity(size / 2));
 
         ASSERT_EQ(pool.size(), size - 1u - (target != entt::null));
-        ASSERT_FALSE(pool.contains(entt::entity(size/2)));
+        ASSERT_FALSE(pool.contains(entt::entity(size / 2)));
         ASSERT_FALSE(pool.contains(target));
 
         pool.clear();

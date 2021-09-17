@@ -1,18 +1,15 @@
 #ifndef ENTT_ENTITY_HELPER_HPP
 #define ENTT_ENTITY_HELPER_HPP
 
-
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
-#include "registry.hpp"
 #include "fwd.hpp"
-
+#include "registry.hpp"
 
 namespace entt {
-
 
 /**
  * @brief Converts a registry to a view.
@@ -46,7 +43,6 @@ private:
     registry_type &reg;
 };
 
-
 /**
  * @brief Deduction guide.
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -54,14 +50,12 @@ private:
 template<typename Entity>
 as_view(basic_registry<Entity> &) -> as_view<Entity>;
 
-
 /**
  * @brief Deduction guide.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
 as_view(const basic_registry<Entity> &) -> as_view<const Entity>;
-
 
 /**
  * @brief Converts a registry to a group.
@@ -100,7 +94,6 @@ private:
     registry_type &reg;
 };
 
-
 /**
  * @brief Deduction guide.
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -108,15 +101,12 @@ private:
 template<typename Entity>
 as_group(basic_registry<Entity> &) -> as_group<Entity>;
 
-
 /**
  * @brief Deduction guide.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
 as_group(const basic_registry<Entity> &) -> as_group<const Entity>;
-
-
 
 /**
  * @brief Helper to create a listener that directly invokes a member function.
@@ -132,7 +122,6 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
     func.template connect<Member>(reg.template get<member_class_t<decltype(Member)>>(entt));
     func(reg, entt);
 }
-
 
 /**
  * @brief Returns the entity associated with a given component.
@@ -161,8 +150,6 @@ Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
     return null;
 }
 
-
-}
-
+} // namespace entt
 
 #endif

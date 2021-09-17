@@ -1,7 +1,6 @@
 #ifndef ENTT_ENTITY_STORAGE_HPP
 #define ENTT_ENTITY_STORAGE_HPP
 
-
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -19,18 +18,14 @@
 #include "fwd.hpp"
 #include "sparse_set.hpp"
 
-
 namespace entt {
-
 
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
-
 namespace internal {
-
 
 template<typename Traits>
 class storage_iterator final {
@@ -50,10 +45,9 @@ public:
 
     storage_iterator(const data_pointer *ref, difference_type idx) ENTT_NOEXCEPT
         : packed{ref},
-          index{idx}
-    {}
+          index{idx} {}
 
-    storage_iterator & operator++() ENTT_NOEXCEPT {
+    storage_iterator &operator++() ENTT_NOEXCEPT {
         return --index, *this;
     }
 
@@ -62,7 +56,7 @@ public:
         return ++(*this), orig;
     }
 
-    storage_iterator & operator--() ENTT_NOEXCEPT {
+    storage_iterator &operator--() ENTT_NOEXCEPT {
         return ++index, *this;
     }
 
@@ -71,7 +65,7 @@ public:
         return operator--(), orig;
     }
 
-    storage_iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
+    storage_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
         index -= value;
         return *this;
     }
@@ -81,7 +75,7 @@ public:
         return (copy += value);
     }
 
-    storage_iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+    storage_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
         return (*this += -value);
     }
 
@@ -135,15 +129,12 @@ private:
     difference_type index;
 };
 
-
-}
-
+} // namespace internal
 
 /**
  * Internal details not to be documented.
  * @endcond
  */
-
 
 /**
  * @brief Basic storage implementation.
@@ -191,8 +182,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using comp_traits = component_traits<Type>;
     using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
 
-    [[nodiscard]] auto & element_at(const std::size_t pos) const {
-        return packed[pos/packed_page_v][fast_mod<packed_page_v>(pos)];
+    [[nodiscard]] auto &element_at(const std::size_t pos) const {
+        return packed[pos / packed_page_v][fast_mod<packed_page_v>(pos)];
     }
 
     auto assure_at_least(const std::size_t pos) {
@@ -208,7 +199,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
                 for(auto next = bucket.second(); next < sz; ++next) {
                     mem[next] = alloc_traits::allocate(bucket.first(), packed_page_v);
                 }
-            } ENTT_CATCH {
+            }
+            ENTT_CATCH {
                 for(auto next = bucket.second(); next < sz && mem[next]; ++next) {
                     alloc_traits::deallocate(bucket.first(), mem[next], packed_page_v);
                 }
@@ -271,7 +263,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     template<typename... Args>
-    void construct(alloc_pointer ptr, Args &&... args) {
+    void construct(alloc_pointer ptr, Args &&...args) {
         if constexpr(std::is_aggregate_v<value_type>) {
             alloc_traits::construct(bucket.first(), to_address(ptr), Type{std::forward<Args>(args)...});
         } else {
@@ -372,7 +364,8 @@ protected:
             ENTT_TRY {
                 base_type::try_emplace(entt, nullptr);
                 ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
-            } ENTT_CATCH {
+            }
+            ENTT_CATCH {
                 std::destroy_at(std::addressof(element_at(pos)));
                 ENTT_THROW;
             }
@@ -407,8 +400,7 @@ public:
     basic_storage()
         : base_type{deletion_policy{comp_traits::in_place_delete::value}},
           bucket{allocator_type{}, size_type{}},
-          packed{}
-    {}
+          packed{} {}
 
     /**
      * @brief Constructs an empty storage with a given allocator.
@@ -417,8 +409,7 @@ public:
     explicit basic_storage(const allocator_type &allocator)
         : base_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
           bucket{allocator, size_type{}},
-          packed{}
-    {}
+          packed{} {}
 
     /**
      * @brief Move constructor.
@@ -427,8 +418,7 @@ public:
     basic_storage(basic_storage &&other) ENTT_NOEXCEPT
         : base_type{std::move(other)},
           bucket{std::move(other.bucket.first()), std::exchange(other.bucket.second(), size_type{})},
-          packed{std::exchange(other.packed, alloc_ptr_pointer{})}
-    {}
+          packed{std::exchange(other.packed, alloc_ptr_pointer{})} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -438,8 +428,7 @@ public:
     basic_storage(basic_storage &&other, const allocator_type &allocator) ENTT_NOEXCEPT
         : base_type{std::move(other), allocator},
           bucket{allocator, std::exchange(other.bucket.second(), size_type{})},
-          packed{std::exchange(other.packed, alloc_ptr_pointer{})}
-    {
+          packed{std::exchange(other.packed, alloc_ptr_pointer{})} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || bucket.first() == other.bucket.first(), "Copying a storage is not allowed");
     }
 
@@ -453,7 +442,7 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT {
+    basic_storage &operator=(basic_storage &&other) ENTT_NOEXCEPT {
         release_memory();
         base_type::operator=(std::move(other));
         propagate_on_container_move_assignment(bucket.first(), other.bucket.first());
@@ -619,12 +608,12 @@ public:
      * @param entt A valid identifier.
      * @return The object assigned to the entity.
      */
-    [[nodiscard]] const value_type & get(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] const value_type &get(const entity_type entt) const ENTT_NOEXCEPT {
         return element_at(base_type::index(entt));
     }
 
     /*! @copydoc get */
-    [[nodiscard]] value_type & get(const entity_type entt) ENTT_NOEXCEPT {
+    [[nodiscard]] value_type &get(const entity_type entt) ENTT_NOEXCEPT {
         return const_cast<value_type &>(std::as_const(*this).get(entt));
     }
 
@@ -662,7 +651,7 @@ public:
      * @return A reference to the newly created object.
      */
     template<typename... Args>
-    value_type & emplace(const entity_type entt, Args &&... args) {
+    value_type &emplace(const entity_type entt, Args &&...args) {
         const auto pos = base_type::slot();
         alloc_pointer elem = assure_at_least(pos);
         construct(elem, std::forward<Args>(args)...);
@@ -670,7 +659,8 @@ public:
         ENTT_TRY {
             base_type::try_emplace(entt, nullptr);
             ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
-        } ENTT_CATCH {
+        }
+        ENTT_CATCH {
             std::destroy_at(std::addressof(element_at(pos)));
             ENTT_THROW;
         }
@@ -686,7 +676,7 @@ public:
      * @return A reference to the updated instance.
      */
     template<typename... Func>
-    value_type & patch(const entity_type entt, Func &&... func) {
+    value_type &patch(const entity_type entt, Func &&...func) {
         const auto idx = base_type::index(entt);
         auto &elem = element_at(idx);
         (std::forward<Func>(func)(elem), ...);
@@ -733,12 +723,10 @@ private:
     alloc_ptr_pointer packed;
 };
 
-
 /*! @copydoc basic_storage */
 template<typename Entity, typename Type, typename Allocator>
 class basic_storage<Entity, Type, Allocator, std::enable_if_t<ignore_as_empty_v<Type>>>
-    : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>
-{
+    : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using allocator_traits = std::allocator_traits<Allocator>;
     using comp_traits = component_traits<Type>;
 
@@ -756,16 +744,14 @@ public:
 
     /*! @brief Default constructor. */
     basic_storage()
-        : base_type{deletion_policy{comp_traits::in_place_delete::value}}
-    {}
+        : base_type{deletion_policy{comp_traits::in_place_delete::value}} {}
 
     /**
      * @brief Constructs an empty container with a given allocator.
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{deletion_policy{comp_traits::in_place_delete::value}, allocator}
-    {}
+        : base_type{deletion_policy{comp_traits::in_place_delete::value}, allocator} {}
 
     /**
      * @brief Move constructor.
@@ -778,7 +764,7 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    basic_storage & operator=(basic_storage &&other) ENTT_NOEXCEPT = default;
+    basic_storage &operator=(basic_storage &&other) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Returns the associated allocator.
@@ -828,7 +814,7 @@ public:
      * @param args Parameters to use to construct an object for the entity.
      */
     template<typename... Args>
-    void emplace(const entity_type entt, Args &&... args) {
+    void emplace(const entity_type entt, Args &&...args) {
         [[maybe_unused]] const value_type elem{std::forward<Args>(args)...};
         base_type::try_emplace(entt, nullptr);
     }
@@ -840,7 +826,7 @@ public:
     * @param func Valid function objects.
     */
     template<typename... Func>
-    void patch([[maybe_unused]] const entity_type entt, Func &&... func) {
+    void patch([[maybe_unused]] const entity_type entt, Func &&...func) {
         ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
         (std::forward<Func>(func)(), ...);
     }
@@ -866,7 +852,6 @@ public:
     }
 };
 
-
 /**
  * @brief Mixin type to use to wrap basic storage classes.
  * @tparam Type The type of the underlying storage.
@@ -891,7 +876,7 @@ struct storage_adapter_mixin: Type {
      * @return A reference to the newly created object.
      */
     template<typename... Args>
-    decltype(auto) emplace(basic_registry<entity_type> &, const entity_type entt, Args &&... args) {
+    decltype(auto) emplace(basic_registry<entity_type> &, const entity_type entt, Args &&...args) {
         return Type::emplace(entt, std::forward<Args>(args)...);
     }
 
@@ -903,7 +888,7 @@ struct storage_adapter_mixin: Type {
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entt, Func &&... func) {
+    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entt, Func &&...func) {
         return Type::patch(entt, std::forward<Func>(func)...);
     }
 
@@ -918,11 +903,10 @@ struct storage_adapter_mixin: Type {
      * entities.
      */
     template<typename It, typename... Args>
-    void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
+    void insert(basic_registry<entity_type> &, It first, It last, Args &&...args) {
         Type::insert(std::move(first), std::move(last), std::forward<Args>(args)...);
     }
 };
-
 
 /**
  * @brief Mixin type to use to add signal support to storage types.
@@ -1034,7 +1018,7 @@ public:
      * @return A reference to the newly created object.
      */
     template<typename... Args>
-    decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entt, Args &&... args) {
+    decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entt, Args &&...args) {
         Type::emplace(entt, std::forward<Args>(args)...);
         construction.publish(owner, entt);
         return this->get(entt);
@@ -1049,7 +1033,7 @@ public:
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entt, Func &&... func) {
+    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entt, Func &&...func) {
         Type::patch(entt, std::forward<Func>(func)...);
         update.publish(owner, entt);
         return this->get(entt);
@@ -1067,7 +1051,7 @@ public:
      * entities.
      */
     template<typename It, typename... Args>
-    void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
+    void insert(basic_registry<entity_type> &owner, It first, It last, Args &&...args) {
         Type::insert(first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
@@ -1083,7 +1067,6 @@ private:
     sigh<void(basic_registry<entity_type> &, const entity_type)> update{};
 };
 
-
 /**
  * @brief Provides a common way to access certain properties of storage types.
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -1095,8 +1078,6 @@ struct storage_traits {
     using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

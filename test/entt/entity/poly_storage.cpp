@@ -15,10 +15,7 @@ struct PolyStorage
               void(const Entity *, const Entity *, void *),
               void(entt::basic_registry<Entity> &, const Entity, const void *),
               const void *(const Entity) const,
-              void(entt::basic_registry<Entity> &) const
-          >
-      >
-{
+              void(entt::basic_registry<Entity> &) const>> {
     using entity_type = Entity;
     using size_type = std::size_t;
 
@@ -34,7 +31,7 @@ struct PolyStorage
             entt::poly_call<base + 1>(*this, owner, entity, instance);
         }
 
-        const void * get(const entity_type entity) const {
+        const void *get(const entity_type entity) const {
             return entt::poly_call<base + 2>(*this, entity);
         }
 
@@ -49,7 +46,7 @@ struct PolyStorage
             self.emplace(owner, entity, *static_cast<const typename Type::value_type *>(instance));
         }
 
-        static const typename Type::value_type * get(const Type &self, const entity_type entity) {
+        static const typename Type::value_type *get(const Type &self, const entity_type entity) {
             return &self.get(entity);
         }
 
@@ -66,9 +63,7 @@ struct PolyStorage
             &Type::template erase<const entity_type *>,
             &members<Type>::emplace,
             &members<Type>::get,
-            &members<Type>::copy_to
-        >
-    >;
+            &members<Type>::copy_to>>;
 };
 
 template<typename Entity>

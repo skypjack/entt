@@ -3,12 +3,14 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
-#include <entt/entity/registry.hpp>
 #include <entt/entity/group.hpp>
+#include <entt/entity/registry.hpp>
 
 struct empty_type {};
 
-struct boxed_int { int value; };
+struct boxed_int {
+    int value;
+};
 
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
     return lhs.value == rhs.value;
@@ -286,7 +288,7 @@ TEST(NonOwningGroup, SortAsAPool) {
     registry.emplace<unsigned int>(e0, uval++);
     registry.emplace<unsigned int>(e1, uval++);
     registry.emplace<unsigned int>(e2, uval++);
-    registry.emplace<unsigned int>(e3, uval+1);
+    registry.emplace<unsigned int>(e3, uval + 1);
 
     registry.emplace<int>(e0, ival++);
     registry.emplace<int>(e1, ival++);
@@ -1067,7 +1069,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(group.get<int, const char, double, const float>({})), std::tuple<int &, const char &, double &, const float &>>);
     static_assert(std::is_same_v<decltype(group.get({})), std::tuple<int &, const char &, double &, const float &>>);
     static_assert(std::is_same_v<decltype(group.data()), const entt::entity *>);
-    static_assert(std::is_same_v<decltype(group.raw<const char>()), const char * const *>);
+    static_assert(std::is_same_v<decltype(group.raw<const char>()), const char *const *>);
     static_assert(std::is_same_v<decltype(group.raw<int>()), int **>);
 
     static_assert(std::is_same_v<decltype(std::as_const(registry).group_if_exists<int>(entt::get<char>)), decltype(std::as_const(registry).group_if_exists<const int>(entt::get<const char>))>);

@@ -1,13 +1,10 @@
 #ifndef ENTT_RESOURCE_LOADER_HPP
 #define ENTT_RESOURCE_LOADER_HPP
 
-
 #include "fwd.hpp"
 #include "handle.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Base class for resource loaders.
@@ -54,13 +51,11 @@ class resource_loader {
      * @return The resource just loaded or an empty pointer in case of errors.
      */
     template<typename... Args>
-    [[nodiscard]] resource_handle<Resource> get(Args &&... args) const {
+    [[nodiscard]] resource_handle<Resource> get(Args &&...args) const {
         return static_cast<const Loader *>(this)->load(std::forward<Args>(args)...);
     }
 };
 
-
-}
-
+} // namespace entt
 
 #endif

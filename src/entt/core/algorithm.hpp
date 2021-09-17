@@ -1,17 +1,14 @@
 #ifndef ENTT_CORE_ALGORITHM_HPP
 #define ENTT_CORE_ALGORITHM_HPP
 
-
-#include <vector>
-#include <utility>
-#include <iterator>
 #include <algorithm>
 #include <functional>
+#include <iterator>
+#include <utility>
+#include <vector>
 #include "utility.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Function object to wrap `std::sort` in a class type.
@@ -36,11 +33,10 @@ struct std_sort {
      * @param args Arguments to forward to the sort function, if any.
      */
     template<typename It, typename Compare = std::less<>, typename... Args>
-    void operator()(It first, It last, Compare compare = Compare{}, Args &&... args) const {
+    void operator()(It first, It last, Compare compare = Compare{}, Args &&...args) const {
         std::sort(std::forward<Args>(args)..., std::move(first), std::move(last), std::move(compare));
     }
 };
-
 
 /*! @brief Function object for performing insertion sort. */
 struct insertion_sort {
@@ -62,8 +58,8 @@ struct insertion_sort {
                 auto value = std::move(*it);
                 auto pre = it;
 
-                for(; pre > first && compare(value, *(pre-1)); --pre) {
-                    *pre = std::move(*(pre-1));
+                for(; pre > first && compare(value, *(pre - 1)); --pre) {
+                    *pre = std::move(*(pre - 1));
                 }
 
                 *pre = std::move(value);
@@ -71,7 +67,6 @@ struct insertion_sort {
         }
     }
 };
-
 
 /**
  * @brief Function object for performing LSD radix sort.
@@ -137,8 +132,6 @@ struct radix_sort {
     }
 };
 
-
-}
-
+} // namespace entt
 
 #endif

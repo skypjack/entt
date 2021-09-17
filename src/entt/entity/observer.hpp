@@ -1,29 +1,25 @@
 #ifndef ENTT_ENTITY_OBSERVER_HPP
 #define ENTT_ENTITY_OBSERVER_HPP
 
-
-#include <limits>
 #include <cstddef>
 #include <cstdint>
-#include <utility>
+#include <limits>
 #include <type_traits>
+#include <utility>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
+#include "entity.hpp"
+#include "fwd.hpp"
 #include "registry.hpp"
 #include "storage.hpp"
 #include "utility.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
-
 
 namespace entt {
-
 
 /*! @brief Grouping matcher. */
 template<typename...>
 struct matcher {};
-
 
 /**
  * @brief Collector.
@@ -33,7 +29,6 @@ struct matcher {};
  */
 template<typename...>
 struct basic_collector;
-
 
 /**
  * @brief Collector.
@@ -114,10 +109,8 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
     }
 };
 
-
 /*! @brief Variable template used to ease the definition of collectors. */
 inline constexpr basic_collector<> collector{};
-
 
 /**
  * @brief Observer.
@@ -282,8 +275,7 @@ public:
     /*! @brief Default constructor. */
     basic_observer()
         : release{},
-          storage{}
-    {}
+          storage{} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     basic_observer(const basic_observer &) = delete;
@@ -297,8 +289,7 @@ public:
      */
     template<typename... Matcher>
     basic_observer(basic_registry<entity_type> &reg, basic_collector<Matcher...>)
-        : basic_observer{}
-    {
+        : basic_observer{} {
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
     }
 
@@ -309,13 +300,13 @@ public:
      * @brief Default copy assignment operator, deleted on purpose.
      * @return This observer.
      */
-    basic_observer & operator=(const basic_observer &) = delete;
+    basic_observer &operator=(const basic_observer &) = delete;
 
     /**
      * @brief Default move assignment operator, deleted on purpose.
      * @return This observer.
      */
-    basic_observer & operator=(basic_observer &&) = delete;
+    basic_observer &operator=(basic_observer &&) = delete;
 
     /**
      * @brief Connects an observer to a given registry.
@@ -365,7 +356,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type *data() const ENTT_NOEXCEPT {
         return storage.data();
     }
 
@@ -440,8 +431,6 @@ private:
     basic_storage<entity_type, payload_type> storage;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

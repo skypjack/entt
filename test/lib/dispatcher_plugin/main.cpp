@@ -1,7 +1,7 @@
 #define CR_HOST
 
-#include <cr.h>
 #include <gtest/gtest.h>
+#include <cr.h>
 #include <entt/core/type_info.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include "type_context.h"
@@ -16,7 +16,10 @@ struct entt::type_index<Type> {
 };
 
 struct listener {
-    void on(message msg) { value = msg.payload; }
+    void on(message msg) {
+        value = msg.payload;
+    }
+
     int value{};
 };
 

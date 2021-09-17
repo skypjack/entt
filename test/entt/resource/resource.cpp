@@ -3,7 +3,9 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/resource/cache.hpp>
 
-struct resource { int value; };
+struct resource {
+    int value;
+};
 
 struct derived_resource: resource {};
 

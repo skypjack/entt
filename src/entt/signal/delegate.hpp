@@ -1,76 +1,60 @@
 #ifndef ENTT_SIGNAL_DELEGATE_HPP
 #define ENTT_SIGNAL_DELEGATE_HPP
 
-
-#include <tuple>
 #include <cstddef>
-#include <utility>
 #include <functional>
+#include <tuple>
 #include <type_traits>
-#include "../core/type_traits.hpp"
+#include <utility>
 #include "../config/config.h"
-
+#include "../core/type_traits.hpp"
 
 namespace entt {
-
 
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
-
 namespace internal {
 
-
 template<typename Ret, typename... Args>
-auto function_pointer(Ret(*)(Args...)) -> Ret(*)(Args...);
-
+auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
 
 template<typename Ret, typename Type, typename... Args, typename Other>
-auto function_pointer(Ret(*)(Type, Args...), Other &&) -> Ret(*)(Args...);
-
-
-template<typename Class, typename Ret, typename... Args, typename... Other>
-auto function_pointer(Ret(Class:: *)(Args...), Other &&...) -> Ret(*)(Args...);
-
+auto function_pointer(Ret (*)(Type, Args...), Other &&) -> Ret (*)(Args...);
 
 template<typename Class, typename Ret, typename... Args, typename... Other>
-auto function_pointer(Ret(Class:: *)(Args...) const, Other &&...) -> Ret(*)(Args...);
+auto function_pointer(Ret (Class::*)(Args...), Other &&...) -> Ret (*)(Args...);
 
+template<typename Class, typename Ret, typename... Args, typename... Other>
+auto function_pointer(Ret (Class::*)(Args...) const, Other &&...) -> Ret (*)(Args...);
 
 template<typename Class, typename Type, typename... Other>
-auto function_pointer(Type Class:: *, Other &&...) -> Type(*)();
-
+auto function_pointer(Type Class::*, Other &&...) -> Type (*)();
 
 template<typename... Type>
 using function_pointer_t = decltype(internal::function_pointer(std::declval<Type>()...));
 
-
 template<typename... Class, typename Ret, typename... Args>
-[[nodiscard]] constexpr auto index_sequence_for(Ret(*)(Args...)) {
+[[nodiscard]] constexpr auto index_sequence_for(Ret (*)(Args...)) {
     return std::index_sequence_for<Class..., Args...>{};
 }
 
-
-}
-
+} // namespace internal
 
 /**
  * Internal details not to be documented.
  * @endcond
  */
 
-
 /*! @brief Used to wrap a function or a member of a specified type. */
 template<auto>
 struct connect_arg_t {};
 
-
 /*! @brief Constant of type connect_arg_t used to disambiguate calls. */
 template<auto Func>
 inline constexpr connect_arg_t<Func> connect_arg{};
-
 
 /**
  * @brief Basic delegate implementation.
@@ -80,7 +64,6 @@ inline constexpr connect_arg_t<Func> connect_arg{};
  */
 template<typename>
 class delegate;
-
 
 /**
  * @brief Utility class to use to send around functions and members.
@@ -132,8 +115,8 @@ public:
 
     /*! @brief Default constructor. */
     delegate() ENTT_NOEXCEPT
-        : fn{nullptr}, data{nullptr}
-    {}
+        : fn{nullptr},
+          data{nullptr} {}
 
     /**
      * @brief Constructs a delegate and connects a free function or an unbound
@@ -271,7 +254,7 @@ public:
      * @brief Returns the instance or the payload linked to a delegate, if any.
      * @return An opaque pointer to the underlying data.
      */
-    [[nodiscard]] const void * instance() const ENTT_NOEXCEPT {
+    [[nodiscard]] const void *instance() const ENTT_NOEXCEPT {
         return data;
     }
 
@@ -315,7 +298,6 @@ private:
     const void *data;
 };
 
-
 /**
  * @brief Compares the contents of two delegates.
  * @tparam Ret Return type of a function type.
@@ -329,14 +311,12 @@ template<typename Ret, typename... Args>
     return !(lhs == rhs);
 }
 
-
 /**
  * @brief Deduction guide.
  * @tparam Candidate Function or member to connect to the delegate.
  */
 template<auto Candidate>
 delegate(connect_arg_t<Candidate>) -> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate)>>>;
-
 
 /**
  * @brief Deduction guide.
@@ -346,17 +326,14 @@ delegate(connect_arg_t<Candidate>) -> delegate<std::remove_pointer_t<internal::f
 template<auto Candidate, typename Type>
 delegate(connect_arg_t<Candidate>, Type &&) -> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate), Type>>>;
 
-
 /**
  * @brief Deduction guide.
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of arguments of a function type.
  */
 template<typename Ret, typename... Args>
-delegate(Ret(*)(const void *, Args...), const void * = nullptr) -> delegate<Ret(Args...)>;
+delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret(Args...)>;
 
-
-}
-
+} // namespace entt
 
 #endif

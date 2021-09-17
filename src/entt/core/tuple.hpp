@@ -1,15 +1,12 @@
 #ifndef ENTT_CORE_TUPLE_HPP
 #define ENTT_CORE_TUPLE_HPP
 
-
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 
-
 namespace entt {
-
 
 /**
  * @brief Utility function to unwrap tuples of a single element.
@@ -27,8 +24,6 @@ constexpr decltype(auto) unwrap_tuple(Type &&value) ENTT_NOEXCEPT {
     }
 }
 
-
-}
-
+} // namespace entt
 
 #endif

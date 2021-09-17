@@ -1,18 +1,15 @@
 #ifndef ENTT_PROCESS_SCHEDULER_HPP
 #define ENTT_PROCESS_SCHEDULER_HPP
 
-
-#include <vector>
-#include <memory>
-#include <utility>
 #include <algorithm>
+#include <memory>
 #include <type_traits>
+#include <utility>
+#include <vector>
 #include "../config/config.h"
 #include "process.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Cooperative scheduler for processes.
@@ -43,7 +40,7 @@ namespace entt {
 template<typename Delta>
 class scheduler {
     struct process_handler {
-        using instance_type = std::unique_ptr<void, void(*)(void *)>;
+        using instance_type = std::unique_ptr<void, void (*)(void *)>;
         using update_fn_type = bool(process_handler &, Delta, void *);
         using abort_fn_type = void(process_handler &, bool);
         using next_type = std::unique_ptr<process_handler>;
@@ -56,11 +53,10 @@ class scheduler {
 
     struct continuation {
         continuation(process_handler *ref)
-            : handler{ref}
-        {}
+            : handler{ref} {}
 
         template<typename Proc, typename... Args>
-        continuation then(Args &&... args) {
+        continuation then(Args &&...args) {
             static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
             auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
             handler->next.reset(new process_handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr});
@@ -118,7 +114,7 @@ public:
     scheduler(scheduler &&) = default;
 
     /*! @brief Default move assignment operator. @return This scheduler. */
-    scheduler & operator=(scheduler &&) = default;
+    scheduler &operator=(scheduler &&) = default;
 
     /**
      * @brief Number of processes currently scheduled.
@@ -172,7 +168,7 @@ public:
      * @return An opaque object to use to concatenate processes.
      */
     template<typename Proc, typename... Args>
-    auto attach(Args &&... args) {
+    auto attach(Args &&...args) {
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
         auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
         process_handler handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr};
@@ -253,7 +249,7 @@ public:
         auto sz = handlers.size();
 
         for(auto pos = handlers.size(); pos; --pos) {
-            auto &handler = handlers[pos-1];
+            auto &handler = handlers[pos - 1];
 
             if(const auto dead = handler.update(handler, delta, data); dead) {
                 std::swap(handler, handlers[--sz]);
@@ -289,8 +285,6 @@ private:
     std::vector<process_handler> handlers{};
 };
 
-
-}
-
+} // namespace entt
 
 #endif

@@ -1,14 +1,11 @@
 #ifndef ENTT_LOCATOR_LOCATOR_HPP
 #define ENTT_LOCATOR_LOCATOR_HPP
 
-
 #include <memory>
 #include <utility>
 #include "../config/config.h"
 
-
 namespace entt {
-
 
 /**
  * @brief Service locator, nothing more.
@@ -67,7 +64,7 @@ struct service_locator {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    [[nodiscard]] static Service & ref() ENTT_NOEXCEPT {
+    [[nodiscard]] static Service &ref() ENTT_NOEXCEPT {
         return *service;
     }
 
@@ -78,7 +75,7 @@ struct service_locator {
      * @param args Parameters to use to construct the service.
      */
     template<typename Impl = Service, typename... Args>
-    static void set(Args &&... args) {
+    static void set(Args &&...args) {
         service = std::make_shared<Impl>(std::forward<Args>(args)...);
     }
 
@@ -104,8 +101,6 @@ private:
     inline static std::shared_ptr<Service> service = nullptr;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

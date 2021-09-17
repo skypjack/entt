@@ -3,15 +3,15 @@
 #include <entt/signal/delegate.hpp>
 
 int delegate_function(const int &i) {
-    return i*i;
+    return i * i;
 }
 
 int curried_by_ref(const int &i, int j) {
-    return i+j;
+    return i + j;
 }
 
 int curried_by_ptr(const int *i, int j) {
-    return (*i)*j;
+    return (*i) * j;
 }
 
 int non_const_reference(int &i) {
@@ -24,7 +24,7 @@ int move_only_type(std::unique_ptr<int> ptr) {
 
 struct delegate_functor {
     int operator()(int i) {
-        return i+i;
+        return i + i;
     }
 
     int identity(int i) const {
@@ -36,13 +36,21 @@ struct delegate_functor {
 };
 
 struct const_nonconst_noexcept {
-    void f() { ++cnt; }
+    void f() {
+        ++cnt;
+    }
 
-    void g() noexcept { ++cnt; }
+    void g() noexcept {
+        ++cnt;
+    }
 
-    void h() const { ++cnt; }
+    void h() const {
+        ++cnt;
+    }
 
-    void i() const noexcept { ++cnt; }
+    void i() const noexcept {
+        ++cnt;
+    }
 
     int u{};
     const int v{};

@@ -1,12 +1,14 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
-#include <entt/entity/helper.hpp>
-#include <entt/entity/entity.hpp>
-#include <entt/entity/registry.hpp>
 #include <entt/core/type_traits.hpp>
+#include <entt/entity/entity.hpp>
+#include <entt/entity/helper.hpp>
+#include <entt/entity/registry.hpp>
 
 struct clazz {
-    void func(entt::registry &, entt::entity curr) { entt = curr; }
+    void func(entt::registry &, entt::entity curr) {
+        entt = curr;
+    }
 
     entt::entity entt{entt::null};
 };

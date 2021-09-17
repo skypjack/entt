@@ -1,16 +1,13 @@
 #ifndef ENTT_RESOURCE_HANDLE_HPP
 #define ENTT_RESOURCE_HANDLE_HPP
 
-
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "fwd.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Shared resource handle.
@@ -42,8 +39,7 @@ public:
      * @param res A pointer to a properly initialized resource.
      */
     resource_handle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
-        : resource{std::move(res)}
-    {}
+        : resource{std::move(res)} {}
 
     /**
      * @brief Copy constructor.
@@ -64,8 +60,7 @@ public:
      */
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>>>
     resource_handle(const resource_handle<Other> &other) ENTT_NOEXCEPT
-        : resource{other.resource}
-    {}
+        : resource{other.resource} {}
 
     /**
      * @brief Move constructs a handle which takes ownership of the resource.
@@ -74,22 +69,21 @@ public:
      */
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>>>
     resource_handle(resource_handle<Other> &&other) ENTT_NOEXCEPT
-        : resource{std::move(other.resource)}
-    {}
+        : resource{std::move(other.resource)} {}
 
     /**
      * @brief Copy assignment operator.
      * @param other The instance to copy from.
      * @return This resource handle.
      */
-    resource_handle & operator=(const resource_handle<Resource> &other) ENTT_NOEXCEPT = default;
+    resource_handle &operator=(const resource_handle<Resource> &other) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
      * @return This resource handle.
      */
-    resource_handle & operator=(resource_handle<Resource> &&other) ENTT_NOEXCEPT = default;
+    resource_handle &operator=(resource_handle<Resource> &&other) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Copy assignment operator from foreign handle.
@@ -125,33 +119,33 @@ public:
      *
      * @return A reference to the managed resource.
      */
-    [[nodiscard]] const Resource & get() const ENTT_NOEXCEPT {
+    [[nodiscard]] const Resource &get() const ENTT_NOEXCEPT {
         ENTT_ASSERT(static_cast<bool>(resource), "Invalid resource");
         return *resource;
     }
 
     /*! @copydoc get */
-    [[nodiscard]] Resource & get() ENTT_NOEXCEPT {
+    [[nodiscard]] Resource &get() ENTT_NOEXCEPT {
         return const_cast<Resource &>(std::as_const(*this).get());
     }
 
     /*! @copydoc get */
-    [[nodiscard]] operator const Resource & () const ENTT_NOEXCEPT {
+    [[nodiscard]] operator const Resource &() const ENTT_NOEXCEPT {
         return get();
     }
 
     /*! @copydoc get */
-    [[nodiscard]] operator Resource & () ENTT_NOEXCEPT {
+    [[nodiscard]] operator Resource &() ENTT_NOEXCEPT {
         return get();
     }
 
     /*! @copydoc get */
-    [[nodiscard]] const Resource & operator *() const ENTT_NOEXCEPT {
+    [[nodiscard]] const Resource &operator*() const ENTT_NOEXCEPT {
         return get();
     }
 
     /*! @copydoc get */
-    [[nodiscard]] Resource & operator *() ENTT_NOEXCEPT {
+    [[nodiscard]] Resource &operator*() ENTT_NOEXCEPT {
         return get();
     }
 
@@ -164,12 +158,12 @@ public:
      * @return A pointer to the managed resource or `nullptr` if the handle
      * contains no resource at all.
      */
-    [[nodiscard]] const Resource * operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] const Resource *operator->() const ENTT_NOEXCEPT {
         return resource.get();
     }
 
     /*! @copydoc operator-> */
-    [[nodiscard]] Resource * operator->() ENTT_NOEXCEPT {
+    [[nodiscard]] Resource *operator->() ENTT_NOEXCEPT {
         return const_cast<Resource *>(std::as_const(*this).operator->());
     }
 
@@ -193,8 +187,6 @@ private:
     std::shared_ptr<Resource> resource;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

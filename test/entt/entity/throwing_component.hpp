@@ -1,9 +1,7 @@
 #ifndef ENTT_ENTITY_THROWING_COMPONENT_HPP
 #define ENTT_ENTITY_THROWING_COMPONENT_HPP
 
-
 namespace test {
-
 
 class throwing_component {
     struct test_exception {};
@@ -13,19 +11,17 @@ public:
     static constexpr auto moved_from_value = -1;
 
     throwing_component(int value)
-        : data{value}
-    {}
+        : data{value} {}
 
     throwing_component(const throwing_component &other)
-        : data{other.data}
-    {
+        : data{other.data} {
         if(data == trigger_on_value) {
             data = moved_from_value;
             throw exception_type{};
         }
     }
 
-    throwing_component & operator=(const throwing_component &other) {
+    throwing_component &operator=(const throwing_component &other) {
         if(other.data == trigger_on_value) {
             data = moved_from_value;
             throw exception_type{};
@@ -45,8 +41,6 @@ private:
     int data{};
 };
 
-
-}
-
+} // namespace test
 
 #endif

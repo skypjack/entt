@@ -7,20 +7,23 @@
 struct empty_type {};
 
 struct move_only_type {
-    move_only_type(): value{new int{99}} {}
+    move_only_type()
+        : value{new int{99}} {}
 
-    move_only_type(int v): value{new int{v}} {}
+    move_only_type(int v)
+        : value{new int{v}} {}
 
-    ~move_only_type() { delete value; }
+    ~move_only_type() {
+        delete value;
+    }
 
     move_only_type(const move_only_type &) = delete;
-    move_only_type & operator=(const move_only_type &) = delete;
+    move_only_type &operator=(const move_only_type &) = delete;
 
     move_only_type(move_only_type &&other) ENTT_NOEXCEPT
-        : value{std::exchange(other.value, nullptr)}
-    {}
+        : value{std::exchange(other.value, nullptr)} {}
 
-    move_only_type & operator=(move_only_type &&other) ENTT_NOEXCEPT {
+    move_only_type &operator=(move_only_type &&other) ENTT_NOEXCEPT {
         delete value;
         value = std::exchange(other.value, nullptr);
         return *this;
@@ -30,7 +33,8 @@ struct move_only_type {
 };
 
 struct non_default_constructible {
-    non_default_constructible(int v): value{v} {}
+    non_default_constructible(int v)
+        : value{v} {}
 
     int value;
 };

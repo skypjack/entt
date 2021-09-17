@@ -1,16 +1,13 @@
 #ifndef ENTT_CORE_MEMORY_HPP
 #define ENTT_CORE_MEMORY_HPP
 
-
 #include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 
-
 namespace entt {
-
 
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
@@ -27,7 +24,6 @@ template<typename Type>
     }
 }
 
-
 /**
  * @brief Utility function to design allocation-aware containers.
  * @tparam Allocator Type of allocator.
@@ -41,7 +37,6 @@ constexpr void propagate_on_container_copy_assignment([[maybe_unused]] Allocator
     }
 }
 
-
 /**
  * @brief Utility function to design allocation-aware containers.
  * @tparam Allocator Type of allocator.
@@ -54,7 +49,6 @@ constexpr void propagate_on_container_move_assignment([[maybe_unused]] Allocator
         lhs = std::move(rhs);
     }
 }
-
 
 /**
  * @brief Utility function to design allocation-aware containers.
@@ -73,7 +67,6 @@ constexpr void propagate_on_container_swap(Allocator &lhs, Allocator &rhs) ENTT_
     }
 }
 
-
 /**
  * @brief Checks whether a value is a power of two or not.
  * @param value A value that may or may not be a power of two.
@@ -82,7 +75,6 @@ constexpr void propagate_on_container_swap(Allocator &lhs, Allocator &rhs) ENTT_
 [[nodiscard]] inline constexpr bool is_power_of_two(const std::size_t value) ENTT_NOEXCEPT {
     return value && ((value & (value - 1)) == 0);
 }
-
 
 /**
  * @brief Fast module utility function (powers of two only).
@@ -96,8 +88,6 @@ template<std::size_t Value>
     return value & (Value - 1u);
 }
 
-
-}
-
+} // namespace entt
 
 #endif

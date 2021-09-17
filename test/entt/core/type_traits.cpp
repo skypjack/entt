@@ -15,7 +15,9 @@ struct not_comparable {
 struct nlohmann_json_like {
     using value_type = nlohmann_json_like;
 
-    bool operator==(const nlohmann_json_like &) const { return true; }
+    bool operator==(const nlohmann_json_like &) const {
+        return true;
+    }
 };
 
 TEST(TypeTraits, SizeOf) {
@@ -160,9 +162,13 @@ TEST(TypeTraits, ConstnessAs) {
 
 TEST(TypeTraits, MemberClass) {
     struct clazz {
-        char foo(int) { return {}; }
+        char foo(int) {
+            return {};
+        }
 
-        int bar(double, float) const { return {}; }
+        int bar(double, float) const {
+            return {};
+        }
 
         bool quux;
     };

@@ -1,14 +1,11 @@
 #ifndef ENTT_PROCESS_PROCESS_HPP
 #define ENTT_PROCESS_PROCESS_HPP
 
-
-#include <utility>
 #include <type_traits>
+#include <utility>
 #include "../config/config.h"
 
-
 namespace entt {
-
 
 /**
  * @brief Base class for processes.
@@ -71,7 +68,7 @@ namespace entt {
  */
 template<typename Derived, typename Delta>
 class process {
-    enum class state: unsigned int {
+    enum class state : unsigned int {
         UNINITIALIZED = 0,
         RUNNING,
         PAUSED,
@@ -84,31 +81,31 @@ class process {
 
     template<typename Target = Derived>
     auto next(std::integral_constant<state, state::UNINITIALIZED>)
-    -> decltype(std::declval<Target>().init(), void()) {
+        -> decltype(std::declval<Target>().init(), void()) {
         static_cast<Target *>(this)->init();
     }
 
     template<typename Target = Derived>
     auto next(std::integral_constant<state, state::RUNNING>, Delta delta, void *data)
-    -> decltype(std::declval<Target>().update(delta, data), void()) {
+        -> decltype(std::declval<Target>().update(delta, data), void()) {
         static_cast<Target *>(this)->update(delta, data);
     }
 
     template<typename Target = Derived>
     auto next(std::integral_constant<state, state::SUCCEEDED>)
-    -> decltype(std::declval<Target>().succeeded(), void()) {
+        -> decltype(std::declval<Target>().succeeded(), void()) {
         static_cast<Target *>(this)->succeeded();
     }
 
     template<typename Target = Derived>
     auto next(std::integral_constant<state, state::FAILED>)
-    -> decltype(std::declval<Target>().failed(), void()) {
+        -> decltype(std::declval<Target>().failed(), void()) {
         static_cast<Target *>(this)->failed();
     }
 
     template<typename Target = Derived>
     auto next(std::integral_constant<state, state::ABORTED>)
-    -> decltype(std::declval<Target>().aborted(), void()) {
+        -> decltype(std::declval<Target>().aborted(), void()) {
         static_cast<Target *>(this)->aborted();
     }
 
@@ -158,8 +155,8 @@ protected:
      * paused.
      */
     void unpause() ENTT_NOEXCEPT {
-        if(current  == state::PAUSED) {
-            current  = state::RUNNING;
+        if(current == state::PAUSED) {
+            current = state::RUNNING;
         }
     }
 
@@ -228,7 +225,7 @@ public:
      * @param data Optional data.
      */
     void tick(const Delta delta, void *data = nullptr) {
-        switch (current) {
+        switch(current) {
         case state::UNINITIALIZED:
             next(std::integral_constant<state, state::UNINITIALIZED>{});
             current = state::RUNNING;
@@ -264,7 +261,6 @@ public:
 private:
     state current{state::UNINITIALIZED};
 };
-
 
 /**
  * @brief Adaptor for lambdas and functors to turn them into processes.
@@ -313,9 +309,8 @@ struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Fu
      * @param args Parameters to use to initialize the actual process.
      */
     template<typename... Args>
-    process_adaptor(Args &&... args)
-        : Func{std::forward<Args>(args)...}
-    {}
+    process_adaptor(Args &&...args)
+        : Func{std::forward<Args>(args)...} {}
 
     /**
      * @brief Updates a process and its internal state if required.
@@ -327,13 +322,10 @@ struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Fu
             delta,
             data,
             [this]() { this->succeed(); },
-            [this]() { this->fail(); }
-        );
+            [this]() { this->fail(); });
     }
 };
 
-
-}
-
+} // namespace entt
 
 #endif

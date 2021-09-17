@@ -6,12 +6,16 @@
 #include <entt/entity/storage.hpp>
 
 struct empty_type {};
-struct stable_type { int value; };
+
+struct stable_type {
+    int value;
+};
 
 struct non_default_constructible {
     non_default_constructible() = delete;
 
-    non_default_constructible(int v): value{v} {}
+    non_default_constructible(int v)
+        : value{v} {}
 
     int value;
 };

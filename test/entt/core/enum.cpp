@@ -17,8 +17,7 @@ enum class registered {
 
 template<>
 struct entt::enum_as_bitmask<registered>
-    : std::true_type
-{};
+    : std::true_type {};
 
 TEST(Enum, Functionalities) {
     auto test = [](auto identity) {

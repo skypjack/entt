@@ -1,19 +1,16 @@
 #ifndef ENTT_RESOURCE_CACHE_HPP
 #define ENTT_RESOURCE_CACHE_HPP
 
-
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include "../config/config.h"
 #include "../core/fwd.hpp"
+#include "fwd.hpp"
 #include "handle.hpp"
 #include "loader.hpp"
-#include "fwd.hpp"
-
 
 namespace entt {
-
 
 /**
  * @brief Simple cache for resources of a given type.
@@ -39,7 +36,7 @@ struct resource_cache {
     resource_cache(resource_cache &&) = default;
 
     /*! @brief Default move assignment operator. @return This cache. */
-    resource_cache & operator=(resource_cache &&) = default;
+    resource_cache &operator=(resource_cache &&) = default;
 
     /**
      * @brief Number of resources managed by a cache.
@@ -90,7 +87,7 @@ struct resource_cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    resource_handle<Resource> load(const id_type id, Args &&... args) {
+    resource_handle<Resource> load(const id_type id, Args &&...args) {
         if(auto it = resources.find(id); it == resources.cend()) {
             if(auto handle = temp<Loader>(std::forward<Args>(args)...); handle) {
                 return (resources[id] = std::move(handle));
@@ -126,7 +123,7 @@ struct resource_cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    resource_handle<Resource> reload(const id_type id, Args &&... args) {
+    resource_handle<Resource> reload(const id_type id, Args &&...args) {
         return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
     }
 
@@ -143,7 +140,7 @@ struct resource_cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    [[nodiscard]] resource_handle<Resource> temp(Args &&... args) const {
+    [[nodiscard]] resource_handle<Resource> temp(Args &&...args) const {
         return Loader{}.get(std::forward<Args>(args)...);
     }
 
@@ -208,7 +205,7 @@ struct resource_cache {
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
-    template <typename Func>
+    template<typename Func>
     void each(Func func) const {
         auto begin = resources.begin();
         auto end = resources.end();
@@ -230,8 +227,6 @@ private:
     std::unordered_map<id_type, resource_handle<Resource>> resources;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

@@ -1,7 +1,7 @@
-#include <iostream>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <chrono>
+#include <iostream>
 #include <iterator>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
@@ -24,7 +24,8 @@ struct entt::component_traits<stable_position>: basic_component_traits {
 };
 
 struct timer final {
-    timer(): start{std::chrono::system_clock::now()} {}
+    timer()
+        : start{std::chrono::system_clock::now()} {}
 
     void elapsed() {
         auto now = std::chrono::system_clock::now();
@@ -62,7 +63,7 @@ void pathological(Func func) {
         }
     }
 
-    func(registry, [](auto &... comp) {
+    func(registry, [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -304,7 +305,7 @@ TEST(Benchmark, IterateSingleComponent1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -325,7 +326,7 @@ TEST(Benchmark, IterateSingleComponentTombstonePolicy1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -341,7 +342,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
     }
 
     auto test = [&](auto func) {
-        entt::id_type types[] = { entt::type_hash<position>::value() };
+        entt::id_type types[] = {entt::type_hash<position>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -370,7 +371,7 @@ TEST(Benchmark, IterateTwoComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -392,7 +393,7 @@ TEST(Benchmark, IterateTombstonePolicyTwoComponentsTombstonePolicy1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -417,7 +418,7 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -442,7 +443,7 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -465,7 +466,7 @@ TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -488,7 +489,7 @@ TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -511,7 +512,7 @@ TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -530,8 +531,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
     auto test = [&](auto func) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
-            entt::type_hash<velocity>::value()
-        };
+            entt::type_hash<velocity>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -561,8 +561,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     auto test = [&](auto func) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
-            entt::type_hash<velocity>::value()
-        };
+            entt::type_hash<velocity>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -592,8 +591,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     auto test = [&](auto func) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
-            entt::type_hash<velocity>::value()
-        };
+            entt::type_hash<velocity>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -624,7 +622,7 @@ TEST(Benchmark, IterateThreeComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -647,7 +645,7 @@ TEST(Benchmark, IterateThreeComponentsTombstonePolicy1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -673,7 +671,7 @@ TEST(Benchmark, IterateThreeComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -699,7 +697,7 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -723,7 +721,7 @@ TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -747,7 +745,7 @@ TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -771,7 +769,7 @@ TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -792,8 +790,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
             entt::type_hash<velocity>::value(),
-            entt::type_hash<comp<0>>::value()
-        };
+            entt::type_hash<comp<0>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -826,8 +823,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
             entt::type_hash<velocity>::value(),
-            entt::type_hash<comp<0>>::value()
-        };
+            entt::type_hash<comp<0>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -860,8 +856,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
             entt::type_hash<velocity>::value(),
-            entt::type_hash<comp<0>>::value()
-        };
+            entt::type_hash<comp<0>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -895,7 +890,7 @@ TEST(Benchmark, IterateFiveComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -920,7 +915,7 @@ TEST(Benchmark, IterateFiveComponentsTombstonePolicy1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -948,7 +943,7 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -976,7 +971,7 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -1002,7 +997,7 @@ TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -1028,7 +1023,7 @@ TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -1054,7 +1049,7 @@ TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -1080,7 +1075,7 @@ TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -1105,8 +1100,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
             entt::type_hash<velocity>::value(),
             entt::type_hash<comp<0>>::value(),
             entt::type_hash<comp<1>>::value(),
-            entt::type_hash<comp<2>>::value()
-        };
+            entt::type_hash<comp<2>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -1145,8 +1139,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
             entt::type_hash<velocity>::value(),
             entt::type_hash<comp<0>>::value(),
             entt::type_hash<comp<1>>::value(),
-            entt::type_hash<comp<2>>::value()
-        };
+            entt::type_hash<comp<2>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -1185,8 +1178,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
             entt::type_hash<velocity>::value(),
             entt::type_hash<comp<0>>::value(),
             entt::type_hash<comp<1>>::value(),
-            entt::type_hash<comp<2>>::value()
-        };
+            entt::type_hash<comp<2>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);

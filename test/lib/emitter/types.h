@@ -5,8 +5,7 @@
 #include <entt/signal/emitter.hpp>
 
 struct ENTT_API test_emitter
-        : entt::emitter<test_emitter>
-{};
+    : entt::emitter<test_emitter> {};
 
 struct ENTT_API message {
     int payload;

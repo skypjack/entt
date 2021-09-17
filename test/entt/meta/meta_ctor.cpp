@@ -7,39 +7,43 @@
 #include <entt/meta/resolve.hpp>
 
 struct base_t {
-    base_t(): value{'c'} {}
+    base_t()
+        : value{'c'} {}
 
     char value;
 };
 
 struct derived_t: base_t {
-    derived_t(): base_t{} {}
+    derived_t()
+        : base_t{} {}
 };
 
 struct clazz_t {
     clazz_t(const base_t &other, int &iv)
-        : clazz_t{iv, other.value}
-    {}
+        : clazz_t{iv, other.value} {}
 
     clazz_t(const int &iv, char cv)
-        : i{iv}, c{cv}
-    {}
+        : i{iv}, c{cv} {}
 
-    operator int() const { return i; }
+    operator int() const {
+        return i;
+    }
 
     static clazz_t factory(int value) {
-        return { value, 'c' };
+        return {value, 'c'};
     }
 
     static clazz_t factory(base_t other, int value, int mul) {
-        return { value * mul, other.value };
+        return {value * mul, other.value};
     }
 
     int i{};
     char c{};
 };
 
-double double_factory() { return 42.; }
+double double_factory() {
+    return 42.;
+}
 
 struct MetaCtor: ::testing::Test {
     void SetUp() override {

@@ -25,10 +25,11 @@ struct clazz_t {
     clazz_t()
         : i{0},
           j{1},
-          base{}
-    {}
+          base{} {}
 
-    operator int() const { return h; }
+    operator int() const {
+        return h;
+    }
 
     int i{0};
     const int j{1};
@@ -38,7 +39,8 @@ struct clazz_t {
 };
 
 struct setter_getter_t {
-    setter_getter_t(): value{0} {}
+    setter_getter_t()
+        : value{0} {}
 
     int setter(double val) {
         return value = static_cast<int>(val);
@@ -52,7 +54,7 @@ struct setter_getter_t {
         return value = val;
     }
 
-    const int & getter_with_ref() {
+    const int &getter_with_ref() {
         return value;
     }
 
@@ -68,7 +70,8 @@ struct setter_getter_t {
 };
 
 struct multi_setter_t {
-    multi_setter_t(): value{0} {}
+    multi_setter_t()
+        : value{0} {}
 
     void from_double(double val) {
         value = val;
@@ -110,11 +113,15 @@ struct MetaData: ::testing::Test {
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
-            .data<&clazz_t::i, entt::as_ref_t>("i"_hs).prop(3, 0)
+            .data<&clazz_t::i, entt::as_ref_t>("i"_hs)
+            .prop(3, 0)
             .data<&clazz_t::i, entt::as_cref_t>("ci"_hs)
-            .data<&clazz_t::j>("j"_hs).prop(true, 1)
-            .data<&clazz_t::h>("h"_hs).prop(property_t::random, 2)
-            .data<&clazz_t::k>("k"_hs).prop(property_t::value, 3)
+            .data<&clazz_t::j>("j"_hs)
+            .prop(true, 1)
+            .data<&clazz_t::h>("h"_hs)
+            .prop(property_t::random, 2)
+            .data<&clazz_t::k>("k"_hs)
+            .prop(property_t::value, 3)
             .data<&clazz_t::base>("base"_hs)
             .data<&clazz_t::i, entt::as_void_t>("void"_hs)
             .conv<int>();

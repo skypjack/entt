@@ -7,17 +7,20 @@
 #include <entt/core/any.hpp>
 
 struct empty {
-    ~empty() { ++counter; }
+    ~empty() {
+        ++counter;
+    }
 
     inline static int counter = 0;
 };
 
 struct fat {
     fat(double v1, double v2, double v3, double v4)
-        : value{v1, v2, v3, v4}
-    {}
+        : value{v1, v2, v3, v4} {}
 
-    ~fat() { ++counter; }
+    ~fat() {
+        ++counter;
+    }
 
     bool operator==(const fat &other) const {
         return std::equal(std::begin(value), std::end(value), std::begin(other.value), std::end(other.value));
@@ -33,11 +36,15 @@ struct not_comparable {
 
 template<auto Sz>
 struct not_copyable {
-    not_copyable(): payload{} {}
+    not_copyable()
+        : payload{} {}
+
     not_copyable(const not_copyable &) = delete;
     not_copyable(not_copyable &&) = default;
-    not_copyable & operator=(const not_copyable &) = delete;
-    not_copyable & operator=(not_copyable &&) = default;
+
+    not_copyable &operator=(const not_copyable &) = delete;
+    not_copyable &operator=(not_copyable &&) = default;
+
     double payload[Sz];
 };
 
@@ -560,7 +567,7 @@ TEST_F(Any, EmplaceVoid) {
     ASSERT_FALSE(any);
     ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.type(), entt::type_id<void>());
- }
+}
 
 TEST_F(Any, Reset) {
     entt::any any{42};
@@ -1136,15 +1143,17 @@ TEST_F(Any, Alignment) {
         cb(data, target[1].data());
     };
 
-    entt::basic_any<alignment> nosbo[2] = { over_aligned{}, over_aligned{} };
+    entt::basic_any<alignment> nosbo[2] = {over_aligned{}, over_aligned{}};
     test(nosbo, [](auto *pre, auto *post) { ASSERT_EQ(pre, post); });
 
-    entt::basic_any<alignment, alignment> sbo[2] = { over_aligned{}, over_aligned{} };
+    entt::basic_any<alignment, alignment> sbo[2] = {over_aligned{}, over_aligned{}};
     test(sbo, [](auto *pre, auto *post) { ASSERT_NE(pre, post); });
 }
 
 TEST_F(Any, AggregatesMustWork) {
-    struct aggregate_type { int value; };
+    struct aggregate_type {
+        int value;
+    };
 
     // the goal of this test is to enforce the requirements for aggregate types
     entt::any{std::in_place_type<aggregate_type>, 42}.emplace<aggregate_type>(42);
