@@ -53,9 +53,7 @@ private:
 
 
 template<typename Type, std::size_t Tag>
-struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Type>>>
-    : Type
-{
+struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Type>>>: Type {
     template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<Type>>>
     compressed_pair_element()
         : Type{}
@@ -100,9 +98,8 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
  * @tparam Second The type of the second element that the pair stores.
  */
 template<typename First, typename Second>
-class compressed_pair final:
-    internal::compressed_pair_element<First, 0u>,
-    internal::compressed_pair_element<Second, 1u>
+class compressed_pair final
+    : internal::compressed_pair_element<First, 0u>, internal::compressed_pair_element<Second, 1u>
 {
     using first_base = internal::compressed_pair_element<First, 0u>;
     using second_base = internal::compressed_pair_element<Second, 1u>;
@@ -245,8 +242,7 @@ public:
  * @tparam Other Type of value to use to initialize the second element.
  */
 template<typename Type, typename Other>
-compressed_pair(Type &&, Other &&)
--> compressed_pair<std::decay_t<Type>, std::decay_t<Other>>;
+compressed_pair(Type &&, Other &&) -> compressed_pair<std::decay_t<Type>, std::decay_t<Other>>;
 
 
 /**

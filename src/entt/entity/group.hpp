@@ -442,7 +442,7 @@ public:
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
                 handler->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
-                auto forward_compare = [this, &compare](const entity_type lhs, const entity_type rhs) {
+                auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Component) == 1) {
                         return compare((std::get<storage_type<Component> *>(pools)->get(lhs), ...), (std::get<storage_type<Component> *>(pools)->get(rhs), ...));
                     } else {
@@ -450,7 +450,7 @@ public:
                     }
                 };
 
-                handler->sort(std::move(forward_compare), std::move(algo), std::forward<Args>(args)...);
+                handler->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
             }
         }
     }
@@ -606,35 +606,23 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
         {}
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return length ? iterator{
-                std::get<0>(pools)->basic_common_type::end() - *length,
-                std::make_tuple((std::get<storage_type<Owned> *>(pools)->end() - *length)...),
-                std::make_tuple(std::get<storage_type<Get> *>(pools)...)
-            } : iterator{{}, std::make_tuple(decltype(std::get<storage_type<Owned> *>(pools)->end()){}...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
+            auto it = length ? (std::get<0>(pools)->basic_common_type::end() - *length) : typename basic_common_type::iterator{};
+            return iterator{std::move(it), std::make_tuple((std::get<storage_type<Owned> *>(pools)->end() - *length)...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return length ? iterator{
-                std::get<0>(pools)->basic_common_type::end(),
-                std::make_tuple((std::get<storage_type<Owned> *>(pools)->end())...),
-                std::make_tuple(std::get<storage_type<Get> *>(pools)...)
-            } : iterator{{}, std::make_tuple(decltype(std::get<storage_type<Owned> *>(pools)->end()){}...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
+            auto it = length ? std::get<0>(pools)->basic_common_type::end() : typename basic_common_type::iterator{};
+            return iterator{std::move(it), std::make_tuple((std::get<storage_type<Owned> *>(pools)->end())...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return length ? reverse_iterator{
-                std::get<0>(pools)->basic_common_type::rbegin(),
-                std::make_tuple((std::get<storage_type<Owned> *>(pools)->rbegin())...),
-                std::make_tuple(std::get<storage_type<Get> *>(pools)...)
-            } : reverse_iterator{{}, std::make_tuple(decltype(std::get<storage_type<Owned> *>(pools)->rbegin()){}...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
+            auto it = length ? std::get<0>(pools)->basic_common_type::rbegin() : typename basic_common_type::reverse_iterator{};
+            return reverse_iterator{std::move(it), std::make_tuple((std::get<storage_type<Owned> *>(pools)->rbegin())...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return length ? reverse_iterator{
-                std::get<0>(pools)->basic_common_type::rbegin() + *length,
-                std::make_tuple((std::get<storage_type<Owned> *>(pools)->rbegin() + *length)...),
-                std::make_tuple(std::get<storage_type<Get> *>(pools)...)
-            } : reverse_iterator{{}, std::make_tuple(decltype(std::get<storage_type<Owned> *>(pools)->rbegin()){}...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
+            auto it = length ? (std::get<0>(pools)->basic_common_type::rbegin() + *length) : typename basic_common_type::reverse_iterator{};
+            return reverse_iterator{std::move(it), std::make_tuple((std::get<storage_type<Owned> *>(pools)->rbegin() + *length)...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
         }
 
     private:
@@ -941,7 +929,7 @@ public:
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
             cpool->sort_n(*length, std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
-            auto forward_compare = [this, &compare](const entity_type lhs, const entity_type rhs) {
+            auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Component) == 1) {
                     return compare((std::get<storage_type<Component> *>(pools)->get(lhs), ...), (std::get<storage_type<Component> *>(pools)->get(rhs), ...));
                 } else {
@@ -949,7 +937,7 @@ public:
                 }
             };
 
-            cpool->sort_n(*length, std::move(forward_compare), std::move(algo), std::forward<Args>(args)...);
+            cpool->sort_n(*length, std::move(comp), std::move(algo), std::forward<Args>(args)...);
         }
 
         [this](auto *head, auto *... other) {

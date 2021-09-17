@@ -59,8 +59,8 @@ class emitter {
         [[nodiscard]] bool empty() const ENTT_NOEXCEPT override {
             auto pred = [](auto &&element) { return element.first; };
 
-            return std::all_of(once_list.cbegin(), once_list.cend(), pred) &&
-                    std::all_of(on_list.cbegin(), on_list.cend(), pred);
+            return std::all_of(once_list.cbegin(), once_list.cend(), pred)
+                && std::all_of(on_list.cbegin(), on_list.cend(), pred);
         }
 
         void clear() ENTT_NOEXCEPT override {

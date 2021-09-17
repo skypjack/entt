@@ -77,6 +77,7 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
             nullptr,
             property[0u],
             property[1u]
+            // tricks clang-format
         };
 
         property[0u] = std::move(key);
@@ -199,6 +200,7 @@ class meta_factory<Type> {
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
             [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value) || ...); },
             &meta_getter<Type, Getter, Policy>
+            // tricks clang-format
         };
 
         link_data_if_required(id, node);
@@ -244,9 +246,8 @@ public:
         static internal::meta_base_node node{
             nullptr,
             internal::meta_node<Base>::resolve(),
-            [](const void *instance) ENTT_NOEXCEPT -> const void * {
-                return static_cast<const Base *>(static_cast<const Type *>(instance));
-            }
+            [](const void *instance) ENTT_NOEXCEPT -> const void * { return static_cast<const Base *>(static_cast<const Type *>(instance)); }
+            // tricks clang-format
         };
 
         link_base_if_required(node);
@@ -272,9 +273,8 @@ public:
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<conv_type>::resolve(),
-            [](const void *instance) -> meta_any {
-                return forward_as_meta(static_cast<const Type *>(instance)->*Candidate)();
-            }
+            [](const void *instance) -> meta_any { return forward_as_meta(static_cast<const Type *>(instance)->*Candidate)(); }
+            // tricks clang-format
         };
 
         link_conv_if_required(node);
@@ -289,9 +289,8 @@ public:
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<conv_type>::resolve(),
-            [](const void *instance) -> meta_any {
-                return forward_as_meta(Candidate(*static_cast<const Type *>(instance)));
-            }
+            [](const void *instance) -> meta_any { return forward_as_meta(Candidate(*static_cast<const Type *>(instance))); }
+            // tricks clang-format
         };
 
         link_conv_if_required(node);
@@ -314,9 +313,8 @@ public:
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<std::remove_const_t<std::remove_reference_t<To>>>::resolve(),
-            [](const void *instance) -> meta_any {
-                return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)));
-            }
+            [](const void *instance) -> meta_any { return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance))); }
+            // tricks clang-format
         };
 
         link_conv_if_required(node);
@@ -346,6 +344,7 @@ public:
             descriptor::args_type::size,
             &meta_arg<typename descriptor::args_type>,
             &meta_construct<Type, Candidate, Policy>
+            // tricks clang-format
         };
 
         link_ctor_if_required(node);
@@ -371,6 +370,7 @@ public:
             descriptor::args_type::size,
             &meta_arg<typename descriptor::args_type>,
             &meta_construct<Type, Args...>
+            // tricks clang-format
         };
 
         link_ctor_if_required(node);
@@ -430,6 +430,7 @@ public:
                 &meta_arg<type_list<data_type>>,
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>
+                // tricks clang-format
             };
 
             link_data_if_required(id, node);
@@ -473,6 +474,7 @@ public:
                 &meta_arg<type_list<>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>
+                // tricks clang-format
             };
 
             link_data_if_required(id, node);
@@ -491,6 +493,7 @@ public:
                 &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>
+                // tricks clang-format
             };
 
             link_data_if_required(id, node);
@@ -546,6 +549,7 @@ public:
             internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve(),
             &meta_arg<typename descriptor::args_type>,
             &meta_invoke<Type, Candidate, Policy>
+            // tricks clang-format
         };
 
         link_func_if_required(id, node);

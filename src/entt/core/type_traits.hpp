@@ -20,9 +20,7 @@ namespace entt {
 template<std::size_t N>
 struct choice_t
     // Unfortunately, doxygen cannot parse such a construct.
-    /*! @cond TURN_OFF_DOXYGEN */
-    : choice_t<N-1>
-    /*! @endcond */
+    : /*! @cond TURN_OFF_DOXYGEN */ choice_t<N - 1> /*! @endcond */
 {};
 
 
@@ -595,13 +593,11 @@ template<typename>
 
 
 template<typename Type>
-[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>)
--> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<0>) -> decltype(std::declval<Type>() == std::declval<Type>()) { return true; }
 
 
 template<typename Type>
-[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>)
--> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<1>) -> decltype(std::declval<typename Type::value_type>(), std::declval<Type>() == std::declval<Type>()) {
     if constexpr(is_iterator_v<Type>) {
         return true;
     } else if constexpr(std::is_same_v<typename Type::value_type, Type>) {
@@ -613,8 +609,7 @@ template<typename Type>
 
 
 template<typename Type>
-[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>)
--> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
+[[nodiscard]] constexpr auto is_equality_comparable(choice_t<2>) -> decltype(std::declval<typename Type::mapped_type>(), std::declval<Type>() == std::declval<Type>()) {
     return is_equality_comparable<typename Type::key_type>(choice<2>) && is_equality_comparable<typename Type::mapped_type>(choice<2>);
 }
 

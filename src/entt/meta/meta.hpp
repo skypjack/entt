@@ -153,7 +153,9 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    enum class operation { DEREF, SEQ, ASSOC };
+    enum class operation: std::uint8_t {
+        DEREF, SEQ, ASSOC
+    };
 
     using vtable_type = void(const operation, const any &, void *);
 
@@ -1436,7 +1438,9 @@ bool meta_any::set(const id_type id, Type &&value) {
 
 /*! @brief Opaque iterator for sequence containers. */
 class meta_sequence_container::meta_iterator {
-    enum class operation { INCR, DEREF };
+    enum class operation: std::uint8_t {
+        INCR, DEREF
+    };
 
     using vtable_type = void(const operation, const any &, void *);
 
@@ -1637,7 +1641,9 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 
 /*! @brief Opaque iterator for associative containers. */
 class meta_associative_container::meta_iterator {
-    enum class operation { INCR, DEREF };
+    enum class operation: std::uint8_t {
+        INCR, DEREF
+    };
 
     using vtable_type = void(const operation, const any &, void *);
 

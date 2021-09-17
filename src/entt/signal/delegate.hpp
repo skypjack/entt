@@ -335,8 +335,7 @@ template<typename Ret, typename... Args>
  * @tparam Candidate Function or member to connect to the delegate.
  */
 template<auto Candidate>
-delegate(connect_arg_t<Candidate>)
--> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate)>>>;
+delegate(connect_arg_t<Candidate>) -> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate)>>>;
 
 
 /**
@@ -345,8 +344,7 @@ delegate(connect_arg_t<Candidate>)
  * @tparam Type Type of class or type of payload.
  */
 template<auto Candidate, typename Type>
-delegate(connect_arg_t<Candidate>, Type &&)
--> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate), Type>>>;
+delegate(connect_arg_t<Candidate>, Type &&) -> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate), Type>>>;
 
 
 /**
@@ -355,8 +353,7 @@ delegate(connect_arg_t<Candidate>, Type &&)
  * @tparam Args Types of arguments of a function type.
  */
 template<typename Ret, typename... Args>
-delegate(Ret(*)(const void *, Args...), const void * = nullptr)
--> delegate<Ret(Args...)>;
+delegate(Ret(*)(const void *, Args...), const void * = nullptr) -> delegate<Ret(Args...)>;
 
 
 }

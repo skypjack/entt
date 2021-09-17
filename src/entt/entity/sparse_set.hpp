@@ -771,7 +771,7 @@ public:
     /*! @brief Removes all tombstones from the packed array of a sparse set. */
     void compact() {
         size_type next = count;
-        for(; next && packed[next - 1u] == tombstone; --next);
+        for(; next && packed[next - 1u] == tombstone; --next) { continue; }
 
         for(auto *it = &free_list; *it != null && next; it = std::addressof(packed[entity_traits::to_entity(*it)])) {
             if(const size_type pos = entity_traits::to_entity(*it); pos < next) {
@@ -781,7 +781,7 @@ public:
                 const auto entity = static_cast<typename entity_traits::entity_type>(pos);
                 sparse_ref(packed[pos]) = entity_traits::combine(entity, entity_traits::to_integral(packed[pos]));
                 *it = entity_traits::combine(static_cast<typename entity_traits::entity_type>(next), entity_traits::reserved);
-                for(; next && packed[next - 1u] == tombstone; --next);
+                for(; next && packed[next - 1u] == tombstone; --next) { continue; }
             }
         }
 

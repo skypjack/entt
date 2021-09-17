@@ -203,8 +203,7 @@ private:
  * @param str Human-readable identifer.
  */
 template<typename Char, std::size_t N>
-basic_hashed_string(const Char (&str)[N])
--> basic_hashed_string<Char>;
+basic_hashed_string(const Char (&str)[N]) -> basic_hashed_string<Char>;
 
 
 /**

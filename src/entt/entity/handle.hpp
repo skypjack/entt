@@ -56,11 +56,8 @@ struct basic_handle {
      */
     template<typename Other, typename... Args>
     operator basic_handle<Other, Args...>() const ENTT_NOEXCEPT {
-        static_assert(
-            (std::is_same_v<Other, Entity> || std::is_same_v<std::remove_const_t<Other>, Entity>)
-            && (sizeof...(Type) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Type)) && ... && (type_list_contains_v<type_list<Type...>, Args>))),
-            "Invalid conversion between different handles"
-        );
+        static_assert(std::is_same_v<Other, Entity> || std::is_same_v<std::remove_const_t<Other>, Entity>, "Invalid conversion between different handles");
+        static_assert((sizeof...(Type) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Type)) && ... && (type_list_contains_v<type_list<Type...>, Args>))), "Invalid conversion between different handles");
 
         return reg ? basic_handle<Other, Args...>{*reg, entt} : basic_handle<Other, Args...>{};
     }
@@ -322,8 +319,7 @@ template<typename... Args, typename... Other>
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-basic_handle(basic_registry<Entity> &, Entity)
--> basic_handle<Entity>;
+basic_handle(basic_registry<Entity> &, Entity) -> basic_handle<Entity>;
 
 
 /**
@@ -331,8 +327,7 @@ basic_handle(basic_registry<Entity> &, Entity)
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-basic_handle(const basic_registry<Entity> &, Entity)
--> basic_handle<const Entity>;
+basic_handle(const basic_registry<Entity> &, Entity) -> basic_handle<const Entity>;
 
 
 }

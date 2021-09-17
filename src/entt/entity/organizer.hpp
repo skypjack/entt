@@ -381,9 +381,7 @@ public:
             std::apply(Candidate, to_args(reg, typename resource_type::args{}));
         };
 
-        track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
-
-        vertices.push_back({
+        vertex_data vdata {
             resource_type::ro::size,
             resource_type::rw::size,
             name,
@@ -392,7 +390,10 @@ public:
             +[](const bool rw, type_info *buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             +[](basic_registry<entity_type> &reg) { void(to_args(reg, typename resource_type::args{})); },
             type_id<std::integral_constant<decltype(Candidate), Candidate>>()
-        });
+        };
+
+        track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
+        vertices.push_back(std::move(vdata));
     }
 
     /**
@@ -414,22 +415,19 @@ public:
             std::apply(Candidate, std::tuple_cat(std::forward_as_tuple(*curr), to_args(reg, typename resource_type::args{})));
         };
 
-        track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
-
-        vertices.push_back({
+        vertex_data vdata {
             resource_type::ro::size,
             resource_type::rw::size,
             name,
             &value_or_instance,
             callback,
-            +[](const bool rw, type_info *buffer, const std::size_t length) {
-                return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length);
-            },
-            +[](basic_registry<entity_type> &reg) {
-                void(to_args(reg, typename resource_type::args{}));
-            },
+            +[](const bool rw, type_info *buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
+            +[](basic_registry<entity_type> &reg) { void(to_args(reg, typename resource_type::args{})); },
             type_id<std::integral_constant<decltype(Candidate), Candidate>>()
-        });
+        };
+
+        track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
+        vertices.push_back(std::move(vdata));
     }
 
     /**
@@ -445,18 +443,18 @@ public:
         using resource_type = internal::resource<type_list<>, type_list<Req...>>;
         track_dependencies(vertices.size(), true, typename resource_type::ro{}, typename resource_type::rw{});
 
-        vertices.push_back({
+        vertex_data vdata {
             resource_type::ro::size,
             resource_type::rw::size,
             name,
             payload,
             func,
-            +[](const bool rw, type_info *buffer, const std::size_t length) {
-                return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length);
-            },
+            +[](const bool rw, type_info *buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             nullptr,
             type_info{}
-        });
+        };
+
+        vertices.push_back(std::move(vdata));
     }
 
     /**

@@ -501,9 +501,8 @@ public:
     void disconnect(Type *value_or_instance) {
         if(value_or_instance) {
             auto &calls = signal->calls;
-            calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
-                return delegate.instance() == value_or_instance;
-            }), calls.end());
+            auto predicate = [value_or_instance](const auto &delegate) { return delegate.instance() == value_or_instance; };
+            calls.erase(std::remove_if(calls.begin(), calls.end(), std::move(predicate)), calls.end());
         }
     }
 
@@ -528,8 +527,7 @@ private:
  * @tparam Args Types of arguments of a function type.
  */
 template<typename Ret, typename... Args>
-sink(sigh<Ret(Args...)> &)
--> sink<Ret(Args...)>;
+sink(sigh<Ret(Args...)> &) -> sink<Ret(Args...)>;
 
 
 }

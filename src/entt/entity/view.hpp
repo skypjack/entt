@@ -149,7 +149,7 @@ public:
     }
 
     view_iterator & operator++() ENTT_NOEXCEPT {
-        while(++it != last && !valid());
+        while(++it != last && !valid()) { continue; }
         return *this;
     }
 
@@ -159,7 +159,7 @@ public:
     }
 
     view_iterator & operator--() ENTT_NOEXCEPT {
-        while(--it != first && !valid());
+        while(--it != first && !valid()) { continue; }
         return *this;
     }
 
@@ -689,9 +689,7 @@ private:
  * @tparam Component Type of component iterated by the view.
  */
 template<typename Entity, typename Component>
-class basic_view<Entity, get_t<Component>, exclude_t<>, 
-    // Yeah, there is a reason why void_t and enable_if_t were combined here. Try removing the first one and let me know. :)
-    std::void_t<std::enable_if_t<!in_place_delete_v<std::remove_const_t<Component>>>>
+class basic_view<Entity, get_t<Component>, exclude_t<>, std::void_t<std::enable_if_t<!in_place_delete_v<std::remove_const_t<Component>>>>
 > {
     template<typename, typename, typename, typename>
     friend class basic_view;
@@ -1001,8 +999,7 @@ private:
  * @param storage The storage for the types to iterate.
  */
 template<typename... Storage>
-basic_view(Storage &... storage)
--> basic_view<std::common_type_t<typename Storage::entity_type...>, get_t<constness_as_t<typename Storage::value_type, Storage>...>, exclude_t<>>;
+basic_view(Storage &... storage) -> basic_view<std::common_type_t<typename Storage::entity_type...>, get_t<constness_as_t<typename Storage::value_type, Storage>...>, exclude_t<>>;
 
 
 }

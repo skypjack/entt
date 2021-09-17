@@ -39,8 +39,8 @@ template<typename Type>
  * @return The meta type associated with the given identifier, if any.
  */
 [[nodiscard]] inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
-    for(auto *curr = *internal::meta_context::global(); curr; curr = curr->next) {
-        if(curr->id == id) {
+    for(auto &&curr: resolve()) {
+        if(curr.id() == id) {
             return curr;
         }
     }
@@ -56,8 +56,8 @@ template<typename Type>
  * @return The meta type associated with the given type info object, if any.
  */
 [[nodiscard]] inline meta_type resolve(const type_info info) ENTT_NOEXCEPT {
-    for(auto *curr = *internal::meta_context::global(); curr; curr = curr->next) {
-        if(curr->info == info) {
+    for(auto &&curr: resolve()) {
+        if(curr.info() == info) {
             return curr;
         }
     }

@@ -389,7 +389,7 @@ public:
             return create();
         } else {
             auto *it = &free_list;
-            for(; entity_traits::to_entity(*it) != req; it = &entities[entity_traits::to_entity(*it)]);
+            for(; entity_traits::to_entity(*it) != req; it = &entities[entity_traits::to_entity(*it)]) { continue; }
             *it = entity_traits::combine(curr, entity_traits::to_integral(*it));
             return (entities[req] = hint);
         }
@@ -1215,17 +1215,16 @@ public:
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
-        if(auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
+        auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
             return gdata.size == size
-                && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
-                && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
-                && (gdata.exclude(type_hash<Exclude>::value()) && ...);
-        }); it != groups.cend())
-        {
-            handler = static_cast<handler_type *>(it->group.get());
-        }
+                   && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
+                   && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
+                   && (gdata.exclude(type_hash<Exclude>::value()) && ...);
+        });
 
-        if(!handler) {
+        if(it != groups.cend()) {
+            handler = static_cast<handler_type *>(it->group.get());
+        } else {
             group_data candidate = {
                 size,
                 { new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
@@ -1242,11 +1241,13 @@ public:
             if constexpr(sizeof...(Owned) == 0) {
                 groups.push_back(std::move(candidate));
             } else {
-                ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
+                [[maybe_unused]] auto has_conflict = [size](const auto &gdata) {
                     const auto overlapping = (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
                     const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<Exclude>::value()));
                     return !overlapping || ((sz == size) || (sz == gdata.size));
-                }), "Conflicting groups");
+                };
+
+                ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), std::move(has_conflict)), "Conflicting groups");
 
                 const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
                     return !(0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) || (size > gdata.size);
@@ -1296,13 +1297,14 @@ public:
      */
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] basic_group<Entity, owned_t<std::add_const_t<Owned>...>, get_t<std::add_const_t<Get>...>, exclude_t<Exclude...>> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
-        if(auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
+        auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
             return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))
-                && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
-                && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
-                && (gdata.exclude(type_hash<Exclude>::value()) && ...);
-            }); it == groups.cend())
-        {
+                   && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
+                   && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
+                   && (gdata.exclude(type_hash<Exclude>::value()) && ...);
+        });
+
+        if(it == groups.cend()) {
             return {};
         } else {
             using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
@@ -1359,9 +1361,8 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] bool sortable(const basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) ENTT_NOEXCEPT {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        return std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-            return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) && (size < gdata.size);
-        }) == groups.cend();
+        auto pred = [size](const auto &gdata) { return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) && (size < gdata.size); };
+        return std::find_if(groups.cbegin(), groups.cend(), std::move(pred)) == groups.cend();
     }
 
     /**
@@ -1418,9 +1419,8 @@ public:
             cpool->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
             if constexpr(std::is_invocable_v<Compare, decltype(cpool->get({})), decltype(cpool->get({}))>) {
-                cpool->sort([cpool, compare = std::move(compare)](const auto lhs, const auto rhs) {
-                    return compare(std::as_const(cpool->get(lhs)), std::as_const(cpool->get(rhs)));
-                }, std::move(algo), std::forward<Args>(args)...);
+                auto comp = [cpool, compare = std::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool->get(lhs)), std::as_const(cpool->get(rhs))); };
+                cpool->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
             } else {
                 cpool->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             }

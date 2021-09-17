@@ -170,9 +170,8 @@ class ENTT_API meta_node {
             static meta_template_node node{
                 meta_template_traits<Type>::args_type::size,
                 meta_node<typename meta_template_traits<Type>::class_type>::resolve(),
-                [](const std::size_t index) ENTT_NOEXCEPT {
-                    return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index);
-                }
+                [](const std::size_t index) ENTT_NOEXCEPT { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }
+                // tricks clang-format
             };
 
             return &node;
@@ -201,6 +200,7 @@ public:
             meta_default_constructor(),
             meta_conversion_helper(),
             meta_template_info()
+            // tricks clang-format
         };
 
         return &node;

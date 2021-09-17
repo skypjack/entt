@@ -87,7 +87,7 @@ class basic_runtime_view final {
         }
 
         view_iterator & operator++() {
-            while(++it != (*pools)[0]->end() && !valid());
+            while(++it != (*pools)[0]->end() && !valid()) { continue; }
             return *this;
         }
 
@@ -97,7 +97,7 @@ class basic_runtime_view final {
         }
 
         view_iterator & operator--() ENTT_NOEXCEPT {
-            while(--it != (*pools)[0]->begin() && !valid());
+            while(--it != (*pools)[0]->begin() && !valid()) { continue; }
             return *this;
         }
 
@@ -156,10 +156,12 @@ public:
         : pools{std::move(cpools)},
           filter{std::move(epools)}
     {
-        // brings the best candidate (if any) on front of the vector
-        std::rotate(pools.begin(), std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
+        auto candidate = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
             return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
-        }), pools.end());
+        });
+
+        // brings the best candidate (if any) on front of the vector
+        std::rotate(pools.begin(), candidate, pools.end());
     }
 
     /**
