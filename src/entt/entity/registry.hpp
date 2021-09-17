@@ -386,7 +386,7 @@ public:
             return create();
         } else {
             auto *it = &free_list;
-            for(; entity_traits::to_entity(*it) != req; it = &entities[entity_traits::to_entity(*it)]) { continue; }
+            for(; entity_traits::to_entity(*it) != req; it = &entities[entity_traits::to_entity(*it)]) {}
             *it = entity_traits::combine(curr, entity_traits::to_integral(*it));
             return (entities[req] = hint);
         }

@@ -137,7 +137,7 @@ public:
     }
 
     view_iterator &operator++() ENTT_NOEXCEPT {
-        while(++it != last && !valid()) { continue; }
+        while(++it != last && !valid()) {}
         return *this;
     }
 
@@ -147,7 +147,7 @@ public:
     }
 
     view_iterator &operator--() ENTT_NOEXCEPT {
-        while(--it != first && !valid()) { continue; }
+        while(--it != first && !valid()) {}
         return *this;
     }
 

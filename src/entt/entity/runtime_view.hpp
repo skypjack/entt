@@ -83,7 +83,7 @@ class basic_runtime_view final {
         }
 
         view_iterator &operator++() {
-            while(++it != (*pools)[0]->end() && !valid()) { continue; }
+            while(++it != (*pools)[0]->end() && !valid()) {}
             return *this;
         }
 
@@ -93,7 +93,7 @@ class basic_runtime_view final {
         }
 
         view_iterator &operator--() ENTT_NOEXCEPT {
-            while(--it != (*pools)[0]->begin() && !valid()) { continue; }
+            while(--it != (*pools)[0]->begin() && !valid()) {}
             return *this;
         }
 
