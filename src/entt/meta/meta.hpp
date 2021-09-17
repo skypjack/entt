@@ -146,9 +146,9 @@ private:
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
     enum class operation : std::uint8_t {
-        DEREF,
-        SEQ,
-        ASSOC
+        deref,
+        seq,
+        assoc
     };
 
     using vtable_type = void(const operation, const any &, void *);
@@ -159,7 +159,7 @@ class meta_any {
 
         if constexpr(!std::is_void_v<Type>) {
             switch(op) {
-            case operation::DEREF:
+            case operation::deref:
                 if constexpr(is_meta_pointer_like_v<Type>) {
                     if constexpr(std::is_function_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
                         *static_cast<meta_any *>(to) = any_cast<Type>(from);
@@ -169,12 +169,12 @@ class meta_any {
                     }
                 }
                 break;
-            case operation::SEQ:
+            case operation::seq:
                 if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
                     *static_cast<meta_sequence_container *>(to) = {std::in_place_type<Type>, std::move(const_cast<any &>(from))};
                 }
                 break;
-            case operation::ASSOC:
+            case operation::assoc:
                 if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
                     *static_cast<meta_associative_container *>(to) = {std::in_place_type<Type>, std::move(const_cast<any &>(from))};
                 }
@@ -489,14 +489,14 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() ENTT_NOEXCEPT {
         meta_sequence_container proxy;
-        vtable(operation::SEQ, storage.as_ref(), &proxy);
+        vtable(operation::seq, storage.as_ref(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const ENTT_NOEXCEPT {
         meta_sequence_container proxy;
-        vtable(operation::SEQ, storage.as_ref(), &proxy);
+        vtable(operation::seq, storage.as_ref(), &proxy);
         return proxy;
     }
 
@@ -506,14 +506,14 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() ENTT_NOEXCEPT {
         meta_associative_container proxy;
-        vtable(operation::ASSOC, storage.as_ref(), &proxy);
+        vtable(operation::assoc, storage.as_ref(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const ENTT_NOEXCEPT {
         meta_associative_container proxy;
-        vtable(operation::ASSOC, storage.as_ref(), &proxy);
+        vtable(operation::assoc, storage.as_ref(), &proxy);
         return proxy;
     }
 
@@ -524,7 +524,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const ENTT_NOEXCEPT {
         meta_any ret{};
-        vtable(operation::DEREF, storage, &ret);
+        vtable(operation::deref, storage, &ret);
         return ret;
     }
 
@@ -735,7 +735,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_CONST);
+        return !!(node->traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -743,7 +743,7 @@ struct meta_data {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_STATIC);
+        return !!(node->traits & internal::meta_traits::is_static);
     }
 
     /*! @copydoc meta_any::type */
@@ -852,7 +852,7 @@ struct meta_func {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_CONST);
+        return !!(node->traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -860,7 +860,7 @@ struct meta_func {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_STATIC);
+        return !!(node->traits & internal::meta_traits::is_static);
     }
 
     /**
@@ -1026,7 +1026,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_arithmetic() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_ARITHMETIC);
+        return !!(node->traits & internal::meta_traits::is_arithmetic);
     }
 
     /**
@@ -1034,7 +1034,7 @@ public:
      * @return True if the underlying type is an array type, false otherwise.
      */
     [[nodiscard]] bool is_array() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_ARRAY);
+        return !!(node->traits & internal::meta_traits::is_array);
     }
 
     /**
@@ -1042,7 +1042,7 @@ public:
      * @return True if the underlying type is an enum, false otherwise.
      */
     [[nodiscard]] bool is_enum() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_ENUM);
+        return !!(node->traits & internal::meta_traits::is_enum);
     }
 
     /**
@@ -1050,7 +1050,7 @@ public:
      * @return True if the underlying type is a class, false otherwise.
      */
     [[nodiscard]] bool is_class() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_CLASS);
+        return !!(node->traits & internal::meta_traits::is_class);
     }
 
     /**
@@ -1058,7 +1058,7 @@ public:
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_POINTER);
+        return !!(node->traits & internal::meta_traits::is_pointer);
     }
 
     /**
@@ -1067,7 +1067,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_pointer_like() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_META_POINTER_LIKE);
+        return !!(node->traits & internal::meta_traits::is_meta_pointer_like);
     }
 
     /**
@@ -1075,7 +1075,7 @@ public:
      * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_META_SEQUENCE_CONTAINER);
+        return !!(node->traits & internal::meta_traits::is_meta_sequence_container);
     }
 
     /**
@@ -1083,7 +1083,7 @@ public:
      * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const ENTT_NOEXCEPT {
-        return !!(node->traits & internal::meta_traits::IS_META_ASSOCIATIVE_CONTAINER);
+        return !!(node->traits & internal::meta_traits::is_meta_associative_container);
     }
 
     /**
@@ -1400,8 +1400,8 @@ bool meta_any::set(const id_type id, Type &&value) {
 /*! @brief Opaque iterator for sequence containers. */
 class meta_sequence_container::meta_iterator {
     enum class operation : std::uint8_t {
-        INCR,
-        DEREF
+        incr,
+        deref
     };
 
     using vtable_type = void(const operation, const any &, void *);
@@ -1409,10 +1409,10 @@ class meta_sequence_container::meta_iterator {
     template<typename It>
     static void basic_vtable(const operation op, const any &from, void *to) {
         switch(op) {
-        case operation::INCR:
+        case operation::incr:
             ++any_cast<It &>(const_cast<any &>(from));
             break;
-        case operation::DEREF:
+        case operation::deref:
             static_cast<meta_any *>(to)->emplace<typename std::iterator_traits<It>::reference>(*any_cast<const It &>(from));
             break;
         }
@@ -1445,7 +1445,7 @@ public:
 
     /*! @brief Pre-increment operator. @return This iterator. */
     meta_iterator &operator++() ENTT_NOEXCEPT {
-        return vtable(operation::INCR, handle, nullptr), *this;
+        return vtable(operation::incr, handle, nullptr), *this;
     }
 
     /*! @brief Post-increment operator. @return This iterator. */
@@ -1478,7 +1478,7 @@ public:
      */
     [[nodiscard]] reference operator*() const {
         meta_any other;
-        vtable(operation::DEREF, handle, &other);
+        vtable(operation::deref, handle, &other);
         return other;
     }
 
@@ -1592,8 +1592,8 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 /*! @brief Opaque iterator for associative containers. */
 class meta_associative_container::meta_iterator {
     enum class operation : std::uint8_t {
-        INCR,
-        DEREF
+        incr,
+        deref
     };
 
     using vtable_type = void(const operation, const any &, void *);
@@ -1601,10 +1601,10 @@ class meta_associative_container::meta_iterator {
     template<bool KeyOnly, typename It>
     static void basic_vtable(const operation op, const any &from, void *to) {
         switch(op) {
-        case operation::INCR:
+        case operation::incr:
             ++any_cast<It &>(const_cast<any &>(from));
             break;
-        case operation::DEREF:
+        case operation::deref:
             const auto &it = any_cast<const It &>(from);
             if constexpr(KeyOnly) {
                 static_cast<std::pair<meta_any, meta_any> *>(to)->first.emplace<decltype(*it)>(*it);
@@ -1644,7 +1644,7 @@ public:
 
     /*! @brief Pre-increment operator. @return This iterator. */
     meta_iterator &operator++() ENTT_NOEXCEPT {
-        return vtable(operation::INCR, handle, nullptr), *this;
+        return vtable(operation::incr, handle, nullptr), *this;
     }
 
     /*! @brief Post-increment operator. @return This iterator. */
@@ -1677,7 +1677,7 @@ public:
      */
     [[nodiscard]] reference operator*() const {
         reference other;
-        vtable(operation::DEREF, handle, &other);
+        vtable(operation::deref, handle, &other);
         return other;
     }
 

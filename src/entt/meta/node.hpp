@@ -26,17 +26,17 @@ struct meta_handle;
 namespace internal {
 
 enum class meta_traits : std::uint32_t {
-    IS_NONE = 0x0000,
-    IS_CONST = 0x0001,
-    IS_STATIC = 0x0002,
-    IS_ARITHMETIC = 0x0004,
-    IS_ARRAY = 0x0008,
-    IS_ENUM = 0x0010,
-    IS_CLASS = 0x0020,
-    IS_POINTER = 0x0040,
-    IS_META_POINTER_LIKE = 0x0080,
-    IS_META_SEQUENCE_CONTAINER = 0x0100,
-    IS_META_ASSOCIATIVE_CONTAINER = 0x0200,
+    is_none = 0x0000,
+    is_const = 0x0001,
+    is_static = 0x0002,
+    is_arithmetic = 0x0004,
+    is_array = 0x0008,
+    is_enum = 0x0010,
+    is_class = 0x0020,
+    is_pointer = 0x0040,
+    is_meta_pointer_like = 0x0080,
+    is_meta_sequence_container = 0x0100,
+    is_meta_associative_container = 0x0200,
     _entt_enum_as_bitmask
 };
 
@@ -171,15 +171,15 @@ public:
             nullptr,
             nullptr,
             size_of_v<Type>,
-            internal::meta_traits::IS_NONE
-                | (std::is_arithmetic_v<Type> ? internal::meta_traits::IS_ARITHMETIC : internal::meta_traits::IS_NONE)
-                | (std::is_array_v<Type> ? internal::meta_traits::IS_ARRAY : internal::meta_traits::IS_NONE)
-                | (std::is_enum_v<Type> ? internal::meta_traits::IS_ENUM : internal::meta_traits::IS_NONE)
-                | (std::is_class_v<Type> ? internal::meta_traits::IS_CLASS : internal::meta_traits::IS_NONE)
-                | (std::is_pointer_v<Type> ? internal::meta_traits::IS_POINTER : internal::meta_traits::IS_NONE)
-                | (is_meta_pointer_like_v<Type> ? internal::meta_traits::IS_META_POINTER_LIKE : internal::meta_traits::IS_NONE)
-                | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::IS_META_SEQUENCE_CONTAINER : internal::meta_traits::IS_NONE)
-                | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::IS_META_ASSOCIATIVE_CONTAINER : internal::meta_traits::IS_NONE),
+            internal::meta_traits::is_none
+                | (std::is_arithmetic_v<Type> ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)
+                | (std::is_array_v<Type> ? internal::meta_traits::is_array : internal::meta_traits::is_none)
+                | (std::is_enum_v<Type> ? internal::meta_traits::is_enum : internal::meta_traits::is_none)
+                | (std::is_class_v<Type> ? internal::meta_traits::is_class : internal::meta_traits::is_none)
+                | (std::is_pointer_v<Type> ? internal::meta_traits::is_pointer : internal::meta_traits::is_none)
+                | (is_meta_pointer_like_v<Type> ? internal::meta_traits::is_meta_pointer_like : internal::meta_traits::is_none)
+                | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_meta_sequence_container : internal::meta_traits::is_none)
+                | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::is_meta_associative_container : internal::meta_traits::is_none),
             meta_default_constructor(),
             meta_conversion_helper(),
             meta_template_info()

@@ -189,7 +189,7 @@ class meta_factory<Type> {
             nullptr,
             Setter::size,
             /* this is never static */
-            (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE,
+            (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
             internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
             [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value) || ...); },
@@ -418,7 +418,7 @@ public:
                 nullptr,
                 nullptr,
                 1u,
-                ((std::is_same_v<Type, data_type> || std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE) | internal::meta_traits::IS_STATIC,
+                ((std::is_same_v<Type, data_type> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                 internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<data_type>>,
                 &meta_setter<Type, Data>,
@@ -462,7 +462,7 @@ public:
                 nullptr,
                 0u,
                 /* this is never static */
-                internal::meta_traits::IS_CONST,
+                internal::meta_traits::is_const,
                 internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<>>,
                 &meta_setter<Type, Setter>,
@@ -481,7 +481,7 @@ public:
                 nullptr,
                 1u,
                 /* this is never static */
-                (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<data_type>) ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE,
+                (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                 internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                 &meta_setter<Type, Setter>,
@@ -538,7 +538,7 @@ public:
             nullptr,
             nullptr,
             descriptor::args_type::size,
-            (descriptor::is_const ? internal::meta_traits::IS_CONST : internal::meta_traits::IS_NONE) | (descriptor::is_static ? internal::meta_traits::IS_STATIC : internal::meta_traits::IS_NONE),
+            (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
             internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve(),
             &meta_arg<typename descriptor::args_type>,
             &meta_invoke<Type, Candidate, Policy>
