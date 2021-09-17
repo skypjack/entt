@@ -8,6 +8,7 @@
 #include <entt/entity/view.hpp>
 
 struct empty_type {};
+
 struct stable_type { int value; };
 
 template<>

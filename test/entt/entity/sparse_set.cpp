@@ -10,6 +10,7 @@
 #include "throwing_allocator.hpp"
 
 struct empty_type {};
+
 struct boxed_int { int value; };
 
 TEST(SparseSet, Functionalities) {

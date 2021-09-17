@@ -5,6 +5,7 @@
 
 struct an_event {};
 struct another_event {};
+
 // makes the type non-aggregate
 struct one_more_event { one_more_event(int) {} };
 
@@ -14,7 +15,9 @@ struct receiver {
     }
 
     void receive(const an_event &) { ++cnt; }
+
     void reset() { cnt = 0; }
+
     int cnt{0};
 };
 

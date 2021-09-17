@@ -7,6 +7,7 @@
 #include <entt/entity/group.hpp>
 
 struct empty_type {};
+
 struct boxed_int { int value; };
 
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {

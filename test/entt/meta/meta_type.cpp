@@ -21,11 +21,19 @@ Type get(Type &prop) {
     return prop;
 }
 
-struct base_t { base_t(): value{'c'} {}; char value; };
-struct derived_t: base_t { derived_t(): base_t{} {} };
+struct base_t {
+    base_t(): value{'c'} {};
+
+    char value;
+};
+
+struct derived_t: base_t {
+    derived_t(): base_t{} {}
+};
 
 struct abstract_t {
     virtual ~abstract_t() = default;
+
     virtual void func(int) {}
 };
 
@@ -47,6 +55,7 @@ struct clazz_t {
 
     void member() {}
     static void func() {}
+
     operator int() const { return value; }
 
     int value;

@@ -8,15 +8,17 @@ template<typename... Type>
 entt::type_list<Type...> as_type_list(const entt::type_list<Type...> &);
 
 template<typename Entity>
-struct PolyStorage: entt::type_list_cat_t<
-    decltype(as_type_list(std::declval<entt::Storage<Entity>>())),
-    entt::type_list<
-        void(const Entity *, const Entity *, void *),
-        void(entt::basic_registry<Entity> &, const Entity, const void *),
-        const void *(const Entity) const,
-        void(entt::basic_registry<Entity> &) const
-    >
-> {
+struct PolyStorage
+    : entt::type_list_cat_t<
+          decltype(as_type_list(std::declval<entt::Storage<Entity>>())),
+          entt::type_list<
+              void(const Entity *, const Entity *, void *),
+              void(entt::basic_registry<Entity> &, const Entity, const void *),
+              const void *(const Entity) const,
+              void(entt::basic_registry<Entity> &) const
+          >
+      >
+{
     using entity_type = Entity;
     using size_type = std::size_t;
 

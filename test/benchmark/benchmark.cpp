@@ -1260,9 +1260,7 @@ TEST(Benchmark, SortSingle) {
 
     timer timer;
 
-    registry.sort<position>([](const auto &lhs, const auto &rhs) {
-        return lhs.x < rhs.x && lhs.y < rhs.y;
-    });
+    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x < rhs.x && lhs.y < rhs.y; });
 
     timer.elapsed();
 }
@@ -1278,9 +1276,7 @@ TEST(Benchmark, SortMulti) {
         registry.emplace<velocity>(entity, i, i);
     }
 
-    registry.sort<position>([](const auto &lhs, const auto &rhs) {
-        return lhs.x < rhs.x && lhs.y < rhs.y;
-    });
+    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x < rhs.x && lhs.y < rhs.y; });
 
     timer timer;
 
@@ -1312,9 +1308,7 @@ TEST(Benchmark, AlmostSortedStdSort) {
 
     timer timer;
 
-    registry.sort<position>([](const auto &lhs, const auto &rhs) {
-        return lhs.x > rhs.x && lhs.y > rhs.y;
-    });
+    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x > rhs.x && lhs.y > rhs.y; });
 
     timer.elapsed();
 }
@@ -1342,9 +1336,7 @@ TEST(Benchmark, AlmostSortedInsertionSort) {
 
     timer timer;
 
-    registry.sort<position>([](const auto &lhs, const auto &rhs) {
-        return lhs.x > rhs.x && lhs.y > rhs.y;
-    }, entt::insertion_sort{});
+    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x > rhs.x && lhs.y > rhs.y; }, entt::insertion_sort{});
 
     timer.elapsed();
 }

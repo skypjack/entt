@@ -8,6 +8,7 @@ struct empty_type {};
 
 struct move_only_type {
     move_only_type(): value{new int{99}} {}
+
     move_only_type(int v): value{new int{v}} {}
 
     ~move_only_type() { delete value; }
@@ -30,6 +31,7 @@ struct move_only_type {
 
 struct non_default_constructible {
     non_default_constructible(int v): value{v} {}
+
     int value;
 };
 

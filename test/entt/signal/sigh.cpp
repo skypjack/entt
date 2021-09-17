@@ -7,9 +7,11 @@ struct sigh_listener {
     static void f(int &v) { v = 42; }
 
     bool g(int) { k = !k; return true; }
+
     bool h(const int &) { return k; }
 
     void i() {}
+
     // useless definition just because msvc does weird things if both are empty
     void l() { k = true && k; }
 
@@ -18,9 +20,11 @@ struct sigh_listener {
 
 struct before_after {
     void add(int v) { value += v; }
+
     void mul(int v) { value *= v; }
 
     static void static_add(int v) { before_after::value += v; }
+
     static void static_mul(before_after &instance, int v) { instance.value *= v; }
 
     static inline int value{};
@@ -34,9 +38,13 @@ struct SigH: ::testing::Test {
 
 struct const_nonconst_noexcept {
     void f() { ++cnt; }
+
     void g() noexcept { ++cnt; }
+
     void h() const { ++cnt; }
+
     void i() const noexcept { ++cnt; }
+
     mutable int cnt{0};
 };
 
@@ -191,23 +199,27 @@ TEST_F(SigH, Collector) {
     sink.connect<&sigh_listener::g>(&listener);
     sink.connect<&sigh_listener::h>(listener);
 
-    listener.k = true;
-    sigh.collect([&listener, &cnt](bool value) {
+    auto test_1 = [&listener, &cnt](bool value) {
         ASSERT_TRUE(value);
         listener.k = true;
         ++cnt;
-    }, 42);
+    };
+
+    listener.k = true;
+    sigh.collect(std::move(test_1), 42);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(cnt, 2);
 
-    cnt = 0;
-    sigh.collect([&cnt](bool value) {
+    auto test_2 = [&cnt](bool value) {
         // gtest and its macro hell are sometimes really annoying...
         [](auto v) { ASSERT_TRUE(v); }(value);
         ++cnt;
         return true;
-    }, 42);
+    };
+
+    cnt = 0;
+    sigh.collect(std::move(test_1), 42);
 
     ASSERT_EQ(cnt, 1);
 }
@@ -225,11 +237,13 @@ TEST_F(SigH, CollectorVoid) {
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(cnt, 2);
 
-    cnt = 0;
-    sigh.collect([&cnt]() {
+    auto test = [&cnt]() {
         ++cnt;
         return true;
-    }, 42);
+    };
+
+    cnt = 0;
+    sigh.collect(std::move(test), 42);
 
     ASSERT_EQ(cnt, 1);
 }

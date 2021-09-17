@@ -11,6 +11,7 @@
 #include <entt/entity/registry.hpp>
 
 struct empty_type {};
+
 struct stable_type { int value; };
 
 template<>
@@ -20,6 +21,7 @@ struct entt::component_traits<stable_type>: basic_component_traits {
 
 struct non_default_constructible {
     non_default_constructible(int v): value{v} {}
+
     int value;
 };
 

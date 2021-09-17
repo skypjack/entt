@@ -4,6 +4,7 @@
 #include <entt/resource/cache.hpp>
 
 struct resource { int value; };
+
 struct derived_resource: resource {};
 
 template<typename Resource>

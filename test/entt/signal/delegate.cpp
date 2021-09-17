@@ -37,9 +37,13 @@ struct delegate_functor {
 
 struct const_nonconst_noexcept {
     void f() { ++cnt; }
+
     void g() noexcept { ++cnt; }
+
     void h() const { ++cnt; }
+
     void i() const noexcept { ++cnt; }
+
     int u{};
     const int v{};
     mutable int cnt{0};
@@ -60,9 +64,7 @@ TEST(Delegate, Functionalities) {
 
     ff_del.connect<&delegate_function>();
     mf_del.connect<&delegate_functor::operator()>(functor);
-    lf_del.connect([](const void *ptr, int value) {
-        return static_cast<const delegate_functor *>(ptr)->identity(value);
-    }, &functor);
+    lf_del.connect([](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor);
 
     ASSERT_TRUE(ff_del);
     ASSERT_TRUE(mf_del);

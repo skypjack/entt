@@ -4,25 +4,32 @@
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
 
-struct Defined: entt::type_list<
-    void(),
-    void(int),
-    int() const,
-    void(),
-    int(int) const
-> {
+struct Defined
+    : entt::type_list<
+        void(),
+        void(int),
+        int() const,
+        void(),
+        int(int) const
+      >
+{
     template<typename Base>
     struct type: Base {
         void incr() { entt::poly_call<0>(*this); }
+
         void set(int v) { entt::poly_call<1>(*this, v); }
+
         int get() const { return entt::poly_call<2>(*this); }
+
         void decr() { entt::poly_call<3>(*this); }
+
         int mul(int v) const { return entt::poly_call<4>(*this, v); }
     };
 
     template<typename Type>
     struct members {
         static void decr(Type &self) { self.decrement(); }
+
         static double mul(const Type &self, double v) { return self.multiply(v); }
     };
 
@@ -38,12 +45,19 @@ struct Defined: entt::type_list<
 
 struct impl {
     impl() = default;
+
     impl(int v): value{v} {}
+
     void incr() { ++value; }
+
     void set(int v) { value = v; }
+
     int get() const { return value; }
+
     void decrement() { --value; }
+
     double multiply(double v) const { return v * value; }
+
     int value{};
 };
 

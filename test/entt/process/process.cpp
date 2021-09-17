@@ -18,13 +18,19 @@ struct fake_process: entt::process<fake_process<Delta>, Delta> {
     {}
 
     void succeed() noexcept { process_type::succeed(); }
+
     void fail() noexcept { process_type::fail(); }
+
     void pause() noexcept { process_type::pause(); }
+
     void unpause() noexcept { process_type::unpause(); }
 
     void init() { init_invoked = true; }
+
     void succeeded() { succeeded_invoked = true; }
+
     void failed() { failed_invoked = true; }
+
     void aborted() { aborted_invoked = true; }
 
     void update(typename entt::process<fake_process<Delta>, Delta>::delta_type, void *data) {

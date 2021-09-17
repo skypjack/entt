@@ -10,7 +10,9 @@ struct stable_type { int value; };
 
 struct non_default_constructible {
     non_default_constructible() = delete;
+
     non_default_constructible(int v): value{v} {}
+
     int value;
 };
 

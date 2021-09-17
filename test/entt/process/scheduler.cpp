@@ -9,6 +9,7 @@ struct foo_process: entt::process<foo_process, int> {
     {}
 
     void update(delta_type, void *) { on_update(); }
+
     void aborted() { on_aborted(); }
 
     std::function<void()> on_update;
@@ -103,15 +104,21 @@ TEST(Scheduler, Functor) {
     bool first_functor = false;
     bool second_functor = false;
 
-    scheduler.attach([&first_functor](auto, void *, auto resolve, auto){
+    auto attach = [&first_functor](auto, void *, auto resolve, auto) {
         ASSERT_FALSE(first_functor);
         first_functor = true;
         resolve();
-    }).then([&second_functor](auto, void *, auto, auto reject){
+    };
+
+    auto then = [&second_functor](auto, void *, auto, auto reject) {
         ASSERT_FALSE(second_functor);
         second_functor = true;
         reject();
-    }).then([](auto...){ FAIL(); });
+    };
+
+    auto fail = [](auto...) { FAIL(); };
+
+    scheduler.attach(std::move(attach)).then(std::move(then)).then(std::move(fail));
 
     for(auto i = 0; i < 8; ++i) {
         scheduler.update(0);

@@ -11,12 +11,16 @@
 #include "throwing_component.hpp"
 
 struct empty_type {};
+
 struct boxed_int { int value; };
+
 struct stable_type { int value; };
 
 struct non_default_constructible {
     non_default_constructible() = delete;
+
     non_default_constructible(int v): value{v} {}
+
     int value;
 };
 
@@ -716,6 +720,7 @@ TEST(Storage, ShrinkToFit) {
 
 TEST(Storage, AggregatesMustWork) {
     struct aggregate_type { int value; };
+
     // the goal of this test is to enforce the requirements for aggregate types
     entt::storage<aggregate_type>{}.emplace(entt::entity{0}, 42);
 }

@@ -8,6 +8,7 @@
 
 struct base_t {
     base_t(): value{'c'} {}
+
     char value;
 };
 

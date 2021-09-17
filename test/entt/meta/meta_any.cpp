@@ -10,7 +10,9 @@ struct clazz_t {
     clazz_t(): value{0} {}
 
     void member(int i) { value = i; }
+
     static void func() { c = 'd'; }
+
     operator int() const { return value; }
 
     static inline char c = 'c';

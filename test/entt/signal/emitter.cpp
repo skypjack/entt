@@ -5,6 +5,7 @@
 struct test_emitter: entt::emitter<test_emitter> {};
 
 struct foo_event { int i; char c; };
+
 struct bar_event {};
 struct quux_event {};
 

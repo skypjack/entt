@@ -6,8 +6,11 @@
 
 struct clazz_t {
     clazz_t(): value{} {}
+
     void incr() { ++value; }
+
     void decr() { --value; }
+
     int value;
 };
 

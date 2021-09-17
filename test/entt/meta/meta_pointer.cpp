@@ -9,6 +9,7 @@
 template<typename Type>
 struct wrapped_shared_ptr {
     wrapped_shared_ptr(Type init): ptr{new Type {init}} {}
+
     Type & deref() const { return *ptr; }
 
 private:
@@ -17,15 +18,21 @@ private:
 
 struct self_ptr {
     using element_type = self_ptr;
+
     self_ptr(int v): value{v} {}
+
     const self_ptr & operator*() const { return *this; }
+
     int value;
 };
 
 struct proxy_ptr {
     using element_type = proxy_ptr;
+
     proxy_ptr(int &v): value{&v} {}
+
     proxy_ptr operator*() const { return *this; }
+
     int *value;
 };
 

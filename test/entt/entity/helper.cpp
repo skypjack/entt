@@ -7,6 +7,7 @@
 
 struct clazz {
     void func(entt::registry &, entt::entity curr) { entt = curr; }
+
     entt::entity entt{entt::null};
 };
 

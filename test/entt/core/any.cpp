@@ -8,6 +8,7 @@
 
 struct empty {
     ~empty() { ++counter; }
+
     inline static int counter = 0;
 };
 
@@ -1144,6 +1145,7 @@ TEST_F(Any, Alignment) {
 
 TEST_F(Any, AggregatesMustWork) {
     struct aggregate_type { int value; };
+
     // the goal of this test is to enforce the requirements for aggregate types
     entt::any{std::in_place_type<aggregate_type>, 42}.emplace<aggregate_type>(42);
 }
