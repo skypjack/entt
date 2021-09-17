@@ -224,19 +224,19 @@ TEST_F(SigH, Collector) {
     sink.connect<&sigh_listener::g>(&listener);
     sink.connect<&sigh_listener::h>(listener);
 
-    auto test_1 = [&listener, &cnt](bool value) {
+    auto no_return = [&listener, &cnt](bool value) {
         ASSERT_TRUE(value);
         listener.k = true;
         ++cnt;
     };
 
     listener.k = true;
-    sigh.collect(std::move(test_1), 42);
+    sigh.collect(std::move(no_return), 42);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(cnt, 2);
 
-    auto test_2 = [&cnt](bool value) {
+    auto bool_return = [&cnt](bool value) {
         // gtest and its macro hell are sometimes really annoying...
         [](auto v) { ASSERT_TRUE(v); }(value);
         ++cnt;
@@ -244,7 +244,7 @@ TEST_F(SigH, Collector) {
     };
 
     cnt = 0;
-    sigh.collect(std::move(test_1), 42);
+    sigh.collect(std::move(bool_return), 42);
 
     ASSERT_EQ(cnt, 1);
 }
