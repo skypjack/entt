@@ -118,9 +118,7 @@ TEST(Scheduler, Functor) {
         reject();
     };
 
-    auto fail = [](auto...) { FAIL(); };
-
-    scheduler.attach(std::move(attach)).then(std::move(then)).then(std::move(fail));
+    scheduler.attach(std::move(attach)).then(std::move(then)).then(std::move([](auto...) { FAIL(); }));
 
     for(auto i = 0; i < 8; ++i) {
         scheduler.update(0);
