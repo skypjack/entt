@@ -1161,3 +1161,11 @@ TEST_F(Any, DeducedArrayType) {
     ASSERT_EQ(any.type(), entt::type_id<const char *>());
     ASSERT_EQ((strcmp("another array of char", entt::any_cast<const char *>(any))), 0);
 }
+
+TEST_F(Any, IsType) {
+    entt::any any{"array of char"};
+
+    ASSERT_TRUE(any.is<const char*>());
+    ASSERT_FALSE(any.is<char*>());
+    ASSERT_FALSE(any.is<int>());
+}
