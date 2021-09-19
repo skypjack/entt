@@ -1549,7 +1549,7 @@ public:
      */
     template<typename Type>
     void unset() {
-        vars.erase(std::remove_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; }), vars.end());
+        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&var) { return var.template is<Type>(); }), vars.end());
     }
 
     /**
@@ -1577,14 +1577,14 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.template is<Type>(); });
         return it == vars.cend() ? nullptr : any_cast<std::add_const_t<Type>>(&*it);
     }
 
     /*! @copydoc try_ctx */
     template<typename Type>
     [[nodiscard]] Type * try_ctx() {
-        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        auto it = std::find_if(vars.begin(), vars.end(), [](auto &&var) { return var.template is<Type>(); });
         return it == vars.end() ? nullptr : any_cast<Type>(&*it);
     }
 
@@ -1600,7 +1600,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> & ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.template is<Type>(); });
         ENTT_ASSERT(it != vars.cend(), "Invalid instance");
         return any_cast<std::add_const_t<Type> &>(*it);
     }
@@ -1608,7 +1608,7 @@ public:
     /*! @copydoc ctx */
     template<typename Type>
     [[nodiscard]] Type & ctx() {
-        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
+        auto it = std::find_if(vars.begin(), vars.end(), [](auto &&var) { return var.template is<Type>(); });
         ENTT_ASSERT(it != vars.end(), "Invalid instance");
         return any_cast<Type &>(*it);
     }

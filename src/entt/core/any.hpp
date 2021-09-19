@@ -252,6 +252,16 @@ public:
     }
 
     /**
+     * @brief Checks if the contained object has a given type.
+     * @tparam Type Type to query.
+     * @return True if the type matches, false otherwise.
+     */
+    template<typename Type>
+    [[nodiscard]] bool is() const ENTT_NOEXCEPT {
+        return vtable == &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
+    }
+
+    /**
      * @brief Returns an opaque pointer to the contained instance.
      * @return An opaque pointer the contained instance, if any.
      */
@@ -298,7 +308,7 @@ public:
      */
     bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
         const basic_any *trampoline = &other;
-        return type() == other.type() && (vtable(operation::COMP, *this, &trampoline) || !other.data());
+        return vtable == other.vtable && (vtable(operation::COMP, *this, &trampoline) || !other.data());
     }
 
     /**
@@ -389,7 +399,7 @@ Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    return (data->type() == type_id<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
+    return (data->template is<Type>() ? static_cast<const Type *>(data->data()) : nullptr);
 }
 
 
@@ -397,7 +407,7 @@ const Type * any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
 template<typename Type, std::size_t Len, std::size_t Align>
 Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
     // last attempt to make wrappers for const references return their values
-    return (data->type() == type_id<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
+    return (data->template is<Type>() ? static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data()) : nullptr);
 }
 
 
