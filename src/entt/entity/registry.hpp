@@ -1574,15 +1574,33 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> *try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        return it == vars.cend() ? nullptr : any_cast<std::add_const_t<Type>>(&*it);
+        const auto info = type_id<Type>();
+
+        for(const auto &curr: vars) {
+            if(auto *value = curr.data(&info); value) {
+                return static_cast<Type *>(value);
+            }
+        }
+
+        return nullptr;
     }
 
     /*! @copydoc try_ctx */
     template<typename Type>
     [[nodiscard]] Type *try_ctx() {
-        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        return it == vars.end() ? nullptr : any_cast<Type>(&*it);
+        if constexpr(std::is_const_v<Type>) {
+            return std::as_const(*this).template try_ctx<Type>();
+        } else {
+            const auto info = type_id<Type>();
+
+            for(auto &curr: vars) {
+                if(auto *value = curr.data(&info); value) {
+                    return static_cast<Type *>(value);
+                }
+            }
+
+            return nullptr;
+        }
     }
 
     /**
@@ -1597,17 +1615,17 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> &ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        ENTT_ASSERT(it != vars.cend(), "Invalid instance");
-        return any_cast<std::add_const_t<Type> &>(*it);
+        auto *value = try_ctx<Type>();
+        ENTT_ASSERT(value != nullptr, "Invalid instance");
+        return *value;
     }
 
     /*! @copydoc ctx */
     template<typename Type>
     [[nodiscard]] Type &ctx() {
-        auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
-        ENTT_ASSERT(it != vars.end(), "Invalid instance");
-        return any_cast<Type &>(*it);
+        auto *value = try_ctx<Type>();
+        ENTT_ASSERT(value != nullptr, "Invalid instance");
+        return *value;
     }
 
     /**
