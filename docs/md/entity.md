@@ -1252,7 +1252,7 @@ As an example:
 const auto view = registry.view<serialize>();
 output_archive output;
 
-entt::snapshot{registry}.component<a_component, another_component>(output, view.cbegin(), view.cend());
+entt::snapshot{registry}.component<a_component, another_component>(output, view.begin(), view.end());
 ```
 
 Note that `component` stores items along with entities. It means that it works
