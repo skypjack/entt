@@ -1577,7 +1577,7 @@ public:
         const auto info = type_id<Type>();
 
         for(const auto &curr: vars) {
-            if(auto *value = curr.data(&info); value) {
+            if(auto *value = curr.data(info); value) {
                 return static_cast<Type *>(value);
             }
         }
@@ -1594,7 +1594,7 @@ public:
             const auto info = type_id<Type>();
 
             for(auto &curr: vars) {
-                if(auto *value = curr.data(&info); value) {
+                if(auto *value = curr.data(info); value) {
                     return static_cast<Type *>(value);
                 }
             }
