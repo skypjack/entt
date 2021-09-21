@@ -349,6 +349,7 @@ public:
         : reserved{allocator, size_type{}},
           sparse{},
           packed{},
+          udata{},
           bucket{},
           count{},
           free_list{tombstone},
@@ -362,6 +363,7 @@ public:
         : reserved{std::move(other.reserved.first()), std::exchange(other.reserved.second(), size_type{})},
           sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
           packed{std::exchange(other.packed, alloc_pointer{})},
+          udata{std::exchange(other.udata, nullptr)},
           bucket{std::exchange(other.bucket, size_type{})},
           count{std::exchange(other.count, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
@@ -376,6 +378,7 @@ public:
         : reserved{allocator, std::exchange(other.reserved.second(), size_type{})},
           sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
           packed{std::exchange(other.packed, alloc_pointer{})},
+          udata{std::exchange(other.udata, nullptr)},
           bucket{std::exchange(other.bucket, size_type{})},
           count{std::exchange(other.count, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
@@ -400,6 +403,7 @@ public:
         reserved.second() = std::exchange(other.reserved.second(), size_type{});
         sparse = std::exchange(other.sparse, alloc_ptr_pointer{});
         packed = std::exchange(other.packed, alloc_pointer{});
+        udata = std::exchange(other.udata, nullptr);
         bucket = std::exchange(other.bucket, size_type{});
         count = std::exchange(other.count, size_type{});
         free_list = std::exchange(other.free_list, tombstone);
@@ -418,6 +422,7 @@ public:
         swap(reserved.second(), other.reserved.second());
         swap(sparse, other.sparse);
         swap(packed, other.packed);
+        swap(udata, other.udata);
         swap(bucket, other.bucket);
         swap(count, other.count);
         swap(free_list, other.free_list);
@@ -918,12 +923,34 @@ public:
         }
     }
 
+    /**
+     * @brief User defined arbitrary data.
+     * @return An opaque pointer to user defined arbitrary data.
+     */
+    void *user_data() ENTT_NOEXCEPT {
+        return udata;
+    }
+
+    /*! @copydoc user_data */
+    const void *user_data() const ENTT_NOEXCEPT {
+        return udata;
+    }
+
+    /**
+     * @brief User defined arbitrary data.
+     * @param ptr An opaque pointer to user defined arbitrary data.
+     */
+    void user_data(void *ptr) ENTT_NOEXCEPT {
+        udata = ptr;
+    }
+
 private:
     compressed_pair<alloc, size_type> reserved;
     alloc_ptr_pointer sparse;
     alloc_pointer packed;
-    size_type bucket;
+    void *udata;
     size_type count;
+    size_type bucket;
     entity_type free_list;
     deletion_policy mode;
 };
