@@ -109,7 +109,7 @@ struct meta_type_node {
     const size_type size_of;
     const meta_traits traits;
     meta_any (*const default_constructor)();
-    double (*const conversion_helper)(const any &, const any &);
+    double (*const conversion_helper)(void *, const void *);
     const meta_template_node *const templ;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
@@ -136,12 +136,12 @@ class ENTT_API meta_node {
 
     [[nodiscard]] static auto *meta_conversion_helper() ENTT_NOEXCEPT {
         if constexpr(std::is_arithmetic_v<Type>) {
-            return +[](const any &storage, const any &value) {
-                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(any_cast<double>(value))) : static_cast<double>(any_cast<const Type &>(storage));
+            return +[](void *bin, const void *value) {
+                return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(*static_cast<const double *>(value))) : static_cast<double>(*static_cast<const Type *>(value));
             };
         } else if constexpr(std::is_enum_v<Type>) {
-            return +[](const any &storage, const any &value) {
-                return value ? static_cast<double>(any_cast<Type &>(const_cast<any &>(storage)) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(any_cast<double>(value)))) : static_cast<double>(any_cast<const Type &>(storage));
+            return +[](void *bin, const void *value) {
+                return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(value)))) : static_cast<double>(*static_cast<const Type *>(value));
             };
         } else {
             return static_cast<decltype(meta_type_node::conversion_helper)>(nullptr);
