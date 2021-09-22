@@ -244,7 +244,7 @@ template<typename Char>
  */
 template<typename Char>
 [[nodiscard]] constexpr bool operator<=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
-    return lhs.value() <= rhs.value();
+    return !(rhs < lhs);
 }
 
 /**
@@ -257,7 +257,7 @@ template<typename Char>
  */
 template<typename Char>
 [[nodiscard]] constexpr bool operator>(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
-    return !(lhs <= rhs);
+    return rhs < lhs;
 }
 
 /**
