@@ -270,7 +270,13 @@ the object is used in _aliasing mode_, as described below:
 
 ```cpp
 entt::any any{42};
-any.assign(3);
+entt::any value{3};
+
+// assigns by copy
+any.assign(value);
+
+// assigns by move
+any.assign(std::move(value));
 ```
 
 The `any` class will also perform a check on the type information and whether or

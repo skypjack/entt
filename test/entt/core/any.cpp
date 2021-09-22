@@ -47,6 +47,17 @@ struct not_copyable {
     double payload;
 };
 
+struct not_movable {
+    not_movable() = default;
+    not_movable(const not_movable &) = default;
+    not_movable(not_movable &&) = delete;
+
+    not_movable &operator=(const not_movable &) = default;
+    not_movable &operator=(not_movable &&) = delete;
+
+    double payload;
+};
+
 struct alignas(64u) over_aligned {};
 
 struct Any: ::testing::Test {
@@ -1261,8 +1272,41 @@ TEST_F(Any, NotCopyableType) {
         ASSERT_TRUE(copy.owner());
     };
 
-    const not_copyable value;
+    const not_copyable value{};
     test(entt::any{std::in_place_type<not_copyable>}, entt::forward_as_any(value));
+}
+
+TEST_F(Any, NotMovableType) {
+    auto test = [](entt::any any, entt::any other) {
+        ASSERT_TRUE(any);
+        ASSERT_TRUE(other);
+
+        ASSERT_TRUE(any.owner());
+        ASSERT_TRUE(other.owner());
+        ASSERT_EQ(any.type(), other.type());
+
+        ASSERT_TRUE(any.assign(other));
+        ASSERT_TRUE(any.assign(std::move(other)));
+
+        entt::any copy{any};
+
+        ASSERT_TRUE(any);
+        ASSERT_TRUE(copy);
+
+        ASSERT_TRUE(any.owner());
+        ASSERT_TRUE(copy.owner());
+
+        copy = any;
+
+        ASSERT_TRUE(any);
+        ASSERT_TRUE(copy);
+
+        ASSERT_TRUE(any.owner());
+        ASSERT_TRUE(copy.owner());
+    };
+
+    const not_movable value{};
+    test(entt::any{std::in_place_type<not_movable>}, entt::any{std::in_place_type<not_movable>});
 }
 
 TEST_F(Any, Array) {

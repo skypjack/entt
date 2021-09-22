@@ -67,14 +67,14 @@ class basic_any {
             }
 
             return (static_cast<basic_any *>(const_cast<void *>(to))->instance = std::exchange(const_cast<basic_any &>(from).instance, nullptr));
-        case operation::assign:
-            if constexpr(std::is_copy_assignable_v<Type>) {
-                return std::addressof(*const_cast<Type *>(instance) = *static_cast<const Type *>(to));
-            }
-            break;
         case operation::transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
                 return std::addressof(*const_cast<Type *>(instance) = std::move(*static_cast<Type *>(const_cast<void *>(to))));
+            }
+            [[fallthrough]];
+        case operation::assign:
+            if constexpr(std::is_copy_assignable_v<Type>) {
+                return std::addressof(*const_cast<Type *>(instance) = *static_cast<const Type *>(to));
             }
             break;
         case operation::destroy:
