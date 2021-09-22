@@ -350,8 +350,8 @@ public:
           sparse{},
           packed{},
           udata{},
-          bucket{},
           count{},
+          bucket{},
           free_list{tombstone},
           mode{pol} {}
 
@@ -364,8 +364,8 @@ public:
           sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
           packed{std::exchange(other.packed, alloc_pointer{})},
           udata{std::exchange(other.udata, nullptr)},
-          bucket{std::exchange(other.bucket, size_type{})},
           count{std::exchange(other.count, size_type{})},
+          bucket{std::exchange(other.bucket, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode} {}
 
@@ -379,8 +379,8 @@ public:
           sparse{std::exchange(other.sparse, alloc_ptr_pointer{})},
           packed{std::exchange(other.packed, alloc_pointer{})},
           udata{std::exchange(other.udata, nullptr)},
-          bucket{std::exchange(other.bucket, size_type{})},
           count{std::exchange(other.count, size_type{})},
+          bucket{std::exchange(other.bucket, size_type{})},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || reserved.first() == other.reserved.first(), "Copying a sparse set is not allowed");
@@ -404,8 +404,8 @@ public:
         sparse = std::exchange(other.sparse, alloc_ptr_pointer{});
         packed = std::exchange(other.packed, alloc_pointer{});
         udata = std::exchange(other.udata, nullptr);
-        bucket = std::exchange(other.bucket, size_type{});
         count = std::exchange(other.count, size_type{});
+        bucket = std::exchange(other.bucket, size_type{});
         free_list = std::exchange(other.free_list, tombstone);
         mode = other.mode;
         return *this;
@@ -423,8 +423,8 @@ public:
         swap(sparse, other.sparse);
         swap(packed, other.packed);
         swap(udata, other.udata);
-        swap(bucket, other.bucket);
         swap(count, other.count);
+        swap(bucket, other.bucket);
         swap(free_list, other.free_list);
         swap(mode, other.mode);
     }
