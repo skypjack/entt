@@ -172,6 +172,7 @@ TEST_F(MetaType, Resolve) {
 
     ASSERT_EQ(entt::resolve<double>(), entt::resolve("double"_hs));
     ASSERT_EQ(entt::resolve<double>(), entt::resolve(entt::type_id<double>()));
+    ASSERT_FALSE(entt::resolve(entt::type_id<void>()));
 
     auto range = entt::resolve();
     // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
