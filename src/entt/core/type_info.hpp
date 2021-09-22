@@ -231,6 +231,49 @@ private:
 }
 
 /**
+ * @brief Compares two type info objects.
+ * @param lhs A valid type info object.
+ * @param rhs A valid type info object.
+ * @return True if the first element is less than the second, false otherwise.
+ */
+[[nodiscard]] constexpr bool operator<(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
+    return lhs.index() < rhs.index();
+}
+
+/**
+ * @brief Compares two type info objects.
+ * @param lhs A valid type info object.
+ * @param rhs A valid type info object.
+ * @return True if the first element is less than or equal to the second, false
+ * otherwise.
+ */
+[[nodiscard]] constexpr bool operator<=(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
+    return !(rhs < lhs);
+}
+
+/**
+ * @brief Compares two type info objects.
+ * @param lhs A valid type info object.
+ * @param rhs A valid type info object.
+ * @return True if the first element is greater than the second, false
+ * otherwise.
+ */
+[[nodiscard]] constexpr bool operator>(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
+    return rhs < lhs;
+}
+
+/**
+ * @brief Compares two type info objects.
+ * @param lhs A valid type info object.
+ * @param rhs A valid type info object.
+ * @return True if the first element is greater than or equal to the second,
+ * false otherwise.
+ */
+[[nodiscard]] constexpr bool operator>=(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
+    return !(lhs < rhs);
+}
+
+/**
  * @brief Returns the type info object associated to a given type.
  *
  * The type doesn't need to be a complete type. If the type is a reference, the

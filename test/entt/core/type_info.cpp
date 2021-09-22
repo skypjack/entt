@@ -85,3 +85,20 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_TRUE(empty);
     ASSERT_EQ(empty.hash(), info.hash());
 }
+
+TEST(TypeInfo, Order) {
+    entt::type_info lhs = entt::type_id<char>();
+    entt::type_info rhs = entt::type_id<int>();
+
+    // let's adjust the two objects since values are generated at runtime
+    (rhs < lhs) || (std::swap(lhs, rhs), true);
+
+    ASSERT_FALSE(lhs < lhs);
+    ASSERT_FALSE(rhs < rhs);
+
+    ASSERT_LT(rhs, lhs);
+    ASSERT_LE(rhs, lhs);
+
+    ASSERT_GT(lhs, rhs);
+    ASSERT_GE(lhs, rhs);
+}
