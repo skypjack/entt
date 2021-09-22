@@ -262,11 +262,26 @@ element when required, regardless of the storage strategy used for the specific
 object.<br/>
 Furthermore, an instance of `any` is not tied to an actual type. Therefore, the
 wrapper will be reconfigured by assigning it an object of a different type than
-the one contained, so as to be able to handle the new instance.<br/>
+the one contained, so as to be able to handle the new instance.
+
+There exists also a way to directly assign a value to the variable contained by
+an `entt::any`, without necessarily replacing it. This is especially useful when
+the object is used in _aliasing mode_, as described below:
+
+```cpp
+entt::any any{42};
+any.assign(3);
+```
+
+The `any` class will also perform a check on the type information and whether or
+not the original type was copy or move assignable, as appropriate.<br/>
+In all cases, the `assign` function returns a boolean value to indicate the
+success or failure of the operation.
+
 When in doubt about the type of object contained, the `type` member function of
-`any` returns an instance of `type_info` associated with its element, or an
-invalid `type_info` object if the container is empty. The type is also used
-internally when comparing two `any` objects:
+`any` returns a const reference to the `type_info` associated with its element,
+or `type_id<void>()` if the container is empty. The type is also used internally
+when comparing two `any` objects:
 
 ```cpp
 if(any == empty) { /* ... */ }
@@ -274,7 +289,7 @@ if(any == empty) { /* ... */ }
 
 In this case, before proceeding with a comparison, it's verified that the _type_
 of the two objects is actually the same.<br/>
-Refer to the `EnTT` type system documentation for more details on how
+Refer to the `EnTT` type system documentation for more details about how
 `type_info` works and on possible risks of a comparison.
 
 A particularly interesting feature of this class is that it can also be used as
@@ -382,7 +397,7 @@ information to that provided by its counterpart.
 
 Basically, the whole system relies on a handful of classes. In particular:
 
-* The unique, sequential identifier associated with a given type:
+* The unique sequential identifier associated with a given type:
 
   ```cpp
   auto index = entt::type_index<a_type>::value();
@@ -483,13 +498,13 @@ Therefore, they can sometimes be even more reliable than those obtained
 otherwise.
 
 A type info object is an opaque class that is also copy and move constructible.
-This class is returned by the `type_id` function template:
+Objects of this class are returned by the `type_id` function template:
 
 ```cpp
 auto info = entt::type_id<a_type>();
 ```
 
-These are the information made available by this object:
+These are the information made available by a `type_info` object:
 
 * The index associated with a given type:
 

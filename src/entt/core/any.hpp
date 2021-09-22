@@ -23,8 +23,10 @@ class basic_any {
     enum class operation : std::uint8_t {
         copy,
         move,
-        dtor,
-        comp,
+        assign,
+        transfer,
+        destroy,
+        compare,
         get
     };
 
@@ -65,7 +67,17 @@ class basic_any {
             }
 
             return (static_cast<basic_any *>(const_cast<void *>(to))->instance = std::exchange(const_cast<basic_any &>(from).instance, nullptr));
-        case operation::dtor:
+        case operation::assign:
+            if constexpr(std::is_copy_assignable_v<Type>) {
+                return std::addressof(*const_cast<Type *>(instance) = *static_cast<const Type *>(to));
+            }
+            break;
+        case operation::transfer:
+            if constexpr(std::is_move_assignable_v<Type>) {
+                return std::addressof(*const_cast<Type *>(instance) = std::move(*static_cast<Type *>(const_cast<void *>(to))));
+            }
+            break;
+        case operation::destroy:
             if constexpr(in_situ<Type>) {
                 instance->~Type();
             } else if constexpr(std::is_array_v<Type>) {
@@ -74,9 +86,9 @@ class basic_any {
                 delete instance;
             }
             break;
-        case operation::comp:
+        case operation::compare:
             if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
-                return to && (*static_cast<const Type *>(instance) == *static_cast<const Type *>(to)) ? to : nullptr;
+                return *static_cast<const Type *>(instance) == *static_cast<const Type *>(to) ? to : nullptr;
             } else {
                 return (instance == to) ? to : nullptr;
             }
@@ -183,7 +195,7 @@ public:
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
         if(vtable && mode == policy::owner) {
-            vtable(operation::dtor, *this, nullptr);
+            vtable(operation::destroy, *this, nullptr);
         }
     }
 
@@ -287,10 +299,40 @@ public:
         initialize<Type>(std::forward<Args>(args)...);
     }
 
+    /**
+     * @brief Copy assigns a value to the contained object without replacing it.
+     * @param other The value to assign to the contained object.
+     * @return True in case of success, false otherwise.
+     */
+    bool assign(const any &other) {
+        if(vtable && mode != policy::cref && *info == *other.info) {
+            return (vtable(operation::assign, *this, other.data()) != nullptr);
+        }
+
+        return false;
+    }
+
+    /**
+     * @brief Move assigns a value to the contained object without replacing it.
+     * @param other The value to assign to the contained object.
+     * @return True in case of success, false otherwise.
+     */
+    bool assign(any &&other) {
+        if(vtable && mode != policy::cref && *info == *other.info) {
+            if(auto *val = other.data(); val) {
+                return (vtable(operation::transfer, *this, val) != nullptr);
+            } else {
+                return (vtable(operation::assign, *this, std::as_const(other).data()) != nullptr);
+            }
+        }
+
+        return false;
+    }
+
     /*! @brief Destroys contained object */
     void reset() {
         if(vtable && mode == policy::owner) {
-            vtable(operation::dtor, *this, nullptr);
+            vtable(operation::destroy, *this, nullptr);
         }
 
         info = &type_id<void>();
@@ -313,7 +355,7 @@ public:
      */
     bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
         if(vtable && *info == *other.info) {
-            return (vtable(operation::comp, *this, other.data()) != nullptr);
+            return (vtable(operation::compare, *this, other.data()) != nullptr);
         }
 
         return (!vtable && !other.vtable);
