@@ -922,6 +922,7 @@ TEST_F(Any, Comparable) {
     test(fat{.1, .2, .3, .4}, fat{.0, .1, .2, .3});
     test(entt::forward_as_any(value), 3);
     test(3, entt::make_any<const int &>(value));
+    test('c', value);
 }
 
 TEST_F(Any, NotComparable) {

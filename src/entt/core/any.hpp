@@ -25,8 +25,7 @@ class basic_any {
         move,
         dtor,
         comp,
-        get,
-        type
+        get
     };
 
     enum class policy : std::uint8_t {
@@ -75,21 +74,14 @@ class basic_any {
                 delete instance;
             }
             break;
-        case operation::comp: {
-            auto *value = static_cast<const basic_any *>(to)->data(type_id<Type>());
-
+        case operation::comp:
             if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
-                return value && (*static_cast<const Type *>(instance) == *static_cast<const Type *>(value)) ? to : nullptr;
+                return to && (*static_cast<const Type *>(instance) == *static_cast<const Type *>(to)) ? to : nullptr;
             } else {
-                return (instance == value) ? to : nullptr;
+                return (instance == to) ? to : nullptr;
             }
-        }
-        case operation::get: {
-            const type_info &info = *static_cast<const type_info *>(to);
-            return (info == type_id<void>() || info == type_id<Type>()) ? instance : nullptr;
-        }
-        case operation::type:
-            return &type_id<Type>();
+        case operation::get:
+            return instance;
         }
 
         return nullptr;
@@ -99,6 +91,7 @@ class basic_any {
     void initialize([[maybe_unused]] Args &&...args) {
         if constexpr(!std::is_void_v<Type>) {
             vtable = basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
+            info = &type_id<Type>();
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
@@ -122,6 +115,7 @@ class basic_any {
 
     basic_any(const basic_any &other, const policy pol) ENTT_NOEXCEPT
         : instance{other.data()},
+          info{other.info},
           vtable{other.vtable},
           mode{pol} {}
 
@@ -134,6 +128,7 @@ public:
     /*! @brief Default constructor. */
     basic_any() ENTT_NOEXCEPT
         : instance{},
+          info{&type_id<void>()},
           vtable{},
           mode{policy::owner} {}
 
@@ -177,6 +172,7 @@ public:
      */
     basic_any(basic_any &&other) ENTT_NOEXCEPT
         : instance{},
+          info{other.info},
           vtable{other.vtable},
           mode{other.mode} {
         if(other.vtable) {
@@ -216,6 +212,7 @@ public:
 
         if(other.vtable) {
             other.vtable(operation::move, other, this);
+            info = other.info;
             vtable = other.vtable;
             mode = other.mode;
         }
@@ -241,21 +238,41 @@ public:
      * @return The object type if any, `type_id<void>()` otherwise.
      */
     [[nodiscard]] const type_info &type() const ENTT_NOEXCEPT {
-        return vtable ? *static_cast<const type_info *>(vtable(operation::type, *this, nullptr)) : type_id<void>();
+        return *info;
     }
 
     /**
      * @brief Returns an opaque pointer to the contained instance.
-     * @param req Optional expected type.
      * @return An opaque pointer the contained instance, if any.
      */
-    [[nodiscard]] const void *data(const type_info &req = type_id<void>()) const ENTT_NOEXCEPT {
-        return vtable ? vtable(operation::get, *this, &req) : nullptr;
+    [[nodiscard]] const void *data() const ENTT_NOEXCEPT {
+        return vtable ? vtable(operation::get, *this, nullptr) : nullptr;
     }
 
-    /*! @copydoc data */
-    [[nodiscard]] void *data(const type_info &req = type_id<void>()) ENTT_NOEXCEPT {
-        return (!vtable || mode == policy::cref) ? nullptr : const_cast<void *>(vtable(operation::get, *this, &req));
+    /**
+     * @brief Returns an opaque pointer to the contained instance.
+     * @param req Expected type.
+     * @return An opaque pointer the contained instance, if any.
+     */
+    [[nodiscard]] const void *data(const type_info &req) const ENTT_NOEXCEPT {
+        return *info == req ? data() : nullptr;
+    }
+
+    /**
+     * @brief Returns an opaque pointer to the contained instance.
+     * @return An opaque pointer the contained instance, if any.
+     */
+    [[nodiscard]] void *data() ENTT_NOEXCEPT {
+        return (!vtable || mode == policy::cref) ? nullptr : const_cast<void *>(vtable(operation::get, *this, nullptr));
+    }
+
+    /**
+     * @brief Returns an opaque pointer to the contained instance.
+     * @param req Expected type.
+     * @return An opaque pointer the contained instance, if any.
+     */
+    [[nodiscard]] void *data(const type_info &req) ENTT_NOEXCEPT {
+        return *info == req ? data() : nullptr;
     }
 
     /**
@@ -276,6 +293,7 @@ public:
             vtable(operation::dtor, *this, nullptr);
         }
 
+        info = &type_id<void>();
         vtable = nullptr;
         mode = policy::owner;
     }
@@ -294,8 +312,8 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
-        if(vtable && other.vtable) {
-            return (vtable(operation::comp, *this, &other) != nullptr);
+        if(vtable && *info == *other.info) {
+            return (vtable(operation::comp, *this, other.data()) != nullptr);
         }
 
         return (!vtable && !other.vtable);
@@ -327,6 +345,7 @@ private:
         const void *instance;
         storage_type storage;
     };
+    const type_info *info;
     vtable_type *vtable;
     policy mode;
 };
@@ -387,14 +406,14 @@ Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 const Type *any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    const auto info = type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
+    const auto &info = type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
     return static_cast<const Type *>(data->data(info));
 }
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 Type *any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
-    const auto info = type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
+    const auto &info = type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
     // last attempt to make wrappers for const references return their values
     return static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data(info));
 }
