@@ -348,9 +348,9 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
-        if(const auto info = type_id<Type>(); node && node->info == info) {
+        if(const auto &info = type_id<Type>(); node && *node->info == info) {
             return any_cast<Type>(&storage);
-        } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
+        } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return *curr->type->info == info; }, node); base) {
             return static_cast<const Type *>(base->cast(storage.data()));
         }
 
@@ -360,9 +360,9 @@ public:
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        if(const auto info = type_id<Type>(); node && node->info == info) {
+        if(const auto &info = type_id<Type>(); node && *node->info == info) {
             return any_cast<Type>(&storage);
-        } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node); base) {
+        } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return *curr->type->info == info; }, node); base) {
             return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
         }
 
@@ -542,7 +542,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const meta_any &other) const {
-        return (!node && !other.node) || (node && other.node && node->info == other.node->info && storage == other.storage);
+        return (!node && !other.node) || (node && other.node && *node->info == *other.node->info && storage == other.storage);
     }
 
     /**
@@ -1000,8 +1000,8 @@ public:
      * @brief Returns the type info object of the underlying type.
      * @return The type info object of the underlying type.
      */
-    [[nodiscard]] type_info info() const ENTT_NOEXCEPT {
-        return node->info;
+    [[nodiscard]] const type_info &info() const ENTT_NOEXCEPT {
+        return *node->info;
     }
 
     /**
@@ -1321,7 +1321,7 @@ public:
      * @return True if the objects refer to the same type, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
-        return (!node && !other.node) || (node && other.node && node->info == other.node->info);
+        return (!node && !other.node) || (node && other.node && *node->info == *other.node->info);
     }
 
 private:
@@ -1366,9 +1366,9 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    if(const auto info = type.info(); (node && node->info == info) || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return curr->type->info == info; }, node)) {
+    if(const auto info = type.info(); (node && *node->info == info) || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return *curr->type->info == info; }, node)) {
         return as_ref();
-    } else if(const auto *const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return curr->type->info == info; }, node); conv) {
+    } else if(const auto *const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return *curr->type->info == info; }, node); conv) {
         return conv->conv(storage.data());
     } else if(node && node->conversion_helper && (type.is_arithmetic() || type.is_enum())) {
         // exploits the fact that arithmetic types and enums are also default constructible

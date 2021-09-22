@@ -15,7 +15,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
+struct Storage: type_list<const type_info &() const ENTT_NOEXCEPT> {
     /**
      * @brief Concept definition.
      * @tparam Base Opaque base class from which to inherit.
@@ -26,7 +26,7 @@ struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
          * @brief Returns a type info for the contained objects.
          * @return The type info for the contained objects.
          */
-        type_info value_type() const ENTT_NOEXCEPT {
+        const type_info &value_type() const ENTT_NOEXCEPT {
             return poly_call<0>(*this);
         }
     };

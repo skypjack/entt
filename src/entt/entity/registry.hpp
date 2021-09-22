@@ -179,13 +179,13 @@ public:
      * @return A valid poly storage if a pool for the given type exists, an
      * empty and thus invalid element otherwise.
      */
-    poly_storage &storage(const type_info info) {
+    poly_storage &storage(const type_info &info) {
         ENTT_ASSERT(info.index() < pools.size() && pools[info.index()].poly, "Storage not available");
         return pools[info.index()].poly;
     }
 
     /*! @copydoc storage */
-    const poly_storage &storage(const type_info info) const {
+    const poly_storage &storage(const type_info &info) const {
         ENTT_ASSERT(info.index() < pools.size() && pools[info.index()].poly, "Storage not available");
         return pools[info.index()].poly;
     }
@@ -1469,7 +1469,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const type_info);
+     * void(const type_info &);
      * @endcode
      *
      * Returned identifiers are those of the components owned by the entity.
@@ -1499,7 +1499,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const type_info);
+     * void(const type_info &);
      * @endcode
      *
      * Returned identifiers are those of the components managed by the registry.
@@ -1574,7 +1574,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> *try_ctx() const {
-        const auto info = type_id<Type>();
+        const auto &info = type_id<Type>();
 
         for(const auto &curr: vars) {
             if(auto *value = curr.data(info); value) {
@@ -1591,7 +1591,7 @@ public:
         if constexpr(std::is_const_v<Type>) {
             return std::as_const(*this).template try_ctx<Type>();
         } else {
-            const auto info = type_id<Type>();
+            const auto &info = type_id<Type>();
 
             for(auto &curr: vars) {
                 if(auto *value = curr.data(info); value) {
@@ -1635,7 +1635,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const type_info);
+     * void(const type_info &);
      * @endcode
      *
      * Returned identifiers are those of the context variables currently set.

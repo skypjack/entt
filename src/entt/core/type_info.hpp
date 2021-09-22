@@ -138,48 +138,17 @@ struct type_name final {
 };
 
 /*! @brief Implementation specific information about a type. */
-struct type_info final {
-    /*! @brief Default constructor. */
-    constexpr type_info() ENTT_NOEXCEPT
-        : seq{},
-          identifier{},
-          alias{} {}
+class type_info final {
+    template<typename Type>
+    friend constexpr const type_info &type_id() ENTT_NOEXCEPT;
 
-    /*! @brief Default copy constructor. */
-    constexpr type_info(const type_info &) ENTT_NOEXCEPT = default;
-    /*! @brief Default move constructor. */
-    constexpr type_info(type_info &&) ENTT_NOEXCEPT = default;
-
-    /**
-     * @brief Creates a type info object for a given type.
-     * @tparam Type Type for which to generate a type info object.
-     */
     template<typename Type>
     constexpr type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
         : seq{type_index<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
           identifier{type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
           alias{type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value()} {}
 
-    /**
-     * @brief Default copy assignment operator.
-     * @return This type info object.
-     */
-    constexpr type_info &operator=(const type_info &) ENTT_NOEXCEPT = default;
-
-    /**
-     * @brief Default move assignment operator.
-     * @return This type info object.
-     */
-    constexpr type_info &operator=(type_info &&) ENTT_NOEXCEPT = default;
-
-    /**
-     * @brief Checks if a type info object is properly initialized.
-     * @return True if the object is properly initialized, false otherwise.
-     */
-    [[nodiscard]] constexpr explicit operator bool() const ENTT_NOEXCEPT {
-        return alias.data() != nullptr;
-    }
-
+public:
     /**
      * @brief Type index.
      * @return Type index.
@@ -284,8 +253,9 @@ private:
  * @return A properly initialized type info object.
  */
 template<typename Type>
-[[nodiscard]] constexpr type_info type_id() ENTT_NOEXCEPT {
-    return type_info{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>};
+[[nodiscard]] constexpr const type_info &type_id() ENTT_NOEXCEPT {
+    static type_info instance{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>};
+    return instance;
 }
 
 } // namespace entt

@@ -86,11 +86,10 @@ class basic_any {
         }
         case operation::get: {
             const type_info &info = *static_cast<const type_info *>(to);
-            return (!info || (info == type_id<Type>())) ? instance : nullptr;
+            return (info == type_id<void>() || info == type_id<Type>()) ? instance : nullptr;
         }
         case operation::type:
-            *static_cast<type_info *>(const_cast<void *>(to)) = type_id<Type>();
-            break;
+            return &type_id<Type>();
         }
 
         return nullptr;
@@ -241,14 +240,8 @@ public:
      * @brief Returns the object type if any, `type_id<void>()` otherwise.
      * @return The object type if any, `type_id<void>()` otherwise.
      */
-    [[nodiscard]] type_info type() const ENTT_NOEXCEPT {
-        if(vtable) {
-            type_info info{};
-            vtable(operation::type, *this, &info);
-            return info;
-        }
-
-        return type_id<void>();
+    [[nodiscard]] const type_info &type() const ENTT_NOEXCEPT {
+        return vtable ? *static_cast<const type_info *>(vtable(operation::type, *this, nullptr)) : type_id<void>();
     }
 
     /**
@@ -256,12 +249,12 @@ public:
      * @param req Optional expected type.
      * @return An opaque pointer the contained instance, if any.
      */
-    [[nodiscard]] const void *data(const type_info &req = type_info{}) const ENTT_NOEXCEPT {
+    [[nodiscard]] const void *data(const type_info &req = type_id<void>()) const ENTT_NOEXCEPT {
         return vtable ? vtable(operation::get, *this, &req) : nullptr;
     }
 
     /*! @copydoc data */
-    [[nodiscard]] void *data(const type_info &req = type_info{}) ENTT_NOEXCEPT {
+    [[nodiscard]] void *data(const type_info &req = type_id<void>()) ENTT_NOEXCEPT {
         return (!vtable || mode == policy::cref) ? nullptr : const_cast<void *>(vtable(operation::get, *this, &req));
     }
 

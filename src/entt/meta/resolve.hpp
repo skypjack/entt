@@ -44,12 +44,11 @@ template<typename Type>
 }
 
 /**
- * @brief Returns the meta type associated with a given type info object, if
- * any.
+ * @brief Returns the meta type associated with a given type info object.
  * @param info The type info object of the requested type.
  * @return The meta type associated with the given type info object, if any.
  */
-[[nodiscard]] inline meta_type resolve(const type_info info) ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type resolve(const type_info &info) ENTT_NOEXCEPT {
     for(auto &&curr: resolve()) {
         if(curr.info() == info) {
             return curr;

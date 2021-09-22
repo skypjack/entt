@@ -168,7 +168,7 @@ TEST(BasicHandle, Component) {
     ASSERT_TRUE((registry.empty<char, double>()));
     ASSERT_EQ(0u, (handle.remove<char, double>()));
 
-    handle.visit([](auto info) { ASSERT_EQ(entt::type_id<int>(), info); });
+    handle.visit([](const auto &info) { ASSERT_EQ(entt::type_id<int>(), info); });
 
     ASSERT_TRUE((handle.any_of<int, char, double>()));
     ASSERT_FALSE((handle.all_of<int, char, double>()));

@@ -228,7 +228,7 @@ public:
      * @brief Returns the object type if any, `type_id<void>()` otherwise.
      * @return The object type if any, `type_id<void>()` otherwise.
      */
-    [[nodiscard]] type_info type() const ENTT_NOEXCEPT {
+    [[nodiscard]] const type_info &type() const ENTT_NOEXCEPT {
         return storage.type();
     }
 

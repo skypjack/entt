@@ -42,23 +42,23 @@ TEST(TypeName, Functionalities) {
 }
 
 TEST(TypeInfo, Functionalities) {
-    static_assert(std::is_default_constructible_v<entt::type_info>);
     static_assert(std::is_copy_constructible_v<entt::type_info>);
     static_assert(std::is_move_constructible_v<entt::type_info>);
     static_assert(std::is_copy_assignable_v<entt::type_info>);
     static_assert(std::is_move_assignable_v<entt::type_info>);
 
-    ASSERT_EQ(entt::type_info{}, entt::type_info{});
-    ASSERT_NE(entt::type_id<int>(), entt::type_info{});
-    ASSERT_NE(entt::type_id<int>(), entt::type_id<char>());
+    ASSERT_EQ(entt::type_id<int>(), entt::type_id<int>());
     ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int &&>());
     ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int>());
+    ASSERT_NE(entt::type_id<int>(), entt::type_id<char>());
+
+    ASSERT_EQ(&entt::type_id<int>(), &entt::type_id<int>());
+    ASSERT_NE(&entt::type_id<int>(), &entt::type_id<void>());
 
     auto info = entt::type_id<const int &>();
-    const auto unnamed = entt::type_id<float>();
-    entt::type_info empty{};
+    auto other = entt::type_id<void>();
 
-    ASSERT_NE(info, empty);
+    ASSERT_NE(info, other);
     ASSERT_TRUE(info == info);
     ASSERT_FALSE(info != info);
 
@@ -66,29 +66,30 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_EQ(info.hash(), entt::type_hash<int>::value());
     ASSERT_EQ(info.name(), entt::type_name<int>::value());
 
-    ASSERT_TRUE(info);
-    ASSERT_TRUE(unnamed);
-    ASSERT_FALSE(empty);
+    other = info;
 
-    empty = info;
+    ASSERT_EQ(other.index(), entt::type_index<int>::value());
+    ASSERT_EQ(other.hash(), entt::type_hash<int>::value());
+    ASSERT_EQ(other.name(), entt::type_name<int>::value());
 
-    ASSERT_TRUE(empty);
-    ASSERT_EQ(empty.hash(), info.hash());
+    ASSERT_EQ(other.index(), info.index());
+    ASSERT_EQ(other.hash(), info.hash());
+    ASSERT_EQ(other.name(), info.name());
 
-    empty = {};
+    other = std::move(info);
 
-    ASSERT_FALSE(empty);
-    ASSERT_NE(empty.hash(), info.hash());
+    ASSERT_EQ(other.index(), entt::type_index<int>::value());
+    ASSERT_EQ(other.hash(), entt::type_hash<int>::value());
+    ASSERT_EQ(other.name(), entt::type_name<int>::value());
 
-    empty = std::move(info);
-
-    ASSERT_TRUE(empty);
-    ASSERT_EQ(empty.hash(), info.hash());
+    ASSERT_EQ(other.index(), info.index());
+    ASSERT_EQ(other.hash(), info.hash());
+    ASSERT_EQ(other.name(), info.name());
 }
 
 TEST(TypeInfo, Order) {
-    entt::type_info lhs = entt::type_id<char>();
     entt::type_info rhs = entt::type_id<int>();
+    entt::type_info lhs = entt::type_id<char>();
 
     // let's adjust the two objects since values are generated at runtime
     (rhs < lhs) || (std::swap(lhs, rhs), true);

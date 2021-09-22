@@ -82,7 +82,7 @@ TEST(PolyStorage, CopyEntity) {
     ASSERT_TRUE((registry.all_of<int, char>(entity)));
     ASSERT_FALSE((registry.any_of<int, char>(other)));
 
-    registry.visit(entity, [&](const auto info) {
+    registry.visit(entity, [&](const auto &info) {
         auto &&storage = registry.storage(info);
         storage->emplace(registry, other, storage->get(entity));
     });
@@ -107,7 +107,7 @@ TEST(PolyStorage, CopyRegistry) {
     ASSERT_EQ(other.size(), 0u);
 
     other.assign(registry.data(), registry.data() + registry.size(), registry.released());
-    registry.visit([&](const auto info) { std::as_const(registry).storage(info)->copy_to(other); });
+    registry.visit([&](const auto &info) { std::as_const(registry).storage(info)->copy_to(other); });
 
     ASSERT_EQ(registry.size(), other.size());
     ASSERT_EQ((registry.view<int, char>().size_hint()), (other.view<int, char>().size_hint()));

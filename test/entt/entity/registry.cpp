@@ -83,7 +83,7 @@ TEST(Registry, Context) {
 
     auto count = 0;
 
-    registry.ctx([&count](auto info) {
+    registry.ctx([&count](const auto &info) {
         ASSERT_EQ(info.hash(), entt::type_hash<char>::value());
         ++count;
     });
@@ -1884,7 +1884,7 @@ TEST(Registry, Visit) {
 
     bool hasType[3]{};
 
-    registry.visit([&hasType](auto info) {
+    registry.visit([&hasType](const auto &info) {
         hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
         hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
         hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());
@@ -1894,7 +1894,7 @@ TEST(Registry, Visit) {
 
     hasType[0] = hasType[1] = hasType[2] = false;
 
-    registry.visit(entity, [&hasType](auto info) {
+    registry.visit(entity, [&hasType](const auto &info) {
         hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
         hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
         hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());
@@ -1904,7 +1904,7 @@ TEST(Registry, Visit) {
 
     hasType[0] = hasType[2] = false;
 
-    registry.visit(other, [&hasType](auto info) {
+    registry.visit(other, [&hasType](const auto &info) {
         hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
         hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
         hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());

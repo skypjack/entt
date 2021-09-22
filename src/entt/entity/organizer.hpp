@@ -110,7 +110,7 @@ template<typename Entity>
 class basic_organizer final {
     using callback_type = void(const void *, basic_registry<Entity> &);
     using prepare_type = void(basic_registry<Entity> &);
-    using dependency_type = std::size_t(const bool, type_info *, const std::size_t);
+    using dependency_type = std::size_t(const bool, const type_info **, const std::size_t);
 
     struct vertex_data final {
         std::size_t ro_count{};
@@ -120,7 +120,7 @@ class basic_organizer final {
         callback_type *callback{};
         dependency_type *dependency;
         prepare_type *prepare{};
-        type_info info{};
+        const type_info *info{};
     };
 
     template<typename Type>
@@ -140,11 +140,11 @@ class basic_organizer final {
     }
 
     template<typename... Type>
-    static std::size_t fill_dependencies(type_list<Type...>, [[maybe_unused]] type_info *buffer, [[maybe_unused]] const std::size_t count) {
+    static std::size_t fill_dependencies(type_list<Type...>, [[maybe_unused]] const type_info **buffer, [[maybe_unused]] const std::size_t count) {
         if constexpr(sizeof...(Type) == 0u) {
             return {};
         } else {
-            type_info info[sizeof...(Type)]{type_id<Type>()...};
+            const type_info *info[sizeof...(Type)]{&type_id<Type>()...};
             const auto length = (std::min)(count, sizeof...(Type));
             std::copy_n(info, length, buffer);
             return length;
@@ -256,7 +256,7 @@ public:
          * @param length The length of the user-supplied buffer.
          * @return The number of type info objects written to the buffer.
          */
-        size_type ro_dependency(type_info *buffer, const std::size_t length) const ENTT_NOEXCEPT {
+        size_type ro_dependency(const type_info **buffer, const std::size_t length) const ENTT_NOEXCEPT {
             return node.dependency(false, buffer, length);
         }
 
@@ -267,7 +267,7 @@ public:
          * @param length The length of the user-supplied buffer.
          * @return The number of type info objects written to the buffer.
          */
-        size_type rw_dependency(type_info *buffer, const std::size_t length) const ENTT_NOEXCEPT {
+        size_type rw_dependency(const type_info **buffer, const std::size_t length) const ENTT_NOEXCEPT {
             return node.dependency(true, buffer, length);
         }
 
@@ -299,8 +299,8 @@ public:
          * @brief Returns a type info object associated with a vertex.
          * @return A properly initialized type info object.
          */
-        type_info info() const ENTT_NOEXCEPT {
-            return node.info;
+        const type_info &info() const ENTT_NOEXCEPT {
+            return *node.info;
         }
 
         /**
@@ -371,9 +371,9 @@ public:
             name,
             nullptr,
             callback,
-            +[](const bool rw, type_info *buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
+            +[](const bool rw, const type_info **buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             +[](basic_registry<entity_type> &reg) { void(to_args(reg, typename resource_type::args{})); },
-            type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
+            &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
         track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
         vertices.push_back(std::move(vdata));
@@ -404,9 +404,9 @@ public:
             name,
             &value_or_instance,
             callback,
-            +[](const bool rw, type_info *buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
+            +[](const bool rw, const type_info **buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             +[](basic_registry<entity_type> &reg) { void(to_args(reg, typename resource_type::args{})); },
-            type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
+            &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
         track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
         vertices.push_back(std::move(vdata));
@@ -431,9 +431,9 @@ public:
             name,
             payload,
             func,
-            +[](const bool rw, type_info *buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
+            +[](const bool rw, const type_info **buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             nullptr,
-            type_info{}};
+            &type_id<void>()};
 
         vertices.push_back(std::move(vdata));
     }
