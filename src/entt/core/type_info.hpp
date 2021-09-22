@@ -140,7 +140,7 @@ struct type_name final {
 /*! @brief Implementation specific information about a type. */
 class type_info final {
     template<typename Type>
-    friend constexpr const type_info &type_id() ENTT_NOEXCEPT;
+    friend const type_info &type_id() ENTT_NOEXCEPT;
 
     template<typename Type>
     constexpr type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
@@ -253,7 +253,7 @@ private:
  * @return A properly initialized type info object.
  */
 template<typename Type>
-[[nodiscard]] constexpr const type_info &type_id() ENTT_NOEXCEPT {
+[[nodiscard]] const type_info &type_id() ENTT_NOEXCEPT {
     static type_info instance{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>};
     return instance;
 }
