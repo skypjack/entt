@@ -288,6 +288,121 @@ TEST_F(MetaAny, SBODirectAssignment) {
     ASSERT_NE(entt::meta_any{0}, any);
 }
 
+TEST_F(MetaAny, SBOAssignValue) {
+    entt::meta_any any{42};
+    entt::meta_any other{3};
+    entt::meta_any invalid{empty_t{}};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_TRUE(any.assign(other));
+    ASSERT_FALSE(any.assign(invalid));
+    ASSERT_EQ(any.cast<int>(), 3);
+}
+
+TEST_F(MetaAny, SBOConvertAssignValue) {
+    entt::meta_any any{42};
+    entt::meta_any other{3.5};
+    entt::meta_any invalid{empty_t{}};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_TRUE(any.assign(other));
+    ASSERT_FALSE(any.assign(invalid));
+    ASSERT_EQ(any.cast<int>(), 3);
+}
+
+TEST_F(MetaAny, SBOAsRefAssignValue) {
+    int value = 42;
+    entt::meta_any any{entt::forward_as_meta(value)};
+    entt::meta_any other{3};
+    entt::meta_any invalid{empty_t{}};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_TRUE(any.assign(other));
+    ASSERT_FALSE(any.assign(invalid));
+    ASSERT_EQ(any.cast<int>(), 3);
+    ASSERT_EQ(value, 3);
+}
+
+TEST_F(MetaAny, SBOAsConstRefAssignValue) {
+    const int value = 42;
+    entt::meta_any any{entt::forward_as_meta(value)};
+    entt::meta_any other{3};
+    entt::meta_any invalid{empty_t{}};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_FALSE(any.assign(other));
+    ASSERT_FALSE(any.assign(invalid));
+    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_EQ(value, 42);
+}
+
+TEST_F(MetaAny, SBOTransferValue) {
+    entt::meta_any any{42};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_TRUE(any.assign(3));
+    ASSERT_FALSE(any.assign(empty_t{}));
+    ASSERT_EQ(any.cast<int>(), 3);
+}
+
+TEST_F(MetaAny, SBOTransferConstValue) {
+    const int value = 3;
+    entt::meta_any any{42};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_TRUE(any.assign(entt::forward_as_meta(value)));
+    ASSERT_EQ(any.cast<int>(), 3);
+}
+
+TEST_F(MetaAny, SBOConvertTransferValue) {
+    entt::meta_any any{42};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_TRUE(any.assign(3.5));
+    ASSERT_FALSE(any.assign(empty_t{}));
+    ASSERT_EQ(any.cast<int>(), 3);
+}
+
+TEST_F(MetaAny, SBOAsRefTransferValue) {
+    int value = 42;
+    entt::meta_any any{entt::forward_as_meta(value)};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_TRUE(any.assign(3));
+    ASSERT_FALSE(any.assign(empty_t{}));
+    ASSERT_EQ(any.cast<int>(), 3);
+    ASSERT_EQ(value, 3);
+}
+
+TEST_F(MetaAny, SBOAsConstRefTransferValue) {
+    const int value = 42;
+    entt::meta_any any{entt::forward_as_meta(value)};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<int>(), 42);
+
+    ASSERT_FALSE(any.assign(3));
+    ASSERT_FALSE(any.assign(empty_t{}));
+    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_EQ(value, 42);
+}
+
 TEST_F(MetaAny, NoSBOInPlaceTypeConstruction) {
     fat_t instance{.1, .2, .3, .4};
     entt::meta_any any{std::in_place_type<fat_t>, instance};
@@ -432,6 +547,136 @@ TEST_F(MetaAny, NoSBODirectAssignment) {
     ASSERT_EQ(any.cast<fat_t>(), instance);
     ASSERT_EQ(any, (entt::meta_any{fat_t{.1, .2, .3, .4}}));
     ASSERT_NE(fat_t{}, any);
+}
+
+TEST_F(MetaAny, NoSBOAssignValue) {
+    entt::meta_any any{fat_t{.1, .2, .3, .4}};
+    entt::meta_any other{fat_t{.0, .1, .2, .3}};
+    entt::meta_any invalid{'c'};
+
+    const void *addr = std::as_const(any).data();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+
+    ASSERT_TRUE(any.assign(other));
+    ASSERT_FALSE(any.assign(invalid));
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.0, .1, .2, .3}));
+    ASSERT_EQ(addr, std::as_const(any).data());
+}
+
+TEST_F(MetaAny, NoSBOConvertAssignValue) {
+    entt::meta_any any{empty_t{}};
+    entt::meta_any other{fat_t{.0, .1, .2, .3}};
+    entt::meta_any invalid{'c'};
+
+    const void *addr = std::as_const(any).data();
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.assign(other));
+    ASSERT_FALSE(any.assign(invalid));
+    ASSERT_EQ(addr, std::as_const(any).data());
+}
+
+TEST_F(MetaAny, NoSBOAsRefAssignValue) {
+    fat_t instance{.1, .2, .3, .4};
+    entt::meta_any any{entt::forward_as_meta(instance)};
+    entt::meta_any other{fat_t{.0, .1, .2, .3}};
+    entt::meta_any invalid{'c'};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+
+    ASSERT_TRUE(any.assign(other));
+    ASSERT_FALSE(any.assign(invalid));
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.0, .1, .2, .3}));
+    ASSERT_EQ(instance, (fat_t{.0, .1, .2, .3}));
+}
+
+TEST_F(MetaAny, NoSBOAsConstRefAssignValue) {
+    const fat_t instance{.1, .2, .3, .4};
+    entt::meta_any any{entt::forward_as_meta(instance)};
+    entt::meta_any other{fat_t{.0, .1, .2, .3}};
+    entt::meta_any invalid{'c'};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+
+    ASSERT_FALSE(any.assign(other));
+    ASSERT_FALSE(any.assign(invalid));
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+    ASSERT_EQ(instance, (fat_t{.1, .2, .3, .4}));
+}
+
+TEST_F(MetaAny, NoSBOTransferValue) {
+    entt::meta_any any{fat_t{.1, .2, .3, .4}};
+
+    const void *addr = std::as_const(any).data();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+
+    ASSERT_TRUE(any.assign(fat_t{.0, .1, .2, .3}));
+    ASSERT_FALSE(any.assign('c'));
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.0, .1, .2, .3}));
+    ASSERT_EQ(addr, std::as_const(any).data());
+}
+
+TEST_F(MetaAny, NoSBOTransferConstValue) {
+    const fat_t instance{.0, .1, .2, .3};
+    entt::meta_any any{fat_t{.1, .2, .3, .4}};
+
+    const void *addr = std::as_const(any).data();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+
+    ASSERT_TRUE(any.assign(entt::forward_as_meta(instance)));
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.0, .1, .2, .3}));
+    ASSERT_EQ(addr, std::as_const(any).data());
+}
+
+TEST_F(MetaAny, NoSBOConvertTransferValue) {
+    entt::meta_any any{empty_t{}};
+
+    const void *addr = std::as_const(any).data();
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.assign(fat_t{.0, .1, .2, .3}));
+    ASSERT_FALSE(any.assign('c'));
+    ASSERT_EQ(addr, std::as_const(any).data());
+}
+
+TEST_F(MetaAny, NoSBOAsRefTransferValue) {
+    fat_t instance{.1, .2, .3, .4};
+    entt::meta_any any{entt::forward_as_meta(instance)};
+
+    const void *addr = std::as_const(any).data();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+
+    ASSERT_TRUE(any.assign(fat_t{.0, .1, .2, .3}));
+    ASSERT_FALSE(any.assign('c'));
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.0, .1, .2, .3}));
+    ASSERT_EQ(instance, (fat_t{.0, .1, .2, .3}));
+    ASSERT_EQ(addr, std::as_const(any).data());
+}
+
+TEST_F(MetaAny, NoSBOAsConstRefTransferValue) {
+    const fat_t instance{.1, .2, .3, .4};
+    entt::meta_any any{entt::forward_as_meta(instance)};
+
+    const void *addr = std::as_const(any).data();
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+
+    ASSERT_FALSE(any.assign(fat_t{.0, .1, .2, .3}));
+    ASSERT_FALSE(any.assign('c'));
+    ASSERT_EQ(any.cast<const fat_t &>(), (fat_t{.1, .2, .3, .4}));
+    ASSERT_EQ(instance, (fat_t{.1, .2, .3, .4}));
+    ASSERT_EQ(addr, std::as_const(any).data());
 }
 
 TEST_F(MetaAny, VoidInPlaceTypeConstruction) {

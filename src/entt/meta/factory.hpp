@@ -239,7 +239,13 @@ public:
         static internal::meta_base_node node{
             nullptr,
             internal::meta_node<Base>::resolve(),
-            [](const void *instance) ENTT_NOEXCEPT -> const void * { return static_cast<const Base *>(static_cast<const Type *>(instance)); }
+            [](meta_any other) ENTT_NOEXCEPT -> meta_any {
+                if(auto *data = other.data(); data) {
+                    return entt::forward_as_meta(*static_cast<Base *>(static_cast<Type *>(data)));
+                }
+
+                return entt::forward_as_meta(*static_cast<const Base *>(static_cast<const Type *>(std::as_const(other).data())));
+            }
             // tricks clang-format
         };
 

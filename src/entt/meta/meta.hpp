@@ -350,8 +350,9 @@ public:
     [[nodiscard]] const Type *try_cast() const {
         if(const auto &info = type_id<Type>(); node && *node->info == info) {
             return any_cast<Type>(&storage);
-        } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return *curr->type->info == info; }, node); base) {
-            return static_cast<const Type *>(base->cast(storage.data()));
+        } else if(const auto *base = internal::find_by<&internal::meta_type_node::base>(info, node); base) {
+            const auto as_const_base = base->cast(as_ref());
+            return any_cast<Type>(&as_const_base.storage);
         }
 
         return nullptr;
@@ -362,8 +363,9 @@ public:
     [[nodiscard]] Type *try_cast() {
         if(const auto &info = type_id<Type>(); node && *node->info == info) {
             return any_cast<Type>(&storage);
-        } else if(const auto *base = internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return *curr->type->info == info; }, node); base) {
-            return static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(base->cast(static_cast<constness_as_t<any, Type> &>(storage).data())));
+        } else if(const auto *base = internal::find_by<&internal::meta_type_node::base>(info, node); base) {
+            auto as_base = base->cast(as_ref());
+            return any_cast<Type>(&as_base.storage);
         }
 
         return nullptr;
@@ -375,7 +377,7 @@ public:
      * The type of the instance must be such that the cast is possible.
      *
      * @warning
-     * Attempting to perform an invalid cast results in undefined behavior.
+     * Attempting to perform an invalid cast results is undefined behavior.
      *
      * @tparam Type Type to which to cast the instance.
      * @return A reference to the contained instance.
@@ -445,20 +447,16 @@ public:
      */
     template<typename Type>
     bool allow_cast() {
-        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            if(auto other = std::as_const(*this).allow_cast(internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve()); other) {
-                if(other.storage.owner()) {
-                    std::swap(*this, other);
-                    return true;
-                }
-
-                return (storage.data() != nullptr);
+        if(auto other = std::as_const(*this).allow_cast(internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve()); other) {
+            if(other.storage.owner()) {
+                std::swap(*this, other);
+                return true;
             }
 
-            return false;
-        } else {
-            return allow_cast(internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve());
+            return (static_cast<constness_as_t<any, std::remove_reference_t<const Type>> &>(storage).data() != nullptr);
         }
+
+        return false;
     }
 
     /**
@@ -474,6 +472,20 @@ public:
         storage.emplace<Type>(std::forward<Args>(args)...);
         node = internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve();
     }
+
+    /**
+     * @brief Copy assigns a value to the contained object without replacing it.
+     * @param other The value to assign to the contained object.
+     * @return True in case of success, false otherwise.
+     */
+    bool assign(const meta_any &other);
+
+    /**
+     * @brief Move assigns a value to the contained object without replacing it.
+     * @param other The value to assign to the contained object.
+     * @return True in case of success, false otherwise.
+     */
+    bool assign(meta_any &&other);
 
     /*! @brief Destroys contained object */
     void reset() {
@@ -1138,7 +1150,7 @@ public:
      * @return The registered base meta type for the given identifier, if any.
      */
     [[nodiscard]] meta_type base(const id_type id) const {
-        return internal::visit<&node_type::base>([id](const auto *curr) { return curr->type->id == id; }, node);
+        return internal::find_by<&node_type::base>(id, node);
     }
 
     /**
@@ -1158,7 +1170,7 @@ public:
      * @return The registered meta data for the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        return internal::visit<&node_type::data>([id](const auto *curr) { return curr->id == id; }, node);
+        return internal::find_by<&node_type::data>(id, node);
     }
 
     /**
@@ -1180,7 +1192,7 @@ public:
      * @return The registered meta function for the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        return internal::visit<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node);
+        return internal::find_by<&node_type::func>(id, node);
     }
 
     /**
@@ -1304,7 +1316,7 @@ public:
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::visit<&internal::meta_type_node::prop>([&key](const auto *curr) { return curr->id == key; }, node);
+        return internal::find_by<&internal::meta_type_node::prop>(key, node);
     }
 
     /**
@@ -1366,9 +1378,9 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    if(const auto info = type.info(); (node && *node->info == info) || internal::visit<&internal::meta_type_node::base>([info](const auto *curr) { return *curr->type->info == info; }, node)) {
+    if(const auto &info = type.info(); (node && *node->info == info) || internal::find_by<&internal::meta_type_node::base>(info, node)) {
         return as_ref();
-    } else if(const auto *const conv = internal::visit<&internal::meta_type_node::conv>([info](const auto *curr) { return *curr->type->info == info; }, node); conv) {
+    } else if(const auto *const conv = internal::find_by<&internal::meta_type_node::conv>(info, node); conv) {
         return conv->conv(storage.data());
     } else if(node && node->conversion_helper && (type.is_arithmetic() || type.is_enum())) {
         // exploits the fact that arithmetic types and enums are also default constructible
@@ -1380,6 +1392,31 @@ bool meta_any::set(const id_type id, Type &&value) {
     }
 
     return {};
+}
+
+inline bool meta_any::assign(const meta_any &other) {
+    if(const auto value = other.allow_cast(node); value) {
+        if(*value.node->info == *node->info) {
+            return storage.assign(value.storage);
+        } else if(auto *base = internal::find_by<&internal::meta_type_node::base>(*node->info, value.node); base) {
+            const auto as_const_base = base->cast(as_ref());
+            return storage.assign(as_const_base.storage);
+        }
+    }
+
+    return false;
+}
+
+inline bool meta_any::assign(meta_any &&other) {
+    if(other.allow_cast(node)) {
+        if(*other.node->info == *node->info) {
+            return storage.assign(std::move(other.storage));
+        } else if(auto *base = internal::find_by<&internal::meta_type_node::base>(*node->info, other.node); base) {
+            return storage.assign(base->cast(other.as_ref()).storage);
+        }
+    }
+
+    return false;
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const ENTT_NOEXCEPT {

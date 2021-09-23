@@ -51,7 +51,7 @@ struct meta_prop_node {
 struct meta_base_node {
     meta_base_node *next;
     meta_type_node *const type;
-    const void *(*const cast)(const void *)ENTT_NOEXCEPT;
+    meta_any(*const cast)(meta_any)ENTT_NOEXCEPT;
 };
 
 struct meta_conv_node {
@@ -196,20 +196,30 @@ template<typename... Args>
     return args[index + 1u];
 }
 
-template<auto Member, typename Op>
-[[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> visit(const Op &op, const internal::meta_type_node *node) {
+template<auto Member, typename Type>
+[[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> find_by(const Type &info_or_id, const internal::meta_type_node *node) {
     if(!node) {
         return nullptr;
     }
 
     for(auto *curr = node->*Member; curr; curr = curr->next) {
-        if(op(curr)) {
-            return curr;
+        if constexpr(std::is_same_v<Type, type_info>) {
+            if(*curr->type->info == info_or_id) {
+                return curr;
+            }
+        } else if constexpr(std::is_same_v<decltype(curr), meta_base_node *>) {
+            if(curr->type->id == info_or_id) {
+                return curr;
+            }
+        } else {
+            if(curr->id == info_or_id) {
+                return curr;
+            }
         }
     }
 
     for(auto *curr = node->base; curr; curr = curr->next) {
-        if(auto *ret = visit<Member>(op, curr->type); ret) {
+        if(auto *ret = find_by<Member>(info_or_id, curr->type); ret) {
             return ret;
         }
     }
