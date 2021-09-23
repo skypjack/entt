@@ -23,8 +23,8 @@ class basic_any {
     enum class operation : std::uint8_t {
         copy,
         move,
-        assign,
         transfer,
+        assign,
         destroy,
         compare,
         get
