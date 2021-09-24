@@ -130,7 +130,7 @@ class ENTT_API meta_node {
         if constexpr(std::is_default_constructible_v<Type>) {
             return +[]() { return meta_any{std::in_place_type<Type>}; };
         } else {
-            return static_cast<decltype(meta_type_node::default_constructor)>(nullptr);
+            return static_cast<std::decay_t<decltype(meta_type_node::default_constructor)>>(nullptr);
         }
     }
 
@@ -144,7 +144,7 @@ class ENTT_API meta_node {
                 return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(value)))) : static_cast<double>(*static_cast<const Type *>(value));
             };
         } else {
-            return static_cast<decltype(meta_type_node::conversion_helper)>(nullptr);
+            return static_cast<std::decay_t<decltype(meta_type_node::conversion_helper)>>(nullptr);
         }
     }
 
