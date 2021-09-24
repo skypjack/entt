@@ -1305,7 +1305,6 @@ TEST_F(Any, NotMovableType) {
         ASSERT_TRUE(copy.owner());
     };
 
-    const not_movable value{};
     test(entt::any{std::in_place_type<not_movable>}, entt::any{std::in_place_type<not_movable>});
 }
 

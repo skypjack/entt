@@ -92,7 +92,7 @@ TEST(TypeInfo, Order) {
     entt::type_info lhs = entt::type_id<char>();
 
     // let's adjust the two objects since values are generated at runtime
-    (rhs < lhs) || (std::swap(lhs, rhs), true);
+    rhs < lhs ? void() : std::swap(lhs, rhs);
 
     ASSERT_FALSE(lhs < lhs);
     ASSERT_FALSE(rhs < rhs);

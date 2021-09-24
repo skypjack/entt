@@ -51,7 +51,7 @@ struct meta_prop_node {
 struct meta_base_node {
     meta_base_node *next;
     meta_type_node *const type;
-    meta_any(*const cast)(meta_any)ENTT_NOEXCEPT;
+    meta_any (*const cast)(meta_any) ENTT_NOEXCEPT;
 };
 
 struct meta_conv_node {
