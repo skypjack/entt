@@ -760,6 +760,14 @@ public:
     basic_storage(basic_storage &&other) ENTT_NOEXCEPT = default;
 
     /**
+     * @brief Allocator-extended move constructor.
+     * @param other The instance to move from.
+     * @param allocator The allocator to use.
+     */
+    basic_storage(basic_storage &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+        : base_type{std::move(other), allocator} {}
+
+    /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
      * @return This storage.
