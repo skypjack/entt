@@ -57,7 +57,7 @@ struct meta_base_node {
 struct meta_conv_node {
     meta_conv_node *next;
     meta_type_node *const type;
-    meta_any (*const conv)(const void *);
+    meta_any (*const conv)(const meta_any &);
 };
 
 struct meta_ctor_node {
@@ -225,26 +225,6 @@ template<auto Member, typename Type>
     }
 
     return nullptr;
-}
-
-[[nodiscard]] inline bool can_cast_or_convert(const internal::meta_type_node *type, const internal::meta_type_node *other) ENTT_NOEXCEPT {
-    if(type->info == other->info) {
-        return true;
-    }
-
-    for(const auto *curr = type->conv; curr; curr = curr->next) {
-        if(curr->type->info == other->info) {
-            return true;
-        }
-    }
-
-    for(const auto *curr = type->base; curr; curr = curr->next) {
-        if(can_cast_or_convert(curr->type, other)) {
-            return true;
-        }
-    }
-
-    return (type->conversion_helper && other->conversion_helper);
 }
 
 } // namespace internal

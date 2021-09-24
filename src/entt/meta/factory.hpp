@@ -272,7 +272,7 @@ public:
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<conv_type>::resolve(),
-            [](const void *instance) -> meta_any { return forward_as_meta(static_cast<const Type *>(instance)->*Candidate)(); }
+            [](const meta_any &instance) -> meta_any { return forward_as_meta(static_cast<const Type *>(instance.data())->*Candidate)(); }
             // tricks clang-format
         };
 
@@ -288,7 +288,7 @@ public:
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<conv_type>::resolve(),
-            [](const void *instance) -> meta_any { return forward_as_meta(Candidate(*static_cast<const Type *>(instance))); }
+            [](const meta_any &instance) -> meta_any { return forward_as_meta(Candidate(*static_cast<const Type *>(instance.data()))); }
             // tricks clang-format
         };
 
@@ -312,7 +312,7 @@ public:
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<std::remove_const_t<std::remove_reference_t<To>>>::resolve(),
-            [](const void *instance) -> meta_any { return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance))); }
+            [](const meta_any &instance) -> meta_any { return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance.data()))); }
             // tricks clang-format
         };
 

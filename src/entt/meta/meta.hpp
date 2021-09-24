@@ -971,7 +971,14 @@ class meta_type {
                 for(size_type next{}; next < sz && next == (direct + ext) && args[next]; ++next) {
                     const auto type = args[next].type();
                     const auto other = curr->arg(next);
-                    type.info() == other.info() ? ++direct : (ext += internal::can_cast_or_convert(type.node, other.node));
+
+                    if(const auto &info = other.info(); info == type.info()) {
+                        ++direct;
+                    } else {
+                        ext += internal::find_by<&node_type::base>(info, type.node)
+                               || internal::find_by<&node_type::conv>(info, type.node)
+                               || (type.node->conversion_helper && other.node->conversion_helper);
+                    }
                 }
 
                 if((direct + ext) == sz) {
@@ -1381,7 +1388,7 @@ bool meta_any::set(const id_type id, Type &&value) {
     if(const auto &info = type.info(); (node && *node->info == info) || internal::find_by<&internal::meta_type_node::base>(info, node)) {
         return as_ref();
     } else if(const auto *const conv = internal::find_by<&internal::meta_type_node::conv>(info, node); conv) {
-        return conv->conv(storage.data());
+        return conv->conv(*this);
     } else if(node && node->conversion_helper && (type.is_arithmetic() || type.is_enum())) {
         // exploits the fact that arithmetic types and enums are also default constructible
         auto other = type.construct();
