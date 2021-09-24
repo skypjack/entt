@@ -614,14 +614,6 @@ public:
     /**
      * @brief Assigns or replaces the given component for an entity.
      *
-     * Equivalent to the following snippet (pseudocode):
-     *
-     * @code{.cpp}
-     * auto &component = registry.all_of<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.emplace<Component>(entity, args...);
-     * @endcode
-     *
-     * Prefer this function anyway because it has slightly better performance.
-     *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
@@ -865,13 +857,6 @@ public:
      *
      * In case the entity doesn't own the component, the parameters provided are
      * used to construct it.<br/>
-     * Equivalent to the following snippet (pseudocode):
-     *
-     * @code{.cpp}
-     * auto &component = registry.all_of<Component>(entity) ? registry.get<Component>(entity) : registry.emplace<Component>(entity, args...);
-     * @endcode
-     *
-     * Prefer this function anyway because it has slightly better performance.
      *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
@@ -1365,36 +1350,29 @@ public:
     /**
      * @brief Sorts the pool of entities for the given component.
      *
-     * The order of the elements in a pool is highly affected by assignments
-     * of components to entities and deletions. Components are arranged to
-     * maximize the performance during iterations and users should not make any
-     * assumption on the order.<br/>
-     * This function can be used to impose an order to the elements in the pool
-     * of the given component. The order is kept valid until a component of the
-     * given type is assigned or removed from an entity.
+     * This function is used to sort the elements in a pool. The order remains
+     * valid until a component of the given type is assigned to or removed from
+     * an entity.
      *
-     * The comparison function object must return `true` if the first element
-     * is _less_ than the second one, `false` otherwise. The signature of the
-     * comparison function should be equivalent to one of the following:
+     * The comparison function object returns `true` if the first element is
+     * _less_ than the second one, `false` otherwise. Its signature is also
+     * equivalent to one of the following:
      *
      * @code{.cpp}
      * bool(const Entity, const Entity);
      * bool(const Component &, const Component &);
      * @endcode
      *
-     * Moreover, the comparison function object shall induce a
-     * _strict weak ordering_ on the values.
+     * Moreover, it shall induce a _strict weak ordering_ on the values.
      *
-     * The sort function oject must offer a member function template
-     * `operator()` that accepts three arguments:
+     * The sort function object offers an `operator()` that accepts:
      *
      * * An iterator to the first element of the range to sort.
      * * An iterator past the last element of the range to sort.
-     * * A comparison function to use to compare the elements.
+     * * A comparison function object to use to compare the elements.
      *
-     * The comparison funtion object received by the sort function object hasn't
-     * necessarily the type of the one passed along with the other parameters to
-     * this member function.
+     * The comparison function object hasn't necessarily the type of the one
+     * passed along with the other parameters to this member function.
      *
      * @warning
      * Pools of components owned by a group cannot be sorted.
@@ -1427,29 +1405,20 @@ public:
     /**
      * @brief Sorts two pools of components in the same way.
      *
-     * The order of the elements in a pool is highly affected by assignments
-     * of components to entities and deletions. Components are arranged to
-     * maximize the performance during iterations and users should not make any
-     * assumption on the order.
-     *
-     * It happens that different pools of components must be sorted the same way
-     * because of runtime and/or performance constraints. This function can be
-     * used to order a pool of components according to the order between the
-     * entities in another pool of components.
+     * This function is used to sort a pool according to the order of the
+     * elements in a different pool.
      *
      * @b How @b it @b works
      *
-     * Being `A` and `B` the two sets where `B` is the master (the one the order
-     * of which rules) and `A` is the slave (the one to sort), after a call to
-     * this function an iterator for `A` will return the entities according to
-     * the following rules:
+     * Being `To` and `From` the two sets, after invoking this function an
+     * iterator for `To` returns elements according to the following rules:
      *
-     * * All the entities in `A` that are also in `B` are returned first
-     *   according to the order they have in `B`.
-     * * All the entities in `A` that are not in `B` are returned in no
+     * * All entities in `To` that are also in `From` are returned first
+     *   according to the order they have in `From`.
+     * * All entities in `To` that are not in `From` are returned in no
      *   particular order after all the other entities.
      *
-     * Any subsequent change to `B` won't affect the order in `A`.
+     * Any subsequent change to `From` won't affect the order in `To`.
      *
      * @warning
      * Pools of components owned by a group cannot be sorted.
