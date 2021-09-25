@@ -842,7 +842,7 @@ public:
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&...args) {
         // basic no-leak guarantee (with invalid state) if sorting throws
         ENTT_ASSERT(!(length > count), "Length exceeds the number of elements");
-        compact();
+        ENTT_ASSERT(free_list == null, "Partial sorting with tombstones is not supported");
 
         algo(std::make_reverse_iterator(packed + length), std::make_reverse_iterator(packed), std::move(compare), std::forward<Args>(args)...);
 
@@ -876,6 +876,7 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
+        compact();
         sort_n(count, std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 

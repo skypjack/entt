@@ -960,9 +960,24 @@ TEST(SparseSet, SortUnordered) {
 }
 
 TEST(SparseSet, SortRange) {
-    entt::sparse_set set;
+    entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[5u]{entt::entity{7}, entt::entity{9}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
 
+    set.insert(std::begin(entities), std::end(entities));
+    set.erase(entities[0u]);
+
+    ASSERT_DEATH(set.sort_n(0u, std::less{});, "");
+    ASSERT_EQ(set.size(), 5u);
+
+    set.sort(std::less{});
+
+    ASSERT_EQ(set.size(), 4u);
+    ASSERT_EQ(set[0u], entities[4u]);
+    ASSERT_EQ(set[1u], entities[3u]);
+    ASSERT_EQ(set[2u], entities[1u]);
+    ASSERT_EQ(set[3u], entities[2u]);
+
+    set.clear();
     set.insert(std::begin(entities), std::end(entities));
     set.sort_n(0u, std::less{});
 
