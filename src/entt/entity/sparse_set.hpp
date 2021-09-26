@@ -338,10 +338,11 @@ public:
      * @return This sparse set.
      */
     basic_sparse_set &operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
+
         release_sparse_pages();
         sparse = std::move(other.sparse);
         packed = std::move(other.packed);
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
         udata = std::exchange(other.udata, nullptr);
         free_list = std::exchange(other.free_list, tombstone);
         mode = other.mode;
