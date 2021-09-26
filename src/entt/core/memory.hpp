@@ -57,11 +57,10 @@ constexpr void propagate_on_container_move_assignment([[maybe_unused]] Allocator
  * @param rhs Another valid allocator.
  */
 template<typename Allocator>
-constexpr void propagate_on_container_swap(Allocator &lhs, Allocator &rhs) ENTT_NOEXCEPT {
-    constexpr auto pocs = std::allocator_traits<Allocator>::propagate_on_container_swap::value;
-    ENTT_ASSERT(pocs || lhs == rhs, "Cannot swap the containers");
+constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[maybe_unused]] Allocator &rhs) ENTT_NOEXCEPT {
+    ENTT_ASSERT(std::allocator_traits<Allocator>::propagate_on_container_swap::value || lhs == rhs, "Cannot swap the containers");
 
-    if constexpr(pocs) {
+    if constexpr(std::allocator_traits<Allocator>::propagate_on_container_swap::value) {
         using std::swap;
         swap(lhs, rhs);
     }
