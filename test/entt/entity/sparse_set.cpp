@@ -1238,14 +1238,12 @@ TEST(SparseSet, ThrowingAllocator) {
 
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
-    // strong exception safety
     ASSERT_THROW(set.reserve(1u), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_EQ(set.capacity(), 0u);
     ASSERT_EQ(set.extent(), 0u);
 
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
-    // strong exception safety
     ASSERT_THROW(set.emplace(entt::entity{0}), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
     ASSERT_EQ(set.capacity(), 0u);
@@ -1253,7 +1251,6 @@ TEST(SparseSet, ThrowingAllocator) {
     set.emplace(entt::entity{0});
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
-    // strong exception safety
     ASSERT_THROW(set.reserve(2u), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
     ASSERT_TRUE(set.contains(entt::entity{0}));
@@ -1262,7 +1259,6 @@ TEST(SparseSet, ThrowingAllocator) {
     entt::entity entities[2u]{entt::entity{1}, entt::entity{ENTT_SPARSE_PAGE}};
     test::throwing_allocator<entt::entity>::trigger_after_allocate = true;
 
-    // basic exception safety
     ASSERT_THROW(set.insert(std::begin(entities), std::end(entities)), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
     ASSERT_TRUE(set.contains(entt::entity{0}));

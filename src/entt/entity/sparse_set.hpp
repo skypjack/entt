@@ -163,10 +163,9 @@ class basic_sparse_set {
     using allocator_traits = std::allocator_traits<Allocator>;
     using alloc = typename allocator_traits::template rebind_alloc<Entity>;
     using alloc_traits = typename std::allocator_traits<alloc>;
-    using alloc_page = typename allocator_traits::template rebind_alloc<typename alloc_traits::pointer>;
 
     using entity_traits = entt_traits<Entity>;
-    using sparse_container_type = std::vector<typename alloc_traits::pointer, alloc_page>;
+    using sparse_container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using packed_container_type = std::vector<Entity, alloc>;
 
     [[nodiscard]] auto sparse_ptr(const Entity entt) const {
@@ -182,11 +181,13 @@ class basic_sparse_set {
     }
 
     void release_sparse_pages() {
-        for(size_type pos{}, last = sparse.size(); pos < last; ++pos) {
-            if(sparse[pos]) {
-                std::destroy(sparse[pos], sparse[pos] + sparse_page_v);
-                alloc_traits::deallocate(packed.get_allocator(), sparse[pos], sparse_page_v);
-                sparse[pos] = nullptr;
+        auto page_allocator{packed.get_allocator()};
+
+        for(auto &&page: sparse) {
+            if(page != nullptr) {
+                std::destroy(page, page + sparse_page_v);
+                alloc_traits::deallocate(page_allocator, page, sparse_page_v);
+                page = nullptr;
             }
         }
     }
@@ -247,7 +248,8 @@ protected:
         }
 
         if(!sparse[page]) {
-            sparse[page] = alloc_traits::allocate(packed.get_allocator(), sparse_page_v);
+            auto page_allocator{packed.get_allocator()};
+            sparse[page] = alloc_traits::allocate(page_allocator, sparse_page_v);
             std::uninitialized_fill(sparse[page], sparse[page] + sparse_page_v, null);
         }
 
