@@ -130,14 +130,30 @@ public:
 };
 
 /**
- * @brief Converts an entity to its underlying type.
+ * @copydoc entt_traits<Entity>::to_integral
  * @tparam Entity The value type.
- * @param entity The value to convert.
- * @return The integral representation of the given value.
  */
 template<typename Entity>
-[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_integral(const Entity entity) ENTT_NOEXCEPT {
-    return entt_traits<Entity>::to_integral(entity);
+[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_integral(const Entity value) ENTT_NOEXCEPT {
+    return entt_traits<Entity>::to_integral(value);
+}
+
+/**
+ * @copydoc entt_traits<Entity>::to_entity
+ * @tparam Entity The value type.
+ */
+template<typename Entity>
+[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_entity(const Entity value) ENTT_NOEXCEPT {
+    return entt_traits<Entity>::to_entity(value);
+}
+
+/**
+ * @copydoc entt_traits<Entity>::to_version
+ * @tparam Entity The value type.
+ */
+template<typename Entity>
+[[nodiscard]] constexpr typename entt_traits<Entity>::version_type to_version(const Entity value) ENTT_NOEXCEPT {
+    return entt_traits<Entity>::to_version(value);
 }
 
 /*! @brief Null object for all identifiers.  */
