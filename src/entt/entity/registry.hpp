@@ -1267,16 +1267,7 @@ public:
         return {handler->current, *std::get<storage_type<std::remove_const_t<Owned>> *>(cpools)..., *std::get<storage_type<std::remove_const_t<Get>> *>(cpools)...};
     }
 
-    /**
-     * @brief Returns a group for the given components.
-     *
-     * @sa group
-     *
-     * @tparam Owned Types of components owned by the group.
-     * @tparam Get Types of components observed by the group.
-     * @tparam Exclude Types of components used to filter the group.
-     * @return A newly created group.
-     */
+    /*! @copydoc group */
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] basic_group<Entity, owned_t<std::add_const_t<Owned>...>, get_t<std::add_const_t<Get>...>, exclude_t<Exclude...>> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
@@ -1294,29 +1285,13 @@ public:
         }
     }
 
-    /**
-     * @brief Returns a group for the given components.
-     *
-     * @sa group
-     *
-     * @tparam Owned Types of components owned by the group.
-     * @tparam Exclude Types of components used to filter the group.
-     * @return A newly created group.
-     */
+    /*! @copydoc group */
     template<typename... Owned, typename... Exclude>
     [[nodiscard]] basic_group<Entity, owned_t<Owned...>, get_t<>, exclude_t<Exclude...>> group(exclude_t<Exclude...> = {}) {
         return group<Owned...>(get_t<>{}, exclude<Exclude...>);
     }
 
-    /**
-     * @brief Returns a group for the given components.
-     *
-     * @sa group_if_exists
-     *
-     * @tparam Owned Types of components owned by the group.
-     * @tparam Exclude Types of components used to filter the group.
-     * @return A newly created group.
-     */
+    /*! @copydoc group */
     template<typename... Owned, typename... Exclude>
     [[nodiscard]] basic_group<Entity, owned_t<std::add_const_t<Owned>...>, get_t<>, exclude_t<Exclude...>> group_if_exists(exclude_t<Exclude...> = {}) const {
         return group_if_exists<std::add_const_t<Owned>...>(get_t<>{}, exclude<Exclude...>);
