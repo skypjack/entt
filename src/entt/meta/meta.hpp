@@ -350,9 +350,14 @@ public:
     [[nodiscard]] const Type *try_cast() const {
         if(const auto &info = type_id<Type>(); node && *node->info == info) {
             return any_cast<Type>(&storage);
-        } else if(const auto *base = internal::find_by<&internal::meta_type_node::base>(info, node); base) {
-            const auto as_const_base = base->cast(as_ref());
-            return any_cast<Type>(&as_const_base.storage);
+        } else if(node) {
+            for(auto *it = node->base; it; it = it->next) {
+                const auto as_const = it->cast(as_ref());
+
+                if(const Type *base = as_const.try_cast<Type>(); base) {
+                    return base;
+                }
+            }
         }
 
         return nullptr;
@@ -363,9 +368,12 @@ public:
     [[nodiscard]] Type *try_cast() {
         if(const auto &info = type_id<Type>(); node && *node->info == info) {
             return any_cast<Type>(&storage);
-        } else if(const auto *base = internal::find_by<&internal::meta_type_node::base>(info, node); base) {
-            auto as_base = base->cast(as_ref());
-            return any_cast<Type>(&as_base.storage);
+        } else if(node) {
+            for(auto *it = node->base; it; it = it->next) {
+                if(Type *base = it->cast(as_ref()).try_cast<Type>(); base) {
+                    return base;
+                }
+            }
         }
 
         return nullptr;
