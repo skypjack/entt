@@ -136,7 +136,7 @@ public:
  * @return The integral representation of the given value.
  */
 template<typename Entity>
-[[nodiscard]] constexpr auto to_integral(const Entity entity) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_integral(const Entity entity) ENTT_NOEXCEPT {
     return entt_traits<Entity>::to_integral(entity);
 }
 
