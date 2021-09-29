@@ -1393,17 +1393,31 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    if(const auto &info = type.info(); (node && *node->info == info) || internal::find_by<&internal::meta_type_node::base>(info, node)) {
+    if(const auto &info = type.info(); node && *node->info == info) {
         return as_ref();
-    } else if(const auto *const conv = internal::find_by<&internal::meta_type_node::conv>(info, node); conv) {
-        return conv->conv(*this);
-    } else if(node && node->conversion_helper && (type.is_arithmetic() || type.is_enum())) {
-        // exploits the fact that arithmetic types and enums are also default constructible
-        auto other = type.construct();
-        ENTT_ASSERT(other.node->conversion_helper, "Conversion helper not found");
-        const auto value = node->conversion_helper(nullptr, storage.data());
-        other.node->conversion_helper(other.storage.data(), &value);
-        return other;
+    } else if(node) {
+        for(auto *it = node->conv; it; it = it->next) {
+            if(*it->type->info == info) {
+                return it->conv(*this);
+            }
+        }
+
+        if(node->conversion_helper && (type.is_arithmetic() || type.is_enum())) {
+            // exploits the fact that arithmetic types and enums are also default constructible
+            auto other = type.construct();
+            ENTT_ASSERT(other.node->conversion_helper, "Conversion helper not found");
+            const auto value = node->conversion_helper(nullptr, storage.data());
+            other.node->conversion_helper(other.storage.data(), &value);
+            return other;
+        }
+
+        for(auto *it = node->base; it; it = it->next) {
+            const auto as_const = it->cast(as_ref());
+
+            if(auto other = as_const.allow_cast(type); other) {
+                return other;
+            }
+        }
     }
 
     return {};

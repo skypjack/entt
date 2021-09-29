@@ -11,6 +11,11 @@ struct base_1_t {
 
 struct base_2_t {
     base_2_t() = default;
+
+    operator int() const {
+        return value_2;
+    }
+
     int value_2{};
 };
 
@@ -32,6 +37,7 @@ struct MetaBase: ::testing::Test {
             .data<&base_1_t::value_1>("value_1"_hs);
 
         entt::meta<base_2_t>()
+            .conv<int>()
             .data<&base_2_t::value_2>("value_2"_hs);
 
         entt::meta<base_3_t>()
@@ -68,7 +74,7 @@ TEST_F(MetaBase, Functionalities) {
     ASSERT_EQ(any.cast<const base_1_t &>().value_1, as_derived.cast<const derived_t &>().value_1);
 }
 
-TEST_F(MetaBase, ThisIsNotThis) {
+TEST_F(MetaBase, SetGetWithMutatingThis) {
     using namespace entt::literals;
 
     derived_t instance;
@@ -104,6 +110,44 @@ TEST_F(MetaBase, ThisIsNotThis) {
     ASSERT_EQ(instance.value_1, 1);
     ASSERT_EQ(instance.value_2, 2);
     ASSERT_EQ(instance.value_3, 3);
+}
+
+TEST_F(MetaBase, ConvWithMutatingThis) {
+    entt::meta_any any{derived_t{}};
+    auto as_cref = std::as_const(any).as_ref();
+    any.cast<derived_t &>().value_2 = 42;
+
+    auto conv = std::as_const(any).allow_cast<int>();
+    auto from_cref = std::as_const(as_cref).allow_cast<int>();
+
+    ASSERT_TRUE(conv);
+    ASSERT_TRUE(from_cref);
+    ASSERT_EQ(conv.cast<int>(), 42);
+    ASSERT_EQ(from_cref.cast<int>(), 42);
+
+    ASSERT_TRUE(any.allow_cast<int>());
+    ASSERT_TRUE(as_cref.allow_cast<int>());
+    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_EQ(as_cref.cast<int>(), 42);
+}
+
+TEST_F(MetaBase, OpaqueConvWithMutatingThis) {
+    entt::meta_any any{derived_t{}};
+    auto as_cref = std::as_const(any).as_ref();
+    any.cast<derived_t &>().value_2 = 42;
+
+    auto conv = std::as_const(any).allow_cast(entt::resolve<int>());
+    auto from_cref = std::as_const(as_cref).allow_cast(entt::resolve<int>());
+
+    ASSERT_TRUE(conv);
+    ASSERT_TRUE(from_cref);
+    ASSERT_EQ(conv.cast<int>(), 42);
+    ASSERT_EQ(from_cref.cast<int>(), 42);
+
+    ASSERT_TRUE(any.allow_cast(entt::resolve<int>()));
+    ASSERT_TRUE(as_cref.allow_cast(entt::resolve<int>()));
+    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_EQ(as_cref.cast<int>(), 42);
 }
 
 TEST_F(MetaBase, ReRegistration) {
