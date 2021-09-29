@@ -1424,28 +1424,16 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 inline bool meta_any::assign(const meta_any &other) {
-    if(const auto value = other.allow_cast(node); value) {
-        if(*value.node->info == *node->info) {
-            return storage.assign(value.storage);
-        } else if(auto *base = internal::find_by<&internal::meta_type_node::base>(*node->info, value.node); base) {
-            const auto as_const_base = base->cast(as_ref());
-            return storage.assign(as_const_base.storage);
-        }
-    }
-
-    return false;
+    auto value = other.allow_cast(node);
+    return value && storage.assign(std::move(value.storage));
 }
 
 inline bool meta_any::assign(meta_any &&other) {
-    if(other.allow_cast(node)) {
-        if(*other.node->info == *node->info) {
-            return storage.assign(std::move(other.storage));
-        } else if(auto *base = internal::find_by<&internal::meta_type_node::base>(*node->info, other.node); base) {
-            return storage.assign(base->cast(other.as_ref()).storage);
-        }
+    if(*node->info == *other.node->info) {
+        return storage.assign(std::move(other.storage));
     }
 
-    return false;
+    return assign(std::as_const(other));
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const ENTT_NOEXCEPT {

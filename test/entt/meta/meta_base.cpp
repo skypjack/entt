@@ -150,6 +150,32 @@ TEST_F(MetaBase, OpaqueConvWithMutatingThis) {
     ASSERT_EQ(as_cref.cast<int>(), 42);
 }
 
+TEST_F(MetaBase, AssignWithMutatingThis) {
+    using namespace entt::literals;
+
+    entt::meta_any dst{base_2_t{}};
+    entt::meta_any src{derived_t{}};
+
+    dst.cast<base_2_t &>().value_2 = 0;
+    src.cast<derived_t &>().value_2 = 42;
+
+    ASSERT_TRUE(dst.assign(src));
+    ASSERT_EQ(dst.get("value_2"_hs).cast<int>(), 42);
+}
+
+TEST_F(MetaBase, TransferWithMutatingThis) {
+    using namespace entt::literals;
+
+    entt::meta_any dst{base_2_t{}};
+    entt::meta_any src{derived_t{}};
+
+    dst.cast<base_2_t &>().value_2 = 0;
+    src.cast<derived_t &>().value_2 = 42;
+
+    ASSERT_TRUE(dst.assign(std::move(src)));
+    ASSERT_EQ(dst.get("value_2"_hs).cast<int>(), 42);
+}
+
 TEST_F(MetaBase, ReRegistration) {
     SetUp();
 
