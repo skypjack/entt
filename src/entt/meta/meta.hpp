@@ -354,7 +354,7 @@ public:
             for(auto *it = node->base; it; it = it->next) {
                 const auto as_const = it->cast(as_ref());
 
-                if(const Type *base = as_const.try_cast<Type>(); base) {
+                if(const Type *base = as_const.template try_cast<Type>(); base) {
                     return base;
                 }
             }
@@ -370,7 +370,7 @@ public:
             return any_cast<Type>(&storage);
         } else if(node) {
             for(auto *it = node->base; it; it = it->next) {
-                if(Type *base = it->cast(as_ref()).try_cast<Type>(); base) {
+                if(Type *base = it->cast(as_ref()).template try_cast<Type>(); base) {
                     return base;
                 }
             }
