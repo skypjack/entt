@@ -1134,6 +1134,54 @@ TEST_F(MetaAny, AllowCast) {
     ASSERT_EQ(as_cref.type(), entt::resolve<double>());
 }
 
+TEST_F(MetaAny, OpaqueAllowCast) {
+    entt::meta_any clazz{clazz_t{}};
+    entt::meta_any fat{fat_t{}};
+    entt::meta_any arithmetic{42};
+    auto as_cref = entt::forward_as_meta(arithmetic.cast<const int &>());
+
+    ASSERT_TRUE(clazz);
+    ASSERT_TRUE(fat);
+    ASSERT_TRUE(arithmetic);
+    ASSERT_TRUE(as_cref);
+
+    ASSERT_TRUE(clazz.allow_cast(entt::resolve<clazz_t>()));
+    ASSERT_EQ(clazz.type(), entt::resolve<clazz_t>());
+
+    ASSERT_TRUE(clazz.allow_cast(entt::resolve<int>()));
+    ASSERT_EQ(clazz.type(), entt::resolve<int>());
+    ASSERT_TRUE(clazz.allow_cast(entt::resolve<int>()));
+
+    ASSERT_TRUE(fat.allow_cast(entt::resolve<fat_t>()));
+    ASSERT_TRUE(fat.allow_cast(entt::resolve<empty_t>()));
+    ASSERT_EQ(fat.type(), entt::resolve<fat_t>());
+    ASSERT_FALSE(fat.allow_cast(entt::resolve<int>()));
+
+    ASSERT_TRUE(std::as_const(fat).allow_cast(entt::resolve<fat_t>()));
+    ASSERT_TRUE(std::as_const(fat).allow_cast(entt::resolve<empty_t>()));
+    ASSERT_EQ(fat.type(), entt::resolve<fat_t>());
+    ASSERT_FALSE(fat.allow_cast(entt::resolve<int>()));
+
+    ASSERT_TRUE(arithmetic.allow_cast(entt::resolve<int>()));
+    ASSERT_EQ(arithmetic.type(), entt::resolve<int>());
+    ASSERT_FALSE(arithmetic.allow_cast(entt::resolve<fat_t>()));
+
+    ASSERT_TRUE(arithmetic.allow_cast(entt::resolve<double>()));
+    ASSERT_EQ(arithmetic.type(), entt::resolve<double>());
+    ASSERT_EQ(arithmetic.cast<double &>(), 42.);
+
+    ASSERT_TRUE(arithmetic.allow_cast(entt::resolve<float>()));
+    ASSERT_EQ(arithmetic.type(), entt::resolve<float>());
+    ASSERT_EQ(arithmetic.cast<float &>(), 42.f);
+
+    ASSERT_TRUE(as_cref.allow_cast(entt::resolve<int>()));
+    ASSERT_EQ(as_cref.type(), entt::resolve<int>());
+    ASSERT_FALSE(as_cref.allow_cast(entt::resolve<fat_t>()));
+
+    ASSERT_TRUE(as_cref.allow_cast(entt::resolve<double>()));
+    ASSERT_EQ(as_cref.type(), entt::resolve<double>());
+}
+
 TEST_F(MetaAny, Convert) {
     entt::meta_any any{clazz_t{}};
     any.cast<clazz_t &>().value = 42;

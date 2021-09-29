@@ -198,10 +198,6 @@ template<typename... Args>
 
 template<auto Member, typename Type>
 [[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> find_by(const Type &info_or_id, const internal::meta_type_node *node) {
-    if(!node) {
-        return nullptr;
-    }
-
     for(auto *curr = node->*Member; curr; curr = curr->next) {
         if constexpr(std::is_same_v<Type, type_info>) {
             if(*curr->type->info == info_or_id) {
