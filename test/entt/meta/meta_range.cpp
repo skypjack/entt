@@ -28,9 +28,9 @@ TEST_F(MetaRange, Range) {
     ASSERT_TRUE(it != range.end());
     ASSERT_FALSE(it == range.end());
 
-    ASSERT_EQ((*it).info(), entt::resolve<double>().info());
-    ASSERT_EQ((*(++it)).info(), entt::resolve("int"_hs).info());
-    ASSERT_EQ((*it++).info(), entt::resolve<int>().info());
+    ASSERT_EQ(it->info(), entt::resolve<double>().info());
+    ASSERT_EQ((++it)->info(), entt::resolve("int"_hs).info());
+    ASSERT_EQ((it++)->info(), entt::resolve<int>().info());
 
     ASSERT_EQ(it, range.end());
 }

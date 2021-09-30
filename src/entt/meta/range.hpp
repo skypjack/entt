@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include "../core/iterator.hpp"
 
 namespace entt {
 
@@ -16,7 +17,7 @@ class meta_range {
     struct range_iterator {
         using difference_type = std::ptrdiff_t;
         using value_type = Type;
-        using pointer = void;
+        using pointer = input_iterator_proxy<value_type>;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
         using node_type = Node;
@@ -37,6 +38,10 @@ class meta_range {
 
         [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
             return it;
+        }
+
+        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+            return operator*();
         }
 
         [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
