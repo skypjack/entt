@@ -23,7 +23,7 @@ struct input_iterator_proxy {
      * @brief Access operator for accessing wrapped values.
      * @return A pointer to the wrapped value.
      */
-    Type *operator->() ENTT_NOEXCEPT {
+    [[nodiscard]] Type *operator->() ENTT_NOEXCEPT {
         return std::addressof(value);
     }
 
