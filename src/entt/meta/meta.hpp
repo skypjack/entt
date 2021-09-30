@@ -744,7 +744,7 @@ struct meta_data {
 
     /**
      * @brief Returns the number of setters available.
-     * @return The number of arguments accepted by the member function.
+     * @return The number of setters available.
      */
     [[nodiscard]] size_type arity() const ENTT_NOEXCEPT {
         return node->arity;
