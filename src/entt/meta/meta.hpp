@@ -9,6 +9,7 @@
 #include "../config/config.h"
 #include "../core/any.hpp"
 #include "../core/fwd.hpp"
+#include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
@@ -1479,7 +1480,7 @@ public:
     /*! @brief Type of elements returned by the iterator. */
     using value_type = meta_any;
     /*! @brief Pointer type, `void` on purpose. */
-    using pointer = void;
+    using pointer = input_iterator_proxy<value_type>;
     /*! @brief Reference type, it is **not** an actual reference. */
     using reference = value_type;
     /*! @brief Iterator category. */
@@ -1528,13 +1529,21 @@ public:
     }
 
     /**
-     * @brief Indirection operator.
+     * @brief Indirection operator for accessing the pointed opaque object.
      * @return The element to which the iterator points.
      */
     [[nodiscard]] reference operator*() const {
         meta_any other;
         vtable(operation::deref, handle, &other);
         return other;
+    }
+
+    /**
+     * @brief Access operator for accessing the pointed opaque object.
+     * @return The element to which the iterator points.
+     */
+    [[nodiscard]] pointer operator->() ENTT_NOEXCEPT {
+        return operator*();
     }
 
     /**
@@ -1677,7 +1686,7 @@ public:
     /*! @brief Type of elements returned by the iterator. */
     using value_type = std::pair<meta_any, meta_any>;
     /*! @brief Pointer type, `void` on purpose. */
-    using pointer = void;
+    using pointer = input_iterator_proxy<value_type>;
     /*! @brief Reference type, it is **not** an actual reference. */
     using reference = value_type;
     /*! @brief Iterator category. */
@@ -1727,13 +1736,21 @@ public:
     }
 
     /**
-     * @brief Indirection operator.
+     * @brief Indirection operator for accessing the pointed opaque object.
      * @return The element to which the iterator points.
      */
     [[nodiscard]] reference operator*() const {
         reference other;
         vtable(operation::deref, handle, &other);
         return other;
+    }
+
+    /**
+     * @brief Access operator for accessing the pointed opaque object.
+     * @return The element to which the iterator points.
+     */
+    [[nodiscard]] pointer operator->() ENTT_NOEXCEPT {
+        return operator*();
     }
 
     /**
