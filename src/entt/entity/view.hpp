@@ -345,6 +345,8 @@ public:
     using reverse_iterator = internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable_view = iterable;
+    /*! @brief Common type among all storage types. */
+    using common_type = basic_common_type;
 
     /**
      * @brief Storage type associated with a given component.
@@ -379,6 +381,14 @@ public:
         basic_view other{*this};
         other.view = std::get<storage_type<Comp> *>(pools);
         return other;
+    }
+
+    /**
+     * @brief Returns the leading storage of a view.
+     * @return The leading storage of the view.
+     */
+    const common_type &handle() const ENTT_NOEXCEPT {
+        return *view;
     }
 
     /**
@@ -691,6 +701,8 @@ public:
     using reverse_iterator = typename basic_common_type::reverse_iterator;
     /*! @brief Iterable view type. */
     using iterable_view = internal::iterable_storage<Entity, Component>;
+    /*! @brief Common type among all storage types. */
+    using common_type = basic_common_type;
     /*! @brief Storage type associated with the view component. */
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
@@ -706,6 +718,14 @@ public:
     basic_view(storage_type &ref) ENTT_NOEXCEPT
         : pools{&ref},
           filter{} {}
+
+    /**
+     * @brief Returns the leading storage of a view.
+     * @return The leading storage of the view.
+     */
+    const common_type &handle() const ENTT_NOEXCEPT {
+        return *std::get<0>(pools);
+    }
 
     /**
      * @brief Returns the number of entities that have the given component.

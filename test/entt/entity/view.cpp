@@ -74,6 +74,24 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(SingleComponentView, Handle) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    auto view = registry.view<int>();
+    auto &&handle = view.handle();
+
+    ASSERT_TRUE(handle.empty());
+    ASSERT_FALSE(handle.contains(entity));
+    ASSERT_EQ(&handle, &view.handle());
+
+    registry.emplace<int>(entity);
+
+    ASSERT_FALSE(handle.empty());
+    ASSERT_TRUE(handle.contains(entity));
+    ASSERT_EQ(&handle, &view.handle());
+}
+
 TEST(SingleComponentView, RawData) {
     entt::registry registry;
     auto view = registry.view<int>();
@@ -499,6 +517,37 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
     ASSERT_FALSE(invalid);
+}
+
+TEST(MultiComponentView, Handle) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    auto view = registry.view<int, char>();
+    auto &&handle = view.handle();
+
+    ASSERT_TRUE(handle.empty());
+    ASSERT_FALSE(handle.contains(entity));
+    ASSERT_EQ(&handle, &view.handle());
+
+    registry.emplace<int>(entity);
+
+    ASSERT_FALSE(handle.empty());
+    ASSERT_TRUE(handle.contains(entity));
+    ASSERT_EQ(&handle, &view.handle());
+
+    view = registry.view<int, char>();
+    auto &&other = view.handle();
+
+    ASSERT_TRUE(other.empty());
+    ASSERT_FALSE(other.contains(entity));
+    ASSERT_EQ(&other, &view.handle());
+    ASSERT_NE(&handle, &other);
+
+    view = view.use<int>();
+
+    ASSERT_NE(&other, &view.handle());
+    ASSERT_EQ(&handle, &view.handle());
 }
 
 TEST(MultiComponentView, LazyTypesFromConstRegistry) {
