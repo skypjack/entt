@@ -1542,7 +1542,7 @@ public:
      * @brief Access operator for accessing the pointed opaque object.
      * @return The element to which the iterator points.
      */
-    [[nodiscard]] pointer operator->() ENTT_NOEXCEPT {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return operator*();
     }
 
@@ -1749,7 +1749,7 @@ public:
      * @brief Access operator for accessing the pointed opaque object.
      * @return The element to which the iterator points.
      */
-    [[nodiscard]] pointer operator->() ENTT_NOEXCEPT {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return operator*();
     }
 
