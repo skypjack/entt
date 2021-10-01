@@ -17,7 +17,7 @@ class meta_range {
     struct range_iterator {
         using difference_type = std::ptrdiff_t;
         using value_type = Type;
-        using pointer = input_iterator_proxy<value_type>;
+        using pointer = input_iterator_pointer<value_type>;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
         using node_type = Node;

@@ -1480,7 +1480,7 @@ public:
     /*! @brief Type of elements returned by the iterator. */
     using value_type = meta_any;
     /*! @brief Pointer type, it's a _safe_ temporary object. */
-    using pointer = input_iterator_proxy<value_type>;
+    using pointer = input_iterator_pointer<value_type>;
     /*! @brief Reference type, it's **not** an actual reference. */
     using reference = value_type;
     /*! @brief Iterator category. */
@@ -1686,7 +1686,7 @@ public:
     /*! @brief Type of elements returned by the iterator. */
     using value_type = std::pair<meta_any, meta_any>;
     /*! @brief Pointer type, it's a _safe_ temporary object. */
-    using pointer = input_iterator_proxy<value_type>;
+    using pointer = input_iterator_pointer<value_type>;
     /*! @brief Reference type, it's **not** an actual reference. */
     using reference = value_type;
     /*! @brief Iterator category. */
