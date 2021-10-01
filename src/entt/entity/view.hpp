@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
 #include "component.hpp"
 #include "entity.hpp"
@@ -34,7 +35,7 @@ class iterable_storage final {
     struct iterable_storage_iterator final {
         using difference_type = std::ptrdiff_t;
         using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<decltype(std::declval<storage_type &>().get_as_tuple({}))>()));
-        using pointer = void;
+        using pointer = input_iterator_pointer<value_type>;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
 
@@ -53,6 +54,10 @@ class iterable_storage final {
 
         [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
             return {*std::get<It>(it)...};
+        }
+
+        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+            return operator*();
         }
 
         [[nodiscard]] bool operator==(const iterable_storage_iterator &other) const ENTT_NOEXCEPT {
@@ -242,7 +247,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         struct iterable_iterator final {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_view>().get({})));
-            using pointer = void;
+            using pointer = input_iterator_pointer<value_type>;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
 
@@ -261,6 +266,10 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
                 return std::tuple_cat(std::make_tuple(*it), view->get(*it));
+            }
+
+            [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+                return operator*();
             }
 
             [[nodiscard]] bool operator==(const iterable_iterator &other) const ENTT_NOEXCEPT {

@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -74,7 +75,7 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final
         struct iterable_iterator final {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_group>().get({})));
-            using pointer = void;
+            using pointer = input_iterator_pointer<value_type>;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
 
@@ -95,6 +96,10 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
                 const auto entt = *it;
                 return std::tuple_cat(std::make_tuple(entt), std::get<storage_type<Get> *>(pools)->get_as_tuple(entt)...);
+            }
+
+            [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+                return operator*();
             }
 
             [[nodiscard]] bool operator==(const iterable_iterator &other) const ENTT_NOEXCEPT {
@@ -539,7 +544,7 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
         struct iterable_iterator<It, type_list<OIt...>> final {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_group>().get({})));
-            using pointer = void;
+            using pointer = input_iterator_pointer<value_type>;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
 
@@ -563,6 +568,10 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
                     std::make_tuple(*it),
                     std::forward_as_tuple(*std::get<OIt>(owned)...),
                     std::get<storage_type<Get> *>(get)->get_as_tuple(*it)...);
+            }
+
+            [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+                return operator*();
             }
 
             [[nodiscard]] bool operator==(const iterable_iterator &other) const ENTT_NOEXCEPT {
