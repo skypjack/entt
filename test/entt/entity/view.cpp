@@ -191,7 +191,7 @@ TEST(SingleComponentView, Each) {
     auto iterable = view.each();
 
     ASSERT_NE(iterable.begin(), iterable.end());
-    ASSERT_NO_THROW(iterable.begin()->swap(*iterable.begin()));
+    ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
 
     auto cview = std::as_const(registry).view<const int>();
     auto citerable = cview.each();
@@ -680,7 +680,7 @@ TEST(MultiComponentView, Each) {
     auto iterable = view.each();
 
     ASSERT_NE(iterable.begin(), iterable.end());
-    ASSERT_NO_THROW(iterable.begin()->swap(*iterable.begin()));
+    ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
 
     auto cview = std::as_const(registry).view<const int, const char>();
     auto citerable = cview.each();
