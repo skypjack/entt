@@ -160,8 +160,17 @@ public:
      * @param id Unique resource identifier.
      * @return A handle for the given resource.
      */
-    [[nodiscard]] resource_handle<resource_type> handle(const id_type id) const {
+    [[nodiscard]] resource_handle<const resource_type> handle(const id_type id) const {
         if(auto it = resources.find(id); it != resources.cend()) {
+            return it->second;
+        }
+
+        return {};
+    }
+
+    /*! @copydoc handle */
+    [[nodiscard]] resource_handle<resource_type> handle(const id_type id) {
+        if(auto it = resources.find(id); it != resources.end()) {
             return it->second;
         }
 
@@ -201,6 +210,41 @@ public:
      *
      * @code{.cpp}
      * void(const entt::id_type);
+     * void(entt::resource_handle<const resource_type>);
+     * void(const entt::id_type, entt::resource_handle<const resource_type>);
+     * @endcode
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void each(Func func) const {
+        auto begin = resources.begin();
+        auto end = resources.end();
+
+        while(begin != end) {
+            auto curr = begin++;
+
+            if constexpr(std::is_invocable_v<Func, id_type>) {
+                func(curr->first);
+            } else if constexpr(std::is_invocable_v<Func, resource_handle<const resource_type>>) {
+                func(resource_handle<const resource_type>{curr->second});
+            } else {
+                func(curr->first, resource_handle<const resource_type>{curr->second});
+            }
+        }
+    }
+
+    /**
+     * @copybrief each
+     *
+     * The function object is invoked for each element. It is provided with
+     * either the resource identifier, the resource handle or both of them.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
+     *
+     * @code{.cpp}
+     * void(const entt::id_type);
      * void(entt::resource_handle<resource_type>);
      * void(const entt::id_type, entt::resource_handle<resource_type>);
      * @endcode
@@ -209,7 +253,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) const {
+    void each(Func func) {
         auto begin = resources.begin();
         auto end = resources.end();
 

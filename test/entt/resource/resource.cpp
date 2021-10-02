@@ -51,7 +51,7 @@ TEST(Resource, Functionalities) {
 
     auto tmp = cache.handle(hs1);
 
-    ASSERT_EQ(cache.handle(hs1).use_count(), 3);
+    ASSERT_EQ(std::as_const(cache).handle(hs1).use_count(), 3);
     ASSERT_TRUE(static_cast<bool>(tmp));
 
     tmp = {};
@@ -63,7 +63,7 @@ TEST(Resource, Functionalities) {
     ASSERT_FALSE(cache.empty());
     ASSERT_TRUE(cache.contains(hs1));
     ASSERT_FALSE(cache.contains(hs2));
-    ASSERT_EQ((*cache.handle(hs1)).value, 42);
+    ASSERT_EQ((*std::as_const(cache).handle(hs1)).value, 42);
 
     ASSERT_TRUE(cache.load<loader<resource>>(hs1, 42));
     ASSERT_TRUE(cache.load<loader<resource>>(hs2, 42));
@@ -73,7 +73,7 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(cache.contains(hs1));
     ASSERT_TRUE(cache.contains(hs2));
     ASSERT_EQ((*cache.handle(hs1)).value, 42);
-    ASSERT_EQ(cache.handle(hs2)->value, 42);
+    ASSERT_EQ(std::as_const(cache).handle(hs2)->value, 42);
 
     ASSERT_NO_FATAL_FAILURE(cache.discard(hs1));
 
@@ -93,10 +93,10 @@ TEST(Resource, Functionalities) {
 
     ASSERT_NE(cache.size(), 0u);
     ASSERT_FALSE(cache.empty());
-    ASSERT_TRUE(cache.handle(hs1));
+    ASSERT_TRUE(std::as_const(cache).handle(hs1));
     ASSERT_FALSE(cache.handle(hs2));
 
-    ASSERT_TRUE(cache.handle(hs1));
+    ASSERT_TRUE(std::as_const(cache).handle(hs1));
     ASSERT_EQ(&cache.handle(hs1).get(), &static_cast<const resource &>(cache.handle(hs1)));
     ASSERT_NO_FATAL_FAILURE(cache.clear());
 
@@ -201,13 +201,16 @@ TEST(Resource, Each) {
     ASSERT_FALSE(cache.empty());
     ASSERT_EQ(cache.handle("resource"_hs)->value, 1);
 
-    cache.each([](auto id, auto res) {
+    cache.each([](entt::id_type id, entt::resource_handle<resource> res) {
         ASSERT_EQ(id, "resource"_hs);
         ++res->value;
     });
 
     ASSERT_FALSE(cache.empty());
-    ASSERT_EQ(cache.handle("resource"_hs)->value, 2);
+
+    std::as_const(cache).each([](entt::id_type id, entt::resource_handle<const resource> res) {
+        ASSERT_EQ(res->value, 2);
+    });
 
     cache.each([&cache](entt::id_type id) {
         cache.discard(id);
