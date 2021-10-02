@@ -1,13 +1,22 @@
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/core/type_info.hpp>
 #include <entt/resource/cache.hpp>
 
 struct resource {
+    virtual const entt::type_info &type() const ENTT_NOEXCEPT {
+        return entt::type_id<resource>();
+    }
+
     int value;
 };
 
-struct derived_resource: resource {};
+struct derived_resource: resource {
+    const entt::type_info &type() const ENTT_NOEXCEPT override {
+        return entt::type_id<derived_resource>();
+    }
+};
 
 template<typename Resource>
 struct loader: entt::resource_loader<loader<Resource>, Resource> {
@@ -24,6 +33,15 @@ struct broken_loader: entt::resource_loader<broken_loader<Resource>, Resource> {
         return nullptr;
     }
 };
+
+template<typename Type, typename Other>
+entt::resource_handle<Type> dynamic_resource_handle_cast(const entt::resource_handle<Other> &other) {
+    if(other->type() == entt::type_id<Type>()) {
+        return entt::resource_handle<Type>{other, static_cast<Type &>(other.get())};
+    }
+
+    return {};
+}
 
 TEST(Resource, Functionalities) {
     entt::resource_cache<resource> cache;
@@ -149,11 +167,9 @@ TEST(Resource, MutableHandle) {
     ASSERT_EQ(cache.handle(hs)->value, 4);
 }
 
-TEST(Resource, HandleCast) {
-    using namespace entt::literals;
-
+TEST(Resource, HandleImplicitCast) {
     entt::resource_cache<resource> cache;
-    auto handle = cache.load<loader<derived_resource>>("resource"_hs, 0);
+    auto handle = cache.temp<loader<derived_resource>>(0);
 
     auto resource = std::make_shared<derived_resource>();
     entt::resource_handle<derived_resource> other{resource};
@@ -186,6 +202,27 @@ TEST(Resource, HandleCast) {
     ASSERT_FALSE(other);
     ASSERT_FALSE(temp);
     ASSERT_EQ(resource.use_count(), 1u);
+}
+
+TEST(Resource, DynamicResourceHandleCast) {
+    entt::resource_handle<derived_resource> handle = entt::resource_cache<derived_resource>{}.temp<loader<derived_resource>>(42);
+    entt::resource_handle<const resource> base = handle;
+
+    ASSERT_TRUE(base);
+    ASSERT_EQ(handle.use_count(), 2u);
+    ASSERT_EQ(base->value, 42);
+
+    entt::resource_handle<const derived_resource> chandle = dynamic_resource_handle_cast<const derived_resource>(base);
+
+    ASSERT_TRUE(chandle);
+    ASSERT_EQ(handle.use_count(), 3u);
+    ASSERT_EQ(chandle->value, 42);
+
+    base = entt::resource_cache<resource>{}.temp<loader<resource>>(42);
+    chandle = dynamic_resource_handle_cast<const derived_resource>(base);
+
+    ASSERT_FALSE(chandle);
+    ASSERT_EQ(handle.use_count(), 1u);
 }
 
 TEST(Resource, Each) {

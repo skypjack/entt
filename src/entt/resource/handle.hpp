@@ -56,6 +56,16 @@ public:
     resource_handle(resource_handle &&other) ENTT_NOEXCEPT = default;
 
     /**
+     * @brief Aliasing constructor.
+     * @tparam Other Type of resource managed by the received handle.
+     * @param other The handle with which to share ownership information.
+     * @param res Unrelated and unmanaged resources.
+     */
+    template<typename Other>
+    resource_handle(const resource_handle<Other> &other, resource_type &res) noexcept
+        : resource{other.resource, std::addressof(res)} {}
+
+    /**
      * @brief Copy constructs a handle which shares ownership of the resource.
      * @tparam Other Type of resource managed by the received handle.
      * @param other The handle to copy from.
