@@ -113,6 +113,26 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(std::is_move_assignable_v<entt::resource_handle<resource>>);
 }
 
+TEST(Resource, ConstNonConstHandle) {
+    entt::resource_cache<resource> cache;
+
+    entt::resource_handle<resource> handle = cache.temp<loader<resource>>(42);
+    entt::resource_handle<const resource> chandle = handle;
+
+    static_assert(std::is_same_v<decltype(handle.get()), resource &>);
+    static_assert(std::is_same_v<decltype(chandle.get()), const resource &>);
+    static_assert(std::is_same_v<decltype(std::as_const(handle).get()), resource &>);
+
+    ASSERT_TRUE(chandle);
+    ASSERT_EQ(handle.use_count(), 2u);
+    ASSERT_EQ(chandle->value, 42);
+
+    chandle = {};
+
+    ASSERT_FALSE(chandle);
+    ASSERT_EQ(handle.use_count(), 1u);
+}
+
 TEST(Resource, MutableHandle) {
     entt::resource_cache<resource> cache;
 

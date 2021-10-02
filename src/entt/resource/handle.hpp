@@ -121,33 +121,17 @@ public:
      *
      * @return A reference to the managed resource.
      */
-    [[nodiscard]] const resource_type &get() const ENTT_NOEXCEPT {
-        ENTT_ASSERT(static_cast<bool>(resource), "Invalid resource");
+    [[nodiscard]] resource_type &get() const ENTT_NOEXCEPT {
         return *resource;
     }
 
     /*! @copydoc get */
-    [[nodiscard]] resource_type &get() ENTT_NOEXCEPT {
-        return const_cast<resource_type &>(std::as_const(*this).get());
-    }
-
-    /*! @copydoc get */
-    [[nodiscard]] operator const resource_type &() const ENTT_NOEXCEPT {
+    [[nodiscard]] operator resource_type &() const ENTT_NOEXCEPT {
         return get();
     }
 
     /*! @copydoc get */
-    [[nodiscard]] operator resource_type &() ENTT_NOEXCEPT {
-        return get();
-    }
-
-    /*! @copydoc get */
-    [[nodiscard]] const resource_type &operator*() const ENTT_NOEXCEPT {
-        return get();
-    }
-
-    /*! @copydoc get */
-    [[nodiscard]] resource_type &operator*() ENTT_NOEXCEPT {
+    [[nodiscard]] resource_type &operator*() const ENTT_NOEXCEPT {
         return get();
     }
 
@@ -160,12 +144,7 @@ public:
      * @return A pointer to the managed resource or `nullptr` if the handle
      * contains no resource at all.
      */
-    [[nodiscard]] const resource_type *operator->() const ENTT_NOEXCEPT {
-        return resource.get();
-    }
-
-    /*! @copydoc operator-> */
-    [[nodiscard]] resource_type *operator->() ENTT_NOEXCEPT {
+    [[nodiscard]] resource_type *operator->() const ENTT_NOEXCEPT {
         return resource.get();
     }
 
