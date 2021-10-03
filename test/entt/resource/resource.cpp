@@ -111,8 +111,10 @@ TEST(Resource, Functionalities) {
 
     ASSERT_NE(cache.size(), 0u);
     ASSERT_FALSE(cache.empty());
-    ASSERT_TRUE(std::as_const(cache).handle(hs1));
+    ASSERT_TRUE(cache.handle(hs1));
     ASSERT_FALSE(cache.handle(hs2));
+    ASSERT_TRUE(std::as_const(cache).handle(hs1));
+    ASSERT_FALSE(std::as_const(cache).handle(hs2));
 
     ASSERT_TRUE(std::as_const(cache).handle(hs1));
     ASSERT_EQ(&cache.handle(hs1).get(), &static_cast<const resource &>(cache.handle(hs1)));
