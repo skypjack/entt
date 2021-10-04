@@ -314,8 +314,7 @@ template<typename Type, typename... Args, std::size_t... Index>
  */
 
 /**
- * @brief Invokes a callable object given a list of erased parameters, if
- * possible.
+ * @brief Tries to invoke a callable object given a list of erased parameters.
  * @tparam Type Reflected type to which the callable object is associated.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Candidate The type of the actual callable object to invoke.
@@ -339,7 +338,7 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
 }
 
 /**
- * @brief Invokes a function given a list of erased parameters, if possible.
+ * @brief Tries to invoke a function given a list of erased parameters.
  * @tparam Type Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
@@ -353,7 +352,7 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
 }
 
 /**
- * @brief Constructs an instance given a list of erased parameters, if possible.
+ * @brief Tries to construct an instance given a list of erased parameters.
  * @tparam Type Actual type of the instance to construct.
  * @tparam Args Types of arguments expected.
  * @param args Parameters to use to construct the instance.
@@ -365,7 +364,7 @@ template<typename Type, typename... Args>
 }
 
 /**
- * @brief Constructs an instance given a list of erased parameters, if possible.
+ * @brief Tries to construct an instance given a list of erased parameters.
  * @tparam Type Reflected type to which the callable object is associated.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Candidate The actual callable object to invoke.
@@ -379,7 +378,7 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
 }
 
 /**
- * @brief Constructs an instance given a list of erased parameters, if possible.
+ * @brief Tries to construct an instance given a list of erased parameters.
  * @tparam Type Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
