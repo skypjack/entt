@@ -2,7 +2,6 @@
 #define ENTT_META_UTILITY_HPP
 
 #include <cstddef>
-#include <functional>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
