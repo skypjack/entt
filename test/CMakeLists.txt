@@ -214,6 +214,7 @@ SETUP_BASIC_TEST(meta_prop entt/meta/meta_prop.cpp)
 SETUP_BASIC_TEST(meta_range entt/meta/meta_range.cpp)
 SETUP_BASIC_TEST(meta_template entt/meta/meta_template.cpp)
 SETUP_BASIC_TEST(meta_type entt/meta/meta_type.cpp)
+SETUP_BASIC_TEST(meta_utility entt/meta/meta_utility.cpp)
 
 # Test poly
 
