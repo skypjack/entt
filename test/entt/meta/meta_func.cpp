@@ -21,6 +21,14 @@ struct base_t {
     int value{3};
 };
 
+void fake_member(base_t &instance, int value) {
+    instance.value = value;
+}
+
+int fake_const_member(const base_t &instance) {
+    return instance.value;
+}
+
 struct derived_t: base_t {
     derived_t()
         : base_t{} {}
@@ -77,7 +85,9 @@ struct MetaFunc: ::testing::Test {
         entt::meta<base_t>()
             .type("base"_hs)
             .dtor<base_t::destroy>()
-            .func<&base_t::func>("func"_hs);
+            .func<&base_t::func>("func"_hs)
+            .func<fake_member>("fake_member"_hs)
+            .func<fake_const_member>("fake_const_member"_hs);
 
         entt::meta<derived_t>()
             .type("derived"_hs)
@@ -297,6 +307,53 @@ TEST_F(MetaFunc, StaticRetVoid) {
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.key(), true);
     ASSERT_FALSE(prop.value().cast<bool>());
+}
+
+TEST_F(MetaFunc, StaticAsMember) {
+    using namespace entt::literals;
+
+    base_t instance{};
+    auto func = entt::resolve<base_t>().func("fake_member"_hs);
+    auto any = func.invoke(instance, 42);
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.id(), "fake_member"_hs);
+    ASSERT_EQ(func.arity(), 1u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_FALSE(func.is_static());
+    ASSERT_EQ(func.ret(), entt::resolve<void>());
+    ASSERT_EQ(func.arg(0u), entt::resolve<int>());
+    ASSERT_FALSE(func.arg(1u));
+
+    ASSERT_FALSE(func.invoke({}, 42));
+    ASSERT_FALSE(func.invoke(std::as_const(instance), 42));
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<void>());
+    ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(MetaFunc, StaticAsConstMember) {
+    using namespace entt::literals;
+
+    base_t instance{};
+    auto func = entt::resolve<base_t>().func("fake_const_member"_hs);
+    auto any = func.invoke(std::as_const(instance));
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.id(), "fake_const_member"_hs);
+    ASSERT_EQ(func.arity(), 0u);
+    ASSERT_TRUE(func.is_const());
+    ASSERT_FALSE(func.is_static());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+    ASSERT_FALSE(func.arg(0u));
+
+    ASSERT_FALSE(func.invoke({}));
+    ASSERT_TRUE(func.invoke(instance));
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+    ASSERT_EQ(any.cast<int>(), 3);
 }
 
 TEST_F(MetaFunc, MetaAnyArgs) {

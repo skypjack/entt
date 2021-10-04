@@ -79,14 +79,33 @@ struct meta_function_descriptor<Type, Ret Class::*> {
  * @brief Meta function descriptor.
  * @tparam Type Reflected type to which the meta function is associated.
  * @tparam Ret Function return type.
- * @tparam Args Function arguments.
+ * @tparam MaybeType First function argument.
+ * @tparam Args Other function arguments.
  */
-template<typename Type, typename Ret, typename... Args>
-struct meta_function_descriptor<Type, Ret (*)(Args...)> {
+template<typename Type, typename Ret, typename MaybeType, typename... Args>
+struct meta_function_descriptor<Type, Ret (*)(MaybeType, Args...)> {
     /*! @brief Meta function return type. */
     using return_type = Ret;
     /*! @brief Meta function arguments. */
-    using args_type = type_list<Args...>;
+    using args_type = std::conditional_t<std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<MaybeType>>>, type_list<Args...>, type_list<MaybeType, Args...>>;
+
+    /*! @brief True if the meta function is const, false otherwise. */
+    static constexpr auto is_const = std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<MaybeType>>> && std::is_const_v<std::remove_reference_t<MaybeType>>;
+    /*! @brief True if the meta function is static, false otherwise. */
+    static constexpr auto is_static = !std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<MaybeType>>>;
+};
+
+/**
+ * @brief Meta function descriptor.
+ * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Ret Function return type.
+ */
+template<typename Type, typename Ret>
+struct meta_function_descriptor<Type, Ret (*)()> {
+    /*! @brief Meta function return type. */
+    using return_type = Ret;
+    /*! @brief Meta function arguments. */
+    using args_type = type_list<>;
 
     /*! @brief True if the meta function is const, false otherwise. */
     static constexpr auto is_const = false;
@@ -177,7 +196,8 @@ template<typename Type, auto Data>
 [[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
     if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
         if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
-            using data_type = type_list_element_t<1u, typename meta_function_helper_t<Type, decltype(Data)>::args_type>;
+            using descriptor = typename meta_function_helper_t<Type, decltype(Data)>;
+            using data_type = type_list_element_t<descriptor::is_static, descriptor::args_type>;
 
             if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
                 Data(*clazz, value.cast<data_type>());
@@ -368,7 +388,11 @@ template<typename Type, typename... Args>
  */
 template<typename Type, typename Policy = as_is_t, typename Candidate>
 [[nodiscard]] meta_any meta_construct(Candidate &&candidate, meta_any *const args) {
-    return internal::meta_invoke<Type, Policy>({}, std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
+    if constexpr(typename meta_function_helper_t<Type, Candidate>::is_static) {
+        return internal::meta_invoke<Type, Policy>({}, std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
+    } else {
+        return internal::meta_invoke<Type, Policy>(*args, std::forward<Candidate>(candidate), args + 1u, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
+    }
 }
 
 /**
@@ -381,7 +405,11 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
 [[nodiscard]] meta_any meta_construct(meta_any *const args) {
-    return internal::meta_invoke<Type, Policy>({}, Candidate, args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<decltype(Candidate)>>::args_type::size>{});
+    if constexpr(typename meta_function_helper_t<Type, decltype(Candidate)>::is_static) {
+        return internal::meta_invoke<Type, Policy>({}, Candidate, args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<decltype(Candidate)>>::args_type::size>{});
+    } else {
+        return internal::meta_invoke<Type, Policy>(*args, Candidate, args + 1u, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<decltype(Candidate)>>::args_type::size>{});
+    }
 }
 
 } // namespace entt
