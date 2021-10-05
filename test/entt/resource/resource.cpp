@@ -5,6 +5,8 @@
 #include <entt/resource/cache.hpp>
 
 struct resource {
+    virtual ~resource() = default;
+
     virtual const entt::type_info &type() const ENTT_NOEXCEPT {
         return entt::type_id<resource>();
     }
