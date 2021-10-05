@@ -4,7 +4,7 @@
 namespace entt {
 
 template<typename>
-struct resource_cache;
+class resource_cache;
 
 template<typename>
 class resource_handle;

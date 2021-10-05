@@ -42,7 +42,7 @@ template<typename Loader, typename Resource>
 class resource_loader {
     /*! @brief Resource loaders are friends of their caches. */
     template<typename Other>
-    friend struct resource_cache;
+    friend class resource_cache;
 
     /**
      * @brief Loads the resource and returns it.
