@@ -196,8 +196,8 @@ template<typename Type, auto Data>
 [[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
     if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
         if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
-            using descriptor = typename meta_function_helper_t<Type, decltype(Data)>;
-            using data_type = type_list_element_t<descriptor::is_static, descriptor::args_type>;
+            using descriptor = meta_function_helper_t<Type, decltype(Data)>;
+            using data_type = type_list_element_t<descriptor::is_static, typename descriptor::args_type>;
 
             if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
                 Data(*clazz, value.cast<data_type>());
@@ -388,7 +388,7 @@ template<typename Type, typename... Args>
  */
 template<typename Type, typename Policy = as_is_t, typename Candidate>
 [[nodiscard]] meta_any meta_construct(Candidate &&candidate, meta_any *const args) {
-    if constexpr(typename meta_function_helper_t<Type, Candidate>::is_static) {
+    if constexpr(meta_function_helper_t<Type, Candidate>::is_static) {
         return internal::meta_invoke<Type, Policy>({}, std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
     } else {
         return internal::meta_invoke<Type, Policy>(*args, std::forward<Candidate>(candidate), args + 1u, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
@@ -405,7 +405,7 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
 [[nodiscard]] meta_any meta_construct(meta_any *const args) {
-    if constexpr(typename meta_function_helper_t<Type, decltype(Candidate)>::is_static) {
+    if constexpr(meta_function_helper_t<Type, decltype(Candidate)>::is_static) {
         return internal::meta_invoke<Type, Policy>({}, Candidate, args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<decltype(Candidate)>>::args_type::size>{});
     } else {
         return internal::meta_invoke<Type, Policy>(*args, Candidate, args + 1u, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<decltype(Candidate)>>::args_type::size>{});
