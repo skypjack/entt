@@ -7,6 +7,7 @@
 #include <entt/meta/resolve.hpp>
 
 struct base_t {
+    base_t() {}
     virtual ~base_t() = default;
 
     static void destroy(base_t &) {
