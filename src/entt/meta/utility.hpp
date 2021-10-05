@@ -278,37 +278,40 @@ template<typename Type, auto Data, typename Policy = as_is_t>
 
 namespace internal {
 
-template<typename Type, typename Policy = as_is_t, typename Candidate, std::size_t... Index>
-[[nodiscard]] meta_any meta_invoke([[maybe_unused]] meta_handle instance, Candidate &&candidate, meta_any *args, std::index_sequence<Index...>) {
-    using descriptor = meta_function_helper_t<Type, Candidate>;
+template<typename Type, typename Policy, typename Candidate, typename First, typename... Other>
+[[nodiscard]] meta_any meta_invoke_with_args(Candidate &&candidate, First &&maybe_clazz, Other &&...other) {
+    using descriptor = meta_function_helper_t<Type, std::remove_reference_t<Candidate>>;
 
-    const auto invoke_with_args = [&candidate](auto &&maybe_clazz, auto &&...other) {
-        if constexpr(std::is_member_function_pointer_v<std::remove_reference_t<Candidate>>) {
-            if constexpr(std::is_void_v<typename descriptor::return_type>) {
-                (std::forward<decltype(maybe_clazz)>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<decltype(other)>(other)...);
-                return meta_any{std::in_place_type<void>};
-            } else {
-                return meta_dispatch<Policy>((std::forward<decltype(maybe_clazz)>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<decltype(other)>(other)...));
-            }
-        } else if constexpr(std::is_void_v<typename descriptor::return_type>) {
-            std::forward<Candidate>(candidate)(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...);
+    if constexpr(std::is_member_function_pointer_v<std::remove_reference_t<Candidate>>) {
+        if constexpr(std::is_void_v<typename descriptor::return_type>) {
+            (std::forward<decltype(maybe_clazz)>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<decltype(other)>(other)...);
             return meta_any{std::in_place_type<void>};
         } else {
-            return meta_dispatch<Policy>(std::forward<Candidate>(candidate)(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...));
+            return meta_dispatch<Policy>((std::forward<decltype(maybe_clazz)>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<decltype(other)>(other)...));
         }
-    };
+    } else if constexpr(std::is_void_v<typename descriptor::return_type>) {
+        std::forward<Candidate>(candidate)(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...);
+        return meta_any{std::in_place_type<void>};
+    } else {
+        return meta_dispatch<Policy>(std::forward<Candidate>(candidate)(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...));
+    }
+}
+
+template<typename Type, typename Policy, typename Candidate, std::size_t... Index>
+[[nodiscard]] meta_any meta_invoke([[maybe_unused]] meta_handle instance, Candidate &&candidate, [[maybe_unused]] meta_any *args, std::index_sequence<Index...>) {
+    using descriptor = meta_function_helper_t<Type, std::remove_reference_t<Candidate>>;
 
     if constexpr(std::is_invocable_v<std::remove_reference_t<Candidate>, const Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
         if(const auto *const clazz = instance->try_cast<const Type>(); clazz && ((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return invoke_with_args(*clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return meta_invoke_with_args<Type, Policy>(std::forward<Candidate>(candidate), *clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else if constexpr(std::is_invocable_v<std::remove_reference_t<Candidate>, Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
         if(auto *const clazz = instance->try_cast<Type>(); clazz && ((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return invoke_with_args(*clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return meta_invoke_with_args<Type, Policy>(std::forward<Candidate>(candidate), *clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else if constexpr(sizeof...(Index) != 0u) {
         if(((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return invoke_with_args((args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return meta_invoke_with_args<Type, Policy>(std::forward<Candidate>(candidate), (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else if constexpr(std::is_void_v<decltype(std::forward<Candidate>(candidate)())>) {
         std::forward<Candidate>(candidate)();
