@@ -241,10 +241,10 @@ public:
             internal::meta_node<Base>::resolve(),
             [](meta_any other) ENTT_NOEXCEPT -> meta_any {
                 if(auto *data = other.data(); data) {
-                    return entt::forward_as_meta(*static_cast<Base *>(static_cast<Type *>(data)));
+                    return forward_as_meta(*static_cast<Base *>(static_cast<Type *>(data)));
                 }
 
-                return entt::forward_as_meta(*static_cast<const Base *>(static_cast<const Type *>(std::as_const(other).data())));
+                return forward_as_meta(*static_cast<const Base *>(static_cast<const Type *>(std::as_const(other).data())));
             }
             // tricks clang-format
         };

@@ -531,13 +531,10 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
-        if(auto elem = sparse_ptr(entt); elem) {
-            constexpr auto cap = entity_traits::to_entity(entt::null);
-            // testing versions permits to avoid accessing the packed array
-            return (((~cap & entity_traits::to_integral(entt)) ^ entity_traits::to_integral(*elem)) < cap);
-        }
-
-        return false;
+        const auto elem = sparse_ptr(entt);
+        constexpr auto cap = entity_traits::to_entity(null);
+        // testing versions permits to avoid accessing the packed array
+        return elem && (((~cap & entity_traits::to_integral(entt)) ^ entity_traits::to_integral(*elem)) < cap);
     }
 
     /**
@@ -547,11 +544,9 @@ public:
      * version otherwise.
      */
     [[nodiscard]] version_type current(const entity_type entt) const {
-        if(auto elem = sparse_ptr(entt); elem) {
-            return entity_traits::to_version(*elem);
-        }
-
-        return entity_traits::to_version(tombstone);
+        const auto elem = sparse_ptr(entt);
+        constexpr auto fallback = entity_traits::to_version(tombstone);
+        return elem ? entity_traits::to_version(*elem) : fallback;
     }
 
     /**
