@@ -1,3 +1,4 @@
+#include <cmath>
 #include <memory>
 #include <gtest/gtest.h>
 #include <entt/core/memory.hpp>
@@ -33,13 +34,34 @@ TEST(Memory, PoccaPocmaAndPocs) {
 }
 
 TEST(Memory, IsPowerOfTwo) {
-    ASSERT_FALSE(entt::is_power_of_two(0u));
+    // constexpr-ness guaranteed
+    constexpr auto zero_is_power_of_two = entt::is_power_of_two(0u);
+
+    ASSERT_FALSE(zero_is_power_of_two);
     ASSERT_TRUE(entt::is_power_of_two(1u));
     ASSERT_TRUE(entt::is_power_of_two(2u));
     ASSERT_TRUE(entt::is_power_of_two(4u));
     ASSERT_FALSE(entt::is_power_of_two(7u));
     ASSERT_TRUE(entt::is_power_of_two(128u));
     ASSERT_FALSE(entt::is_power_of_two(200u));
+}
+
+TEST(Memory, NextPowerOfTwo) {
+    // constexpr-ness guaranteed
+    constexpr auto next_power_of_two_of_zero = entt::next_power_of_two(0u);
+
+    ASSERT_EQ(next_power_of_two_of_zero, 1u);
+    ASSERT_EQ(entt::next_power_of_two(1u), 2u);
+    ASSERT_EQ(entt::next_power_of_two(17u), 32u);
+    ASSERT_EQ(entt::next_power_of_two(32u), 64u);
+    ASSERT_EQ(entt::next_power_of_two(32u), 64u);
+
+    if constexpr(sizeof(std::size_t) > sizeof(std::uint32_t)) {
+        ASSERT_EQ(entt::next_power_of_two(std::pow(2, 32)), std::pow(2, 33));
+        ASSERT_EQ(entt::next_power_of_two(std::pow(2, 64)), 0u);
+    } else {
+        ASSERT_EQ(entt::next_power_of_two(std::pow(2, 32)), 0u);
+    }
 }
 
 TEST(Memory, FastMod) {

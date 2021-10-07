@@ -76,6 +76,27 @@ constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[ma
 }
 
 /**
+ * @brief Computes the smallest power of two greater than or equal to a value.
+ * @param value The value to use.
+ * @return The smallest power of two greater than or equal to the given value.
+ */
+[[nodiscard]] inline constexpr std::size_t next_power_of_two(const std::size_t value) ENTT_NOEXCEPT {
+    std::size_t curr = value;
+
+    curr |= curr >> 1;
+    curr |= curr >> 2;
+    curr |= curr >> 4;
+    curr |= curr >> 8;
+    curr |= curr >> 16;
+
+    if constexpr(sizeof(value) > sizeof(std::uint32_t)) {
+        curr |= curr >> 32;
+    }
+
+    return ++curr;
+}
+
+/**
  * @brief Fast module utility function (powers of two only).
  * @tparam Value Compile-time page size, it must be a power of two.
  * @param value A value for which to calculate the modulus.
