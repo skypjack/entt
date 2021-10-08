@@ -171,13 +171,13 @@ class basic_sparse_set {
     [[nodiscard]] auto sparse_ptr(const Entity entt) const {
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
         const auto page = pos / sparse_page_v;
-        return (page < sparse.size() && sparse[page]) ? (sparse[page] + fast_mod<sparse_page_v>(pos)) : nullptr;
+        return (page < sparse.size() && sparse[page]) ? (sparse[page] + fast_mod(pos, sparse_page_v)) : nullptr;
     }
 
     [[nodiscard]] auto &sparse_ref(const Entity entt) const {
         ENTT_ASSERT(sparse_ptr(entt), "Invalid element");
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
-        return sparse[pos / sparse_page_v][fast_mod<sparse_page_v>(pos)];
+        return sparse[pos / sparse_page_v][fast_mod(pos, sparse_page_v)];
     }
 
     void release_sparse_pages() {
@@ -253,7 +253,7 @@ protected:
             std::uninitialized_fill(sparse[page], sparse[page] + sparse_page_v, null);
         }
 
-        auto &elem = sparse[page][fast_mod<sparse_page_v>(pos)];
+        auto &elem = sparse[page][fast_mod(pos, sparse_page_v)];
         ENTT_ASSERT(entity_traits::to_version(elem) == entity_traits::to_version(tombstone), "Slot not available");
 
         if(free_list == null) {

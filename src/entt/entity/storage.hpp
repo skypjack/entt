@@ -123,7 +123,7 @@ public:
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         const auto pos = index - 1;
-        return (*packed)[pos / packed_page_v] + fast_mod<packed_page_v>(pos);
+        return (*packed)[pos / packed_page_v] + fast_mod(pos, packed_page_v);
     }
 
     [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
@@ -182,7 +182,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
-        return packed.first()[pos / packed_page_v][fast_mod<packed_page_v>(pos)];
+        return packed.first()[pos / packed_page_v][fast_mod(pos, packed_page_v)];
     }
 
     auto assure_at_least(const std::size_t pos) {
@@ -204,7 +204,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             }
         }
 
-        return container[idx] + fast_mod<packed_page_v>(pos);
+        return container[idx] + fast_mod(pos, packed_page_v);
     }
 
     void release_unused_pages() {

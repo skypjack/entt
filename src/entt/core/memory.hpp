@@ -98,14 +98,13 @@ constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[ma
 
 /**
  * @brief Fast module utility function (powers of two only).
- * @tparam Value Compile-time page size, it must be a power of two.
  * @param value A value for which to calculate the modulus.
- * @return Remainder of division.
+ * @param mod _Modulus_, it must be a power of two.
+ * @return The common remainder.
  */
-template<std::size_t Value>
-[[nodiscard]] constexpr std::size_t fast_mod(const std::size_t value) ENTT_NOEXCEPT {
-    static_assert(is_power_of_two(Value), "Value must be a power of two");
-    return value & (Value - 1u);
+[[nodiscard]] inline constexpr std::size_t fast_mod(const std::size_t value, const std::size_t mod) ENTT_NOEXCEPT {
+    ENTT_ASSERT(is_power_of_two(mod), "Value must be a power of two");
+    return value & (mod - 1u);
 }
 
 } // namespace entt
