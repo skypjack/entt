@@ -12,7 +12,7 @@ struct not_comparable {
     bool operator==(const not_comparable &) const = delete;
 };
 
-struct nlohmann_json_like {
+struct nlohmann_json_like final {
     using value_type = nlohmann_json_like;
 
     bool operator==(const nlohmann_json_like &) const {
@@ -151,6 +151,13 @@ TEST(TypeTraits, IsIteratorType) {
     static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::vector<int>::iterator>);
     static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::reverse_iterator<std::vector<int>::iterator>>);
     static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::reverse_iterator<std::reverse_iterator<std::vector<int>::iterator>>>);
+}
+
+TEST(TypeTraits, IsEBCOEligible) {
+    static_assert(entt::is_ebco_eligible_v<not_comparable>);
+    static_assert(!entt::is_ebco_eligible_v<nlohmann_json_like>);
+    static_assert(!entt::is_ebco_eligible_v<double>);
+    static_assert(!entt::is_ebco_eligible_v<void>);
 }
 
 TEST(TypeTraits, ConstnessAs) {
