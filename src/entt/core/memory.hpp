@@ -2,6 +2,7 @@
 #define ENTT_CORE_MEMORY_HPP
 
 #include <cstddef>
+#include <limits>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -81,16 +82,11 @@ constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[ma
  * @return The smallest power of two greater than or equal to the given value.
  */
 [[nodiscard]] inline constexpr std::size_t next_power_of_two(const std::size_t value) ENTT_NOEXCEPT {
-    std::size_t curr = value;
+    ENTT_ASSERT(value < (std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)), "Numeric limits exceeded");
+    std::size_t curr = value - (value != 0u);
 
-    curr |= curr >> 1;
-    curr |= curr >> 2;
-    curr |= curr >> 4;
-    curr |= curr >> 8;
-    curr |= curr >> 16;
-
-    if constexpr(sizeof(value) > sizeof(std::uint32_t)) {
-        curr |= curr >> 32;
+    for(int next = 1; next < std::numeric_limits<std::size_t>::digits; next = next * 2) {
+        curr |= curr >> next;
     }
 
     return ++curr;
