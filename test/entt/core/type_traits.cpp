@@ -1,3 +1,4 @@
+#include <functional>
 #include <iterator>
 #include <tuple>
 #include <type_traits>
@@ -158,6 +159,13 @@ TEST(TypeTraits, IsEBCOEligible) {
     static_assert(!entt::is_ebco_eligible_v<nlohmann_json_like>);
     static_assert(!entt::is_ebco_eligible_v<double>);
     static_assert(!entt::is_ebco_eligible_v<void>);
+}
+
+TEST(TypeTraits, IsTransparent) {
+    static_assert(!entt::is_transparent_v<std::less<int>>);
+    static_assert(entt::is_transparent_v<std::less<void>>);
+    static_assert(!entt::is_transparent_v<std::logical_not<double>>);
+    static_assert(entt::is_transparent_v<std::logical_not<void>>);
 }
 
 TEST(TypeTraits, ConstnessAs) {

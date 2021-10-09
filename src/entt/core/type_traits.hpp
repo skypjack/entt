@@ -510,6 +510,25 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
+ * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * is valid and denotes a type, false otherwise.
+ * @tparam Type The type to test.
+ */
+template<typename Type, typename = void>
+struct is_transparent: std::false_type {};
+
+/*! @copydoc is_transparent */
+template<typename Type>
+struct is_transparent<Type, std::void_t<typename Type::is_transparent>>: std::true_type {};
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type The type to test.
+ */
+template<typename Type>
+inline constexpr bool is_transparent_v = is_transparent<Type>::value;
+
+/**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
