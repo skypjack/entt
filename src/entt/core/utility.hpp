@@ -8,6 +8,9 @@ namespace entt {
 
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {
+    /*! @brief Indicates that this is a transparent function object. */
+    using is_transparent = void;
+
     /**
      * @brief Returns its argument unchanged.
      * @tparam Type Type of the argument.

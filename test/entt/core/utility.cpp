@@ -1,5 +1,6 @@
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/core/type_traits.hpp>
 #include <entt/core/utility.hpp>
 
 struct functions {
@@ -14,6 +15,7 @@ TEST(Utility, Identity) {
     entt::identity identity;
     int value = 42;
 
+    ASSERT_TRUE(entt::is_transparent_v<entt::identity>);
     ASSERT_EQ(identity(value), value);
     ASSERT_EQ(&identity(value), &value);
 }
