@@ -30,6 +30,8 @@ namespace internal {
 
 template<typename Container>
 class storage_iterator final {
+    friend storage_iterator<const Container>;
+
     static constexpr auto packed_page_v = ENTT_PACKED_PAGE;
 
     using container_type = std::remove_const_t<Container>;
@@ -52,6 +54,11 @@ public:
     storage_iterator(Container *ref, difference_type idx) ENTT_NOEXCEPT
         : packed{ref},
           index{idx} {}
+
+    template<bool Const = std::is_const_v<Container>, typename = std::enable_if_t<Const>>
+    storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) ENTT_NOEXCEPT
+        : packed{other.packed},
+          index{other.index} {}
 
     storage_iterator &operator++() ENTT_NOEXCEPT {
         return --index, *this;
