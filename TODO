@@ -8,14 +8,12 @@ WIP:
 * runtime components (registry), runtime events (dispatcher/emitter), runtime context variables ...
 * runtime_view/registry, remove reference to basic_sparse_set<E>
 * make pools available (registry/view/group), review operator| for views, make views accept registry to ctor
-* make view.lead() or similar available to return leading pool (useful for mt)
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
 * custom allocators all over
 
 WIP:
 * customizable any_vtable, sfinae-friendly definition and op::custom for user-def
 * registry: fake vtable (mixin injected) to get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
-* general purpose paged vector container
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
 * add user data to type_info
