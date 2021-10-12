@@ -159,6 +159,10 @@ if(ENTT_BUILD_SNAPSHOT)
     target_include_directories(cereal PRIVATE ${cereal_INCLUDE_DIR})
 endif()
 
+# Test container
+
+SETUP_BASIC_TEST(dense_hash_map entt/container/dense_hash_map.cpp)
+
 # Test core
 
 SETUP_BASIC_TEST(algorithm entt/core/algorithm.cpp)

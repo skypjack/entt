@@ -23,7 +23,7 @@ struct compressed_pair_element {
     compressed_pair_element()
         : value{} {}
 
-    template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Args>, compressed_pair_element>>>
+    template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
     compressed_pair_element(Args &&args)
         : value{std::forward<Args>(args)} {}
 
@@ -49,7 +49,7 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
     compressed_pair_element()
         : Type{} {}
 
-    template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Args>, compressed_pair_element>>>
+    template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
     compressed_pair_element(Args &&args)
         : Type{std::forward<Args>(args)} {}
 

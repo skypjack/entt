@@ -1,4 +1,5 @@
 #include "config/version.h"
+#include "container/dense_hash_map.hpp"
 #include "core/algorithm.hpp"
 #include "core/any.hpp"
 #include "core/attribute.h"

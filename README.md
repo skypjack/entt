@@ -73,8 +73,7 @@ This project started off as a pure entity-component system. Over time the
 codebase has grown as more and more classes and functionalities were added.<br/>
 Here is a brief, yet incomplete list of what it offers today:
 
-* Statically generated integer **identifiers** for types (assigned either at
-  compile-time or at runtime).
+* A built-in **RTTI system** mostly similar to the standard one.
 * A `constexpr` utility for human readable **resource names**.
 * A minimal **configuration system** built using the monostate pattern.
 * An incredibly fast **entity-component system** based on sparse sets, with its
@@ -88,6 +87,7 @@ Here is a brief, yet incomplete list of what it offers today:
 * The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free runtime **reflection system**.
 * **Static polymorphism** made simple and within everyone's reach.
+* A few homemade containers, like a sparse set based **dense hash map**.
 * A **cooperative scheduler** for processes of any type.
 * All that is needed for **resource management** (cache, loaders, handles).
 * Delegates, **signal handlers** (with built-in support for collectors) and a

@@ -17,6 +17,7 @@ add_custom_target(
     SOURCES
         dox/extra.dox
         md/config.md
+        md/container.md
         md/core.md
         md/entity.md
         md/faq.md
