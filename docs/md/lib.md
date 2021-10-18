@@ -19,8 +19,7 @@
 general and on GNU/Linux when default visibility was set to hidden. The
 limitation was mainly due to a custom utility used to assign unique, sequential
 identifiers with different types.<br/>
-Fortunately, nowadays using `EnTT` across boundaries is easier. However, use in
-standalone applications is favored and user intervention is otherwise required.
+Fortunately, nowadays using `EnTT` across boundaries is much easier.
 
 ## The EnTT way
 
@@ -54,9 +53,9 @@ In general, these classes don't arouse much interest. The only exceptions are:
   that is also shared between the main application and the dynamically loaded
   libraries or plugins.<br/>
   This will make the type system available to the whole application, not just to
-  a particular tool such as the registry or the dispatcher. It means that a call
-  to `type_index::value()` will return the same identifier for the same type
-  from both sides of a boundary and can be used reliably for any purpose.
+  a particular tool such as the registry. It means that a call to
+  `type_index::value()` will return the same identifier for the same type from
+  both sides of a boundary and can be used reliably for any purpose.
 
 For anyone who needs more details, the test suite contains multiple examples
 covering the most common cases (see the `lib` directory for all details).<br/>
