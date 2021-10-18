@@ -102,7 +102,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename PropertyOrKey, typename... Value>
-    meta_factory<Type> prop(PropertyOrKey &&property_or_key, Value &&...value) && {
+    meta_factory<Type> prop(PropertyOrKey &&property_or_key, Value &&...value) {
         if constexpr(sizeof...(Value) == 0) {
             unroll(choice<3>, std::forward<PropertyOrKey>(property_or_key));
         } else {
@@ -122,7 +122,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename... Property>
-    meta_factory<Type> props(Property... property) && {
+    meta_factory<Type> props(Property... property) {
         unroll(choice<3>, std::forward<Property>(property)...);
         return {};
     }
