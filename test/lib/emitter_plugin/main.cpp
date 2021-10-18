@@ -2,18 +2,8 @@
 
 #include <gtest/gtest.h>
 #include <cr.h>
-#include <entt/core/type_info.hpp>
 #include <entt/signal/emitter.hpp>
-#include "type_context.h"
 #include "types.h"
-
-template<typename Type>
-struct entt::type_index<Type> {
-    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
-        static const entt::id_type value = type_context::instance()->value(entt::type_hash<Type>::value());
-        return value;
-    }
-};
 
 TEST(Lib, Emitter) {
     test_emitter emitter;
@@ -25,9 +15,6 @@ TEST(Lib, Emitter) {
 
     cr_plugin ctx;
     cr_plugin_load(ctx, PLUGIN);
-
-    ctx.userdata = type_context::instance();
-    cr_plugin_update(ctx);
 
     ctx.userdata = &emitter;
     cr_plugin_update(ctx);

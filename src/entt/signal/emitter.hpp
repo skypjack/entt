@@ -8,8 +8,8 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
+#include "../container/dense_hash_map.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 
@@ -120,23 +120,19 @@ class emitter {
 
     template<typename Event>
     [[nodiscard]] pool_handler<Event> *assure() {
-        const auto index = type_index<Event>::value();
-
-        if(!(index < pools.size())) {
-            pools.resize(std::size_t(index) + 1u);
+        if(auto &&ptr = pools[type_id<Event>().hash()]; !ptr) {
+            auto *cpool = new pool_handler<Event>{};
+            ptr.reset(cpool);
+            return cpool;
+        } else {
+            return static_cast<pool_handler<Event> *>(ptr.get());
         }
-
-        if(!pools[index]) {
-            pools[index].reset(new pool_handler<Event>{});
-        }
-
-        return static_cast<pool_handler<Event> *>(pools[index].get());
     }
 
     template<typename Event>
     [[nodiscard]] const pool_handler<Event> *assure() const {
-        const auto index = type_index<Event>::value();
-        return (!(index < pools.size()) || !pools[index]) ? nullptr : static_cast<const pool_handler<Event> *>(pools[index].get());
+        const auto it = pools.find(type_id<Event>().hash());
+        return (it == pools.cend()) ? nullptr : static_cast<const pool_handler<Event> *>(it->second.get());
     }
 
 public:
@@ -285,9 +281,7 @@ public:
      */
     void clear() ENTT_NOEXCEPT {
         for(auto &&cpool: pools) {
-            if(cpool) {
-                cpool->clear();
-            }
+            cpool.second->clear();
         }
     }
 
@@ -308,12 +302,12 @@ public:
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) {
-            return !cpool || cpool->empty();
+            return cpool.second->empty();
         });
     }
 
 private:
-    std::vector<std::unique_ptr<basic_pool>> pools{};
+    dense_hash_map<id_type, std::unique_ptr<basic_pool>> pools{};
 };
 
 } // namespace entt
