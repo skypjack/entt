@@ -335,6 +335,8 @@ TEST(Registry, Move) {
 
     entt::registry other{std::move(registry)};
     other.erase<int>(entity);
+
+    registry = {};
     registry.emplace<int>(registry.create(entity));
 
     ASSERT_EQ(test.parent, &other);

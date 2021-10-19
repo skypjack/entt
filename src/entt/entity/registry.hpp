@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
+#include "../container/dense_hash_map.hpp"
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
 #include "../core/fwd.hpp"
@@ -104,25 +105,22 @@ class basic_registry {
     template<typename Component>
     [[nodiscard]] storage_type<Component> *assure() const {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
-        const auto index = type_index<Component>::value();
 
-        if(!(index < pools.size())) {
-            pools.resize(size_type(index) + 1u);
-        }
-
-        if(auto &&pdata = pools[index]; !pdata.pool) {
-            pdata.pool.reset(new storage_type<Component>());
+        if(auto &&pdata = pools[type_id<Component>().hash()]; !pdata.pool) {
+            auto *cpool = new storage_type<Component>{};
+            pdata.pool.reset(cpool);
             pdata.poly.template emplace<storage_type<Component> &>(*static_cast<storage_type<Component> *>(pdata.pool.get()));
+            return cpool;
+        } else {
+            return static_cast<storage_type<Component> *>(pdata.pool.get());
         }
-
-        return static_cast<storage_type<Component> *>(pools[index].pool.get());
     }
 
     template<typename Component>
     [[nodiscard]] const storage_type<Component> *pool_if_exists() const ENTT_NOEXCEPT {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
-        const auto index = type_index<Component>::value();
-        return (!(index < pools.size()) || !pools[index].pool) ? nullptr : static_cast<const storage_type<Component> *>(pools[index].pool.get());
+        const auto it = pools.find(type_id<Component>().hash());
+        return (it == pools.end()) ? nullptr : static_cast<const storage_type<Component> *>(it->second.pool.get());
     }
 
     auto generate_identifier(const std::size_t pos) ENTT_NOEXCEPT {
@@ -180,14 +178,14 @@ public:
      * empty and thus invalid element otherwise.
      */
     poly_storage &storage(const type_info &info) {
-        ENTT_ASSERT(info.index() < pools.size() && pools[info.index()].poly, "Storage not available");
-        return pools[info.index()].poly;
+        ENTT_ASSERT(pools[info.hash()].poly, "Storage not available");
+        return pools[info.hash()].poly;
     }
 
     /*! @copydoc storage */
     const poly_storage &storage(const type_info &info) const {
-        ENTT_ASSERT(info.index() < pools.size() && pools[info.index()].poly, "Storage not available");
-        return pools[info.index()].poly;
+        ENTT_ASSERT(pools[info.hash()].poly, "Storage not available");
+        return pools[info.hash()].poly;
     }
 
     /**
@@ -520,7 +518,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         for(auto &&pdata: pools) {
-            pdata.pool &&pdata.pool->remove(entity, this);
+            pdata.second.pool->remove(entity, this);
         }
 
         return release_entity(entity, version);
@@ -543,7 +541,7 @@ public:
             }
         } else {
             for(auto &&pdata: pools) {
-                pdata.pool &&pdata.pool->remove(first, last, this);
+                pdata.second.pool->remove(first, last, this);
             }
 
             release(first, last);
@@ -774,7 +772,7 @@ public:
     void compact() {
         if constexpr(sizeof...(Component) == 0) {
             for(auto &&pdata: pools) {
-                pdata.pool && (pdata.pool->compact(), true);
+                pdata.second.pool->compact();
             }
         } else {
             (assure<Component>()->compact(), ...);
@@ -917,7 +915,7 @@ public:
     void clear() {
         if constexpr(sizeof...(Component) == 0) {
             for(auto &&pdata: pools) {
-                pdata.pool && (pdata.pool->clear(this), true);
+                pdata.second.pool->clear(this);
             }
 
             each([this](const auto entity) { release_entity(entity, entity_traits::to_version(entity) + 1u); });
@@ -965,7 +963,7 @@ public:
      */
     [[nodiscard]] bool orphan(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.pool && pdata.pool->contains(entity); });
+        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.second.pool->contains(entity); });
     }
 
     /**
@@ -1145,13 +1143,13 @@ public:
         std::vector<const basic_common_type *> filter(std::distance(from, to));
 
         std::transform(first, last, component.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == ctype; });
-            return it == pools.cend() ? nullptr : it->pool.get();
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.second.poly->value_type().hash() == ctype; });
+            return it == pools.cend() ? nullptr : it->second.pool.get();
         });
 
         std::transform(from, to, filter.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.poly && pdata.poly->value_type().hash() == ctype; });
-            return it == pools.cend() ? nullptr : it->pool.get();
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.second.poly->value_type().hash() == ctype; });
+            return it == pools.cend() ? nullptr : it->second.pool.get();
         });
 
         return {std::move(component), std::move(filter)};
@@ -1414,19 +1412,15 @@ public:
      *
      * @sa type_info
      *
-     * @warning
-     * It's not specified whether a component attached to or removed from the
-     * given entity during the visit is returned or not to the caller.
-     *
      * @tparam Func Type of the function object to invoke.
      * @param entity A valid identifier.
      * @param func A valid function object.
      */
     template<typename Func>
     void visit(entity_type entity, Func func) const {
-        for(auto pos = pools.size(); pos; --pos) {
-            if(const auto &pdata = pools[pos - 1]; pdata.pool && pdata.pool->contains(entity)) {
-                func(pdata.poly->value_type());
+        for(auto &&pdata: pools) {
+            if(pdata.second.pool->contains(entity)) {
+                func(pdata.second.poly->value_type());
             }
         }
     }
@@ -1444,19 +1438,13 @@ public:
      *
      * @sa type_info
      *
-     * @warning
-     * It's not specified whether a component for which a pool is created during
-     * the visit is returned or not to the caller.
-     *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
     void visit(Func func) const {
-        for(auto pos = pools.size(); pos; --pos) {
-            if(const auto &pdata = pools[pos - 1]; pdata.pool) {
-                func(pdata.poly->value_type());
-            }
+        for(auto &&pdata: pools) {
+            func(pdata.second.poly->value_type());
         }
     }
 
@@ -1595,8 +1583,8 @@ public:
     }
 
 private:
+    mutable dense_hash_map<id_type, pool_data> pools{};
     std::vector<basic_any<0u>> vars{};
-    mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
     entity_type free_list{tombstone};

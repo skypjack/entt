@@ -2,18 +2,8 @@
 
 #include <gtest/gtest.h>
 #include <cr.h>
-#include <entt/core/type_info.hpp>
 #include <entt/entity/registry.hpp>
-#include "type_context.h"
 #include "types.h"
-
-template<typename Type>
-struct entt::type_index<Type> {
-    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
-        static const entt::id_type value = type_context::instance()->value(entt::type_hash<Type>::value());
-        return value;
-    }
-};
 
 TEST(Lib, Registry) {
     entt::registry registry;
@@ -24,9 +14,6 @@ TEST(Lib, Registry) {
 
     cr_plugin ctx;
     cr_plugin_load(ctx, PLUGIN);
-
-    ctx.userdata = type_context::instance();
-    cr_plugin_update(ctx);
 
     ctx.userdata = &registry;
     cr_plugin_update(ctx);
