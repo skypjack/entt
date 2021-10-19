@@ -170,8 +170,8 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.capacity<int>(), ENTT_PACKED_PAGE);
     ASSERT_EQ(registry.capacity<char>(), ENTT_PACKED_PAGE);
     ASSERT_EQ(registry.size<int>(), 0u);
-    ASSERT_EQ(registry.size<char>(), 0u);
-    ASSERT_TRUE((registry.empty<int, char>()));
+    ASSERT_EQ(registry.size<const char>(), 0u);
+    ASSERT_TRUE((registry.empty<int, const char>()));
 
     registry.prepare<double>();
 
@@ -184,17 +184,17 @@ TEST(Registry, Functionalities) {
     ASSERT_TRUE(registry.all_of<>(e0));
     ASSERT_FALSE(registry.any_of<>(e1));
 
-    ASSERT_EQ(registry.size<int>(), 1u);
+    ASSERT_EQ(registry.size<const int>(), 1u);
     ASSERT_EQ(registry.size<char>(), 1u);
-    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.empty<const int>());
     ASSERT_FALSE(registry.empty<char>());
 
     ASSERT_NE(e0, e1);
 
-    ASSERT_FALSE((registry.all_of<int, char>(e0)));
-    ASSERT_TRUE((registry.all_of<int, char>(e1)));
-    ASSERT_FALSE((registry.any_of<int, double>(e0)));
-    ASSERT_TRUE((registry.any_of<int, double>(e1)));
+    ASSERT_FALSE((registry.all_of<int, const char>(e0)));
+    ASSERT_TRUE((registry.all_of<const int, char>(e1)));
+    ASSERT_FALSE((registry.any_of<int, const double>(e0)));
+    ASSERT_TRUE((registry.any_of<const int, double>(e1)));
 
     ASSERT_EQ(registry.try_get<int>(e0), nullptr);
     ASSERT_NE(registry.try_get<int>(e1), nullptr);
@@ -208,10 +208,10 @@ TEST(Registry, Functionalities) {
     ASSERT_NO_FATAL_FAILURE(registry.erase<int>(e1));
     ASSERT_NO_FATAL_FAILURE(registry.erase<char>(e1));
 
-    ASSERT_TRUE((registry.all_of<int, char>(e0)));
-    ASSERT_FALSE((registry.all_of<int, char>(e1)));
-    ASSERT_TRUE((registry.any_of<int, double>(e0)));
-    ASSERT_FALSE((registry.any_of<int, double>(e1)));
+    ASSERT_TRUE((registry.all_of<const int, char>(e0)));
+    ASSERT_FALSE((registry.all_of<int, const char>(e1)));
+    ASSERT_TRUE((registry.any_of<const int, double>(e0)));
+    ASSERT_FALSE((registry.any_of<int, const double>(e1)));
 
     const auto e2 = registry.create();
 
@@ -278,25 +278,25 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.get_or_emplace<char>(e3, 'c'), 'c');
 
     ASSERT_EQ(registry.size<int>(), 1u);
-    ASSERT_EQ(registry.size<char>(), 1u);
+    ASSERT_EQ(registry.size<const char>(), 1u);
     ASSERT_FALSE(registry.empty<int>());
-    ASSERT_FALSE(registry.empty<char>());
+    ASSERT_FALSE(registry.empty<const char>());
     ASSERT_TRUE((registry.all_of<int, char>(e3)));
     ASSERT_EQ(registry.get<int>(e3), 3);
     ASSERT_EQ(registry.get<char>(e3), 'c');
 
     ASSERT_NO_FATAL_FAILURE(registry.clear<int>());
 
-    ASSERT_EQ(registry.size<int>(), 0u);
+    ASSERT_EQ(registry.size<const int>(), 0u);
     ASSERT_EQ(registry.size<char>(), 1u);
-    ASSERT_TRUE(registry.empty<int>());
+    ASSERT_TRUE(registry.empty<const int>());
     ASSERT_FALSE(registry.empty<char>());
 
     ASSERT_NO_FATAL_FAILURE(registry.clear());
 
     ASSERT_EQ(registry.size<int>(), 0u);
-    ASSERT_EQ(registry.size<char>(), 0u);
-    ASSERT_TRUE((registry.empty<int, char>()));
+    ASSERT_EQ(registry.size<const char>(), 0u);
+    ASSERT_TRUE((registry.empty<const int, char>()));
 
     const auto e4 = registry.create();
     const auto e5 = registry.create();
@@ -306,16 +306,16 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.remove<int>(e4), 1u);
     ASSERT_EQ(registry.remove<int>(e5), 0u);
 
-    ASSERT_EQ(registry.size<int>(), 0u);
+    ASSERT_EQ(registry.size<const int>(), 0u);
     ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE(registry.empty<int>());
 
     ASSERT_EQ(registry.capacity<int>(), ENTT_PACKED_PAGE);
-    ASSERT_EQ(registry.capacity<char>(), ENTT_PACKED_PAGE);
+    ASSERT_EQ(registry.capacity<const char>(), ENTT_PACKED_PAGE);
 
     registry.shrink_to_fit<int, char>();
 
-    ASSERT_EQ(registry.capacity<int>(), 0u);
+    ASSERT_EQ(registry.capacity<const int>(), 0u);
     ASSERT_EQ(registry.capacity<char>(), 0u);
 }
 

@@ -197,7 +197,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type size() const {
-        const auto *cpool = pool_if_exists<Component>();
+        const auto *cpool = pool_if_exists<std::remove_const_t<Component>>();
         return cpool ? cpool->size() : size_type{};
     }
 
@@ -252,7 +252,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type capacity() const {
-        const auto *cpool = pool_if_exists<Component>();
+        const auto *cpool = pool_if_exists<std::remove_const_t<Component>>();
         return cpool ? cpool->capacity() : size_type{};
     }
 
@@ -291,7 +291,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return !alive();
         } else {
-            return [](const auto *...cpool) { return ((!cpool || cpool->empty()) && ...); }(pool_if_exists<Component>()...);
+            return [](const auto *...cpool) { return ((!cpool || cpool->empty()) && ...); }(pool_if_exists<std::remove_const_t<Component>>()...);
         }
     }
 
@@ -796,7 +796,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool all_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return [entity](const auto *...cpool) { return ((cpool && cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
+        return [entity](const auto *...cpool) { return ((cpool && cpool->contains(entity)) && ...); }(pool_if_exists<std::remove_const_t<Component>>()...);
     }
 
     /**
@@ -813,7 +813,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool any_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return [entity](const auto *...cpool) { return !((!cpool || !cpool->contains(entity)) && ...); }(pool_if_exists<Component>()...);
+        return [entity](const auto *...cpool) { return !((!cpool || !cpool->contains(entity)) && ...); }(pool_if_exists<std::remove_const_t<Component>>()...);
     }
 
     /**
