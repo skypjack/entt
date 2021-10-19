@@ -6,7 +6,7 @@
 # Table of Contents
 
 * [Working across boundaries](#working-across-boundaries)
-  * [The EnTT way](#the-entt-way)
+  * [Smooth until proven otherwise](#smooth-until-proven-otherwise)
   * [Meta context](#meta-context)
   * [Memory management](#memory-management)
 <!--
@@ -21,45 +21,29 @@ limitation was mainly due to a custom utility used to assign unique, sequential
 identifiers with different types.<br/>
 Fortunately, nowadays using `EnTT` across boundaries is much easier.
 
-## The EnTT way
+## Smooth until proven otherwise
 
 Many classes in `EnTT` make extensive use of type erasure for their purposes.
-This isn't a problem in itself (in fact, it's the basis of an API so convenient
+This isn't a problem on itself (in fact, it's the basis of an API so convenient
 to use). However, a way is needed to recognize the objects whose type has been
 erased on the other side of a boundary.<br/>
 The `type_hash` class template is how identifiers are generated and thus made
-available to the rest of the library. The `type_index` class template makes all
-types _indexable_ instead, so as to speed up the lookup.
+available to the rest of the library. In general, this class doesn't arouse much
+interest. The only exception is when a conflict between identifiers occurs
+(definitely uncommon though) or when the default solution proposed by `EnTT`
+isn't suitable for the user's purposes.<br/>
+The section dedicated to `type_info` contains all the details to get around the
+issue in a concise and elegant way. Please refer to the specific documentation.
 
-In general, these classes don't arouse much interest. The only exceptions are:
-
-* When a conflict between identifiers occurs (definitely uncommon though) or
-  when the default solution proposed by `EnTT` isn't suitable for the user's
-  purposes.<br/>
-  The section dedicated to `type_info` contains all the details to get around
-  the problem in a concise and elegant way. Please refer to the specific
-  documentation.
-
-* When working with linked libraries that also export all required symbols.<br/>
-  Compile definitions `ENTT_API_EXPORT` and `ENTT_API_IMPORT` should be passed
-  respectively where there is a need to import or export the symbols defined by
-  `EnTT`, so as to make everything work nicely across boundaries.
-
-* When working with plugins or shared libraries that don't export any symbol. In
-  this case, `type_index` confuses the other classes by giving potentially wrong
-  information to them.<br/>
-  To avoid problems, it's required to provide a custom generator. Briefly, it's
-  necessary to specialize the `type_index` class and make it point to a context
-  that is also shared between the main application and the dynamically loaded
-  libraries or plugins.<br/>
-  This will make the type system available to the whole application, not just to
-  a particular tool such as the registry. It means that a call to
-  `type_index::value()` will return the same identifier for the same type from
-  both sides of a boundary and can be used reliably for any purpose.
+When working with linked libraries, compile definitions `ENTT_API_EXPORT` and
+`ENTT_API_IMPORT` can be used where there is a need to import or export symbols,
+so as to make everything work nicely across boundaries.<br/>
+On the other hand, everything should run smoothly when working with plugins or
+shared libraries that don't export any symbols.
 
 For anyone who needs more details, the test suite contains multiple examples
 covering the most common cases (see the `lib` directory for all details).<br/>
-It goes without saying that it's impossible to cover all the possible cases.
+It goes without saying that it's impossible to cover **all** possible cases.
 However, what is offered should hopefully serve as a basis for all of them.
 
 ## Meta context
