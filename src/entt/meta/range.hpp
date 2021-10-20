@@ -45,23 +45,17 @@ struct meta_range_iterator {
         return operator*();
     }
 
-    [[nodiscard]] const node_type *base() const ENTT_NOEXCEPT {
-        return it;
+    [[nodiscard]] bool operator==(const meta_range_iterator &other) const ENTT_NOEXCEPT {
+        return it == other.it;
+    }
+
+    [[nodiscard]] bool operator!=(const meta_range_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
     }
 
 private:
     node_type *it{};
 };
-
-template<typename Type, typename Node>
-[[nodiscard]] bool operator==(const meta_range_iterator<Type, Node> &lhs, const meta_range_iterator<Type, Node> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
-}
-
-template<typename Type, typename Node>
-[[nodiscard]] bool operator!=(const meta_range_iterator<Type, Node> &lhs, const meta_range_iterator<Type, Node> &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 } // namespace internal
 

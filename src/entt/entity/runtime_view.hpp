@@ -76,8 +76,12 @@ public:
         return *operator->();
     }
 
-    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
-        return it;
+    [[nodiscard]] bool operator==(const runtime_view_iterator &other) const ENTT_NOEXCEPT {
+        return it == other.it;
+    }
+
+    [[nodiscard]] bool operator!=(const runtime_view_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
     }
 
 private:
@@ -86,16 +90,6 @@ private:
     iterator_type it;
     bool no_tombstone_check;
 };
-
-template<typename Type>
-[[nodiscard]] bool operator==(const runtime_view_iterator<Type> &lhs, const runtime_view_iterator<Type> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
-}
-
-template<typename Type>
-[[nodiscard]] bool operator!=(const runtime_view_iterator<Type> &lhs, const runtime_view_iterator<Type> &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 } // namespace internal
 

@@ -1537,6 +1537,24 @@ public:
     }
 
     /**
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return True if the iterators refer to the same element, false otherwise.
+     */
+    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return handle == other.handle;
+    }
+
+    /**
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return False if the iterators refer to the same element, true otherwise.
+     */
+    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
+    }
+
+    /**
      * @brief Returns the underlying iterator.
      * @return The underlying iterator.
      */
@@ -1548,26 +1566,6 @@ private:
     vtable_type *vtable{};
     any handle{};
 };
-
-/**
- * @brief Checks if two iterators refer to the same element.
- * @param lhs An iterator to compare.
- * @param rhs An iterator with which to compare.
- * @return True if the iterators refer to the same element, false otherwise.
- */
-[[nodiscard]] inline bool operator==(const typename meta_sequence_container::iterator &lhs, const typename meta_sequence_container::iterator &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
-}
-
-/**
- * @brief Checks if two iterators refer to the same element.
- * @param lhs An iterator to compare.
- * @param rhs An iterator with which to compare.
- * @return False if the iterators refer to the same element, true otherwise.
- */
-[[nodiscard]] inline bool operator!=(const typename meta_sequence_container::iterator &lhs, const typename meta_sequence_container::iterator &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 /**
  * @brief Returns the meta value type of a container.
@@ -1746,37 +1744,27 @@ public:
     }
 
     /**
-     * @brief Returns the underlying iterator.
-     * @return The underlying iterator.
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return True if the iterators refer to the same element, false otherwise.
      */
-    any base() const ENTT_NOEXCEPT {
-        return handle.as_ref();
+    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return handle == other.handle;
+    }
+
+    /**
+     * @brief Checks if two iterators refer to the same element.
+     * @param other The iterator with which to compare.
+     * @return False if the iterators refer to the same element, true otherwise.
+     */
+    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
     }
 
 private:
     vtable_type *vtable{};
     any handle{};
 };
-
-/**
- * @brief Checks if two iterators refer to the same element.
- * @param lhs An iterator to compare.
- * @param rhs An iterator with which to compare.
- * @return True if the iterators refer to the same element, false otherwise.
- */
-[[nodiscard]] inline bool operator==(const typename meta_associative_container::iterator &lhs, const typename meta_associative_container::iterator &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
-}
-
-/**
- * @brief Checks if two iterators refer to the same element.
- * @param lhs An iterator to compare.
- * @param rhs An iterator with which to compare.
- * @return False if the iterators refer to the same element, true otherwise.
- */
-[[nodiscard]] inline bool operator!=(const typename meta_associative_container::iterator &lhs, const typename meta_associative_container::iterator &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 /**
  * @brief Returns true if a container is also key-only, false otherwise.
