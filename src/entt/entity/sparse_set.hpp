@@ -72,36 +72,8 @@ struct sparse_set_iterator final {
         return (*this + -value);
     }
 
-    difference_type operator-(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return other.index - index;
-    }
-
     [[nodiscard]] reference operator[](const difference_type value) const {
         return *operator+(value);
-    }
-
-    [[nodiscard]] bool operator==(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return other.index == index;
-    }
-
-    [[nodiscard]] bool operator!=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
-
-    [[nodiscard]] bool operator<(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return index > other.index;
-    }
-
-    [[nodiscard]] bool operator>(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return index < other.index;
-    }
-
-    [[nodiscard]] bool operator<=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this > other);
-    }
-
-    [[nodiscard]] bool operator>=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this < other);
     }
 
     [[nodiscard]] pointer operator->() const {
@@ -113,10 +85,49 @@ struct sparse_set_iterator final {
         return *operator->();
     }
 
+    [[nodiscard]] difference_type base() const ENTT_NOEXCEPT {
+        return index;
+    }
+
 private:
     const Container *packed;
     difference_type index;
 };
+
+template<typename Container>
+[[nodiscard]] auto operator-(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) ENTT_NOEXCEPT {
+    return rhs.base() - lhs.base();
+}
+
+template<typename Container>
+[[nodiscard]] bool operator==(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() == rhs.base();
+}
+
+template<typename Container>
+[[nodiscard]] bool operator!=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+template<typename Container>
+[[nodiscard]] bool operator<(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() > rhs.base();
+}
+
+template<typename Container>
+[[nodiscard]] bool operator>(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() < rhs.base();
+}
+
+template<typename Container>
+[[nodiscard]] bool operator<=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) ENTT_NOEXCEPT {
+    return !(lhs > rhs);
+}
+
+template<typename Container>
+[[nodiscard]] bool operator>=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) ENTT_NOEXCEPT {
+    return !(lhs < rhs);
+}
 
 } // namespace internal
 
