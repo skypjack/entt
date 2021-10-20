@@ -943,6 +943,15 @@ TEST(Storage, IteratorConversion) {
 
     ASSERT_EQ(it->value, 42);
     ASSERT_EQ(it->value, cit->value);
+
+    ASSERT_EQ(it - cit, 0);
+    ASSERT_EQ(cit - it, 0);
+    ASSERT_LE(it, cit);
+    ASSERT_LE(cit, it);
+    ASSERT_GE(it, cit);
+    ASSERT_GE(cit, it);
+    ASSERT_EQ(it, cit);
+    ASSERT_NE(++cit, it);
 }
 
 TEST(Storage, Raw) {

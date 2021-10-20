@@ -96,36 +96,8 @@ public:
         return (*this + -value);
     }
 
-    difference_type operator-(const storage_iterator &other) const ENTT_NOEXCEPT {
-        return other.index - index;
-    }
-
     [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         return *operator+(value);
-    }
-
-    [[nodiscard]] bool operator==(const storage_iterator &other) const ENTT_NOEXCEPT {
-        return other.index == index;
-    }
-
-    [[nodiscard]] bool operator!=(const storage_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
-
-    [[nodiscard]] bool operator<(const storage_iterator &other) const ENTT_NOEXCEPT {
-        return index > other.index;
-    }
-
-    [[nodiscard]] bool operator>(const storage_iterator &other) const ENTT_NOEXCEPT {
-        return index < other.index;
-    }
-
-    [[nodiscard]] bool operator<=(const storage_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this > other);
-    }
-
-    [[nodiscard]] bool operator>=(const storage_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this < other);
     }
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
@@ -137,10 +109,49 @@ public:
         return *operator->();
     }
 
+    [[nodiscard]] difference_type base() const ENTT_NOEXCEPT {
+        return index;
+    }
+
 private:
     Container *packed;
     difference_type index;
 };
+
+template<typename CLhs, typename CRhs>
+[[nodiscard]] auto operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+    return rhs.base() - lhs.base();
+}
+
+template<typename CLhs, typename CRhs>
+[[nodiscard]] bool operator==(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() == rhs.base();
+}
+
+template<typename CLhs, typename CRhs>
+[[nodiscard]] bool operator!=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+template<typename CLhs, typename CRhs>
+[[nodiscard]] bool operator<(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() > rhs.base();
+}
+
+template<typename CLhs, typename CRhs>
+[[nodiscard]] bool operator>(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() < rhs.base();
+}
+
+template<typename CLhs, typename CRhs>
+[[nodiscard]] bool operator<=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs > rhs);
+}
+
+template<typename CLhs, typename CRhs>
+[[nodiscard]] bool operator>=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs < rhs);
+}
 
 } // namespace internal
 
