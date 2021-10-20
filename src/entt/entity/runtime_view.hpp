@@ -14,6 +14,97 @@
 namespace entt {
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+template<typename Type>
+class runtime_view_iterator final {
+    [[nodiscard]] bool valid() const {
+        return (no_tombstone_check || (*it != tombstone))
+               && std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) { return curr->contains(entt); })
+               && std::none_of(filter->cbegin(), filter->cend(), [entt = *it](const auto *curr) { return curr && curr->contains(entt); });
+    }
+
+public:
+    using iterator_type = typename Type::iterator;
+    using difference_type = typename iterator_type::difference_type;
+    using value_type = typename iterator_type::value_type;
+    using pointer = typename iterator_type::pointer;
+    using reference = typename iterator_type::reference;
+    using iterator_category = std::bidirectional_iterator_tag;
+
+    runtime_view_iterator() ENTT_NOEXCEPT = default;
+
+    runtime_view_iterator(const std::vector<const Type *> &cpools, const std::vector<const Type *> &ignore, iterator_type curr) ENTT_NOEXCEPT
+        : pools{&cpools},
+          filter{&ignore},
+          it{curr},
+          no_tombstone_check{std::all_of(pools->cbegin(), pools->cend(), [](const Type *cpool) { return (cpool->policy() == deletion_policy::swap_and_pop); })} {
+        if(it != (*pools)[0]->end() && !valid()) {
+            ++(*this);
+        }
+    }
+
+    runtime_view_iterator &operator++() {
+        while(++it != (*pools)[0]->end() && !valid()) {}
+        return *this;
+    }
+
+    runtime_view_iterator operator++(int) {
+        runtime_view_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    runtime_view_iterator &operator--() ENTT_NOEXCEPT {
+        while(--it != (*pools)[0]->begin() && !valid()) {}
+        return *this;
+    }
+
+    runtime_view_iterator operator--(int) ENTT_NOEXCEPT {
+        runtime_view_iterator orig = *this;
+        return operator--(), orig;
+    }
+
+    [[nodiscard]] pointer operator->() const {
+        return it.operator->();
+    }
+
+    [[nodiscard]] reference operator*() const {
+        return *operator->();
+    }
+
+    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
+        return it;
+    }
+
+private:
+    const std::vector<const Type *> *pools;
+    const std::vector<const Type *> *filter;
+    iterator_type it;
+    bool no_tombstone_check;
+};
+
+template<typename Type>
+[[nodiscard]] bool operator==(const runtime_view_iterator<Type> &lhs, const runtime_view_iterator<Type> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() == rhs.base();
+}
+
+template<typename Type>
+[[nodiscard]] bool operator!=(const runtime_view_iterator<Type> &lhs, const runtime_view_iterator<Type> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
  * @brief Runtime view.
  *
  * Runtime views iterate over those entities that have at least all the given
@@ -54,76 +145,6 @@ namespace entt {
 template<typename Entity>
 class basic_runtime_view final {
     using basic_common_type = basic_sparse_set<Entity>;
-    using underlying_iterator = typename basic_common_type::iterator;
-
-    class view_iterator final {
-        [[nodiscard]] bool valid() const {
-            return (no_tombstone_check || (*it != tombstone))
-                   && std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) { return curr->contains(entt); })
-                   && std::none_of(filter->cbegin(), filter->cend(), [entt = *it](const auto *curr) { return curr && curr->contains(entt); });
-        }
-
-    public:
-        using difference_type = typename underlying_iterator::difference_type;
-        using value_type = typename underlying_iterator::value_type;
-        using pointer = typename underlying_iterator::pointer;
-        using reference = typename underlying_iterator::reference;
-        using iterator_category = std::bidirectional_iterator_tag;
-
-        view_iterator() ENTT_NOEXCEPT = default;
-
-        view_iterator(const std::vector<const basic_common_type *> &cpools, const std::vector<const basic_common_type *> &ignore, underlying_iterator curr) ENTT_NOEXCEPT
-            : pools{&cpools},
-              filter{&ignore},
-              it{curr},
-              no_tombstone_check{std::all_of(pools->cbegin(), pools->cend(), [](const basic_common_type *cpool) { return (cpool->policy() == deletion_policy::swap_and_pop); })} {
-            if(it != (*pools)[0]->end() && !valid()) {
-                ++(*this);
-            }
-        }
-
-        view_iterator &operator++() {
-            while(++it != (*pools)[0]->end() && !valid()) {}
-            return *this;
-        }
-
-        view_iterator operator++(int) {
-            view_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        view_iterator &operator--() ENTT_NOEXCEPT {
-            while(--it != (*pools)[0]->begin() && !valid()) {}
-            return *this;
-        }
-
-        view_iterator operator--(int) ENTT_NOEXCEPT {
-            view_iterator orig = *this;
-            return operator--(), orig;
-        }
-
-        [[nodiscard]] bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
-            return other.it == it;
-        }
-
-        [[nodiscard]] bool operator!=(const view_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-        [[nodiscard]] pointer operator->() const {
-            return it.operator->();
-        }
-
-        [[nodiscard]] reference operator*() const {
-            return *operator->();
-        }
-
-    private:
-        const std::vector<const basic_common_type *> *pools;
-        const std::vector<const basic_common_type *> *filter;
-        underlying_iterator it;
-        bool no_tombstone_check;
-    };
 
     [[nodiscard]] bool valid() const {
         return !pools.empty() && pools.front();
@@ -135,7 +156,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
-    using iterator = view_iterator;
+    using iterator = internal::runtime_view_iterator<basic_common_type>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_runtime_view() ENTT_NOEXCEPT
