@@ -45,6 +45,7 @@ class dense_hash_map_iterator {
     using iterator_traits = std::iterator_traits<decltype(std::addressof(std::declval<It>()->element))>;
 
 public:
+    using iterator_type = It;
     using value_type = typename iterator_traits::value_type;
     using pointer = typename iterator_traits::pointer;
     using reference = typename iterator_traits::reference;
@@ -53,11 +54,11 @@ public:
 
     dense_hash_map_iterator() ENTT_NOEXCEPT = default;
 
-    dense_hash_map_iterator(const It iter) ENTT_NOEXCEPT
+    dense_hash_map_iterator(const iterator_type iter) ENTT_NOEXCEPT
         : it{iter} {}
 
-    template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
-    dense_hash_map_iterator(const dense_hash_map_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other)
+    template<bool Const = std::is_const_v<std::remove_pointer_t<iterator_type>>, typename = std::enable_if_t<Const>>
+    dense_hash_map_iterator(const dense_hash_map_iterator<std::remove_const_t<std::remove_pointer_t<iterator_type>> *> &other)
         : it{other.it} {}
 
     dense_hash_map_iterator &operator++() ENTT_NOEXCEPT {
@@ -96,36 +97,8 @@ public:
         return (*this + -value);
     }
 
-    difference_type operator-(const dense_hash_map_iterator &other) const ENTT_NOEXCEPT {
-        return it - other.it;
-    }
-
     [[nodiscard]] reference operator[](const difference_type value) const {
         return it->element;
-    }
-
-    [[nodiscard]] bool operator==(const dense_hash_map_iterator &other) const ENTT_NOEXCEPT {
-        return it == other.it;
-    }
-
-    [[nodiscard]] bool operator!=(const dense_hash_map_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
-
-    [[nodiscard]] bool operator<(const dense_hash_map_iterator &other) const ENTT_NOEXCEPT {
-        return it < other.it;
-    }
-
-    [[nodiscard]] bool operator>(const dense_hash_map_iterator &other) const ENTT_NOEXCEPT {
-        return it > other.it;
-    }
-
-    [[nodiscard]] bool operator<=(const dense_hash_map_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this > other);
-    }
-
-    [[nodiscard]] bool operator>=(const dense_hash_map_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this < other);
     }
 
     [[nodiscard]] pointer operator->() const {
@@ -136,9 +109,48 @@ public:
         return *operator->();
     }
 
+    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
+        return it;
+    }
+
 private:
-    It it;
+    iterator_type it;
 };
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] auto operator-(const dense_hash_map_iterator<ILhs> &lhs, const dense_hash_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() - rhs.base();
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator==(const dense_hash_map_iterator<ILhs> &lhs, const dense_hash_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() == rhs.base();
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator!=(const dense_hash_map_iterator<ILhs> &lhs, const dense_hash_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator<(const dense_hash_map_iterator<ILhs> &lhs, const dense_hash_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() < rhs.base();
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator>(const dense_hash_map_iterator<ILhs> &lhs, const dense_hash_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() > rhs.base();
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator<=(const dense_hash_map_iterator<ILhs> &lhs, const dense_hash_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs > rhs);
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator>=(const dense_hash_map_iterator<ILhs> &lhs, const dense_hash_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs < rhs);
+}
 
 template<typename It>
 class dense_hash_map_local_iterator {
@@ -147,6 +159,7 @@ class dense_hash_map_local_iterator {
     using iterator_traits = std::iterator_traits<decltype(std::addressof(std::declval<It>()->element))>;
 
 public:
+    using iterator_type = It;
     using value_type = typename iterator_traits::value_type;
     using pointer = typename iterator_traits::pointer;
     using reference = typename iterator_traits::reference;
@@ -155,12 +168,12 @@ public:
 
     dense_hash_map_local_iterator() ENTT_NOEXCEPT = default;
 
-    dense_hash_map_local_iterator(It iter, const std::size_t pos) ENTT_NOEXCEPT
+    dense_hash_map_local_iterator(iterator_type iter, const std::size_t pos) ENTT_NOEXCEPT
         : it{iter},
           curr{pos} {}
 
-    template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
-    dense_hash_map_local_iterator(const dense_hash_map_local_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other)
+    template<bool Const = std::is_const_v<std::remove_pointer_t<iterator_type>>, typename = std::enable_if_t<Const>>
+    dense_hash_map_local_iterator(const dense_hash_map_local_iterator<std::remove_const_t<std::remove_pointer_t<iterator_type>> *> &other)
         : it{other.it},
           curr{other.curr} {}
 
@@ -173,14 +186,6 @@ public:
         return ++(*this), orig;
     }
 
-    [[nodiscard]] bool operator==(const dense_hash_map_local_iterator &other) const ENTT_NOEXCEPT {
-        return curr == other.curr;
-    }
-
-    [[nodiscard]] bool operator!=(const dense_hash_map_local_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
-
     [[nodiscard]] pointer operator->() const {
         return std::addressof(it[curr].element);
     }
@@ -189,14 +194,24 @@ public:
         return *operator->();
     }
 
-    [[nodiscard]] auto index() const ENTT_NOEXCEPT {
-        return curr;
+    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
+        return (it + curr);
     }
 
 private:
-    It it;
+    iterator_type it;
     std::size_t curr;
 };
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator==(const dense_hash_map_local_iterator<ILhs> &lhs, const dense_hash_map_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() == rhs.base();
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator!=(const dense_hash_map_local_iterator<ILhs> &lhs, const dense_hash_map_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 } // namespace internal
 
@@ -239,7 +254,7 @@ class dense_hash_map final {
     [[nodiscard]] auto constrained_find(const Other &key, std::size_t bucket) {
         for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
             if(packed.second()(it->first, key)) {
-                return iterator{packed.first().data() + it.index()};
+                return iterator{it.base()};
             }
         }
 
@@ -250,7 +265,7 @@ class dense_hash_map final {
     [[nodiscard]] auto constrained_find(const Other &key, std::size_t bucket) const {
         for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
             if(packed.second()(it->first, key)) {
-                return const_iterator{packed.first().data() + it.index()};
+                return const_iterator{it.base()};
             }
         }
 
@@ -802,7 +817,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] const_local_iterator cend([[maybe_unused]] const size_type index) const {
-        return {nullptr, std::numeric_limits<std::size_t>::max()};
+        return {packed.first().data(), std::numeric_limits<size_type>::max()};
     }
 
     /**
@@ -820,7 +835,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] local_iterator end([[maybe_unused]] const size_type index) {
-        return {nullptr, std::numeric_limits<std::size_t>::max()};
+        return {packed.first().data(), std::numeric_limits<size_type>::max()};
     }
 
     /**
