@@ -52,4 +52,7 @@ TEST_F(MetaRange, IteratorConversion) {
 
     ASSERT_EQ(*it, entt::resolve<double>());
     ASSERT_EQ(*it, *cit);
+
+    ASSERT_EQ(it, cit);
+    ASSERT_NE(++cit, it);
 }
