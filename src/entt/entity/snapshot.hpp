@@ -6,10 +6,10 @@
 #include <iterator>
 #include <tuple>
 #include <type_traits>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 #include "../config/config.h"
+#include "../container/dense_hash_map.hpp"
 #include "../core/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -548,7 +548,7 @@ public:
     }
 
 private:
-    std::unordered_map<entity_type, std::pair<entity_type, bool>> remloc;
+    dense_hash_map<entity_type, std::pair<entity_type, bool>> remloc;
     basic_registry<entity_type> *reg;
 };
 

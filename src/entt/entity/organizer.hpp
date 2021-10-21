@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <cstddef>
 #include <type_traits>
-#include <unordered_map>
 #include <utility>
 #include <vector>
+#include "../container/dense_hash_map.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
@@ -477,7 +477,7 @@ public:
     }
 
 private:
-    std::unordered_map<id_type, std::vector<std::pair<std::size_t, bool>>> dependencies;
+    dense_hash_map<id_type, std::vector<std::pair<std::size_t, bool>>> dependencies;
     std::vector<vertex_data> vertices;
 };
 

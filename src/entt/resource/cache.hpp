@@ -2,9 +2,9 @@
 #define ENTT_RESOURCE_CACHE_HPP
 
 #include <type_traits>
-#include <unordered_map>
 #include <utility>
 #include "../config/config.h"
+#include "../container/dense_hash_map.hpp"
 #include "../core/fwd.hpp"
 #include "fwd.hpp"
 #include "handle.hpp"
@@ -271,7 +271,7 @@ public:
     }
 
 private:
-    std::unordered_map<id_type, resource_handle<resource_type>> resources;
+    dense_hash_map<id_type, resource_handle<resource_type>> resources;
 };
 
 } // namespace entt
