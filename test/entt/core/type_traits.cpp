@@ -136,6 +136,7 @@ TEST(TypeTraits, IsComplete) {
 
 TEST(TypeTraits, IsIterator) {
     static_assert(!entt::is_iterator_v<void>);
+    static_assert(!entt::is_iterator_v<void *>);
     static_assert(!entt::is_iterator_v<int>);
 
     static_assert(entt::is_iterator_v<int *>);

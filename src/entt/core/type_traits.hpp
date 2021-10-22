@@ -447,6 +447,26 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+template<typename, typename = void>
+struct is_iterator: std::false_type {};
+
+template<typename Type>
+struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
@@ -456,8 +476,8 @@ struct is_iterator: std::false_type {};
 
 /*! @copydoc is_iterator */
 template<typename Type>
-struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>
-    : std::true_type {};
+struct is_iterator<Type, std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_pointer_t<Type>>, void>>>
+    : internal::is_iterator<Type> {};
 
 /**
  * @brief Helper variable template.
