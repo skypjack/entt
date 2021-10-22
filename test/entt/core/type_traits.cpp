@@ -105,18 +105,24 @@ TEST(TypeTraits, ValueList) {
 
 TEST(TypeTraits, IsEqualityComparable) {
     static_assert(entt::is_equality_comparable_v<int>);
+    static_assert(entt::is_equality_comparable_v<const int>);
     static_assert(entt::is_equality_comparable_v<std::vector<int>>);
     static_assert(entt::is_equality_comparable_v<std::vector<std::vector<int>>>);
     static_assert(entt::is_equality_comparable_v<std::unordered_map<int, int>>);
     static_assert(entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, char>>>);
+    static_assert(entt::is_equality_comparable_v<std::pair<const int, int>>);
+    static_assert(entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, char>>>);
     static_assert(entt::is_equality_comparable_v<std::vector<not_comparable>::iterator>);
     static_assert(entt::is_equality_comparable_v<nlohmann_json_like>);
 
     static_assert(!entt::is_equality_comparable_v<not_comparable>);
+    static_assert(!entt::is_equality_comparable_v<const not_comparable>);
     static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
     static_assert(!entt::is_equality_comparable_v<std::vector<std::vector<not_comparable>>>);
     static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>);
     static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>);
+    static_assert(!entt::is_equality_comparable_v<std::pair<const int, not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, not_comparable>>>);
     static_assert(!entt::is_equality_comparable_v<void>);
 }
 
@@ -136,10 +142,11 @@ TEST(TypeTraits, IsComplete) {
 
 TEST(TypeTraits, IsIterator) {
     static_assert(!entt::is_iterator_v<void>);
-    static_assert(!entt::is_iterator_v<void *>);
     static_assert(!entt::is_iterator_v<int>);
 
+    static_assert(!entt::is_iterator_v<void *>);
     static_assert(entt::is_iterator_v<int *>);
+
     static_assert(entt::is_iterator_v<std::vector<int>::iterator>);
     static_assert(entt::is_iterator_v<std::vector<int>::const_iterator>);
     static_assert(entt::is_iterator_v<std::vector<int>::reverse_iterator>);
