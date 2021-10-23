@@ -42,12 +42,12 @@ message(VERBOSE "* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message(VERBOSE "* Copyright (c) 2017-2021 Michele Caini <michele.caini@gmail.com>")
 message(VERBOSE "*")
 
-option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." OFF)
-option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if availbale." OFF)
-
 #
 # Compiler stuff
 #
+
+option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." OFF)
+option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if availbale." OFF)
 
 if(ENTT_USE_LIBCPP)
     if(NOT WIN32)
@@ -86,6 +86,17 @@ endif()
 #
 
 option(ENTT_INCLUDE_HEADERS "Add all EnTT headers to the EnTT target." OFF)
+option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
+
+if(ENTT_INCLUDE_NATVIS)
+    if(MSVC)
+        set(ENTT_HAS_NATVIS TRUE CACHE INTERNAL "")
+    endif()
+
+    if(NOT ENTT_HAS_NATVIS)
+        message(VERBOSE "The option ENTT_INCLUDE_NATVIS is set but natvis files are not supported. They will not be added to the target.")
+    endif()
+endif()
 
 include(GNUInstallDirs)
 
@@ -171,6 +182,24 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/sigh.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entt.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/fwd.hpp>
+    )
+endif()
+
+if(ENTT_HAS_NATVIS)
+    target_sources(
+        EnTT
+        INTERFACE
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/config.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/container.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/core.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/entity.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/locator.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/meta.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/platform.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/poly.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/process.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/resource.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/signal.natvis>
     )
 endif()
 
