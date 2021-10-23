@@ -72,8 +72,9 @@ if(ENTT_USE_LIBCPP)
 endif()
 
 if(ENTT_USE_SANITIZER)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        set(ENTT_HAS_SANITIZER TRUE CACHE INTERNAL "")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        set(ENTT_HAS_SANITIZER TRUE CACHE BOOL "" FORCE)
+        mark_as_advanced(ENTT_HAS_SANITIZER)
     endif()
 
     if(NOT ENTT_HAS_SANITIZER)
@@ -90,7 +91,8 @@ option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
 
 if(ENTT_INCLUDE_NATVIS)
     if(MSVC)
-        set(ENTT_HAS_NATVIS TRUE CACHE INTERNAL "")
+        set(ENTT_HAS_NATVIS TRUE CACHE BOOL "" FORCE)
+        mark_as_advanced(ENTT_HAS_NATVIS)
     endif()
 
     if(NOT ENTT_HAS_NATVIS)
