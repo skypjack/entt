@@ -43,7 +43,7 @@ message(VERBOSE "* Copyright (c) 2017-2021 Michele Caini <michele.caini@gmail.co
 message(VERBOSE "*")
 
 option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." ON)
-option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags" OFF)
+option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if availbale." OFF)
 
 #
 # Compiler stuff
@@ -63,10 +63,18 @@ if(NOT WIN32 AND ENTT_USE_LIBCPP)
     " ENTT_HAS_LIBCPP)
 
     if(NOT ENTT_HAS_LIBCPP)
-        message(VERBOSE "The option ENTT_USE_LIBCPP is set (by default) but libc++ is not available. The flag will not be added to the target.")
+        message(VERBOSE "The option ENTT_USE_LIBCPP is set but libc++ is not available. The flag will not be added to the target.")
     endif()
 
     cmake_pop_check_state()
+endif()
+
+if(ENTT_USE_SANITIZER)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        set(ENTT_HAS_SANITIZER TRUE CACHE INTERNAL "")
+    else()
+        message(VERBOSE "The option ENTT_USE_SANITIZER is set but sanitizer support is not available. The flags will not be added to the target.")
+    endif()
 endif()
 
 #
@@ -152,11 +160,11 @@ target_sources(
 target_include_directories(
     EnTT
     INTERFACE
-        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}>/src
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-if(ENTT_USE_SANITIZER)
+if(ENTT_HAS_SANITIZER)
     target_compile_options(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
     target_link_libraries(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
 endif()
