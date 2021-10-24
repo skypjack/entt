@@ -330,7 +330,7 @@ template<typename Type, typename Policy, typename Candidate, std::size_t... Inde
 template<typename Type, typename... Args, std::size_t... Index>
 [[nodiscard]] meta_any meta_construct(meta_any *const args, std::index_sequence<Index...>) {
     if(((args + Index)->allow_cast<Args>() && ...)) {
-        return Type{(args + Index)->cast<Args>()...};
+        return meta_any{std::in_place_type<Type>, (args + Index)->cast<Args>()...};
     }
 
     return meta_any{};
