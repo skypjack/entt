@@ -282,7 +282,7 @@ class dense_hash_map final {
         }
 
         if(const auto count = size() + 1u; count > (bucket_count() * max_load_factor())) {
-            rehash(count);
+            rehash(bucket_count() * 2u);
             index = hash_to_bucket(hash);
         }
 
