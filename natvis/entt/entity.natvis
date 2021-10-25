@@ -1,3 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="entt::basic_sparse_set&lt;*&gt;">
+		<DisplayString>{{ size={ packed.size() } }}</DisplayString>
+		<Expand>
+			<Item Name="[capacity]">packed.capacity()</Item>
+			<IndexListItems Optional="true" Condition="packed.size() != 0">
+				<Size>packed.size()</Size>
+				<ValueNode Condition="packed[$i] &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">packed[$i]</ValueNode>
+				<ValueNode>tombstone</ValueNode>
+			</IndexListItems>
+		</Expand>
+	</Type>
+	<Type Name="entt::basic_storage&lt;*&gt;">
+		<DisplayString>{{ size={ base_type::packed.size() } }}</DisplayString>
+		<Expand>
+			<Item Name="[capacity]" Optional="true">packed.first_base::value.capacity() * packed_page_v</Item>
+			<Item Name="[page size]" Optional="true">packed_page_v</Item>
+			<Item Name="[entities]">(base_type*)this,nd</Item>
+			<IndexListItems Optional="true" Condition="base_type::packed.size() != 0">
+				<Size>base_type::packed.size()</Size>
+				<ValueNode Condition="base_type::packed[$i] &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">packed.first_base::value[$i / packed_page_v][$i &amp; (packed_page_v - 1)]</ValueNode>
+				<ValueNode>tombstone</ValueNode>
+			</IndexListItems>
+		</Expand>
+	</Type>
 </AutoVisualizer>
