@@ -48,7 +48,8 @@ TEST(CompressedPair, Size) {
     static_assert(sizeof(entt::compressed_pair<int, int>) == sizeof(int[2u]));
     static_assert(sizeof(entt::compressed_pair<empty_type, int>) == sizeof(int));
     static_assert(sizeof(entt::compressed_pair<int, empty_type>) == sizeof(int));
-    static_assert(sizeof(entt::compressed_pair<int, empty_type>) != sizeof(local));
+    static_assert(sizeof(entt::compressed_pair<int, empty_type>) < sizeof(local));
+    static_assert(sizeof(entt::compressed_pair<int, empty_type>) < sizeof(std::pair<int, empty_type>));
 }
 
 TEST(CompressedPair, ConstructCopyMove) {

@@ -19,6 +19,9 @@ namespace internal {
 
 template<typename Type, std::size_t, typename = void>
 struct compressed_pair_element {
+    using reference = Type &;
+    using const_reference = const Type &;
+
     template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<Type>>>
     compressed_pair_element()
         : value{} {}
@@ -31,11 +34,11 @@ struct compressed_pair_element {
     compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
         : value{std::get<Index>(args)...} {}
 
-    [[nodiscard]] Type &get() ENTT_NOEXCEPT {
+    [[nodiscard]] reference get() ENTT_NOEXCEPT {
         return value;
     }
 
-    [[nodiscard]] const Type &get() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reference get() const ENTT_NOEXCEPT {
         return value;
     }
 
@@ -45,23 +48,27 @@ private:
 
 template<typename Type, std::size_t Tag>
 struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Type>>>: Type {
-    template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<Type>>>
+    using reference = Type &;
+    using const_reference = const Type &;
+    using base_type = Type;
+
+    template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<base_type>>>
     compressed_pair_element()
-        : Type{} {}
+        : base_type{} {}
 
     template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
     compressed_pair_element(Args &&args)
-        : Type{std::forward<Args>(args)} {}
+        : base_type{std::forward<Args>(args)} {}
 
     template<typename... Args, std::size_t... Index>
     compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
-        : Type{std::get<Index>(args)...} {}
+        : base_type{std::get<Index>(args)...} {}
 
-    [[nodiscard]] Type &get() ENTT_NOEXCEPT {
+    [[nodiscard]] reference get() ENTT_NOEXCEPT {
         return *this;
     }
 
-    [[nodiscard]] const Type &get() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reference get() const ENTT_NOEXCEPT {
         return *this;
     }
 };

@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-    <Type Name="entt::basic_any&lt;*,*&gt;">
+    <Type Name="entt::basic_any&lt;*&gt;">
 		<DisplayString>{{ type={ info->alias,na }, policy={ mode,en } }}</DisplayString>
     </Type>
+	<Type Name="entt::compressed_pair&lt;*&gt;">
+		<DisplayString Optional="true">({ ((first_base*)this)->value }, { ((second_base*)this)->value })</DisplayString>
+		<DisplayString Optional="true">({ *(first_base::base_type*)this }, { ((second_base*)this)->value })</DisplayString>
+		<DisplayString Optional="true">({ ((first_base*)this)->value }, { *(second_base::base_type*)this })</DisplayString>
+		<DisplayString Optional="true">({ *(first_base::base_type*)this }, { *(second_base::base_type*)this })</DisplayString>
+		<Expand>
+			<Item Name="[first]" Optional="true">((first_base*)this)->value</Item>
+			<Item Name="[first]" Optional="true">*(first_base::base_type*)this</Item>
+			<Item Name="[second]" Optional="true">((second_base*)this)->value</Item>
+			<Item Name="[second]" Optional="true">*(second_base::base_type*)this</Item>
+		</Expand>
+	</Type>
 	<Type Name="entt::type_info">
 		<DisplayString>{{ name={ alias,na } }}</DisplayString>
 		<Expand>
