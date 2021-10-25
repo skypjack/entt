@@ -59,7 +59,7 @@ struct entt_traits<std::uint64_t> {
  * @tparam Type Type of identifier.
  */
 template<typename Type>
-class entt_traits: private internal::entt_traits<Type> {
+class entt_traits: internal::entt_traits<Type> {
     using base_type = internal::entt_traits<Type>;
 
 public:
