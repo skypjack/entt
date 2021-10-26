@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="entt::meta_any">
+		<DisplayString Condition="node != nullptr">{{ type={ node->info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
+		<DisplayString Condition="node == nullptr">{{}}</DisplayString>
+	</Type>
 </AutoVisualizer>
