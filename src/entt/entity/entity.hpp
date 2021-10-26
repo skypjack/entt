@@ -96,8 +96,8 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const value_type value) ENTT_NOEXCEPT {
-        constexpr auto version_mask = (base_type::version_mask << base_type::entity_shift);
-        return ((to_integral(value) & version_mask) >> base_type::entity_shift);
+        constexpr auto mask = (base_type::version_mask << base_type::entity_shift);
+        return ((to_integral(value) & mask) >> base_type::entity_shift);
     }
 
     /**
@@ -125,8 +125,8 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr value_type combine(const entity_type lhs, const entity_type rhs) ENTT_NOEXCEPT {
-        constexpr auto version_mask = (base_type::version_mask << base_type::entity_shift);
-        return value_type{(lhs & base_type::entity_mask) | (rhs & version_mask)};
+        constexpr auto mask = (base_type::version_mask << base_type::entity_shift);
+        return value_type{(lhs & base_type::entity_mask) | (rhs & mask)};
     }
 };
 
