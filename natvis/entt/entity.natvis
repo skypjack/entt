@@ -4,7 +4,7 @@
 		<DisplayString>{{ size={ packed.size() } }}</DisplayString>
 		<Expand>
 			<Item Name="[capacity]">packed.capacity()</Item>
-			<IndexListItems Optional="true" Condition="packed.size() != 0">
+			<IndexListItems Condition="packed.size() != 0">
 				<Size>packed.size()</Size>
 				<ValueNode Condition="packed[$i] &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">packed[$i]</ValueNode>
 				<ValueNode>tombstone</ValueNode>
