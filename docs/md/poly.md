@@ -120,7 +120,7 @@ external call:
 struct Drawable: entt::type_list<> {
     template<typename Base>
     struct type: Base {
-        bool draw() const { entt::poly_call<0>(*this); }
+        void draw() const { entt::poly_call<0>(*this); }
     };
 
     // ...

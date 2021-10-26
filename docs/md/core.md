@@ -693,7 +693,7 @@ Here is a (possibly incomplete) list of the functionalities that come with a
 type list:
 
 * `type_list_element[_t]` to get the N-th element of a type list.
-* `type_list_cast[_t]` and a handy `operator+` to concatenate type lists.
+* `type_list_cat[_t]` and a handy `operator+` to concatenate type lists.
 * `type_list_unique[_t]` to remove duplicate types from a type list.
 * `type_list_contains[_v]` to know if a type list contains a given type.
 * `type_list_diff[_t]` to remove types from type lists.
