@@ -109,7 +109,8 @@ struct MetaData: ::testing::Test {
         entt::meta<derived_t>()
             .type("derived"_hs)
             .base<base_t>()
-            .dtor<derived_t::destroy>();
+            .dtor<derived_t::destroy>()
+            .data<&base_t::value>("value_from_base"_hs);
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
@@ -612,7 +613,7 @@ TEST_F(MetaData, AsConstRef) {
     ASSERT_EQ(instance.i, 0);
 }
 
-TEST_F(MetaData, FromBase) {
+TEST_F(MetaData, SetGetBaseData) {
     using namespace entt::literals;
 
     auto type = entt::resolve<derived_t>();
@@ -622,6 +623,21 @@ TEST_F(MetaData, FromBase) {
 
     ASSERT_EQ(instance.value, 3);
     ASSERT_TRUE(type.data("value"_hs).set(instance, 42));
+    ASSERT_EQ(type.data("value"_hs).get(instance).cast<int>(), 42);
+    ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(MetaData, SetGetFromBase) {
+    using namespace entt::literals;
+
+    auto type = entt::resolve<derived_t>();
+    derived_t instance{};
+
+    ASSERT_TRUE(type.data("value_from_base"_hs));
+
+    ASSERT_EQ(instance.value, 3);
+    ASSERT_TRUE(type.data("value_from_base"_hs).set(instance, 42));
+    ASSERT_EQ(type.data("value_from_base"_hs).get(instance).cast<int>(), 42);
     ASSERT_EQ(instance.value, 42);
 }
 

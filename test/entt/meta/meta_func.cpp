@@ -14,8 +14,16 @@ struct base_t {
         ++counter;
     }
 
-    void func(int v) {
+    void setter(int v) {
         value = v;
+    }
+
+    int getter() const {
+        return value;
+    }
+
+    static void static_setter(base_t &ref, int v) {
+        ref.value = v;
     }
 
     inline static int counter = 0;
@@ -86,13 +94,16 @@ struct MetaFunc: ::testing::Test {
         entt::meta<base_t>()
             .type("base"_hs)
             .dtor<base_t::destroy>()
-            .func<&base_t::func>("func"_hs)
+            .func<&base_t::setter>("setter"_hs)
             .func<fake_member>("fake_member"_hs)
             .func<fake_const_member>("fake_const_member"_hs);
 
         entt::meta<derived_t>()
             .type("derived"_hs)
             .base<base_t>()
+            .func<&base_t::setter>("setter_from_base"_hs)
+            .func<&base_t::getter>("getter_from_base"_hs)
+            .func<&base_t::static_setter>("static_setter_from_base"_hs)
             .dtor<derived_t::destroy>();
 
         entt::meta<func_t>()
@@ -474,18 +485,48 @@ TEST_F(MetaFunc, AsConstRef) {
     ASSERT_EQ(func.invoke(instance).cast<int>(), 3);
 }
 
-TEST_F(MetaFunc, FromBase) {
+TEST_F(MetaFunc, InvokeBaseFunction) {
     using namespace entt::literals;
 
     auto type = entt::resolve<derived_t>();
     derived_t instance{};
 
-    ASSERT_TRUE(type.func("func"_hs));
+    ASSERT_TRUE(type.func("setter"_hs));
     ASSERT_EQ(instance.value, 3);
 
-    type.func("func"_hs).invoke(instance, 42);
+    type.func("setter"_hs).invoke(instance, 42);
 
     ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(MetaFunc, InvokeFromBase) {
+    using namespace entt::literals;
+
+    auto type = entt::resolve<derived_t>();
+    derived_t instance{};
+
+    auto setter_from_base = type.func("setter_from_base"_hs);
+
+    ASSERT_TRUE(setter_from_base);
+    ASSERT_EQ(instance.value, 3);
+
+    setter_from_base.invoke(instance, 42);
+
+    ASSERT_EQ(instance.value, 42);
+
+    auto getter_from_base = type.func("getter_from_base"_hs);
+
+    ASSERT_TRUE(getter_from_base);
+    ASSERT_EQ(getter_from_base.invoke(instance).cast<int>(), 42);
+
+    auto static_setter_from_base = type.func("static_setter_from_base"_hs);
+
+    ASSERT_TRUE(static_setter_from_base);
+    ASSERT_EQ(instance.value, 42);
+
+    static_setter_from_base.invoke(instance, 3);
+
+    ASSERT_EQ(instance.value, 3);
 }
 
 TEST_F(MetaFunc, ExternalMemberFunction) {

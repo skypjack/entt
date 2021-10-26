@@ -28,12 +28,12 @@ struct meta_function_descriptor<Type, Ret (Class::*)(Args...) const> {
     /*! @brief Meta function return type. */
     using return_type = Ret;
     /*! @brief Meta function arguments. */
-    using args_type = std::conditional_t<std::is_same_v<Type, Class>, type_list<Args...>, type_list<const Class &, Args...>>;
+    using args_type = std::conditional_t<std::is_base_of_v<Class, Type>, type_list<Args...>, type_list<const Class &, Args...>>;
 
     /*! @brief True if the meta function is const, false otherwise. */
     static constexpr auto is_const = true;
     /*! @brief True if the meta function is static, false otherwise. */
-    static constexpr auto is_static = !std::is_same_v<Type, Class>;
+    static constexpr auto is_static = !std::is_base_of_v<Class, Type>;
 };
 
 /**
@@ -48,12 +48,12 @@ struct meta_function_descriptor<Type, Ret (Class::*)(Args...)> {
     /*! @brief Meta function return type. */
     using return_type = Ret;
     /*! @brief Meta function arguments. */
-    using args_type = std::conditional_t<std::is_same_v<Type, Class>, type_list<Args...>, type_list<Class &, Args...>>;
+    using args_type = std::conditional_t<std::is_base_of_v<Class, Type>, type_list<Args...>, type_list<Class &, Args...>>;
 
     /*! @brief True if the meta function is const, false otherwise. */
     static constexpr auto is_const = false;
     /*! @brief True if the meta function is static, false otherwise. */
-    static constexpr auto is_static = !std::is_same_v<Type, Class>;
+    static constexpr auto is_static = !std::is_base_of_v<Class, Type>;
 };
 
 /**
@@ -67,7 +67,7 @@ struct meta_function_descriptor<Type, Ret Class::*> {
     /*! @brief Meta data return type. */
     using return_type = Ret;
     /*! @brief Meta data arguments. */
-    using args_type = std::conditional_t<std::is_same_v<Type, Class>, type_list<Ret>, type_list<Class &, Ret>>;
+    using args_type = std::conditional_t<std::is_base_of_v<Class, Type>, type_list<Ret>, type_list<Class &, Ret>>;
 
     /*! @brief True if the meta data is const, false otherwise. */
     static constexpr auto is_const = false;
@@ -87,12 +87,12 @@ struct meta_function_descriptor<Type, Ret (*)(MaybeType, Args...)> {
     /*! @brief Meta function return type. */
     using return_type = Ret;
     /*! @brief Meta function arguments. */
-    using args_type = std::conditional_t<std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<MaybeType>>>, type_list<Args...>, type_list<MaybeType, Args...>>;
+    using args_type = std::conditional_t<std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type>, type_list<Args...>, type_list<MaybeType, Args...>>;
 
     /*! @brief True if the meta function is const, false otherwise. */
-    static constexpr auto is_const = std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<MaybeType>>> && std::is_const_v<std::remove_reference_t<MaybeType>>;
+    static constexpr auto is_const = std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type> && std::is_const_v<std::remove_reference_t<MaybeType>>;
     /*! @brief True if the meta function is static, false otherwise. */
-    static constexpr auto is_static = !std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<MaybeType>>>;
+    static constexpr auto is_static = !std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type>;
 };
 
 /**
