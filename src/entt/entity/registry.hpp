@@ -1461,9 +1461,9 @@ public:
      */
     template<typename Type, typename... Args>
     Type &set(Args &&...args) {
-        unset<Type>();
-        vars.emplace_back(std::in_place_type<Type>, std::forward<Args>(args)...);
-        return any_cast<Type &>(vars.back());
+        auto &&elem = vars[type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()];
+        elem.template emplace<Type>(std::forward<Args>(args)...);
+        return any_cast<Type &>(elem);
     }
 
     /**
@@ -1472,7 +1472,7 @@ public:
      */
     template<typename Type>
     void unset() {
-        vars.erase(std::remove_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; }), vars.end());
+        vars.erase(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
     }
 
     /**
@@ -1488,8 +1488,8 @@ public:
      */
     template<typename Type, typename... Args>
     [[nodiscard]] Type &ctx_or_set(Args &&...args) {
-        auto *value = try_ctx<Type>();
-        return value ? *value : set<Type>(std::forward<Args>(args)...);
+        auto *elem = try_ctx<Type>();
+        return elem ? *elem : set<Type>(std::forward<Args>(args)...);
     }
 
     /**
@@ -1500,15 +1500,8 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> *try_ctx() const {
-        const auto &info = type_id<Type>();
-
-        for(const auto &curr: vars) {
-            if(auto *value = curr.data(info); value) {
-                return static_cast<Type *>(value);
-            }
-        }
-
-        return nullptr;
+        auto it = vars.find(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
+        return it == vars.cend() ? nullptr : any_cast<Type>(&it->second);
     }
 
     /*! @copydoc try_ctx */
@@ -1517,15 +1510,8 @@ public:
         if constexpr(std::is_const_v<Type>) {
             return std::as_const(*this).template try_ctx<Type>();
         } else {
-            const auto &info = type_id<Type>();
-
-            for(auto &curr: vars) {
-                if(auto *value = curr.data(info); value) {
-                    return static_cast<Type *>(value);
-                }
-            }
-
-            return nullptr;
+            auto it = vars.find(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
+            return it == vars.end() ? nullptr : any_cast<Type>(&it->second);
         }
     }
 
@@ -1568,23 +1554,19 @@ public:
      *
      * @sa type_info
      *
-     * @warning
-     * It's not specified whether a context variable created during the visit is
-     * returned or not to the caller.
-     *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
     void ctx(Func func) const {
-        for(auto pos = vars.size(); pos; --pos) {
-            func(vars[pos - 1].type());
+        for(auto &&curr: vars) {
+            func(curr.second.type());
         }
     }
 
 private:
     mutable dense_hash_map<id_type, pool_data> pools{};
-    std::vector<basic_any<0u>> vars{};
+    dense_hash_map<id_type, basic_any<0u>> vars{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
     entity_type free_list{tombstone};
