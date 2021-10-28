@@ -16,6 +16,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../core/utility.hpp"
 #include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -1565,8 +1566,8 @@ public:
     }
 
 private:
-    mutable dense_hash_map<id_type, pool_data> pools{};
-    dense_hash_map<id_type, basic_any<0u>> vars{};
+    mutable dense_hash_map<id_type, pool_data, identity> pools{};
+    dense_hash_map<id_type, basic_any<0u>, identity> vars{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
     entity_type free_list{tombstone};
