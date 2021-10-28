@@ -13,21 +13,21 @@ ENTT_API void set_up() {
     using namespace entt::literals;
 
     entt::meta<position>()
-            .type("position"_hs)
-            .ctor<&create_position>()
-            .data<&position::x>("x"_hs)
-            .data<&position::y>("y"_hs);
+        .type("position"_hs)
+        .ctor<&create_position>()
+        .data<&position::x>("x"_hs)
+        .data<&position::y>("y"_hs);
 
     entt::meta<velocity>()
-            .type("velocity"_hs)
-            .ctor<>()
-            .data<&velocity::dx>("dx"_hs)
-            .data<&velocity::dy>("dy"_hs);
+        .type("velocity"_hs)
+        .ctor<>()
+        .data<&velocity::dx>("dx"_hs)
+        .data<&velocity::dy>("dy"_hs);
 }
 
 ENTT_API void tear_down() {
-    entt::resolve<position>().reset();
-    entt::resolve<velocity>().reset();
+    entt::meta_reset<position>();
+    entt::meta_reset<velocity>();
 }
 
 ENTT_API entt::meta_any wrap_int(int value) {

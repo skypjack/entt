@@ -1,7 +1,6 @@
 #ifndef ENTT_ENTITY_POLY_STORAGE_HPP
 #define ENTT_ENTITY_POLY_STORAGE_HPP
 
-
 #include <cstddef>
 #include <tuple>
 #include "../core/type_info.hpp"
@@ -9,16 +8,14 @@
 #include "../poly/poly.hpp"
 #include "fwd.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Basic poly storage implementation.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
+struct Storage: type_list<const type_info &() const ENTT_NOEXCEPT> {
     /**
      * @brief Concept definition.
      * @tparam Base Opaque base class from which to inherit.
@@ -29,7 +26,7 @@ struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
          * @brief Returns a type info for the contained objects.
          * @return The type info for the contained objects.
          */
-        type_info value_type() const ENTT_NOEXCEPT {
+        const type_info &value_type() const ENTT_NOEXCEPT {
             return poly_call<0>(*this);
         }
     };
@@ -42,7 +39,6 @@ struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
     using impl = value_list<&type_id<typename Type::value_type>>;
 };
 
-
 /**
  * @brief Defines the poly storage type associate with a given entity type.
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -53,8 +49,6 @@ struct poly_storage_traits {
     using storage_type = poly<Storage<Entity>>;
 };
 
-
-}
-
+} // namespace entt
 
 #endif

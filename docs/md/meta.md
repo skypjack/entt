@@ -13,6 +13,7 @@
   * [Container support](#container-support)
   * [Pointer-like types](#pointer-like-types)
   * [Template information](#template-information)
+  * [Automatic conversions](#automatic-conversions)
   * [Implicitly generated default constructor](#implicitly-generated-default-constructor)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
@@ -146,6 +147,12 @@ decorated version of it. This object can be used to add the following:
   entt::meta<my_type>().data<nullptr, &my_type::data_member>("member"_hs);
   ```
 
+  Multiple setters are also supported by means of a `value_list` object:
+
+  ```cpp
+  entt::meta<my_type>().data<entt::value_list<&from_int, &from_string>, &my_type::data_member>("member"_hs);
+  ```
+
   Refer to the inline documentation for all the details.
 
 * _Member functions_. Both real member functions of the underlying type and free
@@ -210,9 +217,10 @@ Among the few relevant differences, `meta_any` adds support for containers and
 pointer-like types (see the following sections for more details), while `any`
 does not.<br/>
 Similar to `any`, this class can also be used to create _aliases_ for unmanaged
-objects either upon construction using `std::ref` and `std::cref` or from an
-existing instance by means of the `as_ref` function. However, unlike `any`,
-`meta_any` treats an empty instance and one initialized with `void` differently:
+objects either with `forward_as_meta` or using the `std::in_place_type<T &>`
+disambiguation tag, as well as from an existing object by means of the `as_ref`
+member function. However, unlike `any`, `meta_any` treats an empty instance and
+one initialized with `void` differently:
 
 ```cpp
 entt::meta_any empty{};
@@ -266,19 +274,6 @@ Refer to the inline documentation for all the details.
 
 The meta objects that compose a meta type are accessed in the following ways:
 
-* _Meta constructors_. They are accessed by types of arguments:
-
-  ```cpp
-  auto ctor = entt::resolve<my_type>().ctor<int, char>();
-  ```
-
-  The returned type is `meta_ctor` and may be invalid if there is no constructor
-  that accepts the supplied arguments or at least some types from which they are
-  derived or to which they can be converted.<br/>
-  A meta constructor offers an API to know the number of its arguments and their
-  expected meta types. Furthermor, it's possible to invoke it and therefore to
-  construct new instances of the underlying type.
-
 * _Meta data_. They are accessed by _name_:
 
   ```cpp
@@ -327,7 +322,7 @@ Furthermore, all them are also returned by specific overloads that provide the
 caller with iterable ranges of top-level elements. As an example:
 
 ```cpp
-for(auto data = entt::resolve<my_type>().data()) {
+for(auto data: entt::resolve<my_type>().data()) {
     // ...
 }
 ```
@@ -386,7 +381,7 @@ object for a sequence container:
 
 ```cpp
 std::vector<int> vec{1, 2, 3};
-entt::meta_any any{std::ref(vec)};
+entt::meta_any any = entt::forward_as_meta(vec);
 
 if(any.type().is_sequence_container()) {
     if(auto view = any.as_sequence_container(); view) {
@@ -714,6 +709,56 @@ correspondence between real types and meta types.<br/>
 Therefore, the specialization will be used as is and the information it contains
 will be associated with the appropriate type when required.
 
+## Automatic conversions
+
+In C++, there are a number of conversions allowed between arithmetic types that
+make it convenient to work with this kind of data.<br/>
+If this were to be translated into explicit registrations with the reflection
+system, it would result in a long series of instructions such as the following:
+
+```cpp
+entt::meta<int>()
+    .conv<bool>()
+    .conv<char>()
+    // ...
+    .conv<double>();
+```
+
+Repeated for each type eligible to undergo this type of conversions. This is
+both error prone and repetitive.<br/>
+Similarly, the language allows users to silently convert unscoped enums to their
+underlying types and offers what it takes to do the same for scoped enums. It
+would result in the following if it were to be done explicitly:
+
+```cpp
+entt::meta<my_enum>()
+    .conv<std::underlying_type_t<my_enum>>();
+```
+
+Fortunately, all of this can also be avoided. `EnTT` offers implicit support for
+these types of conversions:
+
+```cpp
+entt::meta_any any{42};
+any.allow_cast<double>();
+double value = any.cast<double>();
+```
+
+With no need for registration, the conversion takes place automatically under
+the hood. The same goes for a call to `allow_cast` involving a meta type:
+
+```cpp
+entt::meta_type type = entt::resolve<int>();
+entt::meta_any any{my_enum::a_value};
+any.allow_cast(type);
+int value = any.cast<int>();
+```
+
+This should make working with arithmetic types and scoped or unscoped enums as
+easy as it is in C++.<br/>
+It's also worth noting that it's still possible to set up conversion functions
+manually and these will always be preferred over the automatic ones.
+
 ## Implicitly generated default constructor
 
 In many cases, it's useful to be able to create objects of default constructible
@@ -725,14 +770,7 @@ them.
 For this reason and only for default constructible types, default constructors
 are automatically defined and associated with their meta types, whether they are
 explicitly or implicitly generated.<br/>
-Therefore, it won't be necessary to do this in order to construct an integer
-from its meta type:
-
-```cpp
-entt::meta<int>().ctor<>();
-```
-
-Instead, just do this:
+Therefore, this is all is needed to construct an integer from its meta type:
 
 ```cpp
 entt::resolve<int>().construct();
@@ -741,11 +779,8 @@ entt::resolve<int>().construct();
 Where the meta type can be for example the one returned from a meta container,
 useful for building keys without knowing or having to register the actual types.
 
-In all cases, when users register custom defaul constructors, they are preferred
-both during searches and when the `construct` member function is invoked.<br/>
-However, the implicitly generated default constructor will always be returned,
-either if one is not explicitly specified or if all constructors are iterated
-for some reason (in this case, it will always be the last element).
+In all cases, when users register default constructors, they are preferred both
+during searches and when the `construct` member function is invoked.
 
 ## Policies: the more, the less
 
@@ -770,9 +805,11 @@ There are a few alternatives available at the moment:
 * The _as-void_ policy, associated with the type `entt::as_void_t`.<br/>
   Its purpose is to discard the return value of a meta object, whatever it is,
   thus making it appear as if its type were `void`:
+
   ```cpp
   entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
   ```
+
   If the use with functions is obvious, it must be said that it's also possible
   to use this policy with constructors and data members. In the first case, the
   constructor will be invoked but the returned wrapper will actually be empty.
@@ -784,9 +821,11 @@ There are a few alternatives available at the moment:
   Accessing the object contained in the wrapper for which the _reference_ was
   requested will make it possible to directly access the instance used to
   initialize the wrapper itself:
+
   ```cpp
   entt::meta<my_type>().data<&my_type::data_member, entt::as_ref_t>("member"_hs);
   ```
+
   These policies work with constructors (for example, when objects are taken
   from an external container rather than created on demand), data members and
   functions in general.<br/>
@@ -880,38 +919,15 @@ Multiple formats are supported when it comes to defining a property:
 
   A tuple contains one or more properties. All of them are treated individually.
 
-* Annotations:
+Note that it's not possible to invoke `prop` multiple times for the same meta
+object and trying to do that will result in a compilation error.<br/>
+However, the `props` function is available to associate several properties at
+once. In this case, properties in the key/value form aren't allowed, since they
+would be interpreted as two different properties rather than a single one.
 
-  ```cpp
-  entt::meta<my_type>().type("reflected_type"_hs).prop(&property_generator);
-  ```
-
-  An annotation is an invocable object that returns one or more properties. All
-  of them are treated individually.
-
-It's possible to invoke the `prop` function several times if needed, one for
-each property to associate with the last meta object created:
-
-```cpp
-entt::meta<my_type>()
-    .type("reflected_type"_hs)
-        .prop(entt::hashed_string{"Name"}, "Reflected Type")
-    .data<&my_type::data_member>("member"_hs)
-        .prop(std::make_pair("tooltip"_hs, "Member"))
-        .prop(my_enum::a_value, 42);
-```
-
-Alternatively, the `props` function is available to associate several properties
-at a time. However, in this case properties in the key/value form aren't
-allowed, since they would be interpreted as two different properties rather than
-a single one.
-
-The meta objects for which properties are supported are currently the meta
-types, meta constructors, meta data and meta functions. It's not possible to
-attach properties to other types of meta objects and the factory returned as a
-result of their construction won't allow such an operation.
-
-These types offer a couple of member functions named `prop` to iterate all
+The meta objects for which properties are supported are currently meta types,
+meta data and meta functions.<br/>
+These types also offer a couple of member functions named `prop` to iterate all
 properties at once or to search a specific property by key:
 
 ```cpp
@@ -941,7 +957,21 @@ objects from it and making its identifier no longer visible. The underlying node
 will remain available though, as if it were implicitly generated:
 
 ```cpp
-entt::resolve<my_type>().reset();
+entt::meta_reset<my_type>();
 ```
 
-The type can be re-registered later with a completely different name and form.
+It's also possible to reset types by their unique identifiers if required:
+
+```cpp
+entt::meta_reset("my_type"_hs);
+```
+
+Finally, there exists a non-template overload of the `meta_reset` function that
+doesn't accept argument and resets all searchable types (that is, all types that
+were assigned an unique identifier):
+
+```cpp
+entt::meta_reset();
+```
+
+All types can be re-registered later with a completely different name and form.

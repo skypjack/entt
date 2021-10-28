@@ -1,7 +1,7 @@
 #define CR_HOST
 
-#include <cr.h>
 #include <gtest/gtest.h>
+#include <cr.h>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
@@ -26,7 +26,7 @@ TEST(Lib, Meta) {
     ASSERT_TRUE(entt::resolve("velocity"_hs));
 
     auto pos = entt::resolve("position"_hs).construct(42., 3.);
-    auto vel = entt::resolve("velocity"_hs).ctor<>().invoke();
+    auto vel = entt::resolve("velocity"_hs).construct();
 
     ASSERT_TRUE(pos && vel);
 

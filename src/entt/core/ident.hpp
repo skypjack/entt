@@ -1,17 +1,14 @@
 #ifndef ENTT_CORE_IDENT_HPP
 #define ENTT_CORE_IDENT_HPP
 
-
 #include <cstddef>
-#include <utility>
 #include <type_traits>
+#include <utility>
 #include "../config/config.h"
 #include "fwd.hpp"
 #include "type_traits.hpp"
 
-
 namespace entt {
-
 
 /**
  * @brief Types identifiers.
@@ -57,8 +54,6 @@ public:
     static constexpr identifier_type type = get<std::decay_t<Type>>(std::index_sequence_for<Types...>{});
 };
 
-
-}
-
+} // namespace entt
 
 #endif

@@ -1,4 +1,4 @@
-#include <string.h>
+#include <string>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -19,8 +19,7 @@ struct MetaProp: ::testing::Test {
 
         entt::meta<base_2_t>()
             .type("base_2"_hs)
-            .prop("bool"_hs, false)
-            .prop("char[]"_hs, "char[]");
+            .props(std::make_pair("bool"_hs, false), std::make_pair("char[]"_hs, "char[]"));
 
         entt::meta<derived_t>()
             .type("derived"_hs)
@@ -29,9 +28,7 @@ struct MetaProp: ::testing::Test {
     }
 
     void TearDown() override {
-        for(auto type: entt::resolve()) {
-            type.reset();
-        }
+        entt::meta_reset();
     }
 };
 
@@ -75,7 +72,7 @@ TEST_F(MetaProp, ReRegistration) {
 
     SetUp();
 
-    auto *node = entt::internal::meta_info<base_1_t>::resolve();
+    auto *node = entt::internal::meta_node<base_1_t>::resolve();
     auto type = entt::resolve<base_1_t>();
 
     ASSERT_NE(node->prop, nullptr);

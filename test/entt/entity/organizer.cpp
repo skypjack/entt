@@ -2,24 +2,24 @@
 #include <entt/entity/organizer.hpp>
 #include <entt/entity/registry.hpp>
 
-void ro_int_rw_char_double(entt::view<entt::exclude_t<>, const int, char>, double &) {}
-void ro_char_rw_int(entt::view<entt::exclude_t<>, int, const char>) {}
-void ro_char_rw_double(entt::view<entt::exclude_t<>, const char>, double &) {}
-void ro_int_double(entt::view<entt::exclude_t<>, const int>, const double &) {}
-void sync_point(entt::registry &, entt::view<entt::exclude_t<>, const int>) {}
+void ro_int_rw_char_double(entt::view<entt::get_t<const int, char>>, double &) {}
+void ro_char_rw_int(entt::view<entt::get_t<int, const char>>) {}
+void ro_char_rw_double(entt::view<entt::get_t<const char>>, double &) {}
+void ro_int_double(entt::view<entt::get_t<const int>>, const double &) {}
+void sync_point(entt::registry &, entt::view<entt::get_t<const int>>) {}
 
 struct clazz {
-    void ro_int_char_double(entt::view<entt::exclude_t<>, const int, const char>, const double &) {}
-    void rw_int(entt::view<entt::exclude_t<>, int>) {}
-    void rw_int_char(entt::view<entt::exclude_t<>, int, char>) {}
-    void rw_int_char_double(entt::view<entt::exclude_t<>, int, char>, double &) {}
+    void ro_int_char_double(entt::view<entt::get_t<const int, const char>>, const double &) {}
+    void rw_int(entt::view<entt::get_t<int>>) {}
+    void rw_int_char(entt::view<entt::get_t<int, char>>) {}
+    void rw_int_char_double(entt::view<entt::get_t<int, char>>, double &) {}
 
-    static void ro_int_with_payload(const clazz &, entt::view<entt::exclude_t<>, const int>) {}
-    static void ro_char_with_payload(const clazz &, entt::view<entt::exclude_t<>, const char>) {}
-    static void ro_int_char_with_payload(clazz &, entt::view<entt::exclude_t<>, const int, const char>) {}
+    static void ro_int_with_payload(const clazz &, entt::view<entt::get_t<const int>>) {}
+    static void ro_char_with_payload(const clazz &, entt::view<entt::get_t<const char>>) {}
+    static void ro_int_char_with_payload(clazz &, entt::view<entt::get_t<const int, const char>>) {}
 };
 
-void to_args_integrity(entt::view<entt::exclude_t<>, int> view, std::size_t &value, entt::registry &registry) {
+void to_args_integrity(entt::view<entt::get_t<int>> view, std::size_t &value, entt::registry &registry) {
     value = view.size();
 }
 
@@ -244,10 +244,10 @@ TEST(Organizer, EmplaceDirectFunction) {
     ASSERT_EQ(graph[2u].data(), nullptr);
     ASSERT_EQ(graph[3u].data(), &instance);
 
-    ASSERT_EQ(graph[0u].info(), entt::type_info{});
-    ASSERT_EQ(graph[1u].info(), entt::type_info{});
-    ASSERT_EQ(graph[2u].info(), entt::type_info{});
-    ASSERT_EQ(graph[3u].info(), entt::type_info{});
+    ASSERT_EQ(graph[0u].info(), entt::type_id<void>());
+    ASSERT_EQ(graph[1u].info(), entt::type_id<void>());
+    ASSERT_EQ(graph[2u].info(), entt::type_id<void>());
+    ASSERT_EQ(graph[3u].info(), entt::type_id<void>());
 
     ASSERT_TRUE(graph[0u].top_level());
     ASSERT_FALSE(graph[1u].top_level());
@@ -380,7 +380,7 @@ TEST(Organizer, Dependencies) {
     organizer.emplace<char, const double>(+[](const void *, entt::registry &) {});
 
     const auto graph = organizer.graph();
-    entt::type_info buffer[5u]{};
+    const entt::type_info *buffer[5u]{};
 
     ASSERT_EQ(graph.size(), 3u);
 
@@ -391,8 +391,8 @@ TEST(Organizer, Dependencies) {
     ASSERT_EQ(graph[0u].rw_dependency(buffer, 2u), 0u);
 
     ASSERT_EQ(graph[0u].ro_dependency(buffer, 5u), 2u);
-    ASSERT_EQ(buffer[0u], entt::type_id<int>());
-    ASSERT_EQ(buffer[1u], entt::type_id<double>());
+    ASSERT_EQ(*buffer[0u], entt::type_id<int>());
+    ASSERT_EQ(*buffer[1u], entt::type_id<double>());
 
     ASSERT_EQ(graph[1u].ro_count(), 0u);
     ASSERT_EQ(graph[1u].rw_count(), 2u);
@@ -401,8 +401,8 @@ TEST(Organizer, Dependencies) {
     ASSERT_EQ(graph[1u].rw_dependency(buffer, 0u), 0u);
 
     ASSERT_EQ(graph[1u].rw_dependency(buffer, 5u), 2u);
-    ASSERT_EQ(buffer[0u], entt::type_id<int>());
-    ASSERT_EQ(buffer[1u], entt::type_id<char>());
+    ASSERT_EQ(*buffer[0u], entt::type_id<int>());
+    ASSERT_EQ(*buffer[1u], entt::type_id<char>());
 
     ASSERT_EQ(graph[2u].ro_count(), 1u);
     ASSERT_EQ(graph[2u].rw_count(), 1u);
@@ -411,10 +411,10 @@ TEST(Organizer, Dependencies) {
     ASSERT_EQ(graph[2u].rw_dependency(buffer, 0u), 0u);
 
     ASSERT_EQ(graph[2u].ro_dependency(buffer, 5u), 1u);
-    ASSERT_EQ(buffer[0u], entt::type_id<double>());
+    ASSERT_EQ(*buffer[0u], entt::type_id<double>());
 
     ASSERT_EQ(graph[2u].rw_dependency(buffer, 5u), 1u);
-    ASSERT_EQ(buffer[0u], entt::type_id<char>());
+    ASSERT_EQ(*buffer[0u], entt::type_id<char>());
 }
 
 TEST(Organizer, ToArgsIntegrity) {

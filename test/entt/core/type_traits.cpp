@@ -1,3 +1,5 @@
+#include <functional>
+#include <iterator>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
@@ -11,6 +13,14 @@ struct not_comparable {
     bool operator==(const not_comparable &) const = delete;
 };
 
+struct nlohmann_json_like final {
+    using value_type = nlohmann_json_like;
+
+    bool operator==(const nlohmann_json_like &) const {
+        return true;
+    }
+};
+
 TEST(TypeTraits, SizeOf) {
     static_assert(entt::size_of_v<void> == 0u);
     static_assert(entt::size_of_v<char> == sizeof(char));
@@ -19,17 +29,21 @@ TEST(TypeTraits, SizeOf) {
 }
 
 TEST(TypeTraits, UnpackAsType) {
-    ASSERT_EQ([](auto &&... args) {
+    auto test = [](auto &&...args) {
         return [](entt::unpack_as_t<int, decltype(args)>... value) {
             return (value + ... + 0);
         };
-    }('c', 42., true)(1, 2, 3), 6);
+    };
+
+    ASSERT_EQ(test('c', 42., true)(1, 2, 3), 6);
 }
 
 TEST(TypeTraits, UnpackAsValue) {
-    ASSERT_EQ([](auto &&... args) {
+    auto test = [](auto &&...args) {
         return (entt::unpack_as_v<2, decltype(args)> + ... + 0);
-    }('c', 42., true), 6);
+    };
+
+    ASSERT_EQ(test('c', 42., true), 6);
 }
 
 TEST(TypeTraits, IntegralConstant) {
@@ -91,17 +105,24 @@ TEST(TypeTraits, ValueList) {
 
 TEST(TypeTraits, IsEqualityComparable) {
     static_assert(entt::is_equality_comparable_v<int>);
+    static_assert(entt::is_equality_comparable_v<const int>);
     static_assert(entt::is_equality_comparable_v<std::vector<int>>);
     static_assert(entt::is_equality_comparable_v<std::vector<std::vector<int>>>);
     static_assert(entt::is_equality_comparable_v<std::unordered_map<int, int>>);
     static_assert(entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, char>>>);
+    static_assert(entt::is_equality_comparable_v<std::pair<const int, int>>);
+    static_assert(entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, char>>>);
+    static_assert(entt::is_equality_comparable_v<std::vector<not_comparable>::iterator>);
+    static_assert(entt::is_equality_comparable_v<nlohmann_json_like>);
 
     static_assert(!entt::is_equality_comparable_v<not_comparable>);
+    static_assert(!entt::is_equality_comparable_v<const not_comparable>);
     static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
     static_assert(!entt::is_equality_comparable_v<std::vector<std::vector<not_comparable>>>);
     static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>);
     static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>);
-
+    static_assert(!entt::is_equality_comparable_v<std::pair<const int, not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, not_comparable>>>);
     static_assert(!entt::is_equality_comparable_v<void>);
 }
 
@@ -115,8 +136,44 @@ TEST(TypeTraits, IsApplicable) {
 }
 
 TEST(TypeTraits, IsComplete) {
-    static_assert(entt::is_complete_v<int>);
     static_assert(!entt::is_complete_v<void>);
+    static_assert(entt::is_complete_v<int>);
+}
+
+TEST(TypeTraits, IsIterator) {
+    static_assert(!entt::is_iterator_v<void>);
+    static_assert(!entt::is_iterator_v<int>);
+
+    static_assert(!entt::is_iterator_v<void *>);
+    static_assert(entt::is_iterator_v<int *>);
+
+    static_assert(entt::is_iterator_v<std::vector<int>::iterator>);
+    static_assert(entt::is_iterator_v<std::vector<int>::const_iterator>);
+    static_assert(entt::is_iterator_v<std::vector<int>::reverse_iterator>);
+}
+
+TEST(TypeTraits, IsIteratorType) {
+    static_assert(!entt::is_iterator_type_v<void, std::vector<int>::iterator>);
+    static_assert(!entt::is_iterator_type_v<std::vector<int>::iterator, std::vector<int>::const_iterator>);
+    static_assert(!entt::is_iterator_type_v<std::vector<int>::iterator, int *>);
+
+    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::vector<int>::iterator>);
+    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::reverse_iterator<std::vector<int>::iterator>>);
+    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::reverse_iterator<std::reverse_iterator<std::vector<int>::iterator>>>);
+}
+
+TEST(TypeTraits, IsEBCOEligible) {
+    static_assert(entt::is_ebco_eligible_v<not_comparable>);
+    static_assert(!entt::is_ebco_eligible_v<nlohmann_json_like>);
+    static_assert(!entt::is_ebco_eligible_v<double>);
+    static_assert(!entt::is_ebco_eligible_v<void>);
+}
+
+TEST(TypeTraits, IsTransparent) {
+    static_assert(!entt::is_transparent_v<std::less<int>>);
+    static_assert(entt::is_transparent_v<std::less<void>>);
+    static_assert(!entt::is_transparent_v<std::logical_not<double>>);
+    static_assert(entt::is_transparent_v<std::logical_not<void>>);
 }
 
 TEST(TypeTraits, IsStdHashable) {
@@ -133,8 +190,14 @@ TEST(TypeTraits, ConstnessAs) {
 
 TEST(TypeTraits, MemberClass) {
     struct clazz {
-        char foo(int) { return {}; }
-        int bar(double, float) const { return {}; }
+        char foo(int) {
+            return {};
+        }
+
+        int bar(double, float) const {
+            return {};
+        }
+
         bool quux;
     };
 

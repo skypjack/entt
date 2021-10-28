@@ -4,26 +4,45 @@
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
 
-struct Defined: entt::type_list<
-    void(),
-    void(int),
-    int() const,
-    void(),
-    int(int) const
-> {
+struct Defined
+    : entt::type_list<
+          void(),
+          void(int),
+          int() const,
+          void(),
+          int(int) const> {
     template<typename Base>
     struct type: Base {
-        void incr() { entt::poly_call<0>(*this); }
-        void set(int v) { entt::poly_call<1>(*this, v); }
-        int get() const { return entt::poly_call<2>(*this); }
-        void decr() { entt::poly_call<3>(*this); }
-        int mul(int v) const { return entt::poly_call<4>(*this, v); }
+        void incr() {
+            entt::poly_call<0>(*this);
+        }
+
+        void set(int v) {
+            entt::poly_call<1>(*this, v);
+        }
+
+        int get() const {
+            return entt::poly_call<2>(*this);
+        }
+
+        void decr() {
+            entt::poly_call<3>(*this);
+        }
+
+        int mul(int v) const {
+            return entt::poly_call<4>(*this, v);
+        }
     };
 
     template<typename Type>
     struct members {
-        static void decr(Type &self) { self.decrement(); }
-        static double mul(const Type &self, double v) { return self.multiply(v); }
+        static void decr(Type &self) {
+            self.decrement();
+        }
+
+        static double mul(const Type &self, double v) {
+            return self.multiply(v);
+        }
     };
 
     template<typename Type>
@@ -32,18 +51,35 @@ struct Defined: entt::type_list<
         &Type::set,
         &Type::get,
         &members<Type>::decr,
-        &members<Type>::mul
-    >;
+        &members<Type>::mul>;
 };
 
 struct impl {
     impl() = default;
-    impl(int v): value{v} {}
-    void incr() { ++value; }
-    void set(int v) { value = v; }
-    int get() const { return value; }
-    void decrement() { --value; }
-    double multiply(double v) const { return v * value; }
+
+    impl(int v)
+        : value{v} {}
+
+    void incr() {
+        ++value;
+    }
+
+    void set(int v) {
+        value = v;
+    }
+
+    int get() const {
+        return value;
+    }
+
+    void decrement() {
+        --value;
+    }
+
+    double multiply(double v) const {
+        return v * value;
+    }
+
     int value{};
 };
 
@@ -54,7 +90,7 @@ TEST(PolyDefined, Functionalities) {
 
     entt::poly<Defined> empty{};
     entt::poly<Defined> in_place{std::in_place_type<impl>, 3};
-    entt::poly<Defined> alias{std::ref(instance)};
+    entt::poly<Defined> alias{std::in_place_type<impl &>, instance};
     entt::poly<Defined> value{impl{}};
 
     ASSERT_FALSE(empty);
@@ -62,7 +98,7 @@ TEST(PolyDefined, Functionalities) {
     ASSERT_TRUE(alias);
     ASSERT_TRUE(value);
 
-    ASSERT_EQ(empty.type(), entt::type_info{});
+    ASSERT_EQ(empty.type(), entt::type_id<void>());
     ASSERT_EQ(in_place.type(), entt::type_id<impl>());
     ASSERT_EQ(alias.type(), entt::type_id<impl>());
     ASSERT_EQ(value.type(), entt::type_id<impl>());
@@ -105,13 +141,13 @@ TEST(PolyDefined, Functionalities) {
     entt::poly<Defined> move = std::move(copy);
 
     ASSERT_TRUE(move);
-    ASSERT_FALSE(copy);
+    ASSERT_TRUE(copy);
     ASSERT_EQ(move->get(), 3);
 
     move.reset();
 
     ASSERT_FALSE(move);
-    ASSERT_EQ(move.type(), entt::type_info{});
+    ASSERT_EQ(move.type(), entt::type_id<void>());
 }
 
 TEST(PolyDefined, Owned) {
@@ -140,7 +176,7 @@ TEST(PolyDefined, Owned) {
 
 TEST(PolyDefined, Reference) {
     impl instance{};
-    entt::poly<Defined> poly{std::ref(instance)};
+    entt::poly<Defined> poly{std::in_place_type<impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_NE(poly.data(), nullptr);
@@ -164,7 +200,7 @@ TEST(PolyDefined, Reference) {
 
 TEST(PolyDefined, ConstReference) {
     impl instance{};
-    entt::poly<Defined> poly{std::cref(instance)};
+    entt::poly<Defined> poly{std::in_place_type<const impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_EQ(poly.data(), nullptr);
@@ -253,9 +289,9 @@ TEST(PolyDefined, Alignment) {
         cb(data, target[1].data());
     };
 
-    entt::basic_poly<Defined, alignment> nosbo[2] = { over_aligned{}, over_aligned{} };
+    entt::basic_poly<Defined, alignment> nosbo[2] = {over_aligned{}, over_aligned{}};
     test(nosbo, [](auto *pre, auto *post) { ASSERT_EQ(pre, post); });
 
-    entt::basic_poly<Defined, alignment, alignment> sbo[2] = { over_aligned{}, over_aligned{} };
+    entt::basic_poly<Defined, alignment, alignment> sbo[2] = {over_aligned{}, over_aligned{}};
     test(sbo, [](auto *pre, auto *post) { ASSERT_NE(pre, post); });
 }

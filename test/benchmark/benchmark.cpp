@@ -1,7 +1,7 @@
-#include <iostream>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <chrono>
+#include <iostream>
 #include <iterator>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
@@ -12,16 +12,20 @@ struct position {
     std::uint64_t y;
 };
 
-struct velocity {
-    std::uint64_t x;
-    std::uint64_t y;
-};
+struct velocity: position {};
+struct stable_position: position {};
 
 template<std::size_t>
 struct comp { int x; };
 
+template<>
+struct entt::component_traits<stable_position>: basic_component_traits {
+    using in_place_delete = std::true_type;
+};
+
 struct timer final {
-    timer(): start{std::chrono::system_clock::now()} {}
+    timer()
+        : start{std::chrono::system_clock::now()} {}
 
     void elapsed() {
         auto now = std::chrono::system_clock::now();
@@ -45,9 +49,9 @@ void pathological(Func func) {
 
     for(auto i = 0; i < 10; ++i) {
         registry.each([i = 0, &registry](const auto entity) mutable {
-            if(!(++i % 7)) { registry.remove_if_exists<position>(entity); }
-            if(!(++i % 11)) { registry.remove_if_exists<velocity>(entity); }
-            if(!(++i % 13)) { registry.remove_if_exists<comp<0>>(entity); }
+            if(!(++i % 7)) { registry.remove<position>(entity); }
+            if(!(++i % 11)) { registry.remove<velocity>(entity); }
+            if(!(++i % 13)) { registry.remove<comp<0>>(entity); }
             if(!(++i % 17)) { registry.destroy(entity); }
         });
 
@@ -59,7 +63,7 @@ void pathological(Func func) {
         }
     }
 
-    func(registry, [](auto &... comp) {
+    func(registry, [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -72,7 +76,7 @@ TEST(Benchmark, Create) {
     timer timer;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create();
+        static_cast<void>(registry.create());
     }
 
     timer.elapsed();
@@ -120,6 +124,39 @@ TEST(Benchmark, CreateManyWithComponents) {
     timer.elapsed();
 }
 
+TEST(Benchmark, Erase) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Erasing 1000000 components from their entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+
+    for(auto entity: registry.view<int>()) {
+        registry.erase<int>(entity);
+    }
+
+    timer.elapsed();
+}
+
+TEST(Benchmark, EraseMany) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Erasing 1000000 components from their entities at once" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    auto view = registry.view<int>();
+    registry.erase<int>(view.begin(), view.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, Remove) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
@@ -142,21 +179,6 @@ TEST(Benchmark, RemoveMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Removing 999999 components from their entities at once" << std::endl;
-
-    registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
-
-    timer timer;
-    auto view = registry.view<int>();
-    registry.remove<int>(++view.begin(), view.end());
-    timer.elapsed();
-}
-
-TEST(Benchmark, RemoveAll) {
-    entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
-
     std::cout << "Removing 1000000 components from their entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
@@ -165,6 +187,20 @@ TEST(Benchmark, RemoveAll) {
     timer timer;
     auto view = registry.view<int>();
     registry.remove<int>(view.begin(), view.end());
+    timer.elapsed();
+}
+
+TEST(Benchmark, Clear) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Clearing 1000000 components from their entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.clear<int>();
     timer.elapsed();
 }
 
@@ -183,7 +219,7 @@ TEST(Benchmark, Recycle) {
     timer timer;
 
     for(auto next = entities.size(); next; --next) {
-        registry.create();
+        static_cast<void>(registry.create());
     }
 
     timer.elapsed();
@@ -228,7 +264,7 @@ TEST(Benchmark, DestroyMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Destroying 1000000 entities" << std::endl;
+    std::cout << "Destroying 1000000 entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
     registry.insert<int>(entities.begin(), entities.end());
@@ -236,6 +272,20 @@ TEST(Benchmark, DestroyMany) {
     timer timer;
     auto view = registry.view<int>();
     registry.destroy(view.begin(), view.end());
+    timer.elapsed();
+}
+
+TEST(Benchmark, DestroyManyFastPath) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Destroying 1000000 entities at once, fast path" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.destroy(entities.begin(), entities.end());
     timer.elapsed();
 }
 
@@ -255,7 +305,28 @@ TEST(Benchmark, IterateSingleComponent1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateSingleComponentTombstonePolicy1M) {
+    entt::registry registry;
+
+    std::cout << "Iterating over 1000000 entities, one component, tombstone policy" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.emplace<stable_position>(entity);
+    }
+
+    auto test = [&](auto func) {
+        timer timer;
+        registry.view<stable_position>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -271,7 +342,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
     }
 
     auto test = [&](auto func) {
-        entt::id_type types[] = { entt::type_hash<position>::value() };
+        entt::id_type types[] = {entt::type_hash<position>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -300,7 +371,29 @@ TEST(Benchmark, IterateTwoComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateTombstonePolicyTwoComponentsTombstonePolicy1M) {
+    entt::registry registry;
+
+    std::cout << "Iterating over 1000000 entities, two components, tombstone policy" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.emplace<stable_position>(entity);
+        registry.emplace<velocity>(entity);
+    }
+
+    auto test = [&](auto func) {
+        timer timer;
+        registry.view<stable_position, velocity>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -325,7 +418,7 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -350,7 +443,7 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -373,7 +466,7 @@ TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -396,7 +489,7 @@ TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -419,7 +512,7 @@ TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -438,8 +531,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
     auto test = [&](auto func) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
-            entt::type_hash<velocity>::value()
-        };
+            entt::type_hash<velocity>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -469,8 +561,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     auto test = [&](auto func) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
-            entt::type_hash<velocity>::value()
-        };
+            entt::type_hash<velocity>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -500,8 +591,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     auto test = [&](auto func) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
-            entt::type_hash<velocity>::value()
-        };
+            entt::type_hash<velocity>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -532,7 +622,30 @@ TEST(Benchmark, IterateThreeComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateThreeComponentsTombstonePolicy1M) {
+    entt::registry registry;
+
+    std::cout << "Iterating over 1000000 entities, three components, tombstone policy" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.emplace<stable_position>(entity);
+        registry.emplace<velocity>(entity);
+        registry.emplace<comp<0>>(entity);
+    }
+
+    auto test = [&](auto func) {
+        timer timer;
+        registry.view<stable_position, velocity, comp<0>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -558,7 +671,7 @@ TEST(Benchmark, IterateThreeComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -584,7 +697,7 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -608,7 +721,7 @@ TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -632,7 +745,7 @@ TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -656,7 +769,7 @@ TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -677,8 +790,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
             entt::type_hash<velocity>::value(),
-            entt::type_hash<comp<0>>::value()
-        };
+            entt::type_hash<comp<0>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -711,8 +823,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
             entt::type_hash<velocity>::value(),
-            entt::type_hash<comp<0>>::value()
-        };
+            entt::type_hash<comp<0>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -745,8 +856,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
         entt::id_type types[] = {
             entt::type_hash<position>::value(),
             entt::type_hash<velocity>::value(),
-            entt::type_hash<comp<0>>::value()
-        };
+            entt::type_hash<comp<0>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -780,7 +890,32 @@ TEST(Benchmark, IterateFiveComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateFiveComponentsTombstonePolicy1M) {
+    entt::registry registry;
+
+    std::cout << "Iterating over 1000000 entities, five components, tombstone policy" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.emplace<stable_position>(entity);
+        registry.emplace<velocity>(entity);
+        registry.emplace<comp<0>>(entity);
+        registry.emplace<comp<1>>(entity);
+        registry.emplace<comp<2>>(entity);
+    }
+
+    auto test = [&](auto func) {
+        timer timer;
+        registry.view<stable_position, velocity, comp<0>, comp<1>, comp<2>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -808,7 +943,7 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -836,7 +971,7 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -862,7 +997,7 @@ TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -888,7 +1023,7 @@ TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -914,7 +1049,7 @@ TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -940,7 +1075,7 @@ TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](auto &... comp) {
+    test([](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -965,8 +1100,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
             entt::type_hash<velocity>::value(),
             entt::type_hash<comp<0>>::value(),
             entt::type_hash<comp<1>>::value(),
-            entt::type_hash<comp<2>>::value()
-        };
+            entt::type_hash<comp<2>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -1005,8 +1139,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
             entt::type_hash<velocity>::value(),
             entt::type_hash<comp<0>>::value(),
             entt::type_hash<comp<1>>::value(),
-            entt::type_hash<comp<2>>::value()
-        };
+            entt::type_hash<comp<2>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -1045,8 +1178,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
             entt::type_hash<velocity>::value(),
             entt::type_hash<comp<0>>::value(),
             entt::type_hash<comp<1>>::value(),
-            entt::type_hash<comp<2>>::value()
-        };
+            entt::type_hash<comp<2>>::value()};
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -1120,9 +1252,7 @@ TEST(Benchmark, SortSingle) {
 
     timer timer;
 
-    registry.sort<position>([](const auto &lhs, const auto &rhs) {
-        return lhs.x < rhs.x && lhs.y < rhs.y;
-    });
+    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x < rhs.x && lhs.y < rhs.y; });
 
     timer.elapsed();
 }
@@ -1138,9 +1268,7 @@ TEST(Benchmark, SortMulti) {
         registry.emplace<velocity>(entity, i, i);
     }
 
-    registry.sort<position>([](const auto &lhs, const auto &rhs) {
-        return lhs.x < rhs.x && lhs.y < rhs.y;
-    });
+    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x < rhs.x && lhs.y < rhs.y; });
 
     timer timer;
 
@@ -1172,9 +1300,7 @@ TEST(Benchmark, AlmostSortedStdSort) {
 
     timer timer;
 
-    registry.sort<position>([](const auto &lhs, const auto &rhs) {
-        return lhs.x > rhs.x && lhs.y > rhs.y;
-    });
+    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x > rhs.x && lhs.y > rhs.y; });
 
     timer.elapsed();
 }
@@ -1202,9 +1328,7 @@ TEST(Benchmark, AlmostSortedInsertionSort) {
 
     timer timer;
 
-    registry.sort<position>([](const auto &lhs, const auto &rhs) {
-        return lhs.x > rhs.x && lhs.y > rhs.y;
-    }, entt::insertion_sort{});
+    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x > rhs.x && lhs.y > rhs.y; }, entt::insertion_sort{});
 
     timer.elapsed();
 }

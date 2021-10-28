@@ -14,18 +14,39 @@ struct fake_process: entt::process<fake_process<Delta>, Delta> {
           update_invoked{false},
           succeeded_invoked{false},
           failed_invoked{false},
-          aborted_invoked{false}
-    {}
+          aborted_invoked{false} {}
 
-    void succeed() noexcept { process_type::succeed(); }
-    void fail() noexcept { process_type::fail(); }
-    void pause() noexcept { process_type::pause(); }
-    void unpause() noexcept { process_type::unpause(); }
+    void succeed() noexcept {
+        process_type::succeed();
+    }
 
-    void init() { init_invoked = true; }
-    void succeeded() { succeeded_invoked = true; }
-    void failed() { failed_invoked = true; }
-    void aborted() { aborted_invoked = true; }
+    void fail() noexcept {
+        process_type::fail();
+    }
+
+    void pause() noexcept {
+        process_type::pause();
+    }
+
+    void unpause() noexcept {
+        process_type::unpause();
+    }
+
+    void init() {
+        init_invoked = true;
+    }
+
+    void succeeded() {
+        succeeded_invoked = true;
+    }
+
+    void failed() {
+        failed_invoked = true;
+    }
+
+    void aborted() {
+        aborted_invoked = true;
+    }
 
     void update(typename entt::process<fake_process<Delta>, Delta>::delta_type, void *data) {
         if(data) {
@@ -46,7 +67,7 @@ TEST(Process, Basics) {
     fake_process<int> process{};
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
@@ -57,42 +78,42 @@ TEST(Process, Basics) {
     process.unpause();
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.tick(0);
 
     ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.pause();
 
     ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_TRUE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.unpause();
 
     ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.fail();
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
     process.tick(0);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 }
@@ -106,7 +127,7 @@ TEST(Process, Succeeded) {
     process.tick({});
 
     ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
+    ASSERT_TRUE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
@@ -126,7 +147,7 @@ TEST(Process, Fail) {
     process.tick(0);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 
@@ -147,7 +168,7 @@ TEST(Process, Data) {
     process.tick({}, &value);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
+    ASSERT_TRUE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_FALSE(process.rejected());
 
@@ -167,7 +188,7 @@ TEST(Process, AbortNextTick) {
     process.tick(0);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 
@@ -185,7 +206,7 @@ TEST(Process, AbortImmediately) {
     process.abort(true);
 
     ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 
@@ -209,7 +230,7 @@ TEST(ProcessAdaptor, Resolved) {
     process.tick(0);
     process.tick(0);
 
-    ASSERT_TRUE(process.dead());
+    ASSERT_TRUE(process.finished());
     ASSERT_TRUE(updated);
 }
 
@@ -243,6 +264,6 @@ TEST(ProcessAdaptor, Data) {
     process.tick(0);
     process.tick(0, &value);
 
-    ASSERT_TRUE(process.dead());
+    ASSERT_TRUE(process.finished());
     ASSERT_EQ(value, 42);
 }

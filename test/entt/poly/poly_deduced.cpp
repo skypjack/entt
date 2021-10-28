@@ -4,20 +4,40 @@
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
 
-struct Deduced: entt::type_list<> {
+struct Deduced
+    : entt::type_list<> {
     template<typename Base>
     struct type: Base {
-        void incr() { entt::poly_call<0>(*this); }
-        void set(int v) { entt::poly_call<1>(*this, v); }
-        int get() const { return entt::poly_call<2>(*this); }
-        void decr() { entt::poly_call<3>(*this); }
-        int mul(int v) const { return static_cast<int>(entt::poly_call<4>(*this, v)); }
+        void incr() {
+            entt::poly_call<0>(*this);
+        }
+
+        void set(int v) {
+            entt::poly_call<1>(*this, v);
+        }
+
+        int get() const {
+            return entt::poly_call<2>(*this);
+        }
+
+        void decr() {
+            entt::poly_call<3>(*this);
+        }
+
+        int mul(int v) const {
+            return static_cast<int>(entt::poly_call<4>(*this, v));
+        }
     };
 
     template<typename Type>
     struct members {
-        static void decr(Type &self) { self.set(self.get()-1); }
-        static double mul(const Type &self, double v) { return v * self.get(); }
+        static void decr(Type &self) {
+            self.set(self.get() - 1);
+        }
+
+        static double mul(const Type &self, double v) {
+            return v * self.get();
+        }
     };
 
     template<typename Type>
@@ -26,18 +46,35 @@ struct Deduced: entt::type_list<> {
         &Type::set,
         &Type::get,
         &members<Type>::decr,
-        &members<Type>::mul
-    >;
+        &members<Type>::mul>;
 };
 
 struct impl {
     impl() = default;
-    impl(int v): value{v} {}
-    void incr() { ++value; }
-    void set(int v) { value = v; }
-    int get() const { return value; }
-    void decrement() { --value; }
-    double multiply(double v) const { return v * value; }
+
+    impl(int v)
+        : value{v} {}
+
+    void incr() {
+        ++value;
+    }
+
+    void set(int v) {
+        value = v;
+    }
+
+    int get() const {
+        return value;
+    }
+
+    void decrement() {
+        --value;
+    }
+
+    double multiply(double v) const {
+        return v * value;
+    }
+
     int value{};
 };
 
@@ -48,7 +85,7 @@ TEST(PolyDeduced, Functionalities) {
 
     entt::poly<Deduced> empty{};
     entt::poly<Deduced> in_place{std::in_place_type<impl>, 3};
-    entt::poly<Deduced> alias{std::ref(instance)};
+    entt::poly<Deduced> alias{std::in_place_type<impl &>, instance};
     entt::poly<Deduced> value{impl{}};
 
     ASSERT_FALSE(empty);
@@ -56,7 +93,7 @@ TEST(PolyDeduced, Functionalities) {
     ASSERT_TRUE(alias);
     ASSERT_TRUE(value);
 
-    ASSERT_EQ(empty.type(), entt::type_info{});
+    ASSERT_EQ(empty.type(), entt::type_id<void>());
     ASSERT_EQ(in_place.type(), entt::type_id<impl>());
     ASSERT_EQ(alias.type(), entt::type_id<impl>());
     ASSERT_EQ(value.type(), entt::type_id<impl>());
@@ -99,13 +136,13 @@ TEST(PolyDeduced, Functionalities) {
     entt::poly<Deduced> move = std::move(copy);
 
     ASSERT_TRUE(move);
-    ASSERT_FALSE(copy);
+    ASSERT_TRUE(copy);
     ASSERT_EQ(move->get(), 3);
 
     move.reset();
 
     ASSERT_FALSE(move);
-    ASSERT_EQ(move.type(), entt::type_info{});
+    ASSERT_EQ(move.type(), entt::type_id<void>());
 }
 
 TEST(PolyDeduced, Owned) {
@@ -134,7 +171,7 @@ TEST(PolyDeduced, Owned) {
 
 TEST(PolyDeduced, Reference) {
     impl instance{};
-    entt::poly<Deduced> poly{std::ref(instance)};
+    entt::poly<Deduced> poly{std::in_place_type<impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_NE(poly.data(), nullptr);
@@ -158,7 +195,7 @@ TEST(PolyDeduced, Reference) {
 
 TEST(PolyDeduced, ConstReference) {
     impl instance{};
-    entt::poly<Deduced> poly{std::cref(instance)};
+    entt::poly<Deduced> poly{std::in_place_type<const impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_EQ(poly.data(), nullptr);
@@ -247,9 +284,9 @@ TEST(PolyDeduced, Alignment) {
         cb(data, target[1].data());
     };
 
-    entt::basic_poly<Deduced, alignment> nosbo[2] = { over_aligned{}, over_aligned{} };
+    entt::basic_poly<Deduced, alignment> nosbo[2] = {over_aligned{}, over_aligned{}};
     test(nosbo, [](auto *pre, auto *post) { ASSERT_EQ(pre, post); });
 
-    entt::basic_poly<Deduced, alignment, alignment> sbo[2] = { over_aligned{}, over_aligned{} };
+    entt::basic_poly<Deduced, alignment, alignment> sbo[2] = {over_aligned{}, over_aligned{}};
     test(sbo, [](auto *pre, auto *post) { ASSERT_NE(pre, post); });
 }

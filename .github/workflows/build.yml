@@ -9,34 +9,36 @@ jobs:
 
     strategy:
       matrix:
-        compiler: [
-            g++-7, g++-8, g++-9, g++,
-            clang++-8, clang++-9, clang++
-        ]
+        compiler:
+          - pkg: g++-7
+            exe: g++-7
+          - pkg: g++-8
+            exe: g++-8
+          - pkg: g++-9
+            exe: g++-9
+          - pkg: g++
+            exe: g++
+          - pkg: clang-8
+            exe: clang++-8
+          - pkg: clang-9
+            exe: clang++-9
+          - pkg: clang-10
+            exe: clang++-10
+          - pkg: clang
+            exe: clang++
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install g++-7
-      if: ${{ matrix.compiler == 'g++-7' }}
+    - name: Install compiler
       run: |
         sudo apt-get update
-        sudo apt-get install g++-7 -y
-    - name: Install g++-8
-      if: ${{ matrix.compiler == 'g++-8' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install g++-8 -y
-    - name: Install clang-8
-      if: ${{ matrix.compiler == 'clang++-8' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install clang-8 -y
+        sudo apt-get install ${{ matrix.compiler.pkg }} -y
     - name: Compile tests
       working-directory: build
       env:
-        CXX: ${{ matrix.compiler }}
+        CXX: ${{ matrix.compiler.exe }}
       run: |
         cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
         make -j4
@@ -44,7 +46,38 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 10 -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4
+
+  linux-extra:
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        compiler: [g++, clang++]
+        id_type: [uint32, uint64]
+        cxx_std: [cxx_std_17, cxx_std_20]
+        include:
+          - id_type: uint64
+            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
+          - cxx_std: cxx_std_20
+            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Compile tests
+      working-directory: build
+      env:
+        CXX: ${{ matrix.compiler }}
+      run: |
+        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
+        make -j4
+    - name: Run tests
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 30 -C Debug -j4
 
   windows:
     timeout-minutes: 10
@@ -77,7 +110,35 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 10 -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4
+
+  windows-extra:
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        id_type: [uint32, uint64]
+        cxx_std: [cxx_std_17, cxx_std_20]
+        include:
+          - id_type: uint64
+            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
+          - cxx_std: cxx_std_20
+            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Compile tests
+      working-directory: build
+      run: |
+        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
+        cmake --build . -j 4
+    - name: Run tests
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 30 -C Debug -j4
 
   macos:
     timeout-minutes: 10
@@ -94,4 +155,32 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 10 -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4
+
+  macos-extra:
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        id_type: [uint32, uint64]
+        cxx_std: [cxx_std_17, cxx_std_20]
+        include:
+          - id_type: uint64
+            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
+          - cxx_std: cxx_std_20
+            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
+
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Compile tests
+      working-directory: build
+      run: |
+        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
+        make -j4
+    - name: Run tests
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 30 -C Debug -j4

@@ -1,6 +1,7 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/entity/entity.hpp>
 #include <entt/entity/handle.hpp>
 #include <entt/entity/registry.hpp>
 
@@ -50,7 +51,7 @@ TEST(BasicHandle, Invalidation) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    handle = { registry, entity };
+    handle = {registry, entity};
 
     ASSERT_TRUE(handle);
     ASSERT_NE(handle.registry(), nullptr);
@@ -64,6 +65,8 @@ TEST(BasicHandle, Invalidation) {
 }
 
 TEST(BasicHandle, Destruction) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::registry registry;
     const auto entity = registry.create();
     entt::handle handle{registry, entity};
@@ -73,7 +76,7 @@ TEST(BasicHandle, Destruction) {
     ASSERT_NE(handle.registry(), nullptr);
     ASSERT_EQ(handle.entity(), entity);
 
-    handle.destroy(registry.version(entity));
+    handle.destroy(traits_type::to_version(entity));
 
     ASSERT_FALSE(handle);
     ASSERT_FALSE(handle.valid());
@@ -134,8 +137,8 @@ TEST(BasicHandle, Comparison) {
     entt::registry other;
     const auto entt = other.create();
 
-    handle = { registry, entity };
-    chandle = { other, entt };
+    handle = {registry, entity};
+    chandle = {other, entt};
 
     ASSERT_NE(handle, chandle);
     ASSERT_FALSE(chandle == handle);
@@ -160,18 +163,19 @@ TEST(BasicHandle, Component) {
     ASSERT_TRUE((handle.all_of<int, char, double>()));
     ASSERT_EQ((std::make_tuple(42, 'a', .3)), (handle.get<int, char, double>()));
 
-    handle.remove<char, double>();
+    handle.erase<char, double>();
 
     ASSERT_TRUE((registry.empty<char, double>()));
-    ASSERT_EQ(0u, (handle.remove_if_exists<char, double>()));
+    ASSERT_EQ(0u, (handle.remove<char, double>()));
 
-    handle.visit([](auto info) { ASSERT_EQ(entt::type_id<int>(), info); });
+    handle.visit([](const auto &info) { ASSERT_EQ(entt::type_id<int>(), info); });
 
     ASSERT_TRUE((handle.any_of<int, char, double>()));
     ASSERT_FALSE((handle.all_of<int, char, double>()));
     ASSERT_FALSE(handle.orphan());
 
-    handle.remove<int>();
+    ASSERT_EQ(1u, (handle.remove<int>()));
+    ASSERT_DEATH(handle.erase<int>(), "");
 
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_TRUE(handle.orphan());
@@ -183,20 +187,6 @@ TEST(BasicHandle, Component) {
     ASSERT_EQ(42, *handle.try_get<int>());
     ASSERT_EQ(nullptr, handle.try_get<char>());
     ASSERT_EQ(nullptr, std::get<1>(handle.try_get<int, char, double>()));
-}
-
-TEST(BasicHandle, RemoveAll) {
-    entt::registry registry;
-    const auto entity = registry.create();
-    entt::handle handle{registry, entity};
-
-    ASSERT_EQ(3, handle.emplace<int>(3));
-    ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
-    ASSERT_TRUE((handle.all_of<int, char>()));
-
-    handle.remove_all();
-
-    ASSERT_FALSE((handle.any_of<int, char>()));
 }
 
 TEST(BasicHandle, FromEntity) {

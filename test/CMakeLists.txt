@@ -38,6 +38,7 @@ add_compile_options($<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>)
 
 function(SETUP_TARGET TARGET_NAME)
     set_target_properties(${TARGET_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+    target_compile_features(${TARGET_NAME} PRIVATE ${ENTT_CXX_STD})
     target_link_libraries(${TARGET_NAME} PRIVATE EnTT)
 
     if(MSVC)
@@ -61,6 +62,7 @@ function(SETUP_TARGET TARGET_NAME)
     target_compile_definitions(
         ${TARGET_NAME}
         PRIVATE
+            ENTT_ID_TYPE=${ENTT_ID_TYPE}
             _ENABLE_EXTENDED_ALIGNED_STORAGE
             NOMINMAX
             ${ARGN}
@@ -157,14 +159,23 @@ if(ENTT_BUILD_SNAPSHOT)
     target_include_directories(cereal PRIVATE ${cereal_INCLUDE_DIR})
 endif()
 
+# Test container
+
+SETUP_BASIC_TEST(dense_hash_map entt/container/dense_hash_map.cpp)
+
 # Test core
 
 SETUP_BASIC_TEST(algorithm entt/core/algorithm.cpp)
 SETUP_BASIC_TEST(any entt/core/any.cpp)
+SETUP_BASIC_TEST(compressed_pair entt/core/compressed_pair.cpp)
+SETUP_BASIC_TEST(enum entt/core/enum.cpp)
 SETUP_BASIC_TEST(family entt/core/family.cpp)
 SETUP_BASIC_TEST(hashed_string entt/core/hashed_string.cpp)
 SETUP_BASIC_TEST(ident entt/core/ident.cpp)
+SETUP_BASIC_TEST(iterator entt/core/iterator.cpp)
+SETUP_BASIC_TEST(memory entt/core/memory.cpp)
 SETUP_BASIC_TEST(monostate entt/core/monostate.cpp)
+SETUP_BASIC_TEST(tuple entt/core/tuple.cpp)
 SETUP_BASIC_TEST(type_info entt/core/type_info.cpp)
 SETUP_BASIC_TEST(type_traits entt/core/type_traits.cpp)
 SETUP_BASIC_TEST(utility entt/core/utility.cpp)
@@ -181,6 +192,7 @@ SETUP_BASIC_TEST(organizer entt/entity/organizer.cpp)
 SETUP_BASIC_TEST(registry entt/entity/registry.cpp)
 SETUP_BASIC_TEST(registry_no_eto entt/entity/registry_no_eto.cpp ENTT_NO_ETO)
 SETUP_BASIC_TEST(runtime_view entt/entity/runtime_view.cpp)
+SETUP_BASIC_TEST(sigh_storage_mixin entt/entity/sigh_storage_mixin.cpp)
 SETUP_BASIC_TEST(snapshot entt/entity/snapshot.cpp)
 SETUP_BASIC_TEST(sparse_set entt/entity/sparse_set.cpp)
 SETUP_BASIC_TEST(storage entt/entity/storage.cpp)
@@ -206,6 +218,7 @@ SETUP_BASIC_TEST(meta_prop entt/meta/meta_prop.cpp)
 SETUP_BASIC_TEST(meta_range entt/meta/meta_range.cpp)
 SETUP_BASIC_TEST(meta_template entt/meta/meta_template.cpp)
 SETUP_BASIC_TEST(meta_type entt/meta/meta_type.cpp)
+SETUP_BASIC_TEST(meta_utility entt/meta/meta_utility.cpp)
 
 # Test poly
 

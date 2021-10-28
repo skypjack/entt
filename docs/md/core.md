@@ -17,7 +17,8 @@
   * [Small buffer optimization](#small-buffer-optimization)
   * [Alignment requirement](#alignment-requirement)
 * [Type support](#type-support)
-  * [Type info](#type-info)
+  * [Built-in RTTI support](#built-in-rtti-support)
+    * [Type info](#type-info)
     * [Almost unique identifiers](#almost-unique-identifiers)
   * [Type traits](#type-traits)
     * [Size of](#size-of)
@@ -27,6 +28,8 @@
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
     * [Type list and value list](#type-list-and-value-list)
+* [Compressed pair](#compressed-pair)
+* [Enum as bitmask](#enum-as-bitmask)
 * [Utilities](#utilities)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -247,15 +250,44 @@ entt::any any{0};
 entt::any in_place{std::in_place_type<int>, 42};
 ```
 
-The `any` class takes the burden of destroying the contained element when
-required, regardless of the storage strategy used for the specific object.<br/>
+Alternatively, the `make_any` function serves the same purpose but requires to
+always be explicit about the type:
+
+```cpp
+entt::any any = entt::make_any<int>(42);
+```
+
+In both cases, the `any` class takes the burden of destroying the contained
+element when required, regardless of the storage strategy used for the specific
+object.<br/>
 Furthermore, an instance of `any` is not tied to an actual type. Therefore, the
 wrapper will be reconfigured by assigning it an object of a different type than
-the one contained, so as to be able to handle the new instance.<br/>
+the one contained, so as to be able to handle the new instance.
+
+There exists also a way to directly assign a value to the variable contained by
+an `entt::any`, without necessarily replacing it. This is especially useful when
+the object is used in _aliasing mode_, as described below:
+
+```cpp
+entt::any any{42};
+entt::any value{3};
+
+// assigns by copy
+any.assign(value);
+
+// assigns by move
+any.assign(std::move(value));
+```
+
+The `any` class will also perform a check on the type information and whether or
+not the original type was copy or move assignable, as appropriate.<br/>
+In all cases, the `assign` function returns a boolean value to indicate the
+success or failure of the operation.
+
 When in doubt about the type of object contained, the `type` member function of
-`any` returns an instance of `type_info` associated with its element, or an
-invalid `type_info` object if the container is empty. The type is also used
-internally when comparing two `any` objects:
+`any` returns a const reference to the `type_info` associated with its element,
+or `type_id<void>()` if the container is empty. The type is also used internally
+when comparing two `any` objects:
 
 ```cpp
 if(any == empty) { /* ... */ }
@@ -263,7 +295,7 @@ if(any == empty) { /* ... */ }
 
 In this case, before proceeding with a comparison, it's verified that the _type_
 of the two objects is actually the same.<br/>
-Refer to the `EnTT` type system documentation for more details on how
+Refer to the `EnTT` type system documentation for more details about how
 `type_info` works and on possible risks of a comparison.
 
 A particularly interesting feature of this class is that it can also be used as
@@ -272,20 +304,17 @@ an opaque container for const and non-const references:
 ```cpp
 int value = 42;
 
-// reference construction
-entt::any any{std::ref(value)};
-entt::any cany{std::cref(value)};
+entt::any any{std::in_place_type<int &>(value)};
+entt::any cany = entt::make_any<const int &>(value);
+entt::any fwd = entt::forward_as_any(value);
 
-// alias construction
-int value = 42;
-entt::any in_place{std::in_place_type<int &>, &value};
+any.emplace<const int &>(value);
 ```
 
-In other words, whenever `any` intercepts a `reference_wrapper` or is explicitly
-told that users want to construct an alias, it acts as a pointer to the original
-instance rather than making a copy of it or moving it internally. The contained
-object is never destroyed and users must ensure that its lifetime exceeds that
-of the container.<br/>
+In other words, whenever `any` is explicitly told to construct an _alias_, it
+acts as a pointer to the original instance rather than making a copy of it or
+moving it internally. The contained object is never destroyed and users must
+ensure that its lifetime exceeds that of the container.<br/>
 Similarly, it's possible to create non-owning copies of `any` from an existing
 object:
 
@@ -362,33 +391,22 @@ that won't be able to interoperate with each other.
 It also offers additional features that are not yet available in the standard
 library or that will never be.
 
-## Type info
+## Built-in RTTI support
 
-The `type_info` class isn't a drop-in replacement for `std::type_info` but can
-provide similar information which are not implementation defined and don't
-require to enable RTTI.<br/>
-Therefore, they can sometimes be even more reliable than those obtained
-otherwise.
+Runtime type identification support (or RTTI) is one of the most frequently
+disabled features in the C++ world, especially in the gaming sector. Regardless
+of the reasons for this, it's often a shame not to be able to rely on opaque
+type information at runtime.<br/>
+The library tries to fill this gap by offering a built-in system that doesn't
+serve as a replacement but comes very close to being one and offers similar
+information to that provided by its counterpart.
 
-A type info object is an opaque class that is also copy and move constructible.
-This class is returned by the `type_id` function template:
+Basically, the whole system relies on a handful of classes. In particular:
 
-```cpp
-auto info = entt::type_id<a_type>();
-```
-
-These are the information made available by this object:
-
-* The unique, sequential identifier associated with a given type:
+* The unique sequential identifier associated with a given type:
 
   ```cpp
-  auto index = entt::type_id<a_type>().seq();
-  ```
-
-  This is also an alias for the following:
-
-  ```cpp
-  auto index = entt::type_seq<a_type>::value();
+  auto index = entt::type_index<a_type>::value();
   ```
 
   The returned value isn't guaranteed to be stable across different runs.
@@ -402,13 +420,13 @@ These are the information made available by this object:
   and therefore the generation of custom runtime sequences of indices for their
   own purposes, if necessary.
   
-  An external generator can also be used if needed. In fact, `type_seq` can be
+  An external generator can also be used if needed. In fact, `type_index` can be
   specialized by type and is also _sfinae-friendly_ in order to allow more
   refined specializations such as:
   
   ```cpp
   template<typename Type>
-  struct entt::type_seq<Type, std::void_d<decltype(Type::index())>> {
+  struct entt::type_index<Type, std::void_d<decltype(Type::index())>> {
       static entt::id_type value() ENTT_NOEXCEPT {
           return Type::index();
       }
@@ -422,20 +440,12 @@ These are the information made available by this object:
 * The hash value associated with a given type:
 
   ```cpp
-  auto hash = entt::type_id<a_type>().hash();
-  ```
-
-  This is also an alias for the following:
-
-  ```cpp
   auto hash = entt::type_hash<a_type>::value();
   ```
 
   In general, the `value` function exposed by `type_hash` is also `constexpr`
   but this isn't guaranteed for all compilers and platforms (although it's valid
-  with the most well-known and popular ones).<br/>
-  The `hash` function offered by the type info object isn't `constexpr` in any
-  case instead.
+  with the most well-known and popular ones).
 
   This function **can** use non-standard features of the language for its own
   purposes. This makes it possible to provide compile-time identifiers that
@@ -445,17 +455,11 @@ These are the information made available by this object:
   that identifiers remain stable across executions. Moreover, they are generated
   at runtime and are no longer a compile-time thing.
 
-  As for `type_seq`, also `type_hash` is a _sfinae-friendly_ class that can be
+  As for `type_index`, also `type_hash` is a _sfinae-friendly_ class that can be
   specialized in order to customize its behavior globally or on a per-type or
   per-traits basis.
 
 * The name associated with a given type:
-
-  ```cpp
-  auto name = entt::type_id<my_type>().name();
-  ```
-
-  This is also an alias for the following:
 
   ```cpp
   auto name = entt::type_name<a_type>::value();
@@ -484,9 +488,70 @@ These are the information made available by this object:
   means of the `ENTT_STANDARD_CPP` definition. In this case, the name will be
   empty by default.
 
-  As for `type_seq`, also `type_name` is a _sfinae-friendly_ class that can be
+  As for `type_index`, also `type_name` is a _sfinae-friendly_ class that can be
   specialized in order to customize its behavior globally or on a per-type or
   per-traits basis.
+
+These are then combined into utilities that aim to offer an API that is somewhat
+similar to that offered by the language.
+
+### Type info
+
+The `type_info` class isn't a drop-in replacement for `std::type_info` but can
+provide similar information which are not implementation defined and don't
+require to enable RTTI.<br/>
+Therefore, they can sometimes be even more reliable than those obtained
+otherwise.
+
+A type info object is an opaque class that is also copy and move constructible.
+Objects of this class are returned by the `type_id` function template:
+
+```cpp
+auto info = entt::type_id<a_type>();
+```
+
+These are the information made available by a `type_info` object:
+
+* The index associated with a given type:
+
+  ```cpp
+  auto idx = entt::type_id<a_type>().index();
+  ```
+
+  This is also an alias for the following:
+
+  ```cpp
+  auto idx = entt::type_index<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  ```
+
+* The hash value associated with a given type:
+
+  ```cpp
+  auto hash = entt::type_id<a_type>().hash();
+  ```
+
+  This is also an alias for the following:
+
+  ```cpp
+  auto hash = entt::type_hash<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  ```
+
+* The name associated with a given type:
+
+  ```cpp
+  auto name = entt::type_id<my_type>().name();
+  ```
+
+  This is also an alias for the following:
+
+  ```cpp
+  auto name = entt::type_name<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  ```
+
+Where all accessed features are available at compile-time, the `type_info` class
+is also fully `constexpr`. However, this cannot be guaranteed in advance and
+depends mainly on the compiler in use and any specializations of the classes
+described above.
 
 ### Almost unique identifiers
 
@@ -638,6 +703,86 @@ needs become apparent.<br/>
 Many of these functionalities also exist in their version dedicated to value
 lists. We therefore have `value_list_element[_v]` as well as
 `value_list_cat[_t]`and so on.
+
+# Compressed pair
+
+Primarily designed for internal use and far from being feature complete, the
+`compressed_pair` class does exactly what it promises: it tries to reduce the
+size of a pair by exploiting _Empty Base Class Optimization_ (or _EBCO_).<br/>
+This class **is not** a drop-in replacement for `std::pair`. However, it offers
+enough functionalities to be a good alternative for when reducing memory usage
+is more important than having some cool and probably useless feature.
+
+Although the API is very close to that of `std::pair` (apart from the fact that
+the template parameters are inferred from the constructor and therefore there is
+no` entt::make_compressed_pair`), the major difference is that `first` and
+`second` are functions for implementation needs:
+
+```cpp
+entt::compressed_pair pair{0, 3.};
+pair.first() = 42;
+```
+
+There isn't much to describe then. It's recommended to rely on documentation and
+intuition. At the end of the day, it's just a pair and nothing more.
+
+# Enum as bitmask
+
+Sometimes it's useful to be able to use enums as bitmasks. However, enum classes
+aren't really suitable for the purpose out of the box. Main problem is that they
+don't convert implicitly to their underlying type.<br/>
+All that remains is to make a choice between using old-fashioned enums (with all
+their problems that I don't want to discuss here) or writing _ugly_ code.
+
+Fortunately, there is also a third way: adding enough operators in the global
+scope to treat enum classes as bitmask transparently.<br/>
+The ultimate goal is to be able to write code like the following (or maybe
+something more meaningful, but this should give a grasp and remain simple at the
+same time):
+
+```cpp
+enum class my_flag {
+    unknown = 0x01,
+    enabled = 0x02,
+    disabled = 0x04
+};
+
+const my_flag flags = my_flag::enabled;
+const bool is_enabled = !!(flags & my_flag::enabled);
+```
+
+The problem with adding all operators to the global scope is that these will
+come into play even when not required, with the risk of introducing errors that
+are difficult to deal with.<br/>
+However, C++ offers enough tools to get around this problem. In particular, the
+library requires users to register all enum classes for which bitmask support
+should be enabled:
+
+```cpp
+template<>
+struct entt::enum_as_bitmask<my_flag>
+    : std::true_type
+{};
+```
+
+This is handy when dealing with enum classes defined by third party libraries
+and over which the users have no control. However, it's also verbose and can be
+avoided by adding a specific value to the enum class itself:
+
+```cpp
+enum class my_flag {
+    unknown = 0x01,
+    enabled = 0x02,
+    disabled = 0x04,
+    _entt_enum_as_bitmask
+};
+```
+
+In this case, there is no need to specialize the `enum_as_bitmask` traits, since
+`EnTT` will automatically detect the flag and enable the bitmask support.<br/>
+Once the enum class has been registered (in one way or the other) all the most
+common operators will be available, such as `&`, `|` but also `&=` and `|=`.
+Refer to the official documentation for the full list of operators.
 
 # Utilities
 

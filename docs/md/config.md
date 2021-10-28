@@ -7,10 +7,11 @@
 
 * [Introduction](#introduction)
 * [Definitions](#definitions)
-  * [ENTT_NOEXCEPT](#entt_noexcept)
+  * [ENTT_NOEXCEPTION](#entt_noexcept)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
   * [ENTT_ID_TYPE](#entt_id_type)
-  * [ENTT_PAGE_SIZE](#entt_page_size)
+  * [ENTT_SPARSE_PAGE](#entt_sparse_page)
+  * [ENTT_PACKED_PAGE](#entt_packed_page)
   * [ENTT_ASSERT](#entt_assert)
     * [ENTT_DISABLE_ASSERT](#entt_disable_assert)
   * [ENTT_NO_ETO](#entt_no_eto)
@@ -37,11 +38,11 @@ Each parameter can result in internal library definitions. It's not recommended
 to try to also modify these definitions, since there is no guarantee that they
 will remain stable over time unlike the options below.
 
-## ENTT_NOEXCEPT
+## ENTT_NOEXCEPTION
 
-The purpose of this parameter is to suppress the use of `noexcept` by this
-library.<br/>
-To do this, simply define the variable without assigning any value to it.
+This parameter can be used to switch off exception handling in `EnTT`.<br/>
+To do this, simply define the variable without assigning any value to it. This
+is roughly equivalent to setting the compiler flag `-ff-noexceptions`.
 
 ## ENTT_USE_ATOMIC
 
@@ -59,11 +60,20 @@ the library.<br/>
 By default, its type is `std::uint32_t`. However, users can define a different
 default type if necessary.
 
-## ENTT_PAGE_SIZE
+## ENTT_SPARSE_PAGE
 
-As is known, the ECS module of `EnTT` is based on _sparse sets_. What is less
-known perhaps is that these are paged to reduce memory consumption.<br/>
+It's known that the ECS module of `EnTT` is based on _sparse sets_. What is less
+known perhaps is that the sparse arrays are paged to reduce memory usage.<br/>
 Default size of pages (that is, the number of elements they contain) is 4096 but
+users can adjust it if appropriate. In all case, the chosen value **must** be a
+power of 2.
+
+## ENTT_PACKED_PAGE
+
+Similar to sparse arrays, packed arrays of components are paginated as well. In
+However, int this case the aim isn't to reduce memory usage but to have pointer
+stability upon component creation.<br/>
+Default size of pages (that is, the number of elements they contain) is 1024 but
 users can adjust it if appropriate. In all case, the chosen value **must** be a
 power of 2.
 

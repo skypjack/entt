@@ -16,7 +16,7 @@ public:
         return name_to_index[name];
     }
 
-    static type_context * instance() {
+    static type_context *instance() {
         static type_context self{};
         return &self;
     }

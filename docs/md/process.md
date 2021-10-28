@@ -28,9 +28,9 @@ A typical process must inherit from the `process` class template that stays true
 to the CRTP idiom. Moreover, derived classes must specify what's the intended
 type for elapsed times.
 
-A process should expose publicly the following member functions whether
-required (note that it isn't required to define a function unless the derived
-class wants to _override_ the default behavior):
+A process should expose publicly the following member functions whether needed
+(note that it isn't required to define a function unless the derived class wants
+to _override_ the default behavior):
 
 * `void update(Delta, void *);`
 

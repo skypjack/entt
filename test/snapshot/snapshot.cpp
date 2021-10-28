@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
 #include <sstream>
 #include <vector>
+#include <gtest/gtest.h>
 #include <cereal/archives/json.hpp>
+#include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
-#include <entt/entity/helper.hpp>
 
 struct position {
     float x;
@@ -135,8 +135,8 @@ TEST(Snapshot, Continuous) {
     cereal::JSONInputArchive input{storage};
     entt::continuous_loader loader{destination};
     loader.entities(input)
-            .component<position, relationship>(input, &relationship::parent)
-            .component<timer, entt::tag<"empty"_hs>>(input);
+        .component<position, relationship>(input, &relationship::parent)
+        .component<timer, entt::tag<"empty"_hs>>(input);
 
     ASSERT_FALSE(destination.valid(e0));
     ASSERT_TRUE(loader.contains(e0));

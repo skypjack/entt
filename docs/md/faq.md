@@ -77,45 +77,30 @@ not different techniques depending on how the data are laid out.
 I tried to describe some of the techniques that fit well with the model of
 `EnTT`. [Here](https://skypjack.github.io/2019-06-25-ecs-baf-part-4/) is the
 first post of a series that tries to explore the problem. More will probably
-come in future.
-
-Long story short, you can always define a tree where the nodes expose implicit
-lists of children by means of the following type:
-
-```cpp
-struct relationship {
-    std::size_t children{};
-    entt::entity first{entt::null};
-    entt::entity prev{entt::null};
-    entt::entity next{entt::null};
-    entt::entity parent{entt::null};
-    // ... other data members ...
-};
-```
-
-The sort functionalities of `EnTT`, the groups and all the other features of the
-library can help then to get the best in terms of data locality and therefore
-performance from this component.
+come in future.<br/>
+In addition, `EnTT` also offers the possibility to create stable storage types
+and therefore have pointer stability for one, all or some components. This is by
+far the most convenient solution when it comes to creating hierarchies and
+whatnot. See the documentation for the ECS part of the library and in particular
+what concerns the `component_traits` class for further details.
 
 ## Custom entity identifiers: yay or nay?
 
 Custom entity identifiers are definitely a good idea in two cases at least:
 
-* If `std::uint32_t` is too large or isn't large enough for your purposes, since
-  this is the underlying type of `entt::entity`.
+* If `std::uint32_t` isn't large enough for your purposes, since this is the
+  underlying type of `entt::entity`.
 * If you want to avoid conflicts when using multiple registries.
 
-Identifiers can be defined through enum classes and custom types for which a
-specialization of `entt_traits` exists. For this purpose, `entt_traits` is also
-defined as a _sfinae-friendly_ class template.<br/>
+Identifiers can be defined through enum classes and class types that define an
+`entity_type` member of type `std::uint32_t` or `std::uint64_t`.<br/>
 In fact, this is a definition equivalent to that of `entt::entity`:
 
 ```cpp
 enum class entity: std::uint32_t {};
 ```
 
-In theory, integral types can also be used as entity identifiers, even though
-this may break in future and isn't recommended in general.
+There is no limit to the number of identifiers that can be defined.
 
 ## Warning C4307: integral constant overflow
 

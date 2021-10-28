@@ -1,31 +1,27 @@
 * long term feature: shared_ptr less locator and resource cache
-* custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
-* allow to replace std:: with custom implementations
 * add examples (and credits) from @alanjfs :)
-* custom pools example (multi instance, tables, enable/disable, and so on...)
 
 WIP:
-* HP: see msvc only issue at https://godbolt.org/z/8KW9PhG4c
-* HP: scheduler, use any (or poly?) instead of unique_ptr
-* HP: any and the like: remove constructor that accepts reference wrapper, allow only in-place T& and entt::make_any<T>(...)
-* HP: resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
-* HP: make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
-* HP: add user data to type_info
-* HP: make pools available (registry/view/group), review operator| for views
-* HP: any_vector for context variables
-* HP: make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
-* HP: weak reference wrapper example with custom storage
-* HP: paginate pools
-* HP: headless (sparse set only) view
-* HP: write documentation for custom storages and views!!
-* HP: registry: use a poly object for pools, no more pool_data type.
-* HP: make runtime views use opaque storage and therefore return also elements.
-* HP: add exclude-only views to combine with packs
-* HP: entity-aware observer, add observer functions aside observer class
+* fast-contains for sparse sets (low prio but nice-to-have)
+* runtime components (registry), runtime events (dispatcher/emitter), runtime context variables ...
+* runtime_view/registry, remove reference to basic_sparse_set<E>
+* make pools available (registry/view/group), review operator| for views, make views accept registry to ctor
+* dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
+* custom allocators all over
+
+WIP:
+* customizable any_vtable, sfinae-friendly definition and op::custom for user-def
+* registry: fake vtable (mixin injected) to get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
+* resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
+* make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
+* add user data to type_info
+* make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
+* headless (sparse set only) view
+* write documentation for custom storages and views!!
+* make runtime views use opaque storage and therefore return also elements.
+* add exclude-only views to combine with packs
+* entity-aware observer, add observer functions aside observer class
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
-* pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
 * snapshot: support for range-based archives
-* page size 0 -> page less mode
-* add example: 64 bit ids with 32 bits reserved for users' purposes

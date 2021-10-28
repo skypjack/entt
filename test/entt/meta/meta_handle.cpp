@@ -5,9 +5,17 @@
 #include <entt/meta/resolve.hpp>
 
 struct clazz_t {
-    clazz_t(): value{} {}
-    void incr() { ++value; }
-    void decr() { --value; }
+    clazz_t()
+        : value{} {}
+
+    void incr() {
+        ++value;
+    }
+
+    void decr() {
+        --value;
+    }
+
     int value;
 };
 
@@ -22,9 +30,7 @@ struct MetaHandle: ::testing::Test {
     }
 
     void TearDown() override {
-        for(auto type: entt::resolve()) {
-            type.reset();
-        }
+        entt::meta_reset();
     }
 };
 
@@ -42,7 +48,7 @@ TEST_F(MetaHandle, Functionalities) {
     ASSERT_TRUE(handle->invoke("incr"_hs));
     ASSERT_EQ(instance.value, 1);
 
-    entt::meta_any any{std::ref(instance)};
+    auto any = entt::forward_as_meta(instance);
     handle = entt::meta_handle{any};
 
     ASSERT_FALSE(std::as_const(handle)->invoke("decr"_hs));
