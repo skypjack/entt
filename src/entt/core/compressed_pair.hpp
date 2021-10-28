@@ -97,6 +97,11 @@ class compressed_pair final
     using second_base = internal::compressed_pair_element<Second, 1u>;
 
 public:
+    /*! @brief The type of the first element that the pair stores. */
+    using first_type = First;
+    /*! @brief The type of the second element that the pair stores. */
+    using second_type = Second;
+
     /**
      * @brief Default constructor, conditionally enabled.
      *
@@ -105,7 +110,7 @@ public:
      *
      * @tparam Dummy Dummy template parameter used for internal purposes.
      */
-    template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<First> && std::is_default_constructible_v<Second>>>
+    template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<first_type> && std::is_default_constructible_v<second_type>>>
     constexpr compressed_pair()
         : first_base{},
           second_base{} {}
@@ -164,12 +169,12 @@ public:
      * @brief Returns the first element that a pair stores.
      * @return The first element that a pair stores.
      */
-    [[nodiscard]] First &first() ENTT_NOEXCEPT {
+    [[nodiscard]] first_type &first() ENTT_NOEXCEPT {
         return static_cast<first_base &>(*this).get();
     }
 
     /*! @copydoc first */
-    [[nodiscard]] const First &first() const ENTT_NOEXCEPT {
+    [[nodiscard]] const first_type &first() const ENTT_NOEXCEPT {
         return static_cast<const first_base &>(*this).get();
     }
 
@@ -177,12 +182,12 @@ public:
      * @brief Returns the second element that a pair stores.
      * @return The second element that a pair stores.
      */
-    [[nodiscard]] Second &second() ENTT_NOEXCEPT {
+    [[nodiscard]] second_type &second() ENTT_NOEXCEPT {
         return static_cast<second_base &>(*this).get();
     }
 
     /*! @copydoc second */
-    [[nodiscard]] const Second &second() const ENTT_NOEXCEPT {
+    [[nodiscard]] const second_type &second() const ENTT_NOEXCEPT {
         return static_cast<const second_base &>(*this).get();
     }
 
