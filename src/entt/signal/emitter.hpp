@@ -12,6 +12,7 @@
 #include "../container/dense_hash_map.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
+#include "../core/utility.hpp"
 
 namespace entt {
 
@@ -120,7 +121,7 @@ class emitter {
 
     template<typename Event>
     [[nodiscard]] pool_handler<Event> *assure() {
-        if(auto &&ptr = pools[type_id<Event>().hash()]; !ptr) {
+        if(auto &&ptr = pools[type_hash<Event>::value()]; !ptr) {
             auto *cpool = new pool_handler<Event>{};
             ptr.reset(cpool);
             return cpool;
@@ -131,7 +132,7 @@ class emitter {
 
     template<typename Event>
     [[nodiscard]] const pool_handler<Event> *assure() const {
-        const auto it = pools.find(type_id<Event>().hash());
+        const auto it = pools.find(type_hash<Event>::value());
         return (it == pools.cend()) ? nullptr : static_cast<const pool_handler<Event> *>(it->second.get());
     }
 
@@ -307,7 +308,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, std::unique_ptr<basic_pool>> pools{};
+    dense_hash_map<id_type, std::unique_ptr<basic_pool>, identity> pools{};
 };
 
 } // namespace entt

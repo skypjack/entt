@@ -9,6 +9,7 @@
 #include "../container/dense_hash_map.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../core/utility.hpp"
 #include "fwd.hpp"
 #include "helper.hpp"
 
@@ -477,7 +478,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, std::vector<std::pair<std::size_t, bool>>> dependencies;
+    dense_hash_map<id_type, std::vector<std::pair<std::size_t, bool>>, identity> dependencies;
     std::vector<vertex_data> vertices;
 };
 

@@ -10,6 +10,7 @@
 #include "../container/dense_hash_map.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
+#include "../core/utility.hpp"
 #include "sigh.hpp"
 
 namespace entt {
@@ -85,7 +86,7 @@ class dispatcher {
 
     template<typename Event>
     [[nodiscard]] pool_handler<Event> &assure() {
-        if(auto &&ptr = pools[type_id<Event>().hash()]; !ptr) {
+        if(auto &&ptr = pools[type_hash<Event>::value()]; !ptr) {
             auto *cpool = new pool_handler<Event>{};
             ptr.reset(cpool);
             return *cpool;
@@ -255,7 +256,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, std::unique_ptr<basic_pool>> pools;
+    dense_hash_map<id_type, std::unique_ptr<basic_pool>, identity> pools;
 };
 
 } // namespace entt
