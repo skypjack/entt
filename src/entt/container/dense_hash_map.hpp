@@ -299,13 +299,14 @@ class dense_hash_map final {
             for(; *curr != last; curr = &packed.first()[*curr].next) {}
             *curr = pos;
 
-            auto allocator = packed.first().get_allocator();
-            auto *ptr = packed.first().data() + pos;
+            using node_allocator_traits = typename alloc_traits::template rebind_traits<decltype(node_type::element)>;
+            typename node_allocator_traits::allocator_type allocator = packed.first().get_allocator();
+            auto *ptr = std::addressof(packed.first()[pos].element);
 
             std::destroy_at(ptr);
-            // no exception guarantees when mapped type has a throwing move constructor
-            using node_allocator_traits = typename alloc_traits::template rebind_traits<node_type>;
-            node_allocator_traits::construct(allocator, ptr, std::move(packed.first()[last]));
+            packed.first()[pos].next = packed.first().back().next;
+            // no exception guarantees when mapped type has a throwing move constructor (we're technically doomed)
+            node_allocator_traits::construct(allocator, ptr, std::move(packed.first().back().element));
         }
 
         packed.first().pop_back();
