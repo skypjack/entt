@@ -8,6 +8,7 @@
 * [Introduction](#introduction)
 * [Containers](#containers)
   * [Dense hash map](#dense-hash-map)
+  * [Dense hash set](#dense-hash-set)
 
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -40,4 +41,16 @@ implicit list within the packed array itself.
 
 The interface is in all respects similar to its counterpart in the standard
 library, that is, `std::unordered_map`.<br/>
+Therefore, there is no need to go into the API description.
+
+## Dense hash set
+
+The dense hash set made available in `EnTT` is a set that aims to return a
+packed array of elements, so as to reduce the number of jumps in memory during
+the iteration.<br/>
+The implementation is based on _sparse sets_ and each bucket is identified by an
+implicit list within the packed array itself.
+
+The interface is in all respects similar to its counterpart in the standard
+library, that is, `std::unordered_set`.<br/>
 Therefore, there is no need to go into the API description.

@@ -162,6 +162,7 @@ endif()
 # Test container
 
 SETUP_BASIC_TEST(dense_hash_map entt/container/dense_hash_map.cpp)
+SETUP_BASIC_TEST(dense_hash_set entt/container/dense_hash_set.cpp)
 
 # Test core
 

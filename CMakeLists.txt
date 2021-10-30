@@ -121,6 +121,7 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/config.h>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/version.h>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_hash_map.hpp>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_hash_set.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/algorithm.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/any.hpp>

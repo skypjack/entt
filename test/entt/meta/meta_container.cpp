@@ -322,6 +322,52 @@ TEST_F(MetaContainer, DenseHashMap) {
     ASSERT_EQ(view.size(), 0u);
 }
 
+TEST_F(MetaContainer, DenseHashSet) {
+    entt::dense_hash_set<int> set{};
+    auto any = entt::forward_as_meta(set);
+    auto view = any.as_associative_container();
+
+    set.emplace(2);
+    set.emplace(3);
+    set.emplace(4);
+
+    ASSERT_TRUE(view);
+    ASSERT_TRUE(view.key_only());
+    ASSERT_EQ(view.key_type(), entt::resolve<int>());
+    ASSERT_EQ(view.mapped_type(), entt::meta_type{});
+    ASSERT_EQ(view.value_type(), entt::resolve<int>());
+
+    ASSERT_EQ(view.size(), 3u);
+    ASSERT_NE(view.begin(), view.end());
+
+    ASSERT_EQ(view.find(3)->first.cast<int>(), 3);
+
+    ASSERT_FALSE(view.insert(invalid_type{}));
+
+    ASSERT_TRUE(view.insert(.0));
+    ASSERT_TRUE(view.insert(1));
+
+    ASSERT_EQ(view.size(), 5u);
+    ASSERT_EQ(view.find(0)->first.cast<int>(), 0);
+    ASSERT_EQ(view.find(1.)->first.cast<int>(), 1);
+
+    ASSERT_FALSE(view.erase(invalid_type{}));
+    ASSERT_FALSE(view.find(invalid_type{}));
+    ASSERT_EQ(view.size(), 5u);
+
+    ASSERT_TRUE(view.erase(0));
+    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ(view.find(0), view.end());
+
+    ASSERT_EQ(view.find(1.f)->first.try_cast<int>(), nullptr);
+    ASSERT_NE(view.find(1.)->first.try_cast<const int>(), nullptr);
+    ASSERT_EQ(view.find(true)->first.cast<const int &>(), 1);
+
+    ASSERT_TRUE(view.erase(1.));
+    ASSERT_TRUE(view.clear());
+    ASSERT_EQ(view.size(), 0u);
+}
+
 TEST_F(MetaContainer, ConstSequenceContainer) {
     std::vector<int> vec{};
     auto any = entt::forward_as_meta(std::as_const(vec));
