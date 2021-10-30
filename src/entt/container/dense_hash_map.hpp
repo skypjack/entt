@@ -745,7 +745,7 @@ public:
     /**
      * @brief Finds an element with a key that compares _equivalent_ to a given
      * value.
-     * @tparam Other Type of the key value of the element to search for.
+     * @tparam Other Type of the key value of an element to search for.
      * @param key Key value of an element to search for.
      * @return An iterator to an element with the given key. If no such element
      * is found, a past-the-end iterator is returned.
@@ -775,7 +775,7 @@ public:
     /**
      * @brief Checks if the container contains an element with a key that
      * compares _equivalent_ to a given value.
-     * @tparam Other Type of the key value of the element to search for.
+     * @tparam Other Type of the key value of an element to search for.
      * @param key Key value of an element to search for.
      * @return True if there is such an element, false otherwise.
      */

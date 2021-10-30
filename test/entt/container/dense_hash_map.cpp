@@ -256,7 +256,6 @@ TEST(DenseHashMap, ConstIterator) {
 
     ASSERT_EQ(cbegin[0u].first, map.cbegin()->first);
     ASSERT_EQ(cbegin[0u].second, (*map.cbegin()).second);
-    ASSERT_EQ(cbegin[0u].second, (*map.cbegin()).second);
 
     ASSERT_LT(cbegin, cend);
     ASSERT_LE(cbegin, map.cbegin());
@@ -278,7 +277,7 @@ TEST(DenseHashMap, IteratorConversion) {
     ASSERT_EQ(it->first, 3);
     ASSERT_EQ((*it).second, 42);
     ASSERT_EQ(it->first, cit->first);
-    ASSERT_EQ((*it).second, (*it).second);
+    ASSERT_EQ((*it).second, (*cit).second);
 
     ASSERT_EQ(it - cit, 0);
     ASSERT_EQ(cit - it, 0);
@@ -767,7 +766,7 @@ TEST(DenseHashMap, EraseFromBucket) {
     ASSERT_EQ(map.size(), 0u);
 
     for(std::size_t next{}; next < 4u; ++next) {
-        ASSERT_TRUE(map.emplace(2u * minimum_bucket_count * next, 2u * 2u * minimum_bucket_count * next).second);
+        ASSERT_TRUE(map.emplace(2u * minimum_bucket_count * next, 2u * minimum_bucket_count * next).second);
         ASSERT_TRUE(map.emplace(2u * minimum_bucket_count * next + 2u, 2u * minimum_bucket_count * next + 2u).second);
         ASSERT_TRUE(map.emplace(2u * minimum_bucket_count * (next + 1u) - 1u, 2u * minimum_bucket_count * (next + 1u) - 1u).second);
     }
@@ -960,7 +959,7 @@ TEST(DenseHashMap, LocalIteratorConversion) {
     ASSERT_EQ(it->first, 3);
     ASSERT_EQ((*it).second, 42);
     ASSERT_EQ(it->first, cit->first);
-    ASSERT_EQ((*it).second, (*it).second);
+    ASSERT_EQ((*it).second, (*cit).second);
 
     ASSERT_EQ(it, cit);
     ASSERT_NE(++cit, it);
