@@ -13,4 +13,17 @@
 			</IndexListItems>
 		</Expand>
 	</Type>
+	<Type Name="entt::dense_hash_set&lt;*&gt;">
+		<DisplayString>{{ size={ packed.first_base::value.size() } }}</DisplayString>
+		<Expand>
+			<Item Name="[capacity]">packed.first_base::value.capacity()</Item>
+			<Item Name="[bucket_count]">sparse.first_base::value.size()</Item>
+			<Item Name="[load_factor]">(float)packed.first_base::value.size() / (float)sparse.first_base::value.size()</Item>
+			<Item Name="[max_load_factor]">threshold</Item>
+			<IndexListItems Optional="true" Condition="packed.first_base::value.size() != 0">
+				<Size>packed.first_base::value.size()</Size>
+				<ValueNode>packed.first_base::value[$i].element</ValueNode>
+			</IndexListItems>
+		</Expand>
+	</Type>
 </AutoVisualizer>
