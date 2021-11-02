@@ -97,7 +97,8 @@ public:
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-        return *operator+(value);
+        const auto pos = index - value - 1;
+        return (*packed)[pos / packed_page_v][fast_mod(pos, packed_page_v)];
     }
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {

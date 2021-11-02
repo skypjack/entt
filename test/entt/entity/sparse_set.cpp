@@ -830,6 +830,12 @@ TEST(SparseSet, Iterator) {
 
     ASSERT_EQ(*begin, entt::entity{3});
     ASSERT_EQ(*begin.operator->(), entt::entity{3});
+
+    set.emplace(entt::entity{42});
+    begin = set.begin();
+
+    ASSERT_EQ(begin[0u], entt::entity{42});
+    ASSERT_EQ(begin[1u], entt::entity{3});
 }
 
 TEST(SparseSet, ReverseIterator) {
@@ -878,6 +884,13 @@ TEST(SparseSet, ReverseIterator) {
     ASSERT_GE(end, set.rend());
 
     ASSERT_EQ(*begin, entt::entity{3});
+    ASSERT_EQ(*begin.operator->(), entt::entity{3});
+
+    set.emplace(entt::entity{42});
+    begin = set.rbegin();
+
+    ASSERT_EQ(begin[0u], entt::entity{3});
+    ASSERT_EQ(begin[1u], entt::entity{42});
 }
 
 TEST(SparseSet, Find) {

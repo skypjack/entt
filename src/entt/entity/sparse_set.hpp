@@ -73,7 +73,8 @@ struct sparse_set_iterator final {
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const {
-        return *operator+(value);
+        const auto pos = index - value - 1;
+        return packed->data()[pos];
     }
 
     [[nodiscard]] pointer operator->() const {
