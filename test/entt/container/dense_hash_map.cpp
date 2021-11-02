@@ -215,6 +215,12 @@ TEST(DenseHashMap, Iterator) {
 
     ASSERT_GT(end, begin);
     ASSERT_GE(end, map.end());
+
+    map.emplace(42, 3);
+    begin = map.begin();
+
+    ASSERT_EQ(begin[0u].first, 3);
+    ASSERT_EQ(begin[1u].second, 3);
 }
 
 TEST(DenseHashMap, ConstIterator) {
@@ -262,6 +268,12 @@ TEST(DenseHashMap, ConstIterator) {
 
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, map.cend());
+
+    map.emplace(42, 3);
+    cbegin = map.cbegin();
+
+    ASSERT_EQ(cbegin[0u].first, 3);
+    ASSERT_EQ(cbegin[1u].second, 3);
 }
 
 TEST(DenseHashMap, IteratorConversion) {

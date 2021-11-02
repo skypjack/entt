@@ -98,7 +98,7 @@ public:
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const {
-        return it->element;
+        return it[value].element;
     }
 
     [[nodiscard]] pointer operator->() const {
