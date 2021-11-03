@@ -31,7 +31,6 @@
     * [In-place delete](#in-place-delete)
     * [Hierarchies and the like](#hierarchies-and-the-like)
   * [Making the most of range-destroy](#making-the-most-of-range-destroy)
-  * [Meet the runtime](#meet-the-runtime)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
     * [Continuous loader](#continuous-loader)
@@ -101,8 +100,8 @@ The library provides a default implementation for many things and a mixin model
 that allows users to completely replace or even just enrich the pool dedicated
 to one or more components.<br/>
 The built-in signal support is an example of that: defined as a mixin, it's
-easily disabled if not needed. Similarly, poly storage is another example of how
-everything is customizable down to the smallest detail.
+easily disabled if not needed. Similarly, the storage class has a specialization
+that shows how everything is customizable down to the smallest detail.
 
 ## Pay per use
 
@@ -1139,59 +1138,6 @@ With a good chance, the last note can be ignored and there will never be a need
 to do the above even after writing millions of lines of code.<br/>
 However, it's good to know how to exploit the `destroy` function to get the best
 out of it.
-
-## Meet the runtime
-
-`EnTT` takes full advantage of what the language offers at compile-time.<br/>
-However, by combining these feature with a tool for static polymorphism, it's
-also possible to have opaque proxies to work with _type-less_ pools at runtime.
-
-These objects are returned by the `storage` member function, which accepts a
-`type_info` object as an argument rather than a compile-time type (the same
-returned by the `visit` member function):
-
-```cpp
-auto storage = registry.storage(info);
-```
-
-By default and to stay true with the philosophy of the library, the API of a
-proxy is minimal and doesn't allow users to do much.<br/>
-However, it's also completely customizable in a generic way and with the
-possibility of defining specific behaviors for given types.
-
-This section won't go into detail on how to define a poly storage to get all the
-possible functionalities out of it. `EnTT` already contains enough snippets to
-get inspiration from, both in the test suite and in the `example` folder.<br/>
-In short, users will have to define their own _concepts_ (see the `entt::poly`
-documentation for this) and register them via the `poly_storage_traits` class
-template, which has been designed as sfinae-friendly for the purpose.
-
-Once the concept that a poly storage must adhere to has been properly defined,
-copying an entity will be as easy as:
-
-```cpp
-registry.visit(entity, [&](const auto info) {
-    auto &&storage = registry.storage(info);
-    storage->emplace(registry, other, storage->get(entity));
-});
-```
-
-Where `other` is the entity to which the elements should be replicated.<br/>
-Similarly, copying entire pools between different registries can look like this:
-
-```cpp
-registry.visit([&](const auto info) {
-    registry.storage(info)->copy_to(other);
-});
-```
-
-Where this time `other` represents the destination registry.
-
-So, all in all, `EnTT` shifts the complexity to the one-time definition of a
-_concept_ that reflects the user's needs, and then leaves room for ease of use
-within the codebase.<br/>
-The possibility of extreme customization is the icing on the cake in this sense,
-allowing users to design this tool around their own requirements.
 
 ## Snapshot: complete vs continuous
 

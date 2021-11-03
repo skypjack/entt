@@ -21,7 +21,6 @@
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
-#include "poly_storage.hpp"
 #include "runtime_view.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
@@ -43,15 +42,14 @@ namespace entt {
 template<typename Entity>
 class basic_registry {
     using entity_traits = entt_traits<Entity>;
-    using poly_storage_type = typename poly_storage_traits<Entity>::storage_type;
     using basic_common_type = basic_sparse_set<Entity>;
 
     template<typename Component>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
     struct pool_data {
-        poly_storage_type poly;
         std::unique_ptr<basic_common_type> pool{};
+        const entt::type_info *info{};
     };
 
     template<typename...>
@@ -106,16 +104,15 @@ class basic_registry {
     template<typename Component>
     [[nodiscard]] storage_type<Component> *assure() const {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
+        auto &&pdata = pools[type_id<Component>().hash()];
 
-        if(auto &&pdata = pools[type_id<Component>().hash()]; !pdata.pool) {
-            auto *cpool = new storage_type<Component>{};
-            pdata.pool.reset(cpool);
+        if(!pdata.pool) {
+            pdata.pool.reset(new storage_type<Component>{});
             pdata.pool->context(forward_as_any(const_cast<basic_registry &>(*this)));
-            pdata.poly.template emplace<storage_type<Component> &>(*static_cast<storage_type<Component> *>(pdata.pool.get()));
-            return cpool;
-        } else {
-            return static_cast<storage_type<Component> *>(pdata.pool.get());
+            pdata.info = &type_id<Component>();
         }
+
+        return static_cast<storage_type<Component> *>(pdata.pool.get());
     }
 
     template<typename Component>
@@ -151,8 +148,6 @@ public:
     using version_type = typename entity_traits::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Poly storage type. */
-    using poly_storage = typename poly_storage_traits<Entity>::storage_type;
 
     /*! @brief Default constructor. */
     basic_registry() = default;
@@ -199,23 +194,6 @@ public:
     void prepare() {
         // suppress the warning due to the [[nodiscard]] attribute
         static_cast<void>(assure<Component>());
-    }
-
-    /**
-     * @brief Returns a poly storage for a given type.
-     * @param info The type for which to return a poly storage.
-     * @return A valid poly storage if a pool for the given type exists, an
-     * empty and thus invalid element otherwise.
-     */
-    poly_storage &storage(const type_info &info) {
-        ENTT_ASSERT(pools[info.hash()].poly, "Storage not available");
-        return pools[info.hash()].poly;
-    }
-
-    /*! @copydoc storage */
-    const poly_storage &storage(const type_info &info) const {
-        ENTT_ASSERT(pools[info.hash()].poly, "Storage not available");
-        return pools[info.hash()].poly;
     }
 
     /**
@@ -547,8 +525,8 @@ public:
     version_type destroy(const entity_type entity, const version_type version) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
-        for(auto &&pdata: pools) {
-            pdata.second.pool->remove(entity);
+        for(auto &&curr: pools) {
+            curr.second.pool->remove(entity);
         }
 
         return release_entity(entity, version);
@@ -570,8 +548,8 @@ public:
                 destroy(*first, entity_traits::to_version(*first) + 1u);
             }
         } else {
-            for(auto &&pdata: pools) {
-                pdata.second.pool->remove(first, last);
+            for(auto &&curr: pools) {
+                curr.second.pool->remove(first, last);
             }
 
             release(first, last);
@@ -801,8 +779,8 @@ public:
     template<typename... Component>
     void compact() {
         if constexpr(sizeof...(Component) == 0) {
-            for(auto &&pdata: pools) {
-                pdata.second.pool->compact();
+            for(auto &&curr: pools) {
+                curr.second.pool->compact();
             }
         } else {
             (assure<Component>()->compact(), ...);
@@ -944,8 +922,8 @@ public:
     template<typename... Component>
     void clear() {
         if constexpr(sizeof...(Component) == 0) {
-            for(auto &&pdata: pools) {
-                pdata.second.pool->clear();
+            for(auto &&curr: pools) {
+                curr.second.pool->clear();
             }
 
             each([this](const auto entity) { release_entity(entity, entity_traits::to_version(entity) + 1u); });
@@ -993,7 +971,7 @@ public:
      */
     [[nodiscard]] bool orphan(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.second.pool->contains(entity); });
+        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&curr) { return curr.second.pool->contains(entity); });
     }
 
     /**
@@ -1173,12 +1151,12 @@ public:
         std::vector<const basic_common_type *> filter(std::distance(from, to));
 
         std::transform(first, last, component.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.second.poly->value_type().hash() == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&curr) { return curr.second.info->hash() == ctype; });
             return it == pools.cend() ? nullptr : it->second.pool.get();
         });
 
         std::transform(from, to, filter.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.second.poly->value_type().hash() == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&curr) { return curr.second.info->hash() == ctype; });
             return it == pools.cend() ? nullptr : it->second.pool.get();
         });
 
@@ -1448,9 +1426,9 @@ public:
      */
     template<typename Func>
     void visit(entity_type entity, Func func) const {
-        for(auto &&pdata: pools) {
-            if(pdata.second.pool->contains(entity)) {
-                func(pdata.second.poly->value_type());
+        for(auto &&curr: pools) {
+            if(curr.second.pool->contains(entity)) {
+                func(*curr.second.info);
             }
         }
     }
@@ -1473,8 +1451,8 @@ public:
      */
     template<typename Func>
     void visit(Func func) const {
-        for(auto &&pdata: pools) {
-            func(pdata.second.poly->value_type());
+        for(auto &&curr: pools) {
+            func(*curr.second.info);
         }
     }
 

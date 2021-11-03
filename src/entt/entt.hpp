@@ -23,7 +23,6 @@
 #include "entity/helper.hpp"
 #include "entity/observer.hpp"
 #include "entity/organizer.hpp"
-#include "entity/poly_storage.hpp"
 #include "entity/registry.hpp"
 #include "entity/runtime_view.hpp"
 #include "entity/snapshot.hpp"
