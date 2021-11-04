@@ -284,16 +284,16 @@ template<typename Type, typename Policy, typename Candidate, typename First, typ
 
     if constexpr(std::is_member_function_pointer_v<std::remove_reference_t<Candidate>>) {
         if constexpr(std::is_void_v<typename descriptor::return_type>) {
-            (std::forward<decltype(maybe_clazz)>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<decltype(other)>(other)...);
+            (std::forward<First>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<Other>(other)...);
             return meta_any{std::in_place_type<void>};
         } else {
-            return meta_dispatch<Policy>((std::forward<decltype(maybe_clazz)>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<decltype(other)>(other)...));
+            return meta_dispatch<Policy>((std::forward<First>(maybe_clazz).*std::forward<Candidate>(candidate))(std::forward<Other>(other)...));
         }
     } else if constexpr(std::is_void_v<typename descriptor::return_type>) {
-        std::forward<Candidate>(candidate)(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...);
+        std::forward<Candidate>(candidate)(std::forward<First>(maybe_clazz), std::forward<Other>(other)...);
         return meta_any{std::in_place_type<void>};
     } else {
-        return meta_dispatch<Policy>(std::forward<Candidate>(candidate)(std::forward<decltype(maybe_clazz)>(maybe_clazz), std::forward<decltype(other)>(other)...));
+        return meta_dispatch<Policy>(std::forward<Candidate>(candidate)(std::forward<First>(maybe_clazz), std::forward<Other>(other)...));
     }
 }
 
