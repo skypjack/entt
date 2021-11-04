@@ -1365,15 +1365,11 @@ public:
         ENTT_ASSERT(sortable<Component>(), "Cannot sort owned storage");
         auto *cpool = assure<Component>();
 
-        if constexpr(ignore_as_empty_v<Component>) {
-            cpool->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        if constexpr(std::is_invocable_v<Compare, decltype(cpool->get({})), decltype(cpool->get({}))>) {
+            auto comp = [cpool, compare = std::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool->get(lhs)), std::as_const(cpool->get(rhs))); };
+            cpool->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
         } else {
-            if constexpr(std::is_invocable_v<Compare, decltype(cpool->get({})), decltype(cpool->get({}))>) {
-                auto comp = [cpool, compare = std::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool->get(lhs)), std::as_const(cpool->get(rhs))); };
-                cpool->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
-            } else {
-                cpool->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
-            }
+            cpool->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
         }
     }
 
