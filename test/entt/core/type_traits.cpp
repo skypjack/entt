@@ -30,7 +30,7 @@ TEST(TypeTraits, SizeOf) {
 
 TEST(TypeTraits, UnpackAsType) {
     auto test = [](auto &&...args) {
-        return [](entt::unpack_as_t<int, decltype(args)>... value) {
+        return [](entt::unpack_as_type<int, decltype(args)>... value) {
             return (value + ... + 0);
         };
     };
@@ -40,7 +40,7 @@ TEST(TypeTraits, UnpackAsType) {
 
 TEST(TypeTraits, UnpackAsValue) {
     auto test = [](auto &&...args) {
-        return (entt::unpack_as_v<2, decltype(args)> + ... + 0);
+        return (entt::unpack_as_value<2, decltype(args)> + ... + 0);
     };
 
     ASSERT_EQ(test('c', 42., true), 6);

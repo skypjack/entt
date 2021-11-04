@@ -78,7 +78,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
  * @tparam Type A type to repeat.
  */
 template<typename Type, typename>
-using unpack_as_t = Type;
+using unpack_as_type = Type;
 
 /**
  * @brief Helper variable template to be used to _repeat_ the same value a
@@ -86,7 +86,7 @@ using unpack_as_t = Type;
  * @tparam Value A value to repeat.
  */
 template<auto Value, typename>
-inline constexpr auto unpack_as_v = Value;
+inline constexpr auto unpack_as_value = Value;
 
 /**
  * @brief Wraps a static constant.
