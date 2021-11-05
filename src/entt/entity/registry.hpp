@@ -494,10 +494,8 @@ public:
      *
      * @warning
      * Adding or removing components to an entity that is being destroyed can
-     * result in undefined behavior.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
+     * result in undefined behavior. Attempting to use an invalid entity results
+     * in undefined behavior.
      *
      * @param entity A valid identifier.
      * @return The version of the recycled entity.
