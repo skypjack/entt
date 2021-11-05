@@ -1167,7 +1167,7 @@ TEST(MultiComponentView, SameComponentTypes) {
     entt::registry registry;
     typename entt::storage_traits<entt::entity, int>::storage_type storage;
     typename entt::storage_traits<entt::entity, int>::storage_type other;
-    entt::view<entt::get_t<int, int>> view{storage, other};
+    entt::basic_view view{storage, other};
 
     const entt::entity e0{42u};
     const entt::entity e1{3u};
