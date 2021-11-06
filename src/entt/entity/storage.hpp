@@ -356,7 +356,7 @@ protected:
             construct(assure_at_least(pos));
 
             ENTT_TRY {
-                base_type::try_emplace(entt, nullptr);
+                base_type::try_emplace(entt, ud);
                 ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
             }
             ENTT_CATCH {
