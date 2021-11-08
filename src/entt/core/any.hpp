@@ -43,40 +43,40 @@ class basic_any {
     static constexpr bool in_situ = Len && alignof(Type) <= alignof(storage_type) && sizeof(Type) <= sizeof(storage_type) && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
-    static const void *basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &from, [[maybe_unused]] const void *to) {
+    static const void *basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &value, [[maybe_unused]] const void *other) {
         static_assert(!std::is_same_v<Type, void> && std::is_same_v<std::remove_reference_t<std::remove_const_t<Type>>, Type>, "Invalid type");
         const Type *instance = nullptr;
 
         if constexpr(in_situ<Type>) {
-            instance = (from.mode == policy::owner) ? ENTT_LAUNDER(reinterpret_cast<const Type *>(&from.storage)) : static_cast<const Type *>(from.instance);
+            instance = (value.mode == policy::owner) ? ENTT_LAUNDER(reinterpret_cast<const Type *>(&value.storage)) : static_cast<const Type *>(value.instance);
         } else {
-            instance = static_cast<const Type *>(from.instance);
+            instance = static_cast<const Type *>(value.instance);
         }
 
         switch(op) {
         case operation::copy:
             if constexpr(std::is_copy_constructible_v<Type>) {
-                static_cast<basic_any *>(const_cast<void *>(to))->initialize<Type>(*instance);
+                static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*instance);
             }
             break;
         case operation::move:
             if constexpr(in_situ<Type>) {
-                if(from.mode == policy::owner) {
-                    return new(&static_cast<basic_any *>(const_cast<void *>(to))->storage) Type{std::move(*const_cast<Type *>(instance))};
+                if(value.mode == policy::owner) {
+                    return new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(instance))};
                 }
             }
 
-            return (static_cast<basic_any *>(const_cast<void *>(to))->instance = std::exchange(const_cast<basic_any &>(from).instance, nullptr));
+            return (static_cast<basic_any *>(const_cast<void *>(other))->instance = std::exchange(const_cast<basic_any &>(value).instance, nullptr));
         case operation::transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
-                *const_cast<Type *>(instance) = std::move(*static_cast<Type *>(const_cast<void *>(to)));
-                return to;
+                *const_cast<Type *>(instance) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
+                return other;
             }
             [[fallthrough]];
         case operation::assign:
             if constexpr(std::is_copy_assignable_v<Type>) {
-                *const_cast<Type *>(instance) = *static_cast<const Type *>(to);
-                return to;
+                *const_cast<Type *>(instance) = *static_cast<const Type *>(other);
+                return other;
             }
             break;
         case operation::destroy:
@@ -90,9 +90,9 @@ class basic_any {
             break;
         case operation::compare:
             if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
-                return *static_cast<const Type *>(instance) == *static_cast<const Type *>(to) ? to : nullptr;
+                return *static_cast<const Type *>(instance) == *static_cast<const Type *>(other) ? other : nullptr;
             } else {
-                return (instance == to) ? to : nullptr;
+                return (instance == other) ? other : nullptr;
             }
         case operation::get:
             return instance;
