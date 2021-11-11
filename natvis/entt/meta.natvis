@@ -3,6 +3,9 @@
 	<Type Name="entt::meta_any">
 		<DisplayString Condition="node != nullptr">{{ type={ node->info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="node != nullptr">*node</ExpandedItem>
+		</Expand>
 	</Type>
 	<Type Name="entt::meta_associative_container">
 		<DisplayString Condition="mapped_type_node != nullptr">{{ key_type={ key_type_node->info->alias,na }, mapped_type={ mapped_type_node->info->alias,na } }}</DisplayString>
