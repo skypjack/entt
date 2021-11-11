@@ -15,6 +15,13 @@
 			<Item Name="[second]" Optional="true">*(second_base::base_type*)this</Item>
 		</Expand>
 	</Type>
+	<Type Name="entt::basic_hashed_string&lt;*&gt;">
+		<DisplayString Condition="str != nullptr">{{ hash={ hash } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+		<Expand>
+			<Item Name="[str]">str,na</Item>
+		</Expand>
+	</Type>
 	<Type Name="entt::type_info">
 		<DisplayString>{{ name={ alias,na } }}</DisplayString>
 		<Expand>
