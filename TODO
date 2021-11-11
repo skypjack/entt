@@ -4,7 +4,6 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* use identity with dense hash map: cache (review api with hashed string), registry
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime components (registry), runtime events (dispatcher/emitter), runtime context variables ...
 * runtime_view/registry, remove reference to basic_sparse_set<E>

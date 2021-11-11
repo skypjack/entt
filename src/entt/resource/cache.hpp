@@ -6,6 +6,7 @@
 #include "../config/config.h"
 #include "../container/dense_hash_map.hpp"
 #include "../core/fwd.hpp"
+#include "../core/utility.hpp"
 #include "fwd.hpp"
 #include "handle.hpp"
 #include "loader.hpp"
@@ -271,7 +272,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, resource_handle<resource_type>> resources;
+    dense_hash_map<id_type, resource_handle<resource_type>, identity> resources;
 };
 
 } // namespace entt
