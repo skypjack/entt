@@ -7,7 +7,7 @@
 template<typename Entity, typename Type>
 struct entt::storage_traits<Entity, Type> {
     // no signal regardless of component type ...
-    using storage_type = storage_adapter_mixin<basic_storage<Entity, Type>>;
+    using storage_type = basic_storage<Entity, Type>;
 };
 
 template<typename Entity>

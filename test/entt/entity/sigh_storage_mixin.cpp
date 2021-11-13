@@ -39,14 +39,16 @@ TEST(SighStorageMixin, GenericType) {
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
     entt::registry registry{};
 
+    pool.context(entt::forward_as_any(registry));
+
     counter on_construct{};
     counter on_destroy{};
 
     pool.on_construct().connect<&listener>(on_construct);
     pool.on_destroy().connect<&listener>(on_destroy);
 
-    base.emplace(entities[0u], &registry);
-    pool.emplace(registry, entities[1u]);
+    base.emplace(entities[0u]);
+    pool.emplace(entities[1u]);
 
     ASSERT_EQ(on_construct.value, 2);
     ASSERT_EQ(on_destroy.value, 0);
@@ -55,32 +57,32 @@ TEST(SighStorageMixin, GenericType) {
     ASSERT_EQ(pool.get(entities[0u]), 0);
     ASSERT_EQ(pool.get(entities[1u]), 0);
 
-    base.erase(entities[0u], &registry);
-    pool.erase(entities[1u], &registry);
+    base.erase(entities[0u]);
+    pool.erase(entities[1u]);
 
     ASSERT_EQ(on_construct.value, 2);
     ASSERT_EQ(on_destroy.value, 2);
     ASSERT_TRUE(pool.empty());
 
-    base.insert(std::begin(entities), std::end(entities), &registry);
+    base.insert(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(pool.get(entities[0u]), 0);
     ASSERT_EQ(pool.get(entities[1u]), 0);
     ASSERT_FALSE(pool.empty());
 
-    base.erase(entities[1u], &registry);
+    base.erase(entities[1u]);
 
     ASSERT_EQ(on_construct.value, 4);
     ASSERT_EQ(on_destroy.value, 3);
     ASSERT_FALSE(pool.empty());
 
-    base.erase(entities[0u], &registry);
+    base.erase(entities[0u]);
 
     ASSERT_EQ(on_construct.value, 4);
     ASSERT_EQ(on_destroy.value, 4);
     ASSERT_TRUE(pool.empty());
 
-    pool.insert(registry, std::begin(entities), std::end(entities), 3);
+    pool.insert(std::begin(entities), std::end(entities), 3);
 
     ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 4);
@@ -89,7 +91,7 @@ TEST(SighStorageMixin, GenericType) {
     ASSERT_EQ(pool.get(entities[0u]), 3);
     ASSERT_EQ(pool.get(entities[1u]), 3);
 
-    pool.erase(std::begin(entities), std::end(entities), &registry);
+    pool.erase(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 6);
@@ -102,14 +104,16 @@ TEST(SighStorageMixin, EmptyType) {
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
     entt::registry registry{};
 
+    pool.context(entt::forward_as_any(registry));
+
     counter on_construct{};
     counter on_destroy{};
 
     pool.on_construct().connect<&listener>(on_construct);
     pool.on_destroy().connect<&listener>(on_destroy);
 
-    base.emplace(entities[0u], &registry);
-    pool.emplace(registry, entities[1u]);
+    base.emplace(entities[0u]);
+    pool.emplace(entities[1u]);
 
     ASSERT_EQ(on_construct.value, 2);
     ASSERT_EQ(on_destroy.value, 0);
@@ -118,32 +122,32 @@ TEST(SighStorageMixin, EmptyType) {
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
 
-    base.erase(entities[0u], &registry);
-    pool.erase(entities[1u], &registry);
+    base.erase(entities[0u]);
+    pool.erase(entities[1u]);
 
     ASSERT_EQ(on_construct.value, 2);
     ASSERT_EQ(on_destroy.value, 2);
     ASSERT_TRUE(pool.empty());
 
-    base.insert(std::begin(entities), std::end(entities), &registry);
+    base.insert(std::begin(entities), std::end(entities));
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
     ASSERT_FALSE(pool.empty());
 
-    base.erase(entities[1u], &registry);
+    base.erase(entities[1u]);
 
     ASSERT_EQ(on_construct.value, 4);
     ASSERT_EQ(on_destroy.value, 3);
     ASSERT_FALSE(pool.empty());
 
-    base.erase(entities[0u], &registry);
+    base.erase(entities[0u]);
 
     ASSERT_EQ(on_construct.value, 4);
     ASSERT_EQ(on_destroy.value, 4);
     ASSERT_TRUE(pool.empty());
 
-    pool.insert(registry, std::begin(entities), std::end(entities));
+    pool.insert(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 4);
@@ -152,7 +156,7 @@ TEST(SighStorageMixin, EmptyType) {
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
 
-    pool.erase(std::begin(entities), std::end(entities), &registry);
+    pool.erase(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 6);
@@ -165,15 +169,17 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
     entt::registry registry{};
 
+    pool.context(entt::forward_as_any(registry));
+
     counter on_construct{};
     counter on_destroy{};
 
     pool.on_construct().connect<&listener>(on_construct);
     pool.on_destroy().connect<&listener>(on_destroy);
 
-    ASSERT_DEATH(base.emplace(entities[0u], &registry), "");
+    ASSERT_DEATH(base.emplace(entities[0u]), "");
 
-    pool.emplace(registry, entities[1u], 3);
+    pool.emplace(entities[1u], 3);
 
     ASSERT_EQ(on_construct.value, 1);
     ASSERT_EQ(on_destroy.value, 0);
@@ -182,19 +188,19 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_EQ(pool.get(entities[1u]).value, 3);
 
-    base.erase(entities[1u], &registry);
+    base.erase(entities[1u]);
 
     ASSERT_EQ(on_construct.value, 1);
     ASSERT_EQ(on_destroy.value, 1);
     ASSERT_TRUE(pool.empty());
 
-    ASSERT_DEATH(base.insert(std::begin(entities), std::end(entities), &registry), "");
+    ASSERT_DEATH(base.insert(std::begin(entities), std::end(entities)), "");
 
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
     ASSERT_TRUE(pool.empty());
 
-    pool.insert(registry, std::begin(entities), std::end(entities), 3);
+    pool.insert(std::begin(entities), std::end(entities), 3);
 
     ASSERT_EQ(on_construct.value, 3);
     ASSERT_EQ(on_destroy.value, 1);
@@ -203,7 +209,7 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
     ASSERT_EQ(pool.get(entities[0u]).value, 3);
     ASSERT_EQ(pool.get(entities[1u]).value, 3);
 
-    pool.erase(std::begin(entities), std::end(entities), &registry);
+    pool.erase(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(on_construct.value, 3);
     ASSERT_EQ(on_destroy.value, 3);

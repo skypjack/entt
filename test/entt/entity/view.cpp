@@ -1213,9 +1213,9 @@ TEST(MultiComponentView, SameComponentTypes) {
     const entt::entity e0{42u};
     const entt::entity e1{3u};
 
-    storage.emplace(registry, e0, 7);
-    other.emplace(registry, e0, 9);
-    other.emplace(registry, e1, 1);
+    storage.emplace(e0, 7);
+    other.emplace(e0, 9);
+    other.emplace(e1, 1);
 
     ASSERT_TRUE(view.contains(e0));
     ASSERT_FALSE(view.contains(e1));

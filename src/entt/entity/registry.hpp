@@ -110,6 +110,7 @@ class basic_registry {
         if(auto &&pdata = pools[type_id<Component>().hash()]; !pdata.pool) {
             auto *cpool = new storage_type<Component>{};
             pdata.pool.reset(cpool);
+            pdata.pool->context(forward_as_any(const_cast<basic_registry &>(*this)));
             pdata.poly.template emplace<storage_type<Component> &>(*static_cast<storage_type<Component> *>(pdata.pool.get()));
             return cpool;
         } else {
@@ -156,11 +157,39 @@ public:
     /*! @brief Default constructor. */
     basic_registry() = default;
 
-    /*! @brief Default move constructor. */
-    basic_registry(basic_registry &&) = default;
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    basic_registry(basic_registry &&other) ENTT_NOEXCEPT
+        : pools{std::move(other.pools)},
+          vars{std::move(other.vars)},
+          groups{std::move(other.groups)},
+          entities{std::move(other.entities)},
+          free_list{other.free_list} {
+        for(auto &&pdata: pools) {
+            pdata.second.pool->context(forward_as_any(*this));
+        }
+    }
 
-    /*! @brief Default move assignment operator. @return This registry. */
-    basic_registry &operator=(basic_registry &&) = default;
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to move from.
+     * @return This registry.
+     */
+    basic_registry &operator=(basic_registry &&other) ENTT_NOEXCEPT {
+        pools = std::move(other.pools);
+        vars = std::move(other.vars);
+        groups = std::move(other.groups);
+        entities = std::move(other.entities);
+        free_list = other.free_list;
+
+        for(auto &&pdata: pools) {
+            pdata.second.pool->context(forward_as_any(*this));
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Prepares a pool for the given type if required.
@@ -519,7 +548,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         for(auto &&pdata: pools) {
-            pdata.second.pool->remove(entity, this);
+            pdata.second.pool->remove(entity);
         }
 
         return release_entity(entity, version);
@@ -542,7 +571,7 @@ public:
             }
         } else {
             for(auto &&pdata: pools) {
-                pdata.second.pool->remove(first, last, this);
+                pdata.second.pool->remove(first, last);
             }
 
             release(first, last);
@@ -569,7 +598,7 @@ public:
     template<typename Component, typename... Args>
     decltype(auto) emplace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Component>()->emplace(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>()->emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -586,7 +615,7 @@ public:
     template<typename Component, typename It>
     void insert(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-        assure<Component>()->insert(*this, first, last, value);
+        assure<Component>()->insert(first, last, value);
     }
 
     /**
@@ -605,7 +634,7 @@ public:
     void insert(EIt first, EIt last, CIt from) {
         static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>, "Invalid value type");
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-        assure<Component>()->insert(*this, first, last, from);
+        assure<Component>()->insert(first, last, from);
     }
 
     /**
@@ -626,8 +655,8 @@ public:
         auto *cpool = assure<Component>();
 
         return cpool->contains(entity)
-                   ? cpool->patch(*this, entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); })
-                   : cpool->emplace(*this, entity, std::forward<Args>(args)...);
+                   ? cpool->patch(entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); })
+                   : cpool->emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -657,7 +686,7 @@ public:
     template<typename Component, typename... Func>
     decltype(auto) patch(const entity_type entity, Func &&...func) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Component>()->patch(*this, entity, std::forward<Func>(func)...);
+        return assure<Component>()->patch(entity, std::forward<Func>(func)...);
     }
 
     /**
@@ -679,7 +708,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&...args) {
-        return assure<Component>()->patch(*this, entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
+        return assure<Component>()->patch(entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
     }
 
     /**
@@ -696,7 +725,7 @@ public:
     size_type remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        return (assure<Component>()->remove(entity, this) + ... + size_type{});
+        return (assure<Component>()->remove(entity) + ... + size_type{});
     }
 
     /**
@@ -719,7 +748,7 @@ public:
         for(; first != last; ++first) {
             const auto entity = *first;
             ENTT_ASSERT(valid(entity), "Invalid entity");
-            count += (std::get<storage_type<Component> *>(cpools)->remove(entity, this) + ...);
+            count += (std::get<storage_type<Component> *>(cpools)->remove(entity) + ...);
         }
 
         return count;
@@ -739,7 +768,7 @@ public:
     void erase(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>()->erase(entity, this), ...);
+        (assure<Component>()->erase(entity), ...);
     }
 
     /**
@@ -760,7 +789,7 @@ public:
         for(; first != last; ++first) {
             const auto entity = *first;
             ENTT_ASSERT(valid(entity), "Invalid entity");
-            (std::get<storage_type<Component> *>(cpools)->erase(entity, this), ...);
+            (std::get<storage_type<Component> *>(cpools)->erase(entity), ...);
         }
     }
 
@@ -868,7 +897,7 @@ public:
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
         auto *cpool = assure<Component>();
-        return cpool->contains(entity) ? cpool->get(entity) : cpool->emplace(*this, entity, std::forward<Args>(args)...);
+        return cpool->contains(entity) ? cpool->get(entity) : cpool->emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -916,12 +945,12 @@ public:
     void clear() {
         if constexpr(sizeof...(Component) == 0) {
             for(auto &&pdata: pools) {
-                pdata.second.pool->clear(this);
+                pdata.second.pool->clear();
             }
 
             each([this](const auto entity) { release_entity(entity, entity_traits::to_version(entity) + 1u); });
         } else {
-            (assure<Component>()->clear(this), ...);
+            (assure<Component>()->clear(), ...);
         }
     }
 

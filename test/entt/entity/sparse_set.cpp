@@ -75,6 +75,8 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.contains(entt::entity{0}));
     ASSERT_FALSE(set.contains(entt::entity{42}));
+
+    ASSERT_NO_THROW(set.context(entt::any{}));
 }
 
 TEST(SparseSet, Contains) {
@@ -1167,35 +1169,6 @@ TEST(SparseSet, CanModifyDuringIteration) {
 
     // this should crash with asan enabled if we break the constraint
     [[maybe_unused]] const auto entity = *it;
-}
-
-TEST(SparseSet, UserData) {
-    entt::sparse_set set;
-    int value = 42;
-
-    ASSERT_EQ(set.user_data(), nullptr);
-
-    set.user_data(&value);
-    entt::sparse_set other{std::move(set)};
-
-    ASSERT_EQ(std::as_const(set).user_data(), nullptr);
-    ASSERT_EQ(other.user_data(), &value);
-
-    std::swap(set, other);
-
-    ASSERT_EQ(set.user_data(), &value);
-    ASSERT_EQ(std::as_const(other).user_data(), nullptr);
-
-    other = std::move(set);
-
-    ASSERT_EQ(set.user_data(), nullptr);
-    ASSERT_EQ(other.user_data(), &value);
-
-    entt::sparse_set last{std::move(other), std::allocator<entt::entity>{}};
-
-    ASSERT_EQ(set.user_data(), nullptr);
-    ASSERT_EQ(other.user_data(), nullptr);
-    ASSERT_EQ(last.user_data(), &value);
 }
 
 TEST(SparseSet, CustomAllocator) {

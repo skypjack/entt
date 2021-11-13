@@ -10,6 +10,7 @@
 #include <vector>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/any.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
@@ -316,9 +317,8 @@ protected:
     /**
      * @brief Erase an element from a storage.
      * @param entt A valid identifier.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void swap_and_pop(const Entity entt, void *ud) override {
+    void swap_and_pop(const Entity entt) override {
         const auto pos = base_type::index(entt);
         const auto last = base_type::size() - 1u;
 
@@ -330,17 +330,16 @@ protected:
         target = std::move(elem);
         std::destroy_at(std::addressof(elem));
 
-        base_type::swap_and_pop(entt, ud);
+        base_type::swap_and_pop(entt);
     }
 
     /**
      * @brief Erases an element from a storage.
      * @param entt A valid identifier.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void in_place_pop(const Entity entt, void *ud) override {
+    void in_place_pop(const Entity entt) override {
         const auto pos = base_type::index(entt);
-        base_type::in_place_pop(entt, ud);
+        base_type::in_place_pop(entt);
         // support for nosy destructors
         std::destroy_at(std::addressof(element_at(pos)));
     }
@@ -348,15 +347,14 @@ protected:
     /**
      * @brief Assigns an entity to a storage.
      * @param entt A valid identifier.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] void *ud) override {
+    void try_emplace([[maybe_unused]] const Entity entt) override {
         if constexpr(std::is_default_constructible_v<value_type>) {
             const auto pos = base_type::slot();
             construct(assure_at_least(pos));
 
             ENTT_TRY {
-                base_type::try_emplace(entt, ud);
+                base_type::try_emplace(entt);
                 ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
             }
             ENTT_CATCH {
@@ -648,7 +646,7 @@ public:
         construct(elem, std::forward<Args>(args)...);
 
         ENTT_TRY {
-            base_type::try_emplace(entt, nullptr);
+            base_type::try_emplace(entt);
             ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
         }
         ENTT_CATCH {
@@ -814,7 +812,7 @@ public:
     template<typename... Args>
     void emplace(const entity_type entt, Args &&...args) {
         [[maybe_unused]] const value_type elem{std::forward<Args>(args)...};
-        base_type::try_emplace(entt, nullptr);
+        base_type::try_emplace(entt);
     }
 
     /**
@@ -851,86 +849,30 @@ public:
 };
 
 /**
- * @brief Mixin type to use to wrap basic storage classes.
- * @tparam Type The type of the underlying storage.
- */
-template<typename Type>
-struct storage_adapter_mixin: Type {
-    static_assert(std::is_same_v<typename Type::value_type, std::decay_t<typename Type::value_type>>, "Invalid object type");
-
-    /*! @brief Type of the objects assigned to entities. */
-    using value_type = typename Type::value_type;
-    /*! @brief Underlying entity identifier. */
-    using entity_type = typename Type::entity_type;
-
-    /*! @brief Inherited constructors. */
-    using Type::Type;
-
-    /**
-     * @brief Assigns entities to a storage.
-     * @tparam Args Types of arguments to use to construct the object.
-     * @param entt A valid identifier.
-     * @param args Parameters to use to initialize the object.
-     * @return A reference to the newly created object.
-     */
-    template<typename... Args>
-    decltype(auto) emplace(basic_registry<entity_type> &, const entity_type entt, Args &&...args) {
-        return Type::emplace(entt, std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Patches the given instance for an entity.
-     * @tparam Func Types of the function objects to invoke.
-     * @param entt A valid identifier.
-     * @param func Valid function objects.
-     * @return A reference to the patched instance.
-     */
-    template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entt, Func &&...func) {
-        return Type::patch(entt, std::forward<Func>(func)...);
-    }
-
-    /**
-     * @brief Assigns entities to a storage.
-     * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the objects assigned
-     * to the entities.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the objects assigned to the
-     * entities.
-     */
-    template<typename It, typename... Args>
-    void insert(basic_registry<entity_type> &, It first, It last, Args &&...args) {
-        Type::insert(std::move(first), std::move(last), std::forward<Args>(args)...);
-    }
-};
-
-/**
  * @brief Mixin type to use to add signal support to storage types.
  * @tparam Type The type of the underlying storage.
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
     /*! @copydoc basic_sparse_set::swap_and_pop */
-    void swap_and_pop(const typename Type::entity_type entt, void *ud) final {
-        ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
-        destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entt);
-        Type::swap_and_pop(entt, ud);
+    void swap_and_pop(const typename Type::entity_type entt) final {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        destruction.publish(*owner, entt);
+        Type::swap_and_pop(entt);
     }
 
     /*! @copydoc basic_sparse_set::in_place_pop */
-    void in_place_pop(const typename Type::entity_type entt, void *ud) final {
-        ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
-        destruction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entt);
-        Type::in_place_pop(entt, ud);
+    void in_place_pop(const typename Type::entity_type entt) final {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        destruction.publish(*owner, entt);
+        Type::in_place_pop(entt);
     }
 
     /*! @copydoc basic_sparse_set::try_emplace */
-    void try_emplace(const typename Type::entity_type entt, void *ud) final {
-        ENTT_ASSERT(ud != nullptr, "Invalid pointer to registry");
-        Type::try_emplace(entt, ud);
-        construction.publish(*static_cast<basic_registry<typename Type::entity_type> *>(ud), entt);
+    void try_emplace(const typename Type::entity_type entt) final {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        Type::try_emplace(entt);
+        construction.publish(*owner, entt);
     }
 
 public:
@@ -1010,30 +952,28 @@ public:
     /**
      * @brief Assigns entities to a storage.
      * @tparam Args Types of arguments to use to construct the object.
-     * @param owner The registry that issued the request.
      * @param entt A valid identifier.
      * @param args Parameters to use to initialize the object.
      * @return A reference to the newly created object.
      */
     template<typename... Args>
-    decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entt, Args &&...args) {
+    decltype(auto) emplace(const entity_type entt, Args &&...args) {
         Type::emplace(entt, std::forward<Args>(args)...);
-        construction.publish(owner, entt);
+        construction.publish(*owner, entt);
         return this->get(entt);
     }
 
     /**
      * @brief Patches the given instance for an entity.
      * @tparam Func Types of the function objects to invoke.
-     * @param owner The registry that issued the request.
      * @param entt A valid identifier.
      * @param func Valid function objects.
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entt, Func &&...func) {
+    decltype(auto) patch(const entity_type entt, Func &&...func) {
         Type::patch(entt, std::forward<Func>(func)...);
-        update.publish(owner, entt);
+        update.publish(*owner, entt);
         return this->get(entt);
     }
 
@@ -1042,27 +982,37 @@ public:
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the objects assigned
      * to the entities.
-     * @param owner The registry that issued the request.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param args Parameters to use to initialize the objects assigned to the
      * entities.
      */
     template<typename It, typename... Args>
-    void insert(basic_registry<entity_type> &owner, It first, It last, Args &&...args) {
+    void insert(It first, It last, Args &&...args) {
         Type::insert(first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
             for(; first != last; ++first) {
-                construction.publish(owner, *first);
+                construction.publish(*owner, *first);
             }
         }
+    }
+
+    /**
+     * @brief Forwards context variables to mixins, if any.
+     * @param value A context variable wrapped in an opaque container.
+     */
+    void context(any value) ENTT_NOEXCEPT final {
+        auto *reg = any_cast<basic_registry<entity_type>>(&value);
+        owner = reg ? reg : owner;
+        Type::context(std::move(value));
     }
 
 private:
     sigh<void(basic_registry<entity_type> &, const entity_type)> construction{};
     sigh<void(basic_registry<entity_type> &, const entity_type)> destruction{};
     sigh<void(basic_registry<entity_type> &, const entity_type)> update{};
+    basic_registry<entity_type> *owner{};
 };
 
 /**

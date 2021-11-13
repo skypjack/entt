@@ -9,6 +9,7 @@
 #include <vector>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/any.hpp"
 #include "../core/memory.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -207,7 +208,7 @@ protected:
      * @brief Erase an entity from a sparse set.
      * @param entt A valid identifier.
      */
-    virtual void swap_and_pop(const Entity entt, void *) {
+    virtual void swap_and_pop(const Entity entt) {
         auto &ref = sparse_ref(entt);
         const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
         ENTT_ASSERT(packed[pos] == entt, "Invalid identifier");
@@ -226,7 +227,7 @@ protected:
      * @brief Erase an entity from a sparse set.
      * @param entt A valid identifier.
      */
-    virtual void in_place_pop(const Entity entt, void *) {
+    virtual void in_place_pop(const Entity entt) {
         auto &ref = sparse_ref(entt);
         const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
         ENTT_ASSERT(packed[pos] == entt, "Invalid identifier");
@@ -240,7 +241,7 @@ protected:
      * @brief Assigns an entity to a sparse set.
      * @param entt A valid identifier.
      */
-    virtual void try_emplace(const Entity entt, void *) {
+    virtual void try_emplace(const Entity entt) {
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
         const auto page = pos / sparse_page_v;
 
@@ -301,7 +302,6 @@ public:
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &allocator = {})
         : sparse{allocator},
           packed{allocator},
-          udata{},
           free_list{tombstone},
           mode{pol} {}
 
@@ -312,7 +312,6 @@ public:
     basic_sparse_set(basic_sparse_set &&other) ENTT_NOEXCEPT
         : sparse{std::move(other.sparse)},
           packed{std::move(other.packed)},
-          udata{std::exchange(other.udata, nullptr)},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode} {}
 
@@ -324,7 +323,6 @@ public:
     basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) ENTT_NOEXCEPT
         : sparse{std::move(other.sparse), allocator},
           packed{std::move(other.packed), allocator},
-          udata{std::exchange(other.udata, nullptr)},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
@@ -346,7 +344,6 @@ public:
         release_sparse_pages();
         sparse = std::move(other.sparse);
         packed = std::move(other.packed);
-        udata = std::exchange(other.udata, nullptr);
         free_list = std::exchange(other.free_list, tombstone);
         mode = other.mode;
         return *this;
@@ -361,7 +358,6 @@ public:
         swap_contents(other);
         swap(sparse, other.sparse);
         swap(packed, other.packed);
-        swap(udata, other.udata);
         swap(free_list, other.free_list);
         swap(mode, other.mode);
     }
@@ -592,10 +588,9 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid identifier.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void emplace(const entity_type entt, void *ud = nullptr) {
-        try_emplace(entt, ud);
+    void emplace(const entity_type entt) {
+        try_emplace(entt);
         ENTT_ASSERT(contains(entt), "Emplace did not take place");
     }
 
@@ -609,18 +604,17 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     template<typename It>
-    void insert(It first, It last, void *ud = nullptr) {
+    void insert(It first, It last) {
         for(; first != last && free_list != null; ++first) {
-            emplace(*first, ud);
+            emplace(*first);
         }
 
         reserve(packed.size() + std::distance(first, last));
 
         for(; first != last; ++first) {
-            emplace(*first, ud);
+            emplace(*first);
         }
     }
 
@@ -632,11 +626,10 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid identifier.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
-    void erase(const entity_type entt, void *ud = nullptr) {
+    void erase(const entity_type entt) {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
-        (mode == deletion_policy::in_place) ? in_place_pop(entt, ud) : swap_and_pop(entt, ud);
+        (mode == deletion_policy::in_place) ? in_place_pop(entt) : swap_and_pop(entt);
         ENTT_ASSERT(!contains(entt), "Destruction did not take place");
     }
 
@@ -648,23 +641,21 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      */
     template<typename It>
-    void erase(It first, It last, void *ud = nullptr) {
+    void erase(It first, It last) {
         for(; first != last; ++first) {
-            erase(*first, ud);
+            erase(*first);
         }
     }
 
     /**
      * @brief Removes an entity from a sparse set if it exists.
      * @param entt A valid identifier.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      * @return True if the entity is actually removed, false otherwise.
      */
-    bool remove(const entity_type entt, void *ud = nullptr) {
-        return contains(entt) && (erase(entt, ud), true);
+    bool remove(const entity_type entt) {
+        return contains(entt) && (erase(entt), true);
     }
 
     /**
@@ -672,15 +663,14 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
      * @return The number of entities actually removed.
      */
     template<typename It>
-    size_type remove(It first, It last, void *ud = nullptr) {
+    size_type remove(It first, It last) {
         size_type found{};
 
         for(; first != last; ++first) {
-            found += remove(*first, ud);
+            found += remove(*first);
         }
 
         return found;
@@ -840,42 +830,20 @@ public:
         }
     }
 
-    /**
-     * @brief Clears a sparse set.
-     * @param ud Optional user data that are forwarded as-is to derived classes.
-     */
-    void clear(void *ud = nullptr) {
+    /*! @brief Clears a sparse set. */
+    void clear() {
         for(auto &&entity: *this) {
             // honor the modality and filter all tombstones
-            remove(entity, ud);
+            remove(entity);
         }
     }
 
-    /**
-     * @brief User defined arbitrary data.
-     * @return An opaque pointer to user defined arbitrary data.
-     */
-    void *user_data() ENTT_NOEXCEPT {
-        return udata;
-    }
-
-    /*! @copydoc user_data */
-    const void *user_data() const ENTT_NOEXCEPT {
-        return udata;
-    }
-
-    /**
-     * @brief User defined arbitrary data.
-     * @param ptr An opaque pointer to user defined arbitrary data.
-     */
-    void user_data(void *ptr) ENTT_NOEXCEPT {
-        udata = ptr;
-    }
+    /*! @brief Forwards context variables to mixins, if any. */
+    virtual void context(any) ENTT_NOEXCEPT {}
 
 private:
     sparse_container_type sparse;
     packed_container_type packed;
-    void *udata;
     entity_type free_list;
     deletion_policy mode;
 };
