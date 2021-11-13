@@ -1147,18 +1147,21 @@ public:
      */
     template<typename ItComp, typename ItExcl = id_type *>
     [[nodiscard]] basic_runtime_view<Entity> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
-        std::vector<const basic_common_type *> component(std::distance(first, last));
-        std::vector<const basic_common_type *> filter(std::distance(from, to));
+        std::vector<const basic_common_type *> component{};
+        std::vector<const basic_common_type *> filter{};
 
-        std::transform(first, last, component.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&curr) { return curr.second.info->hash() == ctype; });
-            return it == pools.cend() ? nullptr : it->second.pool.get();
-        });
+        component.reserve(std::distance(first, last));
+        filter.reserve(std::distance(from, to));
 
-        std::transform(from, to, filter.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&curr) { return curr.second.info->hash() == ctype; });
-            return it == pools.cend() ? nullptr : it->second.pool.get();
-        });
+        for(; first != last; ++first) {
+            const auto it = pools.find(*first);
+            component.emplace_back(it == pools.cend() ? nullptr : it->second.pool.get());
+        }
+
+        for(; from != to; ++from) {
+            const auto it = pools.find(*from);
+            filter.emplace_back(it == pools.cend() ? nullptr : it->second.pool.get());
+        }
 
         return {std::move(component), std::move(filter)};
     }
