@@ -23,6 +23,9 @@ I hope this list can grow much more in the future:
   * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
     [Tilted Phoques](https://github.com/tiltedphoques): Skyrim and Fallout 4 mod
     to play online.
+  * [Apparently](https://www.youtube.com/watch?v=P8xvOA3ikrQ&t=1105s)
+    [Call of Duty: Vanguard](https://www.callofduty.com/vanguard): I can neither
+    confirm nor deny but there is a license I know in the credits.
   * [Antkeeper](https://github.com/antkeeper/antkeeper-source): an ant colony
     simulation [game](https://antkeeper.com/).
   * [Openblack](https://github.com/openblack/openblack): open source
@@ -97,6 +100,9 @@ I hope this list can grow much more in the future:
     vrooooommm.
   * [Antara Gaming SDK](https://github.com/KomodoPlatform/antara-gaming-sdk):
     the Komodo Gaming Software Development Kit.
+  * [XVP](https://ravingbots.com/xvp-expansive-vehicle-physics-for-unreal-engine/):
+    [_eXpansive Vehicle Physics_](https://github.com/raving-bots/xvp/wiki/Plugin-integration-guide)
+    plugin for Unreal Engine.
   * [Apparently](https://teamwisp.github.io/credits/)
     [Wisp](https://teamwisp.github.io/product/) by
     [Team Wisp](https://teamwisp.github.io/): an advanced real-time ray tracing
@@ -129,6 +135,11 @@ I hope this list can grow much more in the future:
     oriented game engine.
   * [Becketron](https://github.com/Doctor-Foxling/Becketron): a game engine
     written mostly in C++.
+  * [Spatial Engine](https://github.com/luizgabriel/Spatial.Engine): A
+    cross-platform engine created on top of google's filament rendering engine.
+  * [Kaguya](https://github.com/KaiH0717/Kaguya): D3D12 Rendering Engine.
+  * [OpenAWE](https://github.com/OpenAWE-Project/OpenAWE): Open implementation
+    of the Alan Wake Engine.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
