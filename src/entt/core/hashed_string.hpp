@@ -47,6 +47,7 @@ struct fnv1a_traits<std::uint64_t> {
  * counterparts at runtime.<br/>
  * Because of that, a hashed string can also be used in constant expressions if
  * required.
+ * A hashed string only contains a pointer to a user-provided string, and assumes no ownership.
  *
  * @tparam Char Character type.
  */
@@ -145,6 +146,7 @@ public:
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
      * string directly from a `const value_type *`.
+     * The lifetime of the pointed-to string is not extended nor is it copied.
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
@@ -154,6 +156,7 @@ public:
     /**
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
+     * May point to undefined memory if the initial string has gone out of scope.
      */
     [[nodiscard]] constexpr const value_type *data() const ENTT_NOEXCEPT {
         return str;
