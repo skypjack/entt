@@ -891,7 +891,7 @@ public:
 
         if constexpr(sizeof...(Component) == 1) {
             const auto *cpool = pool_if_exists<std::remove_const_t<Component>...>();
-            return (cpool && cpool->contains(entity)) ? &cpool->get(entity) : nullptr;
+            return (cpool && cpool->contains(entity)) ? std::addressof(cpool->get(entity)) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
         }
