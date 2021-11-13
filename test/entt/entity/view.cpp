@@ -135,18 +135,18 @@ TEST(SingleComponentView, LazyTypeFromConstRegistry) {
     ASSERT_TRUE(cview);
     ASSERT_TRUE(eview);
 
-    ASSERT_NE(cview.raw(), nullptr);
-    ASSERT_NE(eview.data(), nullptr);
+    ASSERT_EQ(cview.raw(), nullptr);
+    ASSERT_EQ(eview.data(), nullptr);
 
-    ASSERT_FALSE(cview.empty());
-    ASSERT_EQ(eview.size(), 1u);
-    ASSERT_TRUE(cview.contains(entity));
+    ASSERT_TRUE(cview.empty());
+    ASSERT_EQ(eview.size(), 0u);
+    ASSERT_FALSE(cview.contains(entity));
 
-    ASSERT_NE(cview.begin(), cview.end());
-    ASSERT_NE(eview.rbegin(), eview.rend());
-    ASSERT_NE(eview.find(entity), eview.end());
-    ASSERT_EQ(cview.front(), entity);
-    ASSERT_EQ(eview.back(), entity);
+    ASSERT_EQ(cview.begin(), cview.end());
+    ASSERT_EQ(eview.rbegin(), eview.rend());
+    ASSERT_EQ(eview.find(entity), eview.end());
+    ASSERT_NE(cview.front(), entity);
+    ASSERT_NE(eview.back(), entity);
 }
 
 TEST(SingleComponentView, ElementAccess) {
@@ -572,13 +572,13 @@ TEST(MultiComponentView, LazyTypesFromConstRegistry) {
 
     ASSERT_TRUE(view);
 
-    ASSERT_EQ(view.size_hint(), 1u);
-    ASSERT_TRUE(view.contains(entity));
+    ASSERT_EQ(view.size_hint(), 0u);
+    ASSERT_FALSE(view.contains(entity));
 
-    ASSERT_NE(view.begin(), view.end());
-    ASSERT_NE(view.find(entity), view.end());
-    ASSERT_EQ(view.front(), entity);
-    ASSERT_EQ(view.back(), entity);
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.find(entity), view.end());
+    ASSERT_NE(view.front(), entity);
+    ASSERT_NE(view.back(), entity);
 }
 
 TEST(MultiComponentView, LazyExcludedTypeFromConstRegistry) {
