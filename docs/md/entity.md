@@ -161,16 +161,12 @@ below. For more details, please refer to the inline documentation.
 In `EnTT`, pools of components are made available through a specialized version
 of a sparse set.
 
-Each pool contains all the instances of a single component, as well as all the
-entities to which it's assigned. Sparse arrays are also _paged_ to avoid wasting
-memory in some cases while packed arrays are not for obvious reasons.<br/>
-Pools also make available at any time a pointer to the packed lists of entities
-and components they contain, in addition to the number of elements in use. For
-this reason, pools can rearrange their items in order to keep the internal
-arrays tightly packed and maximize performance.
-
-At the moment, it's possible to specialize pools within certain limits, although
-a more flexible and user-friendly model is under development.
+Each pool contains all the instances of a single component and all the entities
+to which it's assigned. Sparse arrays are _paged_ to avoid wasting memory in
+some cases. Packed arrays of components are also paged to have pointer stability
+upon additions. Packed arrays of entities are not instead.<br/>
+All pools can rearrange their items in order to keep the internal arrays tightly
+packed and maximize performance.
 
 # The Registry, the Entity and the Component
 
@@ -181,7 +177,7 @@ to represent an entity. Because `std::uint32_t` is large enough for almost all
 the cases, there exists also the enum class `entt::entity` that _wraps_ it and
 the alias `entt::registry` for `entt::basic_registry<entt::entity>`.
 
-Entities are represented by _entity identifiers_. An entity identifier carries
+Entities are represented by _entity identifiers_. An entity identifier contains
 information about the entity itself and its version.<br/>
 User defined identifiers can be introduced through enum classes and class types
 that define an `entity_type` member of type `std::uint32_t` or `std::uint64_t`.
@@ -1327,7 +1323,7 @@ In particular:
   void operator()(entt::entity, const T &);
   ```
 
-  The output archive can freely decide how to serialize the data. The register
+  The output archive can freely decide how to serialize the data. The registry
   is not affected at all by the decision.
 
 * An input archive, the one used when restoring a snapshot, must expose a
@@ -1432,10 +1428,13 @@ type view exposes utility functions to get the estimated number of entities it
 is going to return and to know if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
-There is no need to store views aside for they are extremely cheap to construct,
-even though valid views can be copied without problems and reused freely.<br/>
-Views also return newly created and correctly initialized iterators whenever
-`begin` or `end` are invoked.
+There is no need to store views aside as they are extremely cheap to construct.
+In fact, this is even discouraged when creating a view from a const registry.
+Since all storage are lazily initialized, they may not exist when the view is
+built. Therefore, the view itself will refer to an empty _placeholder_ and will
+never be re-assigned the actual storage.<br/>
+In all cases, views return newly created and correctly initialized iterators for
+the storage they refer to when `begin` or `end` are invoked.
 
 Views share the way they are created by means of a registry:
 
@@ -1548,7 +1547,7 @@ Refer to the inline documentation for all the details.
 
 Runtime views are pretty cheap to construct and should not be stored aside in
 any case. They should be used immediately after creation and then they should be
-thrown away. The reasons for this go far beyond the scope of this document.<br/>
+thrown away.<br/>
 To iterate a runtime view, either use it in a range-for loop:
 
 ```cpp
@@ -1618,9 +1617,8 @@ list for owned components. It's also possible to ask a group if it contains a
 given entity.<br/>
 Refer to the inline documentation for all the details.
 
-There is no need to store groups aside for they are extremely cheap to
-construct, even though valid groups can be copied without problems and reused
-freely.<br/>
+There is no need to store groups aside for they are extremely cheap to create,
+even though valid groups can be copied without problems and reused freely.<br/>
 A group performs an initialization step the very first time it's requested and
 this could be quite costly. To avoid it, consider creating the group when no
 components have been assigned yet. If the registry is empty, preparation is
@@ -2133,25 +2131,32 @@ should even benefit from it further.
 
 ## Const registry
 
-Contrary to what the standard library containers offer, a const registry is
-generally but not completely thread safe.<br/>
-In particular, one (and only one) of its const member functions isn't fully
-thread safe. That is the `view` method.
-
+A const registry is also fully thread safe. This means that it won't be able to
+lazily initialize a missing storage when a view is generated.<br/>
 The reason for this is easy to explain. To avoid requiring types to be
-_announced_ in advance, the registry lazily initializes the storage objects for
-the different components.<br/>
-In most cases, this isn't even necessary. The absence of a storage is itself the
-required information. However, when building a view, all pools must necessarily
-exist. This makes the `view` member function not thread safe even in its const
-overload, unless all pools already exist.
+_announced_ in advance, a registry lazily creates the storage objects for the
+different components. However, this isn't possible for a thread safe const
+registry.<br/>
+On the other side, all pools must necessarily _exist_ when creating a view.
+Therefore, static _placeholders_ for missing storage are used to fill the gap.
+
+Note that returned views are always valid and behave as expected in the context
+of the caller. The only difference is that static _placeholders_ (if any) are
+never renewed.<br/>
+As a result, a view created from a const registry may behave incorrectly over
+time if it's kept for a second use.<br/>
+Therefore, if the general advice is to create views when necessary and discard
+them immediately afterwards, this becomes almost a rule when it comes to views
+generated from a const registry.
 
 Fortunately, there is also a way to instantiate storage classes early when in
 doubt or when there are special requirements.<br/>
 Calling the `prepare` method is equivalent to _announcing_ the existence of a
 particular storage, to avoid running into problems. For those interested, there
 are also alternative approaches, such as a single threaded tick for the registry
-warm-up, but these are not always applicable.
+warm-up, but these are not always applicable.<br/>
+In this case, no placeholders will be used since all storage exist. In other
+words, views never risk becoming _invalid_.
 
 # Beyond this document
 
