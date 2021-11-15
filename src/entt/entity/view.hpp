@@ -232,7 +232,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     template<typename Comp>
     using storage_type_t = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
-    static constexpr auto is_multi_type_v = ((sizeof...(Component) + sizeof...(Exclude)) != 1u);
+    static constexpr bool is_multi_type_v = ((sizeof...(Component) + sizeof...(Exclude)) != 1u);
     using basic_common_type = std::common_type_t<typename storage_type_t<Component>::base_type...>;
 
     class iterable final {
@@ -305,7 +305,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         const basic_view view;
     };
 
-    template<auto... Index>
+    template<std::size_t... Index>
     [[nodiscard]] auto test_set(std::index_sequence<Index...>) const ENTT_NOEXCEPT {
         std::size_t pos{};
         std::array<const basic_common_type *, sizeof...(Component) - 1u> other{};
@@ -313,7 +313,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         return other;
     }
 
-    template<auto Comp, auto Other, typename... Args>
+    template<std::size_t Comp, std::size_t Other, typename... Args>
     [[nodiscard]] auto dispatch_get(const std::tuple<Entity, Args...> &curr) const {
         if constexpr(Comp == Other) {
             return std::forward_as_tuple(std::get<Args>(curr)...);
@@ -322,7 +322,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         }
     }
 
-    template<auto Comp, typename Func, auto... Index>
+    template<std::size_t Comp, typename Func, std::size_t... Index>
     void each(Func func, std::index_sequence<Index...>) const {
         for(const auto curr: internal::iterable_storage{*std::get<Comp>(pools)}) {
             const auto entt = std::get<0>(curr);
@@ -339,7 +339,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         }
     }
 
-    template<typename Func, auto... Index>
+    template<typename Func, std::size_t... Index>
     void pick_and_each(Func func, std::index_sequence<Index...> seq) const {
         ((std::get<Index>(pools) == view ? each<Index>(std::move(func), seq) : void()), ...);
     }
