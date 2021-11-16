@@ -48,6 +48,10 @@ struct fnv1a_traits<std::uint64_t> {
  * Because of that, a hashed string can also be used in constant expressions if
  * required.
  *
+ * @warning
+ * This class doesn't take ownership of user-supplied strings nor does it make a
+ * copy of them.
+ *
  * @tparam Char Character type.
  */
 template<typename Char>
@@ -145,6 +149,10 @@ public:
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
      * string directly from a `const value_type *`.
+     *
+     * @warning
+     * The lifetime of the string is not extended nor is it copied.
+     *
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
