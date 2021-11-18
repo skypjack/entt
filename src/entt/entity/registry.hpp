@@ -108,7 +108,7 @@ class basic_registry {
 
         if(!pdata.pool) {
             pdata.pool.reset(new storage_type<Component>{});
-            pdata.pool->context(forward_as_any(*this));
+            pdata.pool->bind(forward_as_any(*this));
             pdata.info = &type_id<Component>();
         }
 
@@ -168,7 +168,7 @@ public:
           entities{std::move(other.entities)},
           free_list{other.free_list} {
         for(auto &&pdata: pools) {
-            pdata.second.pool->context(forward_as_any(*this));
+            pdata.second.pool->bind(forward_as_any(*this));
         }
     }
 
@@ -185,7 +185,7 @@ public:
         free_list = other.free_list;
 
         for(auto &&pdata: pools) {
-            pdata.second.pool->context(forward_as_any(*this));
+            pdata.second.pool->bind(forward_as_any(*this));
         }
 
         return *this;

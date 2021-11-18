@@ -999,13 +999,13 @@ public:
     }
 
     /**
-     * @brief Forwards context variables to mixins, if any.
-     * @param value A context variable wrapped in an opaque container.
+     * @brief Forwards variables to mixins, if any.
+     * @param value A variable wrapped in an opaque container.
      */
-    void context(any value) ENTT_NOEXCEPT final {
+    void bind(any value) ENTT_NOEXCEPT final {
         auto *reg = any_cast<basic_registry<entity_type>>(&value);
         owner = reg ? reg : owner;
-        Type::context(std::move(value));
+        Type::bind(std::move(value));
     }
 
 private:

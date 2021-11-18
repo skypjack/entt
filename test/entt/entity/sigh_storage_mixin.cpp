@@ -39,7 +39,7 @@ TEST(SighStorageMixin, GenericType) {
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
     entt::registry registry{};
 
-    pool.context(entt::forward_as_any(registry));
+    pool.bind(entt::forward_as_any(registry));
 
     counter on_construct{};
     counter on_destroy{};
@@ -104,7 +104,7 @@ TEST(SighStorageMixin, EmptyType) {
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
     entt::registry registry{};
 
-    pool.context(entt::forward_as_any(registry));
+    pool.bind(entt::forward_as_any(registry));
 
     counter on_construct{};
     counter on_destroy{};
@@ -169,7 +169,7 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
     entt::registry registry{};
 
-    pool.context(entt::forward_as_any(registry));
+    pool.bind(entt::forward_as_any(registry));
 
     counter on_construct{};
     counter on_destroy{};

@@ -838,8 +838,8 @@ public:
         }
     }
 
-    /*! @brief Forwards context variables to mixins, if any. */
-    virtual void context(any) ENTT_NOEXCEPT {}
+    /*! @brief Forwards variables to mixins, if any. */
+    virtual void bind(any) ENTT_NOEXCEPT {}
 
 private:
     sparse_container_type sparse;

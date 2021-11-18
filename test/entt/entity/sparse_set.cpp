@@ -76,7 +76,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_FALSE(set.contains(entt::entity{0}));
     ASSERT_FALSE(set.contains(entt::entity{42}));
 
-    ASSERT_NO_THROW(set.context(entt::any{}));
+    ASSERT_NO_THROW(set.bind(entt::any{}));
 }
 
 TEST(SparseSet, Contains) {
