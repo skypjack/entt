@@ -1990,23 +1990,25 @@ and components during iterations, nor to have pointer stability.<br/>
 
 * Deleting the current entity or removing its components is allowed during
   iterations but it could invalidate references. For all the other entities,
-  destroying them or removing their components isn't allowed and can result in
-  undefined behavior.
+  destroying them or removing their iterated components isn't allowed and can
+  result in undefined behavior.
 
-* If a type has stable pointers, it's possible to destroy any entity and any
-  component, even if not currently iterated, without the risk of invalidating
-  any references.
+* When pointer stability is enabled for the type leading the iteration, adding
+  instances of the same type may or may not cause the entity involved to be
+  returned. Destroying entities and components is always allowed instead, even
+  if not currently iterated, without the risk of invalidating any references.
 
-In other terms, iterators are never invalidated. Also, component references
+In other terms, iterators are rarely invalidated. Also, component references
 aren't invalidated when a new element is added while they could be invalidated
 upon destruction due to the _swap-and-pop_ policy, unless the type leading the
 iteration undergoes in-place deletion.<br/>
-Consider the following example:
+As an example, consider the following snippet:
 
 ```cpp
 registry.view<position>([&](const auto entity, auto &pos) {
     registry.emplace<position>(registry.create(), 0., 0.);
-    pos.x = 0.; // warning: dangling pointer
+    // references remain stable after adding new instances
+    pos.x = 0.;
 });
 ```
 
@@ -2029,7 +2031,7 @@ To work around it, possible approaches are:
   must be purged, then perform a second iteration to clean them up one by one.
 
 A notable side effect of this feature is that the number of required allocations
-is further reduced in most of the cases.
+is further reduced in most cases.
 
 ### More performance, more constraints
 
