@@ -577,17 +577,19 @@ TEST(Storage, TypeFromBase) {
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
 
-    base.emplace(entities[0u]);
+    int instance = 42;
+    base.emplace(entities[0u], &instance);
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
-    ASSERT_EQ(pool.get(entities[0u]), 0);
+    ASSERT_EQ(pool.get(entities[0u]), 42);
 
     base.erase(entities[0u]);
     base.insert(std::begin(entities), std::end(entities));
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
+    ASSERT_EQ(pool.get(entities[0u]), 0);
     ASSERT_EQ(pool.get(entities[1u]), 0);
 
     base.erase(std::begin(entities), std::end(entities));
@@ -603,7 +605,8 @@ TEST(Storage, EmptyTypeFromBase) {
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
 
-    base.emplace(entities[0u]);
+    empty_stable_type instance{};
+    base.emplace(entities[0u], &instance);
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
@@ -637,7 +640,8 @@ TEST(Storage, NonDefaultConstructibleTypeFromBase) {
     ASSERT_EQ(base.find(entities[0u]), base.end());
     ASSERT_TRUE(pool.empty());
 
-    pool.emplace(entities[0u], 3);
+    non_default_constructible instance{3};
+    base.emplace(entities[0u], &instance);
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
@@ -654,6 +658,42 @@ TEST(Storage, NonDefaultConstructibleTypeFromBase) {
     ASSERT_EQ(base.find(entities[0u]), base.end());
     ASSERT_EQ(base.find(entities[1u]), base.end());
     ASSERT_TRUE(pool.empty());
+}
+
+TEST(Storage, NonCopyConstructibleTypeFromBase) {
+    entt::storage<std::unique_ptr<int>> pool;
+    entt::sparse_set &base = pool;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    ASSERT_FALSE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+
+    base.emplace(entities[0u]);
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_NE(base.find(entities[0u]), base.end());
+    ASSERT_FALSE(pool.empty());
+
+    std::unique_ptr<int> instance = std::make_unique<int>(3);
+
+    ASSERT_DEATH(base.emplace(entities[1u], &instance), "");
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+
+    base.erase(entities[0u]);
+
+    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(pool.contains(entities[0u]));
+
+    base.insert(std::begin(entities), std::end(entities));
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_TRUE(pool.contains(entities[1u]));
+    ASSERT_NE(base.find(entities[0u]), base.end());
+    ASSERT_NE(base.find(entities[1u]), base.end());
+    ASSERT_FALSE(pool.empty());
 }
 
 TEST(Storage, Compact) {

@@ -347,11 +347,12 @@ protected:
     /**
      * @brief Assigns an entity to a storage.
      * @param entt A valid identifier.
+     * @param value Optional opaque value.
      */
-    void try_emplace([[maybe_unused]] const Entity entt) override {
-        if constexpr(std::is_default_constructible_v<value_type>) {
+    void try_emplace(const Entity entt, [[maybe_unused]] const void *value) override {
+        [[maybe_unused]] const auto try_emplace_with_args = [this, entt](auto &&...args) {
             const auto pos = base_type::slot();
-            construct(assure_at_least(pos));
+            construct(assure_at_least(pos), std::forward<decltype(args)>(args)...);
 
             ENTT_TRY {
                 base_type::try_emplace(entt);
@@ -360,6 +361,16 @@ protected:
             ENTT_CATCH {
                 std::destroy_at(std::addressof(element_at(pos)));
                 ENTT_THROW;
+            }
+        };
+
+        if(value) {
+            if constexpr(std::is_copy_constructible_v<value_type>) {
+                try_emplace_with_args(*static_cast<const value_type *>(value));
+            }
+        } else {
+            if constexpr(std::is_default_constructible_v<value_type>) {
+                try_emplace_with_args();
             }
         }
     }
@@ -869,9 +880,9 @@ class sigh_storage_mixin final: public Type {
     }
 
     /*! @copydoc basic_sparse_set::try_emplace */
-    void try_emplace(const typename Type::entity_type entt) final {
+    void try_emplace(const typename Type::entity_type entt, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        Type::try_emplace(entt);
+        Type::try_emplace(entt, value);
         construction.publish(*owner, entt);
     }
 

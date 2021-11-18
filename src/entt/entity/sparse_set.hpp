@@ -241,7 +241,7 @@ protected:
      * @brief Assigns an entity to a sparse set.
      * @param entt A valid identifier.
      */
-    virtual void try_emplace(const Entity entt) {
+    virtual void try_emplace(const Entity entt, const void * = nullptr) {
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
         const auto page = pos / sparse_page_v;
 
@@ -588,9 +588,10 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid identifier.
+     * @param value Optional opaque value to forward to mixins, if any.
      */
-    void emplace(const entity_type entt) {
-        try_emplace(entt);
+    void emplace(const entity_type entt, const void *value = nullptr) {
+        try_emplace(entt, value);
         ENTT_ASSERT(contains(entt), "Emplace did not take place");
     }
 
