@@ -266,33 +266,29 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate>
-    std::enable_if_t<std::is_member_function_pointer_v<decltype(Candidate)>, meta_factory<Type>> conv() ENTT_NOEXCEPT {
+    auto conv() ENTT_NOEXCEPT {
         using conv_type = std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
-        static internal::meta_conv_node node{
-            nullptr,
-            internal::meta_node<conv_type>::resolve(),
-            [](const meta_any &instance) -> meta_any { return forward_as_meta(static_cast<const Type *>(instance.data())->*Candidate)(); }
-            // tricks clang-format
-        };
+        if constexpr(std::is_member_function_pointer_v<decltype(Candidate)>) {
+            static internal::meta_conv_node node{
+                nullptr,
+                internal::meta_node<conv_type>::resolve(),
+                [](const meta_any &instance) -> meta_any { return forward_as_meta((static_cast<const Type *>(instance.data())->*Candidate)()); }
+                // tricks clang-format
+            };
 
-        link_conv_if_required(node);
-        return meta_factory<Type>{};
-    }
+            link_conv_if_required(node);
+        } else {
+            static internal::meta_conv_node node{
+                nullptr,
+                internal::meta_node<conv_type>::resolve(),
+                [](const meta_any &instance) -> meta_any { return forward_as_meta(Candidate(*static_cast<const Type *>(instance.data()))); }
+                // tricks clang-format
+            };
 
-    /*! @copydoc conv */
-    template<auto Candidate>
-    std::enable_if_t<!std::is_member_function_pointer_v<decltype(Candidate)>, meta_factory<Type>> conv() ENTT_NOEXCEPT {
-        using conv_type = std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
+            link_conv_if_required(node);
+        }
 
-        static internal::meta_conv_node node{
-            nullptr,
-            internal::meta_node<conv_type>::resolve(),
-            [](const meta_any &instance) -> meta_any { return forward_as_meta(Candidate(*static_cast<const Type *>(instance.data()))); }
-            // tricks clang-format
-        };
-
-        link_conv_if_required(node);
         return meta_factory<Type>{};
     }
 
