@@ -417,7 +417,7 @@ public:
      * Moreover, the comparison function object shall induce a
      * _strict weak ordering_ on the values.
      *
-     * The sort function oject must offer a member function template
+     * The sort function object must offer a member function template
      * `operator()` that accepts three arguments:
      *
      * * An iterator to the first element of the range to sort.
@@ -899,7 +899,7 @@ public:
      * Moreover, the comparison function object shall induce a
      * _strict weak ordering_ on the values.
      *
-     * The sort function oject must offer a member function template
+     * The sort function object must offer a member function template
      * `operator()` that accepts three arguments:
      *
      * * An iterator to the first element of the range to sort.
