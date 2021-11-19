@@ -13,6 +13,7 @@
 #include "../core/any.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/memory.hpp"
+#include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
 #include "component.hpp"
@@ -390,15 +391,14 @@ public:
 
     /*! @brief Default constructor. */
     basic_storage()
-        : base_type{deletion_policy{comp_traits::in_place_delete::value}},
-          packed{} {}
+        : basic_storage{allocator_type{}} {}
 
     /**
      * @brief Constructs an empty storage with a given allocator.
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{deletion_policy{comp_traits::in_place_delete::value}, allocator},
+        : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete::value}, allocator},
           packed{container_type{allocator}, allocator} {}
 
     /**
@@ -743,14 +743,14 @@ public:
 
     /*! @brief Default constructor. */
     basic_storage()
-        : base_type{deletion_policy{comp_traits::in_place_delete::value}} {}
+        : basic_storage{allocator_type{}} {}
 
     /**
      * @brief Constructs an empty container with a given allocator.
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{deletion_policy{comp_traits::in_place_delete::value}, allocator} {}
+        : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete::value}, allocator} {}
 
     /**
      * @brief Move constructor.

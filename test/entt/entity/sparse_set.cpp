@@ -19,6 +19,7 @@ TEST(SparseSet, Functionalities) {
     entt::sparse_set set;
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
+    ASSERT_EQ(set.type(), entt::type_id<void>());
 
     set.reserve(42);
 

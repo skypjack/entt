@@ -73,6 +73,7 @@ TEST(Storage, Functionalities) {
     entt::storage<int> pool;
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
+    ASSERT_EQ(pool.type(), entt::type_id<int>());
 
     pool.reserve(42);
 
@@ -141,11 +142,13 @@ TEST(Storage, Move) {
 
     ASSERT_TRUE(std::is_move_constructible_v<decltype(pool)>);
     ASSERT_TRUE(std::is_move_assignable_v<decltype(pool)>);
+    ASSERT_EQ(pool.type(), entt::type_id<int>());
 
     entt::storage<int> other{std::move(pool)};
 
     ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
+    ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(other.at(0u), entt::entity{3});
     ASSERT_EQ(other.get(entt::entity{3}), 3);
@@ -184,6 +187,9 @@ TEST(Storage, Swap) {
 
     pool.swap(other);
 
+    ASSERT_EQ(pool.type(), entt::type_id<int>());
+    ASSERT_EQ(other.type(), entt::type_id<int>());
+
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
 
@@ -209,6 +215,9 @@ TEST(Storage, StableSwap) {
 
     pool.swap(other);
 
+    ASSERT_EQ(pool.type(), entt::type_id<stable_type>());
+    ASSERT_EQ(other.type(), entt::type_id<stable_type>());
+
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(other.size(), 1u);
 
@@ -224,6 +233,8 @@ TEST(Storage, EmptyType) {
     pool.emplace(entt::entity{99});
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
+    ASSERT_EQ(pool.type(), entt::type_id<empty_stable_type>());
+
     ASSERT_TRUE(pool.contains(entt::entity{99}));
     ASSERT_DEATH(pool.get(entt::entity{}), "");
 
@@ -574,6 +585,9 @@ TEST(Storage, TypeFromBase) {
     entt::sparse_set &base = pool;
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
+    ASSERT_EQ(pool.type(), entt::type_id<int>());
+    ASSERT_EQ(pool.type(), base.type());
+
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
 
@@ -602,6 +616,9 @@ TEST(Storage, EmptyTypeFromBase) {
     entt::sparse_set &base = pool;
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
+    ASSERT_EQ(pool.type(), entt::type_id<empty_stable_type>());
+    ASSERT_EQ(pool.type(), base.type());
+
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
 
@@ -629,6 +646,9 @@ TEST(Storage, NonDefaultConstructibleTypeFromBase) {
     entt::storage<non_default_constructible> pool;
     entt::sparse_set &base = pool;
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    ASSERT_EQ(pool.type(), entt::type_id<non_default_constructible>());
+    ASSERT_EQ(pool.type(), base.type());
 
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
@@ -664,6 +684,9 @@ TEST(Storage, NonCopyConstructibleTypeFromBase) {
     entt::storage<std::unique_ptr<int>> pool;
     entt::sparse_set &base = pool;
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    ASSERT_EQ(pool.type(), entt::type_id<std::unique_ptr<int>>());
+    ASSERT_EQ(pool.type(), base.type());
 
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));

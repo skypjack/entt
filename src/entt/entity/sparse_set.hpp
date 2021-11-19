@@ -11,6 +11,7 @@
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
 #include "../core/memory.hpp"
+#include "../core/type_info.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -282,14 +283,14 @@ public:
 
     /*! @brief Default constructor. */
     basic_sparse_set()
-        : basic_sparse_set{allocator_type{}} {}
+        : basic_sparse_set{type_id<void>()} {}
 
     /**
      * @brief Constructs an empty container with a given allocator.
      * @param allocator The allocator to use.
      */
     explicit basic_sparse_set(const allocator_type &allocator)
-        : basic_sparse_set{deletion_policy::swap_and_pop, allocator} {}
+        : basic_sparse_set{type_id<void>(), deletion_policy::swap_and_pop, allocator} {}
 
     /**
      * @brief Constructs an empty container with the given policy and allocator.
@@ -297,8 +298,18 @@ public:
      * @param allocator The allocator to use (possibly default-constructed).
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &allocator = {})
+        : basic_sparse_set{type_id<void>(), pol, allocator} {}
+
+    /**
+     * @brief Constructs an empty container with the given policy and allocator.
+     * @param value Returned value type, if any.
+     * @param pol Type of deletion policy.
+     * @param allocator The allocator to use (possibly default-constructed).
+     */
+    explicit basic_sparse_set(const type_info &value, deletion_policy pol = deletion_policy::swap_and_pop, const allocator_type &allocator = {})
         : sparse{allocator},
           packed{allocator},
+          info{&value},
           free_list{tombstone},
           mode{pol} {}
 
@@ -309,6 +320,7 @@ public:
     basic_sparse_set(basic_sparse_set &&other) ENTT_NOEXCEPT
         : sparse{std::move(other.sparse)},
           packed{std::move(other.packed)},
+          info{other.info},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode} {}
 
@@ -320,6 +332,7 @@ public:
     basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) ENTT_NOEXCEPT
         : sparse{std::move(other.sparse), allocator},
           packed{std::move(other.packed), allocator},
+          info{other.info},
           free_list{std::exchange(other.free_list, tombstone)},
           mode{other.mode} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
@@ -341,6 +354,7 @@ public:
         release_sparse_pages();
         sparse = std::move(other.sparse);
         packed = std::move(other.packed);
+        info = other.info;
         free_list = std::exchange(other.free_list, tombstone);
         mode = other.mode;
         return *this;
@@ -354,6 +368,7 @@ public:
         using std::swap;
         swap(sparse, other.sparse);
         swap(packed, other.packed);
+        swap(info, other.info);
         swap(free_list, other.free_list);
         swap(mode, other.mode);
     }
@@ -835,12 +850,21 @@ public:
         }
     }
 
+    /**
+     * @brief Returned value type, if any.
+     * @return Returned value type, if any.
+     */
+    const type_info &type() const ENTT_NOEXCEPT {
+        return *info;
+    }
+
     /*! @brief Forwards variables to mixins, if any. */
     virtual void bind(any) ENTT_NOEXCEPT {}
 
 private:
     sparse_container_type sparse;
     packed_container_type packed;
+    const type_info *info;
     entity_type free_list;
     deletion_policy mode;
 };
