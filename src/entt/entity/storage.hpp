@@ -284,17 +284,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
 protected:
     /**
-     * @brief Exchanges the contents with those of a given storage.
-     * @param base Reference to base storage to exchange the content with.
-     */
-    void swap_contents(underlying_type &base) override {
-        using std::swap;
-        auto &other = static_cast<basic_storage &>(base);
-        propagate_on_container_swap(packed.second(), other.packed.second());
-        swap(packed.first(), other.packed.first());
-    }
-
-    /**
      * @brief Swaps two elements in a storage.
      * @param lhs A valid position of an element within a storage.
      * @param rhs A valid position of an element within a storage.
@@ -449,6 +438,17 @@ public:
         packed.first() = std::move(other.packed.first());
         propagate_on_container_move_assignment(packed.second(), other.packed.second());
         return *this;
+    }
+
+    /**
+     * @brief Exchanges the contents with those of a given storage.
+     * @param other Storage to exchange the content with.
+     */
+    void swap(basic_storage &other) {
+        using std::swap;
+        underlying_type::swap(other);
+        propagate_on_container_swap(packed.second(), other.packed.second());
+        swap(packed.first(), other.packed.first());
     }
 
     /**
