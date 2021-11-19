@@ -285,6 +285,15 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
 protected:
     /**
+     * @brief Returns the element assigned to an entity.
+     * @param pos A valid position of an element within a storage.
+     * @return An opaque pointer to the element assigned to the entity.
+     */
+    const void *get_at(const std::size_t pos) const ENTT_NOEXCEPT override {
+        return std::addressof(element_at(pos));
+    }
+
+    /**
      * @brief Swaps two elements in a storage.
      * @param lhs A valid position of an element within a storage.
      * @param rhs A valid position of an element within a storage.

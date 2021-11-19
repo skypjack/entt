@@ -596,6 +596,7 @@ TEST(Storage, TypeFromBase) {
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(base.get(entities[0u]), &pool.get(entities[0u]));
     ASSERT_EQ(pool.get(entities[0u]), 42);
 
     base.erase(entities[0u]);
@@ -627,6 +628,7 @@ TEST(Storage, EmptyTypeFromBase) {
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(base.get(entities[0u]), nullptr);
 
     base.erase(entities[0u]);
     base.insert(std::begin(entities), std::end(entities));

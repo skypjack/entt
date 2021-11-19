@@ -196,6 +196,14 @@ class basic_sparse_set {
     }
 
 protected:
+    /**
+     * @brief Returns the element assigned to an entity.
+     * @return An opaque pointer to the element assigned to the entity.
+     */
+    virtual const void *get_at(const std::size_t) const ENTT_NOEXCEPT {
+        return nullptr;
+    }
+
     /*! @brief Swaps two entities in a sparse set. */
     virtual void swap_at(const std::size_t, const std::size_t) {}
 
@@ -589,6 +597,26 @@ public:
     [[nodiscard]] entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
         ENTT_ASSERT(pos < packed.size(), "Position is out of bounds");
         return packed[pos];
+    }
+
+    /**
+     * @brief Returns the element assigned to an entity, if any.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the sparse set results
+     * in undefined behavior.
+     *
+     * @param entt A valid identifier.
+     * @return An opaque pointer to the element assigned to the entity, if any.
+     */
+    const void *get(const entity_type entt) const ENTT_NOEXCEPT {
+        ENTT_ASSERT(contains(entt), "Set does not contain entity");
+        return get_at(index(entt));
+    }
+
+    /*! @copydoc get */
+    void *get(const entity_type entt) ENTT_NOEXCEPT {
+        return const_cast<void *>(std::as_const(*this).get(entt));
     }
 
     /**

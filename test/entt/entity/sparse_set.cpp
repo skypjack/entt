@@ -49,6 +49,9 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.at(1u), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(set[0u], entt::entity{42});
 
+    ASSERT_DEATH(set.get(entt::entity{0}), "");
+    ASSERT_EQ(set.get(entt::entity{42}), nullptr);
+
     set.erase(entt::entity{42});
 
     ASSERT_TRUE(set.empty());
