@@ -637,10 +637,6 @@ public:
     /**
      * @brief Assigns an entity to a storage and constructs its object.
      *
-     * This version accept both types that can be constructed in place directly
-     * and types like aggregates that do not work well with a placement new as
-     * performed usually under the hood during an _emplace back_.
-     *
      * @warning
      * Attempting to use an entity that already belongs to the storage results
      * in undefined behavior.
@@ -860,7 +856,16 @@ public:
 };
 
 /**
- * @brief Mixin type to use to add signal support to storage types.
+ * @brief Mixin type used to add signal support to storage types.
+ *
+ * The function type of a listener is equivalent to:
+ *
+ * @code{.cpp}
+ * void(basic_registry<entity_type> &, entity_type);
+ * @endcode
+ *
+ * This applies to all signals made available.
+ *
  * @tparam Type The type of the underlying storage.
  */
 template<typename Type>
@@ -900,14 +905,7 @@ public:
      *
      * The sink returned by this function can be used to receive notifications
      * whenever a new instance is created and assigned to an entity.<br/>
-     * The function type for a listener is equivalent to:
-     *
-     * @code{.cpp}
-     * void(basic_registry<entity_type> &, entity_type);
-     * @endcode
-     *
-     * Listeners are invoked **after** the object has been assigned to the
-     * entity.
+     * Listeners are invoked after the object has been assigned to the entity.
      *
      * @sa sink
      *
@@ -922,13 +920,7 @@ public:
      *
      * The sink returned by this function can be used to receive notifications
      * whenever an instance is explicitly updated.<br/>
-     * The function type for a listener is equivalent to:
-     *
-     * @code{.cpp}
-     * void(basic_registry<entity_type> &, entity_type);
-     * @endcode
-     *
-     * Listeners are invoked **after** the object has been updated.
+     * Listeners are invoked after the object has been updated.
      *
      * @sa sink
      *
@@ -943,14 +935,7 @@ public:
      *
      * The sink returned by this function can be used to receive notifications
      * whenever an instance is removed from an entity and thus destroyed.<br/>
-     * The function type for a listener is equivalent to:
-     *
-     * @code{.cpp}
-     * void(basic_registry<entity_type> &, entity_type);
-     * @endcode
-     *
-     * Listeners are invoked **before** the object has been removed from the
-     * entity.
+     * Listeners are invoked before the object has been removed from the entity.
      *
      * @sa sink
      *
