@@ -846,7 +846,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
-            return (static_cast<Component &>(assure<std::remove_const_t<Component>>().get(entity)), ...);
+            return (const_cast<Component &>(assure<std::remove_const_t<Component>>().get(entity)), ...);
         } else {
             return std::forward_as_tuple(get<Component>(entity)...);
         }
