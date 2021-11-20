@@ -1,3 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="entt::delegate&lt;*&gt;">
+		<DisplayString>{{ type={ "$T1" } }}</DisplayString>
+		<Expand>
+			<Item Name="[empty]">fn == nullptr</Item>
+			<Item Name="[data]">data</Item>
+		</Expand>
+	</Type>
+	<Type Name="entt::sigh&lt;*&gt;">
+		<DisplayString>{{ size={ calls.size() }, type={ "$T1" } }}</DisplayString>
+		<Expand>
+			<IndexListItems>
+				<Size>calls.size()</Size>
+				<ValueNode>calls[$i]</ValueNode>
+			</IndexListItems>
+		</Expand>
+	</Type>
+	<Type Name="entt::sink&lt;*&gt;">
+		<DisplayString>{{ type={ "$T1" } }}</DisplayString>
+		<Expand>
+			<Item Name="[signal]">signal,na</Item>
+			<Item Name="[offset]">offset</Item>
+		</Expand>
+	</Type>
+	<Type Name="entt::connection">
+		<DisplayString>{{ bound={ signal != nullptr } }}</DisplayString>
+	</Type>
+	<Type Name="entt::scoped_connection">
+		<DisplayString>{ conn }</DisplayString>
+	</Type>
 </AutoVisualizer>
