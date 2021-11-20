@@ -683,6 +683,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&...args) {
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         return assure<Component>().patch(entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
     }
 
@@ -842,8 +843,10 @@ public:
     /*! @copydoc get */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) {
+        ENTT_ASSERT(valid(entity), "Invalid entity");
+
         if constexpr(sizeof...(Component) == 1) {
-            return (const_cast<Component &>(assure<std::remove_const_t<Component>>().get(entity)), ...);
+            return (static_cast<Component &>(assure<std::remove_const_t<Component>>().get(entity)), ...);
         } else {
             return std::forward_as_tuple(get<Component>(entity)...);
         }
