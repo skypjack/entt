@@ -4,7 +4,6 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* remove the const_cast within registry::assure (view<const E, ...> vs view<E, ...>, thread safe const registry)
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime components (registry), runtime events (dispatcher/emitter), runtime context variables ...
 * runtime_view/registry, remove reference to basic_sparse_set<E>
@@ -14,11 +13,9 @@ WIP:
 
 WIP:
 * customizable any_vtable, sfinae-friendly definition and op::custom for user-def
-* registry: fake vtable (mixin injected) to get rid of poly storage, use pointer to sparse set only for pools, discard pool_data type.
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
-* make it possible to create views of the type `view<T, T>`, add get by index and such, allow to register custom pools by name with the registry
+* allow to register custom pools by name with the registry
 * add user data to type_info
-* make const registry::view thread safe, switch to a view<T...>{registry} model (long term goal)
 * headless (sparse set only) view
 * write documentation for custom storages and views!!
 * make runtime views use opaque storage and therefore return also elements.

@@ -47,11 +47,6 @@ class basic_registry {
     template<typename Component>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
-    struct pool_data {
-        std::unique_ptr<basic_common_type> pool{};
-        const entt::type_info *info{};
-    };
-
     template<typename...>
     struct group_handler;
 
@@ -104,15 +99,14 @@ class basic_registry {
     template<typename Component>
     [[nodiscard]] storage_type<Component> &assure() {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
-        auto &&pdata = pools[type_id<Component>().hash()];
+        auto &&cpool = pools[type_id<Component>().hash()];
 
-        if(!pdata.pool) {
-            pdata.pool.reset(new storage_type<Component>{});
-            pdata.pool->bind(forward_as_any(*this));
-            pdata.info = &type_id<Component>();
+        if(!cpool) {
+            cpool.reset(new storage_type<Component>{});
+            cpool->bind(forward_as_any(*this));
         }
 
-        return static_cast<storage_type<Component> &>(*pdata.pool);
+        return static_cast<storage_type<Component> &>(*cpool);
     }
 
     template<typename Component>
@@ -120,7 +114,7 @@ class basic_registry {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
 
         if(const auto it = pools.find(type_id<Component>().hash()); it != pools.cend()) {
-            return static_cast<storage_type<Component> &>(*it->second.pool);
+            return static_cast<storage_type<Component> &>(*it->second);
         }
 
         static storage_type<Component> placeholder{};
@@ -167,8 +161,8 @@ public:
           groups{std::move(other.groups)},
           entities{std::move(other.entities)},
           free_list{other.free_list} {
-        for(auto &&pdata: pools) {
-            pdata.second.pool->bind(forward_as_any(*this));
+        for(auto &&curr: pools) {
+            curr.second->bind(forward_as_any(*this));
         }
     }
 
@@ -184,8 +178,8 @@ public:
         entities = std::move(other.entities);
         free_list = other.free_list;
 
-        for(auto &&pdata: pools) {
-            pdata.second.pool->bind(forward_as_any(*this));
+        for(auto &&curr: pools) {
+            curr.second->bind(forward_as_any(*this));
         }
 
         return *this;
@@ -529,7 +523,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         for(auto &&curr: pools) {
-            curr.second.pool->remove(entity);
+            curr.second->remove(entity);
         }
 
         return release_entity(entity, version);
@@ -552,7 +546,7 @@ public:
             }
         } else {
             for(auto &&curr: pools) {
-                curr.second.pool->remove(first, last);
+                curr.second->remove(first, last);
             }
 
             release(first, last);
@@ -783,7 +777,7 @@ public:
     void compact() {
         if constexpr(sizeof...(Component) == 0) {
             for(auto &&curr: pools) {
-                curr.second.pool->compact();
+                curr.second->compact();
             }
         } else {
             (assure<Component>().compact(), ...);
@@ -920,7 +914,7 @@ public:
     void clear() {
         if constexpr(sizeof...(Component) == 0) {
             for(auto &&curr: pools) {
-                curr.second.pool->clear();
+                curr.second->clear();
             }
 
             each([this](const auto entity) { release_entity(entity, entity_traits::to_version(entity) + 1u); });
@@ -968,7 +962,7 @@ public:
      */
     [[nodiscard]] bool orphan(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&curr) { return curr.second.pool->contains(entity); });
+        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&curr) { return curr.second->contains(entity); });
     }
 
     /**
@@ -1152,12 +1146,12 @@ public:
 
         for(; first != last; ++first) {
             const auto it = pools.find(*first);
-            component.emplace_back(it == pools.cend() ? nullptr : it->second.pool.get());
+            component.emplace_back(it == pools.cend() ? nullptr : it->second.get());
         }
 
         for(; from != to; ++from) {
             const auto it = pools.find(*from);
-            filter.emplace_back(it == pools.cend() ? nullptr : it->second.pool.get());
+            filter.emplace_back(it == pools.cend() ? nullptr : it->second.get());
         }
 
         return {std::move(component), std::move(filter)};
@@ -1408,17 +1402,15 @@ public:
     }
 
     /**
-     * @brief Visits an entity and returns the type info for its components.
+     * @brief Visits an entity and returns the pools for its components.
      *
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const type_info &);
+     * void(const basic_sparse_set<entity_type> &);
      * @endcode
      *
-     * Returned identifiers are those of the components owned by the entity.
-     *
-     * @sa type_info
+     * Returned pools are those of the components owned by the entity.
      *
      * @tparam Func Type of the function object to invoke.
      * @param entity A valid identifier.
@@ -1427,24 +1419,22 @@ public:
     template<typename Func>
     void visit(entity_type entity, Func func) const {
         for(auto &&curr: pools) {
-            if(curr.second.pool->contains(entity)) {
-                func(*curr.second.info);
+            if(curr.second->contains(entity)) {
+                func(*curr.second);
             }
         }
     }
 
     /**
-     * @brief Visits a registry and returns the type info for its components.
+     * @brief Visits a registry and returns the pools for its components.
      *
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const type_info &);
+     * void(const basic_sparse_set<entity_type> &);
      * @endcode
      *
-     * Returned identifiers are those of the components managed by the registry.
-     *
-     * @sa type_info
+     * Returned pools are those of the components managed by the registry.
      *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
@@ -1452,7 +1442,7 @@ public:
     template<typename Func>
     void visit(Func func) const {
         for(auto &&curr: pools) {
-            func(*curr.second.info);
+            func(*curr.second);
         }
     }
 
@@ -1573,7 +1563,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, pool_data, identity> pools{};
+    dense_hash_map<id_type, std::unique_ptr<basic_common_type>, identity> pools{};
     dense_hash_map<id_type, basic_any<0u>, identity> vars{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};

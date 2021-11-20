@@ -265,7 +265,7 @@ struct basic_handle {
     }
 
     /**
-     * @brief Visits a handle and returns the types for its components.
+     * @brief Visits a handle and returns the pools for its components.
      * @sa basic_registry::visit
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.

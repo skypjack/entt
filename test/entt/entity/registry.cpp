@@ -1886,30 +1886,30 @@ TEST(Registry, Visit) {
 
     bool hasType[3]{};
 
-    registry.visit([&hasType](const auto &info) {
-        hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
-        hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
-        hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());
+    registry.visit([&hasType](const auto &pool) {
+        hasType[0] = hasType[0] || (pool.type() == entt::type_id<int>());
+        hasType[1] = hasType[1] || (pool.type() == entt::type_id<double>());
+        hasType[2] = hasType[2] || (pool.type() == entt::type_id<char>());
     });
 
     ASSERT_TRUE(hasType[0] && hasType[1] && hasType[2]);
 
     hasType[0] = hasType[1] = hasType[2] = false;
 
-    registry.visit(entity, [&hasType](const auto &info) {
-        hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
-        hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
-        hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());
+    registry.visit(entity, [&hasType](const auto &pool) {
+        hasType[0] = hasType[0] || (pool.type() == entt::type_id<int>());
+        hasType[1] = hasType[1] || (pool.type() == entt::type_id<double>());
+        hasType[2] = hasType[2] || (pool.type() == entt::type_id<char>());
     });
 
     ASSERT_TRUE(hasType[0] && !hasType[1] && hasType[2]);
 
     hasType[0] = hasType[2] = false;
 
-    registry.visit(other, [&hasType](const auto &info) {
-        hasType[0] = hasType[0] || (info.hash() == entt::type_hash<int>::value());
-        hasType[1] = hasType[1] || (info.hash() == entt::type_hash<double>::value());
-        hasType[2] = hasType[2] || (info.hash() == entt::type_hash<char>::value());
+    registry.visit(other, [&hasType](const auto &pool) {
+        hasType[0] = hasType[0] || (pool.type() == entt::type_id<int>());
+        hasType[1] = hasType[1] || (pool.type() == entt::type_id<double>());
+        hasType[2] = hasType[2] || (pool.type() == entt::type_id<char>());
     });
 
     ASSERT_TRUE(!hasType[0] && hasType[1] && !hasType[2]);
