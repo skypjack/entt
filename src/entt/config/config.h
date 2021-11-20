@@ -69,6 +69,11 @@ static_assert(ENTT_PACKED_PAGE && ((ENTT_PACKED_PAGE & (ENTT_PACKED_PAGE - 1)) =
 #endif
 
 
+#ifndef ENTT_REGISTRY_CONTEXT_GUARD
+	#define ENTT_REGISTRY_CONTEXT_GUARD()
+#endif
+
+
 #ifndef ENTT_STANDARD_CPP
 #    if defined __clang__ || defined __GNUC__
 #       define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
