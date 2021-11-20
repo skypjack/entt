@@ -1596,6 +1596,7 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
+        ENTT_REGISTRY_CONTEXT_GUARD()
         vars.emplace_back(std::in_place_type<Type>, std::forward<Args>(args)...);
         return any_cast<Type &>(vars.back());
     }
@@ -1606,6 +1607,7 @@ public:
      */
     template<typename Type>
     void unset() {
+        ENTT_REGISTRY_CONTEXT_GUARD()
         vars.erase(std::remove_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; }), vars.end());
     }
 
@@ -1634,6 +1636,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> * try_ctx() const {
+        ENTT_REGISTRY_CONTEXT_GUARD()
         auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
         return it == vars.cend() ? nullptr : any_cast<std::add_const_t<Type>>(&*it);
     }
@@ -1641,6 +1644,7 @@ public:
     /*! @copydoc try_ctx */
     template<typename Type>
     [[nodiscard]] Type * try_ctx() {
+        ENTT_REGISTRY_CONTEXT_GUARD()
         auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
         return it == vars.end() ? nullptr : any_cast<Type>(&*it);
     }
@@ -1657,6 +1661,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> & ctx() const {
+        ENTT_REGISTRY_CONTEXT_GUARD()
         auto it = std::find_if(vars.cbegin(), vars.cend(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
         ENTT_ASSERT(it != vars.cend(), "Invalid instance");
         return any_cast<std::add_const_t<Type> &>(*it);
@@ -1665,6 +1670,7 @@ public:
     /*! @copydoc ctx */
     template<typename Type>
     [[nodiscard]] Type & ctx() {
+        ENTT_REGISTRY_CONTEXT_GUARD()
         auto it = std::find_if(vars.begin(), vars.end(), [type = type_id<Type>()](auto &&var) { return var.type() == type; });
         ENTT_ASSERT(it != vars.end(), "Invalid instance");
         return any_cast<Type &>(*it);
@@ -1693,6 +1699,7 @@ public:
      */
     template<typename Func>
     void ctx(Func func) const {
+        ENTT_REGISTRY_CONTEXT_GUARD()
         for(auto pos = vars.size(); pos; --pos) {
             func(vars[pos-1].type());
         }
