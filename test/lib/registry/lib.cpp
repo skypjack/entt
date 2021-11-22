@@ -11,7 +11,7 @@ ENTT_API void update_position(entt::registry &registry) {
 
 ENTT_API void emplace_velocity(entt::registry &registry) {
     // forces the creation of the pool for the velocity component
-    registry.prepare<velocity>();
+    registry.storage<velocity>();
 
     for(auto entity: registry.view<position>()) {
         registry.emplace<velocity>(entity, 1., 1.);

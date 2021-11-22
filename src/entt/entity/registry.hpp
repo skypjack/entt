@@ -58,11 +58,11 @@ class basic_registry {
 
         template<typename Component>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
-            [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
+            [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.storage<Owned>()...);
 
             const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<storage_type<Owned> &>(cpools).contains(entt)) && ...)
-                                  && ((std::is_same_v<Component, Get> || owner.assure<Get>().contains(entt)) && ...)
-                                  && ((std::is_same_v<Component, Exclude> || !owner.assure<Exclude>().contains(entt)) && ...);
+                                  && ((std::is_same_v<Component, Get> || owner.storage<Get>().contains(entt)) && ...)
+                                  && ((std::is_same_v<Component, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...);
 
             if constexpr(sizeof...(Owned) == 0) {
                 if(is_valid && !current.contains(entt)) {
@@ -80,7 +80,7 @@ class basic_registry {
             if constexpr(sizeof...(Owned) == 0) {
                 current.remove(entt);
             } else {
-                if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
+                if(const auto cpools = std::forward_as_tuple(owner.storage<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = --current;
                     (std::get<storage_type<Owned> &>(cpools).swap_elements(std::get<storage_type<Owned> &>(cpools).data()[pos], entt), ...);
                 }
@@ -95,31 +95,6 @@ class basic_registry {
         bool (*get)(const id_type) ENTT_NOEXCEPT;
         bool (*exclude)(const id_type) ENTT_NOEXCEPT;
     };
-
-    template<typename Component>
-    [[nodiscard]] storage_type<Component> &assure() {
-        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
-        auto &&cpool = pools[type_id<Component>().hash()];
-
-        if(!cpool) {
-            cpool.reset(new storage_type<Component>{});
-            cpool->bind(forward_as_any(*this));
-        }
-
-        return static_cast<storage_type<Component> &>(*cpool);
-    }
-
-    template<typename Component>
-    [[nodiscard]] const storage_type<Component> &assure() const {
-        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
-
-        if(const auto it = pools.find(type_id<Component>().hash()); it != pools.cend()) {
-            return static_cast<storage_type<Component> &>(*it->second);
-        }
-
-        static storage_type<Component> placeholder{};
-        return placeholder;
-    }
 
     auto generate_identifier(const std::size_t pos) ENTT_NOEXCEPT {
         ENTT_ASSERT(pos < entity_traits::to_integral(null), "No entities available");
@@ -186,13 +161,45 @@ public:
     }
 
     /**
-     * @brief Prepares a pool for the given type if required.
-     * @tparam Component Type of component for which to prepare a pool.
+     * @brief Returns the container for a given component type.
+     * @tparam Component Type of component of which to return the container.
+     * @param id Optional name used to map the container for a given component.
+     * @return The container for the given component type.
      */
     template<typename Component>
-    void prepare() {
-        // suppress the warning due to the [[nodiscard]] attribute
-        static_cast<void>(assure<Component>());
+    [[nodiscard]] storage_type<Component> &storage(const id_type id = type_hash<Component>::value()) {
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
+        auto &&cpool = pools[id];
+
+        if(!cpool) {
+            cpool.reset(new storage_type<Component>{});
+            cpool->bind(forward_as_any(*this));
+        }
+
+        return static_cast<storage_type<Component> &>(*cpool);
+    }
+
+    /**
+     * @copybrief storage
+     *
+     * @warning
+     * If a container for the given component doesn't exist yet, a temporary
+     * placeholder is returned.
+     *
+     * @tparam Component Type of component of which to return the container.
+     * @param id Optional name used to map the container for a given component.
+     * @return The container for the given component type.
+     */
+    template<typename Component>
+    [[nodiscard]] const storage_type<Component> &storage(const id_type id = type_hash<Component>::value()) const {
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
+
+        if(const auto it = pools.find(id); it != pools.cend()) {
+            return static_cast<storage_type<Component> &>(*it->second);
+        }
+
+        static storage_type<Component> placeholder{};
+        return placeholder;
     }
 
     /**
@@ -202,7 +209,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type size() const {
-        return assure<std::remove_const_t<Component>>().size();
+        return storage<std::remove_const_t<Component>>().size();
     }
 
     /**
@@ -245,7 +252,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             entities.reserve(cap);
         } else {
-            (assure<Component>().reserve(cap), ...);
+            (storage<Component>().reserve(cap), ...);
         }
     }
 
@@ -256,7 +263,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type capacity() const {
-        return assure<std::remove_const_t<Component>>().capacity();
+        return storage<std::remove_const_t<Component>>().capacity();
     }
 
     /**
@@ -275,7 +282,7 @@ public:
      */
     template<typename... Component>
     void shrink_to_fit() {
-        (assure<Component>().shrink_to_fit(), ...);
+        (storage<Component>().shrink_to_fit(), ...);
     }
 
     /**
@@ -294,7 +301,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return !alive();
         } else {
-            return (assure<std::remove_const_t<Component>>().empty() && ...);
+            return (storage<std::remove_const_t<Component>>().empty() && ...);
         }
     }
 
@@ -573,7 +580,7 @@ public:
     template<typename Component, typename... Args>
     decltype(auto) emplace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Component>().emplace(entity, std::forward<Args>(args)...);
+        return storage<Component>().emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -590,7 +597,7 @@ public:
     template<typename Component, typename It>
     void insert(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-        assure<Component>().insert(first, last, value);
+        storage<Component>().insert(first, last, value);
     }
 
     /**
@@ -609,7 +616,7 @@ public:
     void insert(EIt first, EIt last, CIt from) {
         static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>, "Invalid value type");
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-        assure<Component>().insert(first, last, from);
+        storage<Component>().insert(first, last, from);
     }
 
     /**
@@ -627,7 +634,7 @@ public:
     template<typename Component, typename... Args>
     decltype(auto) emplace_or_replace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        auto &cpool = assure<Component>();
+        auto &cpool = storage<Component>();
 
         return cpool.contains(entity)
                    ? cpool.patch(entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); })
@@ -661,7 +668,7 @@ public:
     template<typename Component, typename... Func>
     decltype(auto) patch(const entity_type entity, Func &&...func) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Component>().patch(entity, std::forward<Func>(func)...);
+        return storage<Component>().patch(entity, std::forward<Func>(func)...);
     }
 
     /**
@@ -684,7 +691,7 @@ public:
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Component>().patch(entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
+        return storage<Component>().patch(entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
     }
 
     /**
@@ -701,7 +708,7 @@ public:
     size_type remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        return (assure<Component>().remove(entity) + ... + size_type{});
+        return (storage<Component>().remove(entity) + ... + size_type{});
     }
 
     /**
@@ -718,7 +725,7 @@ public:
     template<typename... Component, typename It>
     size_type remove(It first, It last) {
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        const auto cpools = std::forward_as_tuple(assure<Component>()...);
+        const auto cpools = std::forward_as_tuple(storage<Component>()...);
         size_type count{};
 
         for(; first != last; ++first) {
@@ -744,7 +751,7 @@ public:
     void erase(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>().erase(entity), ...);
+        (storage<Component>().erase(entity), ...);
     }
 
     /**
@@ -760,7 +767,7 @@ public:
     template<typename... Component, typename It>
     void erase(It first, It last) {
         static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        const auto cpools = std::forward_as_tuple(assure<Component>()...);
+        const auto cpools = std::forward_as_tuple(storage<Component>()...);
 
         for(; first != last; ++first) {
             const auto entity = *first;
@@ -781,7 +788,7 @@ public:
                 curr.second->compact();
             }
         } else {
-            (assure<Component>().compact(), ...);
+            (storage<Component>().compact(), ...);
         }
     }
 
@@ -798,7 +805,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool all_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<std::remove_const_t<Component>>().contains(entity) && ...);
+        return (storage<std::remove_const_t<Component>>().contains(entity) && ...);
     }
 
     /**
@@ -815,7 +822,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool any_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<std::remove_const_t<Component>>().contains(entity) || ...);
+        return (storage<std::remove_const_t<Component>>().contains(entity) || ...);
     }
 
     /**
@@ -834,7 +841,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
-            return assure<std::remove_const_t<Component>...>().get(entity);
+            return storage<std::remove_const_t<Component>...>().get(entity);
         } else {
             return std::forward_as_tuple(get<Component>(entity)...);
         }
@@ -846,7 +853,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
-            return (const_cast<Component &>(assure<std::remove_const_t<Component>>().get(entity)), ...);
+            return (const_cast<Component &>(storage<std::remove_const_t<Component>>().get(entity)), ...);
         } else {
             return std::forward_as_tuple(get<Component>(entity)...);
         }
@@ -870,7 +877,7 @@ public:
     template<typename Component, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        auto &cpool = assure<Component>();
+        auto &cpool = storage<Component>();
         return cpool.contains(entity) ? cpool.get(entity) : cpool.emplace(entity, std::forward<Args>(args)...);
     }
 
@@ -892,7 +899,7 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
-            const auto &cpool = assure<std::remove_const_t<Component>...>();
+            const auto &cpool = storage<std::remove_const_t<Component>...>();
             return cpool.contains(entity) ? std::addressof(cpool.get(entity)) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
@@ -922,7 +929,7 @@ public:
 
             each([this](const auto entity) { release_entity(entity, entity_traits::to_version(entity) + 1u); });
         } else {
-            (assure<Component>().clear(), ...);
+            (storage<Component>().clear(), ...);
         }
     }
 
@@ -1015,7 +1022,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] auto on_construct() {
-        return assure<Component>().on_construct();
+        return storage<Component>().on_construct();
     }
 
     /**
@@ -1038,7 +1045,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] auto on_update() {
-        return assure<Component>().on_update();
+        return storage<Component>().on_update();
     }
 
     /**
@@ -1063,7 +1070,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] auto on_destroy() {
-        return assure<Component>().on_destroy();
+        return storage<Component>().on_destroy();
     }
 
     /**
@@ -1101,14 +1108,14 @@ public:
     template<typename... Component, typename... Exclude>
     [[nodiscard]] basic_view<Entity, get_t<std::add_const_t<Component>...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) const {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        return {assure<std::remove_const_t<Component>>()..., assure<Exclude>()...};
+        return {storage<std::remove_const_t<Component>>()..., storage<Exclude>()...};
     }
 
     /*! @copydoc view */
     template<typename... Component, typename... Exclude>
     [[nodiscard]] basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        return {assure<std::remove_const_t<Component>>()..., assure<Exclude>()...};
+        return {storage<std::remove_const_t<Component>>()..., storage<Exclude>()...};
     }
 
     /**
@@ -1194,7 +1201,7 @@ public:
 
         using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
 
-        const auto cpools = std::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...);
+        const auto cpools = std::forward_as_tuple(storage<std::remove_const_t<Owned>>()..., storage<std::remove_const_t<Get>>()...);
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
@@ -1282,7 +1289,7 @@ public:
             return {};
         } else {
             using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
-            return {static_cast<handler_type *>(it->group.get())->current, assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...};
+            return {static_cast<handler_type *>(it->group.get())->current, storage<std::remove_const_t<Owned>>()..., storage<std::remove_const_t<Get>>()...};
         }
     }
 
@@ -1364,7 +1371,7 @@ public:
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
         ENTT_ASSERT(sortable<Component>(), "Cannot sort owned storage");
-        auto &cpool = assure<Component>();
+        auto &cpool = storage<Component>();
 
         if constexpr(std::is_invocable_v<Compare, decltype(cpool.get({})), decltype(cpool.get({}))>) {
             auto comp = [&cpool, compare = std::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool.get(lhs)), std::as_const(cpool.get(rhs))); };
@@ -1401,7 +1408,7 @@ public:
     template<typename To, typename From>
     void sort() {
         ENTT_ASSERT(sortable<To>(), "Cannot sort owned storage");
-        assure<To>().respect(assure<From>());
+        storage<To>().respect(storage<From>());
     }
 
     /**

@@ -173,8 +173,6 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.size<const char>(), 0u);
     ASSERT_TRUE((registry.empty<int, const char>()));
 
-    registry.prepare<double>();
-
     const auto e0 = registry.create();
     const auto e1 = registry.create();
 
@@ -1932,4 +1930,34 @@ TEST(Registry, ScramblingPoolsIsAllowed) {
     registry.view<const int>().each([](const auto entity, const auto &value) {
         ASSERT_EQ(entt::to_integral(entity), value);
     });
+}
+
+TEST(Registry, RuntimePools) {
+    using namespace entt::literals;
+
+    entt::registry registry;
+    auto &storage = registry.storage<empty_type>("other"_hs);
+    const auto entity = registry.create();
+
+    ASSERT_FALSE(registry.any_of<empty_type>(entity));
+    ASSERT_FALSE(storage.contains(entity));
+
+    registry.emplace<empty_type>(entity);
+
+    ASSERT_FALSE(storage.contains(entity));
+    ASSERT_TRUE(registry.any_of<empty_type>(entity));
+    ASSERT_EQ((entt::basic_view{registry.storage<empty_type>(), storage}.size_hint()), 0u);
+
+    storage.emplace(entity);
+
+    ASSERT_TRUE(storage.contains(entity));
+    ASSERT_TRUE(registry.any_of<empty_type>(entity));
+    ASSERT_EQ((entt::basic_view{registry.storage<empty_type>(), storage}.size_hint()), 1u);
+
+    registry.destroy(entity);
+
+    ASSERT_EQ(registry.create(entity), entity);
+
+    ASSERT_FALSE(storage.contains(entity));
+    ASSERT_FALSE(registry.any_of<empty_type>(entity));
 }
