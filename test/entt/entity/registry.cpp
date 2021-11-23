@@ -1939,6 +1939,14 @@ TEST(Registry, RuntimePools) {
     auto &storage = registry.storage<empty_type>("other"_hs);
     const auto entity = registry.create();
 
+    static_assert(std::is_same_v<decltype(registry.storage<empty_type>()), typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
+    static_assert(std::is_same_v<decltype(registry.storage<const empty_type>()), const typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).storage<const empty_type>()), const typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
+
+    ASSERT_EQ(&storage, &registry.storage<const empty_type>("other"_hs));
+    ASSERT_EQ(&registry.storage<empty_type>(), &registry.storage<const empty_type>());
+
     ASSERT_FALSE(registry.any_of<empty_type>(entity));
     ASSERT_FALSE(storage.contains(entity));
 
