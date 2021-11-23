@@ -9,7 +9,7 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
         auto &registry = *static_cast<entt::registry *>(ctx->userdata);
 
         // forces the creation of the pool for the velocity component
-        registry.storage<velocity>();
+        static_cast<void>(registry.storage<velocity>());
 
         const auto view = registry.view<position>();
         registry.insert(view.begin(), view.end(), velocity{1., 1.});
