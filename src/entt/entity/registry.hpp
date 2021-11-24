@@ -44,9 +44,6 @@ class basic_registry {
     using entity_traits = entt_traits<Entity>;
     using basic_common_type = basic_sparse_set<Entity>;
 
-    template<typename Component>
-    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
-
     template<typename...>
     struct group_handler;
 
@@ -97,7 +94,7 @@ class basic_registry {
     };
 
     template<typename Component>
-    [[nodiscard]] storage_type<Component> &assure(const id_type id = type_hash<Component>::value()) {
+    [[nodiscard]] auto &assure(const id_type id = type_hash<Component>::value()) {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
         auto &&cpool = pools[id];
 
@@ -110,11 +107,11 @@ class basic_registry {
     }
 
     template<typename Component>
-    [[nodiscard]] const storage_type<Component> &assure(const id_type id = type_hash<Component>::value()) const {
+    [[nodiscard]] const auto &assure(const id_type id = type_hash<Component>::value()) const {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
 
         if(const auto it = pools.find(id); it != pools.cend()) {
-            return static_cast<storage_type<Component> &>(*it->second);
+            return static_cast<const storage_type<Component> &>(*it->second);
         }
 
         static storage_type<Component> placeholder{};
@@ -147,6 +144,13 @@ public:
     using version_type = typename entity_traits::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+
+    /**
+     * @brief Type of storage assigned to a given component.
+     * @tparam Component Type of component of which to return the storage type.
+     */
+    template<typename Component>
+    using storage_type = typename storage_traits<Entity, Component>::storage_type;
 
     /*! @brief Default constructor. */
     basic_registry() = default;
@@ -192,8 +196,8 @@ public:
      * @return The container for the given component type.
      */
     template<typename Component>
-    [[nodiscard]] storage_type<Component> &storage(const id_type id = type_hash<std::remove_const_t<Component>>::value()) {
-        return assure<std::remove_const_t<Component>>(id);
+    [[nodiscard]] storage_type<Component> &storage(const id_type id = type_hash<Component>::value()) {
+        return assure<Component>(id);
     }
 
     /**
@@ -208,8 +212,8 @@ public:
      * @return The container for the given component type.
      */
     template<typename Component>
-    [[nodiscard]] storage_type<const Component> &storage(const id_type id = type_hash<std::remove_const_t<Component>>::value()) const {
-        return assure<std::remove_const_t<Component>>(id);
+    [[nodiscard]] const storage_type<Component> &storage(const id_type id = type_hash<Component>::value()) const {
+        return assure<Component>(id);
     }
 
     /**
@@ -1209,7 +1213,7 @@ public:
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only groups are not supported");
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
 
-        using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
+        using handler_type = group_handler<exclude_t<std::remove_const_t<Exclude>...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
 
         const auto cpools = std::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...);
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
@@ -1298,7 +1302,7 @@ public:
         if(it == groups.cend()) {
             return {};
         } else {
-            using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
+            using handler_type = group_handler<exclude_t<std::remove_const_t<Exclude>...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
             return {static_cast<handler_type *>(it->group.get())->current, assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...};
         }
     }

@@ -138,8 +138,8 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
  */
 template<typename Entity, typename Component>
 Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
-    const auto &storage = reg.template storage<const Component>();
-    const typename std::remove_const_t<std::remove_reference_t<decltype(storage)>>::base_type &base = storage;
+    const auto &storage = reg.template storage<Component>();
+    const typename basic_registry<Entity>::template storage_type<Component>::base_type &base = storage;
     const auto *addr = std::addressof(instance);
 
     for(auto it = base.rbegin(), last = base.rend(); it < last; it += ENTT_PACKED_PAGE) {
