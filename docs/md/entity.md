@@ -31,6 +31,9 @@
     * [In-place delete](#in-place-delete)
     * [Hierarchies and the like](#hierarchies-and-the-like)
   * [Making the most of range-destroy](#making-the-most-of-range-destroy)
+  * [Meet the runtime](#meet-the-runtime)
+    * [A base class to rule them all](#a-base-class-to-rule-them-all)
+    * [Beam me up, registry](#beam-me-up-registry)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
     * [Continuous loader](#continuous-loader)
@@ -1134,6 +1137,144 @@ With a good chance, the last note can be ignored and there will never be a need
 to do the above even after writing millions of lines of code.<br/>
 However, it's good to know how to exploit the `destroy` function to get the best
 out of it.
+
+## Meet the runtime
+
+`EnTT` takes full advantage of what the language offers at compile-time.<br/>
+However, this can have its downsides (well known to those familiar with type
+erasure techniques).
+
+To bridge this gap, the library provides a bunch of utilities and features that
+can be very useful when needed.<br/>
+On the one hand, storage classes are standalone objects that allow users to work
+with components within certain limits and without knowing the actual types. On
+the other hand, it's possible to create component storage dynamically and link
+them to a name rather than a type.
+
+### A base class to rule them all
+
+Storage classes are fully self-contained types. These can be extended via mixins
+to add more functionalities (generic or type specific). In addition, they offer
+a basic set of functions that already allow users to go very far.<br/>
+The aim is to limit the need for customizations as much as possible, offering
+what is usually necessary for the majority of cases.
+
+When a storage is used through its base class (i.e. when its actual type isn't
+known), there is always the possibility of receiving a `type_info` describing
+the type of the objects associated with the entities (if any):
+
+```cpp
+if(entt::type_id<velocity>() == base.type()) {
+    // ...
+}
+```
+
+Furthermore, all features rely on internal functions that forward the calls to
+the mixins. The latter can then make use of any context variables, which can be
+set via `bind`:
+
+```cpp
+base.bind(entt::forward_as_any(registry));
+```
+
+The `bind` function accepts an `entt::any` object, that is a _typed type-erased_
+value.<br/>
+This is how a registry _passes_ itself to all pools that support signals and
+also why a storage keeps sending events without requiring the registry to be
+passed to it every time.
+
+Alongside these more specific things, there are also a couple of functions
+designed to address some common requirements such as copying an entity.<br/>
+In particular, the base class behind a storage offers the possibility to _take_
+the object associated with an entity through an opaque pointer:
+
+```cpp
+const void *instance = base.get(entity);
+```
+
+Similarly, the non-specialized `emplace` function accepts an optional opaque
+pointer and behaves differently depending on the case:
+
+* When the pointer is null, the function tries to default-construct an instance
+  of the object to bind to the entity and returns true on success.
+
+* When the pointer is non-null, the function tries to copy-construct an instance
+  of the object to bind to the entity and returns true on success.
+
+This means that, starting from a reference to the base, it's possible to bind
+components with entities without knowing their actual type and even initialize
+them by copy if needed:
+
+```cpp
+registry.visit(entity, [other](auto &&storage) {
+    // create a copy of an entity component by component
+    storage.emplace(other, storage.get(entity));
+});
+```
+
+This is particularly useful to clone entities in an opaque way. In addition, the
+decoupling of features allows for filtering or use of different copying policies
+depending on the type.
+
+### Beam me up, registry
+
+`EnTT` is strongly based on types and has always allowed to create only one
+storage of a certain type within a registry.<br/>
+However, this doesn't work well for users who want to create multiple storage of
+the same type associated with different _names_, such as for interacting with a
+scripting system.
+
+Nowadays, the library has _solved_ this limitation and offers the possibility of
+associating a _type_ with a name (or rather, a numeric identifier):
+
+```cpp
+using namespace entt::literals;
+auto &&storage = registry.storage<velocity>("second pool"_hs);
+```
+
+If a name isn't provided, the default storage associated with the given type is
+always returned.<br/>
+Since the storage are also self-contained, the registry doesn't try in any way
+to _duplicate_ its API and offer parallel functionalities for storage discovered
+by name.<br/>
+However, there is still no limit to the possibilities of use. For example:
+
+```cpp
+auto &&other = registry.storage<velocity>("other"_hs);
+
+registry.emplace<velocity>(entity);
+storage.emplace(entity);
+```
+
+In other words, anything that can be done via the registry interface can also be
+done directly on the reference storage.<br/>
+On the other hand, those calls involving all storage are guaranteed to also
+_reach_ manually created ones:
+
+```cpp
+// will remove the entity from both storage
+registry.destroy(entity);
+```
+
+Finally, a storage of this type can be used with any view (which also accept
+multiple storages of the same type, if necessary):
+
+```cpp
+// direct initialization
+entt::basic_view direct{
+    registry.storage<velocity>(),
+    registry.storage<velocity>("other"_hs)
+};
+
+// concatenation
+auto join = registry.view<velocity>() | entt::basic_view{registry.storage<velocity>("other"_hs)};
+```
+
+The possibility of direct use of storage combined with the freedom of being able
+to create and use more than one of the same type opens the door to the use of
+`EnTT` _at runtime_, which was previously quite limited.<br/>
+Sure the basic design remains very type-bound, but finally it's no longer bound
+to this one option alone.
 
 ## Snapshot: complete vs continuous
 
