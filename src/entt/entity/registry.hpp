@@ -146,8 +146,8 @@ public:
     using size_type = std::size_t;
 
     /**
-     * @brief Type of storage assigned to a given component.
-     * @tparam Component Type of component of which to return the storage type.
+     * @brief Storage type associated with a given component.
+     * @tparam Type Type of component.
      */
     template<typename Component>
     using storage_type = typename storage_traits<Entity, Component>::storage_type;
@@ -190,10 +190,10 @@ public:
     }
 
     /**
-     * @brief Returns the container for a given component type.
-     * @tparam Component Type of component of which to return the container.
-     * @param id Optional name used to map the container for a given component.
-     * @return The container for the given component type.
+     * @brief Returns the storage for a given component type.
+     * @tparam Component Type of component of which to return the storage.
+     * @param id Optional name used to map the storage for a given component.
+     * @return The storage for the given component type.
      */
     template<typename Component>
     [[nodiscard]] storage_type<Component> &storage(const id_type id = type_hash<Component>::value()) {
@@ -204,12 +204,12 @@ public:
      * @copybrief storage
      *
      * @warning
-     * If a container for the given component doesn't exist yet, a temporary
-     * placeholder is returned.
+     * If a storage for the given component doesn't exist yet, a temporary
+     * placeholder is returned instead.
      *
-     * @tparam Component Type of component of which to return the container.
-     * @param id Optional name used to map the container for a given component.
-     * @return The container for the given component type.
+     * @tparam Component Type of component of which to return the storage.
+     * @param id Optional name used to map the storage for a given component.
+     * @return The storage for the given component type.
      */
     template<typename Component>
     [[nodiscard]] const storage_type<Component> &storage(const id_type id = type_hash<Component>::value()) const {
@@ -323,7 +323,7 @@ public:
      * @brief Direct access to the list of entities of a registry.
      *
      * The returned pointer is such that range `[data(), data() + size())` is
-     * always a valid range, even if the container is empty.
+     * always a valid range, even if the registry is empty.
      *
      * @warning
      * This list contains both valid and destroyed entities and isn't suitable
