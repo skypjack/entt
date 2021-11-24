@@ -28,7 +28,7 @@ namespace internal {
 
 template<typename Storage>
 class iterable_storage final {
-    using basic_common_type = typename Storage::base_type;
+    using base_type_t = typename Storage::base_type;
 
     template<typename... It>
     struct iterable_storage_iterator final {
@@ -74,30 +74,30 @@ class iterable_storage final {
 public:
     using iterator = std::conditional_t<
         ignore_as_empty_v<typename Storage::value_type>,
-        iterable_storage_iterator<typename basic_common_type::iterator>,
-        iterable_storage_iterator<typename basic_common_type::iterator, decltype(std::declval<Storage>().begin())>>;
+        iterable_storage_iterator<typename base_type_t::iterator>,
+        iterable_storage_iterator<typename base_type_t::iterator, decltype(std::declval<Storage>().begin())>>;
     using reverse_iterator = std::conditional_t<
         ignore_as_empty_v<typename Storage::value_type>,
-        iterable_storage_iterator<typename basic_common_type::reverse_iterator>,
-        iterable_storage_iterator<typename basic_common_type::reverse_iterator, decltype(std::declval<Storage>().rbegin())>>;
+        iterable_storage_iterator<typename base_type_t::reverse_iterator>,
+        iterable_storage_iterator<typename base_type_t::reverse_iterator, decltype(std::declval<Storage>().rbegin())>>;
 
     iterable_storage(Storage &ref)
         : pool{&ref} {}
 
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{pool->basic_common_type::begin(), pool->begin()};
+        return iterator{pool->base_type_t::begin(), pool->begin()};
     }
 
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{pool->basic_common_type::end(), pool->end()};
+        return iterator{pool->base_type_t::end(), pool->end()};
     }
 
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return reverse_iterator{pool->basic_common_type::rbegin(), pool->rbegin()};
+        return reverse_iterator{pool->base_type_t::rbegin(), pool->rbegin()};
     }
 
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return reverse_iterator{pool->basic_common_type::rend(), pool->rend()};
+        return reverse_iterator{pool->base_type_t::rend(), pool->rend()};
     }
 
 private:
@@ -230,7 +230,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     template<typename Comp>
     using storage_type_t = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
-    using basic_common_type = std::common_type_t<typename storage_type_t<Component>::base_type...>;
+    using base_type_t = std::common_type_t<typename storage_type_t<Component>::base_type...>;
 
     class iterable final {
         template<typename It>
@@ -276,8 +276,8 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         };
 
     public:
-        using iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
-        using reverse_iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
+        using iterator = iterable_iterator<internal::view_iterator<base_type_t, typename base_type_t::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
+        using reverse_iterator = iterable_iterator<internal::view_iterator<base_type_t, typename base_type_t::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
 
         iterable(const basic_view &parent)
             : view{parent} {}
@@ -305,7 +305,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     template<std::size_t... Index>
     [[nodiscard]] auto test_set(std::index_sequence<Index...>) const ENTT_NOEXCEPT {
         std::size_t pos{};
-        std::array<const basic_common_type *, sizeof...(Component) - 1u> other{};
+        std::array<const base_type *, sizeof...(Component) - 1u> other{};
         (static_cast<void>(std::get<Index>(pools) == view ? void() : void(other[pos++] = std::get<Index>(pools))), ...);
         return other;
     }
@@ -347,13 +347,13 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using iterator = internal::view_iterator<base_type_t, typename base_type_t::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using reverse_iterator = internal::view_iterator<base_type_t, typename base_type_t::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable_view = iterable;
     /*! @brief Common type among all storage types. */
-    using common_type = basic_common_type;
+    using base_type = base_type_t;
 
     /**
      * @brief Storage type associated with a given component.
@@ -376,7 +376,7 @@ public:
     basic_view(storage_type<Component> &...component, const storage_type<Exclude> &...epool) ENTT_NOEXCEPT
         : pools{&component...},
           filter{&epool...},
-          view{(std::min)({&static_cast<const basic_common_type &>(component)...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); })} {}
+          view{(std::min)({&static_cast<const base_type &>(component)...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); })} {}
 
     /**
      * @brief Creates a new view driven by a given component in its iterations.
@@ -406,7 +406,7 @@ public:
      * @brief Returns the leading storage of a view.
      * @return The leading storage of the view.
      */
-    const common_type &handle() const ENTT_NOEXCEPT {
+    const base_type &handle() const ENTT_NOEXCEPT {
         return *view;
     }
 
@@ -630,8 +630,8 @@ public:
 
 private:
     std::tuple<storage_type<Component> *...> pools;
-    std::array<const basic_common_type *, sizeof...(Exclude)> filter;
-    const basic_common_type *view;
+    std::array<const base_type *, sizeof...(Exclude)> filter;
+    const base_type *view;
 };
 
 /**
@@ -662,7 +662,7 @@ class basic_view<Entity, get_t<Component>, exclude_t<>, std::void_t<std::enable_
     friend class basic_view;
 
     using storage_type_t = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
-    using basic_common_type = typename storage_type_t::base_type;
+    using base_type_t = typename storage_type_t::base_type;
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -670,13 +670,13 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator = typename basic_common_type::iterator;
+    using iterator = typename base_type_t::iterator;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename basic_common_type::reverse_iterator;
+    using reverse_iterator = typename base_type_t::reverse_iterator;
     /*! @brief Iterable view type. */
     using iterable_view = internal::iterable_storage<storage_type_t>;
     /*! @brief Common type among all storage types. */
-    using common_type = basic_common_type;
+    using base_type = base_type_t;
     /*! @brief Storage type associated with the view component. */
     using storage_type = storage_type_t;
 
@@ -697,7 +697,7 @@ public:
      * @brief Returns the leading storage of a view.
      * @return The leading storage of the view.
      */
-    const common_type &handle() const ENTT_NOEXCEPT {
+    const base_type &handle() const ENTT_NOEXCEPT {
         return *std::get<0>(pools);
     }
 
@@ -746,7 +746,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->basic_common_type::begin();
+        return std::get<0>(pools)->base_type::begin();
     }
 
     /**
@@ -759,7 +759,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->basic_common_type::end();
+        return std::get<0>(pools)->base_type::end();
     }
 
     /**
@@ -771,7 +771,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->basic_common_type::rbegin();
+        return std::get<0>(pools)->base_type::rbegin();
     }
 
     /**
@@ -786,7 +786,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->basic_common_type::rend();
+        return std::get<0>(pools)->base_type::rend();
     }
 
     /**
