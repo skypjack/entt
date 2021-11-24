@@ -46,7 +46,7 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
 
     template<std::size_t Step = 0, typename... Property, typename... Other>
     void unroll(choice_t<2>, std::tuple<Property...> property, Other &&...other) {
-        std::apply([this](auto &&...curr) { (unroll<Step>(choice<2>, std::forward<Property>(curr)...)); }, property);
+        std::apply([this](auto &&...curr) { (this->unroll<Step>(choice<2>, std::forward<Property>(curr)...)); }, property);
         unroll<Step + sizeof...(Property)>(choice<2>, std::forward<Other>(other)...);
     }
 
