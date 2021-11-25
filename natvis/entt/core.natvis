@@ -19,7 +19,7 @@
 		<DisplayString Condition="str != nullptr">{{ hash={ hash } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<Item Name="[str]">str,na</Item>
+			<Item Name="[data]">str,na</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::type_info">
