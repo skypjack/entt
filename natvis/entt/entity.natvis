@@ -9,8 +9,8 @@
 		<Intrinsic Name="var_at" Expression="vars.packed.first_base::value[idx].element.second">
 			<Parameter Name="idx" Type="int"/>
 		</Intrinsic>
-		<Intrinsic Name="to_entity" Expression="entity &amp; entity_traits::entity_mask">
-			<Parameter Name="entity" Type="int"/>
+		<Intrinsic Name="to_entity" Expression="*((entity_traits::entity_type *)&amp;entity) &amp; entity_traits::entity_mask">
+			<Parameter Name="entity" Type="entity_traits::value_type &amp;"/>
 		</Intrinsic>
 		<DisplayString>{{ size={ entities.size() } }}</DisplayString>
 		<Expand>
@@ -25,14 +25,16 @@
 				</Expand>
 			</Synthetic>
 			<Synthetic Name="[destroyed]" ExcludeView="simple">
-				<DisplayString>{ free_list != entity_traits::reserved }</DisplayString>
+				<DisplayString>{ to_entity(free_list) != entity_traits::entity_mask }</DisplayString>
 				<Expand>
 					<CustomListItems>
 						<Variable Name="it" InitialValue="to_entity(free_list)" />
+						<Variable Name="cnt" InitialValue="0" />
 						<Loop>
-							<Break Condition="to_entity(it) == entity_traits::entity_mask"/>
-							<Item Name="[entity]">to_entity(it)</Item>
+							<Break Condition="it == entity_traits::entity_mask"/>
+							<Item Name="[{ cnt }]">it</Item>
 							<Exec>it = to_entity(entities[it])</Exec>
+							<Exec>++cnt</Exec>
 						</Loop>
 					</CustomListItems>
 				</Expand>
@@ -63,8 +65,8 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_sparse_set&lt;*&gt;">
-		<Intrinsic Name="is_valid" Expression="entity &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
-			<Parameter Name="entity" Type="entity_type"/>
+		<Intrinsic Name="is_valid" Expression="*((entity_traits::entity_type *)&amp;entity) &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
+			<Parameter Name="entity" Type="entity_traits::value_type &amp;"/>
 		</Intrinsic>
 		<DisplayString>{{ size={ packed.size() }, type={ info->alias,na } }}</DisplayString>
 		<Expand>
@@ -79,8 +81,8 @@
 	</Type>
 	<Type Name="entt::basic_storage&lt;*&gt;">
 		<Intrinsic Name="capacity" Expression="packed.first_base::value.capacity() * packed_page_v"/>
-		<Intrinsic Name="is_valid" Expression="base_type::packed[idx] &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
-			<Parameter Name="idx" Type="int"/>
+		<Intrinsic Name="is_valid" Expression="*((entity_traits::entity_type *)&amp;entity) &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
+			<Parameter Name="entity" Type="entity_traits::value_type &amp;"/>
 		</Intrinsic>
 		<Intrinsic Name="element" Expression="packed.first_base::value[idx / packed_page_v][idx &amp; (packed_page_v - 1)]">
 			<Parameter Name="idx" Type="int"/>
@@ -93,7 +95,7 @@
 			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)na</Item>
 			<IndexListItems Optional="true">
 				<Size>base_type::packed.size()</Size>
-				<ValueNode Condition="is_valid($i)">element($i)</ValueNode>
+				<ValueNode Condition="is_valid(base_type::packed[$i])">element($i)</ValueNode>
 				<ValueNode>tombstone</ValueNode>
 			</IndexListItems>
 		</Expand>
