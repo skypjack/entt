@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="entt::basic_sparse_set&lt;*&gt;">
+		<Intrinsic Name="is_valid" Expression="entity &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
+			<Parameter Name="entity" Type="entity_type"/>
+		</Intrinsic>
 		<DisplayString>{{ size={ packed.size() }, type={ info->alias,na } }}</DisplayString>
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
 			<Item Name="[policy]" ExcludeView="simple">mode,en</Item>
 			<IndexListItems>
 				<Size>packed.size()</Size>
-				<ValueNode Condition="packed[$i] &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">packed[$i]</ValueNode>
+				<ValueNode Condition="is_valid(packed[$i])">packed[$i]</ValueNode>
 				<ValueNode>tombstone</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_storage&lt;*&gt;">
+		<Intrinsic Name="capacity" Expression="packed.first_base::value.capacity() * packed_page_v"/>
+		<Intrinsic Name="is_valid" Expression="base_type::packed[idx] &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
+			<Parameter Name="idx" Type="int"/>
+		</Intrinsic>
+		<Intrinsic Name="element" Expression="packed.first_base::value[idx / packed_page_v][idx &amp; (packed_page_v - 1)]">
+			<Parameter Name="idx" Type="int"/>
+		</Intrinsic>
 		<DisplayString>{{ size={ base_type::packed.size() }, type={ base_type::info->alias,na } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" Optional="true" ExcludeView="simple">packed.first_base::value.capacity() * packed_page_v</Item>
+			<Item Name="[capacity]" Optional="true" ExcludeView="simple">capacity()</Item>
 			<Item Name="[page size]" Optional="true" ExcludeView="simple">packed_page_v</Item>
 			<Item Name="[base]" ExcludeView="simple">(base_type*)this,na</Item>
 			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)na</Item>
 			<IndexListItems Optional="true">
 				<Size>base_type::packed.size()</Size>
-				<ValueNode Condition="base_type::packed[$i] &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">packed.first_base::value[$i / packed_page_v][$i &amp; (packed_page_v - 1)]</ValueNode>
+				<ValueNode Condition="is_valid($i)">element($i)</ValueNode>
 				<ValueNode>tombstone</ValueNode>
 			</IndexListItems>
 		</Expand>

@@ -4,15 +4,14 @@
 		<DisplayString>{{ type={ info->alias,na }, policy={ mode,en } }}</DisplayString>
     </Type>
 	<Type Name="entt::compressed_pair&lt;*&gt;">
-		<DisplayString Optional="true">({ ((first_base*)this)->value }, { ((second_base*)this)->value })</DisplayString>
-		<DisplayString Optional="true">({ *(first_base::base_type*)this }, { ((second_base*)this)->value })</DisplayString>
-		<DisplayString Optional="true">({ ((first_base*)this)->value }, { *(second_base::base_type*)this })</DisplayString>
-		<DisplayString Optional="true">({ *(first_base::base_type*)this }, { *(second_base::base_type*)this })</DisplayString>
+		<Intrinsic Name="first" Optional="true" Expression="((first_base*)this)->value"/>
+		<Intrinsic Name="first" Optional="true" Expression="*(first_base::base_type*)this"/>
+		<Intrinsic Name="second" Optional="true" Expression="((second_base*)this)->value"/>
+		<Intrinsic Name="second" Optional="true" Expression="*(second_base::base_type*)this"/>
+		<DisplayString >({ first() }, { second() })</DisplayString>
 		<Expand>
-			<Item Name="[first]" Optional="true">((first_base*)this)->value</Item>
-			<Item Name="[first]" Optional="true">*(first_base::base_type*)this</Item>
-			<Item Name="[second]" Optional="true">((second_base*)this)->value</Item>
-			<Item Name="[second]" Optional="true">*(second_base::base_type*)this</Item>
+			<Item Name="[first]">first()</Item>
+			<Item Name="[second]">second()</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_hashed_string&lt;*&gt;">

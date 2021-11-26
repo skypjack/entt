@@ -25,13 +25,16 @@
 		<DisplayString>{{}}</DisplayString>
 	</Type>
 	<Type Name="entt::internal::meta_data_node">
+		<Intrinsic Name="has_property" Expression="!!(traits &amp; property)">
+			<Parameter Name="property" Type="int"/>
+		</Intrinsic>
 		<DisplayString Condition="type != nullptr">{{ type={ type->info->alias,na } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[id]">id</Item>
 			<Item Name="[arity]">arity</Item>
-			<Item Name="[is_const]">!!(traits &amp; entt::internal::meta_traits::is_const)</Item>
-			<Item Name="[is_static]">!!(traits &amp; entt::internal::meta_traits::is_static)</Item>
+			<Item Name="[is_const]">has_property(entt::internal::meta_traits::is_const)</Item>
+			<Item Name="[is_static]">has_property(entt::internal::meta_traits::is_static)</Item>
 			<Synthetic Name="[prop]" Condition="prop != nullptr">
 				<Expand>
 					<LinkedListItems>
@@ -51,12 +54,15 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_func_node"	>
+		<Intrinsic Name="has_property" Expression="!!(traits &amp; property)">
+			<Parameter Name="property" Type="int"/>
+		</Intrinsic>
 		<DisplayString Condition="ret != nullptr">{{ arity={ arity }, ret={ ret->info->alias,na } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[id]">id</Item>
-			<Item Name="[is_const]">!!(traits &amp; entt::internal::meta_traits::is_const)</Item>
-			<Item Name="[is_static]">!!(traits &amp; entt::internal::meta_traits::is_static)</Item>
+			<Item Name="[is_const]">has_property(entt::internal::meta_traits::is_const)</Item>
+			<Item Name="[is_static]">has_property(entt::internal::meta_traits::is_static)</Item>
 			<Synthetic Name="[prop]" Condition="prop != nullptr">
 				<Expand>
 					<LinkedListItems>
@@ -106,19 +112,22 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_type_node">
+		<Intrinsic Name="has_property" Expression="!!(traits &amp; property)">
+			<Parameter Name="property" Type="int"/>
+		</Intrinsic>
 		<DisplayString Condition="info != nullptr">{{ type={ info->alias,na } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[id]">id</Item>
 			<Item Name="[sizeof]">size_of</Item>
-			<Item Name="[is_arithmetic]">!!(traits &amp; entt::internal::meta_traits::is_arithmetic)</Item>
-			<Item Name="[is_array]">!!(traits &amp; entt::internal::meta_traits::is_array)</Item>
-			<Item Name="[is_enum]">!!(traits &amp; entt::internal::meta_traits::is_enum)</Item>
-			<Item Name="[is_class]">!!(traits &amp; entt::internal::meta_traits::is_class)</Item>
-			<Item Name="[is_pointer]">!!(traits &amp; entt::internal::meta_traits::is_pointer)</Item>
-			<Item Name="[is_meta_pointer_like]">!!(traits &amp; entt::internal::meta_traits::is_meta_pointer_like)</Item>
-			<Item Name="[is_meta_sequence_container]">!!(traits &amp; entt::internal::meta_traits::is_meta_sequence_container)</Item>
-			<Item Name="[is_meta_associative_container]">!!(traits &amp; entt::internal::meta_traits::is_meta_associative_container)</Item>
+			<Item Name="[is_arithmetic]">has_property(entt::internal::meta_traits::is_arithmetic)</Item>
+			<Item Name="[is_array]">has_property(entt::internal::meta_traits::is_array)</Item>
+			<Item Name="[is_enum]">has_property(entt::internal::meta_traits::is_enum)</Item>
+			<Item Name="[is_class]">has_property(entt::internal::meta_traits::is_class)</Item>
+			<Item Name="[is_pointer]">has_property(entt::internal::meta_traits::is_pointer)</Item>
+			<Item Name="[is_meta_pointer_like]">has_property(entt::internal::meta_traits::is_meta_pointer_like)</Item>
+			<Item Name="[is_meta_sequence_container]">has_property(entt::internal::meta_traits::is_meta_sequence_container)</Item>
+			<Item Name="[is_meta_associative_container]">has_property(entt::internal::meta_traits::is_meta_associative_container)</Item>
 			<Item Name="[default_constructor]">default_constructor != nullptr</Item>
 			<Item Name="[conversion_helper]">conversion_helper != nullptr</Item>
 			<Item Name="[template_info]" Condition="templ != nullptr">*templ</Item>

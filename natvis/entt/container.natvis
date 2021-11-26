@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="entt::dense_hash_map&lt;*&gt;">
-		<DisplayString>{{ size={ packed.first_base::value.size() } }}</DisplayString>
+		<Intrinsic Name="capacity" Expression="packed.first_base::value.capacity()"/>
+		<Intrinsic Name="size" Expression="packed.first_base::value.size()"/>
+		<Intrinsic Name="bucket_count" Expression="sparse.first_base::value.size()"/>
+		<Intrinsic Name="element" Expression="packed.first_base::value[idx].element">
+			<Parameter Name="idx" Type="int"/>
+		</Intrinsic>
+		<DisplayString>{{ size={ size() } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" ExcludeView="simple">packed.first_base::value.capacity()</Item>
-			<Item Name="[bucket_count]" ExcludeView="simple">sparse.first_base::value.size()</Item>
-			<Item Name="[load_factor]" ExcludeView="simple">(float)packed.first_base::value.size() / (float)sparse.first_base::value.size()</Item>
+			<Item Name="[capacity]" ExcludeView="simple">capacity()</Item>
+			<Item Name="[bucket_count]" ExcludeView="simple">bucket_count()</Item>
+			<Item Name="[load_factor]" ExcludeView="simple">(float)size() / (float)bucket_count()</Item>
 			<Item Name="[max_load_factor]" ExcludeView="simple">threshold</Item>
 			<IndexListItems>
-				<Size>packed.first_base::value.size()</Size>
-				<ValueNode>packed.first_base::value[$i].element</ValueNode>
+				<Size>size()</Size>
+				<ValueNode>element($i)</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
 	<Type Name="entt::dense_hash_set&lt;*&gt;">
-		<DisplayString>{{ size={ packed.first_base::value.size() } }}</DisplayString>
+		<Intrinsic Name="capacity" Expression="packed.first_base::value.capacity()"/>
+		<Intrinsic Name="size" Expression="packed.first_base::value.size()"/>
+		<Intrinsic Name="bucket_count" Expression="sparse.first_base::value.size()"/>
+		<Intrinsic Name="element" Expression="packed.first_base::value[idx].element">
+			<Parameter Name="idx" Type="int"/>
+		</Intrinsic>
+		<DisplayString>{{ size={ size() } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" ExcludeView="simple">packed.first_base::value.capacity()</Item>
-			<Item Name="[bucket_count]" ExcludeView="simple">sparse.first_base::value.size()</Item>
-			<Item Name="[load_factor]" ExcludeView="simple">(float)packed.first_base::value.size() / (float)sparse.first_base::value.size()</Item>
+			<Item Name="[capacity]" ExcludeView="simple">capacity()</Item>
+			<Item Name="[bucket_count]" ExcludeView="simple">bucket_count()</Item>
+			<Item Name="[load_factor]" ExcludeView="simple">(float)size() / (float)bucket_count()</Item>
 			<Item Name="[max_load_factor]" ExcludeView="simple">threshold</Item>
 			<IndexListItems>
-				<Size>packed.first_base::value.size()</Size>
-				<ValueNode>packed.first_base::value[$i].element</ValueNode>
+				<Size>size()</Size>
+				<ValueNode>element($i)</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
