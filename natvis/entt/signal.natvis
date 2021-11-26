@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="entt::connection">
+		<DisplayString>{{ bound={ signal != nullptr } }}</DisplayString>
+	</Type>
 	<Type Name="entt::delegate&lt;*&gt;">
 		<DisplayString>{{ type={ "$T1" } }}</DisplayString>
 		<Expand>
 			<Item Name="[empty]">fn == nullptr</Item>
 			<Item Name="[data]">data</Item>
 		</Expand>
+	</Type>
+	<Type Name="entt::dispatcher">
+		<Intrinsic Name="pool_at" Expression="pools.packed.first_base::value[idx].element.second">
+			<Parameter Name="idx" Type="int"/>
+		</Intrinsic>
+		<DisplayString>{{ size={ pools.size() } }}</DisplayString>
+		<Expand>
+			<Synthetic Name="[pools]">
+				<DisplayString>{ pools.size() }</DisplayString>
+				<Expand>
+					<IndexListItems>
+						<Size>pools.size()</Size>
+						<ValueNode>pool_at($i)</ValueNode>
+					</IndexListItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
+	<Type Name="entt::dispatcher::pool_handler&lt;*&gt;">
+		<DisplayString>{{ size={ events.size() }, event={ "$T1" } }}</DisplayString>
+		<Expand>
+			<Item Name="[signal]">signal</Item>
+		</Expand>
+	</Type>
+	<Type Name="entt::scoped_connection">
+		<DisplayString>{ conn }</DisplayString>
 	</Type>
 	<Type Name="entt::sigh&lt;*&gt;">
 		<DisplayString>{{ size={ calls.size() }, type={ "$T1" } }}</DisplayString>
@@ -22,11 +51,5 @@
 			<Item Name="[signal]">signal,na</Item>
 			<Item Name="[offset]">offset</Item>
 		</Expand>
-	</Type>
-	<Type Name="entt::connection">
-		<DisplayString>{{ bound={ signal != nullptr } }}</DisplayString>
-	</Type>
-	<Type Name="entt::scoped_connection">
-		<DisplayString>{ conn }</DisplayString>
 	</Type>
 </AutoVisualizer>
