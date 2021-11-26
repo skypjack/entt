@@ -1,5 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="entt::basic_registry&lt;*&gt;">
+		<Intrinsic Name="pools_count" Expression="pools.packed.first_base::value.size()"/>
+		<Intrinsic Name="pool_at" Expression="*pools.packed.first_base::value[idx].element.second">
+			<Parameter Name="idx" Type="int"/>
+		</Intrinsic>
+		<Intrinsic Name="vars_count" Expression="vars.packed.first_base::value.size()"/>
+		<Intrinsic Name="var_at" Expression="vars.packed.first_base::value[idx].element.second">
+			<Parameter Name="idx" Type="int"/>
+		</Intrinsic>
+		<Intrinsic Name="to_entity" Expression="entity &amp; entity_traits::entity_mask">
+			<Parameter Name="entity" Type="int"/>
+		</Intrinsic>
+		<DisplayString>{{ size={ entities.size() } }}</DisplayString>
+		<Expand>
+			<Synthetic Name="[entities]">
+				<DisplayString>{ entities.size() }</DisplayString>
+				<Expand>
+					<IndexListItems>
+						<Size>entities.size()</Size>
+						<ValueNode Condition="to_entity(entities[$i]) == $i">entities[$i]</ValueNode>
+						<ValueNode>null</ValueNode>
+					</IndexListItems>
+				</Expand>
+			</Synthetic>
+			<Synthetic Name="[destroyed]" ExcludeView="simple">
+				<DisplayString>{ free_list != entity_traits::reserved }</DisplayString>
+				<Expand>
+					<CustomListItems>
+						<Variable Name="it" InitialValue="to_entity(free_list)" />
+						<Loop>
+							<Break Condition="to_entity(it) == entity_traits::entity_mask"/>
+							<Item Name="[entity]">to_entity(it)</Item>
+							<Exec>it = to_entity(entities[it])</Exec>
+						</Loop>
+					</CustomListItems>
+				</Expand>
+			</Synthetic>
+			<Synthetic Name="[pools]">
+				<DisplayString>{ pools_count() }</DisplayString>
+				<Expand>
+					<IndexListItems ExcludeView="simple">
+						<Size>pools_count()</Size>
+						<ValueNode>pool_at($i)</ValueNode>
+					</IndexListItems>
+					<IndexListItems IncludeView="simple">
+						<Size>pools_count()</Size>
+						<ValueNode>pool_at($i),view(simple)</ValueNode>
+					</IndexListItems>
+				</Expand>
+			</Synthetic>
+			<Item Name="[groups]" ExcludeView="simple">groups.size()</Item>
+			<Synthetic Name="[vars]">
+				<DisplayString>{ vars_count() }</DisplayString>
+				<Expand>
+					<IndexListItems>
+						<Size>vars_count()</Size>
+						<ValueNode>var_at($i)</ValueNode>
+					</IndexListItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
 	<Type Name="entt::basic_sparse_set&lt;*&gt;">
 		<Intrinsic Name="is_valid" Expression="entity &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
 			<Parameter Name="entity" Type="entity_type"/>
