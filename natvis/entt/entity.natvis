@@ -36,4 +36,10 @@
 			</IndexListItems>
 		</Expand>
 	</Type>
+	<Type Name="entt::null_t">
+		<DisplayString>&lt;null&gt;</DisplayString>
+	</Type>
+	<Type Name="entt::tombstone_t">
+		<DisplayString>&lt;tombstone&gt;</DisplayString>
+	</Type>
 </AutoVisualizer>
