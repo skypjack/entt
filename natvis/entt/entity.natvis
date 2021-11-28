@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="entt::basic_registry&lt;*&gt;">
-		<Intrinsic Name="pools_count" Expression="pools.packed.first_base::value.size()"/>
-		<Intrinsic Name="pool_at" Expression="*pools.packed.first_base::value[idx].element.second">
-			<Parameter Name="idx" Type="int"/>
-		</Intrinsic>
-		<Intrinsic Name="vars_count" Expression="vars.packed.first_base::value.size()"/>
-		<Intrinsic Name="var_at" Expression="vars.packed.first_base::value[idx].element.second">
-			<Parameter Name="idx" Type="int"/>
-		</Intrinsic>
+		<Intrinsic Name="pools_size" Expression="pools.packed.first_base::value.size()"/>
+		<Intrinsic Name="vars_size" Expression="vars.packed.first_base::value.size()"/>
 		<Intrinsic Name="to_entity" Expression="*((entity_traits::entity_type *)&amp;entity) &amp; entity_traits::entity_mask">
 			<Parameter Name="entity" Type="entity_traits::value_type &amp;"/>
 		</Intrinsic>
@@ -40,62 +34,57 @@
 				</Expand>
 			</Synthetic>
 			<Synthetic Name="[pools]">
-				<DisplayString>{ pools_count() }</DisplayString>
+				<DisplayString>{ pools_size() }</DisplayString>
 				<Expand>
 					<IndexListItems ExcludeView="simple">
-						<Size>pools_count()</Size>
-						<ValueNode>pool_at($i)</ValueNode>
+						<Size>pools_size()</Size>
+						<ValueNode>*pools.packed.first_base::value[$i].element.second</ValueNode>
 					</IndexListItems>
 					<IndexListItems IncludeView="simple">
-						<Size>pools_count()</Size>
-						<ValueNode>pool_at($i),view(simple)</ValueNode>
+						<Size>pools_size()</Size>
+						<ValueNode>*pools.packed.first_base::value[$i].element.second,view(simple)</ValueNode>
 					</IndexListItems>
 				</Expand>
 			</Synthetic>
 			<Item Name="[groups]" ExcludeView="simple">groups.size()</Item>
 			<Synthetic Name="[vars]">
-				<DisplayString>{ vars_count() }</DisplayString>
+				<DisplayString>{ vars_size() }</DisplayString>
 				<Expand>
 					<IndexListItems>
-						<Size>vars_count()</Size>
-						<ValueNode>var_at($i)</ValueNode>
+						<Size>vars_size()</Size>
+						<ValueNode>vars.packed.first_base::value[$i].element.second</ValueNode>
 					</IndexListItems>
 				</Expand>
 			</Synthetic>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_sparse_set&lt;*&gt;">
-		<Intrinsic Name="is_valid" Expression="*((entity_traits::entity_type *)&amp;entity) &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
-			<Parameter Name="entity" Type="entity_traits::value_type &amp;"/>
-		</Intrinsic>
 		<DisplayString>{{ size={ packed.size() }, type={ info->alias,na } }}</DisplayString>
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
 			<Item Name="[policy]" ExcludeView="simple">mode,en</Item>
 			<IndexListItems>
 				<Size>packed.size()</Size>
-				<ValueNode Condition="is_valid(packed[$i])">packed[$i]</ValueNode>
+				<ValueNode Condition="*((entity_traits::entity_type *)&amp;packed[$i]) &lt; ~entity_traits::entity_mask">
+					packed[$i]
+				</ValueNode>
 				<ValueNode>tombstone</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_storage&lt;*&gt;">
-		<Intrinsic Name="capacity" Expression="packed.first_base::value.capacity() * packed_page_v"/>
-		<Intrinsic Name="is_valid" Expression="*((entity_traits::entity_type *)&amp;entity) &lt; (entity_traits::reserved &amp; ~entity_traits::entity_mask)">
-			<Parameter Name="entity" Type="entity_traits::value_type &amp;"/>
-		</Intrinsic>
-		<Intrinsic Name="element" Expression="packed.first_base::value[idx / packed_page_v][idx &amp; (packed_page_v - 1)]">
-			<Parameter Name="idx" Type="int"/>
-		</Intrinsic>
 		<DisplayString>{{ size={ base_type::packed.size() }, type={ base_type::info->alias,na } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" Optional="true" ExcludeView="simple">capacity()</Item>
-			<Item Name="[page size]" Optional="true" ExcludeView="simple">packed_page_v</Item>
-			<Item Name="[base]" ExcludeView="simple">(base_type*)this,na</Item>
-			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)na</Item>
-			<IndexListItems Optional="true">
+			<Item Name="[capacity]" Optional="true" ExcludeView="simple">packed.first_base::value.capacity() * comp_traits::page_size</Item>
+			<Item Name="[page size]" Optional="true" ExcludeView="simple">comp_traits::page_size</Item>
+			<Item Name="[base]" ExcludeView="simple">(base_type*)this,nand</Item>
+			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)nand</Item>
+			<!-- having SFINAE-like techniques in natvis is priceless :) -->
+			<IndexListItems Condition="packed.first_base::value.size() != 0" Optional="true">
 				<Size>base_type::packed.size()</Size>
-				<ValueNode Condition="is_valid(base_type::packed[$i])">element($i)</ValueNode>
+				<ValueNode Condition="*((base_type::entity_traits::entity_type *)&amp;base_type::packed[$i]) &lt; ~base_type::entity_traits::entity_mask">
+					packed.first_base::value[$i / comp_traits::page_size][$i &amp; (comp_traits::page_size - 1)]
+				</ValueNode>
 				<ValueNode>tombstone</ValueNode>
 			</IndexListItems>
 		</Expand>
