@@ -34,10 +34,9 @@ template<typename Container>
 class storage_iterator final {
     friend storage_iterator<const Container>;
 
-    static constexpr auto packed_page_v = ENTT_PACKED_PAGE;
-
     using container_type = std::remove_const_t<Container>;
     using allocator_traits = std::allocator_traits<typename container_type::allocator_type>;
+    using comp_traits = component_traits<typename container_type::value_type>;
 
     using iterator_traits = std::iterator_traits<std::conditional_t<
         std::is_const_v<Container>,
@@ -100,12 +99,12 @@ public:
 
     [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         const auto pos = index - value - 1;
-        return (*packed)[pos / packed_page_v][fast_mod(pos, packed_page_v)];
+        return (*packed)[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         const auto pos = index - 1;
-        return (*packed)[pos / packed_page_v] + fast_mod(pos, packed_page_v);
+        return (*packed)[pos / comp_traits::page_size] + fast_mod(pos, comp_traits::page_size);
     }
 
     [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
@@ -191,24 +190,21 @@ template<typename CLhs, typename CRhs>
  */
 template<typename Entity, typename Type, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
-    static constexpr auto packed_page_v = ENTT_PACKED_PAGE;
-
     using allocator_traits = std::allocator_traits<Allocator>;
     using alloc = typename allocator_traits::template rebind_alloc<Type>;
     using alloc_traits = typename std::allocator_traits<alloc>;
 
-    using entity_traits = entt_traits<Entity>;
     using comp_traits = component_traits<Type>;
     using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
-        return packed.first()[pos / packed_page_v][fast_mod(pos, packed_page_v)];
+        return packed.first()[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
     auto assure_at_least(const std::size_t pos) {
         auto &&container = packed.first();
-        const auto idx = pos / packed_page_v;
+        const auto idx = pos / comp_traits::page_size;
 
         if(!(idx < container.size())) {
             auto curr = container.size();
@@ -216,7 +212,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
             ENTT_TRY {
                 for(const auto last = container.size(); curr < last; ++curr) {
-                    container[curr] = alloc_traits::allocate(packed.second(), packed_page_v);
+                    container[curr] = alloc_traits::allocate(packed.second(), comp_traits::page_size);
                 }
             }
             ENTT_CATCH {
@@ -225,16 +221,16 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             }
         }
 
-        return container[idx] + fast_mod(pos, packed_page_v);
+        return container[idx] + fast_mod(pos, comp_traits::page_size);
     }
 
     void release_unused_pages() {
         auto &&container = packed.first();
         auto page_allocator{packed.second()};
-        const auto in_use = (base_type::size() + packed_page_v - 1u) / packed_page_v;
+        const auto in_use = (base_type::size() + comp_traits::page_size - 1u) / comp_traits::page_size;
 
         for(auto pos = in_use, last = container.size(); pos < last; ++pos) {
-            alloc_traits::deallocate(page_allocator, container[pos], packed_page_v);
+            alloc_traits::deallocate(page_allocator, container[pos], comp_traits::page_size);
         }
 
         container.resize(in_use);
@@ -242,7 +238,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     void release_all_pages() {
         for(size_type pos{}, last = base_type::size(); pos < last; ++pos) {
-            if constexpr(comp_traits::in_place_delete::value) {
+            if constexpr(comp_traits::in_place_delete) {
                 if(base_type::at(pos) != tombstone) {
                     std::destroy_at(std::addressof(element_at(pos)));
                 }
@@ -255,7 +251,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         auto page_allocator{packed.second()};
 
         for(size_type pos{}, last = container.size(); pos < last; ++pos) {
-            alloc_traits::deallocate(page_allocator, container[pos], packed_page_v);
+            alloc_traits::deallocate(page_allocator, container[pos], comp_traits::page_size);
         }
     }
 
@@ -393,7 +389,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete::value}, allocator},
+        : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete}, allocator},
           packed{container_type{allocator}, allocator} {}
 
     /**
@@ -476,7 +472,7 @@ public:
      * @return Capacity of the storage.
      */
     [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT override {
-        return packed.first().size() * packed_page_v;
+        return packed.first().size() * comp_traits::page_size;
     }
 
     /*! @brief Requests the removal of unused capacity. */
@@ -741,7 +737,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete::value}, allocator} {}
+        : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete}, allocator} {}
 
     /**
      * @brief Move constructor.

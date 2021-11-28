@@ -1013,14 +1013,16 @@ The definition common to all components is the following:
 
 ```cpp
 struct basic_component_traits {
-    using in_place_delete = std::false_type;
-    using ignore_if_empty = ENTT_IGNORE_IF_EMPTY;
+    static constexpr auto in_place_delete = false;
+    static constexpr auto ignore_if_empty = ENTT_IGNORE_IF_EMPTY;
+    static constexpr auto page_size = ENTT_PACKED_PAGE;
 };
 ```
 
 Where `in_place_delete` instructs the library on the deletion policy for a given
-type while `ignore_if_empty` selectively disables empty type optimization.<br/>
-The `component_traits` class template is _sfinae-friendly_, it supports single-
+type while `ignore_if_empty` selectively disables empty type optimization and
+`page_size` dictates the storage behavior for non-empty types.<br/>
+The `component_traits` class template is _sfinae-friendly_, it supports single
 and multi type specializations as well as feature-based ones:
 
 ```cpp

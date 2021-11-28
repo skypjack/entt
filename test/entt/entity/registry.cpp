@@ -18,7 +18,7 @@ struct stable_type {
 
 template<>
 struct entt::component_traits<stable_type>: basic_component_traits {
-    using in_place_delete = std::true_type;
+    static constexpr auto in_place_delete = true;
 };
 
 struct non_default_constructible {

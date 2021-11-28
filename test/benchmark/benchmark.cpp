@@ -20,7 +20,7 @@ struct comp { int x; };
 
 template<>
 struct entt::component_traits<stable_position>: basic_component_traits {
-    using in_place_delete = std::true_type;
+    static constexpr auto in_place_delete = true;
 };
 
 struct timer final {

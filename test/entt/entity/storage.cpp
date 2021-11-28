@@ -57,12 +57,12 @@ private:
 
 template<>
 struct entt::component_traits<stable_type>: basic_component_traits {
-    using in_place_delete = std::true_type;
+    static constexpr auto in_place_delete = true;
 };
 
 template<>
 struct entt::component_traits<empty_stable_type>: basic_component_traits {
-    using in_place_delete = std::true_type;
+    static constexpr auto in_place_delete = true;
 };
 
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
