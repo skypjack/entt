@@ -11,9 +11,6 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::dispatcher">
-		<Intrinsic Name="pool_at" Expression="pools.packed.first_base::value[idx].element.second">
-			<Parameter Name="idx" Type="int"/>
-		</Intrinsic>
 		<DisplayString>{{ size={ pools.size() } }}</DisplayString>
 		<Expand>
 			<Synthetic Name="[pools]">
@@ -21,7 +18,7 @@
 				<Expand>
 					<IndexListItems>
 						<Size>pools.size()</Size>
-						<ValueNode>pool_at($i)</ValueNode>
+						<ValueNode>*pools.packed.first_base::value[$i].element.second</ValueNode>
 					</IndexListItems>
 				</Expand>
 			</Synthetic>
