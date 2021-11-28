@@ -7,6 +7,7 @@
 #include "../config/config.h"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
+#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "sparse_set.hpp"

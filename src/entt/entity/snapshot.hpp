@@ -11,6 +11,7 @@
 #include "../config/config.h"
 #include "../container/dense_hash_map.hpp"
 #include "../core/type_traits.hpp"
+#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "registry.hpp"
