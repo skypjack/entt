@@ -1005,7 +1005,7 @@ public:
     }
 
 private:
-    std::tuple<> filter;
+    std::array<const basic_common_type *, 0u> filter;
     storage_type *view;
 };
 
