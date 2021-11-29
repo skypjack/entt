@@ -89,6 +89,13 @@
 			</IndexListItems>
 		</Expand>
 	</Type>
+	<Type Name="entt::basic_view&lt;*&gt;">
+		<DisplayString>{{ size_hint={ view->packed.size() } }}</DisplayString>
+		<Expand>
+			<Item Name="[pools]">pools,na</Item>
+			<Item Name="[filter]">filter,na</Item>
+		</Expand>
+	</Type>
 	<Type Name="entt::null_t">
 		<DisplayString>&lt;null&gt;</DisplayString>
 	</Type>
