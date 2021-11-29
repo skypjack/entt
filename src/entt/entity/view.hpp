@@ -412,17 +412,21 @@ public:
 
     /**
      * @brief Returns the storage for a given component type.
-     * @tparam Comp Type or index of component of which to return the storage.
+     * @tparam Comp Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
     template<typename Comp>
-    [[nodiscard]] storage_type<Comp> &storage() {
+    [[nodiscard]] storage_type<Comp> &storage() const ENTT_NOEXCEPT {
         return *std::get<storage_type<Comp> *>(pools);
     }
 
-    /*! @copydoc storage */
+    /**
+     * @brief Returns the storage for a given component type.
+     * @tparam Comp Index of component of which to return the storage.
+     * @return The storage for the given component type.
+     */
     template<std::size_t Comp>
-    [[nodiscard]] decltype(auto) storage() {
+    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
         return *std::get<Comp>(pools);
     }
 
@@ -718,20 +722,11 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type.
-     * @tparam Comp Type or index of component of which to return the storage.
+     * @brief Returns the storage for the given component type.
      * @return The storage for the given component type.
      */
-    template<typename... Comp>
-    [[nodiscard]] storage_type &storage() {
-        static_assert((std::is_same_v<Comp, Component> && ...), "Invalid component type");
+    [[nodiscard]] storage_type &storage() const ENTT_NOEXCEPT {
         return *std::get<0>(pools);
-    }
-
-    /*! @copydoc storage */
-    template<std::size_t Comp>
-    [[nodiscard]] storage_type &storage() {
-        return *std::get<Comp>(pools);
     }
 
     /**

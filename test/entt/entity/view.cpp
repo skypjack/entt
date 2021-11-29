@@ -485,6 +485,36 @@ TEST(SingleComponentView, StableType) {
     ASSERT_EQ(view.size_hint(), 1u);
 }
 
+TEST(SingleComponentView, Storage) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    const auto view = registry.view<int>();
+    const auto cview = registry.view<const char>();
+
+    static_assert(std::is_same_v<decltype(view.storage()), typename entt::storage_traits<entt::entity, int>::storage_type &>);
+    static_assert(std::is_same_v<decltype(cview.storage()), const typename entt::storage_traits<entt::entity, char>::storage_type &>);
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(cview.size(), 0u);
+
+    view.storage().emplace(entity);
+    registry.emplace<char>(entity);
+
+    ASSERT_EQ(view.size(), 1u);
+    ASSERT_EQ(cview.size(), 1u);
+    ASSERT_TRUE(view.storage().contains(entity));
+    ASSERT_TRUE(cview.storage().contains(entity));
+    ASSERT_TRUE((registry.all_of<int, char>(entity)));
+
+    view.storage().erase(entity);
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(cview.size(), 1u);
+    ASSERT_FALSE(view.storage().contains(entity));
+    ASSERT_TRUE(cview.storage().contains(entity));
+    ASSERT_FALSE((registry.all_of<int, char>(entity)));
+}
+
 TEST(MultiComponentView, Functionalities) {
     entt::registry registry;
     auto view = registry.view<int, char>();
@@ -1277,4 +1307,30 @@ TEST(View, Pipe) {
 
     ASSERT_FALSE((view1 | view4 | view2).contains(entity));
     ASSERT_TRUE((view1 | view4 | view2).contains(other));
+}
+
+TEST(MultiComponentView, Storage) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    const auto view = registry.view<int, const char>();
+
+    static_assert(std::is_same_v<decltype(view.storage<0u>()), typename entt::storage_traits<entt::entity, int>::storage_type &>);
+    static_assert(std::is_same_v<decltype(view.storage<int>()), typename entt::storage_traits<entt::entity, int>::storage_type &>);
+    static_assert(std::is_same_v<decltype(view.storage<1u>()), const typename entt::storage_traits<entt::entity, char>::storage_type &>);
+    static_assert(std::is_same_v<decltype(view.storage<const char>()), const typename entt::storage_traits<entt::entity, char>::storage_type &>);
+
+    ASSERT_EQ(view.size_hint(), 0u);
+
+    view.storage<int>().emplace(entity);
+    registry.emplace<char>(entity);
+
+    ASSERT_EQ(view.size_hint(), 1u);
+    ASSERT_TRUE(view.storage<const char>().contains(entity));
+    ASSERT_TRUE((registry.all_of<int, char>(entity)));
+
+    view.storage<0u>().erase(entity);
+
+    ASSERT_EQ(view.size_hint(), 0u);
+    ASSERT_TRUE(view.storage<1u>().contains(entity));
+    ASSERT_FALSE((registry.all_of<int, char>(entity)));
 }
