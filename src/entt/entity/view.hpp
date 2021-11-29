@@ -26,6 +26,11 @@ namespace entt {
 
 namespace internal {
 
+template<typename View, std::size_t... Index>
+auto storage_tuple(const View &view, std::index_sequence<Index...>) {
+    return std::forward_as_tuple(view.storage<Index>()...);
+}
+
 template<typename Storage>
 class iterable_storage final {
     using basic_common_type = typename Storage::base_type;
@@ -642,8 +647,8 @@ public:
     [[nodiscard]] auto operator|(const basic_view<Entity, get_t<Get...>, exclude_t<Excl...>> &other) const ENTT_NOEXCEPT {
         using view_type = basic_view<Entity, get_t<Component..., Get...>, exclude_t<Exclude..., Excl...>>;
         return std::make_from_tuple<view_type>(std::tuple_cat(
-            std::apply([](auto *...curr) { return std::forward_as_tuple(*curr...); }, pools),
-            std::apply([](auto *...curr) { return std::forward_as_tuple(*curr...); }, other.pools),
+            internal ::storage_tuple(*this, std::index_sequence_for<Component...>{}),
+            internal ::storage_tuple(other, std::index_sequence_for<Get...>{}),
             std::apply([](const auto *...curr) { return std::forward_as_tuple(static_cast<const storage_type<Exclude> &>(*curr)...); }, filter),
             std::apply([](const auto *...curr) { return std::forward_as_tuple(static_cast<const storage_type<Excl> &>(*curr)...); }, other.filter)));
     }
@@ -702,7 +707,7 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
-        : pools{},
+        : view{},
           filter{} {}
 
     /**
@@ -710,7 +715,7 @@ public:
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : pools{&ref},
+        : view{&ref},
           filter{} {}
 
     /**
@@ -718,15 +723,29 @@ public:
      * @return The leading storage of the view.
      */
     const base_type &handle() const ENTT_NOEXCEPT {
-        return *std::get<0>(pools);
+        return *view;
     }
 
     /**
-     * @brief Returns the storage for the given component type.
+     * @brief Returns the storage for a given component type.
+     * @tparam Comp Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
+    template<typename... Comp>
     [[nodiscard]] storage_type &storage() const ENTT_NOEXCEPT {
-        return *std::get<0>(pools);
+        static_assert((std::is_same_v<Comp, Component> && ...), "Invalid component type");
+        return *view;
+    }
+
+    /**
+     * @brief Returns the storage for a given component type.
+     * @tparam Comp Index of component of which to return the storage.
+     * @return The storage for the given component type.
+     */
+    template<std::size_t Comp>
+    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
+        static_assert(Comp == 0u, "Invalid component type");
+        return *view;
     }
 
     /**
@@ -734,7 +753,7 @@ public:
      * @return Number of entities that have the given component.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->size();
+        return view->size();
     }
 
     /**
@@ -742,7 +761,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->empty();
+        return view->empty();
     }
 
     /**
@@ -750,7 +769,7 @@ public:
      * @return A pointer to the array of components.
      */
     [[nodiscard]] auto raw() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->raw();
+        return view->raw();
     }
 
     /**
@@ -762,7 +781,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] auto data() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->data();
+        return view->data();
     }
 
     /**
@@ -774,7 +793,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->base_type::begin();
+        return view->base_type::begin();
     }
 
     /**
@@ -787,7 +806,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->base_type::end();
+        return view->base_type::end();
     }
 
     /**
@@ -799,7 +818,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->base_type::rbegin();
+        return view->base_type::rbegin();
     }
 
     /**
@@ -814,7 +833,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->base_type::rend();
+        return view->base_type::rend();
     }
 
     /**
@@ -844,7 +863,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = std::get<0>(pools)->find(entt);
+        const auto it = view->find(entt);
         return it != end() && *it == entt ? it : end();
     }
 
@@ -871,7 +890,7 @@ public:
      * @return True if the view is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return std::get<0>(pools) != nullptr;
+        return view != nullptr;
     }
 
     /**
@@ -880,7 +899,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return std::get<0>(pools)->contains(entt);
+        return view->contains(entt);
     }
 
     /**
@@ -899,10 +918,10 @@ public:
         ENTT_ASSERT(contains(entt), "View does not contain entity");
 
         if constexpr(sizeof...(Comp) == 0) {
-            return std::get<0>(pools)->get_as_tuple(entt);
+            return view->get_as_tuple(entt);
         } else {
             static_assert(std::is_same_v<Comp..., Component>, "Invalid component type");
-            return std::get<0>(pools)->get(entt);
+            return view->get(entt);
         }
     }
 
@@ -910,7 +929,7 @@ public:
     template<std::size_t Comp>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         ENTT_ASSERT(contains(entt), "View does not contain entity");
-        return std::get<Comp>(pools)->get(entt);
+        return view->get(entt);
     }
 
     /**
@@ -949,7 +968,7 @@ public:
                     std::apply(func, pack);
                 }
             } else {
-                for(auto &&component: *std::get<0>(pools)) {
+                for(auto &&component: *view) {
                     func(component);
                 }
             }
@@ -966,7 +985,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        return iterable_view{*std::get<0>(pools)};
+        return iterable_view{*view};
     }
 
     /**
@@ -980,14 +999,14 @@ public:
     [[nodiscard]] auto operator|(const basic_view<Entity, get_t<Get...>, exclude_t<Excl...>> &other) const ENTT_NOEXCEPT {
         using view_type = basic_view<Entity, get_t<Component, Get...>, exclude_t<Excl...>>;
         return std::make_from_tuple<view_type>(std::tuple_cat(
-            std::apply([](auto *...curr) { return std::forward_as_tuple(*curr...); }, pools),
-            std::apply([](auto *...curr) { return std::forward_as_tuple(*curr...); }, other.pools),
+            internal ::storage_tuple(*this, std::make_index_sequence<1u>{}),
+            internal ::storage_tuple(other, std::index_sequence_for<Get...>{}),
             std::apply([](const auto *...curr) { return std::forward_as_tuple(static_cast<const typename view_type::template storage_type<Excl> &>(*curr)...); }, other.filter)));
     }
 
 private:
-    std::tuple<storage_type *> pools;
     std::tuple<> filter;
+    storage_type *view;
 };
 
 /**
