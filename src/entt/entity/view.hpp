@@ -28,7 +28,7 @@ namespace internal {
 
 template<typename View, std::size_t... Index>
 auto storage_tuple(const View &view, std::index_sequence<Index...>) {
-    return std::forward_as_tuple(view.storage<Index>()...);
+    return std::forward_as_tuple(view.template storage<Index>()...);
 }
 
 template<typename Storage>
@@ -707,16 +707,16 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
-        : view{},
-          filter{} {}
+        : filter{},
+          view{} {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : view{&ref},
-          filter{} {}
+        : filter{},
+          view{&ref} {}
 
     /**
      * @brief Returns the leading storage of a view.
