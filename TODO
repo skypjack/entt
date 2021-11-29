@@ -8,7 +8,7 @@ WIP:
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime events (dispatcher/emitter), runtime context variables...
 * runtime_view/registry, remove reference to basic_sparse_set<E>
-* make pools available (group), review operator| for views
+* review operator| for views
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
 * custom allocators all over
 
