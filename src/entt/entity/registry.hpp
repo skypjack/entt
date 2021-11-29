@@ -49,7 +49,8 @@ class basic_registry {
 
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
-        static_assert((!component_traits<Owned>::in_place_delete && ...), "Groups do not support in-place delete");
+        // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
+        static_assert(!std::disjunction_v<std::bool_constant<component_traits<Owned>::in_place_delete>...>, "Groups do not support in-place delete");
         std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t> current{};
 
         template<typename Component>
