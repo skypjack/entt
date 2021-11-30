@@ -144,6 +144,8 @@ public:
     using version_type = typename entity_traits::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Common type among all storage types. */
+    using base_type = basic_common_type;
 
     /**
      * @brief Storage type associated with a given component.
