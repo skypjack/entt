@@ -8,14 +8,21 @@
 		</Intrinsic>
 		<DisplayString>{{ size={ entities.size() } }}</DisplayString>
 		<Expand>
-			<Synthetic Name="[entities]">
+			<Item IncludeView="simple" Name="[entities]">entities,view(simple)nr</Item>
+			<Synthetic Name="[entities]" ExcludeView="simple">
 				<DisplayString>{ entities.size() }</DisplayString>
 				<Expand>
-					<IndexListItems>
-						<Size>entities.size()</Size>
-						<ValueNode Condition="to_entity(entities[$i]) == $i">entities[$i]</ValueNode>
-						<ValueNode>null</ValueNode>
-					</IndexListItems>
+					<CustomListItems>
+						<Variable Name="pos" InitialValue="0" />
+						<Variable Name="last" InitialValue="entities.size()"/>
+						<Loop>
+							<Break Condition="pos == last"/>
+							<If Condition="to_entity(entities[pos]) == pos">
+								<Item Name="[{ pos }]">entities[pos]</Item>
+							</If>
+							<Exec>++pos</Exec>
+						</Loop>
+					</CustomListItems>
 				</Expand>
 			</Synthetic>
 			<Synthetic Name="[destroyed]" ExcludeView="simple">
@@ -23,12 +30,10 @@
 				<Expand>
 					<CustomListItems>
 						<Variable Name="it" InitialValue="to_entity(free_list)" />
-						<Variable Name="cnt" InitialValue="0" />
 						<Loop>
 							<Break Condition="it == entity_traits::entity_mask"/>
-							<Item Name="[{ cnt }]">it</Item>
+							<Item Name="[{ it }]">entities[it]</Item>
 							<Exec>it = to_entity(entities[it])</Exec>
-							<Exec>++cnt</Exec>
 						</Loop>
 					</CustomListItems>
 				</Expand>
@@ -62,14 +67,19 @@
 		<DisplayString>{{ size={ packed.size() }, type={ info->alias,na } }}</DisplayString>
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
-			<Item Name="[policy]" ExcludeView="simple">mode,en</Item>
-			<IndexListItems>
-				<Size>packed.size()</Size>
-				<ValueNode Condition="*((entity_traits::entity_type *)&amp;packed[$i]) &lt; ~entity_traits::entity_mask">
-					packed[$i]
-				</ValueNode>
-				<ValueNode>tombstone</ValueNode>
-			</IndexListItems>
+			<Item Name="[policy]">mode,en</Item>
+			<ExpandedItem IncludeView="simple">packed,view(simple)</ExpandedItem>
+			<CustomListItems ExcludeView="simple">
+				<Variable Name="pos" InitialValue="0" />
+				<Variable Name="last" InitialValue="packed.size()"/>
+				<Loop>
+					<Break Condition="pos == last"/>
+					<If Condition="*((entity_traits::entity_type *)&amp;packed[pos]) &lt; ~entity_traits::entity_mask">
+						<Item Name="[{ pos }]">packed[pos]</Item>
+					</If>
+					<Exec>++pos</Exec>
+				</Loop>
+			</CustomListItems>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_storage&lt;*&gt;">
@@ -80,13 +90,17 @@
 			<Item Name="[base]" ExcludeView="simple">(base_type*)this,nand</Item>
 			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)nand</Item>
 			<!-- having SFINAE-like techniques in natvis is priceless :) -->
-			<IndexListItems Condition="packed.first_base::value.size() != 0" Optional="true">
-				<Size>base_type::packed.size()</Size>
-				<ValueNode Condition="*((base_type::entity_traits::entity_type *)&amp;base_type::packed[$i]) &lt; ~base_type::entity_traits::entity_mask">
-					packed.first_base::value[$i / comp_traits::page_size][$i &amp; (comp_traits::page_size - 1)]
-				</ValueNode>
-				<ValueNode>tombstone</ValueNode>
-			</IndexListItems>
+			<CustomListItems Condition="packed.first_base::value.size() != 0" Optional="true">
+				<Variable Name="pos" InitialValue="0" />
+				<Variable Name="last" InitialValue="base_type::packed.size()"/>
+				<Loop>
+					<Break Condition="pos == last"/>
+					<If Condition="*((base_type::entity_traits::entity_type *)&amp;base_type::packed[pos]) &lt; ~base_type::entity_traits::entity_mask">
+						<Item Name="[{ pos }]">packed.first_base::value[pos / comp_traits::page_size][pos &amp; (comp_traits::page_size - 1)]</Item>
+					</If>
+					<Exec>++pos</Exec>
+				</Loop>
+			</CustomListItems>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_view&lt;*&gt;">
