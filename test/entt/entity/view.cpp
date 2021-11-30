@@ -1163,6 +1163,47 @@ TEST(MultiComponentView, StableType) {
     ASSERT_EQ(view.size_hint(), 1u);
 }
 
+TEST(MultiComponentView, StableTypeWithExcludedComponent) {
+    entt::registry registry;
+    auto view = registry.view<stable_type>(entt::exclude<int>).use<stable_type>();
+
+    const auto entity = registry.create();
+    const auto other = registry.create();
+
+    registry.emplace<stable_type>(entity, 0);
+    registry.emplace<stable_type>(other, 42);
+    registry.emplace<int>(entity);
+
+    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
+
+    registry.destroy(entity);
+
+    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
+
+    for(auto entt: view) {
+        constexpr entt::entity tombstone = entt::tombstone;
+        ASSERT_NE(entt, tombstone);
+        ASSERT_EQ(entt, other);
+    }
+
+    for(auto [entt, comp]: view.each()) {
+        constexpr entt::entity tombstone = entt::tombstone;
+        ASSERT_NE(entt, tombstone);
+        ASSERT_EQ(entt, other);
+        ASSERT_EQ(comp.value, 42);
+    }
+
+    view.each([other](const auto entt, auto &&...) {
+        constexpr entt::entity tombstone = entt::tombstone;
+        ASSERT_NE(entt, tombstone);
+        ASSERT_EQ(entt, other);
+    });
+}
+
 TEST(MultiComponentView, SameComponentTypes) {
     entt::registry registry;
     typename entt::storage_traits<entt::entity, int>::storage_type storage;

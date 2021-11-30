@@ -106,10 +106,8 @@ private:
 
 template<typename Type, typename It, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
-    static constexpr auto is_multi_type_v = ((Component + Exclude) != 0u);
-
     [[nodiscard]] bool valid() const {
-        return (is_multi_type_v || (*it != tombstone))
+        return ((Component != 0u) || (*it != tombstone))
                && std::apply([entt = *it](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
                && std::apply([entt = *it](const auto *...curr) { return (!curr->contains(entt) && ...); }, filter);
     }
@@ -232,7 +230,6 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     template<typename Comp>
     using storage_type_t = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
-    static constexpr bool is_multi_type_v = ((sizeof...(Component) + sizeof...(Exclude)) != 1u);
     using basic_common_type = std::common_type_t<typename storage_type_t<Component>::base_type...>;
 
     class iterable final {
@@ -327,7 +324,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
         for(const auto curr: internal::iterable_storage{*std::get<Comp>(pools)}) {
             const auto entt = std::get<0>(curr);
 
-            if((is_multi_type_v || (entt != tombstone))
+            if(((sizeof...(Component) != 1u) || (entt != tombstone))
                && ((Comp == Index || std::get<Index>(pools)->contains(entt)) && ...)
                && std::apply([entt](const auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
