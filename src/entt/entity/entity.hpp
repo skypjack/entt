@@ -96,8 +96,7 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const value_type value) ENTT_NOEXCEPT {
-        constexpr auto mask = (base_type::version_mask << base_type::entity_shift);
-        return ((to_integral(value) & mask) >> base_type::entity_shift);
+        return (to_integral(value) >> base_type::entity_shift);
     }
 
     /**
