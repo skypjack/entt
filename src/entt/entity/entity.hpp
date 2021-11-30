@@ -71,6 +71,8 @@ public:
     using version_type = typename base_type::version_type;
     /*! @brief Reserved identifier. */
     static constexpr entity_type reserved = base_type::entity_mask | (base_type::version_mask << base_type::entity_shift);
+    /*! @brief Page size, default is `ENTT_SPARSE_PAGE`. */
+    static constexpr auto page_size = ENTT_SPARSE_PAGE;
 
     /**
      * @brief Converts an entity to its underlying type.

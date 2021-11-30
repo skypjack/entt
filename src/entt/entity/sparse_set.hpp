@@ -161,8 +161,6 @@ enum class deletion_policy : std::uint8_t {
  */
 template<typename Entity, typename Allocator>
 class basic_sparse_set {
-    static constexpr auto sparse_page_v = ENTT_SPARSE_PAGE;
-
     using allocator_traits = std::allocator_traits<Allocator>;
     using alloc = typename allocator_traits::template rebind_alloc<Entity>;
     using alloc_traits = typename std::allocator_traits<alloc>;
@@ -173,14 +171,14 @@ class basic_sparse_set {
 
     [[nodiscard]] auto sparse_ptr(const Entity entt) const {
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
-        const auto page = pos / sparse_page_v;
-        return (page < sparse.size() && sparse[page]) ? (sparse[page] + fast_mod(pos, sparse_page_v)) : nullptr;
+        const auto page = pos / entity_traits::page_size;
+        return (page < sparse.size() && sparse[page]) ? (sparse[page] + fast_mod(pos, entity_traits::page_size)) : nullptr;
     }
 
     [[nodiscard]] auto &sparse_ref(const Entity entt) const {
         ENTT_ASSERT(sparse_ptr(entt), "Invalid element");
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
-        return sparse[pos / sparse_page_v][fast_mod(pos, sparse_page_v)];
+        return sparse[pos / entity_traits::page_size][fast_mod(pos, entity_traits::page_size)];
     }
 
     void release_sparse_pages() {
@@ -188,8 +186,8 @@ class basic_sparse_set {
 
         for(auto &&page: sparse) {
             if(page != nullptr) {
-                std::destroy(page, page + sparse_page_v);
-                alloc_traits::deallocate(page_allocator, page, sparse_page_v);
+                std::destroy(page, page + entity_traits::page_size);
+                alloc_traits::deallocate(page_allocator, page, entity_traits::page_size);
                 page = nullptr;
             }
         }
@@ -249,7 +247,7 @@ protected:
      */
     virtual void try_emplace(const Entity entt, const void * = nullptr) {
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
-        const auto page = pos / sparse_page_v;
+        const auto page = pos / entity_traits::page_size;
 
         if(!(page < sparse.size())) {
             sparse.resize(page + 1u, nullptr);
@@ -257,11 +255,11 @@ protected:
 
         if(!sparse[page]) {
             auto page_allocator{packed.get_allocator()};
-            sparse[page] = alloc_traits::allocate(page_allocator, sparse_page_v);
-            std::uninitialized_fill(sparse[page], sparse[page] + sparse_page_v, null);
+            sparse[page] = alloc_traits::allocate(page_allocator, entity_traits::page_size);
+            std::uninitialized_fill(sparse[page], sparse[page] + entity_traits::page_size, null);
         }
 
-        auto &elem = sparse[page][fast_mod(pos, sparse_page_v)];
+        auto &elem = sparse[page][fast_mod(pos, entity_traits::page_size)];
         ENTT_ASSERT(entity_traits::to_version(elem) == entity_traits::to_version(tombstone), "Slot not available");
 
         if(free_list == null) {
@@ -442,7 +440,7 @@ public:
      * @return Extent of the sparse set.
      */
     [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
-        return sparse.size() * sparse_page_v;
+        return sparse.size() * entity_traits::page_size;
     }
 
     /**
