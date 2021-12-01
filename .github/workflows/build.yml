@@ -84,20 +84,14 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest, windows-2016]
         toolset: [clang-cl, default, v141]
         include:
           - toolset: clang-cl
             toolset_option: -T"ClangCl"
           - toolset: v141
             toolset_option: -T"v141"
-        exclude:
-          - os: windows-2016
-            toolset: clang-cl
-          - os: windows-2016
-            toolset: v141
 
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
