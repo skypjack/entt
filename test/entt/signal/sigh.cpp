@@ -2,6 +2,8 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/signal/sigh.hpp>
+#include "../common/throwing_allocator.hpp"
+#include "../common/throwing_type.hpp"
 
 struct sigh_listener {
     static void f(int &v) {
@@ -122,7 +124,7 @@ TEST_F(SigH, Swap) {
     ASSERT_FALSE(sigh1.empty());
     ASSERT_TRUE(sigh2.empty());
 
-    std::swap(sigh1, sigh2);
+    sigh1.swap(sigh2);
 
     ASSERT_TRUE(sink1.empty());
     ASSERT_FALSE(sink2.empty());
@@ -529,4 +531,56 @@ TEST_F(SigH, UnboundMemberFunction) {
     sigh.publish(&listener, 42);
 
     ASSERT_TRUE(listener.k);
+}
+
+TEST_F(SigH, CustomAllocator) {
+    test::throwing_allocator<entt::delegate<void(int)>> allocator;
+
+    auto test = [&](auto curr) {
+        ASSERT_EQ(curr.get_allocator(), allocator);
+        ASSERT_TRUE(curr.empty());
+
+        entt::sink sink{curr};
+        sigh_listener listener;
+        sink.template connect<&sigh_listener::i>(listener);
+
+        decltype(curr) copy{curr, allocator};
+        sink.disconnect(listener);
+
+        ASSERT_TRUE(curr.empty());
+        ASSERT_FALSE(copy.empty());
+
+        curr = copy;
+
+        ASSERT_FALSE(curr.empty());
+        ASSERT_FALSE(copy.empty());
+
+        decltype(curr) move{std::move(copy), allocator};
+
+        ASSERT_TRUE(copy.empty());
+        ASSERT_FALSE(move.empty());
+
+        sink = entt::sink{move};
+        sink.disconnect(&listener);
+
+        ASSERT_TRUE(copy.empty());
+        ASSERT_TRUE(move.empty());
+
+        sink.template connect<&sigh_listener::i>(listener);
+        copy.swap(move);
+
+        ASSERT_FALSE(copy.empty());
+        ASSERT_TRUE(move.empty());
+
+        sink = entt::sink{copy};
+        sink.disconnect();
+
+        ASSERT_TRUE(copy.empty());
+        ASSERT_TRUE(move.empty());
+    };
+
+    entt::sigh<void(int), decltype(allocator)> sigh{allocator};
+
+    test(sigh);
+    test(std::move(sigh));
 }

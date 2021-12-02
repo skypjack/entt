@@ -7,8 +7,8 @@
 #include <gtest/gtest.h>
 #include <entt/entity/component.hpp>
 #include <entt/entity/storage.hpp>
-#include "throwing_allocator.hpp"
-#include "throwing_component.hpp"
+#include "../common/throwing_allocator.hpp"
+#include "../common/throwing_type.hpp"
 
 struct empty_stable_type {};
 
@@ -1480,28 +1480,28 @@ TEST(Storage, ThrowingAllocator) {
 }
 
 TEST(Storage, ThrowingComponent) {
-    entt::storage<test::throwing_component> pool;
-    test::throwing_component::trigger_on_value = 42;
+    entt::storage<test::throwing_type> pool;
+    test::throwing_type::trigger_on_value = 42;
 
     // strong exception safety
-    ASSERT_THROW(pool.emplace(entt::entity{0}, test::throwing_component{42}), typename test::throwing_component::exception_type);
+    ASSERT_THROW(pool.emplace(entt::entity{0}, test::throwing_type{42}), typename test::throwing_type::exception_type);
     ASSERT_TRUE(pool.empty());
 
     const entt::entity entities[2u]{entt::entity{42}, entt::entity{1}};
-    const test::throwing_component components[2u]{42, 1};
+    const test::throwing_type components[2u]{42, 1};
 
     // basic exception safety
-    ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), test::throwing_component{42}), typename test::throwing_component::exception_type);
+    ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), test::throwing_type{42}), typename test::throwing_type::exception_type);
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_FALSE(pool.contains(entt::entity{1}));
 
     // basic exception safety
-    ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), std::begin(components)), typename test::throwing_component::exception_type);
+    ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), std::begin(components)), typename test::throwing_type::exception_type);
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_FALSE(pool.contains(entt::entity{1}));
 
     // basic exception safety
-    ASSERT_THROW(pool.insert(std::rbegin(entities), std::rend(entities), std::rbegin(components)), typename test::throwing_component::exception_type);
+    ASSERT_THROW(pool.insert(std::rbegin(entities), std::rend(entities), std::rbegin(components)), typename test::throwing_type::exception_type);
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_TRUE(pool.contains(entt::entity{1}));
     ASSERT_EQ(pool.get(entt::entity{1}), 1);
@@ -1511,7 +1511,7 @@ TEST(Storage, ThrowingComponent) {
     pool.emplace(entt::entity{42}, 42);
 
     // basic exception safety
-    ASSERT_THROW(pool.erase(entt::entity{1}), typename test::throwing_component::exception_type);
+    ASSERT_THROW(pool.erase(entt::entity{1}), typename test::throwing_type::exception_type);
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_TRUE(pool.contains(entt::entity{42}));
     ASSERT_TRUE(pool.contains(entt::entity{1}));
@@ -1519,9 +1519,9 @@ TEST(Storage, ThrowingComponent) {
     ASSERT_EQ(pool.at(1u), entt::entity{42});
     ASSERT_EQ(pool.get(entt::entity{42}), 42);
     // the element may have been moved but it's still there
-    ASSERT_EQ(pool.get(entt::entity{1}), test::throwing_component::moved_from_value);
+    ASSERT_EQ(pool.get(entt::entity{1}), test::throwing_type::moved_from_value);
 
-    test::throwing_component::trigger_on_value = 99;
+    test::throwing_type::trigger_on_value = 99;
     pool.erase(entt::entity{1});
 
     ASSERT_EQ(pool.size(), 1u);

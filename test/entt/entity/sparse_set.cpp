@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
-#include "throwing_allocator.hpp"
+#include "../common/throwing_allocator.hpp"
 
 struct empty_type {};
 

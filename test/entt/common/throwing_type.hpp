@@ -1,19 +1,19 @@
-#ifndef ENTT_ENTITY_THROWING_COMPONENT_HPP
-#define ENTT_ENTITY_THROWING_COMPONENT_HPP
+#ifndef ENTT_COMMON_THROWING_TYPE_HPP
+#define ENTT_COMMON_THROWING_TYPE_HPP
 
 namespace test {
 
-class throwing_component {
+class throwing_type {
     struct test_exception {};
 
 public:
     using exception_type = test_exception;
     static constexpr auto moved_from_value = -1;
 
-    throwing_component(int value)
+    throwing_type(int value)
         : data{value} {}
 
-    throwing_component(const throwing_component &other)
+    throwing_type(const throwing_type &other)
         : data{other.data} {
         if(data == trigger_on_value) {
             data = moved_from_value;
@@ -21,7 +21,7 @@ public:
         }
     }
 
-    throwing_component &operator=(const throwing_component &other) {
+    throwing_type &operator=(const throwing_type &other) {
         if(other.data == trigger_on_value) {
             data = moved_from_value;
             throw exception_type{};
