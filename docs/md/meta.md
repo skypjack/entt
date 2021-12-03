@@ -110,9 +110,10 @@ decorated version of it. This object can be used to add the following:
   entt::meta<my_type>().ctor<int, char>().ctor<&factory>();
   ```
 
-* _Destructors_. Free functions can be set as destructors of reflected types.
-  The purpose is to give users the ability to free up resources that require
-  special treatment before an object is actually destroyed.<br/>
+* _Destructors_. Free functions and member functions can be used as destructors
+  of reflected types. The purpose is to give users the ability to free up
+  resources that require special treatment before an object is actually
+  destroyed.<br/>
   Use the `dtor` member function for this purpose:
 
   ```cpp

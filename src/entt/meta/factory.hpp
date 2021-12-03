@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -192,7 +193,7 @@ class meta_factory<Type> {
             (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
             internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
-            [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value) || ...); },
+            [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
             &meta_getter<Type, Getter, Policy>
             // tricks clang-format
         };
@@ -269,26 +270,16 @@ public:
     auto conv() ENTT_NOEXCEPT {
         using conv_type = std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
-        if constexpr(std::is_member_function_pointer_v<decltype(Candidate)>) {
-            static internal::meta_conv_node node{
-                nullptr,
-                internal::meta_node<conv_type>::resolve(),
-                [](const meta_any &instance) -> meta_any { return forward_as_meta((static_cast<const Type *>(instance.data())->*Candidate)()); }
-                // tricks clang-format
-            };
+        static internal::meta_conv_node node{
+            nullptr,
+            internal::meta_node<conv_type>::resolve(),
+            [](const meta_any &instance) -> meta_any {
+                return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data())));
+            }
+            // tricks clang-format
+        };
 
-            link_conv_if_required(node);
-        } else {
-            static internal::meta_conv_node node{
-                nullptr,
-                internal::meta_node<conv_type>::resolve(),
-                [](const meta_any &instance) -> meta_any { return forward_as_meta(Candidate(*static_cast<const Type *>(instance.data()))); }
-                // tricks clang-format
-            };
-
-            link_conv_if_required(node);
-        }
-
+        link_conv_if_required(node);
         return meta_factory<Type>{};
     }
 
@@ -375,13 +366,15 @@ public:
     /**
      * @brief Assigns a meta destructor to a meta type.
      *
-     * Free functions can be assigned to meta types in the role of destructors.
-     * The signature of the function should identical to the following:
+     * Both free functions and member functions can be assigned to meta types in
+     * the role of destructors.<br/>
+     * The signature of a free function should be identical to the following:
      *
      * @code{.cpp}
      * void(Type &);
      * @endcode
      *
+     * Member functions should not take arguments instead.<br/>
      * The purpose is to give users the ability to free up resources that
      * require special treatment before an object is actually destroyed.
      *
@@ -391,7 +384,7 @@ public:
     template<auto Func>
     auto dtor() ENTT_NOEXCEPT {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
-        owner->dtor = [](void *instance) { Func(*static_cast<Type *>(instance)); };
+        owner->dtor = [](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
         return meta_factory<Type>{};
     }
 
@@ -411,7 +404,24 @@ public:
     template<auto Data, typename Policy = as_is_t>
     auto data(const id_type id) ENTT_NOEXCEPT {
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-            return data<Data, Data, Policy>(id);
+            using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
+
+            static internal::meta_data_node node{
+                {},
+                nullptr,
+                nullptr,
+                1u,
+                /* this is never static */
+                std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
+                internal::meta_node<std::remove_const_t<data_type>>::resolve(),
+                &meta_arg<type_list<std::remove_const_t<data_type>>>,
+                &meta_setter<Type, Data>,
+                &meta_getter<Type, Data, Policy>
+                // tricks clang-format
+            };
+
+            link_data_if_required(id, node);
+            return meta_factory<Type, std::integral_constant<decltype(Data), Data>, std::integral_constant<decltype(Data), Data>>{&node.prop};
         } else {
             using data_type = std::remove_pointer_t<decltype(Data)>;
 
@@ -422,7 +432,7 @@ public:
                 1u,
                 ((std::is_same_v<Type, data_type> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                 internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
-                &meta_arg<type_list<data_type>>,
+                &meta_arg<type_list<std::remove_const_t<std::remove_reference_t<data_type>>>>,
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>
                 // tricks clang-format
@@ -482,8 +492,8 @@ public:
                 nullptr,
                 nullptr,
                 1u,
-                /* this is never static */
-                (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
+                /* this is never static nor const */
+                internal::meta_traits::is_none,
                 internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                 &meta_setter<Type, Setter>,
