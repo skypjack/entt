@@ -181,8 +181,9 @@ class meta_factory<Type> {
 
     template<typename Setter, auto Getter, typename Policy, std::size_t... Index>
     auto data(const id_type id, std::index_sequence<Index...>) ENTT_NOEXCEPT {
-        using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
+        using data_type = std::invoke_result_t<decltype(Getter), Type &>;
         using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
+        static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         static internal::meta_data_node node{
             {},
@@ -190,7 +191,7 @@ class meta_factory<Type> {
             nullptr,
             Setter::size,
             /* this is never static */
-            (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
+            (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
             internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
             [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
@@ -268,11 +269,9 @@ public:
      */
     template<auto Candidate>
     auto conv() ENTT_NOEXCEPT {
-        using conv_type = std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
-
         static internal::meta_conv_node node{
             nullptr,
-            internal::meta_node<conv_type>::resolve(),
+            internal::meta_node<std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>>::resolve(),
             [](const meta_any &instance) -> meta_any {
                 return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data())));
             }
@@ -323,6 +322,7 @@ public:
     template<auto Candidate, typename Policy = as_is_t>
     auto ctor() ENTT_NOEXCEPT {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
+        static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::decay_t<typename descriptor::return_type>, Type>, "The function doesn't return an object of the required type");
 
         static internal::meta_ctor_node node{
@@ -423,16 +423,16 @@ public:
             link_data_if_required(id, node);
             return meta_factory<Type, std::integral_constant<decltype(Data), Data>, std::integral_constant<decltype(Data), Data>>{&node.prop};
         } else {
-            using data_type = std::remove_pointer_t<decltype(Data)>;
+            using data_type = std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>;
 
             static internal::meta_data_node node{
                 {},
                 nullptr,
                 nullptr,
                 1u,
-                ((std::is_same_v<Type, data_type> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
-                internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
-                &meta_arg<type_list<std::remove_const_t<std::remove_reference_t<data_type>>>>,
+                ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
+                internal::meta_node<std::remove_const_t<data_type>>::resolve(),
+                &meta_arg<type_list<std::remove_const_t<data_type>>>,
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>
                 // tricks clang-format
@@ -465,7 +465,8 @@ public:
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) ENTT_NOEXCEPT {
-        using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
+        using data_type = std::invoke_result_t<decltype(Getter), Type &>;
+        static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
             static internal::meta_data_node node{
@@ -544,6 +545,7 @@ public:
     template<auto Candidate, typename Policy = as_is_t>
     auto func(const id_type id) ENTT_NOEXCEPT {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
+        static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
         static internal::meta_func_node node{
             {},
