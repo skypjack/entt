@@ -108,7 +108,7 @@ struct MetaFunc: ::testing::Test {
 
         entt::meta<func_t>()
             .type("func"_hs)
-            .func<&entt::registry::emplace_or_replace<func_t>, entt::as_ref_t>("emplace"_hs)
+            .func<&entt::registry::emplace_or_replace<func_t>>("emplace"_hs)
             .func<entt::overload<int(const base_t &, int, int)>(&func_t::f)>("f3"_hs)
             .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs)
             .prop(true, false)
