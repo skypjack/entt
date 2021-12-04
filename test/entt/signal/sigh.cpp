@@ -536,6 +536,7 @@ TEST_F(SigH, CustomAllocator) {
 
     auto test = [&](auto curr) {
         ASSERT_EQ(curr.get_allocator(), allocator);
+        ASSERT_FALSE(curr.get_allocator() != allocator);
         ASSERT_TRUE(curr.empty());
 
         entt::sink sink{curr};

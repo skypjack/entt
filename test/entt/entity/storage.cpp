@@ -1377,6 +1377,7 @@ TEST(Storage, UpdateFromDestructor) {
 TEST(Storage, CustomAllocator) {
     auto test = [](auto pool, auto alloc) {
         ASSERT_EQ(pool.get_allocator(), alloc);
+        ASSERT_FALSE(pool.get_allocator() != alloc);
 
         pool.reserve(1u);
 

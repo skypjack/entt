@@ -56,6 +56,10 @@ public:
         return true;
     }
 
+    bool operator!=(const throwing_allocator<Type> &other) const {
+        return !(*this == other);
+    }
+
     static inline bool trigger_on_allocate{};
     static inline bool trigger_after_allocate{};
 };
