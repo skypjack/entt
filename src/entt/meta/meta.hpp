@@ -583,6 +583,14 @@ public:
         return meta_any{*this, storage.as_ref()};
     }
 
+    /**
+     * @brief Returns true if a wrapper owns its object, false otherwise.
+     * @return True if the wrapper owns its object, false otherwise.
+     */
+    [[nodiscard]] bool owner() const ENTT_NOEXCEPT {
+        return storage.owner();
+    }
+
 private:
     any storage;
     internal::meta_type_node *node;
