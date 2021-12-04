@@ -19,8 +19,6 @@ struct sigh_listener {
         return k;
     }
 
-    void i() {}
-
     // useless definition just because msvc does weird things if both are empty
     void l() {
         k = true && k;
@@ -542,7 +540,7 @@ TEST_F(SigH, CustomAllocator) {
 
         entt::sink sink{curr};
         sigh_listener listener;
-        sink.template connect<&sigh_listener::i>(listener);
+        sink.template connect<&sigh_listener::g>(listener);
 
         decltype(curr) copy{curr, allocator};
         sink.disconnect(listener);
@@ -566,7 +564,7 @@ TEST_F(SigH, CustomAllocator) {
         ASSERT_TRUE(copy.empty());
         ASSERT_TRUE(move.empty());
 
-        sink.template connect<&sigh_listener::i>(listener);
+        sink.template connect<&sigh_listener::g>(listener);
         copy.swap(move);
 
         ASSERT_FALSE(copy.empty());

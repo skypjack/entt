@@ -56,10 +56,6 @@ public:
         return true;
     }
 
-    bool operator!=(const throwing_allocator<Type> &) const {
-        return false;
-    }
-
     static inline bool trigger_on_allocate{};
     static inline bool trigger_after_allocate{};
 };
