@@ -815,24 +815,14 @@ public:
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-
-        if constexpr(sizeof...(Component) == 1) {
-            return assure<std::remove_const_t<Component>...>().get(entity);
-        } else {
-            return std::forward_as_tuple(get<Component>(entity)...);
-        }
+        return view<Component...>().template get<const Component...>(entity);
     }
 
     /*! @copydoc get */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-
-        if constexpr(sizeof...(Component) == 1) {
-            return (const_cast<Component &>(assure<std::remove_const_t<Component>>().get(entity)), ...);
-        } else {
-            return std::forward_as_tuple(get<Component>(entity)...);
-        }
+        return view<Component...>().template get<Component...>(entity);
     }
 
     /**
@@ -912,16 +902,13 @@ public:
     /**
      * @brief Iterates all the entities that are still in use.
      *
-     * The function object is invoked for each entity that is still in use.<br/>
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
      * void(const Entity);
      * @endcode
      *
-     * This function is fairly slow and should not be used frequently. However,
-     * it's useful for iterating all the entities still in use, regardless of
-     * their components.
+     * It's not defined whether entities created during iteration are returned.
      *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
@@ -954,8 +941,6 @@ public:
     /**
      * @brief Iterates orphans and applies them the given function object.
      *
-     * The function object is invoked for each entity that is still in use and
-     * has no components assigned.<br/>
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
@@ -979,17 +964,15 @@ public:
     /**
      * @brief Returns a sink object for the given component.
      *
-     * The sink returned by this function can be used to receive notifications
-     * whenever a new instance of the given component is created and assigned to
-     * an entity.<br/>
+     * Use this function to receive notifications whenever a new instance of the
+     * given component is created and assigned to an entity.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
      * void(basic_registry<Entity> &, Entity);
      * @endcode
      *
-     * Listeners are invoked **after** the component has been assigned to the
-     * entity.
+     * Listeners are invoked **after** assigning the component to the entity.
      *
      * @sa sink
      *
@@ -1004,15 +987,15 @@ public:
     /**
      * @brief Returns a sink object for the given component.
      *
-     * The sink returned by this function can be used to receive notifications
-     * whenever an instance of the given component is explicitly updated.<br/>
+     * Use this function to receive notifications whenever an instance of the
+     * given component is explicitly updated.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
      * void(basic_registry<Entity> &, Entity);
      * @endcode
      *
-     * Listeners are invoked **after** the component has been updated.
+     * Listeners are invoked **after** updating the component.
      *
      * @sa sink
      *
@@ -1027,17 +1010,15 @@ public:
     /**
      * @brief Returns a sink object for the given component.
      *
-     * The sink returned by this function can be used to receive notifications
-     * whenever an instance of the given component is removed from an entity and
-     * thus destroyed.<br/>
+     * Use this function to receive notifications whenever an instance of the
+     * given component is removed from an entity and thus destroyed.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
      * void(basic_registry<Entity> &, Entity);
      * @endcode
      *
-     * Listeners are invoked **before** the component has been removed from the
-     * entity.
+     * Listeners are invoked **before** removing the component from the entity.
      *
      * @sa sink
      *
