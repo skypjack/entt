@@ -19,8 +19,8 @@ TEST(RuntimeView, Functionalities) {
     entt::registry registry;
 
     // forces the creation of the pools
-    registry.reserve<int>(0);
-    registry.reserve<char>(0);
+    static_cast<void>(registry.storage<int>());
+    static_cast<void>(registry.storage<char>());
 
     entt::id_type types[] = {entt::type_hash<int>::value(), entt::type_hash<char>::value()};
     auto view = registry.runtime_view(std::begin(types), std::end(types));

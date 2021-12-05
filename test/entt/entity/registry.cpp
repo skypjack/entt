@@ -162,13 +162,10 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.size(), 0u);
     ASSERT_EQ(registry.alive(), 0u);
-    ASSERT_NO_FATAL_FAILURE((registry.reserve<int, char>(8)));
     ASSERT_NO_FATAL_FAILURE(registry.reserve(42));
     ASSERT_TRUE(registry.empty());
 
     ASSERT_EQ(registry.capacity(), 42u);
-    ASSERT_EQ(registry.capacity<int>(), ENTT_PACKED_PAGE);
-    ASSERT_EQ(registry.capacity<char>(), ENTT_PACKED_PAGE);
     ASSERT_EQ(registry.size<int>(), 0u);
     ASSERT_EQ(registry.size<const char>(), 0u);
     ASSERT_TRUE((registry.empty<int, const char>()));
@@ -307,14 +304,6 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.size<const int>(), 0u);
     ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE(registry.empty<int>());
-
-    ASSERT_EQ(registry.capacity<int>(), ENTT_PACKED_PAGE);
-    ASSERT_EQ(registry.capacity<const char>(), ENTT_PACKED_PAGE);
-
-    registry.shrink_to_fit<int, char>();
-
-    ASSERT_EQ(registry.capacity<const int>(), 0u);
-    ASSERT_EQ(registry.capacity<char>(), 0u);
 }
 
 TEST(Registry, Move) {

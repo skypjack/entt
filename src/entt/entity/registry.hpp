@@ -31,12 +31,6 @@ namespace entt {
 
 /**
  * @brief Fast and reliable entity-component system.
- *
- * The registry is the core class of the entity-component framework.<br/>
- * It stores entities and arranges pools of components on a per request basis.
- * By means of a registry, users can manage entities and components, then create
- * views or groups to iterate them.
- *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
@@ -251,35 +245,11 @@ public:
     }
 
     /**
-     * @brief Increases the capacity of the registry or of the pools for the
-     * given components.
-     *
-     * If no components are specified, the capacity of the registry is
-     * increased, that is the number of entities it contains. Otherwise the
-     * capacity of the pools for the given components is increased.<br/>
-     * In both cases, if the new capacity is greater than the current capacity,
-     * new storage is allocated, otherwise the method does nothing.
-     *
-     * @tparam Component Types of components for which to reserve storage.
+     * @brief Increases the capacity (number of entities) of the registry.
      * @param cap Desired capacity.
      */
-    template<typename... Component>
     void reserve(const size_type cap) {
-        if constexpr(sizeof...(Component) == 0) {
-            entities.reserve(cap);
-        } else {
-            (assure<Component>().reserve(cap), ...);
-        }
-    }
-
-    /**
-     * @brief Returns the capacity of the pool for the given component.
-     * @tparam Component Type of component in which one is interested.
-     * @return Capacity of the pool of the given component.
-     */
-    template<typename Component>
-    [[nodiscard]] size_type capacity() const {
-        return assure<std::remove_const_t<Component>>().capacity();
+        entities.reserve(cap);
     }
 
     /**
@@ -289,16 +259,6 @@ public:
      */
     [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
         return entities.capacity();
-    }
-
-    /**
-     * @brief Requests the removal of unused capacity for the given components.
-     * @tparam Component Types of components for which to reclaim unused
-     * capacity.
-     */
-    template<typename... Component>
-    void shrink_to_fit() {
-        (assure<Component>().shrink_to_fit(), ...);
     }
 
     /**
