@@ -109,6 +109,77 @@ private:
     Storage *const pool;
 };
 
+template<typename View>
+class iterable_view final {
+    template<typename It>
+    struct iterable_view_iterator final {
+        using difference_type = std::ptrdiff_t;
+        using value_type = decltype(std::tuple_cat(std::tuple<typename View::entity_type>{}, std::declval<View>().get({})));
+        using pointer = input_iterator_pointer<value_type>;
+        using reference = value_type;
+        using iterator_category = std::input_iterator_tag;
+
+        iterable_view_iterator(It from, const View *parent) ENTT_NOEXCEPT
+            : it{from},
+              view{parent} {}
+
+        iterable_view_iterator &operator++() ENTT_NOEXCEPT {
+            return ++it, *this;
+        }
+
+        iterable_view_iterator operator++(int) ENTT_NOEXCEPT {
+            iterable_view_iterator orig = *this;
+            return ++(*this), orig;
+        }
+
+        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+            return std::tuple_cat(std::make_tuple(*it), view->get(*it));
+        }
+
+        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+            return operator*();
+        }
+
+        [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
+            return other.it == it;
+        }
+
+        [[nodiscard]] bool operator!=(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
+            return !(*this == other);
+        }
+
+    private:
+        It it;
+        const View *view;
+    };
+
+public:
+    using iterator = iterable_view_iterator<typename View::iterator>;
+    using reverse_iterator = iterable_view_iterator<typename View::reverse_iterator>;
+
+    iterable_view(const View &parent)
+        : view{parent} {}
+
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
+        return {view.begin(), &view};
+    }
+
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
+        return {view.end(), &view};
+    }
+
+    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+        return {view.rbegin(), &view};
+    }
+
+    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+        return {view.rend(), &view};
+    }
+
+private:
+    const View view;
+};
+
 template<typename Type, typename It, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
     [[nodiscard]] bool valid() const {
@@ -237,76 +308,6 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
 
     using basic_common_type = std::common_type_t<typename basic_storage_type<Component>::base_type...>;
 
-    class iterable final {
-        template<typename It>
-        struct iterable_iterator final {
-            using difference_type = std::ptrdiff_t;
-            using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_view>().get({})));
-            using pointer = input_iterator_pointer<value_type>;
-            using reference = value_type;
-            using iterator_category = std::input_iterator_tag;
-
-            iterable_iterator(It from, const basic_view *parent) ENTT_NOEXCEPT
-                : it{from},
-                  view{parent} {}
-
-            iterable_iterator &operator++() ENTT_NOEXCEPT {
-                return ++it, *this;
-            }
-
-            iterable_iterator operator++(int) ENTT_NOEXCEPT {
-                iterable_iterator orig = *this;
-                return ++(*this), orig;
-            }
-
-            [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-                return std::tuple_cat(std::make_tuple(*it), view->get(*it));
-            }
-
-            [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-                return operator*();
-            }
-
-            [[nodiscard]] bool operator==(const iterable_iterator &other) const ENTT_NOEXCEPT {
-                return other.it == it;
-            }
-
-            [[nodiscard]] bool operator!=(const iterable_iterator &other) const ENTT_NOEXCEPT {
-                return !(*this == other);
-            }
-
-        private:
-            It it;
-            const basic_view *view;
-        };
-
-    public:
-        using iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
-        using reverse_iterator = iterable_iterator<internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>>;
-
-        iterable(const basic_view &parent)
-            : view{parent} {}
-
-        [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return {view.begin(), &view};
-        }
-
-        [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return {view.end(), &view};
-        }
-
-        [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return {view.rbegin(), &view};
-        }
-
-        [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return {view.rend(), &view};
-        }
-
-    private:
-        const basic_view view;
-    };
-
     template<std::size_t... Index>
     [[nodiscard]] auto test_set(std::index_sequence<Index...>) const ENTT_NOEXCEPT {
         std::size_t pos{};
@@ -356,7 +357,7 @@ public:
     /*! @brief Reverse iterator type. */
     using reverse_iterator = internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
-    using iterable_view = iterable;
+    using iterable_view = internal::iterable_view<basic_view>;
     /*! @brief Common type among all storage types. */
     using base_type = basic_common_type;
 
