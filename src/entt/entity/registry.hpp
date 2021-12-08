@@ -213,16 +213,6 @@ public:
     }
 
     /**
-     * @brief Returns the number of existing components of the given type.
-     * @tparam Component Type of component of which to return the size.
-     * @return Number of existing components of the given type.
-     */
-    template<typename Component>
-    [[nodiscard]] size_type size() const {
-        return assure<std::remove_const_t<Component>>().size();
-    }
-
-    /**
      * @brief Returns the number of entities created so far.
      * @return Number of entities created so far.
      */

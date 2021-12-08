@@ -60,10 +60,11 @@ TEST(Helper, ToEntity) {
     ASSERT_EQ(entt::to_entity(registry, value), null);
 
     const auto entity = registry.create();
-    registry.emplace<int>(entity);
+    auto &&storage = registry.storage<int>();
+    storage.emplace(entity);
 
-    while(registry.size<int>() < (ENTT_PACKED_PAGE - 1u)) {
-        registry.emplace<int>(registry.create(), value);
+    while(storage.size() < (ENTT_PACKED_PAGE - 1u)) {
+        storage.emplace(registry.create(), value);
     }
 
     const auto other = registry.create();
@@ -98,10 +99,11 @@ TEST(Helper, ToEntityStableType) {
     ASSERT_EQ(entt::to_entity(registry, value), null);
 
     const auto entity = registry.create();
+    auto &&storage = registry.storage<stable_type>();
     registry.emplace<stable_type>(entity);
 
-    while(registry.size<stable_type>() < (ENTT_PACKED_PAGE - 2u)) {
-        registry.emplace<stable_type>(registry.create(), value);
+    while(storage.size() < (ENTT_PACKED_PAGE - 2u)) {
+        storage.emplace(registry.create(), value);
     }
 
     const auto other = registry.create();

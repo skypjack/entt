@@ -18,7 +18,7 @@ TEST(Lib, Registry) {
     emplace_velocity(registry);
     update_position(registry);
 
-    ASSERT_EQ(registry.size<position>(), registry.size<velocity>());
+    ASSERT_EQ(registry.storage<position>().size(), registry.storage<velocity>().size());
 
     registry.view<position>().each([](auto entity, auto &position) {
         ASSERT_EQ(position.x, static_cast<int>(entt::to_integral(entity) + 16));
