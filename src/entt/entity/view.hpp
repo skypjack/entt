@@ -309,7 +309,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     using basic_common_type = std::common_type_t<typename basic_storage_type<Component>::base_type...>;
 
     template<std::size_t... Index>
-    [[nodiscard]] auto test_set(std::index_sequence<Index...>) const ENTT_NOEXCEPT {
+    [[nodiscard]] auto pools_to_array(std::index_sequence<Index...>) const ENTT_NOEXCEPT {
         std::size_t pos{};
         std::array<const base_type *, sizeof...(Component) - 1u> other{};
         (static_cast<void>(std::get<Index>(pools) == view ? void() : void(other[pos++] = std::get<Index>(pools))), ...);
@@ -453,7 +453,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
-        return iterator{view->begin(), view->end(), view->begin(), test_set(std::index_sequence_for<Component...>{}), filter};
+        return iterator{view->begin(), view->end(), view->begin(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
     }
 
     /**
@@ -466,7 +466,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
-        return iterator{view->begin(), view->end(), view->end(), test_set(std::index_sequence_for<Component...>{}), filter};
+        return iterator{view->begin(), view->end(), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
     }
 
     /**
@@ -478,7 +478,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), test_set(std::index_sequence_for<Component...>{}), filter};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
     }
 
     /**
@@ -493,7 +493,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), test_set(std::index_sequence_for<Component...>{}), filter};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
     }
 
     /**
@@ -523,7 +523,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = iterator{view->begin(), view->end(), view->find(entt), test_set(std::index_sequence_for<Component...>{}), filter};
+        const auto it = iterator{view->begin(), view->end(), view->find(entt), pools_to_array(std::index_sequence_for<Component...>{}), filter};
         return (it != end() && *it == entt) ? it : end();
     }
 
