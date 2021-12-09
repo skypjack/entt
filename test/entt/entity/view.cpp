@@ -55,14 +55,10 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_EQ(view.get<char>(e1), '2');
 
     for(auto entity: view) {
-        ASSERT_TRUE(cview.get<const char>(entity) == '1' || std::get<const char &>(cview.get(entity)) == '2');
+        ASSERT_TRUE(entity == e0 || entity == e1);
+        ASSERT_TRUE(entity != e0 || cview.get<const char>(entity) == '1');
+        ASSERT_TRUE(entity != e1 || std::get<const char &>(cview.get(entity)) == '2');
     }
-
-    ASSERT_EQ(view.data()[0u], e1);
-    ASSERT_EQ(view.data()[1u], e0);
-
-    ASSERT_EQ(view.raw()[0u][0u], '2');
-    ASSERT_EQ(cview.raw()[0u][1u], '1');
 
     registry.erase<char>(e0);
     registry.erase<char>(e1);
@@ -96,33 +92,6 @@ TEST(SingleComponentView, Handle) {
     ASSERT_EQ(&handle, &view.handle());
 }
 
-TEST(SingleComponentView, RawData) {
-    entt::registry registry;
-    auto view = registry.view<int>();
-    auto cview = std::as_const(registry).view<const int>();
-
-    const auto entity = registry.create();
-
-    ASSERT_EQ(view.size(), 0u);
-    ASSERT_EQ(cview.size(), 0u);
-    ASSERT_EQ(view.raw(), cview.raw());
-    ASSERT_EQ(view.data(), cview.data());
-
-    registry.emplace<int>(entity, 42);
-
-    ASSERT_NE(view.size(), 0u);
-    ASSERT_NE(cview.size(), 0u);
-    ASSERT_EQ(view.raw()[0u][0u], 42);
-    ASSERT_EQ(cview.raw()[0u][0u], 42);
-    ASSERT_EQ(view.data()[0u], entity);
-    ASSERT_EQ(cview.data()[0u], entity);
-
-    registry.destroy(entity);
-
-    ASSERT_EQ(view.size(), 0u);
-    ASSERT_EQ(cview.size(), 0u);
-}
-
 TEST(SingleComponentView, LazyTypeFromConstRegistry) {
     entt::registry registry{};
     auto eview = std::as_const(registry).view<const empty_type>();
@@ -134,9 +103,6 @@ TEST(SingleComponentView, LazyTypeFromConstRegistry) {
 
     ASSERT_TRUE(cview);
     ASSERT_TRUE(eview);
-
-    ASSERT_EQ(cview.raw(), nullptr);
-    ASSERT_EQ(eview.data(), nullptr);
 
     ASSERT_TRUE(cview.empty());
     ASSERT_EQ(eview.size(), 0u);
@@ -262,18 +228,13 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(view.size(), 1u);
     ASSERT_EQ(cview.size(), 1u);
 
-    static_assert(std::is_same_v<decltype(view.raw()), int **>);
-    static_assert(std::is_same_v<decltype(cview.raw()), const int *const *>);
-
     static_assert(std::is_same_v<decltype(view.get<0u>({})), int &>);
     static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(view.get({})), std::tuple<int &>>);
-    static_assert(std::is_same_v<decltype(view.raw()), int **>);
 
     static_assert(std::is_same_v<decltype(cview.get<0u>({})), const int &>);
     static_assert(std::is_same_v<decltype(cview.get<const int>({})), const int &>);
     static_assert(std::is_same_v<decltype(cview.get({})), std::tuple<const int &>>);
-    static_assert(std::is_same_v<decltype(cview.raw()), const int *const *>);
 
     static_assert(std::is_same_v<decltype(std::as_const(registry).view<int>()), decltype(cview)>);
 

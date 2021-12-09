@@ -14,7 +14,7 @@ TEST(Registry, NoEto) {
     registry.emplace<empty_type>(entity);
     registry.emplace<int>(entity, 42);
 
-    ASSERT_NE(registry.view<empty_type>().raw(), nullptr);
+    ASSERT_NE(registry.storage<empty_type>().raw(), nullptr);
     ASSERT_NE(registry.try_get<empty_type>(entity), nullptr);
     ASSERT_EQ(registry.view<empty_type>().get(entity), std::as_const(registry).view<const empty_type>().get(entity));
 

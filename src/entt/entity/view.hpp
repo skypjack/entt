@@ -766,14 +766,6 @@ public:
     }
 
     /**
-     * @brief Direct access to the raw representation offered by the storage.
-     * @return A pointer to the array of components.
-     */
-    [[nodiscard]] auto raw() const ENTT_NOEXCEPT {
-        return view->raw();
-    }
-
-    /**
      * @brief Direct access to the list of entities.
      *
      * The returned pointer is such that range `[data(), data() + size())` is
