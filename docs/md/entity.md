@@ -1044,8 +1044,7 @@ once in-place deletion is enabled. In particular:
 * Multi type views are completely transparent to storage policies.
 
 * Single type views for stable storage types offer the same interface of multi
-  type views. For example, only `size_hint` is available and it's not possible
-  to directly access the raw representation of entities and components.
+  type views. For example, only `size_hint` is available.
 
 In other words, the more generic version of a view will be provided in case of
 stable storage, even for single components, always supported by an appropriate
@@ -1556,10 +1555,9 @@ the situations. This kind of views can access the underlying data structures
 directly and avoid superfluous checks. There is nothing as fast as a single type
 view. In fact, they walk through a packed (actually paged) array of components
 and return them one at a time.<br/>
-Single type views also offer a bunch of functionalities to get the number of
-entities they are going to return and a raw access to the entity list as well as
-to the component list. It's also possible to ask a view if it contains a given
-entity.<br/>
+Views also offer a bunch of functionalities to get the number of entities and
+components they are going to return. It's also possible to ask a view if it
+contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
 Multi type views iterate entities that have at least all the given components in
@@ -1754,10 +1752,9 @@ That being said, the way groups operate is beyond the scope of this document.
 However, it's unlikely that users will be able to appreciate the impact of
 groups on the other functionalities of a registry.
 
-Groups offer a bunch of functionalities to get the number of entities they are
-going to return and a raw access to the entity list as well as to the component
-list for owned components. It's also possible to ask a group if it contains a
-given entity.<br/>
+Groups offer a bunch of functionalities to get the number of entities and
+components they are going to return. It's also possible to ask a group if it
+contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
 There is no need to store groups aside for they are extremely cheap to create,
