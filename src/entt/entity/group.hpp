@@ -160,6 +160,8 @@ public:
     using reverse_iterator = typename basic_common_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable_group = iterable;
+    /*! @brief Common type among all storage types. */
+    using base_type = basic_common_type;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() ENTT_NOEXCEPT
@@ -661,6 +663,8 @@ public:
     using reverse_iterator = typename basic_common_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable_group = iterable;
+    /*! @brief Common type among all storage types. */
+    using base_type = basic_common_type;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() ENTT_NOEXCEPT
