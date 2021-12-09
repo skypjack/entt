@@ -1242,13 +1242,13 @@ TEST(Registry, SortEmpty) {
     registry.emplace<empty_type>(registry.create());
     registry.emplace<empty_type>(registry.create());
 
-    ASSERT_LT(registry.view<empty_type>().data()[0], registry.view<empty_type>().data()[1]);
-    ASSERT_LT(registry.view<empty_type>().data()[1], registry.view<empty_type>().data()[2]);
+    ASSERT_LT(registry.storage<empty_type>().data()[0], registry.storage<empty_type>().data()[1]);
+    ASSERT_LT(registry.storage<empty_type>().data()[1], registry.storage<empty_type>().data()[2]);
 
     registry.sort<empty_type>(std::less<entt::entity>{});
 
-    ASSERT_GT(registry.view<empty_type>().data()[0], registry.view<empty_type>().data()[1]);
-    ASSERT_GT(registry.view<empty_type>().data()[1], registry.view<empty_type>().data()[2]);
+    ASSERT_GT(registry.storage<empty_type>().data()[0], registry.storage<empty_type>().data()[1]);
+    ASSERT_GT(registry.storage<empty_type>().data()[1], registry.storage<empty_type>().data()[2]);
 }
 
 TEST(Registry, ComponentsWithTypesFromStandardTemplateLibrary) {
@@ -1401,7 +1401,7 @@ TEST(Registry, Insert) {
     float value[3]{0.f, 1.f, 2.f};
 
     const auto iview = registry.view<int>();
-    registry.insert<float>(iview.data(), iview.data() + iview.size(), value);
+    registry.insert<float>(iview.rbegin(), iview.rend(), value);
 
     ASSERT_EQ(registry.get<float>(entities[0u]), 0.f);
     ASSERT_EQ(registry.get<float>(entities[1u]), 1.f);

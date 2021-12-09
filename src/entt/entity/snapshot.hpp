@@ -115,7 +115,7 @@ public:
     const basic_snapshot &component(Archive &archive) const {
         if constexpr(sizeof...(Component) == 1u) {
             const auto view = reg->template view<const Component...>();
-            (component<Component>(archive, view.data(), view.data() + view.size()), ...);
+            (component<Component>(archive, view.rbegin(), view.rend()), ...);
             return *this;
         } else {
             (component<Component>(archive), ...);

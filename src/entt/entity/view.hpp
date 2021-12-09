@@ -766,18 +766,6 @@ public:
     }
 
     /**
-     * @brief Direct access to the list of entities.
-     *
-     * The returned pointer is such that range `[data(), data() + size())` is
-     * always a valid range, even if the container is empty.
-     *
-     * @return A pointer to the array of entities.
-     */
-    [[nodiscard]] auto data() const ENTT_NOEXCEPT {
-        return view->data();
-    }
-
-    /**
      * @brief Returns an iterator to the first entity of the view.
      *
      * The returned iterator points to the first entity of the view. If the view
