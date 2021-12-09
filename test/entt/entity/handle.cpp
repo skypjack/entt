@@ -165,7 +165,8 @@ TEST(BasicHandle, Component) {
 
     handle.erase<char, double>();
 
-    ASSERT_TRUE((registry.empty<char, double>()));
+    ASSERT_TRUE(registry.storage<char>().empty());
+    ASSERT_TRUE(registry.storage<double>().empty());
     ASSERT_EQ(0u, (handle.remove<char, double>()));
 
     handle.visit([](const auto &pool) { ASSERT_EQ(entt::type_id<int>(), pool.type()); });
@@ -177,7 +178,7 @@ TEST(BasicHandle, Component) {
     ASSERT_EQ(1u, (handle.remove<int>()));
     ASSERT_DEATH(handle.erase<int>(), "");
 
-    ASSERT_TRUE(registry.empty<int>());
+    ASSERT_TRUE(registry.storage<int>().empty());
     ASSERT_TRUE(handle.orphan());
 
     ASSERT_EQ(42, handle.get_or_emplace<int>(42));
@@ -211,7 +212,7 @@ TEST(BasicHandle, Lifetime) {
     auto *handle = new entt::handle{registry, entity};
     handle->emplace<int>();
 
-    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.storage<int>().empty());
     ASSERT_FALSE(registry.empty());
 
     registry.each([handle](const auto e) {
@@ -220,7 +221,7 @@ TEST(BasicHandle, Lifetime) {
 
     delete handle;
 
-    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.storage<int>().empty());
     ASSERT_FALSE(registry.empty());
 }
 

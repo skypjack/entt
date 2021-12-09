@@ -252,23 +252,11 @@ public:
     }
 
     /**
-     * @brief Checks whether the registry or the pools of the given components
-     * are empty.
-     *
-     * A registry is considered empty when it doesn't contain entities that are
-     * still in use.
-     *
-     * @tparam Component Types of components in which one is interested.
-     * @return True if the registry or the pools of the given components are
-     * empty, false otherwise.
+     * @brief Checks whether the registry is empty (no entities still in use).
+     * @return True if the registry is empty, false otherwise.
      */
-    template<typename... Component>
     [[nodiscard]] bool empty() const {
-        if constexpr(sizeof...(Component) == 0) {
-            return !alive();
-        } else {
-            return (assure<std::remove_const_t<Component>>().empty() && ...);
-        }
+        return !alive();
     }
 
     /**

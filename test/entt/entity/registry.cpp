@@ -168,7 +168,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
-    ASSERT_TRUE((registry.empty<int, const char>()));
+    ASSERT_TRUE(registry.storage<int>().empty());
+    ASSERT_TRUE(registry.storage<char>().empty());
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -181,8 +182,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.storage<int>().size(), 1u);
     ASSERT_EQ(registry.storage<char>().size(), 1u);
-    ASSERT_FALSE(registry.empty<const int>());
-    ASSERT_FALSE(registry.empty<char>());
+    ASSERT_FALSE(registry.storage<int>().empty());
+    ASSERT_FALSE(registry.storage<char>().empty());
 
     ASSERT_NE(e0, e1);
 
@@ -274,8 +275,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.storage<int>().size(), 1u);
     ASSERT_EQ(registry.storage<char>().size(), 1u);
-    ASSERT_FALSE(registry.empty<int>());
-    ASSERT_FALSE(registry.empty<const char>());
+    ASSERT_FALSE(registry.storage<int>().empty());
+    ASSERT_FALSE(registry.storage<char>().empty());
     ASSERT_TRUE((registry.all_of<int, char>(e3)));
     ASSERT_EQ(registry.get<int>(e3), 3);
     ASSERT_EQ(registry.get<char>(e3), 'c');
@@ -284,14 +285,15 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 1u);
-    ASSERT_TRUE(registry.empty<const int>());
-    ASSERT_FALSE(registry.empty<char>());
+    ASSERT_TRUE(registry.storage<int>().empty());
+    ASSERT_FALSE(registry.storage<char>().empty());
 
     ASSERT_NO_FATAL_FAILURE(registry.clear());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
-    ASSERT_TRUE((registry.empty<const int, char>()));
+    ASSERT_TRUE(registry.storage<int>().empty());
+    ASSERT_TRUE(registry.storage<char>().empty());
 
     const auto e4 = registry.create();
     const auto e5 = registry.create();
@@ -303,7 +305,7 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
-    ASSERT_TRUE(registry.empty<int>());
+    ASSERT_TRUE(registry.storage<int>().empty());
 }
 
 TEST(Registry, Move) {

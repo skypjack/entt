@@ -146,7 +146,7 @@ TEST(Snapshot, Dump) {
     ASSERT_EQ(registry.get<char>(e3), '0');
     ASSERT_TRUE(registry.all_of<a_component>(e3));
 
-    ASSERT_TRUE(registry.empty<another_component>());
+    ASSERT_TRUE(registry.storage<another_component>().empty());
 }
 
 TEST(Snapshot, Partial) {
