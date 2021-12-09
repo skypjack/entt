@@ -309,13 +309,7 @@ public:
     }
 
     /**
-     * @brief Creates a new entity and returns it.
-     *
-     * There are two kinds of possible identifiers:
-     *
-     * * Newly created ones in case no entities have been previously destroyed.
-     * * Recycled ones with updated versions.
-     *
+     * @brief Creates a new entity or recycles a destroyed one.
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
@@ -323,12 +317,10 @@ public:
     }
 
     /**
-     * @brief Creates a new entity and returns it.
+     * @copybrief create
      *
-     * @sa create
-     *
-     * If the requested entity isn't in use, the suggested identifier is created
-     * and returned. Otherwise, a new identifier is generated.
+     * If the requested entity isn't in use, the suggested identifier is used.
+     * Otherwise, a new identifier is generated.
      *
      * @param hint Required identifier.
      * @return A valid identifier.
@@ -357,7 +349,7 @@ public:
     }
 
     /**
-     * @brief Assigns each element in a range an entity.
+     * @brief Assigns each element in a range an identifier.
      *
      * @sa create
      *
@@ -380,7 +372,7 @@ public:
     }
 
     /**
-     * @brief Assigns entities to an empty registry.
+     * @brief Assigns identifiers to an empty registry.
      *
      * This function is intended for use in conjunction with `data`, `size` and
      * `destroyed`.<br/>
@@ -454,7 +446,7 @@ public:
     /**
      * @brief Destroys an entity and releases its identifier.
      *
-     * The version is updated and the identifier can be recycled at any time.
+     * @sa release
      *
      * @warning
      * Adding or removing components to an entity that is being destroyed can
@@ -517,9 +509,7 @@ public:
     /**
      * @brief Assigns the given component to an entity.
      *
-     * A new instance of the given component is created and initialized with the
-     * arguments provided (the component must have a proper constructor or be of
-     * aggregate type). Then the component is assigned to the given entity.
+     * The component must have a proper constructor or be of aggregate type.
      *
      * @warning
      * Attempting to use an invalid entity or to assign a component to an entity
@@ -628,9 +618,7 @@ public:
     /**
      * @brief Replaces the given component for an entity.
      *
-     * A new instance of the given component is created and initialized with the
-     * arguments provided (the component must have a proper constructor or be of
-     * aggregate type). Then the component is assigned to the given entity.
+     * The component must have a proper constructor or be of aggregate type.
      *
      * @warning
      * Attempting to use an invalid entity or to replace a component of an
@@ -807,7 +795,7 @@ public:
      * @brief Returns a reference to the given component for an entity.
      *
      * In case the entity doesn't own the component, the parameters provided are
-     * used to construct it.<br/>
+     * used to construct it.
      *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
@@ -1018,23 +1006,15 @@ public:
      * initialization.<br/>
      * As a rule of thumb, storing a view should never be an option.
      *
-     * Views do their best to iterate the smallest set of candidate entities.
-     * In particular:
+     * Views do their best to iterate the smallest set of candidate entities:
      *
      * * Single component views are incredibly fast and iterate a packed array
      *   of entities, all of which has the given component.
-     * * Multi component views look at the number of entities available for each
-     *   component and pick up a reference to the smallest set of candidates to
+     * * Multi component views find the smallest set of candidates and use it to
      *   test for the given components.
      *
      * Views in no way affect the functionalities of the registry nor those of
      * the underlying pools.
-     *
-     * @note
-     * Multi component views are pretty fast. However their performance tend to
-     * degenerate when the number of components to iterate grows up and the most
-     * of the entities have all the given components.<br/>
-     * To get a performance boost, consider using a group instead.
      *
      * @tparam Component Type of components used to construct the view.
      * @tparam Exclude Types of components used to filter the view.
@@ -1058,9 +1038,9 @@ public:
      *
      * This kind of objects are created on the fly and share with the registry
      * its internal data structures.<br/>
-     * Users should throw away the view after use. Fortunately, creating and
-     * destroying a runtime view is an incredibly cheap operation because they
-     * do not require any type of initialization.<br/>
+     * Users should throw away the view after use. Creating and destroying a
+     * runtime view is an incredibly cheap operation because they do not require
+     * any type of initialization.<br/>
      * As a rule of thumb, storing a view should never be an option.
      *
      * Runtime views are to be used when users want to construct a view from
@@ -1116,8 +1096,7 @@ public:
      * types are owned by a group, the faster it is to iterate entities and
      * components.<br/>
      * However, groups also affect some features of the registry such as the
-     * creation and destruction of components, which will consequently be
-     * slightly slower (nothing that can be noticed in most cases).
+     * creation and destruction of components.
      *
      * @note
      * Pools of components that are owned by a group cannot be sorted anymore.
@@ -1266,7 +1245,7 @@ public:
     }
 
     /**
-     * @brief Sorts the pool of entities for the given component.
+     * @brief Sorts the elements of a given component.
      *
      * This function is used to sort the elements in a pool. The order remains
      * valid until a component of the given type is assigned to or removed from
@@ -1320,10 +1299,7 @@ public:
      * @brief Sorts two pools of components in the same way.
      *
      * This function is used to sort a pool according to the order of the
-     * elements in a different pool.
-     *
-     * @b How @b it @b works
-     *
+     * elements in a different pool.<br/>
      * Being `To` and `From` the two sets, after invoking this function an
      * iterator for `To` returns elements according to the following rules:
      *
