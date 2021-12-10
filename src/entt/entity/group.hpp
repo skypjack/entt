@@ -168,6 +168,14 @@ public:
         : handler{} {}
 
     /**
+     * @brief Returns a const reference to the underlying handler.
+     * @return A const reference to the underlying handler.
+     */
+    const base_type &handle() const ENTT_NOEXCEPT {
+        return *handler;
+    }
+
+    /**
      * @brief Returns the storage for a given component type.
      * @tparam Comp Type of component of which to return the storage.
      * @return The storage for the given component type.

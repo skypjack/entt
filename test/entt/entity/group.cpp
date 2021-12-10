@@ -80,6 +80,25 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(NonOwningGroup, Handle) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    auto group = registry.group(entt::get<int, char>);
+    auto &&handle = group.handle();
+
+    ASSERT_TRUE(handle.empty());
+    ASSERT_FALSE(handle.contains(entity));
+    ASSERT_EQ(&handle, &group.handle());
+
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+
+    ASSERT_FALSE(handle.empty());
+    ASSERT_TRUE(handle.contains(entity));
+    ASSERT_EQ(&handle, &group.handle());
+}
+
 TEST(NonOwningGroup, Invalid) {
     entt::registry registry{};
     auto group = std::as_const(registry).group_if_exists(entt::get<const empty_type, const int>);
