@@ -228,18 +228,6 @@ public:
     }
 
     /**
-     * @brief Direct access to the list of entities.
-     *
-     * The returned pointer is such that range `[data(), data() + size())` is
-     * always a valid range, even if the container is empty.
-     *
-     * @return A pointer to the array of entities.
-     */
-    [[nodiscard]] auto data() const ENTT_NOEXCEPT {
-        return *this ? handler->data() : nullptr;
-    }
-
-    /**
      * @brief Returns an iterator to the first entity of the group.
      *
      * The returned iterator points to the first entity of the group. If the
@@ -712,18 +700,6 @@ public:
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return !*this || !*length;
-    }
-
-    /**
-     * @brief Direct access to the list of entities.
-     *
-     * The returned pointer is such that range `[data(), data() + size())` is
-     * always a valid range, even if the container is empty.
-     *
-     * @return A pointer to the array of entities.
-     */
-    [[nodiscard]] auto data() const ENTT_NOEXCEPT {
-        return *this ? std::get<0>(pools)->data() : nullptr;
     }
 
     /**
