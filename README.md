@@ -73,30 +73,33 @@ This project started off as a pure entity-component system. Over time the
 codebase has grown as more and more classes and functionalities were added.<br/>
 Here is a brief, yet incomplete list of what it offers today:
 
-* A built-in **RTTI system** mostly similar to the standard one.
+* Built-in **RTTI system** mostly similar to the standard one.
 * A `constexpr` utility for human readable **resource names**.
-* A minimal **configuration system** built using the monostate pattern.
-* An incredibly fast **entity-component system** based on sparse sets, with its
-  own _pay for what you use_ policy to adjust performance and memory usage
-  according to the users' requirements.
+* Minimal **configuration system** built using the monostate pattern.
+* Incredibly fast **entity-component system** with its own _pay for what you
+  use_ policy.
 * Views and groups to iterate entities and components and allow different access
   patterns, from **perfect SoA** to fully random.
 * A lot of **facilities** built on top of the entity-component system to help
-  the users and avoid reinventing the wheel (dependencies, snapshot, handles,
-  support for **reactive systems** and so on).
+  the users and avoid reinventing the wheel.
 * The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free runtime **reflection system**.
 * **Static polymorphism** made simple and within everyone's reach.
 * A few homemade containers, like a sparse set based **dense hash map**.
 * A **cooperative scheduler** for processes of any type.
 * All that is needed for **resource management** (cache, loaders, handles).
-* Delegates, **signal handlers** (with built-in support for collectors) and a
-  tiny event dispatcher for immediate and delayed events to integrate in loops.
+* Delegates, **signal handlers** and a tiny event dispatcher.
 * A general purpose **event emitter** as a CRTP idiom based class template.
 * And **much more**! Check out the
   [**wiki**](https://github.com/skypjack/entt/wiki).
 
-Consider this list a work in progress as well as the project. The whole API is
+**Breaking news**:
+
+* The ECS allows attaching multiple components of the same type to an entity.
+* All tools work perfectly across boundaries (DLL-friendly)!!
+  :slightly_smiling_face:
+
+Consider these lists a work in progress as well as the project. The whole API is
 fully documented in-code for those who are brave enough to read it.
 
 It is also known that `EnTT` is used in **Minecraft**.<br/>
@@ -245,6 +248,14 @@ it in many of the ways that you can think of and that involve `CMake`.<br/>
 Covering all possible cases would require a treaty and not a simple README file,
 but I'm confident that anyone reading this section also knows what it's about
 and can use `EnTT` from a `CMake` project without problems.
+
+## Natvis support
+
+When using `CMake`, just enable the option `ENTT_INCLUDE_NATVIS` and enjoy
+it.<br/>
+Otherwise, most of the tools are covered via Natvis and all files can be found
+in the `natvis` directory, divided by module.<br/>
+If you spot errors or have suggestions, any contribution is welcome!
 
 ## Packaging Tools
 
