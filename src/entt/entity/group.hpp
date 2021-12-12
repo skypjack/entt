@@ -154,14 +154,14 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Common type among all storage types. */
+    using base_type = basic_common_type;
     /*! @brief Random access iterator type. */
     using iterator = typename basic_common_type::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename basic_common_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable_group = iterable;
-    /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() ENTT_NOEXCEPT
@@ -181,7 +181,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Comp>
-    [[nodiscard]] storage_type<Comp> &storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
         return *std::get<storage_type<Comp> *>(pools);
     }
 
@@ -653,14 +653,14 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Common type among all storage types. */
+    using base_type = basic_common_type;
     /*! @brief Random access iterator type. */
     using iterator = typename basic_common_type::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename basic_common_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable_group = iterable;
-    /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() ENTT_NOEXCEPT
@@ -672,7 +672,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Comp>
-    [[nodiscard]] storage_type<Comp> &storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
         return *std::get<storage_type<Comp> *>(pools);
     }
 

@@ -38,6 +38,9 @@ class basic_registry {
     using entity_traits = entt_traits<Entity>;
     using basic_common_type = basic_sparse_set<Entity>;
 
+    template<typename Component>
+    using storage_type = typename storage_traits<Entity, Component>::storage_type;
+
     template<typename...>
     struct group_handler;
 
@@ -141,13 +144,6 @@ public:
     /*! @brief Common type among all storage types. */
     using base_type = basic_common_type;
 
-    /**
-     * @brief Storage type associated with a given component.
-     * @tparam Type Type of component.
-     */
-    template<typename Component>
-    using storage_type = typename storage_traits<Entity, Component>::storage_type;
-
     /*! @brief Default constructor. */
     basic_registry() = default;
 
@@ -192,7 +188,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Component>
-    [[nodiscard]] storage_type<Component> &storage(const id_type id = type_hash<Component>::value()) {
+    [[nodiscard]] decltype(auto) storage(const id_type id = type_hash<Component>::value()) {
         return assure<Component>(id);
     }
 
@@ -208,7 +204,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Component>
-    [[nodiscard]] const storage_type<Component> &storage(const id_type id = type_hash<Component>::value()) const {
+    [[nodiscard]] decltype(auto) storage(const id_type id = type_hash<Component>::value()) const {
         return assure<Component>(id);
     }
 

@@ -33,7 +33,7 @@ auto storage_tuple(const View &view, std::index_sequence<Index...>) {
 
 template<typename Storage>
 class iterable_storage final {
-    using basic_common_type = typename Storage::base_type;
+    using base_type = typename Storage::base_type;
 
     template<typename... It>
     struct iterable_storage_iterator final {
@@ -79,18 +79,18 @@ class iterable_storage final {
 public:
     using iterator = std::conditional_t<
         ignore_as_empty_v<typename Storage::value_type>,
-        iterable_storage_iterator<typename basic_common_type::iterator>,
-        iterable_storage_iterator<typename basic_common_type::iterator, decltype(std::declval<Storage>().begin())>>;
+        iterable_storage_iterator<typename base_type::iterator>,
+        iterable_storage_iterator<typename base_type::iterator, decltype(std::declval<Storage>().begin())>>;
 
     iterable_storage(Storage &ref)
         : pool{&ref} {}
 
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{pool->basic_common_type::begin(), pool->begin()};
+        return iterator{pool->base_type::begin(), pool->begin()};
     }
 
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{pool->basic_common_type::end(), pool->end()};
+        return iterator{pool->base_type::end(), pool->end()};
     }
 
 private:
@@ -269,9 +269,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     friend class basic_view;
 
     template<typename Comp>
-    using basic_storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
-
-    using basic_common_type = std::common_type_t<typename basic_storage_type<Component>::base_type...>;
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
     template<std::size_t... Index>
     [[nodiscard]] auto pools_to_array(std::index_sequence<Index...>) const ENTT_NOEXCEPT {
@@ -317,19 +315,12 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Common type among all storage types. */
+    using base_type = std::common_type_t<typename storage_type<Component>::base_type...>;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<basic_common_type, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using iterator = internal::view_iterator<base_type, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable_view = internal::iterable_view<basic_view>;
-    /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
-
-    /**
-     * @brief Storage type associated with a given component.
-     * @tparam Type Type of component.
-     */
-    template<typename Comp>
-    using storage_type = basic_storage_type<Comp>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
@@ -385,7 +376,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Comp>
-    [[nodiscard]] storage_type<Comp> &storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
         return *std::get<storage_type<Comp> *>(pools);
     }
 
@@ -623,24 +614,21 @@ class basic_view<Entity, get_t<Component>, exclude_t<>, std::void_t<std::enable_
     template<typename, typename, typename, typename>
     friend class basic_view;
 
-    using basic_storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
-    using basic_common_type = typename basic_storage_type::base_type;
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Random access iterator type. */
-    using iterator = typename basic_common_type::iterator;
-    /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename basic_common_type::reverse_iterator;
-    /*! @brief Iterable view type. */
-    using iterable_view = internal::iterable_storage<basic_storage_type>;
     /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
-    /*! @brief Storage type associated with the view component. */
-    using storage_type = basic_storage_type;
+    using base_type = typename storage_type::base_type;
+    /*! @brief Random access iterator type. */
+    using iterator = typename base_type::iterator;
+    /*! @brief Reversed iterator type. */
+    using reverse_iterator = typename base_type::reverse_iterator;
+    /*! @brief Iterable view type. */
+    using iterable_view = internal::iterable_storage<storage_type>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
@@ -669,7 +657,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename... Comp>
-    [[nodiscard]] storage_type &storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
         static_assert((std::is_same_v<Comp, Component> && ...), "Invalid component type");
         return *view;
     }
@@ -919,7 +907,7 @@ public:
     }
 
 private:
-    std::array<const basic_common_type *, 0u> filter;
+    std::array<const base_type *, 0u> filter;
     storage_type *view;
 };
 
