@@ -567,7 +567,6 @@ TEST(Registry, RangeDestroy) {
     ASSERT_TRUE(registry.valid(entities[2u]));
 
     registry.destroy(icview.begin(), icview.end());
-    registry.destroy(icview.rbegin(), icview.rend());
 
     ASSERT_FALSE(registry.valid(entities[0u]));
     ASSERT_FALSE(registry.valid(entities[1u]));
@@ -1431,7 +1430,6 @@ TEST(Registry, Erase) {
 
     registry.erase<int, char>(entities[0u]);
     registry.erase<int, char>(icview.begin(), icview.end());
-    registry.erase<int, char>(icview.rbegin(), icview.rend());
 
     ASSERT_FALSE(registry.any_of<int>(entities[0u]));
     ASSERT_FALSE(registry.all_of<int>(entities[1u]));
@@ -1539,7 +1537,7 @@ TEST(Registry, Remove) {
     registry.remove<int, char>(entities[0u]);
 
     ASSERT_EQ((registry.remove<int, char>(icview.begin(), icview.end())), 2u);
-    ASSERT_EQ((registry.remove<int, char>(icview.rbegin(), icview.rend())), 0u);
+    ASSERT_EQ((registry.remove<int, char>(icview.begin(), icview.end())), 0u);
 
     ASSERT_FALSE(registry.any_of<int>(entities[0u]));
     ASSERT_FALSE(registry.all_of<int>(entities[1u]));
@@ -1602,7 +1600,7 @@ TEST(Registry, StableRemove) {
     registry.remove<int, stable_type>(entities[0u]);
 
     ASSERT_EQ((registry.remove<int, stable_type>(icview.begin(), icview.end())), 2u);
-    ASSERT_EQ((registry.remove<int, stable_type>(icview.rbegin(), icview.rend())), 0u);
+    ASSERT_EQ((registry.remove<int, stable_type>(icview.begin(), icview.end())), 0u);
 
     ASSERT_FALSE(registry.any_of<int>(entities[0u]));
     ASSERT_FALSE(registry.all_of<int>(entities[1u]));

@@ -2240,7 +2240,7 @@ See the relevant documentation for more information.
 
 A special mention is needed for the iterators returned by views and groups. Most
 of the times they meet the requirements of random access iterators, in all cases
-they meet at least the requirements of bidirectional iterators.<br/>
+they meet at least the requirements of forward iterators.<br/>
 In other terms, they are suitable for use with the parallel algorithms of the
 standard library. If it's not clear, this is a great thing.
 

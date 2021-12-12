@@ -81,10 +81,6 @@ public:
         ignore_as_empty_v<typename Storage::value_type>,
         iterable_storage_iterator<typename basic_common_type::iterator>,
         iterable_storage_iterator<typename basic_common_type::iterator, decltype(std::declval<Storage>().begin())>>;
-    using reverse_iterator = std::conditional_t<
-        ignore_as_empty_v<typename Storage::value_type>,
-        iterable_storage_iterator<typename basic_common_type::reverse_iterator>,
-        iterable_storage_iterator<typename basic_common_type::reverse_iterator, decltype(std::declval<Storage>().rbegin())>>;
 
     iterable_storage(Storage &ref)
         : pool{&ref} {}
@@ -95,14 +91,6 @@ public:
 
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return iterator{pool->basic_common_type::end(), pool->end()};
-    }
-
-    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return reverse_iterator{pool->basic_common_type::rbegin(), pool->rbegin()};
-    }
-
-    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return reverse_iterator{pool->basic_common_type::rend(), pool->rend()};
     }
 
 private:
@@ -155,7 +143,6 @@ class iterable_view final {
 
 public:
     using iterator = iterable_view_iterator<typename View::iterator>;
-    using reverse_iterator = iterable_view_iterator<typename View::reverse_iterator>;
 
     iterable_view(const View &parent)
         : view{parent} {}
@@ -166,14 +153,6 @@ public:
 
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return {view.end(), &view};
-    }
-
-    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return {view.rbegin(), &view};
-    }
-
-    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return {view.rend(), &view};
     }
 
 private:
@@ -194,19 +173,17 @@ public:
     using value_type = typename std::iterator_traits<It>::value_type;
     using pointer = typename std::iterator_traits<It>::pointer;
     using reference = typename std::iterator_traits<It>::reference;
-    using iterator_category = std::bidirectional_iterator_tag;
+    using iterator_category = std::forward_iterator_tag;
 
     view_iterator() ENTT_NOEXCEPT
-        : first{},
+        : it{},
           last{},
-          it{},
           pools{},
           filter{} {}
 
-    view_iterator(It from, It to, It curr, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) ENTT_NOEXCEPT
-        : first{from},
+    view_iterator(It curr, It to, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) ENTT_NOEXCEPT
+        : it{curr},
           last{to},
-          it{curr},
           pools{all_of},
           filter{none_of} {
         if(it != last && !valid()) {
@@ -222,16 +199,6 @@ public:
     view_iterator operator++(int) ENTT_NOEXCEPT {
         view_iterator orig = *this;
         return ++(*this), orig;
-    }
-
-    view_iterator &operator--() ENTT_NOEXCEPT {
-        while(--it != first && !valid()) {}
-        return *this;
-    }
-
-    view_iterator operator--(int) ENTT_NOEXCEPT {
-        view_iterator orig = *this;
-        return operator--(), orig;
     }
 
     [[nodiscard]] bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
@@ -251,9 +218,8 @@ public:
     }
 
 private:
-    It first;
-    It last;
     It it;
+    It last;
     std::array<const Type *, Component> pools;
     std::array<const Type *, Exclude> filter;
 };
@@ -354,8 +320,6 @@ public:
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
     using iterator = internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
-    /*! @brief Reverse iterator type. */
-    using reverse_iterator = internal::view_iterator<basic_common_type, typename basic_common_type::reverse_iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable_view = internal::iterable_view<basic_view>;
     /*! @brief Common type among all storage types. */
@@ -453,7 +417,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
-        return iterator{view->begin(), view->end(), view->begin(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
+        return iterator{view->begin(), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
     }
 
     /**
@@ -466,34 +430,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
-        return iterator{view->begin(), view->end(), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
-    }
-
-    /**
-     * @brief Returns an iterator to the first entity of the reversed view.
-     *
-     * The returned iterator points to the first entity of the reversed view. If
-     * the view is empty, the returned iterator will be equal to `rend()`.
-     *
-     * @return An iterator to the first entity of the reversed view.
-     */
-    [[nodiscard]] reverse_iterator rbegin() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
-    }
-
-    /**
-     * @brief Returns an iterator that is past the last entity of the reversed
-     * view.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the reversed view. Attempting to dereference the returned iterator
-     * results in undefined behavior.
-     *
-     * @return An iterator to the entity following the last entity of the
-     * reversed view.
-     */
-    [[nodiscard]] reverse_iterator rend() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
+        return iterator{view->end(), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
     }
 
     /**
@@ -512,8 +449,9 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const {
-        const auto it = rbegin();
-        return it != rend() ? *it : null;
+        auto it = view->rbegin();
+        for(const auto last = view->rend(); it != last && !contains(*it); ++it) {}
+        return it == view->rend() ? null : *it;
     }
 
     /**
@@ -523,8 +461,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = iterator{view->begin(), view->end(), view->find(entt), pools_to_array(std::index_sequence_for<Component...>{}), filter};
-        return (it != end() && *it == entt) ? it : end();
+        return contains(entt) ? iterator{view->find(entt), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter} : end();
     }
 
     /**
@@ -823,8 +760,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type front() const {
-        const auto it = begin();
-        return it != end() ? *it : null;
+        return empty() ? null : *begin();
     }
 
     /**
@@ -833,8 +769,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const {
-        const auto it = rbegin();
-        return it != rend() ? *it : null;
+        return empty() ? null : *rbegin();
     }
 
     /**
@@ -844,8 +779,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto it = view->find(entt);
-        return it != end() && *it == entt ? it : end();
+        return contains(entt) ? view->find(entt) : end();
     }
 
     /**

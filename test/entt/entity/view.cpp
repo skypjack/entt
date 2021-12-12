@@ -171,48 +171,45 @@ TEST(SingleComponentView, Empty) {
 
 TEST(SingleComponentView, Each) {
     entt::registry registry;
+    entt::entity entity[2]{registry.create(), registry.create()};
 
-    registry.emplace<int>(registry.create(), 0);
-    registry.emplace<int>(registry.create(), 1);
+    registry.emplace<int>(entity[0u], 0);
+    registry.emplace<int>(entity[1u], 1);
 
     auto view = registry.view<int>();
-    auto iterable = view.each();
-
-    ASSERT_NE(iterable.begin(), iterable.end());
-    ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
-
     auto cview = std::as_const(registry).view<const int>();
+
+    auto iterable = view.each();
     auto citerable = cview.each();
 
-    std::size_t cnt = 0;
-
-    for(auto first = citerable.rbegin(), last = citerable.rend(); first != last; ++first) {
-        static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &>>);
-        ASSERT_EQ(std::get<1>(*first), cnt++);
-    }
-
-    view.each([&cnt](auto, int &) { ++cnt; });
-    view.each([&cnt](int &) { ++cnt; });
-
-    ASSERT_EQ(cnt, std::size_t{6});
-
-    cview.each([&cnt](const int &) { --cnt; });
-    cview.each([&cnt](auto, const int &) { --cnt; });
-
-    // do not use iterable, make sure an iterable view works when created from a temporary
-    for(auto [entt, iv]: registry.view<int>().each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        ASSERT_EQ(iv, --cnt);
-    }
-
-    ASSERT_EQ(cnt, std::size_t{0});
+    ASSERT_NE(citerable.begin(), citerable.end());
+    ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
 
     auto it = iterable.begin();
-    auto rit = iterable.rbegin();
 
     ASSERT_EQ((it++, ++it), iterable.end());
-    ASSERT_EQ((rit++, ++rit), iterable.rend());
+
+    view.each([expected = 1u](auto entt, int &value) mutable {
+        ASSERT_EQ(entt::to_integral(entt), expected);
+        ASSERT_EQ(value, expected);
+        --expected;
+    });
+
+    cview.each([expected = 1u](const int &value) mutable {
+        ASSERT_EQ(value, expected);
+        --expected;
+    });
+
+    ASSERT_EQ(std::get<0>(*iterable.begin()), entity[1u]);
+    ASSERT_EQ(std::get<0>(*++citerable.begin()), entity[0u]);
+
+    static_assert(std::is_same_v<decltype(std::get<1>(*iterable.begin())), int &>);
+    static_assert(std::is_same_v<decltype(std::get<1>(*citerable.begin())), const int &>);
+
+    // do not use iterable, make sure an iterable view works when created from a temporary
+    for(auto [entt, value]: view.each()) {
+        ASSERT_EQ(entt::to_integral(entt), value);
+    }
 }
 
 TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
@@ -493,19 +490,15 @@ TEST(MultiComponentView, Functionalities) {
     registry.emplace<char>(e1, '2');
 
     ASSERT_EQ(*view.begin(), e1);
-    ASSERT_EQ(*view.rbegin(), e1);
+    ASSERT_EQ(*cview.begin(), e1);
     ASSERT_EQ(++view.begin(), (view.end()));
-    ASSERT_EQ(++view.rbegin(), (view.rend()));
+    ASSERT_EQ(++cview.begin(), (cview.end()));
 
     ASSERT_NO_FATAL_FAILURE((view.begin()++));
     ASSERT_NO_FATAL_FAILURE((++cview.begin()));
-    ASSERT_NO_FATAL_FAILURE(view.rbegin()++);
-    ASSERT_NO_FATAL_FAILURE(++cview.rbegin());
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_NE(cview.begin(), cview.end());
-    ASSERT_NE(view.rbegin(), view.rend());
-    ASSERT_NE(cview.rbegin(), cview.rend());
     ASSERT_EQ(view.size_hint(), 1u);
 
     for(auto entity: view) {
@@ -597,9 +590,10 @@ TEST(MultiComponentView, LazyExcludedTypeFromConstRegistry) {
 
 TEST(MultiComponentView, Iterator) {
     entt::registry registry;
-    const auto entity = registry.create();
-    registry.emplace<int>(entity);
-    registry.emplace<char>(entity);
+    const entt::entity entity[2]{registry.create(), registry.create()};
+
+    registry.insert<int>(std::begin(entity), std::end(entity));
+    registry.insert<char>(std::begin(entity), std::end(entity));
 
     const auto view = registry.view<int, char>();
     using iterator = typename decltype(view)::iterator;
@@ -613,57 +607,13 @@ TEST(MultiComponentView, Iterator) {
     ASSERT_EQ(end, view.end());
     ASSERT_NE(begin, end);
 
+    ASSERT_EQ(*begin, entity[1u]);
+    ASSERT_EQ(*begin.operator->(), entity[1u]);
     ASSERT_EQ(begin++, view.begin());
-    ASSERT_EQ(begin--, view.end());
 
+    ASSERT_EQ(*begin, entity[0u]);
+    ASSERT_EQ(*begin.operator->(), entity[0u]);
     ASSERT_EQ(++begin, view.end());
-    ASSERT_EQ(--begin, view.begin());
-
-    ASSERT_EQ(*begin, entity);
-    ASSERT_EQ(*begin.operator->(), entity);
-
-    registry.emplace<int>(registry.create());
-    registry.emplace<char>(registry.create());
-
-    const auto other = registry.create();
-    registry.emplace<int>(other);
-    registry.emplace<char>(other);
-
-    begin = view.begin();
-
-    ASSERT_EQ(*(begin++), other);
-    ASSERT_EQ(*(begin++), entity);
-    ASSERT_EQ(begin--, end);
-    ASSERT_EQ(*(begin--), entity);
-    ASSERT_EQ(*begin, other);
-}
-
-TEST(MultiComponentView, ReverseIterator) {
-    entt::registry registry;
-    const auto entity = registry.create();
-    registry.emplace<int>(entity);
-    registry.emplace<char>(entity);
-
-    const auto view = registry.view<int, char>();
-    using iterator = typename decltype(view)::reverse_iterator;
-
-    iterator end{view.rbegin()};
-    iterator begin{};
-    begin = view.rend();
-    std::swap(begin, end);
-
-    ASSERT_EQ(begin, view.rbegin());
-    ASSERT_EQ(end, view.rend());
-    ASSERT_NE(begin, end);
-
-    ASSERT_EQ(begin++, view.rbegin());
-    ASSERT_EQ(begin--, view.rend());
-
-    ASSERT_EQ(++begin, view.rend());
-    ASSERT_EQ(--begin, view.rbegin());
-
-    ASSERT_EQ(*begin, entity);
-    ASSERT_EQ(*begin.operator->(), entity);
 }
 
 TEST(MultiComponentView, ElementAccess) {
@@ -718,59 +668,56 @@ TEST(MultiComponentView, SizeHint) {
 
     ASSERT_EQ(view.size_hint(), 1u);
     ASSERT_EQ(view.begin(), view.end());
-    ASSERT_EQ(view.rbegin(), view.rend());
 }
 
 TEST(MultiComponentView, Each) {
     entt::registry registry;
+    entt::entity entity[2]{registry.create(), registry.create()};
 
-    const auto e0 = registry.create();
-    registry.emplace<int>(e0, 0);
-    registry.emplace<char>(e0);
+    registry.emplace<int>(entity[0u], 0);
+    registry.emplace<char>(entity[0u], 0);
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1, 1);
-    registry.emplace<char>(e1);
+    registry.emplace<int>(entity[1u], 1);
+    registry.emplace<char>(entity[1u], 1);
 
     auto view = registry.view<int, char>();
-    auto iterable = view.each();
-
-    ASSERT_NE(iterable.begin(), iterable.end());
-    ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
-
     auto cview = std::as_const(registry).view<const int, const char>();
+
+    auto iterable = view.each();
     auto citerable = cview.each();
 
-    std::size_t cnt = 0;
-
-    for(auto first = citerable.rbegin(), last = citerable.rend(); first != last; ++first) {
-        static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &, const char &>>);
-        ASSERT_EQ(std::get<1>(*first), cnt++);
-    }
-
-    view.each([&cnt](auto, int &, char &) { ++cnt; });
-    view.each([&cnt](int &, char &) { ++cnt; });
-
-    ASSERT_EQ(cnt, std::size_t{6});
-
-    cview.each([&cnt](const int &, const char &) { --cnt; });
-    cview.each([&cnt](auto, const int &, const char &) { --cnt; });
-
-    // do not use iterable, make sure an iterable view works when created from a temporary
-    for(auto [entt, iv, cv]: registry.view<int, char>().each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
-        ASSERT_EQ(iv, --cnt);
-    }
-
-    ASSERT_EQ(cnt, std::size_t{0});
+    ASSERT_NE(citerable.begin(), citerable.end());
+    ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
 
     auto it = iterable.begin();
-    auto rit = iterable.rbegin();
 
     ASSERT_EQ((it++, ++it), iterable.end());
-    ASSERT_EQ((rit++, ++rit), iterable.rend());
+
+    view.each([expected = 1u](auto entt, int &ivalue, char &cvalue) mutable {
+        ASSERT_EQ(entt::to_integral(entt), expected);
+        ASSERT_EQ(ivalue, expected);
+        ASSERT_EQ(cvalue, expected);
+        --expected;
+    });
+
+    cview.each([expected = 1u](const int &ivalue, const char &cvalue) mutable {
+        ASSERT_EQ(ivalue, expected);
+        ASSERT_EQ(cvalue, expected);
+        --expected;
+    });
+
+    ASSERT_EQ(std::get<0>(*iterable.begin()), entity[1u]);
+    ASSERT_EQ(std::get<0>(*++citerable.begin()), entity[0u]);
+
+    static_assert(std::is_same_v<decltype(std::get<1>(*iterable.begin())), int &>);
+    static_assert(std::is_same_v<decltype(std::get<2>(*citerable.begin())), const char &>);
+
+    // do not use iterable, make sure an iterable view works when created from a temporary
+    for(auto [entt, ivalue, cvalue]: registry.view<int, char>().each()) {
+        ASSERT_EQ(entt::to_integral(entt), ivalue);
+        ASSERT_EQ(entt::to_integral(entt), cvalue);
+    }
 }
 
 TEST(MultiComponentView, EachWithSuggestedType) {
