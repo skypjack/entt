@@ -99,7 +99,6 @@ private:
 
 template<typename View>
 class iterable_view final {
-    template<typename It>
     struct iterable_view_iterator final {
         using difference_type = std::ptrdiff_t;
         using value_type = decltype(std::tuple_cat(std::tuple<typename View::entity_type>{}, std::declval<View>().get({})));
@@ -107,7 +106,7 @@ class iterable_view final {
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
 
-        iterable_view_iterator(It from, const View *parent) ENTT_NOEXCEPT
+        iterable_view_iterator(typename View::iterator from, const View *parent) ENTT_NOEXCEPT
             : it{from},
               view{parent} {}
 
@@ -137,12 +136,12 @@ class iterable_view final {
         }
 
     private:
-        It it;
+        typename View::iterator it;
         const View *view;
     };
 
 public:
-    using iterator = iterable_view_iterator<typename View::iterator>;
+    using iterator = iterable_view_iterator;
 
     iterable_view(const View &parent)
         : view{parent} {}
@@ -159,7 +158,7 @@ private:
     const View view;
 };
 
-template<typename Type, typename It, std::size_t Component, std::size_t Exclude>
+template<typename Type, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
     [[nodiscard]] bool valid() const {
         return ((Component != 0u) || (*it != tombstone))
@@ -168,11 +167,11 @@ class view_iterator final {
     }
 
 public:
-    using iterator_type = It;
-    using difference_type = typename std::iterator_traits<It>::difference_type;
-    using value_type = typename std::iterator_traits<It>::value_type;
-    using pointer = typename std::iterator_traits<It>::pointer;
-    using reference = typename std::iterator_traits<It>::reference;
+    using iterator_type = typename Type::iterator;
+    using difference_type = typename std::iterator_traits<iterator_type>::difference_type;
+    using value_type = typename std::iterator_traits<iterator_type>::value_type;
+    using pointer = typename std::iterator_traits<iterator_type>::pointer;
+    using reference = typename std::iterator_traits<iterator_type>::reference;
     using iterator_category = std::forward_iterator_tag;
 
     view_iterator() ENTT_NOEXCEPT
@@ -181,7 +180,7 @@ public:
           pools{},
           filter{} {}
 
-    view_iterator(It curr, It to, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) ENTT_NOEXCEPT
+    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) ENTT_NOEXCEPT
         : it{curr},
           last{to},
           pools{all_of},
@@ -218,8 +217,8 @@ public:
     }
 
 private:
-    It it;
-    It last;
+    iterator_type it;
+    iterator_type last;
     std::array<const Type *, Component> pools;
     std::array<const Type *, Exclude> filter;
 };
@@ -319,7 +318,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<basic_common_type, typename basic_common_type::iterator, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using iterator = internal::view_iterator<basic_common_type, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable_view = internal::iterable_view<basic_view>;
     /*! @brief Common type among all storage types. */
