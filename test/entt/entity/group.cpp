@@ -178,52 +178,51 @@ TEST(NonOwningGroup, Empty) {
 
 TEST(NonOwningGroup, Each) {
     entt::registry registry;
+    entt::entity entity[2]{registry.create(), registry.create()};
+
     auto group = registry.group(entt::get<int, char>);
+    auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
+
     auto iterable = group.each();
+    auto citerable = cgroup.each();
 
-    const auto e0 = registry.create();
-    registry.emplace<int>(e0, 0);
-    registry.emplace<char>(e0);
+    registry.emplace<int>(entity[0u], 0);
+    registry.emplace<char>(entity[0u], 0);
 
-    const auto e1 = registry.create();
-    registry.emplace<int>(e1, 1);
-    registry.emplace<char>(e1);
+    registry.emplace<int>(entity[1u], 1);
+    registry.emplace<char>(entity[1u], 1);
 
-    ASSERT_NE(iterable.begin(), iterable.end());
+    ASSERT_NE(citerable.begin(), citerable.end());
     ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
 
-    auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
-    auto citerable = cgroup.each();
-    std::size_t cnt = 0;
-
-    for(auto first = citerable.rbegin(), last = citerable.rend(); first != last; ++first) {
-        static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &, const char &>>);
-        ASSERT_EQ(std::get<1>(*first), cnt++);
-    }
-
-    group.each([&cnt](auto, int &, char &) { ++cnt; });
-    group.each([&cnt](int &, char &) { ++cnt; });
-
-    ASSERT_EQ(cnt, std::size_t{6});
-
-    cgroup.each([&cnt](const int &, const char &) { --cnt; });
-    cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
-
-    // do not use iterable, make sure an iterable group works when created from a temporary
-    for(auto [entt, iv, cv]: registry.group(entt::get<int, char>).each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
-        ASSERT_EQ(iv, --cnt);
-    }
-
-    ASSERT_EQ(cnt, std::size_t{0});
-
     auto it = iterable.begin();
-    auto rit = iterable.rbegin();
 
     ASSERT_EQ((it++, ++it), iterable.end());
-    ASSERT_EQ((rit++, ++rit), iterable.rend());
+
+    group.each([expected = 1u](auto entt, int &ivalue, char &cvalue) mutable {
+        ASSERT_EQ(entt::to_integral(entt), expected);
+        ASSERT_EQ(ivalue, expected);
+        ASSERT_EQ(cvalue, expected);
+        --expected;
+    });
+
+    cgroup.each([expected = 1u](const int &ivalue, const char &cvalue) mutable {
+        ASSERT_EQ(ivalue, expected);
+        ASSERT_EQ(cvalue, expected);
+        --expected;
+    });
+
+    ASSERT_EQ(std::get<0>(*iterable.begin()), entity[1u]);
+    ASSERT_EQ(std::get<0>(*++citerable.begin()), entity[0u]);
+
+    static_assert(std::is_same_v<decltype(std::get<1>(*iterable.begin())), int &>);
+    static_assert(std::is_same_v<decltype(std::get<2>(*citerable.begin())), const char &>);
+
+    // do not use iterable, make sure an iterable group works when created from a temporary
+    for(auto [entt, ivalue, cvalue]: registry.group(entt::get<int, char>).each()) {
+        ASSERT_EQ(entt::to_integral(entt), ivalue);
+        ASSERT_EQ(entt::to_integral(entt), cvalue);
+    }
 }
 
 TEST(NonOwningGroup, Sort) {
@@ -822,52 +821,51 @@ TEST(OwningGroup, Empty) {
 
 TEST(OwningGroup, Each) {
     entt::registry registry;
+    entt::entity entity[2]{registry.create(), registry.create()};
+
     auto group = registry.group<int>(entt::get<char>);
+    auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
+
     auto iterable = group.each();
+    auto citerable = cgroup.each();
 
-    const auto e0 = registry.create();
-    registry.emplace<int>(e0, 0);
-    registry.emplace<char>(e0);
+    registry.emplace<int>(entity[0u], 0);
+    registry.emplace<char>(entity[0u], 0);
 
-    const auto e1 = registry.create();
-    registry.emplace<int>(e1, 1);
-    registry.emplace<char>(e1);
+    registry.emplace<int>(entity[1u], 1);
+    registry.emplace<char>(entity[1u], 1);
 
-    ASSERT_NE(iterable.begin(), iterable.end());
+    ASSERT_NE(citerable.begin(), citerable.end());
     ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
 
-    auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
-    auto citerable = cgroup.each();
-    std::size_t cnt = 0;
-
-    for(auto first = citerable.rbegin(), last = citerable.rend(); first != last; ++first) {
-        static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &, const char &>>);
-        ASSERT_EQ(std::get<1>(*first), cnt++);
-    }
-
-    group.each([&cnt](auto, int &, char &) { ++cnt; });
-    group.each([&cnt](int &, char &) { ++cnt; });
-
-    ASSERT_EQ(cnt, std::size_t{6});
-
-    cgroup.each([&cnt](const int &, const char &) { --cnt; });
-    cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
-
-    // do not use iterable, make sure an iterable group works when created from a temporary
-    for(auto [entt, iv, cv]: registry.group<int>(entt::get<char>).each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
-        ASSERT_EQ(iv, --cnt);
-    }
-
-    ASSERT_EQ(cnt, std::size_t{0});
-
     auto it = iterable.begin();
-    auto rit = iterable.rbegin();
 
     ASSERT_EQ((it++, ++it), iterable.end());
-    ASSERT_EQ((rit++, ++rit), iterable.rend());
+
+    group.each([expected = 1u](auto entt, int &ivalue, char &cvalue) mutable {
+        ASSERT_EQ(entt::to_integral(entt), expected);
+        ASSERT_EQ(ivalue, expected);
+        ASSERT_EQ(cvalue, expected);
+        --expected;
+    });
+
+    cgroup.each([expected = 1u](const int &ivalue, const char &cvalue) mutable {
+        ASSERT_EQ(ivalue, expected);
+        ASSERT_EQ(cvalue, expected);
+        --expected;
+    });
+
+    ASSERT_EQ(std::get<0>(*iterable.begin()), entity[1u]);
+    ASSERT_EQ(std::get<0>(*++citerable.begin()), entity[0u]);
+
+    static_assert(std::is_same_v<decltype(std::get<1>(*iterable.begin())), int &>);
+    static_assert(std::is_same_v<decltype(std::get<2>(*citerable.begin())), const char &>);
+
+    // do not use iterable, make sure an iterable group works when created from a temporary
+    for(auto [entt, ivalue, cvalue]: registry.group<int>(entt::get<char>).each()) {
+        ASSERT_EQ(entt::to_integral(entt), ivalue);
+        ASSERT_EQ(entt::to_integral(entt), cvalue);
+    }
 }
 
 TEST(OwningGroup, SortOrdered) {

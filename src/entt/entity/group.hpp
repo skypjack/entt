@@ -72,7 +72,6 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final
     using basic_common_type = std::common_type_t<typename storage_type<Get>::base_type...>;
 
     class iterable final {
-        template<typename It>
         struct iterable_iterator final {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_group>().get({})));
@@ -81,7 +80,7 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final
             using iterator_category = std::input_iterator_tag;
 
             template<typename... Args>
-            iterable_iterator(It from, const std::tuple<storage_type<Get> *...> &args) ENTT_NOEXCEPT
+            iterable_iterator(typename basic_common_type::iterator from, const std::tuple<storage_type<Get> *...> &args) ENTT_NOEXCEPT
                 : it{from},
                   pools{args} {}
 
@@ -112,13 +111,12 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final
             }
 
         private:
-            It it;
+            typename basic_common_type::iterator it;
             std::tuple<storage_type<Get> *...> pools;
         };
 
     public:
-        using iterator = iterable_iterator<typename basic_common_type::iterator>;
-        using reverse_iterator = iterable_iterator<typename basic_common_type::reverse_iterator>;
+        using iterator = iterable_iterator;
 
         iterable(basic_common_type *const ref, const std::tuple<storage_type<Get> *...> &cpools)
             : handler{ref},
@@ -130,14 +128,6 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return handler ? iterator{handler->end(), pools} : iterator{{}, pools};
-        }
-
-        [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return handler ? reverse_iterator{handler->rbegin(), pools} : reverse_iterator{{}, pools};
-        }
-
-        [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return handler ? reverse_iterator{handler->rend(), pools} : reverse_iterator{{}, pools};
         }
 
     private:
@@ -157,9 +147,9 @@ public:
     /*! @brief Common type among all storage types. */
     using base_type = basic_common_type;
     /*! @brief Random access iterator type. */
-    using iterator = typename basic_common_type::iterator;
+    using iterator = typename base_type::iterator;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename basic_common_type::reverse_iterator;
+    using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable_group = iterable;
 
@@ -495,7 +485,7 @@ public:
     }
 
 private:
-    basic_common_type *const handler;
+    base_type *const handler;
     const std::tuple<storage_type<Get> *...> pools;
 };
 
@@ -556,11 +546,11 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
     using basic_common_type = std::common_type_t<typename storage_type<Owned>::base_type..., typename storage_type<Get>::base_type...>;
 
     class iterable final {
-        template<typename, typename>
+        template<typename>
         struct iterable_iterator;
 
-        template<typename It, typename... OIt>
-        struct iterable_iterator<It, type_list<OIt...>> final {
+        template<typename... OIt>
+        struct iterable_iterator<type_list<OIt...>> final {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_group>().get({})));
             using pointer = input_iterator_pointer<value_type>;
@@ -568,7 +558,7 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
             using iterator_category = std::input_iterator_tag;
 
             template<typename... Other>
-            iterable_iterator(It from, const std::tuple<Other...> &other, const std::tuple<storage_type<Get> *...> &cpools) ENTT_NOEXCEPT
+            iterable_iterator(typename basic_common_type::iterator from, const std::tuple<Other...> &other, const std::tuple<storage_type<Get> *...> &cpools) ENTT_NOEXCEPT
                 : it{from},
                   owned{std::get<OIt>(other)...},
                   get{cpools} {}
@@ -602,18 +592,13 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
             }
 
         private:
-            It it;
+            typename basic_common_type::iterator it;
             std::tuple<OIt...> owned;
             std::tuple<storage_type<Get> *...> get;
         };
 
     public:
-        using iterator = iterable_iterator<
-            typename basic_common_type::iterator,
-            type_list_cat_t<std::conditional_t<ignore_as_empty_v<std::remove_const_t<Owned>>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>>;
-        using reverse_iterator = iterable_iterator<
-            typename basic_common_type::reverse_iterator,
-            type_list_cat_t<std::conditional_t<ignore_as_empty_v<std::remove_const_t<Owned>>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>>;
+        using iterator = iterable_iterator<type_list_cat_t<std::conditional_t<ignore_as_empty_v<std::remove_const_t<Owned>>, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>>;
 
         iterable(std::tuple<storage_type<Owned> *..., storage_type<Get> *...> cpools, const std::size_t *const extent)
             : pools{cpools},
@@ -627,16 +612,6 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             auto it = length ? std::get<0>(pools)->basic_common_type::end() : typename basic_common_type::iterator{};
             return iterator{std::move(it), std::make_tuple((std::get<storage_type<Owned> *>(pools)->end())...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
-        }
-
-        [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            auto it = length ? std::get<0>(pools)->basic_common_type::rbegin() : typename basic_common_type::reverse_iterator{};
-            return reverse_iterator{std::move(it), std::make_tuple((std::get<storage_type<Owned> *>(pools)->rbegin())...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
-        }
-
-        [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            auto it = length ? (std::get<0>(pools)->basic_common_type::rbegin() + *length) : typename basic_common_type::reverse_iterator{};
-            return reverse_iterator{std::move(it), std::make_tuple((std::get<storage_type<Owned> *>(pools)->rbegin() + *length)...), std::make_tuple(std::get<storage_type<Get> *>(pools)...)};
         }
 
     private:
@@ -656,9 +631,9 @@ public:
     /*! @brief Common type among all storage types. */
     using base_type = basic_common_type;
     /*! @brief Random access iterator type. */
-    using iterator = typename basic_common_type::iterator;
+    using iterator = typename base_type::iterator;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename basic_common_type::reverse_iterator;
+    using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable_group = iterable;
 
@@ -711,7 +686,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return *this ? (std::get<0>(pools)->basic_common_type::end() - *length) : iterator{};
+        return *this ? (std::get<0>(pools)->base_type::end() - *length) : iterator{};
     }
 
     /**
@@ -725,7 +700,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return *this ? std::get<0>(pools)->basic_common_type::end() : iterator{};
+        return *this ? std::get<0>(pools)->base_type::end() : iterator{};
     }
 
     /**
@@ -737,7 +712,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return *this ? std::get<0>(pools)->basic_common_type::rbegin() : reverse_iterator{};
+        return *this ? std::get<0>(pools)->base_type::rbegin() : reverse_iterator{};
     }
 
     /**
@@ -752,7 +727,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return *this ? (std::get<0>(pools)->basic_common_type::rbegin() + *length) : reverse_iterator{};
+        return *this ? (std::get<0>(pools)->base_type::rbegin() + *length) : reverse_iterator{};
     }
 
     /**
