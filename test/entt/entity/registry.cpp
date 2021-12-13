@@ -781,30 +781,22 @@ TEST(Registry, Each) {
 
 TEST(Registry, Orphans) {
     entt::registry registry;
-    entt::registry::size_type tot{};
     entt::entity entities[3u]{};
 
     registry.create(std::begin(entities), std::end(entities));
     registry.emplace<int>(entities[0u]);
     registry.emplace<int>(entities[2u]);
 
-    registry.orphans([&](auto) { ++tot; });
-
-    ASSERT_EQ(tot, 1u);
+    registry.each([&](const auto entt) {
+        ASSERT_TRUE(entt != entities[1u] || registry.orphan(entt));
+    });
 
     registry.erase<int>(entities[0u]);
     registry.erase<int>(entities[2u]);
 
-    tot = {};
-    registry.orphans([&](auto) { ++tot; });
-
-    ASSERT_EQ(tot, 3u);
-
-    registry.clear();
-    tot = {};
-
-    registry.orphans([&](auto) { ++tot; });
-    ASSERT_EQ(tot, 0u);
+    registry.each([&](const auto entt) {
+        ASSERT_TRUE(registry.orphan(entt));
+    });
 }
 
 TEST(Registry, View) {

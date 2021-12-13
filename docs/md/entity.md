@@ -2038,30 +2038,25 @@ registry.each([](auto entity) {
 });
 ```
 
-It returns to the caller all the entities that are still in use.<br/>
 As a rule of thumb, consider using a view or a group if the goal is to iterate
 entities that have a determinate set of components. These tools are usually much
-faster than combining this function with a bunch of custom tests.<br/>
-In all the other cases, this is the way to go.
-
-There exists also another member function to use to retrieve orphans. An orphan
-is an entity that is still in use and has no assigned components.<br/>
-The signature of the function is the same of `each`:
+faster than combining the `each` function with a bunch of custom tests.<br/>
+In all the other cases, this is the way to go. For example, it's possible to
+combine `each` with the `orphan` member function to clean up orphan entities
+(that is, entities that are still in use and have no assigned components):
 
 ```cpp
-registry.orphans([](auto entity) {
-    // ...
+registry.each([&registry](auto entity) {
+    if(registry.orphan(entity)) {
+        registry.release(entity);
+    }
 });
 ```
 
-To test the _orphanity_ of a single entity, use the member function `orphan`
-instead. It accepts a valid entity identifer as an argument and returns true in
-case the entity is an orphan, false otherwise.
-
-In general, all these functions can result in poor performance.<br/>
-`each` is fairly slow because of some checks it performs on each and every
-entity. For similar reasons, `orphans` can be even slower. Both functions should
-not be used frequently to avoid the risk of a performance hit.
+In general, iterating all entities can result in poor performance. It should not
+be done frequently to avoid the risk of a performance hit.<br/>
+However, it can be convenient when initializing an editor or to reclaim pending
+identifiers.
 
 ## What is allowed and what is not
 

@@ -901,29 +901,6 @@ public:
     }
 
     /**
-     * @brief Iterates orphans and applies them the given function object.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const Entity);
-     * @endcode
-     *
-     * This function can be very slow and should not be used frequently.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void orphans(Func func) const {
-        each([this, &func](const auto entity) {
-            if(orphan(entity)) {
-                func(entity);
-            }
-        });
-    }
-
-    /**
      * @brief Returns a sink object for the given component.
      *
      * Use this function to receive notifications whenever a new instance of the
