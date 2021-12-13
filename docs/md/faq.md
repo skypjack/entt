@@ -200,4 +200,11 @@ In the first case, `on_created` is invoked if the entity has not the component,
 otherwise the latter is replaced and therefore `on_update` is triggered. As for
 the second case, components are removed from their entities and thus freed when
 they are recycled. It means that `on_destroyed` is triggered for every component 
-owned by the entity that is destroyed.
+that is explicitly removed from the entity.
+
+To remove all components from an entity use `registry.remove_all()`. This will 
+cause `on_destroy` to be invoked for every component owned by the entity. 
+Note, however, that the `registry.destroy` methods do NOT cause `on_destroy` to 
+be invoked, since these methods act on the entities themselves, rather than
+their components.
+
