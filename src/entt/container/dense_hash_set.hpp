@@ -198,6 +198,9 @@ public:
         return (it + curr);
     }
 
+    template<typename ILhs, typename IRhs>
+    [[nodiscard]] friend bool operator==(const dense_hash_set_local_iterator<ILhs> &, const dense_hash_set_local_iterator<IRhs> &) ENTT_NOEXCEPT;
+
 private:
     iterator_type it;
     std::size_t curr;
@@ -205,7 +208,7 @@ private:
 
 template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator==(const dense_hash_set_local_iterator<ILhs> &lhs, const dense_hash_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
+    return lhs.curr == rhs.curr;
 }
 
 template<typename ILhs, typename IRhs>
