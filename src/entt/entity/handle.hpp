@@ -272,7 +272,11 @@ struct basic_handle {
      */
     template<typename Func>
     void visit(Func &&func) const {
-        reg->visit(entt, std::forward<Func>(func));
+        reg->visit([func = std::forward<Func>(func), this](auto &&storage) {
+            if(storage.contains(entt)) {
+                func(storage);
+            }
+        });
     }
 
 private:

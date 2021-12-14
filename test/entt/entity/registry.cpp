@@ -1872,28 +1872,6 @@ TEST(Registry, Visit) {
     });
 
     ASSERT_TRUE(hasType[0] && hasType[1] && hasType[2]);
-
-    hasType[0] = hasType[1] = hasType[2] = false;
-
-    registry.visit(entity, [&hasType](const auto &pool) {
-        hasType[0] = hasType[0] || (pool.type() == entt::type_id<int>());
-        hasType[1] = hasType[1] || (pool.type() == entt::type_id<double>());
-        hasType[2] = hasType[2] || (pool.type() == entt::type_id<char>());
-    });
-
-    ASSERT_TRUE(hasType[0] && !hasType[1] && hasType[2]);
-
-    hasType[0] = hasType[2] = false;
-
-    registry.visit(other, [&hasType](const auto &pool) {
-        hasType[0] = hasType[0] || (pool.type() == entt::type_id<int>());
-        hasType[1] = hasType[1] || (pool.type() == entt::type_id<double>());
-        hasType[2] = hasType[2] || (pool.type() == entt::type_id<char>());
-    });
-
-    ASSERT_TRUE(!hasType[0] && hasType[1] && !hasType[2]);
-
-    hasType[1] = false;
 }
 
 TEST(Registry, ScramblingPoolsIsAllowed) {

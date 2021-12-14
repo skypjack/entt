@@ -1207,9 +1207,11 @@ components with entities without knowing their actual type and even initialize
 them by copy if needed:
 
 ```cpp
-registry.visit(entity, [other](auto &&storage) {
-    // create a copy of an entity component by component
-    storage.emplace(other, storage.get(entity));
+// create a copy of an entity component by component
+registry.visit([entity, other](auto &&storage) {
+    if(storage.contains(entity)) {
+        storage.emplace(other, storage.get(entity));
+    }
 });
 ```
 

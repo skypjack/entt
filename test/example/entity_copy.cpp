@@ -22,9 +22,9 @@ TEST(Example, EntityCopy) {
     ASSERT_FALSE((registry.any_of<int, char, double>(dst)));
     ASSERT_FALSE(custom.contains(dst));
 
-    registry.visit(src, [src, dst](auto &&storage) {
+    registry.visit([src, dst](auto &&storage) {
         // discard chars because why not, this is just an example after all
-        if(storage.type() != entt::type_id<char>()) {
+        if(storage.type() != entt::type_id<char>() && storage.contains(src)) {
             storage.emplace(dst, storage.get(src));
         }
     });

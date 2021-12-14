@@ -1296,30 +1296,6 @@ public:
     }
 
     /**
-     * @brief Visits an entity and returns the pools for its components.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const basic_sparse_set<entity_type> &);
-     * @endcode
-     *
-     * Returned pools are those of the components owned by the entity.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param entity A valid identifier.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void visit(entity_type entity, Func func) const {
-        for(auto &&curr: pools) {
-            if(curr.second->contains(entity)) {
-                func(*curr.second);
-            }
-        }
-    }
-
-    /**
      * @brief Visits a registry and returns the pools for its components.
      *
      * The signature of the function should be equivalent to the following:
