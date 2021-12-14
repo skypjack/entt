@@ -554,7 +554,6 @@ public:
      */
     template<typename Component, typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, Component>>>
     void insert(EIt first, EIt last, CIt from) {
-        static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>, "Invalid value type");
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
         assure<Component>().insert(first, last, from);
     }
@@ -638,15 +637,15 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Types of components to remove.
+     * @tparam Component Type of component to remove.
+     * @tparam Other Other types of components to remove.
      * @param entity A valid identifier.
      * @return The number of components actually removed.
      */
-    template<typename... Component>
+    template<typename Component, typename... Other>
     size_type remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        return (assure<Component>().remove(entity) + ... + size_type{});
+        return (assure<Component>().remove(entity) + ... + assure<Other>().remove(entity));
     }
 
     /**
@@ -655,21 +654,20 @@ public:
      * @sa remove
      *
      * @tparam Component Types of components to remove.
+     * @tparam Other Other types of components to remove.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @return The number of components actually removed.
      */
-    template<typename... Component, typename It>
+    template<typename Component, typename... Other, typename It>
     size_type remove(It first, It last) {
-        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        const auto cpools = std::forward_as_tuple(assure<Component>()...);
         size_type count{};
 
-        for(; first != last; ++first) {
+        for(const auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
             const auto entity = *first;
             ENTT_ASSERT(valid(entity), "Invalid entity");
-            count += (std::get<storage_type<Component> &>(cpools).remove(entity) + ...);
+            count += (std::get<storage_type<Component> &>(cpools).remove(entity) + ... + std::get<storage_type<Other> &>(cpools).remove(entity));
         }
 
         return count;
@@ -683,13 +681,13 @@ public:
      * entity that doesn't own it results in undefined behavior.
      *
      * @tparam Component Types of components to erase.
+     * @tparam Other Other types of components to erase.
      * @param entity A valid identifier.
      */
-    template<typename... Component>
+    template<typename Component, typename... Other>
     void erase(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        (assure<Component>().erase(entity), ...);
+        (assure<Component>().erase(entity), (assure<Other>().erase(entity), ...));
     }
 
     /**
@@ -698,19 +696,17 @@ public:
      * @sa erase
      *
      * @tparam Component Types of components to erase.
+     * @tparam Other Other types of components to erase.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename... Component, typename It>
+    template<typename Component, typename... Other, typename It>
     void erase(It first, It last) {
-        static_assert(sizeof...(Component) > 0, "Provide one or more component types");
-        const auto cpools = std::forward_as_tuple(assure<Component>()...);
-
-        for(; first != last; ++first) {
+        for(const auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
             const auto entity = *first;
             ENTT_ASSERT(valid(entity), "Invalid entity");
-            (std::get<storage_type<Component> &>(cpools).erase(entity), ...);
+            (std::get<storage_type<Component> &>(cpools).erase(entity), (std::get<storage_type<Other> &>(cpools).erase(entity), ...));
         }
     }
 
@@ -972,49 +968,31 @@ public:
     /**
      * @brief Returns a view for the given components.
      *
-     * This kind of objects are created on the fly and share with the registry
-     * its internal data structures.<br/>
-     * Feel free to discard a view after the use. Creating and destroying a view
-     * is an incredibly cheap operation because they do not require any type of
-     * initialization.<br/>
-     * As a rule of thumb, storing a view should never be an option.
+     * Views are created on the fly and share with the registry its internal
+     * data structures. Feel free to discard them after the use.<br/>
+     * Creating and destroying a view is an incredibly cheap operation. As a
+     * rule of thumb, storing a view should never be an option.
      *
-     * Views do their best to iterate the smallest set of candidate entities:
-     *
-     * * Single component views are incredibly fast and iterate a packed array
-     *   of entities, all of which has the given component.
-     * * Multi component views find the smallest set of candidates and use it to
-     *   test for the given components.
-     *
-     * Views in no way affect the functionalities of the registry nor those of
-     * the underlying pools.
-     *
-     * @tparam Component Type of components used to construct the view.
+     * @tparam Component Type of component used to construct the view.
+     * @tparam Other Other types of components used to construct the view.
      * @tparam Exclude Types of components used to filter the view.
      * @return A newly created view.
      */
-    template<typename... Component, typename... Exclude>
-    [[nodiscard]] basic_view<Entity, get_t<std::add_const_t<Component>...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) const {
-        static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        return {assure<std::remove_const_t<Component>>()..., assure<Exclude>()...};
+    template<typename Component, typename... Other, typename... Exclude>
+    [[nodiscard]] basic_view<Entity, get_t<std::add_const_t<Component>, std::add_const_t<Other>...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) const {
+        return {assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<Exclude>()...};
     }
 
     /*! @copydoc view */
-    template<typename... Component, typename... Exclude>
-    [[nodiscard]] basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) {
-        static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
-        return {assure<std::remove_const_t<Component>>()..., assure<Exclude>()...};
+    template<typename Component, typename... Other, typename... Exclude>
+    [[nodiscard]] basic_view<Entity, get_t<Component, Other...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) {
+        return {assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<Exclude>()...};
     }
 
     /**
      * @brief Returns a runtime view for the given components.
      *
-     * This kind of objects are created on the fly and share with the registry
-     * its internal data structures.<br/>
-     * Users should throw away the view after use. Creating and destroying a
-     * runtime view is an incredibly cheap operation because they do not require
-     * any type of initialization.<br/>
-     * As a rule of thumb, storing a view should never be an option.
+     * @sa view
      *
      * Runtime views are to be used when users want to construct a view from
      * some external inputs and don't know at compile-time what are the required
@@ -1058,12 +1036,10 @@ public:
     /**
      * @brief Returns a group for the given components.
      *
-     * This kind of objects are created on the fly and share with the registry
-     * its internal data structures.<br/>
-     * Feel free to discard a group after the use. Creating and destroying a
-     * group is an incredibly cheap operation because they do not require any
-     * type of initialization, but for the first time they are requested.<br/>
-     * As a rule of thumb, storing a group should never be an option.
+     * Groups are created on the fly and share with the registry its internal
+     * data structures. Feel free to discard them after the use.<br/>
+     * Creating and destroying a group is an incredibly cheap operation. As a
+     * rule of thumb, storing a group should never be an option.
      *
      * Groups support exclusion lists and can own types of components. The more
      * types are owned by a group, the faster it is to iterate entities and
@@ -1220,10 +1196,8 @@ public:
     /**
      * @brief Sorts the elements of a given component.
      *
-     * This function is used to sort the elements in a pool. The order remains
-     * valid until a component of the given type is assigned to or removed from
-     * an entity.
-     *
+     * The order remains valid until a component of the given type is assigned
+     * to or removed from an entity.<br/>
      * The comparison function object returns `true` if the first element is
      * _less_ than the second one, `false` otherwise. Its signature is also
      * equivalent to one of the following:
@@ -1233,8 +1207,7 @@ public:
      * bool(const Component &, const Component &);
      * @endcode
      *
-     * Moreover, it shall induce a _strict weak ordering_ on the values.
-     *
+     * Moreover, it shall induce a _strict weak ordering_ on the values.<br/>
      * The sort function object offers an `operator()` that accepts:
      *
      * * An iterator to the first element of the range to sort.
@@ -1271,8 +1244,6 @@ public:
     /**
      * @brief Sorts two pools of components in the same way.
      *
-     * This function is used to sort a pool according to the order of the
-     * elements in a different pool.<br/>
      * Being `To` and `From` the two sets, after invoking this function an
      * iterator for `To` returns elements according to the following rules:
      *
