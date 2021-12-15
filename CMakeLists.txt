@@ -30,7 +30,7 @@ project(
     VERSION ${ENTT_VERSION}
     DESCRIPTION "Gaming meets modern C++ - a fast and reliable entity-component system (ECS) and much more"
     HOMEPAGE_URL "https://github.com/skypjack/entt"
-    LANGUAGES CXX
+    LANGUAGES C CXX
 )
 
 if(NOT CMAKE_BUILD_TYPE)
