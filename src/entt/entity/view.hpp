@@ -627,16 +627,16 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
-        : filter{},
-          pools{} {}
+        : pools{},
+          filter{} {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : filter{},
-          pools{&ref} {}
+        : pools{&ref},
+          filter{} {}
 
     /**
      * @brief Returns the leading storage of a view.
