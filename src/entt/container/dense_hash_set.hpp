@@ -199,7 +199,7 @@ public:
     }
 
     template<typename ILhs, typename IRhs>
-    [[nodiscard]] friend bool operator==(const dense_hash_set_local_iterator<ILhs> &, const dense_hash_set_local_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend bool operator==(const dense_hash_set_local_iterator<ILhs> &, const dense_hash_set_local_iterator<IRhs> &) ENTT_NOEXCEPT;
 
 private:
     iterator_type it;
