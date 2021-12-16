@@ -284,8 +284,12 @@ public:
     using pointer = typename packed_container_type::const_pointer;
     /*! @brief Random access iterator type. */
     using iterator = internal::sparse_set_iterator<packed_container_type>;
+    /*! @brief Constant random access iterator type. */
+    using const_iterator = iterator;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
+    /*! @brief Constant reverse iterator type. */
+    using const_reverse_iterator = reverse_iterator;
 
     /*! @brief Default constructor. */
     basic_sparse_set()
@@ -482,9 +486,14 @@ public:
      *
      * @return An iterator to the first entity of the sparse set.
      */
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator begin() const ENTT_NOEXCEPT {
         const auto pos = static_cast<typename iterator::difference_type>(packed.size());
         return iterator{&packed, pos};
+    }
+
+    /*! @brief begin */
+    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
+        return begin();
     }
 
     /**
@@ -501,6 +510,11 @@ public:
         return iterator{&packed, {}};
     }
 
+    /*! @brief end */
+    [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
+        return end();
+    }
+
     /**
      * @brief Returns a reverse iterator to the beginning.
      *
@@ -511,8 +525,13 @@ public:
      * @return An iterator to the first entity of the reversed internal packed
      * array.
      */
-    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reverse_iterator rbegin() const ENTT_NOEXCEPT {
         return std::make_reverse_iterator(end());
+    }
+
+    /*! @brief rbegin */
+    [[nodiscard]] const_reverse_iterator crbegin() const ENTT_NOEXCEPT {
+        return rbegin();
     }
 
     /**
@@ -527,6 +546,11 @@ public:
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
         return std::make_reverse_iterator(begin());
+    }
+
+    /*! @brief rend */
+    [[nodiscard]] const_reverse_iterator crend() const ENTT_NOEXCEPT {
+        return rend();
     }
 
     /**

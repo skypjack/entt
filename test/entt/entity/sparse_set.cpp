@@ -804,8 +804,8 @@ TEST(SparseSet, Iterator) {
     begin = set.end();
     std::swap(begin, end);
 
-    ASSERT_EQ(begin, set.begin());
-    ASSERT_EQ(end, set.end());
+    ASSERT_EQ(begin, set.cbegin());
+    ASSERT_EQ(end, set.cend());
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin++, set.begin());
@@ -859,8 +859,8 @@ TEST(SparseSet, ReverseIterator) {
     begin = set.rend();
     std::swap(begin, end);
 
-    ASSERT_EQ(begin, set.rbegin());
-    ASSERT_EQ(end, set.rend());
+    ASSERT_EQ(begin, set.crbegin());
+    ASSERT_EQ(end, set.crend());
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin++, set.rbegin());
