@@ -1,4 +1,5 @@
 #include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/iterator.hpp>
 
@@ -19,4 +20,20 @@ TEST(Iterator, InputIteratorPointer) {
 
     ASSERT_EQ(instance.value, 0);
     ASSERT_EQ(ptr->value, 42);
+}
+
+TEST(Iterator, IterableAdaptor) {
+    std::vector<int> vec{1, 2};
+    entt::iterable_adaptor iterable{vec.begin(), vec.end()};
+    decltype(iterable) other{};
+
+    ASSERT_NO_THROW(other = iterable);
+    ASSERT_NO_THROW(std::swap(other, iterable));
+
+    ASSERT_EQ(iterable.begin(), vec.begin());
+    ASSERT_EQ(iterable.end(), vec.end());
+
+    ASSERT_EQ(*iterable.cbegin(), 1);
+    ASSERT_EQ(*++iterable.cbegin(), 2);
+    ASSERT_EQ(++iterable.cbegin(), --iterable.end());
 }
