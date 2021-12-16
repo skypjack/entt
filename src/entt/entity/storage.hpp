@@ -169,7 +169,7 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    extended_storage_iterator() ENTT_NOEXCEPT = default;
+    extended_storage_iterator() = default;
 
     extended_storage_iterator(It base, Other... other) ENTT_NOEXCEPT
         : it{base, other...} {}
