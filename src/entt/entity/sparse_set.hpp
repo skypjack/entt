@@ -491,7 +491,7 @@ public:
         return iterator{&packed, pos};
     }
 
-    /*! @brief begin */
+    /*! @copydoc begin */
     [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
         return begin();
     }
@@ -510,7 +510,7 @@ public:
         return iterator{&packed, {}};
     }
 
-    /*! @brief end */
+    /*! @copydoc end */
     [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
         return end();
     }
@@ -529,7 +529,7 @@ public:
         return std::make_reverse_iterator(end());
     }
 
-    /*! @brief rbegin */
+    /*! @copydoc rbegin */
     [[nodiscard]] const_reverse_iterator crbegin() const ENTT_NOEXCEPT {
         return rbegin();
     }
@@ -548,7 +548,7 @@ public:
         return std::make_reverse_iterator(begin());
     }
 
-    /*! @brief rend */
+    /*! @copydoc rend */
     [[nodiscard]] const_reverse_iterator crend() const ENTT_NOEXCEPT {
         return rend();
     }
