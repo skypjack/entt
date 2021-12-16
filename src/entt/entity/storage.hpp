@@ -12,6 +12,7 @@
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
 #include "../core/compressed_pair.hpp"
+#include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
@@ -155,6 +156,63 @@ template<typename CLhs, typename CRhs>
     return !(lhs < rhs);
 }
 
+template<typename It, typename... Other>
+class extended_storage_iterator final {
+    template<typename Iter, typename... Args>
+    friend class extended_storage_iterator;
+
+public:
+    using iterator_type = It;
+    using difference_type = typename std::iterator_traits<It>::difference_type;
+    using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::forward_as_tuple(*std::declval<Other>()...)));
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using iterator_category = std::input_iterator_tag;
+
+    extended_storage_iterator() ENTT_NOEXCEPT = default;
+
+    extended_storage_iterator(It base, Other... other) ENTT_NOEXCEPT
+        : it{base, other...} {}
+
+    template<typename... Args, typename = std::enable_if_t<(!std::is_same_v<Other, Args> && ...) && (std::is_constructible_v<Other, Args> && ...)>>
+    extended_storage_iterator(const extended_storage_iterator<It, Args...> &other) ENTT_NOEXCEPT
+        : it{other.it} {}
+
+    extended_storage_iterator &operator++() ENTT_NOEXCEPT {
+        return ++std::get<It>(it), (++std::get<Other>(it), ...), *this;
+    }
+
+    extended_storage_iterator operator++(int) ENTT_NOEXCEPT {
+        extended_storage_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+        return operator*();
+    }
+
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+        return {*std::get<It>(it), *std::get<Other>(it)...};
+    }
+
+    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
+        return std::get<It>(it);
+    }
+
+private:
+    std::tuple<It, Other...> it;
+};
+
+template<typename... CLhs, typename... CRhs>
+[[nodiscard]] bool operator==(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() == rhs.base();
+}
+
+template<typename... CLhs, typename... CRhs>
+[[nodiscard]] bool operator!=(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
 } // namespace internal
 
 /**
@@ -165,15 +223,6 @@ template<typename CLhs, typename CRhs>
 /**
  * @brief Basic storage implementation.
  *
- * This class is a refinement of a sparse set that associates an object to an
- * entity. The main purpose of this class is to extend sparse sets to store
- * components in a registry. It guarantees fast access both to the elements and
- * to the entities.
- *
- * @note
- * Entities and objects have the same order.
- *
- * @note
  * Internal data structures arrange elements to maximize performance. There are
  * no guarantees that objects are returned in the insertion order when iterate
  * a storage. Do not make assumption on the order in any case.
@@ -181,8 +230,6 @@ template<typename CLhs, typename CRhs>
  * @warning
  * Empty types aren't explicitly instantiated. Therefore, many of the functions
  * normally available for non-empty types will not be available for empty ones.
- *
- * @sa sparse_set<Entity>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Type Type of objects assigned to the entities.
@@ -379,6 +426,10 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    /*! @brief Extended iterable storage proxy. */
+    using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator, iterator>>;
+    /*! @brief Constant extended iterable storage proxy. */
+    using const_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_iterator, const_iterator>>;
 
     /*! @brief Default constructor. */
     basic_storage()
@@ -705,6 +756,23 @@ public:
         consume_range(std::move(first), std::move(last), [&from]() -> decltype(auto) { return *(from++); });
     }
 
+    /**
+     * @brief Returns an iterable object to use to _visit_ the storage.
+     *
+     * The iterable object returns a tuple that contains the current entity and
+     * a reference to its component.
+     *
+     * @return An iterable object to use to _visit_ the storage.
+     */
+    [[nodiscard]] iterable each() ENTT_NOEXCEPT {
+        return {internal::extended_storage_iterator{base_type::begin(), begin()}, internal::extended_storage_iterator{base_type::end(), end()}};
+    }
+
+    /*! @copydoc each */
+    [[nodiscard]] const_iterable each() const ENTT_NOEXCEPT {
+        return {internal::extended_storage_iterator{base_type::cbegin(), cbegin()}, internal::extended_storage_iterator{base_type::cend(), cend()}};
+    }
+
 private:
     compressed_pair<container_type, alloc> packed;
 };
@@ -727,6 +795,10 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Extended iterable storage proxy. */
+    using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
+    /*! @brief Constant extended iterable storage proxy. */
+    using const_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_iterator>>;
 
     /*! @brief Default constructor. */
     basic_storage()
@@ -843,6 +915,22 @@ public:
         for(; first != last; ++first) {
             emplace(*first);
         }
+    }
+
+    /**
+     * @brief Returns an iterable object to use to _visit_ the storage.
+     *
+     * The iterable object returns a tuple that contains the current entity.
+     *
+     * @return An iterable object to use to _visit_ the storage.
+     */
+    [[nodiscard]] iterable each() ENTT_NOEXCEPT {
+        return {internal::extended_storage_iterator{base_type::begin()}, internal::extended_storage_iterator{base_type::end()}};
+    }
+
+    /*! @copydoc each */
+    [[nodiscard]] const_iterable each() const ENTT_NOEXCEPT {
+        return {internal::extended_storage_iterator{base_type::cbegin()}, internal::extended_storage_iterator{base_type::cend()}};
     }
 };
 

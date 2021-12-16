@@ -176,11 +176,11 @@ TEST(SingleComponentView, Each) {
     auto view = registry.view<int>();
     auto cview = std::as_const(registry).view<const int>();
 
-    auto iterable = view.each();
-    auto citerable = cview.each();
-
     registry.emplace<int>(entity[0u], 0);
     registry.emplace<int>(entity[1u], 1);
+
+    auto iterable = view.each();
+    auto citerable = cview.each();
 
     ASSERT_NE(citerable.begin(), citerable.end());
     ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
@@ -677,14 +677,14 @@ TEST(MultiComponentView, Each) {
     auto view = registry.view<int, char>();
     auto cview = std::as_const(registry).view<const int, const char>();
 
-    auto iterable = view.each();
-    auto citerable = cview.each();
-
     registry.emplace<int>(entity[0u], 0);
     registry.emplace<char>(entity[0u], 0);
 
     registry.emplace<int>(entity[1u], 1);
     registry.emplace<char>(entity[1u], 1);
+
+    auto iterable = view.each();
+    auto citerable = cview.each();
 
     ASSERT_NE(citerable.begin(), citerable.end());
     ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));

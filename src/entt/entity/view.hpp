@@ -26,133 +26,6 @@ namespace entt {
 
 namespace internal {
 
-template<typename Storage>
-class iterable_storage final {
-    using base_type = typename Storage::base_type;
-
-    template<typename... It>
-    struct iterable_storage_iterator final {
-        using difference_type = std::ptrdiff_t;
-        using value_type = decltype(std::tuple_cat(std::tuple<typename Storage::entity_type>{}, std::declval<decltype(std::declval<Storage>().get_as_tuple({}))>()));
-        using pointer = input_iterator_pointer<value_type>;
-        using reference = value_type;
-        using iterator_category = std::input_iterator_tag;
-
-        template<typename... Discard>
-        iterable_storage_iterator(It... from, Discard...) ENTT_NOEXCEPT
-            : it{from...} {}
-
-        iterable_storage_iterator &operator++() ENTT_NOEXCEPT {
-            return (++std::get<It>(it), ...), *this;
-        }
-
-        iterable_storage_iterator operator++(int) ENTT_NOEXCEPT {
-            iterable_storage_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return {*std::get<It>(it)...};
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            return operator*();
-        }
-
-        [[nodiscard]] bool operator==(const iterable_storage_iterator &other) const ENTT_NOEXCEPT {
-            return std::get<0>(other.it) == std::get<0>(it);
-        }
-
-        [[nodiscard]] bool operator!=(const iterable_storage_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-    private:
-        std::tuple<It...> it;
-    };
-
-public:
-    using iterator = std::conditional_t<
-        ignore_as_empty_v<typename Storage::value_type>,
-        iterable_storage_iterator<typename base_type::iterator>,
-        iterable_storage_iterator<typename base_type::iterator, decltype(std::declval<Storage>().begin())>>;
-
-    iterable_storage(Storage &ref)
-        : pool{&ref} {}
-
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{pool->base_type::begin(), pool->begin()};
-    }
-
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{pool->base_type::end(), pool->end()};
-    }
-
-private:
-    Storage *const pool;
-};
-
-template<typename View>
-class iterable_view final {
-    struct iterable_view_iterator final {
-        using difference_type = std::ptrdiff_t;
-        using value_type = decltype(std::tuple_cat(std::tuple<typename View::entity_type>{}, std::declval<View>().get({})));
-        using pointer = input_iterator_pointer<value_type>;
-        using reference = value_type;
-        using iterator_category = std::input_iterator_tag;
-
-        iterable_view_iterator(typename View::iterator from, const View *parent) ENTT_NOEXCEPT
-            : it{from},
-              view{parent} {}
-
-        iterable_view_iterator &operator++() ENTT_NOEXCEPT {
-            return ++it, *this;
-        }
-
-        iterable_view_iterator operator++(int) ENTT_NOEXCEPT {
-            iterable_view_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return std::tuple_cat(std::make_tuple(*it), view->get(*it));
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            return operator*();
-        }
-
-        [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
-            return other.it == it;
-        }
-
-        [[nodiscard]] bool operator!=(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-    private:
-        typename View::iterator it;
-        const View *view;
-    };
-
-public:
-    using iterator = iterable_view_iterator;
-
-    iterable_view(const View &parent)
-        : view{parent} {}
-
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return {view.begin(), &view};
-    }
-
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return {view.end(), &view};
-    }
-
-private:
-    const View view;
-};
-
 template<typename Type, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
     [[nodiscard]] bool valid() const {
@@ -195,14 +68,6 @@ public:
         return ++(*this), orig;
     }
 
-    [[nodiscard]] bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
-        return other.it == it;
-    }
-
-    [[nodiscard]] bool operator!=(const view_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
-
     [[nodiscard]] pointer operator->() const {
         return &*it;
     }
@@ -211,12 +76,75 @@ public:
         return *operator->();
     }
 
+    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
+        return it;
+    }
+
 private:
     iterator_type it;
     iterator_type last;
     std::array<const Type *, Component> pools;
     std::array<const Type *, Exclude> filter;
 };
+
+template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
+[[nodiscard]] bool operator==(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() == rhs.base();
+}
+
+template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
+[[nodiscard]] bool operator!=(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+template<typename It, typename... Storage>
+struct extended_view_iterator final {
+    using iterator_type = It;
+    using difference_type = std::ptrdiff_t;
+    using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Storage>().get_as_tuple({})...));
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using iterator_category = std::input_iterator_tag;
+
+    extended_view_iterator(It from, std::tuple<Storage *...> storage) ENTT_NOEXCEPT
+        : it{from},
+          pools{storage} {}
+
+    extended_view_iterator &operator++() ENTT_NOEXCEPT {
+        return ++it, *this;
+    }
+
+    extended_view_iterator operator++(int) ENTT_NOEXCEPT {
+        extended_view_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+        return std::apply([entt = *it](auto *...curr) { return std::tuple_cat(std::make_tuple(entt), curr->get_as_tuple(entt)...); }, pools);
+    }
+
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+        return operator*();
+    }
+
+    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
+        return it;
+    }
+
+private:
+    It it;
+    std::tuple<Storage *...> pools;
+};
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] bool operator==(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+    return lhs.base() == rhs.base();
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] bool operator!=(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 } // namespace internal
 
@@ -285,7 +213,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
 
     template<std::size_t Comp, typename Func, std::size_t... Index>
     void each(Func func, std::index_sequence<Index...>) const {
-        for(const auto curr: internal::iterable_storage{*std::get<Comp>(pools)}) {
+        for(const auto curr: std::get<Comp>(pools)->each()) {
             const auto entt = std::get<0>(curr);
 
             if(((sizeof...(Component) != 1u) || (entt != tombstone))
@@ -315,7 +243,7 @@ public:
     /*! @brief Bidirectional iterator type. */
     using iterator = internal::view_iterator<base_type, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
-    using iterable_view = internal::iterable_view<basic_view>;
+    using iterable = iterable_adaptor<internal::extended_view_iterator<iterator, storage_type<Component>...>>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
@@ -549,14 +477,14 @@ public:
     /**
      * @brief Returns an iterable object to use to _visit_ the view.
      *
-     * The iterable object returns tuples that contain the current entity and a
-     * set of references to its non-empty components. The _constness_ of the
+     * The iterable object returns a tuple that contains the current entity and
+     * a set of references to its non-empty components. The _constness_ of the
      * components is as requested.
      *
      * @return An iterable object to use to _visit_ the view.
      */
-    [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        return iterable_view{*this};
+    [[nodiscard]] iterable each() const ENTT_NOEXCEPT {
+        return {internal::extended_view_iterator{begin(), pools}, internal::extended_view_iterator{end(), pools}};
     }
 
     /**
@@ -623,7 +551,7 @@ public:
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable view type. */
-    using iterable_view = internal::iterable_storage<storage_type>;
+    using iterable = decltype(std::declval<storage_type>().each());
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
@@ -874,14 +802,14 @@ public:
     /**
      * @brief Returns an iterable object to use to _visit_ the view.
      *
-     * The iterable object returns tuples that contain the current entity and a
-     * reference to its component if it's a non-empty one. The _constness_ of
+     * The iterable object returns a tuple that contains the current entity and
+     * a reference to its component if it's a non-empty one. The _constness_ of
      * the component is as requested.
      *
      * @return An iterable object to use to _visit_ the view.
      */
-    [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        return iterable_view{*std::get<0>(pools)};
+    [[nodiscard]] iterable each() const ENTT_NOEXCEPT {
+        return std::get<0>(pools)->each();
     }
 
     /**

@@ -183,14 +183,14 @@ TEST(NonOwningGroup, Each) {
     auto group = registry.group(entt::get<int, char>);
     auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
 
-    auto iterable = group.each();
-    auto citerable = cgroup.each();
-
     registry.emplace<int>(entity[0u], 0);
     registry.emplace<char>(entity[0u], 0);
 
     registry.emplace<int>(entity[1u], 1);
     registry.emplace<char>(entity[1u], 1);
+
+    auto iterable = group.each();
+    auto citerable = cgroup.each();
 
     ASSERT_NE(citerable.begin(), citerable.end());
     ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
@@ -826,14 +826,14 @@ TEST(OwningGroup, Each) {
     auto group = registry.group<int>(entt::get<char>);
     auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
 
-    auto iterable = group.each();
-    auto citerable = cgroup.each();
-
     registry.emplace<int>(entity[0u], 0);
     registry.emplace<char>(entity[0u], 0);
 
     registry.emplace<int>(entity[1u], 1);
     registry.emplace<char>(entity[1u], 1);
+
+    auto iterable = group.each();
+    auto citerable = cgroup.each();
 
     ASSERT_NE(citerable.begin(), citerable.end());
     ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
