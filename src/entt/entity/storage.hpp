@@ -55,15 +55,15 @@ public:
 
     storage_iterator(Container *ref, difference_type idx) ENTT_NOEXCEPT
         : packed{ref},
-          index{idx} {}
+          offset{idx} {}
 
     template<bool Const = std::is_const_v<Container>, typename = std::enable_if_t<Const>>
     storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) ENTT_NOEXCEPT
         : packed{other.packed},
-          index{other.index} {}
+          offset{other.offset} {}
 
     storage_iterator &operator++() ENTT_NOEXCEPT {
-        return --index, *this;
+        return --offset, *this;
     }
 
     storage_iterator operator++(int) ENTT_NOEXCEPT {
@@ -72,7 +72,7 @@ public:
     }
 
     storage_iterator &operator--() ENTT_NOEXCEPT {
-        return ++index, *this;
+        return ++offset, *this;
     }
 
     storage_iterator operator--(int) ENTT_NOEXCEPT {
@@ -81,7 +81,7 @@ public:
     }
 
     storage_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
-        index -= value;
+        offset -= value;
         return *this;
     }
 
@@ -99,12 +99,12 @@ public:
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-        const auto pos = index - value - 1;
+        const auto pos = offset - value - 1;
         return (*packed)[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-        const auto pos = index - 1;
+        const auto pos = offset - 1;
         return (*packed)[pos / comp_traits::page_size] + fast_mod(pos, comp_traits::page_size);
     }
 
@@ -112,23 +112,23 @@ public:
         return *operator->();
     }
 
-    [[nodiscard]] difference_type base() const ENTT_NOEXCEPT {
-        return index;
+    [[nodiscard]] difference_type index() const ENTT_NOEXCEPT {
+        return offset;
     }
 
 private:
     Container *packed;
-    difference_type index;
+    difference_type offset;
 };
 
 template<typename CLhs, typename CRhs>
 [[nodiscard]] auto operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
-    return rhs.base() - lhs.base();
+    return rhs.index() - lhs.index();
 }
 
 template<typename CLhs, typename CRhs>
 [[nodiscard]] bool operator==(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
+    return lhs.index() == rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
@@ -138,12 +138,12 @@ template<typename CLhs, typename CRhs>
 
 template<typename CLhs, typename CRhs>
 [[nodiscard]] bool operator<(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() > rhs.base();
+    return lhs.index() > rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
 [[nodiscard]] bool operator>(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() < rhs.base();
+    return lhs.index() < rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
@@ -162,7 +162,6 @@ class extended_storage_iterator final {
     friend class extended_storage_iterator;
 
 public:
-    using iterator_type = It;
     using difference_type = typename std::iterator_traits<It>::difference_type;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::forward_as_tuple(*std::declval<Other>()...)));
     using pointer = input_iterator_pointer<value_type>;
@@ -195,9 +194,8 @@ public:
         return {*std::get<It>(it), *std::get<Other>(it)...};
     }
 
-    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
-        return std::get<It>(it);
-    }
+    template<typename... CLhs, typename... CRhs>
+    friend bool operator==(const extended_storage_iterator<CLhs...> &, const extended_storage_iterator<CRhs...> &) ENTT_NOEXCEPT;
 
 private:
     std::tuple<It, Other...> it;
@@ -205,7 +203,7 @@ private:
 
 template<typename... CLhs, typename... CRhs>
 [[nodiscard]] bool operator==(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
+    return std::get<0>(lhs.it) == std::get<0>(rhs.it);
 }
 
 template<typename... CLhs, typename... CRhs>
