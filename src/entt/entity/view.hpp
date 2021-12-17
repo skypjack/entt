@@ -555,7 +555,8 @@ public:
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() ENTT_NOEXCEPT
         : pools{},
-          filter{} {}
+          filter{},
+          view{} {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
@@ -563,14 +564,15 @@ public:
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
         : pools{&ref},
-          filter{} {}
+          filter{},
+          view{&ref} {}
 
     /**
      * @brief Returns the leading storage of a view.
      * @return The leading storage of the view.
      */
     const base_type &handle() const ENTT_NOEXCEPT {
-        return *std::get<0>(pools);
+        return *view;
     }
 
     /**
@@ -599,7 +601,7 @@ public:
      * @return Number of entities that have the given component.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->size();
+        return view->size();
     }
 
     /**
@@ -607,7 +609,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->empty();
+        return view->empty();
     }
 
     /**
@@ -619,7 +621,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->base_type::begin();
+        return view->begin();
     }
 
     /**
@@ -632,7 +634,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->base_type::end();
+        return view->end();
     }
 
     /**
@@ -644,7 +646,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->base_type::rbegin();
+        return view->rbegin();
     }
 
     /**
@@ -659,7 +661,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->base_type::rend();
+        return view->rend();
     }
 
     /**
@@ -687,7 +689,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        return contains(entt) ? std::get<0>(pools)->find(entt) : end();
+        return contains(entt) ? view->find(entt) : end();
     }
 
     /**
@@ -713,7 +715,7 @@ public:
      * @return True if the view is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return std::get<0>(pools) != nullptr;
+        return view != nullptr;
     }
 
     /**
@@ -722,7 +724,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return std::get<0>(pools)->contains(entt);
+        return view->contains(entt);
     }
 
     /**
@@ -781,7 +783,7 @@ public:
                     func();
                 }
             } else {
-                for(auto entity: *this) {
+                for(auto entity: *view) {
                     func(entity);
                 }
             }
@@ -830,6 +832,7 @@ public:
 private:
     std::tuple<storage_type *> pools;
     std::array<const base_type *, 0u> filter;
+    const base_type *view;
 };
 
 /**
