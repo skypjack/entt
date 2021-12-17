@@ -34,12 +34,12 @@ struct sparse_set_iterator final {
 
     sparse_set_iterator() ENTT_NOEXCEPT = default;
 
-    sparse_set_iterator(const Container *ref, const difference_type idx) ENTT_NOEXCEPT
-        : packed{ref},
-          index{idx} {}
+    sparse_set_iterator(const Container &ref, const difference_type idx) ENTT_NOEXCEPT
+        : packed{std::addressof(ref)},
+          offset{idx} {}
 
     sparse_set_iterator &operator++() ENTT_NOEXCEPT {
-        return --index, *this;
+        return --offset, *this;
     }
 
     sparse_set_iterator operator++(int) ENTT_NOEXCEPT {
@@ -48,7 +48,7 @@ struct sparse_set_iterator final {
     }
 
     sparse_set_iterator &operator--() ENTT_NOEXCEPT {
-        return ++index, *this;
+        return ++offset, *this;
     }
 
     sparse_set_iterator operator--(int) ENTT_NOEXCEPT {
@@ -57,7 +57,7 @@ struct sparse_set_iterator final {
     }
 
     sparse_set_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
-        index -= value;
+        offset -= value;
         return *this;
     }
 
@@ -75,12 +75,12 @@ struct sparse_set_iterator final {
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const {
-        const auto pos = index - value - 1;
+        const auto pos = offset - value - 1;
         return packed->data()[pos];
     }
 
     [[nodiscard]] pointer operator->() const {
-        const auto pos = index - 1;
+        const auto pos = offset - 1;
         return packed->data() + pos;
     }
 
@@ -88,38 +88,49 @@ struct sparse_set_iterator final {
         return *operator->();
     }
 
-    [[nodiscard]] difference_type operator-(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return other.index - index;
-    }
-
-    [[nodiscard]] bool operator==(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return index == other.index;
-    }
-
-    [[nodiscard]] bool operator!=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
-
-    [[nodiscard]] bool operator<(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return index > other.index;
-    }
-
-    [[nodiscard]] bool operator>(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return index < other.index;
-    }
-
-    [[nodiscard]] bool operator<=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this > other);
-    }
-
-    [[nodiscard]] bool operator>=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this < other);
+    [[nodiscard]] difference_type index() const ENTT_NOEXCEPT {
+        return offset;
     }
 
 private:
     const Container *packed;
-    difference_type index;
+    difference_type offset;
 };
+
+template<typename Type, typename Other>
+[[nodiscard]] auto operator-(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+    return rhs.index() - lhs.index();
+}
+
+template<typename Type, typename Other>
+[[nodiscard]] bool operator==(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+    return lhs.index() == rhs.index();
+}
+
+template<typename Type, typename Other>
+[[nodiscard]] bool operator!=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+template<typename Type, typename Other>
+[[nodiscard]] bool operator<(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+    return lhs.index() > rhs.index();
+}
+
+template<typename Type, typename Other>
+[[nodiscard]] bool operator>(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+    return lhs.index() < rhs.index();
+}
+
+template<typename Type, typename Other>
+[[nodiscard]] bool operator<=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+    return !(lhs > rhs);
+}
+
+template<typename Type, typename Other>
+[[nodiscard]] bool operator>=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+    return !(lhs < rhs);
+}
 
 } // namespace internal
 
@@ -488,7 +499,7 @@ public:
      */
     [[nodiscard]] const_iterator begin() const ENTT_NOEXCEPT {
         const auto pos = static_cast<typename iterator::difference_type>(packed.size());
-        return iterator{&packed, pos};
+        return iterator{packed, pos};
     }
 
     /*! @copydoc begin */
@@ -507,7 +518,7 @@ public:
      * set.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{&packed, {}};
+        return iterator{packed, {}};
     }
 
     /*! @copydoc end */
