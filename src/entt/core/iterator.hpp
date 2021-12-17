@@ -65,7 +65,7 @@ struct iterable_adaptor final {
     /*! @brief Iterator type. */
     using iterator = It;
     /*! @brief Const iterator type. */
-    using const_iterator = It;
+    using const_iterator = iterator;
 
     /*! @brief Default constructor. */
     iterable_adaptor() = default;
@@ -87,11 +87,6 @@ struct iterable_adaptor final {
         return first;
     }
 
-    /*! @copydoc begin */
-    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
-        return begin();
-    }
-
     /**
      * @brief Returns an iterator to the end.
      * @return An iterator to the element following the last element of the
@@ -99,6 +94,11 @@ struct iterable_adaptor final {
      */
     [[nodiscard]] const_iterator end() const ENTT_NOEXCEPT {
         return last;
+    }
+
+    /*! @copydoc begin */
+    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
+        return begin();
     }
 
     /*! @copydoc end */
