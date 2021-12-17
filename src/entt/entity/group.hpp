@@ -78,6 +78,8 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
 
+        extended_group_iterator() = default;
+
         extended_group_iterator(typename basic_common_type::iterator from, const std::tuple<storage_type<Get> *...> &args) ENTT_NOEXCEPT
             : it{from},
               pools{args} {}
@@ -534,6 +536,8 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
         using pointer = input_iterator_pointer<value_type>;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
+
+        extended_group_iterator() = default;
 
         template<typename... Other>
         extended_group_iterator(typename basic_common_type::iterator from, const std::tuple<Other...> &other, const std::tuple<storage_type<Get> *...> &cpools) ENTT_NOEXCEPT

@@ -106,6 +106,8 @@ struct extended_view_iterator final {
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
+    extended_view_iterator() = default;
+
     extended_view_iterator(It from, std::tuple<Storage *...> storage) ENTT_NOEXCEPT
         : it{from},
           pools{storage} {}

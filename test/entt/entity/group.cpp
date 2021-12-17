@@ -194,6 +194,7 @@ TEST(NonOwningGroup, Each) {
 
     ASSERT_NE(citerable.begin(), citerable.end());
     ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
+    ASSERT_EQ(decltype(iterable.end()){}, iterable.end());
 
     auto it = iterable.begin();
 
@@ -837,6 +838,7 @@ TEST(OwningGroup, Each) {
 
     ASSERT_NE(citerable.begin(), citerable.end());
     ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
+    ASSERT_EQ(decltype(iterable.end()){}, iterable.end());
 
     auto it = iterable.begin();
 
