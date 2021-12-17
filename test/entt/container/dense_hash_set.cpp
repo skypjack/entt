@@ -674,11 +674,8 @@ TEST(DenseHashSet, LocalIterator) {
     ASSERT_EQ(*begin.operator->(), 3u + minimum_bucket_count);
     ASSERT_EQ(*begin, 3u + minimum_bucket_count);
 
-    ASSERT_EQ(begin.base(), set.begin().base() + 1u);
     ASSERT_EQ(begin++, set.begin(3u));
-    ASSERT_EQ(begin.base(), set.begin().base());
     ASSERT_EQ(++begin, set.end(3u));
-    ASSERT_NE(begin.base(), set.end().base());
 }
 
 TEST(DenseHashSet, ConstLocalIterator) {
@@ -705,11 +702,8 @@ TEST(DenseHashSet, ConstLocalIterator) {
     ASSERT_EQ(*cbegin.operator->(), 3u + minimum_bucket_count);
     ASSERT_EQ(*cbegin, 3u + minimum_bucket_count);
 
-    ASSERT_EQ(cbegin.base(), set.cbegin().base() + 1u);
     ASSERT_EQ(cbegin++, set.begin(3u));
-    ASSERT_EQ(cbegin.base(), set.cbegin().base());
     ASSERT_EQ(++cbegin, set.end(3u));
-    ASSERT_NE(cbegin.base(), set.cend().base());
 }
 
 TEST(DenseHashSet, LocalIteratorConversion) {

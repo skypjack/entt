@@ -109,9 +109,14 @@ public:
         return *operator->();
     }
 
-    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
-        return it;
-    }
+    template<typename ILhs, typename IRhs>
+    friend auto operator-(const dense_hash_set_iterator<ILhs> &, const dense_hash_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+
+    template<typename ILhs, typename IRhs>
+    friend bool operator==(const dense_hash_set_iterator<ILhs> &, const dense_hash_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+
+    template<typename ILhs, typename IRhs>
+    friend bool operator<(const dense_hash_set_iterator<ILhs> &, const dense_hash_set_iterator<IRhs> &) ENTT_NOEXCEPT;
 
 private:
     iterator_type it;
@@ -119,12 +124,12 @@ private:
 
 template<typename ILhs, typename IRhs>
 [[nodiscard]] auto operator-(const dense_hash_set_iterator<ILhs> &lhs, const dense_hash_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() - rhs.base();
+    return lhs.it - rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator==(const dense_hash_set_iterator<ILhs> &lhs, const dense_hash_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
+    return lhs.it == rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
@@ -134,12 +139,12 @@ template<typename ILhs, typename IRhs>
 
 template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator<(const dense_hash_set_iterator<ILhs> &lhs, const dense_hash_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() < rhs.base();
+    return lhs.it < rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator>(const dense_hash_set_iterator<ILhs> &lhs, const dense_hash_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() > rhs.base();
+    return rhs < lhs;
 }
 
 template<typename ILhs, typename IRhs>
@@ -170,15 +175,15 @@ public:
 
     dense_hash_set_local_iterator(iterator_type iter, const std::size_t pos) ENTT_NOEXCEPT
         : it{iter},
-          curr{pos} {}
+          offset{pos} {}
 
     template<bool Const = std::is_const_v<std::remove_pointer_t<iterator_type>>, typename = std::enable_if_t<Const>>
     dense_hash_set_local_iterator(const dense_hash_set_local_iterator<std::remove_const_t<std::remove_pointer_t<iterator_type>> *> &other)
         : it{other.it},
-          curr{other.curr} {}
+          offset{other.offset} {}
 
     dense_hash_set_local_iterator &operator++() ENTT_NOEXCEPT {
-        return curr = it[curr].next, *this;
+        return offset = it[offset].next, *this;
     }
 
     dense_hash_set_local_iterator operator++(int) ENTT_NOEXCEPT {
@@ -187,28 +192,25 @@ public:
     }
 
     [[nodiscard]] pointer operator->() const {
-        return std::addressof(it[curr].element);
+        return std::addressof(it[offset].element);
     }
 
     [[nodiscard]] reference operator*() const {
         return *operator->();
     }
 
-    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
-        return (it + curr);
+    [[nodiscard]] std::size_t index() const ENTT_NOEXCEPT {
+        return offset;
     }
-
-    template<typename ILhs, typename IRhs>
-    friend bool operator==(const dense_hash_set_local_iterator<ILhs> &, const dense_hash_set_local_iterator<IRhs> &) ENTT_NOEXCEPT;
 
 private:
     iterator_type it;
-    std::size_t curr;
+    std::size_t offset;
 };
 
 template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator==(const dense_hash_set_local_iterator<ILhs> &lhs, const dense_hash_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
-    return lhs.curr == rhs.curr;
+    return lhs.index() == rhs.index();
 }
 
 template<typename ILhs, typename IRhs>
@@ -256,7 +258,7 @@ class dense_hash_set final {
     [[nodiscard]] auto constrained_find(const Other &value, std::size_t bucket) {
         for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
             if(packed.second()(*it, value)) {
-                return iterator{it.base()};
+                return begin() + it.index();
             }
         }
 
@@ -265,9 +267,9 @@ class dense_hash_set final {
 
     template<typename Other>
     [[nodiscard]] auto constrained_find(const Other &value, std::size_t bucket) const {
-        for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
+        for(auto it = cbegin(bucket), last = cend(bucket); it != last; ++it) {
             if(packed.second()(*it, value)) {
-                return const_iterator{it.base()};
+                return cbegin() + it.index();
             }
         }
 
