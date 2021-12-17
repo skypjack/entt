@@ -474,7 +474,7 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to use to _visit_ the view.
+     * @brief Returns an iterable object to use to _visit_ a view.
      *
      * The iterable object returns a tuple that contains the current entity and
      * a set of references to its non-empty components. The _constness_ of the
@@ -801,7 +801,7 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to use to _visit_ the view.
+     * @brief Returns an iterable object to use to _visit_ a view.
      *
      * The iterable object returns a tuple that contains the current entity and
      * a reference to its component if it's a non-empty one. The _constness_ of

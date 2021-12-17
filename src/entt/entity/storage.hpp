@@ -755,7 +755,7 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to use to _visit_ the storage.
+     * @brief Returns an iterable object to use to _visit_ a storage.
      *
      * The iterable object returns a tuple that contains the current entity and
      * a reference to its component.
@@ -916,7 +916,7 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to use to _visit_ the storage.
+     * @brief Returns an iterable object to use to _visit_ a storage.
      *
      * The iterable object returns a tuple that contains the current entity.
      *

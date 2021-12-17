@@ -369,7 +369,7 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to use to _visit_ the group.
+     * @brief Returns an iterable object to use to _visit_ a group.
      *
      * The iterable object returns tuples that contain the current entity and a
      * set of references to its non-empty components. The _constness_ of the
@@ -809,7 +809,7 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to use to _visit_ the group.
+     * @brief Returns an iterable object to use to _visit_ a group.
      *
      * The iterable object returns tuples that contain the current entity and a
      * set of references to its non-empty components. The _constness_ of the
