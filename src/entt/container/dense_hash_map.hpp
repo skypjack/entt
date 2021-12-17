@@ -45,7 +45,6 @@ class dense_hash_map_iterator {
     using iterator_traits = std::iterator_traits<decltype(std::addressof(std::declval<It>()->element))>;
 
 public:
-    using iterator_type = It;
     using value_type = typename iterator_traits::value_type;
     using pointer = typename iterator_traits::pointer;
     using reference = typename iterator_traits::reference;
@@ -54,11 +53,11 @@ public:
 
     dense_hash_map_iterator() ENTT_NOEXCEPT = default;
 
-    dense_hash_map_iterator(const iterator_type iter) ENTT_NOEXCEPT
+    dense_hash_map_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}
 
-    template<bool Const = std::is_const_v<std::remove_pointer_t<iterator_type>>, typename = std::enable_if_t<Const>>
-    dense_hash_map_iterator(const dense_hash_map_iterator<std::remove_const_t<std::remove_pointer_t<iterator_type>> *> &other)
+    template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
+    dense_hash_map_iterator(const dense_hash_map_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other)
         : it{other.it} {}
 
     dense_hash_map_iterator &operator++() ENTT_NOEXCEPT {
@@ -119,7 +118,7 @@ public:
     friend bool operator<(const dense_hash_map_iterator<ILhs> &, const dense_hash_map_iterator<IRhs> &) ENTT_NOEXCEPT;
 
 private:
-    iterator_type it;
+    It it;
 };
 
 template<typename ILhs, typename IRhs>
@@ -164,7 +163,6 @@ class dense_hash_map_local_iterator {
     using iterator_traits = std::iterator_traits<decltype(std::addressof(std::declval<It>()->element))>;
 
 public:
-    using iterator_type = It;
     using value_type = typename iterator_traits::value_type;
     using pointer = typename iterator_traits::pointer;
     using reference = typename iterator_traits::reference;
@@ -173,12 +171,12 @@ public:
 
     dense_hash_map_local_iterator() ENTT_NOEXCEPT = default;
 
-    dense_hash_map_local_iterator(iterator_type iter, const std::size_t pos) ENTT_NOEXCEPT
+    dense_hash_map_local_iterator(It iter, const std::size_t pos) ENTT_NOEXCEPT
         : it{iter},
           offset{pos} {}
 
-    template<bool Const = std::is_const_v<std::remove_pointer_t<iterator_type>>, typename = std::enable_if_t<Const>>
-    dense_hash_map_local_iterator(const dense_hash_map_local_iterator<std::remove_const_t<std::remove_pointer_t<iterator_type>> *> &other)
+    template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
+    dense_hash_map_local_iterator(const dense_hash_map_local_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other)
         : it{other.it},
           offset{other.offset} {}
 
@@ -204,7 +202,7 @@ public:
     }
 
 private:
-    iterator_type it;
+    It it;
     std::size_t offset;
 };
 
