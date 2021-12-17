@@ -169,7 +169,10 @@ TEST(BasicHandle, Component) {
     ASSERT_TRUE(registry.storage<double>().empty());
     ASSERT_EQ(0u, (handle.remove<char, double>()));
 
-    handle.visit([](const auto &pool) { ASSERT_EQ(entt::type_id<int>(), pool.type()); });
+    handle.visit([&handle](const auto id, const auto &pool) {
+        ASSERT_EQ(id, entt::type_id<int>().hash());
+        ASSERT_TRUE(pool.contains(handle.entity()));
+    });
 
     ASSERT_TRUE((handle.any_of<int, char, double>()));
     ASSERT_FALSE((handle.all_of<int, char, double>()));

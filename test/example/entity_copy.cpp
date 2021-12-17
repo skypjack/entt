@@ -22,17 +22,17 @@ TEST(Example, EntityCopy) {
     ASSERT_FALSE((registry.any_of<int, char, double>(dst)));
     ASSERT_FALSE(custom.contains(dst));
 
-    registry.visit([src, dst](auto &&storage) {
-        // discard chars because why not, this is just an example after all
-        if(storage.type() != entt::type_id<char>() && storage.contains(src)) {
+    for(auto [id, storage]: registry.storage()) {
+        // discard the custom storage because why not, this is just an example after all
+        if(id != "custom"_hs && storage.contains(src)) {
             storage.emplace(dst, storage.get(src));
         }
-    });
+    }
 
-    ASSERT_TRUE((registry.all_of<int>(dst)));
-    ASSERT_FALSE((registry.any_of<char, double>(dst)));
-    ASSERT_TRUE(custom.contains(dst));
+    ASSERT_TRUE((registry.all_of<int, char>(dst)));
+    ASSERT_FALSE((registry.all_of<double>(dst)));
+    ASSERT_FALSE(custom.contains(dst));
 
     ASSERT_EQ(registry.get<int>(dst), 42);
-    ASSERT_EQ(custom.get(dst), 1.);
+    ASSERT_EQ(registry.get<char>(dst), 'c');
 }

@@ -14,6 +14,7 @@
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
 #include "../core/fwd.hpp"
+#include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
@@ -28,6 +29,141 @@
 #include "view.hpp"
 
 namespace entt {
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+template<typename It>
+class storage_proxy_iterator {
+    template<typename Other>
+    friend class storage_proxy_iterator;
+
+    using iterator_traits = std::iterator_traits<It>;
+    using first_type = typename iterator_traits::value_type::first_type;
+    using second_type = typename iterator_traits::value_type::second_type::element_type;
+
+public:
+    using value_type = std::pair<first_type, constness_as_t<second_type, std::remove_reference_t<typename iterator_traits::reference>> &>;
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using difference_type = typename iterator_traits::difference_type;
+    using iterator_category = std::input_iterator_tag;
+
+    storage_proxy_iterator() ENTT_NOEXCEPT = default;
+
+    storage_proxy_iterator(const It iter) ENTT_NOEXCEPT
+        : it{iter} {}
+
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    storage_proxy_iterator(const storage_proxy_iterator<Other> &other)
+        : it{other.it} {}
+
+    storage_proxy_iterator &operator++() ENTT_NOEXCEPT {
+        return ++it, *this;
+    }
+
+    storage_proxy_iterator operator++(int) ENTT_NOEXCEPT {
+        storage_proxy_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    storage_proxy_iterator &operator--() ENTT_NOEXCEPT {
+        return --it, *this;
+    }
+
+    storage_proxy_iterator operator--(int) ENTT_NOEXCEPT {
+        storage_proxy_iterator orig = *this;
+        return operator--(), orig;
+    }
+
+    storage_proxy_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+        it += value;
+        return *this;
+    }
+
+    storage_proxy_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+        storage_proxy_iterator copy = *this;
+        return (copy += value);
+    }
+
+    storage_proxy_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+        return (*this += -value);
+    }
+
+    storage_proxy_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+        return (*this + -value);
+    }
+
+    [[nodiscard]] reference operator[](const difference_type value) const {
+        return {it[value].first, *it[value].second};
+    }
+
+    [[nodiscard]] reference operator*() const {
+        return {it->first, *it->second};
+    }
+
+    [[nodiscard]] pointer operator->() const {
+        return operator*();
+    }
+
+    template<typename ILhs, typename IRhs>
+    friend auto operator-(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+
+    template<typename ILhs, typename IRhs>
+    friend bool operator==(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+
+    template<typename ILhs, typename IRhs>
+    friend bool operator<(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+
+private:
+    It it;
+};
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] auto operator-(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.it - rhs.it;
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator==(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.it == rhs.it;
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator!=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator<(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.it < rhs.it;
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator>(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return rhs < lhs;
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator<=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs > rhs);
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator>=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs < rhs);
+}
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief Fast and reliable entity-component system.
@@ -179,6 +315,23 @@ public:
         }
 
         return *this;
+    }
+
+    /**
+     * @brief Returns an iterable object to use to _visit_ a registry.
+     *
+     * The iterable object returns a pair that contains the name and a reference
+     * to the current storage.
+     *
+     * @return An iterable object to use to _visit_ the registry.
+     */
+    [[nodiscard]] auto storage() ENTT_NOEXCEPT {
+        return iterable_adaptor{internal::storage_proxy_iterator{pools.begin()}, internal::storage_proxy_iterator{pools.end()}};
+    }
+
+    /*! @copydoc storage */
+    [[nodiscard]] auto storage() const ENTT_NOEXCEPT {
+        return iterable_adaptor{internal::storage_proxy_iterator{pools.cbegin()}, internal::storage_proxy_iterator{pools.cend()}};
     }
 
     /**
@@ -583,7 +736,7 @@ public:
     /**
      * @brief Patches the given component for an entity.
      *
-     * The signature of the functions should be equivalent to the following:
+     * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
      * void(Component &);
@@ -1264,27 +1417,6 @@ public:
     void sort() {
         ENTT_ASSERT(sortable<To>(), "Cannot sort owned storage");
         assure<To>().respect(assure<From>());
-    }
-
-    /**
-     * @brief Visits a registry and returns the pools for its components.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const basic_sparse_set<entity_type> &);
-     * @endcode
-     *
-     * Returned pools are those of the components managed by the registry.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void visit(Func func) const {
-        for(auto &&curr: pools) {
-            func(*curr.second);
-        }
     }
 
     /**

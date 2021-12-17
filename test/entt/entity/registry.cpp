@@ -1854,26 +1854,6 @@ TEST(Registry, AssignEntities) {
     ASSERT_EQ(traits_type::to_entity(other.create()), traits_type::to_integral(entities[1]));
 }
 
-TEST(Registry, Visit) {
-    entt::registry registry;
-    const auto entity = registry.create();
-    const auto other = registry.create();
-
-    registry.emplace<int>(entity);
-    registry.emplace<double>(other);
-    registry.emplace<char>(entity);
-
-    bool hasType[3]{};
-
-    registry.visit([&hasType](const auto &pool) {
-        hasType[0] = hasType[0] || (pool.type() == entt::type_id<int>());
-        hasType[1] = hasType[1] || (pool.type() == entt::type_id<double>());
-        hasType[2] = hasType[2] || (pool.type() == entt::type_id<char>());
-    });
-
-    ASSERT_TRUE(hasType[0] && hasType[1] && hasType[2]);
-}
-
 TEST(Registry, ScramblingPoolsIsAllowed) {
     entt::registry registry;
     registry.on_destroy<int>().connect<&listener::sort<int>>();
@@ -1925,4 +1905,86 @@ TEST(Registry, RuntimePools) {
 
     ASSERT_FALSE(storage.contains(entity));
     ASSERT_FALSE(registry.any_of<empty_type>(entity));
+}
+
+TEST(Registry, StorageProxy) {
+    using namespace entt::literals;
+
+    entt::registry registry;
+    const auto entity = registry.create();
+    auto &storage = registry.storage<int>("int"_hs);
+    storage.emplace(entity);
+
+    for(auto [id, pool]: registry.storage()) {
+        static_assert(std::is_same_v<decltype(pool), entt::sparse_set &>);
+        static_assert(std::is_same_v<decltype(id), const entt::id_type>);
+
+        ASSERT_TRUE(pool.contains(entity));
+        ASSERT_EQ(std::addressof(storage), std::addressof(pool));
+        ASSERT_EQ(id, "int"_hs);
+    }
+
+    for(auto &&curr: std::as_const(registry).storage()) {
+        static_assert(std::is_same_v<decltype(curr.second), const entt::sparse_set &>);
+        static_assert(std::is_same_v<decltype(curr.first), const entt::id_type>);
+
+        ASSERT_TRUE(curr.second.contains(entity));
+        ASSERT_EQ(std::addressof(storage), std::addressof(curr.second));
+        ASSERT_EQ(curr.first, "int"_hs);
+    }
+}
+
+TEST(Registry, StorageProxyIterator) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    registry.emplace<int>(entity);
+
+    auto test = [entity](auto iterable) {
+        auto end{iterable.begin()};
+        decltype(end) begin{};
+        begin = iterable.end();
+        std::swap(begin, end);
+
+        ASSERT_EQ(begin, iterable.cbegin());
+        ASSERT_EQ(end, iterable.cend());
+        ASSERT_NE(begin, end);
+
+        ASSERT_EQ(begin++, iterable.begin());
+        ASSERT_EQ(begin--, iterable.end());
+
+        ASSERT_EQ(begin + 1, iterable.end());
+        ASSERT_EQ(end - 1, iterable.begin());
+
+        ASSERT_EQ(++begin, iterable.end());
+        ASSERT_EQ(--begin, iterable.begin());
+
+        ASSERT_EQ(begin += 1, iterable.end());
+        ASSERT_EQ(begin -= 1, iterable.begin());
+
+        ASSERT_EQ(begin + (end - begin), iterable.end());
+        ASSERT_EQ(begin - (begin - end), iterable.end());
+
+        ASSERT_EQ(end - (end - begin), iterable.begin());
+        ASSERT_EQ(end + (begin - end), iterable.begin());
+
+        ASSERT_EQ(begin[0u].first, iterable.begin()->first);
+        ASSERT_EQ(std::addressof(begin[0u].second), std::addressof((*iterable.begin()).second));
+
+        ASSERT_LT(begin, end);
+        ASSERT_LE(begin, iterable.begin());
+
+        ASSERT_GT(end, begin);
+        ASSERT_GE(end, iterable.end());
+
+        ASSERT_EQ(begin[0u].first, entt::type_id<int>().hash());
+        ASSERT_TRUE(begin[0u].second.contains(entity));
+    };
+
+    test(registry.storage());
+    test(std::as_const(registry).storage());
+
+    decltype(std::as_const(registry).storage().begin()) cit = registry.storage().begin();
+
+    ASSERT_EQ(cit, registry.storage().begin());
+    ASSERT_NE(cit, std::as_const(registry).storage().end());
 }

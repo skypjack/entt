@@ -1208,11 +1208,11 @@ them by copy if needed:
 
 ```cpp
 // create a copy of an entity component by component
-registry.visit([entity, other](auto &&storage) {
-    if(storage.contains(entity)) {
+for(auto &&curr: registry.storage()) {
+    if(auto &storage = curr.second; storage.contains(entity)) {
         storage.emplace(other, storage.get(entity));
     }
-});
+}
 ```
 
 This is particularly useful to clone entities in an opaque way. In addition, the
