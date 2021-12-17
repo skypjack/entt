@@ -76,9 +76,8 @@ public:
         return *operator->();
     }
 
-    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
-        return it;
-    }
+    template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
+    friend bool operator==(const view_iterator<LhsType, LhsArgs...> &, const view_iterator<RhsType, RhsArgs...> &) ENTT_NOEXCEPT;
 
 private:
     iterator_type it;
@@ -89,7 +88,7 @@ private:
 
 template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 [[nodiscard]] bool operator==(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
+    return lhs.it == rhs.it;
 }
 
 template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
@@ -99,7 +98,6 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 
 template<typename It, typename... Storage>
 struct extended_view_iterator final {
-    using iterator_type = It;
     using difference_type = std::ptrdiff_t;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Storage>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
@@ -129,9 +127,8 @@ struct extended_view_iterator final {
         return operator*();
     }
 
-    [[nodiscard]] iterator_type base() const ENTT_NOEXCEPT {
-        return it;
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend bool operator==(const extended_view_iterator<Lhs...> &, const extended_view_iterator<Rhs...> &) ENTT_NOEXCEPT;
 
 private:
     It it;
@@ -140,7 +137,7 @@ private:
 
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] bool operator==(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
-    return lhs.base() == rhs.base();
+    return lhs.it == rhs.it;
 }
 
 template<typename... Lhs, typename... Rhs>
