@@ -49,6 +49,7 @@ Many thanks to [these people](https://skypjack.github.io/sponsorship/) and
 * [Integration](#integration)
   * [Requirements](#requirements)
   * [CMake](#cmake)
+  * [Natvis support](#natvis-support)
   * [Packaging Tools](#packaging-tools)
   * [pkg-config](#pkg-config)
 * [Documentation](#documentation)
