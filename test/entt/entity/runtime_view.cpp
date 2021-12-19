@@ -274,3 +274,40 @@ TEST(RuntimeView, StableType) {
 
     ASSERT_EQ(view.size_hint(), 1u);
 }
+
+TEST(RuntimeView, StableTypeWithExcludedComponent) {
+    entt::registry registry;
+
+    const auto entity = registry.create();
+    const auto other = registry.create();
+
+    registry.emplace<stable_type>(entity, 0);
+    registry.emplace<stable_type>(other, 42);
+    registry.emplace<int>(entity);
+
+    entt::id_type components[] = {entt::type_hash<stable_type>::value()};
+    entt::id_type filter[] = {entt::type_hash<int>::value()};
+    auto view = registry.runtime_view(std::begin(components), std::end(components), std::begin(filter), std::end(filter));
+
+    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
+
+    registry.destroy(entity);
+
+    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
+
+    for(auto entt: view) {
+        constexpr entt::entity tombstone = entt::tombstone;
+        ASSERT_NE(entt, tombstone);
+        ASSERT_EQ(entt, other);
+    }
+
+    view.each([other](const auto entt) {
+        constexpr entt::entity tombstone = entt::tombstone;
+        ASSERT_NE(entt, tombstone);
+        ASSERT_EQ(entt, other);
+    });
+}

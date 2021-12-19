@@ -23,8 +23,7 @@ namespace internal {
 template<typename Type>
 class runtime_view_iterator final {
     [[nodiscard]] bool valid() const {
-        return (no_tombstone_check || (*it != tombstone))
-               && std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) { return curr->contains(entt); })
+        return std::all_of(pools->begin(), pools->end(), [entt = *it](const auto *curr) { return curr->contains(entt); })
                && std::none_of(filter->cbegin(), filter->cend(), [entt = *it](const auto *curr) { return curr && curr->contains(entt); });
     }
 
@@ -41,8 +40,7 @@ public:
     runtime_view_iterator(const std::vector<const Type *> &cpools, const std::vector<const Type *> &ignore, iterator_type curr) ENTT_NOEXCEPT
         : pools{&cpools},
           filter{&ignore},
-          it{curr},
-          no_tombstone_check{std::all_of(pools->cbegin(), pools->cend(), [](const Type *cpool) { return (cpool->policy() == deletion_policy::swap_and_pop); })} {
+          it{curr} {
         if(it != (*pools)[0]->end() && !valid()) {
             ++(*this);
         }
@@ -88,7 +86,6 @@ private:
     const std::vector<const Type *> *pools;
     const std::vector<const Type *> *filter;
     iterator_type it;
-    bool no_tombstone_check;
 };
 
 } // namespace internal
