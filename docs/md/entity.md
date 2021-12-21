@@ -1209,8 +1209,8 @@ them by copy if needed:
 ```cpp
 // create a copy of an entity component by component
 for(auto &&curr: registry.storage()) {
-    if(auto &storage = curr.second; storage.contains(entity)) {
-        storage.emplace(other, storage.get(entity));
+    if(auto &storage = curr.second; storage.contains(src)) {
+        storage.emplace(dst, storage.get(src));
     }
 }
 ```
