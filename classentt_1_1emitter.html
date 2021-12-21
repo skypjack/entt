@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -112,10 +112,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ab270d2c6d986621a781467e29e64629c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1emitter.html">emitter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1emitter.html#ab270d2c6d986621a781467e29e64629c">operator=</a> (<a class="el" href="classentt_1_1emitter.html">emitter</a> &amp;&amp;)=default</td></tr>
 <tr class="memdesc:ab270d2c6d986621a781467e29e64629c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move assignment operator.  <a href="classentt_1_1emitter.html#ab270d2c6d986621a781467e29e64629c">More...</a><br /></td></tr>
 <tr class="separator:ab270d2c6d986621a781467e29e64629c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ece275ff8736bcdcfb4103087801ea2"><td class="memTemplParams" colspan="2">template&lt;typename Event , typename... Args&gt; </td></tr>
-<tr class="memitem:a4ece275ff8736bcdcfb4103087801ea2"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1emitter.html#a4ece275ff8736bcdcfb4103087801ea2">publish</a> (Args &amp;&amp;... args)</td></tr>
-<tr class="memdesc:a4ece275ff8736bcdcfb4103087801ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits the given event.  <a href="classentt_1_1emitter.html#a4ece275ff8736bcdcfb4103087801ea2">More...</a><br /></td></tr>
-<tr class="separator:a4ece275ff8736bcdcfb4103087801ea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2877515662e6fce3558688b4fd598aa"><td class="memTemplParams" colspan="2">template&lt;typename Event , typename... Args&gt; </td></tr>
+<tr class="memitem:ad2877515662e6fce3558688b4fd598aa"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1emitter.html#ad2877515662e6fce3558688b4fd598aa">publish</a> (Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:ad2877515662e6fce3558688b4fd598aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emits the given event.  <a href="classentt_1_1emitter.html#ad2877515662e6fce3558688b4fd598aa">More...</a><br /></td></tr>
+<tr class="separator:ad2877515662e6fce3558688b4fd598aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b580005200bb810a4a3e94320efcd8a"><td class="memTemplParams" colspan="2">template&lt;typename Event &gt; </td></tr>
 <tr class="memitem:a0b580005200bb810a4a3e94320efcd8a"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1emitter_1_1connection.html">connection</a>&lt; Event &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">on</a> (<a class="el" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>&lt; Event &gt; instance)</td></tr>
 <tr class="memdesc:a0b580005200bb810a4a3e94320efcd8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a long-lived listener with the event emitter.  <a href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">More...</a><br /></td></tr>
@@ -162,7 +162,7 @@ class entt::emitter&lt; Derived &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00043">43</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00041">41</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a4e4324c59afee760ca13772eb6d2d522"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4e4324c59afee760ca13772eb6d2d522">&#9670;&nbsp;</a></span>clear() <span class="overload">[1/2]</span></h2>
@@ -200,7 +200,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00280">280</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00273">273</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +232,7 @@ template&lt;typename Derived &gt; </div>
 <p>Disconnects all the listeners. </p>
 <p>All the connections previously returned are invalidated. Using them results in undefined behavior. </p>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00290">290</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00283">283</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -272,7 +272,7 @@ template&lt;typename Event &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there are no listeners registered, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00304">304</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00295">295</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -304,7 +304,7 @@ template&lt;typename Derived &gt; </div>
 <p>Checks if there are listeners registered with the event emitter. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if there are no listeners registered, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00313">313</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00304">304</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -351,7 +351,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00267">267</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00260">260</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -402,7 +402,7 @@ template&lt;typename Event &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Connection object that can be used to disconnect the listener. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00228">228</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00221">221</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -453,7 +453,7 @@ template&lt;typename Event &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Connection object that can be used to disconnect the listener. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00253">253</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00246">246</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -488,8 +488,8 @@ template&lt;typename Derived &gt; </div>
 
 </div>
 </div>
-<a id="a4ece275ff8736bcdcfb4103087801ea2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ece275ff8736bcdcfb4103087801ea2">&#9670;&nbsp;</a></span>publish()</h2>
+<a id="ad2877515662e6fce3558688b4fd598aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2877515662e6fce3558688b4fd598aa">&#9670;&nbsp;</a></span>publish()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -532,7 +532,7 @@ template&lt;typename Event , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00202">202</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00195">195</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>

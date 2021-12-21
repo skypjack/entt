@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -65,18 +65,12 @@ $(function() {
 &#160;
 
 <h3><a id="index_p"></a>- p -</h3><ul>
-<li>parent()
-: <a class="el" href="structentt_1_1meta__ctor.html#a41b252412ecd919c92cbd79b7abfe635">entt::meta_ctor</a>
-, <a class="el" href="structentt_1_1meta__data.html#afe0bf3fb4f0f15f62e81be0de35891e6">entt::meta_data</a>
-, <a class="el" href="structentt_1_1meta__func.html#aeb0547d031db79d3caa9181bd0000610">entt::meta_func</a>
-</li>
 <li>patch()
-: <a class="el" href="structentt_1_1basic__handle.html#ae94e4e43e9de226c4f44e169ee86bc1f">entt::basic_handle&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1basic__registry.html#a4e83139f8d6774092bb4e0d14446f875">entt::basic_registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage__impl.html#aabc691c7310d4a3f7a8c5b4780f326d5">entt::basic_storage_impl&lt; Entity, Type, Allocator, typename &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage__impl_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_7fdeb5322c9adc1b6d9330e5790be0ac.html#a6284708574bd0ac773d59a71a6a190bc">entt::basic_storage_impl&lt; Entity, Type, Allocator, std::enable_if_t&lt; component_traits&lt; Type &gt;::ignore_if_empty::value &amp;&amp;std::is_empty_v&lt; Type &gt; &gt; &gt;</a>
-, <a class="el" href="classentt_1_1sigh__storage__mixin.html#a0e5aeb25024e190fe7887003e74dc95f">entt::sigh_storage_mixin&lt; Type &gt;</a>
-, <a class="el" href="structentt_1_1storage__adapter__mixin.html#a21c4e0ebe733ed5ef30ba11e5b4b5431">entt::storage_adapter_mixin&lt; Type &gt;</a>
+: <a class="el" href="structentt_1_1basic__handle.html#a78728a75868fc9a74fc033f3249ba642">entt::basic_handle&lt; Entity, Type &gt;</a>
+, <a class="el" href="classentt_1_1basic__registry.html#a22454253689ff77e41326f849bfea976">entt::basic_registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage.html#a93762825431af9dc007dd5db8c5bc21c">entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a9840b8e1334f079dec3a37d46fb9a1fe">entt::basic_storage&lt; Entity, Type, Allocator, std::enable_if_t&lt; ignore_as_empty_v&lt; Type &gt; &gt; &gt;</a>
+, <a class="el" href="classentt_1_1sigh__storage__mixin.html#adb5cd6a62df2a85126b3d77b31eb1b83">entt::sigh_storage_mixin&lt; Type &gt;</a>
 </li>
 <li>pause()
 : <a class="el" href="classentt_1_1process.html#a46b356ef2c1f09818b4dc546721f49fa">entt::process&lt; Derived, Delta &gt;</a>
@@ -89,24 +83,22 @@ $(function() {
 </li>
 <li>prepare()
 : <a class="el" href="structentt_1_1basic__organizer_1_1vertex.html#a9208ce46f18ba46229bacbc070fd8eec">entt::basic_organizer&lt; Entity &gt;::vertex</a>
-, <a class="el" href="classentt_1_1basic__registry.html#aad398e6279c6bbee2068b94c74bf83d6">entt::basic_registry&lt; Entity &gt;</a>
 </li>
 <li>process_adaptor()
-: <a class="el" href="structentt_1_1process__adaptor.html#ad1e2c8f3c44bf42abb05ef913b8267ce">entt::process_adaptor&lt; Func, Delta &gt;</a>
+: <a class="el" href="structentt_1_1process__adaptor.html#af065d57ac7c645279e4a5033f326abd8">entt::process_adaptor&lt; Func, Delta &gt;</a>
 </li>
 <li>prop()
-: <a class="el" href="structentt_1_1meta__ctor.html#aac8cae8255068070a6354226368f73e8">entt::meta_ctor</a>
-, <a class="el" href="structentt_1_1meta__data.html#abe3ebb33e7c66a067c5162715c66c880">entt::meta_data</a>
-, <a class="el" href="structentt_1_1meta__factory_3_01Type_00_01Spec_8_8_8_01_4.html#ae0869aeab7f26e4a98c02cc45ee115cd">entt::meta_factory&lt; Type, Spec... &gt;</a>
+: <a class="el" href="structentt_1_1meta__data.html#abe3ebb33e7c66a067c5162715c66c880">entt::meta_data</a>
+, <a class="el" href="classentt_1_1meta__factory_3_01Type_00_01Spec_8_8_8_01_4.html#a000d32f9fe649aa4526a174c3a0e25e9">entt::meta_factory&lt; Type, Spec... &gt;</a>
 , <a class="el" href="structentt_1_1meta__func.html#a5094550dfc4082e825fb1408160a234e">entt::meta_func</a>
 , <a class="el" href="classentt_1_1meta__type.html#afee5a926f135e9f2f75d8b5522866ab8">entt::meta_type</a>
 </li>
 <li>props()
-: <a class="el" href="structentt_1_1meta__factory_3_01Type_00_01Spec_8_8_8_01_4.html#aaf64cc4c2a8feaf7e37f95be39775d5f">entt::meta_factory&lt; Type, Spec... &gt;</a>
+: <a class="el" href="classentt_1_1meta__factory_3_01Type_00_01Spec_8_8_8_01_4.html#a5f469f90597875f661bade58bdb28a93">entt::meta_factory&lt; Type, Spec... &gt;</a>
 </li>
 <li>publish()
-: <a class="el" href="classentt_1_1emitter.html#a4ece275ff8736bcdcfb4103087801ea2">entt::emitter&lt; Derived &gt;</a>
-, <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_4.html#a062abaa0969c6762616466b67bee5d7d">entt::sigh&lt; Ret(Args...)&gt;</a>
+: <a class="el" href="classentt_1_1emitter.html#ad2877515662e6fce3558688b4fd598aa">entt::emitter&lt; Derived &gt;</a>
+, <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Allocator_01_4.html#a0893ef46dac20781070826fb93c50fb4">entt::sigh&lt; Ret(Args...), Allocator &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->

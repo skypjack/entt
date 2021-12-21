@@ -1,4 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1type__list.html" title=" " alt="" coords="5,5,144,47"/>
-<area shape="rect" id="node2" href="$structentt_1_1Storage.html" title="Basic poly storage implementation." alt="" coords="192,13,347,39"/>
+<area shape="rect" id="node1" href="$structentt_1_1type__list.html" title=" " alt="" coords="5,56,171,83"/>
+<area shape="rect" id="node2" href="$structentt_1_1exclude__t.html" title="Alias for exclusion lists." alt="" coords="219,5,379,32"/>
+<area shape="rect" id="node3" href="$structentt_1_1get__t.html" title="Alias for lists of observed components." alt="" coords="232,56,365,83"/>
+<area shape="rect" id="node4" href="$structentt_1_1owned__t.html" title="Alias for lists of owned components." alt="" coords="223,107,375,133"/>
 </map>

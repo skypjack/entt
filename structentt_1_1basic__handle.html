@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -108,10 +108,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9f88bf2f8fcb94b5ffe0f1290500004a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a9f88bf2f8fcb94b5ffe0f1290500004a">basic_handle</a> (<a class="el" href="structentt_1_1basic__handle.html#ae5df0bde40739b99085169d1955dc1fb">registry_type</a> &amp;ref, <a class="el" href="structentt_1_1basic__handle.html#a4788afd7aa378b5ec2e44bf52f5bec14">entity_type</a> value)</td></tr>
 <tr class="memdesc:a9f88bf2f8fcb94b5ffe0f1290500004a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a handle from a given registry and entity.  <a href="structentt_1_1basic__handle.html#a9f88bf2f8fcb94b5ffe0f1290500004a">More...</a><br /></td></tr>
 <tr class="separator:a9f88bf2f8fcb94b5ffe0f1290500004a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1839d6fb5f093efab8f6c8a9abebfff2"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
-<tr class="memitem:a1839d6fb5f093efab8f6c8a9abebfff2"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a1839d6fb5f093efab8f6c8a9abebfff2">operator==</a> (const <a class="el" href="structentt_1_1basic__handle.html">basic_handle</a>&lt; Args... &gt; &amp;other) const</td></tr>
-<tr class="memdesc:a1839d6fb5f093efab8f6c8a9abebfff2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares two handles.  <a href="structentt_1_1basic__handle.html#a1839d6fb5f093efab8f6c8a9abebfff2">More...</a><br /></td></tr>
-<tr class="separator:a1839d6fb5f093efab8f6c8a9abebfff2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e3190a9991d334cdd20b4d8841d7545"><td class="memTemplParams" colspan="2">template&lt;typename Other , typename... Args&gt; </td></tr>
 <tr class="memitem:a3e3190a9991d334cdd20b4d8841d7545"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a3e3190a9991d334cdd20b4d8841d7545">operator basic_handle&lt; Other, Args... &gt;</a> () const</td></tr>
 <tr class="memdesc:a3e3190a9991d334cdd20b4d8841d7545"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a const handle from a non-const one.  <a href="structentt_1_1basic__handle.html#a3e3190a9991d334cdd20b4d8841d7545">More...</a><br /></td></tr>
@@ -137,22 +133,22 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aed1520d6f7ca04a6d7180d4d10234f2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#aed1520d6f7ca04a6d7180d4d10234f2e">destroy</a> (const <a class="el" href="structentt_1_1basic__handle.html#aa6d8a9ac22ff96212d1a68deb63cac52">version_type</a> version)</td></tr>
 <tr class="memdesc:aed1520d6f7ca04a6d7180d4d10234f2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the entity associated with a handle.  <a href="structentt_1_1basic__handle.html#aed1520d6f7ca04a6d7180d4d10234f2e">More...</a><br /></td></tr>
 <tr class="separator:aed1520d6f7ca04a6d7180d4d10234f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60ac697e9cbedb9718303e0825cb8d63"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
-<tr class="memitem:a60ac697e9cbedb9718303e0825cb8d63"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a60ac697e9cbedb9718303e0825cb8d63">emplace</a> (Args &amp;&amp;... args) const</td></tr>
-<tr class="memdesc:a60ac697e9cbedb9718303e0825cb8d63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the given component to a handle.  <a href="structentt_1_1basic__handle.html#a60ac697e9cbedb9718303e0825cb8d63">More...</a><br /></td></tr>
-<tr class="separator:a60ac697e9cbedb9718303e0825cb8d63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed4c13f8f260f4771a103ada3148a454"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
-<tr class="memitem:aed4c13f8f260f4771a103ada3148a454"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#aed4c13f8f260f4771a103ada3148a454">emplace_or_replace</a> (Args &amp;&amp;... args) const</td></tr>
-<tr class="memdesc:aed4c13f8f260f4771a103ada3148a454"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns or replaces the given component for a handle.  <a href="structentt_1_1basic__handle.html#aed4c13f8f260f4771a103ada3148a454">More...</a><br /></td></tr>
-<tr class="separator:aed4c13f8f260f4771a103ada3148a454"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae94e4e43e9de226c4f44e169ee86bc1f"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Func&gt; </td></tr>
-<tr class="memitem:ae94e4e43e9de226c4f44e169ee86bc1f"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#ae94e4e43e9de226c4f44e169ee86bc1f">patch</a> (Func &amp;&amp;... func) const</td></tr>
-<tr class="memdesc:ae94e4e43e9de226c4f44e169ee86bc1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Patches the given component for a handle.  <a href="structentt_1_1basic__handle.html#ae94e4e43e9de226c4f44e169ee86bc1f">More...</a><br /></td></tr>
-<tr class="separator:ae94e4e43e9de226c4f44e169ee86bc1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afef275f78b5216ce68993e7109260f63"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
-<tr class="memitem:afef275f78b5216ce68993e7109260f63"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#afef275f78b5216ce68993e7109260f63">replace</a> (Args &amp;&amp;... args) const</td></tr>
-<tr class="memdesc:afef275f78b5216ce68993e7109260f63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the given component for a handle.  <a href="structentt_1_1basic__handle.html#afef275f78b5216ce68993e7109260f63">More...</a><br /></td></tr>
-<tr class="separator:afef275f78b5216ce68993e7109260f63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a910e13063772bbd2c14a3287ea913ffd"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
+<tr class="memitem:a910e13063772bbd2c14a3287ea913ffd"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a910e13063772bbd2c14a3287ea913ffd">emplace</a> (Args &amp;&amp;...args) const</td></tr>
+<tr class="memdesc:a910e13063772bbd2c14a3287ea913ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the given component to a handle.  <a href="structentt_1_1basic__handle.html#a910e13063772bbd2c14a3287ea913ffd">More...</a><br /></td></tr>
+<tr class="separator:a910e13063772bbd2c14a3287ea913ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86866a41493a4136f1f50f87bf082e77"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
+<tr class="memitem:a86866a41493a4136f1f50f87bf082e77"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a86866a41493a4136f1f50f87bf082e77">emplace_or_replace</a> (Args &amp;&amp;...args) const</td></tr>
+<tr class="memdesc:a86866a41493a4136f1f50f87bf082e77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns or replaces the given component for a handle.  <a href="structentt_1_1basic__handle.html#a86866a41493a4136f1f50f87bf082e77">More...</a><br /></td></tr>
+<tr class="separator:a86866a41493a4136f1f50f87bf082e77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78728a75868fc9a74fc033f3249ba642"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Func&gt; </td></tr>
+<tr class="memitem:a78728a75868fc9a74fc033f3249ba642"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a78728a75868fc9a74fc033f3249ba642">patch</a> (Func &amp;&amp;...func) const</td></tr>
+<tr class="memdesc:a78728a75868fc9a74fc033f3249ba642"><td class="mdescLeft">&#160;</td><td class="mdescRight">Patches the given component for a handle.  <a href="structentt_1_1basic__handle.html#a78728a75868fc9a74fc033f3249ba642">More...</a><br /></td></tr>
+<tr class="separator:a78728a75868fc9a74fc033f3249ba642"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cf1511f05374af28498b513c32c4a45"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
+<tr class="memitem:a4cf1511f05374af28498b513c32c4a45"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a4cf1511f05374af28498b513c32c4a45">replace</a> (Args &amp;&amp;...args) const</td></tr>
+<tr class="memdesc:a4cf1511f05374af28498b513c32c4a45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the given component for a handle.  <a href="structentt_1_1basic__handle.html#a4cf1511f05374af28498b513c32c4a45">More...</a><br /></td></tr>
+<tr class="separator:a4cf1511f05374af28498b513c32c4a45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac47661c3d8845005ac3826c6c124a2d5"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:ac47661c3d8845005ac3826c6c124a2d5"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1basic__handle.html#a0c6be936b2046833a789caf06e0567fe">size_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#ac47661c3d8845005ac3826c6c124a2d5">remove</a> () const</td></tr>
 <tr class="memdesc:ac47661c3d8845005ac3826c6c124a2d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the given components from a handle.  <a href="structentt_1_1basic__handle.html#ac47661c3d8845005ac3826c6c124a2d5">More...</a><br /></td></tr>
@@ -161,13 +157,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acf95b97a6facfb65d4405d944e390c68"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#acf95b97a6facfb65d4405d944e390c68">erase</a> () const</td></tr>
 <tr class="memdesc:acf95b97a6facfb65d4405d944e390c68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases the given components from a handle.  <a href="structentt_1_1basic__handle.html#acf95b97a6facfb65d4405d944e390c68">More...</a><br /></td></tr>
 <tr class="separator:acf95b97a6facfb65d4405d944e390c68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c3fcc9b3e7ad9ef1037d055b6ea490a"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
-<tr class="memitem:a3c3fcc9b3e7ad9ef1037d055b6ea490a"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1basic__handle.html#a0c6be936b2046833a789caf06e0567fe">size_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a3c3fcc9b3e7ad9ef1037d055b6ea490a">remove_if_exists</a> () const</td></tr>
-<tr class="memdesc:a3c3fcc9b3e7ad9ef1037d055b6ea490a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the given components from a handle.  <a href="structentt_1_1basic__handle.html#a3c3fcc9b3e7ad9ef1037d055b6ea490a">More...</a><br /></td></tr>
-<tr class="separator:a3c3fcc9b3e7ad9ef1037d055b6ea490a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefed83d8596de41136f15d13fdbc6ccd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#aefed83d8596de41136f15d13fdbc6ccd">remove_all</a> () const</td></tr>
-<tr class="memdesc:aefed83d8596de41136f15d13fdbc6ccd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all the components from a handle and makes it orphaned.  <a href="structentt_1_1basic__handle.html#aefed83d8596de41136f15d13fdbc6ccd">More...</a><br /></td></tr>
-<tr class="separator:aefed83d8596de41136f15d13fdbc6ccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29185b95a343d6770517683daebb20c9"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:a29185b95a343d6770517683daebb20c9"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a29185b95a343d6770517683daebb20c9">all_of</a> () const</td></tr>
 <tr class="memdesc:a29185b95a343d6770517683daebb20c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a handle has all the given components.  <a href="structentt_1_1basic__handle.html#a29185b95a343d6770517683daebb20c9">More...</a><br /></td></tr>
@@ -180,10 +169,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1e27c0778d8018e7c54249a365716127"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a1e27c0778d8018e7c54249a365716127">get</a> () const</td></tr>
 <tr class="memdesc:a1e27c0778d8018e7c54249a365716127"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns references to the given components for a handle.  <a href="structentt_1_1basic__handle.html#a1e27c0778d8018e7c54249a365716127">More...</a><br /></td></tr>
 <tr class="separator:a1e27c0778d8018e7c54249a365716127"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa11fae0cc72f18e0c37c8a22d4f30d30"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
-<tr class="memitem:aa11fae0cc72f18e0c37c8a22d4f30d30"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#aa11fae0cc72f18e0c37c8a22d4f30d30">get_or_emplace</a> (Args &amp;&amp;... args) const</td></tr>
-<tr class="memdesc:aa11fae0cc72f18e0c37c8a22d4f30d30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the given component for a handle.  <a href="structentt_1_1basic__handle.html#aa11fae0cc72f18e0c37c8a22d4f30d30">More...</a><br /></td></tr>
-<tr class="separator:aa11fae0cc72f18e0c37c8a22d4f30d30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad992486f889906c7e15d38a1b9d9e842"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
+<tr class="memitem:ad992486f889906c7e15d38a1b9d9e842"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#ad992486f889906c7e15d38a1b9d9e842">get_or_emplace</a> (Args &amp;&amp;...args) const</td></tr>
+<tr class="memdesc:ad992486f889906c7e15d38a1b9d9e842"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the given component for a handle.  <a href="structentt_1_1basic__handle.html#ad992486f889906c7e15d38a1b9d9e842">More...</a><br /></td></tr>
+<tr class="separator:ad992486f889906c7e15d38a1b9d9e842"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51b5f344896763432c91008620678d46"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:a51b5f344896763432c91008620678d46"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a51b5f344896763432c91008620678d46">try_get</a> () const</td></tr>
 <tr class="memdesc:a51b5f344896763432c91008620678d46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns pointers to the given components for a handle.  <a href="structentt_1_1basic__handle.html#a51b5f344896763432c91008620678d46">More...</a><br /></td></tr>
@@ -193,7 +182,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a04557a12530c2c86cd90694d2f4c7bc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a266813a96b5f9fcd92f0f45d775d3e25"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
 <tr class="memitem:a266813a96b5f9fcd92f0f45d775d3e25"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__handle.html#a266813a96b5f9fcd92f0f45d775d3e25">visit</a> (Func &amp;&amp;func) const</td></tr>
-<tr class="memdesc:a266813a96b5f9fcd92f0f45d775d3e25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a handle and returns the types for its components.  <a href="structentt_1_1basic__handle.html#a266813a96b5f9fcd92f0f45d775d3e25">More...</a><br /></td></tr>
+<tr class="memdesc:a266813a96b5f9fcd92f0f45d775d3e25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a handle and returns the pools for its components.  <a href="structentt_1_1basic__handle.html#a266813a96b5f9fcd92f0f45d775d3e25">More...</a><br /></td></tr>
 <tr class="separator:a266813a96b5f9fcd92f0f45d775d3e25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -210,7 +199,7 @@ struct entt::basic_handle&lt; Entity, Type &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00026">26</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00023">23</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a9f88bf2f8fcb94b5ffe0f1290500004a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9f88bf2f8fcb94b5ffe0f1290500004a">&#9670;&nbsp;</a></span>basic_handle()</h2>
@@ -252,12 +241,12 @@ template&lt;typename Entity , typename... Type&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ref</td><td>An instance of the registry class. </td></tr>
-    <tr><td class="paramname">value</td><td>An entity identifier. </td></tr>
+    <tr><td class="paramname">value</td><td>A valid identifier. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00046">46</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00043">43</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -299,7 +288,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the handle has all the components, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00240">240</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00205">205</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -340,7 +329,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the handle has at least one of the given components, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00252">252</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00217">217</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -372,7 +361,7 @@ template&lt;typename Entity , typename... Type&gt; </div>
 <p>Destroys the entity associated with a handle. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a7b2c0368d508a6af2d094a9fc592a4a0" title="Destroys an entity and releases its identifier.">basic_registry::destroy</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00124">124</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00106">106</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -411,12 +400,12 @@ template&lt;typename Entity , typename... Type&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00133">133</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00115">115</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a60ac697e9cbedb9718303e0825cb8d63"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60ac697e9cbedb9718303e0825cb8d63">&#9670;&nbsp;</a></span>emplace()</h2>
+<a id="a910e13063772bbd2c14a3287ea913ffd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a910e13063772bbd2c14a3287ea913ffd">&#9670;&nbsp;</a></span>emplace()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -444,7 +433,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </div><div class="memdoc">
 
 <p>Assigns the given component to a handle. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#ac138930f54716e2b31907586e45367be" title="Assigns the given component to an entity.">basic_registry::emplace</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a4c9c0532972adc7a930a50888a97efdf" title="Assigns the given component to an entity.">basic_registry::emplace</a> </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to create. </td></tr>
@@ -460,12 +449,12 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00146">146</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00128">128</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="aed4c13f8f260f4771a103ada3148a454"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed4c13f8f260f4771a103ada3148a454">&#9670;&nbsp;</a></span>emplace_or_replace()</h2>
+<a id="a86866a41493a4136f1f50f87bf082e77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86866a41493a4136f1f50f87bf082e77">&#9670;&nbsp;</a></span>emplace_or_replace()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -493,7 +482,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </div><div class="memdoc">
 
 <p>Assigns or replaces the given component for a handle. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a5c768fb13e23109823e1dc217eee100a" title="Assigns or replaces the given component for an entity.">basic_registry::emplace_or_replace</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a3bbaebbb9365eef262453e42a8f7dc4b" title="Assigns or replaces the given component for an entity.">basic_registry::emplace_or_replace</a> </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to assign or replace. </td></tr>
@@ -509,7 +498,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00160">160</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00142">142</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -541,7 +530,7 @@ template&lt;typename Entity , typename... Type&gt; </div>
 <p>Returns the entity associated with a handle. </p>
 <dl class="section return"><dt>Returns</dt><dd>The entity associated with the handle. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00116">116</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00098">98</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -573,7 +562,7 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Erases the given components from a handle. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#af92741bdee80da6da80171ce7ff17774" title="Erases the given components from an entity.">basic_registry::erase</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#ad7a51ade7ff181d7aa0b35915d0a4f2b" title="Erases the given components from an entity.">basic_registry::erase</a> </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components to erase. </td></tr>
@@ -581,7 +570,7 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00211">211</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00193">193</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -622,12 +611,12 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the handle. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00263">263</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00228">228</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="aa11fae0cc72f18e0c37c8a22d4f30d30"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa11fae0cc72f18e0c37c8a22d4f30d30">&#9670;&nbsp;</a></span>get_or_emplace()</h2>
+<a id="ad992486f889906c7e15d38a1b9d9e842"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad992486f889906c7e15d38a1b9d9e842">&#9670;&nbsp;</a></span>get_or_emplace()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -655,7 +644,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </div><div class="memdoc">
 
 <p>Returns a reference to the given component for a handle. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#ae8b86324fa88b9162050daf599d0f094" title="Returns a reference to the given component for an entity.">basic_registry::get_or_emplace</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a9c355683752313135c209bc7ba9820bc" title="Returns a reference to the given component for an entity.">basic_registry::get_or_emplace</a> </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to get. </td></tr>
@@ -671,7 +660,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Reference to the component owned by the handle. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00277">277</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00242">242</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -712,7 +701,7 @@ template&lt;typename Other , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A const handle referring to the same registry and the same entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00070">70</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00055">55</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -744,7 +733,7 @@ template&lt;typename Entity , typename... Type&gt; </div>
 <p>Checks if a handle refers to non-null registry pointer and entity. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the handle refers to non-null registry and entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00092">92</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00074">74</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -774,56 +763,9 @@ template&lt;typename Entity , typename... Type&gt; </div>
 </div><div class="memdoc">
 
 <p>Converts a handle to its underlying entity. </p>
-<dl class="section return"><dt>Returns</dt><dd>An entity identifier. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The contained identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00084">84</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a1839d6fb5f093efab8f6c8a9abebfff2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1839d6fb5f093efab8f6c8a9abebfff2">&#9670;&nbsp;</a></span>operator==()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity , typename... Type&gt; </div>
-<div class="memtemplate">
-template&lt;typename... Args&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="structentt_1_1basic__handle.html">entt::basic_handle</a>&lt; Entity, Type &gt;::operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structentt_1_1basic__handle.html">basic_handle</a>&lt; Args... &gt; &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Compares two handles. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Args</td><td>Template parameters of the handle with which to compare. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>Handle with which to compare. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if both handles refer to the same registry and the same entity, false otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00058">58</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00066">66</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -855,12 +797,12 @@ template&lt;typename Entity , typename... Type&gt; </div>
 <p>Checks if a handle has components assigned. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the handle has no components assigned, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00298">298</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00263">263</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ae94e4e43e9de226c4f44e169ee86bc1f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae94e4e43e9de226c4f44e169ee86bc1f">&#9670;&nbsp;</a></span>patch()</h2>
+<a id="a78728a75868fc9a74fc033f3249ba642"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78728a75868fc9a74fc033f3249ba642">&#9670;&nbsp;</a></span>patch()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -888,7 +830,7 @@ template&lt;typename Component , typename... Func&gt; </div>
 </div><div class="memdoc">
 
 <p>Patches the given component for a handle. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a4e83139f8d6774092bb4e0d14446f875" title="Patches the given component for an entity.">basic_registry::patch</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a22454253689ff77e41326f849bfea976" title="Patches the given component for an entity.">basic_registry::patch</a> </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to patch. </td></tr>
@@ -904,7 +846,7 @@ template&lt;typename Component , typename... Func&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the patched component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00174">174</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00156">156</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -936,7 +878,7 @@ template&lt;typename Entity , typename... Type&gt; </div>
 <p>Returns a pointer to the underlying registry, if any. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying registry, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00108">108</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00090">90</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -968,7 +910,7 @@ template&lt;typename... Component&gt; </div>
 </div><div class="memdoc">
 
 <p>Removes the given components from a handle. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a828206f7d5bbde61c6e63f742ab1cf6d" title="Removes the given components from an entity.">basic_registry::remove</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#aa66ca71c5eb6c2e1b3bde6ff86a268c7" title="Removes the given components from an entity.">basic_registry::remove</a> </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components to remove. </td></tr>
@@ -977,85 +919,12 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of components actually removed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00200">200</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00182">182</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="aefed83d8596de41136f15d13fdbc6ccd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefed83d8596de41136f15d13fdbc6ccd">&#9670;&nbsp;</a></span>remove_all()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity , typename... Type&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="structentt_1_1basic__handle.html">entt::basic_handle</a>&lt; Entity, Type &gt;::remove_all </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Removes all the components from a handle and makes it orphaned. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a46d948137afacbb1e4e79b72c917c5ea" title="Removes all the components from an entity and makes it orphaned.">basic_registry::remove_all</a> </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00228">228</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a3c3fcc9b3e7ad9ef1037d055b6ea490a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c3fcc9b3e7ad9ef1037d055b6ea490a">&#9670;&nbsp;</a></span>remove_if_exists()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity , typename... Type&gt; </div>
-<div class="memtemplate">
-template&lt;typename... Component&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structentt_1_1basic__handle.html#a0c6be936b2046833a789caf06e0567fe">size_type</a> <a class="el" href="structentt_1_1basic__handle.html">entt::basic_handle</a>&lt; Entity, Type &gt;::remove_if_exists </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Removes the given components from a handle. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a828206f7d5bbde61c6e63f742ab1cf6d" title="Removes the given components from an entity.">basic_registry::remove</a> </dd></dl>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Component</td><td>Types of components to remove. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of components actually removed. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00219">219</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="afef275f78b5216ce68993e7109260f63"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afef275f78b5216ce68993e7109260f63">&#9670;&nbsp;</a></span>replace()</h2>
+<a id="a4cf1511f05374af28498b513c32c4a45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cf1511f05374af28498b513c32c4a45">&#9670;&nbsp;</a></span>replace()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1083,7 +952,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </div><div class="memdoc">
 
 <p>Replaces the given component for a handle. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a0411735fcddcc942613463c5401dd661" title="Replaces the given component for an entity.">basic_registry::replace</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#a0501ff5a96a3421f3eec427bf5d62380" title="Replaces the given component for an entity.">basic_registry::replace</a> </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of component to replace. </td></tr>
@@ -1099,7 +968,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the component being replaced. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00188">188</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00170">170</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -1140,7 +1009,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointers to the components owned by the handle. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00289">289</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00254">254</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -1172,7 +1041,7 @@ template&lt;typename Entity , typename... Type&gt; </div>
 <p>Checks if a handle refers to a valid entity or not. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the handle refers to a valid entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00100">100</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00082">82</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -1204,8 +1073,11 @@ template&lt;typename Func &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Visits a handle and returns the types for its components. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1basic__registry.html#aef8bac41fdb48e3c8c589dee21b96980" title="Visits an entity and returns the type info for its components.">basic_registry::visit</a> </dd></dl>
+<p>Visits a handle and returns the pools for its components. </p>
+<p>The signature of the function should be equivalent to the following:</p>
+<div class="fragment"><div class="line">void(<a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>, <span class="keyword">const</span> basic_sparse_set&lt;entity_type&gt; &amp;);</div>
+<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00013">fwd.hpp:13</a></div></div>
+</div><!-- fragment --><p>Returned pools are those that contain the entity associated with the handle.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
@@ -1219,7 +1091,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00309">309</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2handle_8hpp_source.html#l00283">283</a> of file <a class="el" href="entity_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>

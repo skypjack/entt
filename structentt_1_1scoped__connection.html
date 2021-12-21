@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -92,6 +92,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1scoped__connection.html#ad52da49cdabbfe1a4aada361f48fb9be">scoped_connection</a> (const <a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ad52da49cdabbfe1a4aada361f48fb9be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default copy constructor, deleted on purpose. <br /></td></tr>
 <tr class="separator:ad52da49cdabbfe1a4aada361f48fb9be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82b3c022128eada5c6be2c5fc7d4bd2b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1scoped__connection.html#a82b3c022128eada5c6be2c5fc7d4bd2b">scoped_connection</a> (<a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:a82b3c022128eada5c6be2c5fc7d4bd2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor.  <a href="structentt_1_1scoped__connection.html#a82b3c022128eada5c6be2c5fc7d4bd2b">More...</a><br /></td></tr>
+<tr class="separator:a82b3c022128eada5c6be2c5fc7d4bd2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bc8b8630e2ad076216b6aca416ce32c"><td class="memItemLeft" align="right" valign="top"><a id="a8bc8b8630e2ad076216b6aca416ce32c"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1scoped__connection.html#a8bc8b8630e2ad076216b6aca416ce32c">~scoped_connection</a> ()</td></tr>
 <tr class="memdesc:a8bc8b8630e2ad076216b6aca416ce32c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Automatically breaks the link on destruction. <br /></td></tr>
@@ -99,6 +102,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae079c45e0eb97f31ec1d5a4be76163fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1scoped__connection.html#ae079c45e0eb97f31ec1d5a4be76163fc">operator=</a> (const <a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ae079c45e0eb97f31ec1d5a4be76163fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default copy assignment operator, deleted on purpose.  <a href="structentt_1_1scoped__connection.html#ae079c45e0eb97f31ec1d5a4be76163fc">More...</a><br /></td></tr>
 <tr class="separator:ae079c45e0eb97f31ec1d5a4be76163fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe0ec74231b7bece430c6dd5ffdeddc2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1scoped__connection.html#abe0ec74231b7bece430c6dd5ffdeddc2">operator=</a> (<a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:abe0ec74231b7bece430c6dd5ffdeddc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator.  <a href="structentt_1_1scoped__connection.html#abe0ec74231b7bece430c6dd5ffdeddc2">More...</a><br /></td></tr>
+<tr class="separator:abe0ec74231b7bece430c6dd5ffdeddc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a900d499bf30a8f33beb19f41af9b93b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1scoped__connection.html#a900d499bf30a8f33beb19f41af9b93b3">operator=</a> (<a class="el" href="classentt_1_1connection.html">connection</a> other)</td></tr>
 <tr class="memdesc:a900d499bf30a8f33beb19f41af9b93b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Acquires a connection.  <a href="structentt_1_1scoped__connection.html#a900d499bf30a8f33beb19f41af9b93b3">More...</a><br /></td></tr>
 <tr class="separator:a900d499bf30a8f33beb19f41af9b93b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,10 +121,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <p>Opaque object the aim of which is to allow users to release an already estabilished connection without having to keep a reference to the signal or the sink that generated it.<br  />
  A scoped connection automatically breaks the link between the two objects when it goes out of scope. </p>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00196">196</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00276">276</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab3c50842fea4014f8bf2e51ce4cfbc8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3c50842fea4014f8bf2e51ce4cfbc8a">&#9670;&nbsp;</a></span>scoped_connection()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3c50842fea4014f8bf2e51ce4cfbc8a">&#9670;&nbsp;</a></span>scoped_connection() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -149,7 +155,43 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00204">204</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00284">284</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a82b3c022128eada5c6be2c5fc7d4bd2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82b3c022128eada5c6be2c5fc7d4bd2b">&#9670;&nbsp;</a></span>scoped_connection() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">entt::scoped_connection::scoped_connection </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Move constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The scoped connection to move from. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00294">294</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -180,12 +222,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <p>Checks whether a scoped connection is properly initialized. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the connection is properly initialized, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00236">236</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00332">332</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a900d499bf30a8f33beb19f41af9b93b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a900d499bf30a8f33beb19f41af9b93b3">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a900d499bf30a8f33beb19f41af9b93b3">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -217,12 +259,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>This scoped connection. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00227">227</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00323">323</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
 <a id="ae079c45e0eb97f31ec1d5a4be76163fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae079c45e0eb97f31ec1d5a4be76163fc">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae079c45e0eb97f31ec1d5a4be76163fc">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -247,6 +289,43 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 
 <p>Default copy assignment operator, deleted on purpose. </p>
 <dl class="section return"><dt>Returns</dt><dd>This scoped connection. </dd></dl>
+
+</div>
+</div>
+<a id="abe0ec74231b7bece430c6dd5ffdeddc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe0ec74231b7bece430c6dd5ffdeddc2">&#9670;&nbsp;</a></span>operator=() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a>&amp; entt::scoped_connection::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structentt_1_1scoped__connection.html">scoped_connection</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Move assignment operator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The scoped connection to move from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>This scoped connection. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00313">313</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>

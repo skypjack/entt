@@ -1,5 +1,4 @@
 <map id="entt::meta_associative_container_traits&lt; std::map&lt; Key, Value, Args... &gt; &gt;" name="entt::meta_associative_container_traits&lt; std::map&lt; Key, Value, Args... &gt; &gt;">
-<area shape="rect" id="node1" title="Meta associative container traits for std::maps of any type." alt="" coords="527,35,729,91"/>
-<area shape="rect" id="node2" href="$structentt_1_1meta__container__traits.html" title=" " alt="" coords="196,5,479,120"/>
-<area shape="rect" id="node3" href="$structentt_1_1basic__container.html" title="Basic STL&#45;compatible container traits." alt="" coords="5,42,148,83"/>
+<area shape="rect" id="node1" title="Meta associative container traits for std::maps of any type." alt="" coords="213,13,416,69"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,5,165,76"/>
 </map>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -96,10 +96,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4298bb90698199b99820bce07d866ac7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1as__view.html#a4298bb90698199b99820bce07d866ac7">as_view</a> (<a class="el" href="structentt_1_1as__view.html#acf6e812f1ff9a8a0a0af828b6597dace">registry_type</a> &amp;source)</td></tr>
 <tr class="memdesc:a4298bb90698199b99820bce07d866ac7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a converter for a given registry.  <a href="structentt_1_1as__view.html#a4298bb90698199b99820bce07d866ac7">More...</a><br /></td></tr>
 <tr class="separator:a4298bb90698199b99820bce07d866ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60dbb15ef8f1a184510c0652ed1c6afd"><td class="memTemplParams" colspan="2">template&lt;typename Exclude , typename... Component&gt; </td></tr>
-<tr class="memitem:a60dbb15ef8f1a184510c0652ed1c6afd"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1as__view.html#a60dbb15ef8f1a184510c0652ed1c6afd">operator basic_view&lt; entity_type, Exclude, Component... &gt;</a> () const</td></tr>
-<tr class="memdesc:a60dbb15ef8f1a184510c0652ed1c6afd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion function from a registry to a view.  <a href="structentt_1_1as__view.html#a60dbb15ef8f1a184510c0652ed1c6afd">More...</a><br /></td></tr>
-<tr class="separator:a60dbb15ef8f1a184510c0652ed1c6afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33df5ef10293a3153cd467edd72be425"><td class="memTemplParams" colspan="2">template&lt;typename Exclude , typename... Component&gt; </td></tr>
+<tr class="memitem:a33df5ef10293a3153cd467edd72be425"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1as__view.html#a33df5ef10293a3153cd467edd72be425">operator basic_view&lt; entity_type, get_t&lt; Component... &gt;, Exclude &gt;</a> () const</td></tr>
+<tr class="memdesc:a33df5ef10293a3153cd467edd72be425"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion function from a registry to a view.  <a href="structentt_1_1as__view.html#a33df5ef10293a3153cd467edd72be425">More...</a><br /></td></tr>
+<tr class="separator:a33df5ef10293a3153cd467edd72be425"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity&gt;<br />
@@ -113,7 +113,7 @@ struct entt::as_view&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00022">22</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00019">19</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4298bb90698199b99820bce07d866ac7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4298bb90698199b99820bce07d866ac7">&#9670;&nbsp;</a></span>as_view()</h2>
@@ -149,13 +149,13 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00032">32</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00029">29</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a60dbb15ef8f1a184510c0652ed1c6afd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60dbb15ef8f1a184510c0652ed1c6afd">&#9670;&nbsp;</a></span>operator basic_view&lt; entity_type, Exclude, Component... &gt;()</h2>
+<a id="a33df5ef10293a3153cd467edd72be425"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33df5ef10293a3153cd467edd72be425">&#9670;&nbsp;</a></span>operator basic_view&lt; entity_type, get_t&lt; Component... &gt;, Exclude &gt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -168,7 +168,7 @@ template&lt;typename Exclude , typename... Component&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1as__view.html">entt::as_view</a>&lt; Entity &gt;::operator <a class="el" href="structentt_1_1basic__view.html">basic_view</a>&lt; <a class="el" href="structentt_1_1as__view.html#ae9599a1614990478c3331fbf562f36c7">entity_type</a>, Exclude, Component... &gt; </td>
+          <td class="memname"><a class="el" href="structentt_1_1as__view.html">entt::as_view</a>&lt; Entity &gt;::operator <a class="el" href="classentt_1_1basic__view.html">basic_view</a>&lt; <a class="el" href="structentt_1_1as__view.html#ae9599a1614990478c3331fbf562f36c7">entity_type</a>, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Component... &gt;, Exclude &gt; </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -191,7 +191,7 @@ template&lt;typename Exclude , typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00041">41</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00038">38</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>

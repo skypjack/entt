@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['meta_5fsequence_5fcontainer_1134',['meta_sequence_container',['../classentt_1_1meta__sequence__container_1_1meta__iterator.html#a6919bcefed41cd55d6154072fcea2e43',1,'entt::meta_sequence_container::meta_iterator']]]
+  ['poly_5fbase_3c_20basic_5fpoly_20_3e_1184',['poly_base&lt; basic_poly &gt;',['../classentt_1_1basic__poly.html#a4f532417307014ab3c9eb0070beaf7fc',1,'entt::basic_poly']]]
 ];

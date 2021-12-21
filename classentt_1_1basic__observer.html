@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -191,7 +191,7 @@ class entt::basic_observer&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00172">172</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00165">165</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abef3c847acf610f1a6f856b05f0f0721"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abef3c847acf610f1a6f856b05f0f0721">&#9670;&nbsp;</a></span>basic_observer()</h2>
@@ -245,7 +245,7 @@ template&lt;typename... Matcher&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00298">298</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00291">291</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +279,7 @@ template&lt;typename Entity &gt; </div>
 <p>The returned iterator points to the first entity of the observer. If the container is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__observer.html#a730adbbd4f425bbf9d69b8bb4a0e2ac2" title="Returns an iterator that is past the last entity of the observer.">end()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity of the observer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00379">379</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00371">371</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>
@@ -335,7 +335,7 @@ template&lt;typename... Matcher&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00325">325</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00317">317</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>
@@ -369,7 +369,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Entities are in the reverse order as returned by the <code>begin</code>/<code>end</code> iterators.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of entities. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00367">367</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00359">359</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>
@@ -416,7 +416,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00432">432</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00424">424</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>
@@ -452,7 +452,7 @@ template&lt;typename Func &gt; </div>
 <p>The function object is invoked for each entity.<br  />
  The signature of the function must be equivalent to the following form:</p>
 <div class="fragment"><div class="line">void(<span class="keyword">const</span> <a class="code" href="classentt_1_1basic__observer.html#af7a57f53ed7a6c835129480ff6594f7d">entity_type</a>);</div>
-<div class="ttc" id="aclassentt_1_1basic__observer_html_af7a57f53ed7a6c835129480ff6594f7d"><div class="ttname"><a href="classentt_1_1basic__observer.html#af7a57f53ed7a6c835129480ff6594f7d">entt::basic_observer::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00275">observer.hpp:275</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__observer_html_af7a57f53ed7a6c835129480ff6594f7d"><div class="ttname"><a href="classentt_1_1basic__observer.html#af7a57f53ed7a6c835129480ff6594f7d">entt::basic_observer::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00269">observer.hpp:269</a></div></div>
 </div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
@@ -466,7 +466,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00416">416</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00408">408</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>
@@ -498,7 +498,7 @@ template&lt;typename Entity &gt; </div>
 <p>Checks whether an observer is empty. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the observer is empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00351">351</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00343">343</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>
@@ -531,7 +531,7 @@ template&lt;typename Entity &gt; </div>
 <p>The returned iterator points to the entity following the last entity of the observer. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity of the observer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00393">393</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00385">385</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>
@@ -625,7 +625,7 @@ template&lt;typename Entity &gt; </div>
 <p>Returns the number of elements in an observer. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of elements. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00343">343</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="observer_8hpp_source.html#l00335">335</a> of file <a class="el" href="observer_8hpp_source.html">observer.hpp</a>.</p>
 
 </div>
 </div>

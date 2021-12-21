@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -81,11 +81,11 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:aad82cae36b6f54ccb4c4ffb98ee247fd"><td class="memTemplParams" colspan="2"><a id="aad82cae36b6f54ccb4c4ffb98ee247fd"></a>
+<tr class="memitem:a4112be35c9b6819c3b0d429a94f77728"><td class="memTemplParams" colspan="2"><a id="a4112be35c9b6819c3b0d429a94f77728"></a>
 template&lt;typename Other &gt; </td></tr>
-<tr class="memitem:aad82cae36b6f54ccb4c4ffb98ee247fd"><td class="memTemplItemLeft" align="right" valign="top">struct&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__loader.html#aad82cae36b6f54ccb4c4ffb98ee247fd">resource_cache</a></td></tr>
-<tr class="memdesc:aad82cae36b6f54ccb4c4ffb98ee247fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resource loaders are friends of their caches. <br /></td></tr>
-<tr class="separator:aad82cae36b6f54ccb4c4ffb98ee247fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4112be35c9b6819c3b0d429a94f77728"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__loader.html#a4112be35c9b6819c3b0d429a94f77728">resource_cache</a></td></tr>
+<tr class="memdesc:a4112be35c9b6819c3b0d429a94f77728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resource loaders are friends of their caches. <br /></td></tr>
+<tr class="separator:a4112be35c9b6819c3b0d429a94f77728"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Loader, typename Resource&gt;<br />
@@ -102,7 +102,7 @@ class entt::resource_loader&lt; Loader, Resource &gt;</h3>
 <div class="line">        <span class="keywordflow">return</span> std::make_shared&lt;my_resource&gt;();</div>
 <div class="line">    }</div>
 <div class="line">};</div>
-<div class="ttc" id="aclassentt_1_1resource__loader_html"><div class="ttname"><a href="classentt_1_1resource__loader.html">entt::resource_loader</a></div><div class="ttdoc">Base class for resource loaders.</div><div class="ttdef"><b>Definition:</b> <a href="loader_8hpp_source.html#l00045">loader.hpp:45</a></div></div>
+<div class="ttc" id="aclassentt_1_1resource__loader_html"><div class="ttname"><a href="classentt_1_1resource__loader.html">entt::resource_loader</a></div><div class="ttdoc">Base class for resource loaders.</div><div class="ttdef"><b>Definition:</b> <a href="loader_8hpp_source.html#l00042">loader.hpp:42</a></div></div>
 </div><!-- fragment --><p>In general, resource loaders should not have a state or retain data of any type. They should let the cache manage their resources instead.</p>
 <dl class="section note"><dt>Note</dt><dd>Base class and CRTP idiom aren't strictly required with the current implementation. One could argue that a cache can easily work with loaders of any type. However, future changes won't be breaking ones by forcing the use of a base class today and that's why the model is already in its place.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -113,7 +113,7 @@ class entt::resource_loader&lt; Loader, Resource &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="loader_8hpp_source.html#l00045">45</a> of file <a class="el" href="loader_8hpp_source.html">loader.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="loader_8hpp_source.html#l00042">42</a> of file <a class="el" href="loader_8hpp_source.html">loader.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/entt/resource/<a class="el" href="resource_2fwd_8hpp_source.html">fwd.hpp</a></li>
 <li>src/entt/resource/<a class="el" href="loader_8hpp_source.html">loader.hpp</a></li>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnTT: entt::sigh&lt; typename &gt; Class Template Reference</title>
+<title>EnTT: entt::sigh&lt; Type, typename &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -67,26 +67,27 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">entt::sigh&lt; typename &gt; Class Template Reference</div>  </div>
+<div class="title">entt::sigh&lt; Type, typename &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p>Unmanaged signal handler.  
  <a href="classentt_1_1sigh.html#details">More...</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename&gt;<br />
-class entt::sigh&lt; typename &gt;</h3>
+<div class="textblock"><h3>template&lt;typename Type, typename = std::allocator&lt;delegate&lt;Type&gt;&gt;&gt;<br />
+class entt::sigh&lt; Type, typename &gt;</h3>
 
 <p>Unmanaged signal handler. </p>
 <p>Primary template isn't defined on purpose. All the specializations give a compile-time error unless the template parameter is a function type.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Function</td><td>A valid function type. </td></tr>
+    <tr><td class="paramname">Type</td><td>A valid function type. </td></tr>
+    <tr><td class="paramname">Allocator</td><td>Type of allocator used to manage memory and elements. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="signal_2fwd_8hpp_source.html#l00030">30</a> of file <a class="el" href="signal_2fwd_8hpp_source.html">fwd.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="signal_2fwd_8hpp_source.html#l00024">24</a> of file <a class="el" href="signal_2fwd_8hpp_source.html">fwd.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/entt/signal/<a class="el" href="signal_2fwd_8hpp_source.html">fwd.hpp</a></li>
 </ul>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -73,225 +73,216 @@ $(function() {
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef ENTT_SIGNAL_EMITTER_HPP</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define ENTT_SIGNAL_EMITTER_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;iterator&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;list&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;utility&gt;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;../core/fwd.hpp&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;../core/type_info.hpp&quot;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;iterator&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;list&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;utility&gt;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;../container/dense_hash_map.hpp&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;../core/fwd.hpp&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;../core/type_info.hpp&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;../core/utility.hpp&quot;</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Derived&gt;</div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html">   43</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1emitter.html">emitter</a> {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">struct </span>basic_pool {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keyword">virtual</span> ~basic_pool() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">empty</a>() <span class="keyword">const</span> ENTT_NOEXCEPT = 0;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">clear</a>() ENTT_NOEXCEPT = 0;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    };</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">struct </span>pool_handler final: basic_pool {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        static_assert(std::is_same_v&lt;Event, std::decay_t&lt;Event&gt;&gt;, <span class="stringliteral">&quot;Invalid event type&quot;</span>);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keyword">using</span> listener_type = std::function&lt;void(Event &amp;, Derived &amp;)&gt;;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keyword">using</span> element_type = std::pair&lt;bool, listener_type&gt;;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keyword">using</span> container_type = std::list&lt;element_type&gt;;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keyword">using</span> connection_type = <span class="keyword">typename</span> container_type::iterator;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        [[nodiscard]] <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">empty</a>() <span class="keyword">const</span> ENTT_NOEXCEPT <span class="keyword">override</span> {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            <span class="keyword">auto</span> pred = [](<span class="keyword">auto</span> &amp;&amp;element) { <span class="keywordflow">return</span> element.first; };</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            <span class="keywordflow">return</span> std::all_of(once_list.cbegin(), once_list.cend(), pred) &amp;&amp;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                    std::all_of(on_list.cbegin(), on_list.cend(), pred);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">clear</a>() ENTT_NOEXCEPT <span class="keyword">override</span> {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            <span class="keywordflow">if</span>(publishing) {</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;                <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;element: once_list) {</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                    element.first = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                }</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;element: on_list) {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                    element.first = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                once_list.clear();</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                on_list.clear();</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            }</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        }</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        connection_type <a class="code" href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">once</a>(listener_type <a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>) {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            <span class="keywordflow">return</span> once_list.emplace(once_list.cend(), <span class="keyword">false</span>, std::move(<a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>));</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        }</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        connection_type <a class="code" href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">on</a>(listener_type <a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>) {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            <span class="keywordflow">return</span> on_list.emplace(on_list.cend(), <span class="keyword">false</span>, std::move(<a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>));</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        }</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a9525364769b8daf55dd942599aa0a09c">erase</a>(connection_type conn) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            conn-&gt;first = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <span class="keywordflow">if</span>(!publishing) {</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                <span class="keyword">auto</span> pred = [](<span class="keyword">auto</span> &amp;&amp;element) { <span class="keywordflow">return</span> element.first; };</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                once_list.remove_if(pred);</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                on_list.remove_if(pred);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            }</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        }</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a4ece275ff8736bcdcfb4103087801ea2">publish</a>(Event &amp;event, Derived &amp;ref) {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            container_type swap_list;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            once_list.swap(swap_list);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Derived&gt;</div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html">   41</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1emitter.html">emitter</a> {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">struct </span>basic_pool {</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keyword">virtual</span> ~basic_pool() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">empty</a>() <span class="keyword">const</span> ENTT_NOEXCEPT = 0;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">clear</a>() ENTT_NOEXCEPT = 0;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    };</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">struct </span>pool_handler final: basic_pool {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        static_assert(std::is_same_v&lt;Event, std::decay_t&lt;Event&gt;&gt;, <span class="stringliteral">&quot;Invalid event type&quot;</span>);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keyword">using</span> listener_type = std::function&lt;void(Event &amp;, Derived &amp;)&gt;;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keyword">using</span> element_type = std::pair&lt;bool, listener_type&gt;;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keyword">using</span> container_type = std::list&lt;element_type&gt;;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keyword">using</span> connection_type = <span class="keyword">typename</span> container_type::iterator;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        [[nodiscard]] <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">empty</a>() <span class="keyword">const</span> ENTT_NOEXCEPT <span class="keyword">override</span> {</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            <span class="keyword">auto</span> pred = [](<span class="keyword">auto</span> &amp;&amp;element) { <span class="keywordflow">return</span> element.first; };</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            <span class="keywordflow">return</span> std::all_of(once_list.cbegin(), once_list.cend(), pred)</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                   &amp;&amp; std::all_of(on_list.cbegin(), on_list.cend(), pred);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        }</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">clear</a>() ENTT_NOEXCEPT <span class="keyword">override</span> {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            <span class="keywordflow">if</span>(publishing) {</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;element: once_list) {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                    element.first = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;                }</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;element: on_list) {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;                    element.first = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                once_list.clear();</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                on_list.clear();</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        }</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        connection_type <a class="code" href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">once</a>(listener_type <a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>) {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            <span class="keywordflow">return</span> once_list.emplace(once_list.cend(), <span class="keyword">false</span>, std::move(<a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>));</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        }</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        connection_type <a class="code" href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">on</a>(listener_type <a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>) {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            <span class="keywordflow">return</span> on_list.emplace(on_list.cend(), <span class="keyword">false</span>, std::move(<a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a>));</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a9525364769b8daf55dd942599aa0a09c">erase</a>(connection_type conn) {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;            conn-&gt;first = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            <span class="keywordflow">if</span>(!publishing) {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                <span class="keyword">auto</span> pred = [](<span class="keyword">auto</span> &amp;&amp;element) { <span class="keywordflow">return</span> element.first; };</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                once_list.remove_if(pred);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                on_list.remove_if(pred);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            }</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        }</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#ad2877515662e6fce3558688b4fd598aa">publish</a>(Event &amp;event, Derived &amp;ref) {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            container_type swap_list;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            once_list.swap(swap_list);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            publishing = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            publishing = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;element: on_list) {</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                element.first ? void() : element.second(event, ref);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;element: swap_list) {</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                element.first ? void() : element.second(event, ref);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;element: on_list) {</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                element.first ? void() : element.second(event, ref);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            }</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;element: swap_list) {</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;                element.first ? void() : element.second(event, ref);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            }</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            publishing = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            publishing = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            on_list.remove_if([](<span class="keyword">auto</span> &amp;&amp;element) { <span class="keywordflow">return</span> element.first; });</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        }</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordtype">bool</span> publishing{<span class="keyword">false</span>};</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        container_type once_list{};</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        container_type on_list{};</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    };</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    [[nodiscard]] pool_handler&lt;Event&gt; * assure() {</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> index = <a class="code" href="structentt_1_1type__seq.html#a4e2551d32b2eb0d5ab7681695de66248">type_seq&lt;Event&gt;::value</a>();</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <span class="keywordflow">if</span>(!(index &lt; pools.size())) {</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            pools.resize(std::size_t(index)+1u);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            on_list.remove_if([](<span class="keyword">auto</span> &amp;&amp;element) { <span class="keywordflow">return</span> element.first; });</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        }</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keywordtype">bool</span> publishing{<span class="keyword">false</span>};</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        container_type once_list{};</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        container_type on_list{};</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    };</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    [[nodiscard]] pool_handler&lt;Event&gt; *assure() {</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordflow">if</span>(<span class="keyword">auto</span> &amp;&amp;ptr = pools[<a class="code" href="structentt_1_1type__hash.html">type_hash&lt;Event&gt;::value</a>()]; !ptr) {</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            <span class="keyword">auto</span> *cpool = <span class="keyword">new</span> pool_handler&lt;Event&gt;{};</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            ptr.reset(cpool);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <span class="keywordflow">return</span> cpool;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>pool_handler&lt;Event&gt; *<span class="keyword">&gt;</span>(ptr.get());</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        }</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordflow">if</span>(!pools[index]) {</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;            pools[index].reset(<span class="keyword">new</span> pool_handler&lt;Event&gt;{});</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        }</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>pool_handler&lt;Event&gt; *<span class="keyword">&gt;</span>(pools[index].get());</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    }</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    [[nodiscard]] <span class="keyword">const</span> pool_handler&lt;Event&gt; *assure()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> it = pools.find(<a class="code" href="structentt_1_1type__hash.html">type_hash&lt;Event&gt;::value</a>());</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keywordflow">return</span> (it == pools.cend()) ? nullptr : <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>pool_handler&lt;Event&gt; *<span class="keyword">&gt;</span>(it-&gt;second.get());</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    }</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    [[nodiscard]] <span class="keyword">const</span> pool_handler&lt;Event&gt; * assure()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> index = <a class="code" href="structentt_1_1type__seq.html#a4e2551d32b2eb0d5ab7681695de66248">type_seq&lt;Event&gt;::value</a>();</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">return</span> (!(index &lt; pools.size()) || !pools[index]) ? nullptr : <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>pool_handler&lt;Event&gt; *<span class="keyword">&gt;</span>(pools[index].get());</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    }</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">  148</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a> = <span class="keyword">typename</span> pool_handler&lt;Event&gt;::listener_type;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00160"></a><span class="lineno"><a class="line" href="structentt_1_1emitter_1_1connection.html">  160</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structentt_1_1emitter_1_1connection.html">connection</a>: <span class="keyword">private</span> pool_handler&lt;Event&gt;::connection_type {</div>
-<div class="line"><a name="l00162"></a><span class="lineno"><a class="line" href="structentt_1_1emitter_1_1connection.html#a0f3bb10ad57dc0e06298fc9ba38a7bd9">  162</a></span>&#160;        <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classentt_1_1emitter.html">emitter</a>;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00165"></a><span class="lineno"><a class="line" href="structentt_1_1emitter_1_1connection.html#a3dcb29742c6824dd28743eb0d896f9c3">  165</a></span>&#160;        <a class="code" href="structentt_1_1emitter_1_1connection.html#a3dcb29742c6824dd28743eb0d896f9c3">connection</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno"><a class="line" href="structentt_1_1emitter_1_1connection.html#a0fa687596e072155e92e586e9de089c3">  171</a></span>&#160;        <a class="code" href="structentt_1_1emitter_1_1connection.html#a0fa687596e072155e92e586e9de089c3">connection</a>(<span class="keyword">typename</span> pool_handler&lt;Event&gt;::connection_type conn)</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            : pool_handler&lt;Event&gt;::connection_type{std::move(conn)}</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        {}</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    };</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00177"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#af36907a2dc7cc0a6607533c67e072f92">  177</a></span>&#160;    <a class="code" href="classentt_1_1emitter.html#af36907a2dc7cc0a6607533c67e072f92">emitter</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#af3d352c547768be34f03f0fbfdd30b43">  180</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classentt_1_1emitter.html#af3d352c547768be34f03f0fbfdd30b43">~emitter</a>() {</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        static_assert(std::is_base_of_v&lt;<a class="code" href="classentt_1_1emitter.html">emitter&lt;Derived&gt;</a>, Derived&gt;, <span class="stringliteral">&quot;Incorrect use of the class template&quot;</span>);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    }</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a842fef69b914a160b0bcc211bb77b27b">  185</a></span>&#160;    <a class="code" href="classentt_1_1emitter.html#a842fef69b914a160b0bcc211bb77b27b">emitter</a>(<a class="code" href="classentt_1_1emitter.html">emitter</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#ab270d2c6d986621a781467e29e64629c">  188</a></span>&#160;    <a class="code" href="classentt_1_1emitter.html">emitter</a> &amp; <a class="code" href="classentt_1_1emitter.html#ab270d2c6d986621a781467e29e64629c">operator=</a>(<a class="code" href="classentt_1_1emitter.html">emitter</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a4ece275ff8736bcdcfb4103087801ea2">  202</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a4ece275ff8736bcdcfb4103087801ea2">publish</a>(Args &amp;&amp;... args) {</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        Event instance{std::forward&lt;Args&gt;(args)...};</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        assure&lt;Event&gt;()-&gt;publish(instance, *<span class="keyword">static_cast&lt;</span>Derived *<span class="keyword">&gt;</span>(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    }</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00228"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">  228</a></span>&#160;    <a class="code" href="structentt_1_1emitter_1_1connection.html">connection&lt;Event&gt;</a> <a class="code" href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">on</a>(<a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener&lt;Event&gt;</a> instance) {</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <span class="keywordflow">return</span> assure&lt;Event&gt;()-&gt;on(std::move(instance));</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00253"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">  253</a></span>&#160;    <a class="code" href="structentt_1_1emitter_1_1connection.html">connection&lt;Event&gt;</a> <a class="code" href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">once</a>(<a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener&lt;Event&gt;</a> instance) {</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <span class="keywordflow">return</span> assure&lt;Event&gt;()-&gt;once(std::move(instance));</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    }</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00267"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a9525364769b8daf55dd942599aa0a09c">  267</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a9525364769b8daf55dd942599aa0a09c">erase</a>(<a class="code" href="structentt_1_1emitter_1_1connection.html">connection&lt;Event&gt;</a> conn) {</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        assure&lt;Event&gt;()-&gt;erase(std::move(conn));</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    }</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00280"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">  280</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">clear</a>() {</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        assure&lt;Event&gt;()-&gt;clear();</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160; </div>
-<div class="line"><a name="l00290"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#afed3485e23fdbb87d007208382428813">  290</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#afed3485e23fdbb87d007208382428813">clear</a>() ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;cpool: pools) {</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;            <span class="keywordflow">if</span>(cpool) {</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;                cpool-&gt;clear();</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;            }</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        }</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    }</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
-<div class="line"><a name="l00304"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">  304</a></span>&#160;    [[nodiscard]] <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">empty</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> *cpool = assure&lt;Event&gt;();</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <span class="keywordflow">return</span> !cpool || cpool-&gt;empty();</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
-<div class="line"><a name="l00313"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#ad395b7c4de0f1f6e01a6e1c113db6937">  313</a></span>&#160;    [[nodiscard]] <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1emitter.html#ad395b7c4de0f1f6e01a6e1c113db6937">empty</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        <span class="keywordflow">return</span> std::all_of(pools.cbegin(), pools.cend(), [](<span class="keyword">auto</span> &amp;&amp;cpool) {</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;            return !cpool || cpool-&gt;empty();</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        });</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    }</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160; </div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    std::vector&lt;std::unique_ptr&lt;basic_pool&gt;&gt; pools{};</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;};</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160; </div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;}</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160; </div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclassentt_1_1emitter_html"><div class="ttname"><a href="classentt_1_1emitter.html">entt::emitter</a></div><div class="ttdoc">General purpose event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00043">emitter.hpp:43</a></div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_a08c6111af231c9a82277069a3bf21b75"><div class="ttname"><a href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">entt::emitter::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdoc">Checks if there are listeners registered for the specific event.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00304">emitter.hpp:304</a></div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_a0b580005200bb810a4a3e94320efcd8a"><div class="ttname"><a href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">entt::emitter::on</a></div><div class="ttdeci">connection&lt; Event &gt; on(listener&lt; Event &gt; instance)</div><div class="ttdoc">Registers a long-lived listener with the event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00228">emitter.hpp:228</a></div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_a1200216d9abb1adb18db6035d99b60da"><div class="ttname"><a href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">entt::emitter::listener</a></div><div class="ttdeci">typename pool_handler&lt; Event &gt;::listener_type listener</div><div class="ttdoc">Type of listeners accepted for the given event.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00148">emitter.hpp:148</a></div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_a4e4324c59afee760ca13772eb6d2d522"><div class="ttname"><a href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">entt::emitter::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Disconnects all the listeners for the given event type.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00280">emitter.hpp:280</a></div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_a4ece275ff8736bcdcfb4103087801ea2"><div class="ttname"><a href="classentt_1_1emitter.html#a4ece275ff8736bcdcfb4103087801ea2">entt::emitter::publish</a></div><div class="ttdeci">void publish(Args &amp;&amp;... args)</div><div class="ttdoc">Emits the given event.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00202">emitter.hpp:202</a></div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_a79834d452b0600ebe0e70c54f4a21fd6"><div class="ttname"><a href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">entt::emitter::once</a></div><div class="ttdeci">connection&lt; Event &gt; once(listener&lt; Event &gt; instance)</div><div class="ttdoc">Registers a short-lived listener with the event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00253">emitter.hpp:253</a></div></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">  142</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener</a> = <span class="keyword">typename</span> pool_handler&lt;Event&gt;::listener_type;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="structentt_1_1emitter_1_1connection.html">  154</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structentt_1_1emitter_1_1connection.html">connection</a>: <span class="keyword">private</span> pool_handler&lt;Event&gt;::connection_type {</div>
+<div class="line"><a name="l00156"></a><span class="lineno"><a class="line" href="structentt_1_1emitter_1_1connection.html#a0f3bb10ad57dc0e06298fc9ba38a7bd9">  156</a></span>&#160;        <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classentt_1_1emitter.html">emitter</a>;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="structentt_1_1emitter_1_1connection.html#a3dcb29742c6824dd28743eb0d896f9c3">  159</a></span>&#160;        <a class="code" href="structentt_1_1emitter_1_1connection.html#a3dcb29742c6824dd28743eb0d896f9c3">connection</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno"><a class="line" href="structentt_1_1emitter_1_1connection.html#a0fa687596e072155e92e586e9de089c3">  165</a></span>&#160;        <a class="code" href="structentt_1_1emitter_1_1connection.html#a0fa687596e072155e92e586e9de089c3">connection</a>(<span class="keyword">typename</span> pool_handler&lt;Event&gt;::connection_type conn)</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            : pool_handler&lt;Event&gt;::connection_type{std::move(conn)} {}</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    };</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#af36907a2dc7cc0a6607533c67e072f92">  170</a></span>&#160;    <a class="code" href="classentt_1_1emitter.html#af36907a2dc7cc0a6607533c67e072f92">emitter</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
+<div class="line"><a name="l00173"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#af3d352c547768be34f03f0fbfdd30b43">  173</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classentt_1_1emitter.html#af3d352c547768be34f03f0fbfdd30b43">~emitter</a>() {</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        static_assert(std::is_base_of_v&lt;<a class="code" href="classentt_1_1emitter.html">emitter&lt;Derived&gt;</a>, Derived&gt;, <span class="stringliteral">&quot;Incorrect use of the class template&quot;</span>);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    }</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
+<div class="line"><a name="l00178"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a842fef69b914a160b0bcc211bb77b27b">  178</a></span>&#160;    <a class="code" href="classentt_1_1emitter.html#a842fef69b914a160b0bcc211bb77b27b">emitter</a>(<a class="code" href="classentt_1_1emitter.html">emitter</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00181"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#ab270d2c6d986621a781467e29e64629c">  181</a></span>&#160;    <a class="code" href="classentt_1_1emitter.html">emitter</a> &amp;<a class="code" href="classentt_1_1emitter.html#ab270d2c6d986621a781467e29e64629c">operator=</a>(<a class="code" href="classentt_1_1emitter.html">emitter</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event, <span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l00195"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#ad2877515662e6fce3558688b4fd598aa">  195</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#ad2877515662e6fce3558688b4fd598aa">publish</a>(Args &amp;&amp;...args) {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        Event instance{std::forward&lt;Args&gt;(args)...};</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        assure&lt;Event&gt;()-&gt;publish(instance, *<span class="keyword">static_cast&lt;</span>Derived *<span class="keyword">&gt;</span>(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00221"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">  221</a></span>&#160;    <a class="code" href="structentt_1_1emitter_1_1connection.html">connection&lt;Event&gt;</a> <a class="code" href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">on</a>(<a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener&lt;Event&gt;</a> instance) {</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        <span class="keywordflow">return</span> assure&lt;Event&gt;()-&gt;on(std::move(instance));</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00246"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">  246</a></span>&#160;    <a class="code" href="structentt_1_1emitter_1_1connection.html">connection&lt;Event&gt;</a> <a class="code" href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">once</a>(<a class="code" href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">listener&lt;Event&gt;</a> instance) {</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordflow">return</span> assure&lt;Event&gt;()-&gt;once(std::move(instance));</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    }</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00260"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a9525364769b8daf55dd942599aa0a09c">  260</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a9525364769b8daf55dd942599aa0a09c">erase</a>(<a class="code" href="structentt_1_1emitter_1_1connection.html">connection&lt;Event&gt;</a> conn) {</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        assure&lt;Event&gt;()-&gt;erase(std::move(conn));</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    }</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00273"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">  273</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">clear</a>() {</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        assure&lt;Event&gt;()-&gt;clear();</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    }</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#afed3485e23fdbb87d007208382428813">  283</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1emitter.html#afed3485e23fdbb87d007208382428813">clear</a>() ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;cpool: pools) {</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            cpool.second-&gt;clear();</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        }</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    }</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160; </div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Event&gt;</div>
+<div class="line"><a name="l00295"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">  295</a></span>&#160;    [[nodiscard]] <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">empty</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> *cpool = assure&lt;Event&gt;();</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        <span class="keywordflow">return</span> !cpool || cpool-&gt;empty();</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    }</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160; </div>
+<div class="line"><a name="l00304"></a><span class="lineno"><a class="line" href="classentt_1_1emitter.html#ad395b7c4de0f1f6e01a6e1c113db6937">  304</a></span>&#160;    [[nodiscard]] <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1emitter.html#ad395b7c4de0f1f6e01a6e1c113db6937">empty</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        <span class="keywordflow">return</span> std::all_of(pools.cbegin(), pools.cend(), [](<span class="keyword">auto</span> &amp;&amp;cpool) {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;            return cpool.second-&gt;empty();</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        });</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    }</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160; </div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <a class="code" href="classentt_1_1dense__hash__map.html">dense_hash_map&lt;id_type, std::unique_ptr&lt;basic_pool&gt;</a>, <a class="code" href="structentt_1_1identity.html">identity</a>&gt; pools{};</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;};</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;} <span class="comment">// namespace entt</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclassentt_1_1dense__hash__map_html"><div class="ttname"><a href="classentt_1_1dense__hash__map.html">entt::dense_hash_map</a></div><div class="ttdoc">Associative container for key-value pairs with unique keys.</div><div class="ttdef"><b>Definition:</b> <a href="dense__hash__map_8hpp_source.html#l00240">dense_hash_map.hpp:240</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html"><div class="ttname"><a href="classentt_1_1emitter.html">entt::emitter</a></div><div class="ttdoc">General purpose event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00041">emitter.hpp:41</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_a08c6111af231c9a82277069a3bf21b75"><div class="ttname"><a href="classentt_1_1emitter.html#a08c6111af231c9a82277069a3bf21b75">entt::emitter::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdoc">Checks if there are listeners registered for the specific event.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00295">emitter.hpp:295</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_a0b580005200bb810a4a3e94320efcd8a"><div class="ttname"><a href="classentt_1_1emitter.html#a0b580005200bb810a4a3e94320efcd8a">entt::emitter::on</a></div><div class="ttdeci">connection&lt; Event &gt; on(listener&lt; Event &gt; instance)</div><div class="ttdoc">Registers a long-lived listener with the event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00221">emitter.hpp:221</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_a1200216d9abb1adb18db6035d99b60da"><div class="ttname"><a href="classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da">entt::emitter::listener</a></div><div class="ttdeci">typename pool_handler&lt; Event &gt;::listener_type listener</div><div class="ttdoc">Type of listeners accepted for the given event.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00142">emitter.hpp:142</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_a4e4324c59afee760ca13772eb6d2d522"><div class="ttname"><a href="classentt_1_1emitter.html#a4e4324c59afee760ca13772eb6d2d522">entt::emitter::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Disconnects all the listeners for the given event type.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00273">emitter.hpp:273</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_a79834d452b0600ebe0e70c54f4a21fd6"><div class="ttname"><a href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">entt::emitter::once</a></div><div class="ttdeci">connection&lt; Event &gt; once(listener&lt; Event &gt; instance)</div><div class="ttdoc">Registers a short-lived listener with the event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00246">emitter.hpp:246</a></div></div>
 <div class="ttc" id="aclassentt_1_1emitter_html_a842fef69b914a160b0bcc211bb77b27b"><div class="ttname"><a href="classentt_1_1emitter.html#a842fef69b914a160b0bcc211bb77b27b">entt::emitter::emitter</a></div><div class="ttdeci">emitter(emitter &amp;&amp;)=default</div><div class="ttdoc">Default move constructor.</div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_a9525364769b8daf55dd942599aa0a09c"><div class="ttname"><a href="classentt_1_1emitter.html#a9525364769b8daf55dd942599aa0a09c">entt::emitter::erase</a></div><div class="ttdeci">void erase(connection&lt; Event &gt; conn)</div><div class="ttdoc">Disconnects a listener from the event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00267">emitter.hpp:267</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_a9525364769b8daf55dd942599aa0a09c"><div class="ttname"><a href="classentt_1_1emitter.html#a9525364769b8daf55dd942599aa0a09c">entt::emitter::erase</a></div><div class="ttdeci">void erase(connection&lt; Event &gt; conn)</div><div class="ttdoc">Disconnects a listener from the event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00260">emitter.hpp:260</a></div></div>
 <div class="ttc" id="aclassentt_1_1emitter_html_ab270d2c6d986621a781467e29e64629c"><div class="ttname"><a href="classentt_1_1emitter.html#ab270d2c6d986621a781467e29e64629c">entt::emitter::operator=</a></div><div class="ttdeci">emitter &amp; operator=(emitter &amp;&amp;)=default</div><div class="ttdoc">Default move assignment operator.</div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_ad395b7c4de0f1f6e01a6e1c113db6937"><div class="ttname"><a href="classentt_1_1emitter.html#ad395b7c4de0f1f6e01a6e1c113db6937">entt::emitter::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdoc">Checks if there are listeners registered with the event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00313">emitter.hpp:313</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_ad2877515662e6fce3558688b4fd598aa"><div class="ttname"><a href="classentt_1_1emitter.html#ad2877515662e6fce3558688b4fd598aa">entt::emitter::publish</a></div><div class="ttdeci">void publish(Args &amp;&amp;...args)</div><div class="ttdoc">Emits the given event.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00195">emitter.hpp:195</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_ad395b7c4de0f1f6e01a6e1c113db6937"><div class="ttname"><a href="classentt_1_1emitter.html#ad395b7c4de0f1f6e01a6e1c113db6937">entt::emitter::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdoc">Checks if there are listeners registered with the event emitter.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00304">emitter.hpp:304</a></div></div>
 <div class="ttc" id="aclassentt_1_1emitter_html_af36907a2dc7cc0a6607533c67e072f92"><div class="ttname"><a href="classentt_1_1emitter.html#af36907a2dc7cc0a6607533c67e072f92">entt::emitter::emitter</a></div><div class="ttdeci">emitter()=default</div><div class="ttdoc">Default constructor.</div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_af3d352c547768be34f03f0fbfdd30b43"><div class="ttname"><a href="classentt_1_1emitter.html#af3d352c547768be34f03f0fbfdd30b43">entt::emitter::~emitter</a></div><div class="ttdeci">virtual ~emitter()</div><div class="ttdoc">Default destructor.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00180">emitter.hpp:180</a></div></div>
-<div class="ttc" id="aclassentt_1_1emitter_html_afed3485e23fdbb87d007208382428813"><div class="ttname"><a href="classentt_1_1emitter.html#afed3485e23fdbb87d007208382428813">entt::emitter::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Disconnects all the listeners.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00290">emitter.hpp:290</a></div></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
-<div class="ttc" id="astructentt_1_1emitter_1_1connection_html"><div class="ttname"><a href="structentt_1_1emitter_1_1connection.html">entt::emitter::connection</a></div><div class="ttdoc">Generic connection type for events.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00160">emitter.hpp:160</a></div></div>
-<div class="ttc" id="astructentt_1_1emitter_1_1connection_html_a0fa687596e072155e92e586e9de089c3"><div class="ttname"><a href="structentt_1_1emitter_1_1connection.html#a0fa687596e072155e92e586e9de089c3">entt::emitter::connection::connection</a></div><div class="ttdeci">connection(typename pool_handler&lt; Event &gt;::connection_type conn)</div><div class="ttdoc">Creates a connection that wraps its underlying instance.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00171">emitter.hpp:171</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_af3d352c547768be34f03f0fbfdd30b43"><div class="ttname"><a href="classentt_1_1emitter.html#af3d352c547768be34f03f0fbfdd30b43">entt::emitter::~emitter</a></div><div class="ttdeci">virtual ~emitter()</div><div class="ttdoc">Default destructor.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00173">emitter.hpp:173</a></div></div>
+<div class="ttc" id="aclassentt_1_1emitter_html_afed3485e23fdbb87d007208382428813"><div class="ttname"><a href="classentt_1_1emitter.html#afed3485e23fdbb87d007208382428813">entt::emitter::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Disconnects all the listeners.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00283">emitter.hpp:283</a></div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="dense__hash__map_8hpp_source.html#l00021">dense_hash_map.hpp:21</a></div></div>
+<div class="ttc" id="astructentt_1_1emitter_1_1connection_html"><div class="ttname"><a href="structentt_1_1emitter_1_1connection.html">entt::emitter::connection</a></div><div class="ttdoc">Generic connection type for events.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00154">emitter.hpp:154</a></div></div>
+<div class="ttc" id="astructentt_1_1emitter_1_1connection_html_a0fa687596e072155e92e586e9de089c3"><div class="ttname"><a href="structentt_1_1emitter_1_1connection.html#a0fa687596e072155e92e586e9de089c3">entt::emitter::connection::connection</a></div><div class="ttdeci">connection(typename pool_handler&lt; Event &gt;::connection_type conn)</div><div class="ttdoc">Creates a connection that wraps its underlying instance.</div><div class="ttdef"><b>Definition:</b> <a href="emitter_8hpp_source.html#l00165">emitter.hpp:165</a></div></div>
 <div class="ttc" id="astructentt_1_1emitter_1_1connection_html_a3dcb29742c6824dd28743eb0d896f9c3"><div class="ttname"><a href="structentt_1_1emitter_1_1connection.html#a3dcb29742c6824dd28743eb0d896f9c3">entt::emitter::connection::connection</a></div><div class="ttdeci">connection()=default</div><div class="ttdoc">Default constructor.</div></div>
-<div class="ttc" id="astructentt_1_1type__seq_html_a4e2551d32b2eb0d5ab7681695de66248"><div class="ttname"><a href="structentt_1_1type__seq.html#a4e2551d32b2eb0d5ab7681695de66248">entt::type_seq::value</a></div><div class="ttdeci">static id_type value()</div><div class="ttdoc">Returns the sequential identifier of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="type__info_8hpp_source.html#l00096">type_info.hpp:96</a></div></div>
+<div class="ttc" id="astructentt_1_1identity_html"><div class="ttname"><a href="structentt_1_1identity.html">entt::identity</a></div><div class="ttdoc">Identity function object (waiting for C++20).</div><div class="ttdef"><b>Definition:</b> <a href="core_2utility_8hpp_source.html#l00010">utility.hpp:10</a></div></div>
+<div class="ttc" id="astructentt_1_1type__hash_html"><div class="ttname"><a href="structentt_1_1type__hash.html">entt::type_hash</a></div><div class="ttdoc">Type hash.</div><div class="ttdef"><b>Definition:</b> <a href="type__info_8hpp_source.html#l00100">type_info.hpp:100</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

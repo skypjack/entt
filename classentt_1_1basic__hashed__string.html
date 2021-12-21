@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -118,9 +118,6 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="memitem:a342323328cacb574f886a5720dd71580"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__hashed__string.html#a342323328cacb574f886a5720dd71580">operator hash_type</a> () const</td></tr>
 <tr class="memdesc:a342323328cacb574f886a5720dd71580"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the numeric representation of a hashed string.  <a href="classentt_1_1basic__hashed__string.html#a342323328cacb574f886a5720dd71580">More...</a><br /></td></tr>
 <tr class="separator:a342323328cacb574f886a5720dd71580"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab71d6deaac023cbc54d7c26489b9b5c8"><td class="memItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__hashed__string.html#ab71d6deaac023cbc54d7c26489b9b5c8">operator==</a> (const <a class="el" href="classentt_1_1basic__hashed__string.html">basic_hashed_string</a> &amp;other) const</td></tr>
-<tr class="memdesc:ab71d6deaac023cbc54d7c26489b9b5c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares two hashed strings.  <a href="classentt_1_1basic__hashed__string.html#ab71d6deaac023cbc54d7c26489b9b5c8">More...</a><br /></td></tr>
-<tr class="separator:ab71d6deaac023cbc54d7c26489b9b5c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -142,6 +139,7 @@ class entt::basic_hashed_string&lt; Char &gt;</h3>
 <p>Zero overhead unique identifier. </p>
 <p>A hashed string is a compile-time tool that allows users to use human-readable identifers in the codebase while using their numeric counterparts at runtime.<br  />
  Because of that, a hashed string can also be used in constant expressions if required.</p>
+<dl class="section warning"><dt>Warning</dt><dd>This class doesn't take ownership of user-supplied strings nor does it make a copy of them.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Char</td><td>Character type. </td></tr>
@@ -149,7 +147,7 @@ class entt::basic_hashed_string&lt; Char &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00064">64</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00058">58</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0b0454a742c7556c805e79fc19b556dd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0b0454a742c7556c805e79fc19b556dd">&#9670;&nbsp;</a></span>basic_hashed_string() <span class="overload">[1/2]</span></h2>
@@ -195,7 +193,7 @@ template&lt;std::size_t N&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00151">151</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00145">145</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 
 </div>
 </div>
@@ -226,6 +224,7 @@ template&lt;typename Char &gt; </div>
 </div><div class="memdoc">
 
 <p>Explicit constructor on purpose to avoid constructing a hashed string directly from a <code>const value_type *</code>. </p>
+<dl class="section warning"><dt>Warning</dt><dd>The lifetime of the string is not extended nor is it copied.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wrapper</td><td>Helps achieving the purpose by relying on overloading. </td></tr>
@@ -233,7 +232,7 @@ template&lt;typename Char &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00160">160</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00158">158</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 
 </div>
 </div>
@@ -266,7 +265,7 @@ template&lt;typename Char &gt; </div>
 <p>Returns the human-readable representation of a hashed string. </p>
 <dl class="section return"><dt>Returns</dt><dd>The string used to initialize the instance. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00168">168</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00166">166</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 
 </div>
 </div>
@@ -298,7 +297,7 @@ template&lt;typename Char &gt; </div>
 <p>Returns the human-readable representation of a hashed string. </p>
 <dl class="section return"><dt>Returns</dt><dd>The string used to initialize the instance. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00181">181</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00179">179</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 
 </div>
 </div>
@@ -334,45 +333,6 @@ template&lt;typename Char &gt; </div>
 
 </div>
 </div>
-<a id="ab71d6deaac023cbc54d7c26489b9b5c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab71d6deaac023cbc54d7c26489b9b5c8">&#9670;&nbsp;</a></span>operator==()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Char &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr bool <a class="el" href="classentt_1_1basic__hashed__string.html">entt::basic_hashed_string</a>&lt; Char &gt;::operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1basic__hashed__string.html">basic_hashed_string</a>&lt; Char &gt; &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Compares two hashed strings. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>Hashed string with which to compare. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the two hashed strings are identical, false otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00194">194</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
-
-</div>
-</div>
 <a id="a40f85633eba5321389c5ceea4d19cebc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a40f85633eba5321389c5ceea4d19cebc">&#9670;&nbsp;</a></span>value() <span class="overload">[1/4]</span></h2>
 
@@ -401,7 +361,7 @@ template&lt;typename Char &gt; </div>
 <p>Returns the numeric representation of a hashed string. </p>
 <dl class="section return"><dt>Returns</dt><dd>The numeric representation of the instance. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00176">176</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00174">174</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 
 </div>
 </div>
@@ -451,7 +411,7 @@ template&lt;typename Char &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The numeric representation of the string. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00096">96</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00090">90</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 
 </div>
 </div>
@@ -485,8 +445,8 @@ template&lt;std::size_t N&gt; </div>
 
 <p>Returns directly the numeric representation of a string. </p>
 <p>Forcing template resolution avoids implicit conversions. An human-readable identifier can be anything but a plain, old bunch of characters.<br  />
- Example of use: </p><div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="classentt_1_1basic__hashed__string.html#a40f85633eba5321389c5ceea4d19cebc">value</a> = basic_hashed_string&lt;char&gt;::to_value(<span class="stringliteral">&quot;my.png&quot;</span>);</div>
-<div class="ttc" id="aclassentt_1_1basic__hashed__string_html_a40f85633eba5321389c5ceea4d19cebc"><div class="ttname"><a href="classentt_1_1basic__hashed__string.html#a40f85633eba5321389c5ceea4d19cebc">entt::basic_hashed_string::value</a></div><div class="ttdeci">constexpr hash_type value() const</div><div class="ttdoc">Returns the numeric representation of a hashed string.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00176">hashed_string.hpp:176</a></div></div>
+ Example of use: </p><div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="classentt_1_1basic__hashed__string.html#a40f85633eba5321389c5ceea4d19cebc">value</a> = <a class="code" href="classentt_1_1basic__hashed__string.html#a40f85633eba5321389c5ceea4d19cebc">basic_hashed_string&lt;char&gt;::value</a>(<span class="stringliteral">&quot;my.png&quot;</span>);</div>
+<div class="ttc" id="aclassentt_1_1basic__hashed__string_html_a40f85633eba5321389c5ceea4d19cebc"><div class="ttname"><a href="classentt_1_1basic__hashed__string.html#a40f85633eba5321389c5ceea4d19cebc">entt::basic_hashed_string::value</a></div><div class="ttdeci">constexpr hash_type value() const</div><div class="ttdoc">Returns the numeric representation of a hashed string.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00174">hashed_string.hpp:174</a></div></div>
 </div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">N</td><td>Number of characters of the identifier. </td></tr>
@@ -501,7 +461,7 @@ template&lt;std::size_t N&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The numeric representation of the string. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00118">118</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00112">112</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 
 </div>
 </div>
@@ -540,7 +500,7 @@ template&lt;typename Char &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The numeric representation of the string. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00127">127</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hashed__string_8hpp_source.html#l00121">121</a> of file <a class="el" href="hashed__string_8hpp_source.html">hashed_string.hpp</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -86,6 +86,10 @@ Public Types</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#a0aa23c3d404c35751aa6b85870eafc21">node_type</a> = internal::meta_data_node</td></tr>
 <tr class="memdesc:a0aa23c3d404c35751aa6b85870eafc21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Node type. <br /></td></tr>
 <tr class="separator:a0aa23c3d404c35751aa6b85870eafc21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab322080e34d8e40621a67f2f0e0672b7"><td class="memItemLeft" align="right" valign="top"><a id="ab322080e34d8e40621a67f2f0e0672b7"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#ab322080e34d8e40621a67f2f0e0672b7">size_type</a> = typename node_type::size_type</td></tr>
+<tr class="memdesc:ab322080e34d8e40621a67f2f0e0672b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
+<tr class="separator:ab322080e34d8e40621a67f2f0e0672b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -95,9 +99,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5e1bd9202426e41b5a0d1f25874fa7ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#a5e1bd9202426e41b5a0d1f25874fa7ec">id</a> () const</td></tr>
 <tr class="memdesc:a5e1bd9202426e41b5a0d1f25874fa7ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the identifier assigned to a type.  <a href="structentt_1_1meta__data.html#a5e1bd9202426e41b5a0d1f25874fa7ec">More...</a><br /></td></tr>
 <tr class="separator:a5e1bd9202426e41b5a0d1f25874fa7ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe0bf3fb4f0f15f62e81be0de35891e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__type.html">meta_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#afe0bf3fb4f0f15f62e81be0de35891e6">parent</a> () const</td></tr>
-<tr class="memdesc:afe0bf3fb4f0f15f62e81be0de35891e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the type to which an object belongs.  <a href="structentt_1_1meta__data.html#afe0bf3fb4f0f15f62e81be0de35891e6">More...</a><br /></td></tr>
-<tr class="separator:afe0bf3fb4f0f15f62e81be0de35891e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae49c225400fa1938e53a5f65f6f36152"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1meta__data.html#ab322080e34d8e40621a67f2f0e0672b7">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#ae49c225400fa1938e53a5f65f6f36152">arity</a> () const</td></tr>
+<tr class="memdesc:ae49c225400fa1938e53a5f65f6f36152"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of setters available.  <a href="structentt_1_1meta__data.html#ae49c225400fa1938e53a5f65f6f36152">More...</a><br /></td></tr>
+<tr class="separator:ae49c225400fa1938e53a5f65f6f36152"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a821782f679650835b47ac17949bb5f4d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#a821782f679650835b47ac17949bb5f4d">is_const</a> () const</td></tr>
 <tr class="memdesc:a821782f679650835b47ac17949bb5f4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether a data member is constant or not.  <a href="structentt_1_1meta__data.html#a821782f679650835b47ac17949bb5f4d">More...</a><br /></td></tr>
 <tr class="separator:a821782f679650835b47ac17949bb5f4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -114,11 +118,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a754da41b4c8057f7c9a3ff4738935d04"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__any.html">meta_any</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#a754da41b4c8057f7c9a3ff4738935d04">get</a> (<a class="el" href="structentt_1_1meta__handle.html">meta_handle</a> instance) const</td></tr>
 <tr class="memdesc:a754da41b4c8057f7c9a3ff4738935d04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the value of a given variable.  <a href="structentt_1_1meta__data.html#a754da41b4c8057f7c9a3ff4738935d04">More...</a><br /></td></tr>
 <tr class="separator:a754da41b4c8057f7c9a3ff4738935d04"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe3ebb33e7c66a067c5162715c66c880"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__range.html">meta_range</a>&lt; <a class="el" href="structentt_1_1meta__prop.html">meta_prop</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#abe3ebb33e7c66a067c5162715c66c880">prop</a> () const</td></tr>
-<tr class="memdesc:abe3ebb33e7c66a067c5162715c66c880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a range to use to visit all properties.  <a href="structentt_1_1meta__data.html#abe3ebb33e7c66a067c5162715c66c880">More...</a><br /></td></tr>
+<tr class="memitem:a754ff9b953cd8f9195776e6d6202ce84"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__type.html">meta_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#a754ff9b953cd8f9195776e6d6202ce84">arg</a> (const <a class="el" href="structentt_1_1meta__data.html#ab322080e34d8e40621a67f2f0e0672b7">size_type</a> index) const</td></tr>
+<tr class="memdesc:a754ff9b953cd8f9195776e6d6202ce84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the type accepted by the i-th setter.  <a href="structentt_1_1meta__data.html#a754ff9b953cd8f9195776e6d6202ce84">More...</a><br /></td></tr>
+<tr class="separator:a754ff9b953cd8f9195776e6d6202ce84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe3ebb33e7c66a067c5162715c66c880"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1meta__range.html">meta_range</a>&lt; <a class="el" href="structentt_1_1meta__prop.html">meta_prop</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#abe3ebb33e7c66a067c5162715c66c880">prop</a> () const</td></tr>
+<tr class="memdesc:abe3ebb33e7c66a067c5162715c66c880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a range to visit registered meta properties.  <a href="structentt_1_1meta__data.html#abe3ebb33e7c66a067c5162715c66c880">More...</a><br /></td></tr>
 <tr class="separator:abe3ebb33e7c66a067c5162715c66c880"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2258b0808fc9c35a27846804b1388fd9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1meta__prop.html">meta_prop</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#a2258b0808fc9c35a27846804b1388fd9">prop</a> (<a class="el" href="classentt_1_1meta__any.html">meta_any</a> key) const</td></tr>
-<tr class="memdesc:a2258b0808fc9c35a27846804b1388fd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property associated with a given key.  <a href="structentt_1_1meta__data.html#a2258b0808fc9c35a27846804b1388fd9">More...</a><br /></td></tr>
+<tr class="memdesc:a2258b0808fc9c35a27846804b1388fd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lookup function for registered meta properties.  <a href="structentt_1_1meta__data.html#a2258b0808fc9c35a27846804b1388fd9">More...</a><br /></td></tr>
 <tr class="separator:a2258b0808fc9c35a27846804b1388fd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a597429fb3dfbc05a48d2f8dd31133d97"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#a597429fb3dfbc05a48d2f8dd31133d97">operator bool</a> () const</td></tr>
 <tr class="memdesc:a597429fb3dfbc05a48d2f8dd31133d97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if an object is valid, false otherwise.  <a href="structentt_1_1meta__data.html#a597429fb3dfbc05a48d2f8dd31133d97">More...</a><br /></td></tr>
@@ -127,7 +134,7 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Opaque wrapper for data members. </p>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00826">826</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00743">743</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a287652cfd950c698d124d12820ec9d10"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a287652cfd950c698d124d12820ec9d10">&#9670;&nbsp;</a></span>meta_data()</h2>
@@ -161,11 +168,78 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00831">831</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00750">750</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a754ff9b953cd8f9195776e6d6202ce84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a754ff9b953cd8f9195776e6d6202ce84">&#9670;&nbsp;</a></span>arg()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1meta__type.html">meta_type</a> entt::meta_data::arg </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structentt_1_1meta__data.html#ab322080e34d8e40621a67f2f0e0672b7">size_type</a>&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the type accepted by the i-th setter. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>Index of the setter of which to return the accepted type. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The type accepted by the i-th setter. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01460">1460</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae49c225400fa1938e53a5f65f6f36152"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae49c225400fa1938e53a5f65f6f36152">&#9670;&nbsp;</a></span>arity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structentt_1_1meta__data.html#ab322080e34d8e40621a67f2f0e0672b7">size_type</a> entt::meta_data::arity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the number of setters available. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of setters available. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00762">762</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a754da41b4c8057f7c9a3ff4738935d04"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a754da41b4c8057f7c9a3ff4738935d04">&#9670;&nbsp;</a></span>get()</h2>
 
@@ -200,7 +274,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper containing the value of the underlying variable. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00890">890</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00813">813</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -230,7 +304,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns the identifier assigned to a type. </p>
 <dl class="section return"><dt>Returns</dt><dd>The identifier assigned to the type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00836">836</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00754">754</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -260,7 +334,7 @@ Public Member Functions</h2></td></tr>
 <p>Indicates whether a data member is constant or not. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the data member is constant, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00847">847</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00770">770</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +364,7 @@ Public Member Functions</h2></td></tr>
 <p>Indicates whether a data member is static or not. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the data member is static, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00855">855</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00778">778</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -320,37 +394,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns true if an object is valid, false otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the object is valid, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00912">912</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
-
-</div>
-</div>
-<a id="afe0bf3fb4f0f15f62e81be0de35891e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe0bf3fb4f0f15f62e81be0de35891e6">&#9670;&nbsp;</a></span>parent()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classentt_1_1meta__type.html">meta_type</a> entt::meta_data::parent </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns the type to which an object belongs. </p>
-<dl class="section return"><dt>Returns</dt><dd>The type to which the object belongs. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01649">1649</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00851">851</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +408,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1meta__range.html">meta_range</a>&lt;<a class="el" href="structentt_1_1meta__prop.html">meta_prop</a>&gt; entt::meta_data::prop </td>
+          <td class="memname"><a class="el" href="structentt_1_1meta__range.html">meta_range</a>&lt;<a class="el" href="structentt_1_1meta__prop.html">meta_prop</a>&gt; entt::meta_data::prop </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -377,10 +421,10 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a range to use to visit all properties. </p>
-<dl class="section return"><dt>Returns</dt><dd>An iterable range to use to visit all properties. </dd></dl>
+<p>Returns a range to visit registered meta properties. </p>
+<dl class="section return"><dt>Returns</dt><dd>An iterable range to visit registered meta properties. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00895">895</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00828">828</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -408,16 +452,16 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the property associated with a given key. </p>
+<p>Lookup function for registered meta properties. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">key</td><td>The key to use to search for a property. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The property associated with the given key, if any. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The registered meta property for the given key, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00904">904</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00837">837</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -459,7 +503,7 @@ template&lt;typename Type &gt; </div>
 
 <p>Sets the value of a given variable. </p>
 <p>It must be possible to cast the instance to the parent type of the data member. Otherwise, invoking the setter results in an undefined behavior.<br  />
- The type of the value must be such that a cast or conversion to the type of the variable is possible. Otherwise, invoking the setter does nothing.</p>
+ The type of the value is such that a cast or conversion to the type of the variable is possible. Otherwise, invoking the setter does nothing.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Type</td><td>Type of value to assign. </td></tr>
@@ -475,7 +519,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True in case of success, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00877">877</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00800">800</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -505,7 +549,7 @@ template&lt;typename Type &gt; </div>
 <p>Returns the type of the underlying object. </p>
 <dl class="section return"><dt>Returns</dt><dd>The type of the underlying object, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01654">1654</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01452">1452</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>

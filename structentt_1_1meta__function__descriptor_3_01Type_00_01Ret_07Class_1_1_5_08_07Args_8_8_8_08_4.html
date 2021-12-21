@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -86,10 +86,10 @@ Public Types</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a63465b01fc295a119b70095722c0e677">return_type</a> = Ret</td></tr>
 <tr class="memdesc:a63465b01fc295a119b70095722c0e677"><td class="mdescLeft">&#160;</td><td class="mdescRight">Meta function return type. <br /></td></tr>
 <tr class="separator:a63465b01fc295a119b70095722c0e677"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a327a5f8c4f6a34d1d1117fd9c98d8e38"><td class="memItemLeft" align="right" valign="top"><a id="a327a5f8c4f6a34d1d1117fd9c98d8e38"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a327a5f8c4f6a34d1d1117fd9c98d8e38">args_type</a> = std::conditional_t&lt; std::is_same_v&lt; Type, Class &gt;, <a class="el" href="structentt_1_1type__list.html">type_list</a>&lt; Args... &gt;, <a class="el" href="structentt_1_1type__list.html">type_list</a>&lt; Class &amp;, Args... &gt; &gt;</td></tr>
-<tr class="memdesc:a327a5f8c4f6a34d1d1117fd9c98d8e38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Meta function arguments. <br /></td></tr>
-<tr class="separator:a327a5f8c4f6a34d1d1117fd9c98d8e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ef80c632428bbd3d479149ba6687691"><td class="memItemLeft" align="right" valign="top"><a id="a9ef80c632428bbd3d479149ba6687691"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a9ef80c632428bbd3d479149ba6687691">args_type</a> = std::conditional_t&lt; std::is_base_of_v&lt; Class, Type &gt;, <a class="el" href="structentt_1_1type__list.html">type_list</a>&lt; Args... &gt;, <a class="el" href="structentt_1_1type__list.html">type_list</a>&lt; Class &amp;, Args... &gt; &gt;</td></tr>
+<tr class="memdesc:a9ef80c632428bbd3d479149ba6687691"><td class="mdescLeft">&#160;</td><td class="mdescRight">Meta function arguments. <br /></td></tr>
+<tr class="separator:a9ef80c632428bbd3d479149ba6687691"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -98,7 +98,7 @@ static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a clas
 <tr class="memdesc:a19154b177e459db7b337ef47e3ddd43c"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the meta function is const, false otherwise. <br /></td></tr>
 <tr class="separator:a19154b177e459db7b337ef47e3ddd43c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f3d42096f81fb16c1f7f4f62f540ad1"><td class="memItemLeft" align="right" valign="top"><a id="a0f3d42096f81fb16c1f7f4f62f540ad1"></a>
-static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a0f3d42096f81fb16c1f7f4f62f540ad1">is_static</a> = !std::is_same_v&lt;Type, Class&gt;</td></tr>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a0f3d42096f81fb16c1f7f4f62f540ad1">is_static</a> = !std::is_base_of_v&lt;Class, Type&gt;</td></tr>
 <tr class="memdesc:a0f3d42096f81fb16c1f7f4f62f540ad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the meta function is static, false otherwise. <br /></td></tr>
 <tr class="separator:a0f3d42096f81fb16c1f7f4f62f540ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -117,7 +117,7 @@ struct entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...)&gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_2utility_8hpp_source.html#l00053">53</a> of file <a class="el" href="meta_2utility_8hpp_source.html">utility.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_2utility_8hpp_source.html#l00048">48</a> of file <a class="el" href="meta_2utility_8hpp_source.html">utility.hpp</a>.</p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>src/entt/meta/<a class="el" href="meta_2utility_8hpp_source.html">utility.hpp</a></li>
 </ul>

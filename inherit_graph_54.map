@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1emitter.html" title="General purpose event emitter." alt="" coords="5,5,164,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,13,204,39"/>
+<area shape="rect" id="node2" href="$structentt_1_1emitter_1_1connection.html" title="Generic connection type for events." alt="" coords="252,5,413,47"/>
 </map>

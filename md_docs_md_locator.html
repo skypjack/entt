@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -66,25 +66,25 @@ $(function() {
 <div class="title">Crash Course: service locator </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md105"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md114"></a>
 Introduction</h1>
 <p>Usually service locators are tightly bound to the services they expose and it's hard to define a general purpose solution. This template based implementation tries to fill the gap and to get rid of the burden of defining a different specific locator for each application.<br  />
  This class is tiny, partially unsafe and thus risky to use. Moreover it doesn't fit probably most of the scenarios in which a service locator is required. Look at it as a small tool that can sometimes be useful if users know how to handle it.</p>
-<h1><a class="anchor" id="autotoc_md106"></a>
+<h1><a class="anchor" id="autotoc_md115"></a>
 Service locator</h1>
 <p>The API is straightforward. The basic idea is that services are implemented by means of interfaces and rely on polymorphism.<br  />
  The locator is instantiated with the base type of the service if any and a concrete implementation is provided along with all the parameters required to initialize it. As an example:</p>
 <div class="fragment"><div class="line"><span class="comment">// the service has no base type, a locator is used to treat it as a kind of singleton</span></div>
-<div class="line"><a class="code" href="structentt_1_1service__locator.html#a116dc62f5d2a1c65db9d7528c957e91f">entt::service_locator&lt;my_service&gt;::set</a>(params...);</div>
+<div class="line"><a class="code" href="structentt_1_1service__locator.html#a1cab7cf8cff562d6ec95b7aaeaf12366">entt::service_locator&lt;my_service&gt;::set</a>(params...);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// sets up an opaque service</span></div>
 <div class="line"><a class="code" href="structentt_1_1service__locator.html">entt::service_locator&lt;audio_interface&gt;::set&lt;audio_implementation&gt;</a>(params...);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// resets (destroys) the service</span></div>
 <div class="line"><a class="code" href="structentt_1_1service__locator.html#a4d655acab54d87058ad41a266830d0e8">entt::service_locator&lt;audio_interface&gt;::reset</a>();</div>
-<div class="ttc" id="astructentt_1_1service__locator_html"><div class="ttname"><a href="structentt_1_1service__locator.html">entt::service_locator</a></div><div class="ttdoc">Service locator, nothing more.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00025">locator.hpp:25</a></div></div>
-<div class="ttc" id="astructentt_1_1service__locator_html_a116dc62f5d2a1c65db9d7528c957e91f"><div class="ttname"><a href="structentt_1_1service__locator.html#a116dc62f5d2a1c65db9d7528c957e91f">entt::service_locator::set</a></div><div class="ttdeci">static void set(Args &amp;&amp;... args)</div><div class="ttdoc">Sets or replaces a service.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00081">locator.hpp:81</a></div></div>
-<div class="ttc" id="astructentt_1_1service__locator_html_a4d655acab54d87058ad41a266830d0e8"><div class="ttname"><a href="structentt_1_1service__locator.html#a4d655acab54d87058ad41a266830d0e8">entt::service_locator::reset</a></div><div class="ttdeci">static void reset()</div><div class="ttdoc">Resets a service.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00099">locator.hpp:99</a></div></div>
+<div class="ttc" id="astructentt_1_1service__locator_html"><div class="ttname"><a href="structentt_1_1service__locator.html">entt::service_locator</a></div><div class="ttdoc">Service locator, nothing more.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00022">locator.hpp:22</a></div></div>
+<div class="ttc" id="astructentt_1_1service__locator_html_a1cab7cf8cff562d6ec95b7aaeaf12366"><div class="ttname"><a href="structentt_1_1service__locator.html#a1cab7cf8cff562d6ec95b7aaeaf12366">entt::service_locator::set</a></div><div class="ttdeci">static void set(Args &amp;&amp;...args)</div><div class="ttdoc">Sets or replaces a service.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00078">locator.hpp:78</a></div></div>
+<div class="ttc" id="astructentt_1_1service__locator_html_a4d655acab54d87058ad41a266830d0e8"><div class="ttname"><a href="structentt_1_1service__locator.html#a4d655acab54d87058ad41a266830d0e8">entt::service_locator::reset</a></div><div class="ttdeci">static void reset()</div><div class="ttdoc">Resets a service.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00096">locator.hpp:96</a></div></div>
 </div><!-- fragment --><p>The locator can also be queried to know if an active service is currently set and to retrieve it if necessary (either as a pointer or as a reference):</p>
 <div class="fragment"><div class="line"><span class="comment">// no service currently set</span></div>
 <div class="line"><span class="keyword">auto</span> empty = <a class="code" href="structentt_1_1service__locator.html#ad96474e6acfb0edd0e123c584f79296b">entt::service_locator&lt;audio_interface&gt;::empty</a>();</div>
@@ -94,9 +94,9 @@ Service locator</h1>
 <div class="line"> </div>
 <div class="line"><span class="comment">// ... or a reference, but it&#39;s undefined behaviour if the service isn&#39;t set yet</span></div>
 <div class="line">audio_interface &amp;ref = <a class="code" href="structentt_1_1service__locator.html#a5379f8d798c2de5b1c41756ba3959e06">entt::service_locator&lt;audio_interface&gt;::ref</a>();</div>
-<div class="ttc" id="astructentt_1_1service__locator_html_a5379f8d798c2de5b1c41756ba3959e06"><div class="ttname"><a href="structentt_1_1service__locator.html#a5379f8d798c2de5b1c41756ba3959e06">entt::service_locator::ref</a></div><div class="ttdeci">static Service &amp; ref()</div><div class="ttdoc">Returns a weak reference to a service implementation, if any.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00070">locator.hpp:70</a></div></div>
-<div class="ttc" id="astructentt_1_1service__locator_html_a88134390e70265359dda08f5aba2877f"><div class="ttname"><a href="structentt_1_1service__locator.html#a88134390e70265359dda08f5aba2877f">entt::service_locator::get</a></div><div class="ttdeci">static std::weak_ptr&lt; Service &gt; get()</div><div class="ttdoc">Returns a weak pointer to a service implementation, if any.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00052">locator.hpp:52</a></div></div>
-<div class="ttc" id="astructentt_1_1service__locator_html_ad96474e6acfb0edd0e123c584f79296b"><div class="ttname"><a href="structentt_1_1service__locator.html#ad96474e6acfb0edd0e123c584f79296b">entt::service_locator::empty</a></div><div class="ttdeci">static bool empty()</div><div class="ttdoc">Tests if a valid service implementation is set.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00038">locator.hpp:38</a></div></div>
+<div class="ttc" id="astructentt_1_1service__locator_html_a5379f8d798c2de5b1c41756ba3959e06"><div class="ttname"><a href="structentt_1_1service__locator.html#a5379f8d798c2de5b1c41756ba3959e06">entt::service_locator::ref</a></div><div class="ttdeci">static Service &amp; ref()</div><div class="ttdoc">Returns a weak reference to a service implementation, if any.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00067">locator.hpp:67</a></div></div>
+<div class="ttc" id="astructentt_1_1service__locator_html_a88134390e70265359dda08f5aba2877f"><div class="ttname"><a href="structentt_1_1service__locator.html#a88134390e70265359dda08f5aba2877f">entt::service_locator::get</a></div><div class="ttdeci">static std::weak_ptr&lt; Service &gt; get()</div><div class="ttdoc">Returns a weak pointer to a service implementation, if any.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00049">locator.hpp:49</a></div></div>
+<div class="ttc" id="astructentt_1_1service__locator_html_ad96474e6acfb0edd0e123c584f79296b"><div class="ttname"><a href="structentt_1_1service__locator.html#ad96474e6acfb0edd0e123c584f79296b">entt::service_locator::empty</a></div><div class="ttdeci">static bool empty()</div><div class="ttdoc">Tests if a valid service implementation is set.</div><div class="ttdef"><b>Definition:</b> <a href="locator_8hpp_source.html#l00035">locator.hpp:35</a></div></div>
 </div><!-- fragment --><p>A common use is to wrap the different locators in a container class, creating aliases for the various services:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>locator {</div>
 <div class="line">    <span class="keyword">using</span> camera = <a class="code" href="structentt_1_1service__locator.html">entt::service_locator&lt;camera_interface&gt;</a>;</div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -69,7 +69,6 @@ $(function() {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classentt_1_1meta__sequence__container_1_1meta__iterator-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">entt::meta_sequence_container::meta_iterator Class Reference</div>  </div>
@@ -91,13 +90,13 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a452e7367da253653f8a5e3a4c9d4f155">value_type</a> = <a class="el" href="classentt_1_1meta__any.html">meta_any</a></td></tr>
 <tr class="memdesc:a452e7367da253653f8a5e3a4c9d4f155"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of elements returned by the iterator. <br /></td></tr>
 <tr class="separator:a452e7367da253653f8a5e3a4c9d4f155"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ce414ee556eed15b08b248af0473d1a"><td class="memItemLeft" align="right" valign="top"><a id="a5ce414ee556eed15b08b248af0473d1a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a5ce414ee556eed15b08b248af0473d1a">pointer</a> = void</td></tr>
-<tr class="memdesc:a5ce414ee556eed15b08b248af0473d1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer type, <code>void</code> on purpose. <br /></td></tr>
-<tr class="separator:a5ce414ee556eed15b08b248af0473d1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab36fb6642c45d6d7a2112e486fc6bc88"><td class="memItemLeft" align="right" valign="top"><a id="ab36fb6642c45d6d7a2112e486fc6bc88"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ab36fb6642c45d6d7a2112e486fc6bc88">pointer</a> = <a class="el" href="structentt_1_1input__iterator__pointer.html">input_iterator_pointer</a>&lt; <a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a452e7367da253653f8a5e3a4c9d4f155">value_type</a> &gt;</td></tr>
+<tr class="memdesc:ab36fb6642c45d6d7a2112e486fc6bc88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer type, it's a <em>safe</em> temporary object. <br /></td></tr>
+<tr class="separator:ab36fb6642c45d6d7a2112e486fc6bc88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57962b1345c3905a11a88cf259aaa288"><td class="memItemLeft" align="right" valign="top"><a id="a57962b1345c3905a11a88cf259aaa288"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a57962b1345c3905a11a88cf259aaa288">reference</a> = <a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a452e7367da253653f8a5e3a4c9d4f155">value_type</a></td></tr>
-<tr class="memdesc:a57962b1345c3905a11a88cf259aaa288"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference type, it is <b>not</b> an actual reference. <br /></td></tr>
+<tr class="memdesc:a57962b1345c3905a11a88cf259aaa288"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference type, it's <b>not</b> an actual reference. <br /></td></tr>
 <tr class="separator:a57962b1345c3905a11a88cf259aaa288"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aade7df8f3ede442e7c811828e93bbd3c"><td class="memItemLeft" align="right" valign="top"><a id="aade7df8f3ede442e7c811828e93bbd3c"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#aade7df8f3ede442e7c811828e93bbd3c">iterator_category</a> = std::input_iterator_tag</td></tr>
@@ -120,30 +119,29 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2ca9ecc7a3bd732c1ef21969b410d547"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html">meta_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a2ca9ecc7a3bd732c1ef21969b410d547">operator++</a> (int)</td></tr>
 <tr class="memdesc:a2ca9ecc7a3bd732c1ef21969b410d547"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post-increment operator.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a2ca9ecc7a3bd732c1ef21969b410d547">More...</a><br /></td></tr>
 <tr class="separator:a2ca9ecc7a3bd732c1ef21969b410d547"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab88fe602ee7756bc182bd2b75554ac56"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a57962b1345c3905a11a88cf259aaa288">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ab88fe602ee7756bc182bd2b75554ac56">operator*</a> () const</td></tr>
+<tr class="memdesc:ab88fe602ee7756bc182bd2b75554ac56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indirection operator for accessing the pointed opaque object.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ab88fe602ee7756bc182bd2b75554ac56">More...</a><br /></td></tr>
+<tr class="separator:ab88fe602ee7756bc182bd2b75554ac56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0386e92772a88a2904a295c88e9cb7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ab36fb6642c45d6d7a2112e486fc6bc88">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ad0386e92772a88a2904a295c88e9cb7a">operator-&gt;</a> () const</td></tr>
+<tr class="memdesc:ad0386e92772a88a2904a295c88e9cb7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access operator for accessing the pointed opaque object.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ad0386e92772a88a2904a295c88e9cb7a">More...</a><br /></td></tr>
+<tr class="separator:ad0386e92772a88a2904a295c88e9cb7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4671598328a55a00a9631bd109d9bc10"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a4671598328a55a00a9631bd109d9bc10">operator bool</a> () const</td></tr>
+<tr class="memdesc:a4671598328a55a00a9631bd109d9bc10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns false if an iterator is invalid, true otherwise.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a4671598328a55a00a9631bd109d9bc10">More...</a><br /></td></tr>
+<tr class="separator:a4671598328a55a00a9631bd109d9bc10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf1a347090bce0e5e133695110988442"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#adf1a347090bce0e5e133695110988442">operator==</a> (const <a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html">meta_iterator</a> &amp;other) const</td></tr>
 <tr class="memdesc:adf1a347090bce0e5e133695110988442"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if two iterators refer to the same element.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#adf1a347090bce0e5e133695110988442">More...</a><br /></td></tr>
 <tr class="separator:adf1a347090bce0e5e133695110988442"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f3c9f4a3d71e6d8686ee509bcca51aa"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a1f3c9f4a3d71e6d8686ee509bcca51aa">operator!=</a> (const <a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html">meta_iterator</a> &amp;other) const</td></tr>
 <tr class="memdesc:a1f3c9f4a3d71e6d8686ee509bcca51aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if two iterators refer to the same element.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a1f3c9f4a3d71e6d8686ee509bcca51aa">More...</a><br /></td></tr>
 <tr class="separator:a1f3c9f4a3d71e6d8686ee509bcca51aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab88fe602ee7756bc182bd2b75554ac56"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a57962b1345c3905a11a88cf259aaa288">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ab88fe602ee7756bc182bd2b75554ac56">operator*</a> () const</td></tr>
-<tr class="memdesc:ab88fe602ee7756bc182bd2b75554ac56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indirection operator.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ab88fe602ee7756bc182bd2b75554ac56">More...</a><br /></td></tr>
-<tr class="separator:ab88fe602ee7756bc182bd2b75554ac56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4671598328a55a00a9631bd109d9bc10"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a4671598328a55a00a9631bd109d9bc10">operator bool</a> () const</td></tr>
-<tr class="memdesc:a4671598328a55a00a9631bd109d9bc10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns false if an iterator is invalid, true otherwise.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a4671598328a55a00a9631bd109d9bc10">More...</a><br /></td></tr>
-<tr class="separator:a4671598328a55a00a9631bd109d9bc10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a6919bcefed41cd55d6154072fcea2e43"><td class="memItemLeft" align="right" valign="top"><a id="a6919bcefed41cd55d6154072fcea2e43"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a6919bcefed41cd55d6154072fcea2e43">meta_sequence_container</a></td></tr>
-<tr class="memdesc:a6919bcefed41cd55d6154072fcea2e43"><td class="mdescLeft">&#160;</td><td class="mdescRight">A sequence container can access the underlying iterator. <br /></td></tr>
-<tr class="separator:a6919bcefed41cd55d6154072fcea2e43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b25b042d4902929b3fb9be9c877749a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceentt.html#a4846741b8f485584c196304f588b94ad">any</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a1b25b042d4902929b3fb9be9c877749a">base</a> () const</td></tr>
+<tr class="memdesc:a1b25b042d4902929b3fb9be9c877749a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the underlying iterator.  <a href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#a1b25b042d4902929b3fb9be9c877749a">More...</a><br /></td></tr>
+<tr class="separator:a1b25b042d4902929b3fb9be9c877749a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Opaque iterator for sequence containers. </p>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01675">1675</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01469">1469</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a027834ba004cd79ca12ed34065378876"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a027834ba004cd79ca12ed34065378876">&#9670;&nbsp;</a></span>meta_iterator()</h2>
@@ -166,7 +164,7 @@ template&lt;typename It &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -185,11 +183,41 @@ template&lt;typename It &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01716">1716</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01510">1510</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a1b25b042d4902929b3fb9be9c877749a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b25b042d4902929b3fb9be9c877749a">&#9670;&nbsp;</a></span>base()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceentt.html#a4846741b8f485584c196304f588b94ad">any</a> entt::meta_sequence_container::meta_iterator::base </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the underlying iterator. </p>
+<dl class="section return"><dt>Returns</dt><dd>The underlying iterator. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01573">1573</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a4671598328a55a00a9631bd109d9bc10"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4671598328a55a00a9631bd109d9bc10">&#9670;&nbsp;</a></span>operator bool()</h2>
 
@@ -216,7 +244,7 @@ template&lt;typename It &gt; </div>
 <p>Returns false if an iterator is invalid, true otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>False if the iterator is invalid, true otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01764">1764</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01547">1547</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +281,7 @@ template&lt;typename It &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>False if the iterators refer to the same element, true otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01746">1746</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01565">1565</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -280,10 +308,10 @@ template&lt;typename It &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Indirection operator. </p>
+<p>Indirection operator for accessing the pointed opaque object. </p>
 <dl class="section return"><dt>Returns</dt><dd>The element to which the iterator points. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01754">1754</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01529">1529</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -313,7 +341,7 @@ template&lt;typename It &gt; </div>
 <p>Pre-increment operator. </p>
 <dl class="section return"><dt>Returns</dt><dd>This iterator. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01722">1722</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01515">1515</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +372,37 @@ template&lt;typename It &gt; </div>
 <p>Post-increment operator. </p>
 <dl class="section return"><dt>Returns</dt><dd>This iterator. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01727">1727</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01520">1520</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad0386e92772a88a2904a295c88e9cb7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0386e92772a88a2904a295c88e9cb7a">&#9670;&nbsp;</a></span>operator-&gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1meta__sequence__container_1_1meta__iterator.html#ab36fb6642c45d6d7a2112e486fc6bc88">pointer</a> entt::meta_sequence_container::meta_iterator::operator-&gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Access operator for accessing the pointed opaque object. </p>
+<dl class="section return"><dt>Returns</dt><dd>The element to which the iterator points. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01539">1539</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -381,7 +439,7 @@ template&lt;typename It &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the iterators refer to the same element, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01737">1737</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01556">1556</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>

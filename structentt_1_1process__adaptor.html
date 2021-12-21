@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -101,10 +101,10 @@ Collaboration diagram for entt::process_adaptor&lt; Func, Delta &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad1e2c8f3c44bf42abb05ef913b8267ce"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
-<tr class="memitem:ad1e2c8f3c44bf42abb05ef913b8267ce"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1process__adaptor.html#ad1e2c8f3c44bf42abb05ef913b8267ce">process_adaptor</a> (Args &amp;&amp;... args)</td></tr>
-<tr class="memdesc:ad1e2c8f3c44bf42abb05ef913b8267ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a process adaptor from a lambda or a functor.  <a href="structentt_1_1process__adaptor.html#ad1e2c8f3c44bf42abb05ef913b8267ce">More...</a><br /></td></tr>
-<tr class="separator:ad1e2c8f3c44bf42abb05ef913b8267ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af065d57ac7c645279e4a5033f326abd8"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:af065d57ac7c645279e4a5033f326abd8"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1process__adaptor.html#af065d57ac7c645279e4a5033f326abd8">process_adaptor</a> (Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:af065d57ac7c645279e4a5033f326abd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a process adaptor from a lambda or a functor.  <a href="structentt_1_1process__adaptor.html#af065d57ac7c645279e4a5033f326abd8">More...</a><br /></td></tr>
+<tr class="separator:af065d57ac7c645279e4a5033f326abd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7514fabbbda491742872bc0e52dde5c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1process__adaptor.html#a7514fabbbda491742872bc0e52dde5c2">update</a> (const Delta delta, void *data)</td></tr>
 <tr class="memdesc:a7514fabbbda491742872bc0e52dde5c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates a process and its internal state if required.  <a href="structentt_1_1process__adaptor.html#a7514fabbbda491742872bc0e52dde5c2">More...</a><br /></td></tr>
 <tr class="separator:a7514fabbbda491742872bc0e52dde5c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -162,8 +162,8 @@ struct entt::process_adaptor&lt; Func, Delta &gt;</h3>
  This class helps in filling the gap and turning lambdas and functors into full featured processes usable by a scheduler.</p>
 <p>The signature of the function call operator should be equivalent to the following:</p>
 <div class="fragment"><div class="line">void(Delta delta, <span class="keywordtype">void</span> *data, <span class="keyword">auto</span> <a class="code" href="classentt_1_1process.html#a3b71fd166a1e6b42ea76f2e92bfa5edc">succeed</a>, <span class="keyword">auto</span> <a class="code" href="classentt_1_1process.html#a43cb8f82148fb6d688fcc9eca358892a">fail</a>);</div>
-<div class="ttc" id="aclassentt_1_1process_html_a3b71fd166a1e6b42ea76f2e92bfa5edc"><div class="ttname"><a href="classentt_1_1process.html#a3b71fd166a1e6b42ea76f2e92bfa5edc">entt::process&lt; process_adaptor&lt; Func, Delta &gt;, Delta &gt;::succeed</a></div><div class="ttdeci">void succeed()</div><div class="ttdoc">Terminates a process with success if it's still alive.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00124">process.hpp:124</a></div></div>
-<div class="ttc" id="aclassentt_1_1process_html_a43cb8f82148fb6d688fcc9eca358892a"><div class="ttname"><a href="classentt_1_1process.html#a43cb8f82148fb6d688fcc9eca358892a">entt::process&lt; process_adaptor&lt; Func, Delta &gt;, Delta &gt;::fail</a></div><div class="ttdeci">void fail()</div><div class="ttdoc">Terminates a process with errors if it's still alive.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00136">process.hpp:136</a></div></div>
+<div class="ttc" id="aclassentt_1_1process_html_a3b71fd166a1e6b42ea76f2e92bfa5edc"><div class="ttname"><a href="classentt_1_1process.html#a3b71fd166a1e6b42ea76f2e92bfa5edc">entt::process&lt; process_adaptor&lt; Func, Delta &gt;, Delta &gt;::succeed</a></div><div class="ttdeci">void succeed()</div><div class="ttdoc">Terminates a process with success if it's still alive.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00122">process.hpp:122</a></div></div>
+<div class="ttc" id="aclassentt_1_1process_html_a43cb8f82148fb6d688fcc9eca358892a"><div class="ttname"><a href="classentt_1_1process.html#a43cb8f82148fb6d688fcc9eca358892a">entt::process&lt; process_adaptor&lt; Func, Delta &gt;, Delta &gt;::fail</a></div><div class="ttdeci">void fail()</div><div class="ttdoc">Terminates a process with errors if it's still alive.</div><div class="ttdef"><b>Definition:</b> <a href="process_8hpp_source.html#l00134">process.hpp:134</a></div></div>
 </div><!-- fragment --><p>Where:</p>
 <ul>
 <li><code>delta</code> is the elapsed time.</li>
@@ -185,10 +185,10 @@ struct entt::process_adaptor&lt; Func, Delta &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00309">309</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00306">306</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad1e2c8f3c44bf42abb05ef913b8267ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1e2c8f3c44bf42abb05ef913b8267ce">&#9670;&nbsp;</a></span>process_adaptor()</h2>
+<a id="af065d57ac7c645279e4a5033f326abd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af065d57ac7c645279e4a5033f326abd8">&#9670;&nbsp;</a></span>process_adaptor()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -229,7 +229,7 @@ template&lt;typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00316">316</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00313">313</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +279,7 @@ template&lt;typename Func , typename Delta &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00325">325</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00321">321</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -73,35 +73,35 @@ $(function() {
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef ENTT_ENTITY_COMPONENT_HPP</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define ENTT_ENTITY_COMPONENT_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="structentt_1_1basic__component__traits.html">   13</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1basic__component__traits.html">basic_component_traits</a> {</div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="structentt_1_1basic__component__traits.html#af33aa4f747fb2a108434048c9661c686">   15</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1basic__component__traits.html#af33aa4f747fb2a108434048c9661c686">in_place_delete</a> = std::false_type;</div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="structentt_1_1basic__component__traits.html#abe1f44f482b1155e7a924bd720fe6528">   17</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1basic__component__traits.html#abe1f44f482b1155e7a924bd720fe6528">ignore_if_empty</a> = ENTT_IGNORE_IF_EMPTY;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;};</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type, <span class="keyword">typename</span> = <span class="keywordtype">void</span>&gt;</div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="structentt_1_1component__traits.html">   26</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1component__traits.html">component_traits</a>: <a class="code" href="structentt_1_1basic__component__traits.html">basic_component_traits</a> {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    static_assert(std::is_same_v&lt;std::decay_t&lt;Type&gt;, Type&gt;, <span class="stringliteral">&quot;Unsupported type&quot;</span>);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;};</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
-<div class="ttc" id="astructentt_1_1basic__component__traits_html"><div class="ttname"><a href="structentt_1_1basic__component__traits.html">entt::basic_component_traits</a></div><div class="ttdoc">Commonly used default traits for all types.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00013">component.hpp:13</a></div></div>
-<div class="ttc" id="astructentt_1_1basic__component__traits_html_abe1f44f482b1155e7a924bd720fe6528"><div class="ttname"><a href="structentt_1_1basic__component__traits.html#abe1f44f482b1155e7a924bd720fe6528">entt::basic_component_traits::ignore_if_empty</a></div><div class="ttdeci">std::true_type ignore_if_empty</div><div class="ttdoc">Empty type optimization, default is ENTT_IGNORE_IF_EMPTY.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00017">component.hpp:17</a></div></div>
-<div class="ttc" id="astructentt_1_1basic__component__traits_html_af33aa4f747fb2a108434048c9661c686"><div class="ttname"><a href="structentt_1_1basic__component__traits.html#af33aa4f747fb2a108434048c9661c686">entt::basic_component_traits::in_place_delete</a></div><div class="ttdeci">std::false_type in_place_delete</div><div class="ttdoc">Pointer stability, default is std::false_type.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00015">component.hpp:15</a></div></div>
-<div class="ttc" id="astructentt_1_1component__traits_html"><div class="ttname"><a href="structentt_1_1component__traits.html">entt::component_traits</a></div><div class="ttdoc">Common way to access various properties of components.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00026">component.hpp:26</a></div></div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structentt_1_1basic__component__traits.html">   10</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1basic__component__traits.html">basic_component_traits</a> {</div>
+<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="structentt_1_1basic__component__traits.html#a4ca4508bcd9833ab7c3354704144c90b">   12</a></span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> <a class="code" href="structentt_1_1basic__component__traits.html#a4ca4508bcd9833ab7c3354704144c90b">in_place_delete</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="structentt_1_1basic__component__traits.html#a2e58d8aa7b15b837cbfb0963cc0c3d46">   14</a></span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> <a class="code" href="structentt_1_1basic__component__traits.html#a2e58d8aa7b15b837cbfb0963cc0c3d46">ignore_if_empty</a> = ENTT_IGNORE_IF_EMPTY;</div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="structentt_1_1basic__component__traits.html#a4b00cb76e92fe28071c08f0b07d37539">   16</a></span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> <a class="code" href="structentt_1_1basic__component__traits.html#a4b00cb76e92fe28071c08f0b07d37539">page_size</a> = ENTT_PACKED_PAGE;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;};</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type, <span class="keyword">typename</span> = <span class="keywordtype">void</span>&gt;</div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="structentt_1_1component__traits.html">   24</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1component__traits.html">component_traits</a>: <a class="code" href="structentt_1_1basic__component__traits.html">basic_component_traits</a> {</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    static_assert(std::is_same_v&lt;std::decay_t&lt;Type&gt;, Type&gt;, <span class="stringliteral">&quot;Unsupported type&quot;</span>);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;};</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="namespaceentt.html#ab9f9b531ebde614244a0da111d4b66ff">   33</a></span>&#160;<span class="keyword">inline</span> constexpr <span class="keywordtype">bool</span> <a class="code" href="namespaceentt.html#ab9f9b531ebde614244a0da111d4b66ff">ignore_as_empty_v</a> = <a class="code" href="structentt_1_1component__traits.html">component_traits&lt;Type&gt;::ignore_if_empty</a> &amp;&amp;std::is_empty_v&lt;Type&gt;;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;} <span class="comment">// namespace entt</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="dense__hash__map_8hpp_source.html#l00021">dense_hash_map.hpp:21</a></div></div>
+<div class="ttc" id="anamespaceentt_html_ab9f9b531ebde614244a0da111d4b66ff"><div class="ttname"><a href="namespaceentt.html#ab9f9b531ebde614244a0da111d4b66ff">entt::ignore_as_empty_v</a></div><div class="ttdeci">constexpr bool ignore_as_empty_v</div><div class="ttdoc">Helper variable template.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00033">component.hpp:33</a></div></div>
+<div class="ttc" id="astructentt_1_1basic__component__traits_html"><div class="ttname"><a href="structentt_1_1basic__component__traits.html">entt::basic_component_traits</a></div><div class="ttdoc">Commonly used default traits for all types.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00010">component.hpp:10</a></div></div>
+<div class="ttc" id="astructentt_1_1basic__component__traits_html_a2e58d8aa7b15b837cbfb0963cc0c3d46"><div class="ttname"><a href="structentt_1_1basic__component__traits.html#a2e58d8aa7b15b837cbfb0963cc0c3d46">entt::basic_component_traits::ignore_if_empty</a></div><div class="ttdeci">static constexpr auto ignore_if_empty</div><div class="ttdoc">Empty type optimization, default is ENTT_IGNORE_IF_EMPTY.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00014">component.hpp:14</a></div></div>
+<div class="ttc" id="astructentt_1_1basic__component__traits_html_a4b00cb76e92fe28071c08f0b07d37539"><div class="ttname"><a href="structentt_1_1basic__component__traits.html#a4b00cb76e92fe28071c08f0b07d37539">entt::basic_component_traits::page_size</a></div><div class="ttdeci">static constexpr auto page_size</div><div class="ttdoc">Page size, default is ENTT_PACKED_PAGE.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00016">component.hpp:16</a></div></div>
+<div class="ttc" id="astructentt_1_1basic__component__traits_html_a4ca4508bcd9833ab7c3354704144c90b"><div class="ttname"><a href="structentt_1_1basic__component__traits.html#a4ca4508bcd9833ab7c3354704144c90b">entt::basic_component_traits::in_place_delete</a></div><div class="ttdeci">static constexpr auto in_place_delete</div><div class="ttdoc">Pointer stability, default is false.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00012">component.hpp:12</a></div></div>
+<div class="ttc" id="astructentt_1_1component__traits_html"><div class="ttname"><a href="structentt_1_1component__traits.html">entt::component_traits</a></div><div class="ttdoc">Common way to access various properties of components.</div><div class="ttdef"><b>Definition:</b> <a href="component_8hpp_source.html#l00024">component.hpp:24</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

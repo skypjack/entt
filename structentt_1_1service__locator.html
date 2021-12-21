@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -110,10 +110,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a5379f8d798c2de5b1c41756ba3959e06"><td class="memItemLeft" align="right" valign="top">static Service &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1service__locator.html#a5379f8d798c2de5b1c41756ba3959e06">ref</a> ()</td></tr>
 <tr class="memdesc:a5379f8d798c2de5b1c41756ba3959e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a weak reference to a service implementation, if any.  <a href="structentt_1_1service__locator.html#a5379f8d798c2de5b1c41756ba3959e06">More...</a><br /></td></tr>
 <tr class="separator:a5379f8d798c2de5b1c41756ba3959e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a116dc62f5d2a1c65db9d7528c957e91f"><td class="memTemplParams" colspan="2">template&lt;typename Impl  = Service, typename... Args&gt; </td></tr>
-<tr class="memitem:a116dc62f5d2a1c65db9d7528c957e91f"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1service__locator.html#a116dc62f5d2a1c65db9d7528c957e91f">set</a> (Args &amp;&amp;... args)</td></tr>
-<tr class="memdesc:a116dc62f5d2a1c65db9d7528c957e91f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets or replaces a service.  <a href="structentt_1_1service__locator.html#a116dc62f5d2a1c65db9d7528c957e91f">More...</a><br /></td></tr>
-<tr class="separator:a116dc62f5d2a1c65db9d7528c957e91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cab7cf8cff562d6ec95b7aaeaf12366"><td class="memTemplParams" colspan="2">template&lt;typename Impl  = Service, typename... Args&gt; </td></tr>
+<tr class="memitem:a1cab7cf8cff562d6ec95b7aaeaf12366"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1service__locator.html#a1cab7cf8cff562d6ec95b7aaeaf12366">set</a> (Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:a1cab7cf8cff562d6ec95b7aaeaf12366"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets or replaces a service.  <a href="structentt_1_1service__locator.html#a1cab7cf8cff562d6ec95b7aaeaf12366">More...</a><br /></td></tr>
+<tr class="separator:a1cab7cf8cff562d6ec95b7aaeaf12366"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86770e79d01ab5fb0dddffba0bf9a697"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1service__locator.html#a86770e79d01ab5fb0dddffba0bf9a697">set</a> (std::shared_ptr&lt; Service &gt; ptr)</td></tr>
 <tr class="memdesc:a86770e79d01ab5fb0dddffba0bf9a697"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets or replaces a service.  <a href="structentt_1_1service__locator.html#a86770e79d01ab5fb0dddffba0bf9a697">More...</a><br /></td></tr>
 <tr class="separator:a86770e79d01ab5fb0dddffba0bf9a697"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,7 +135,7 @@ struct entt::service_locator&lt; Service &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00025">25</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00022">22</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad96474e6acfb0edd0e123c584f79296b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad96474e6acfb0edd0e123c584f79296b">&#9670;&nbsp;</a></span>empty()</h2>
@@ -165,7 +165,7 @@ template&lt;typename Service &gt; </div>
 <p>Tests if a valid service implementation is set. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the service is set, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00038">38</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00035">35</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
 
 </div>
 </div>
@@ -198,7 +198,7 @@ template&lt;typename Service &gt; </div>
 <p>Clients of a service shouldn't retain references to it. The recommended way is to retrieve the service implementation currently set each and every time the need of using it arises. Otherwise users can incur in unexpected behaviors.</p>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the service implementation currently set, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00052">52</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00049">49</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +232,7 @@ template&lt;typename Service &gt; </div>
 <dl class="section warning"><dt>Warning</dt><dd>In case no service implementation has been set, a call to this function results in undefined behavior.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the service implementation currently set, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00070">70</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00067">67</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
 
 </div>
 </div>
@@ -264,12 +264,12 @@ template&lt;typename Service &gt; </div>
 <p>Resets a service. </p>
 <p>The service is no longer valid after a reset. </p>
 
-<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00099">99</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00096">96</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a116dc62f5d2a1c65db9d7528c957e91f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a116dc62f5d2a1c65db9d7528c957e91f">&#9670;&nbsp;</a></span>set() <span class="overload">[1/2]</span></h2>
+<a id="a1cab7cf8cff562d6ec95b7aaeaf12366"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cab7cf8cff562d6ec95b7aaeaf12366">&#9670;&nbsp;</a></span>set() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -311,7 +311,7 @@ template&lt;typename Impl  = Service, typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00081">81</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00078">78</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
 
 </div>
 </div>
@@ -349,7 +349,7 @@ template&lt;typename Service &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00089">89</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="locator_8hpp_source.html#l00086">86</a> of file <a class="el" href="locator_8hpp_source.html">locator.hpp</a>.</p>
 
 </div>
 </div>

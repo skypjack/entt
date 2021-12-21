@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -67,6 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classentt_1_1resource__handle-members.html">List of all members</a>  </div>
@@ -80,70 +81,76 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:aaa5bb317dff4e02ec3cef610705de341"><td class="memItemLeft" align="right" valign="top"><a id="aaa5bb317dff4e02ec3cef610705de341"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#aaa5bb317dff4e02ec3cef610705de341">size_type</a> = long</td></tr>
+<tr class="memdesc:aaa5bb317dff4e02ec3cef610705de341"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
+<tr class="separator:aaa5bb317dff4e02ec3cef610705de341"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fed7493bab627b5378f1e027e7c845b"><td class="memItemLeft" align="right" valign="top"><a id="a8fed7493bab627b5378f1e027e7c845b"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> = Resource</td></tr>
+<tr class="memdesc:a8fed7493bab627b5378f1e027e7c845b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of resources managed by a cache. <br /></td></tr>
+<tr class="separator:a8fed7493bab627b5378f1e027e7c845b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:afb9bff321847029a473ffe4e7c486b42"><td class="memItemLeft" align="right" valign="top"><a id="afb9bff321847029a473ffe4e7c486b42"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#afb9bff321847029a473ffe4e7c486b42">resource_handle</a> ()=default</td></tr>
 <tr class="memdesc:afb9bff321847029a473ffe4e7c486b42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:afb9bff321847029a473ffe4e7c486b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42e3c213eb9c7dc431cde6a780149605"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a42e3c213eb9c7dc431cde6a780149605">resource_handle</a> (std::shared_ptr&lt; Resource &gt; res)</td></tr>
-<tr class="memdesc:a42e3c213eb9c7dc431cde6a780149605"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a handle from a shared pointer, namely a resource.  <a href="classentt_1_1resource__handle.html#a42e3c213eb9c7dc431cde6a780149605">More...</a><br /></td></tr>
-<tr class="separator:a42e3c213eb9c7dc431cde6a780149605"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e1b7d2c2129b0364c5ea216d906164f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a6e1b7d2c2129b0364c5ea216d906164f">resource_handle</a> (const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Resource &gt; &amp;other)=default</td></tr>
-<tr class="memdesc:a6e1b7d2c2129b0364c5ea216d906164f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="classentt_1_1resource__handle.html#a6e1b7d2c2129b0364c5ea216d906164f">More...</a><br /></td></tr>
-<tr class="separator:a6e1b7d2c2129b0364c5ea216d906164f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34925b310f55e7886f546b7e646a27a4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a34925b310f55e7886f546b7e646a27a4">resource_handle</a> (<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Resource &gt; &amp;&amp;other)=default</td></tr>
-<tr class="memdesc:a34925b310f55e7886f546b7e646a27a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor.  <a href="classentt_1_1resource__handle.html#a34925b310f55e7886f546b7e646a27a4">More...</a><br /></td></tr>
-<tr class="separator:a34925b310f55e7886f546b7e646a27a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6462af299f1cd36898e916bbce96f55"><td class="memTemplParams" colspan="2">template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;Other, Resource&gt; &amp;&amp; std::is_base_of_v&lt;Resource, Other&gt;&gt;&gt; </td></tr>
+<tr class="memitem:a956f8cad244f0239984326e6e341ff0e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a956f8cad244f0239984326e6e341ff0e">resource_handle</a> (std::shared_ptr&lt; <a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> &gt; res)</td></tr>
+<tr class="memdesc:a956f8cad244f0239984326e6e341ff0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a handle from a shared pointer, namely a resource.  <a href="classentt_1_1resource__handle.html#a956f8cad244f0239984326e6e341ff0e">More...</a><br /></td></tr>
+<tr class="separator:a956f8cad244f0239984326e6e341ff0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab41848b032f6f27bc52c7cfa1f19cb36"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#ab41848b032f6f27bc52c7cfa1f19cb36">resource_handle</a> (const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;other)=default</td></tr>
+<tr class="memdesc:ab41848b032f6f27bc52c7cfa1f19cb36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="classentt_1_1resource__handle.html#ab41848b032f6f27bc52c7cfa1f19cb36">More...</a><br /></td></tr>
+<tr class="separator:ab41848b032f6f27bc52c7cfa1f19cb36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15d311a1fdcde8ee910df415b21e9f07"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a15d311a1fdcde8ee910df415b21e9f07">resource_handle</a> (<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&amp;other)=default</td></tr>
+<tr class="memdesc:a15d311a1fdcde8ee910df415b21e9f07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor.  <a href="classentt_1_1resource__handle.html#a15d311a1fdcde8ee910df415b21e9f07">More...</a><br /></td></tr>
+<tr class="separator:a15d311a1fdcde8ee910df415b21e9f07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e10e22e344bc029eb6b1f90293276a0"><td class="memTemplParams" colspan="2">template&lt;typename Other &gt; </td></tr>
+<tr class="memitem:a7e10e22e344bc029eb6b1f90293276a0"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a7e10e22e344bc029eb6b1f90293276a0">resource_handle</a> (const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;other, <a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> &amp;res) noexcept</td></tr>
+<tr class="memdesc:a7e10e22e344bc029eb6b1f90293276a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aliasing constructor.  <a href="classentt_1_1resource__handle.html#a7e10e22e344bc029eb6b1f90293276a0">More...</a><br /></td></tr>
+<tr class="separator:a7e10e22e344bc029eb6b1f90293276a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6462af299f1cd36898e916bbce96f55"><td class="memTemplParams" colspan="2">template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;resource_type, Other&gt; &amp;&amp; std::is_base_of_v&lt;resource_type, Other&gt;&gt;&gt; </td></tr>
 <tr class="memitem:aa6462af299f1cd36898e916bbce96f55"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#aa6462af299f1cd36898e916bbce96f55">resource_handle</a> (const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;other)</td></tr>
 <tr class="memdesc:aa6462af299f1cd36898e916bbce96f55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructs a handle which shares ownership of the resource.  <a href="classentt_1_1resource__handle.html#aa6462af299f1cd36898e916bbce96f55">More...</a><br /></td></tr>
 <tr class="separator:aa6462af299f1cd36898e916bbce96f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a8f44ef759531027a6d8a7e7556b5de"><td class="memTemplParams" colspan="2">template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;Other, Resource&gt; &amp;&amp; std::is_base_of_v&lt;Resource, Other&gt;&gt;&gt; </td></tr>
+<tr class="memitem:a5a8f44ef759531027a6d8a7e7556b5de"><td class="memTemplParams" colspan="2">template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;resource_type, Other&gt; &amp;&amp; std::is_base_of_v&lt;resource_type, Other&gt;&gt;&gt; </td></tr>
 <tr class="memitem:a5a8f44ef759531027a6d8a7e7556b5de"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a5a8f44ef759531027a6d8a7e7556b5de">resource_handle</a> (<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;&amp;other)</td></tr>
 <tr class="memdesc:a5a8f44ef759531027a6d8a7e7556b5de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructs a handle which takes ownership of the resource.  <a href="classentt_1_1resource__handle.html#a5a8f44ef759531027a6d8a7e7556b5de">More...</a><br /></td></tr>
 <tr class="separator:a5a8f44ef759531027a6d8a7e7556b5de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a485226952edb743d8c0de61ac76b12cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a485226952edb743d8c0de61ac76b12cd">operator=</a> (const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Resource &gt; &amp;other)=default</td></tr>
-<tr class="memdesc:a485226952edb743d8c0de61ac76b12cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assignment operator.  <a href="classentt_1_1resource__handle.html#a485226952edb743d8c0de61ac76b12cd">More...</a><br /></td></tr>
-<tr class="separator:a485226952edb743d8c0de61ac76b12cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe5287127aa99409283853d3666cb4db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#abe5287127aa99409283853d3666cb4db">operator=</a> (<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Resource &gt; &amp;&amp;other)=default</td></tr>
-<tr class="memdesc:abe5287127aa99409283853d3666cb4db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator.  <a href="classentt_1_1resource__handle.html#abe5287127aa99409283853d3666cb4db">More...</a><br /></td></tr>
-<tr class="separator:abe5287127aa99409283853d3666cb4db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af96bea0ef9e6b77b9cb4e4cb6531d2c9"><td class="memTemplParams" colspan="2">template&lt;typename Other &gt; </td></tr>
-<tr class="memitem:af96bea0ef9e6b77b9cb4e4cb6531d2c9"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;!std::is_same_v&lt; Other, Resource &gt; &amp;&amp;std::is_base_of_v&lt; Resource, Other &gt;, <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#af96bea0ef9e6b77b9cb4e4cb6531d2c9">operator=</a> (const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;other)</td></tr>
-<tr class="memdesc:af96bea0ef9e6b77b9cb4e4cb6531d2c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assignment operator from foreign handle.  <a href="classentt_1_1resource__handle.html#af96bea0ef9e6b77b9cb4e4cb6531d2c9">More...</a><br /></td></tr>
-<tr class="separator:af96bea0ef9e6b77b9cb4e4cb6531d2c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae25bab9b8ace94027052dafab241dcc8"><td class="memTemplParams" colspan="2">template&lt;typename Other &gt; </td></tr>
-<tr class="memitem:ae25bab9b8ace94027052dafab241dcc8"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;!std::is_same_v&lt; Other, Resource &gt; &amp;&amp;std::is_base_of_v&lt; Resource, Other &gt;, <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#ae25bab9b8ace94027052dafab241dcc8">operator=</a> (<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;&amp;other)</td></tr>
-<tr class="memdesc:ae25bab9b8ace94027052dafab241dcc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator from foreign handle.  <a href="classentt_1_1resource__handle.html#ae25bab9b8ace94027052dafab241dcc8">More...</a><br /></td></tr>
-<tr class="separator:ae25bab9b8ace94027052dafab241dcc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9fda6031b24dc071430adcbe3daff93"><td class="memItemLeft" align="right" valign="top">const Resource &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#af9fda6031b24dc071430adcbe3daff93">get</a> () const</td></tr>
-<tr class="memdesc:af9fda6031b24dc071430adcbe3daff93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#af9fda6031b24dc071430adcbe3daff93">More...</a><br /></td></tr>
-<tr class="separator:af9fda6031b24dc071430adcbe3daff93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6d7e90631a0561dec00af3ab780fbec"><td class="memItemLeft" align="right" valign="top">Resource &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#ae6d7e90631a0561dec00af3ab780fbec">get</a> ()</td></tr>
-<tr class="memdesc:ae6d7e90631a0561dec00af3ab780fbec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#ae6d7e90631a0561dec00af3ab780fbec">More...</a><br /></td></tr>
-<tr class="separator:ae6d7e90631a0561dec00af3ab780fbec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ff9de8d8c8f906ee0dcedbaafe94173"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a7ff9de8d8c8f906ee0dcedbaafe94173">operator const Resource &amp;</a> () const</td></tr>
-<tr class="memdesc:a7ff9de8d8c8f906ee0dcedbaafe94173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#a7ff9de8d8c8f906ee0dcedbaafe94173">More...</a><br /></td></tr>
-<tr class="separator:a7ff9de8d8c8f906ee0dcedbaafe94173"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab95ae30c0c965a3260ab695c54bab472"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#ab95ae30c0c965a3260ab695c54bab472">operator Resource &amp;</a> ()</td></tr>
-<tr class="memdesc:ab95ae30c0c965a3260ab695c54bab472"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#ab95ae30c0c965a3260ab695c54bab472">More...</a><br /></td></tr>
-<tr class="separator:ab95ae30c0c965a3260ab695c54bab472"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86057c09652ca6db4171391fc74d274d"><td class="memItemLeft" align="right" valign="top">const Resource &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a86057c09652ca6db4171391fc74d274d">operator*</a> () const</td></tr>
-<tr class="memdesc:a86057c09652ca6db4171391fc74d274d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#a86057c09652ca6db4171391fc74d274d">More...</a><br /></td></tr>
-<tr class="separator:a86057c09652ca6db4171391fc74d274d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e27c4a08089699207b2446445b8dc3e"><td class="memItemLeft" align="right" valign="top">Resource &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a8e27c4a08089699207b2446445b8dc3e">operator*</a> ()</td></tr>
-<tr class="memdesc:a8e27c4a08089699207b2446445b8dc3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#a8e27c4a08089699207b2446445b8dc3e">More...</a><br /></td></tr>
-<tr class="separator:a8e27c4a08089699207b2446445b8dc3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9188fe6bec68988ab2c5af18320e88a0"><td class="memItemLeft" align="right" valign="top">const Resource *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a9188fe6bec68988ab2c5af18320e88a0">operator-&gt;</a> () const</td></tr>
-<tr class="memdesc:a9188fe6bec68988ab2c5af18320e88a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a pointer to the managed resource.  <a href="classentt_1_1resource__handle.html#a9188fe6bec68988ab2c5af18320e88a0">More...</a><br /></td></tr>
-<tr class="separator:a9188fe6bec68988ab2c5af18320e88a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab3e519ca02a9e6f05ad3acb4ac8f684"><td class="memItemLeft" align="right" valign="top">Resource *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#aab3e519ca02a9e6f05ad3acb4ac8f684">operator-&gt;</a> ()</td></tr>
-<tr class="memdesc:aab3e519ca02a9e6f05ad3acb4ac8f684"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a pointer to the managed resource.  <a href="classentt_1_1resource__handle.html#aab3e519ca02a9e6f05ad3acb4ac8f684">More...</a><br /></td></tr>
-<tr class="separator:aab3e519ca02a9e6f05ad3acb4ac8f684"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32c522c1b72534ba95ceb7c17b9baebf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a32c522c1b72534ba95ceb7c17b9baebf">operator=</a> (const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;other)=default</td></tr>
+<tr class="memdesc:a32c522c1b72534ba95ceb7c17b9baebf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assignment operator.  <a href="classentt_1_1resource__handle.html#a32c522c1b72534ba95ceb7c17b9baebf">More...</a><br /></td></tr>
+<tr class="separator:a32c522c1b72534ba95ceb7c17b9baebf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93f95303ff32ef9686bfa69bb75abbb6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a93f95303ff32ef9686bfa69bb75abbb6">operator=</a> (<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&amp;other)=default</td></tr>
+<tr class="memdesc:a93f95303ff32ef9686bfa69bb75abbb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator.  <a href="classentt_1_1resource__handle.html#a93f95303ff32ef9686bfa69bb75abbb6">More...</a><br /></td></tr>
+<tr class="separator:a93f95303ff32ef9686bfa69bb75abbb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dab45269845d4eb2e90daa813b318a6"><td class="memTemplParams" colspan="2">template&lt;typename Other &gt; </td></tr>
+<tr class="memitem:a6dab45269845d4eb2e90daa813b318a6"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;!std::is_same_v&lt; <a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>, Other &gt; &amp;&amp;std::is_base_of_v&lt; <a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>, Other &gt;, <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a6dab45269845d4eb2e90daa813b318a6">operator=</a> (const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;other)</td></tr>
+<tr class="memdesc:a6dab45269845d4eb2e90daa813b318a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assignment operator from foreign handle.  <a href="classentt_1_1resource__handle.html#a6dab45269845d4eb2e90daa813b318a6">More...</a><br /></td></tr>
+<tr class="separator:a6dab45269845d4eb2e90daa813b318a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8236f83607681c7e421613f19eb79f56"><td class="memTemplParams" colspan="2">template&lt;typename Other &gt; </td></tr>
+<tr class="memitem:a8236f83607681c7e421613f19eb79f56"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;!std::is_same_v&lt; <a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>, Other &gt; &amp;&amp;std::is_base_of_v&lt; <a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>, Other &gt;, <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a8236f83607681c7e421613f19eb79f56">operator=</a> (<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;&amp;other)</td></tr>
+<tr class="memdesc:a8236f83607681c7e421613f19eb79f56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator from foreign handle.  <a href="classentt_1_1resource__handle.html#a8236f83607681c7e421613f19eb79f56">More...</a><br /></td></tr>
+<tr class="separator:a8236f83607681c7e421613f19eb79f56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31d8af87e1bf0fd0502da76fd2797cfd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a31d8af87e1bf0fd0502da76fd2797cfd">get</a> () const</td></tr>
+<tr class="memdesc:a31d8af87e1bf0fd0502da76fd2797cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#a31d8af87e1bf0fd0502da76fd2797cfd">More...</a><br /></td></tr>
+<tr class="separator:a31d8af87e1bf0fd0502da76fd2797cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ef20d31d925a71d0fa95c8ac5a28dec"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a9ef20d31d925a71d0fa95c8ac5a28dec">operator resource_type &amp;</a> () const</td></tr>
+<tr class="memdesc:a9ef20d31d925a71d0fa95c8ac5a28dec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#a9ef20d31d925a71d0fa95c8ac5a28dec">More...</a><br /></td></tr>
+<tr class="separator:a9ef20d31d925a71d0fa95c8ac5a28dec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a505077caf97084b6f507c635e4d3630b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a505077caf97084b6f507c635e4d3630b">operator*</a> () const</td></tr>
+<tr class="memdesc:a505077caf97084b6f507c635e4d3630b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the managed resource.  <a href="classentt_1_1resource__handle.html#a505077caf97084b6f507c635e4d3630b">More...</a><br /></td></tr>
+<tr class="separator:a505077caf97084b6f507c635e4d3630b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdb14da5bcb5a4d1676235d9cc6b6ee3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#abdb14da5bcb5a4d1676235d9cc6b6ee3">operator-&gt;</a> () const</td></tr>
+<tr class="memdesc:abdb14da5bcb5a4d1676235d9cc6b6ee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a pointer to the managed resource.  <a href="classentt_1_1resource__handle.html#abdb14da5bcb5a4d1676235d9cc6b6ee3">More...</a><br /></td></tr>
+<tr class="separator:abdb14da5bcb5a4d1676235d9cc6b6ee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78608879425212e25817c16e3393ee07"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a78608879425212e25817c16e3393ee07">operator bool</a> () const</td></tr>
 <tr class="memdesc:a78608879425212e25817c16e3393ee07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a handle contains a resource, false otherwise.  <a href="classentt_1_1resource__handle.html#a78608879425212e25817c16e3393ee07">More...</a><br /></td></tr>
 <tr class="separator:a78608879425212e25817c16e3393ee07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47f319eeef51a7d1745961f2dc2ea331"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html#aaa5bb317dff4e02ec3cef610705de341">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__handle.html#a47f319eeef51a7d1745961f2dc2ea331">use_count</a> () const</td></tr>
+<tr class="memdesc:a47f319eeef51a7d1745961f2dc2ea331"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of handles pointing the same resource.  <a href="classentt_1_1resource__handle.html#a47f319eeef51a7d1745961f2dc2ea331">More...</a><br /></td></tr>
+<tr class="separator:a47f319eeef51a7d1745961f2dc2ea331"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -167,10 +174,10 @@ class entt::resource_handle&lt; Resource &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00028">28</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00025">25</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a42e3c213eb9c7dc431cde6a780149605"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a42e3c213eb9c7dc431cde6a780149605">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[1/5]</span></h2>
+<a id="a956f8cad244f0239984326e6e341ff0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a956f8cad244f0239984326e6e341ff0e">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[1/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,7 +190,7 @@ template&lt;typename Resource &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> </td>
           <td>(</td>
-          <td class="paramtype">std::shared_ptr&lt; Resource &gt;&#160;</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> &gt;&#160;</td>
           <td class="paramname"><em>res</em></td><td>)</td>
           <td></td>
         </tr>
@@ -203,12 +210,12 @@ template&lt;typename Resource &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00041">41</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00043">43</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a6e1b7d2c2129b0364c5ea216d906164f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e1b7d2c2129b0364c5ea216d906164f">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[2/5]</span></h2>
+<a id="ab41848b032f6f27bc52c7cfa1f19cb36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab41848b032f6f27bc52c7cfa1f19cb36">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[2/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -243,8 +250,8 @@ template&lt;typename Resource &gt; </div>
 
 </div>
 </div>
-<a id="a34925b310f55e7886f546b7e646a27a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a34925b310f55e7886f546b7e646a27a4">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[3/5]</span></h2>
+<a id="a15d311a1fdcde8ee910df415b21e9f07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15d311a1fdcde8ee910df415b21e9f07">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[3/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -279,15 +286,72 @@ template&lt;typename Resource &gt; </div>
 
 </div>
 </div>
-<a id="aa6462af299f1cd36898e916bbce96f55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6462af299f1cd36898e916bbce96f55">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[4/5]</span></h2>
+<a id="a7e10e22e344bc029eb6b1f90293276a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e10e22e344bc029eb6b1f90293276a0">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[4/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Resource &gt; </div>
 <div class="memtemplate">
-template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;Other, Resource&gt; &amp;&amp; std::is_base_of_v&lt;Resource, Other&gt;&gt;&gt; </div>
+template&lt;typename Other &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::<a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>res</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Aliasing constructor. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Other</td><td>Type of resource managed by the received handle. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The handle with which to share ownership information. </td></tr>
+    <tr><td class="paramname">res</td><td>Unrelated and unmanaged resources. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00065">65</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aa6462af299f1cd36898e916bbce96f55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6462af299f1cd36898e916bbce96f55">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[5/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Resource &gt; </div>
+<div class="memtemplate">
+template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;resource_type, Other&gt; &amp;&amp; std::is_base_of_v&lt;resource_type, Other&gt;&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -321,19 +385,19 @@ template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00063">63</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00074">74</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a5a8f44ef759531027a6d8a7e7556b5de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a8f44ef759531027a6d8a7e7556b5de">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[5/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a8f44ef759531027a6d8a7e7556b5de">&#9670;&nbsp;</a></span>resource_handle() <span class="overload">[6/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Resource &gt; </div>
 <div class="memtemplate">
-template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;Other, Resource&gt; &amp;&amp; std::is_base_of_v&lt;Resource, Other&gt;&gt;&gt; </div>
+template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;resource_type, Other&gt; &amp;&amp; std::is_base_of_v&lt;resource_type, Other&gt;&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -367,13 +431,13 @@ template&lt;typename Other , typename  = std::enable_if_t&lt;!std::is_same_v&lt;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00073">73</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00083">83</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae6d7e90631a0561dec00af3ab780fbec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6d7e90631a0561dec00af3ab780fbec">&#9670;&nbsp;</a></span>get() <span class="overload">[1/2]</span></h2>
+<a id="a31d8af87e1bf0fd0502da76fd2797cfd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31d8af87e1bf0fd0502da76fd2797cfd">&#9670;&nbsp;</a></span>get()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -384,40 +448,7 @@ template&lt;typename Resource &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Resource&amp; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::get </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets a reference to the managed resource. </p>
-<dl class="section warning"><dt>Warning</dt><dd>The behavior is undefined if the handle doesn't contain a resource.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to the managed resource. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00131">131</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="af9fda6031b24dc071430adcbe3daff93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af9fda6031b24dc071430adcbe3daff93">&#9670;&nbsp;</a></span>get() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const Resource&amp; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::get </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>&amp; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::get </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -434,7 +465,7 @@ template&lt;typename Resource &gt; </div>
 <dl class="section warning"><dt>Warning</dt><dd>The behavior is undefined if the handle doesn't contain a resource.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the managed resource. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00125">125</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00134">134</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
@@ -466,12 +497,12 @@ template&lt;typename Resource &gt; </div>
 <p>Returns true if a handle contains a resource, false otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the handle contains a resource, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00177">177</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00165">165</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a7ff9de8d8c8f906ee0dcedbaafe94173"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ff9de8d8c8f906ee0dcedbaafe94173">&#9670;&nbsp;</a></span>operator const Resource &amp;()</h2>
+<a id="a9ef20d31d925a71d0fa95c8ac5a28dec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ef20d31d925a71d0fa95c8ac5a28dec">&#9670;&nbsp;</a></span>operator resource_type &amp;()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -482,7 +513,7 @@ template&lt;typename Resource &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator const Resource &amp; </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator <a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a> &amp; </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -499,12 +530,12 @@ template&lt;typename Resource &gt; </div>
 <dl class="section warning"><dt>Warning</dt><dd>The behavior is undefined if the handle doesn't contain a resource.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the managed resource. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00136">136</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00139">139</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ab95ae30c0c965a3260ab695c54bab472"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab95ae30c0c965a3260ab695c54bab472">&#9670;&nbsp;</a></span>operator Resource &amp;()</h2>
+<a id="a505077caf97084b6f507c635e4d3630b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a505077caf97084b6f507c635e4d3630b">&#9670;&nbsp;</a></span>operator*()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -515,73 +546,7 @@ template&lt;typename Resource &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator Resource &amp; </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets a reference to the managed resource. </p>
-<dl class="section warning"><dt>Warning</dt><dd>The behavior is undefined if the handle doesn't contain a resource.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to the managed resource. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00141">141</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a8e27c4a08089699207b2446445b8dc3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8e27c4a08089699207b2446445b8dc3e">&#9670;&nbsp;</a></span>operator*() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Resource&amp; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator* </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets a reference to the managed resource. </p>
-<dl class="section warning"><dt>Warning</dt><dd>The behavior is undefined if the handle doesn't contain a resource.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to the managed resource. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00151">151</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a86057c09652ca6db4171391fc74d274d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86057c09652ca6db4171391fc74d274d">&#9670;&nbsp;</a></span>operator*() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const Resource&amp; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator* </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>&amp; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator* </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -598,12 +563,12 @@ template&lt;typename Resource &gt; </div>
 <dl class="section warning"><dt>Warning</dt><dd>The behavior is undefined if the handle doesn't contain a resource.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the managed resource. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00146">146</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00144">144</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="aab3e519ca02a9e6f05ad3acb4ac8f684"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab3e519ca02a9e6f05ad3acb4ac8f684">&#9670;&nbsp;</a></span>operator-&gt;() <span class="overload">[1/2]</span></h2>
+<a id="abdb14da5bcb5a4d1676235d9cc6b6ee3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abdb14da5bcb5a4d1676235d9cc6b6ee3">&#9670;&nbsp;</a></span>operator-&gt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -614,40 +579,7 @@ template&lt;typename Resource &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Resource* <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator-&gt; </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets a pointer to the managed resource. </p>
-<dl class="section warning"><dt>Warning</dt><dd>The behavior is undefined if the handle doesn't contain a resource.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>A pointer to the managed resource or <code>nullptr</code> if the handle contains no resource at all. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00169">169</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a9188fe6bec68988ab2c5af18320e88a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9188fe6bec68988ab2c5af18320e88a0">&#9670;&nbsp;</a></span>operator-&gt;() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const Resource* <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator-&gt; </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>* <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator-&gt; </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -664,59 +596,12 @@ template&lt;typename Resource &gt; </div>
 <dl class="section warning"><dt>Warning</dt><dd>The behavior is undefined if the handle doesn't contain a resource.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the managed resource or <code>nullptr</code> if the handle contains no resource at all. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00164">164</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00157">157</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="af96bea0ef9e6b77b9cb4e4cb6531d2c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af96bea0ef9e6b77b9cb4e4cb6531d2c9">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<div class="memtemplate">
-template&lt;typename Other &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::enable_if_t&lt;!std::is_same_v&lt;Other, Resource&gt; &amp;&amp; std::is_base_of_v&lt;Resource, Other&gt;, <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&gt; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Copy assignment operator from foreign handle. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Other</td><td>Type of resource managed by the received handle. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>The handle to copy from. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>This resource handle. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00099">99</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a485226952edb743d8c0de61ac76b12cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a485226952edb743d8c0de61ac76b12cd">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/4]</span></h2>
+<a id="a32c522c1b72534ba95ceb7c17b9baebf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32c522c1b72534ba95ceb7c17b9baebf">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -752,8 +637,8 @@ template&lt;typename Resource &gt; </div>
 
 </div>
 </div>
-<a id="ae25bab9b8ace94027052dafab241dcc8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae25bab9b8ace94027052dafab241dcc8">&#9670;&nbsp;</a></span>operator=() <span class="overload">[3/4]</span></h2>
+<a id="a6dab45269845d4eb2e90daa813b318a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dab45269845d4eb2e90daa813b318a6">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -766,9 +651,9 @@ template&lt;typename Other &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::enable_if_t&lt;!std::is_same_v&lt;Other, Resource&gt; &amp;&amp; std::is_base_of_v&lt;Resource, Other&gt;, <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&gt; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator= </td>
+          <td class="memname">std::enable_if_t&lt;!std::is_same_v&lt;<a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>, Other&gt; &amp;&amp; std::is_base_of_v&lt;<a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>, Other&gt;, <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&gt; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator= </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;&amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
           <td></td>
         </tr>
@@ -780,7 +665,7 @@ template&lt;typename Other &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Move assignment operator from foreign handle. </p>
+<p>Copy assignment operator from foreign handle. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Other</td><td>Type of resource managed by the received handle. </td></tr>
@@ -789,18 +674,18 @@ template&lt;typename Other &gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>The handle to move from. </td></tr>
+    <tr><td class="paramname">other</td><td>The handle to copy from. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>This resource handle. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00112">112</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00108">108</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>
-<a id="abe5287127aa99409283853d3666cb4db"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe5287127aa99409283853d3666cb4db">&#9670;&nbsp;</a></span>operator=() <span class="overload">[4/4]</span></h2>
+<a id="a93f95303ff32ef9686bfa69bb75abbb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93f95303ff32ef9686bfa69bb75abbb6">&#9670;&nbsp;</a></span>operator=() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -833,6 +718,85 @@ template&lt;typename Resource &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>This resource handle. </dd></dl>
+
+</div>
+</div>
+<a id="a8236f83607681c7e421613f19eb79f56"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8236f83607681c7e421613f19eb79f56">&#9670;&nbsp;</a></span>operator=() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Resource &gt; </div>
+<div class="memtemplate">
+template&lt;typename Other &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::enable_if_t&lt;!std::is_same_v&lt;<a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>, Other&gt; &amp;&amp; std::is_base_of_v&lt;<a class="el" href="classentt_1_1resource__handle.html#a8fed7493bab627b5378f1e027e7c845b">resource_type</a>, Other&gt;, <a class="el" href="classentt_1_1resource__handle.html">resource_handle</a> &amp;&gt; <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; Other &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Move assignment operator from foreign handle. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Other</td><td>Type of resource managed by the received handle. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The handle to move from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>This resource handle. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00121">121</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a47f319eeef51a7d1745961f2dc2ea331"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47f319eeef51a7d1745961f2dc2ea331">&#9670;&nbsp;</a></span>use_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Resource &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html#aaa5bb317dff4e02ec3cef610705de341">size_type</a> <a class="el" href="classentt_1_1resource__handle.html">entt::resource_handle</a>&lt; Resource &gt;::use_count </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the number of handles pointing the same resource. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of handles pointing the same resource. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="resource_2handle_8hpp_source.html#l00173">173</a> of file <a class="el" href="resource_2handle_8hpp_source.html">handle.hpp</a>.</p>
 
 </div>
 </div>

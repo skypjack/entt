@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['unpack_5fas_5fv_1051',['unpack_as_v',['../namespaceentt.html#a447c782d9f4f5332dfd4dde6f03d4a4e',1,'entt']]]
+  ['reserved_1089',['reserved',['../classentt_1_1entt__traits.html#a376f015afde8d69c3e6f52a5da9429d1',1,'entt::entt_traits']]]
 ];

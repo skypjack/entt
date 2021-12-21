@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['tombstone_1048',['tombstone',['../namespaceentt.html#a674269102fdfe3fd6d7766210a828862',1,'entt']]],
-  ['type_1049',['type',['../classentt_1_1family.html#ad2c16ecd854f12f1aa70ceaba094e43a',1,'entt::family::type()'],['../classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178',1,'entt::identifier::type()']]],
-  ['type_5flist_5fcontains_5fv_1050',['type_list_contains_v',['../namespaceentt.html#a988ce063936d499bf2d69406c391fd5c',1,'entt']]]
+  ['page_5fsize_1088',['page_size',['../structentt_1_1basic__component__traits.html#a4b00cb76e92fe28071c08f0b07d37539',1,'entt::basic_component_traits::page_size()'],['../classentt_1_1entt__traits.html#a16382ceec002b305cf6c48a2a913836a',1,'entt::entt_traits::page_size()']]]
 ];

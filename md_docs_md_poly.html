@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -66,7 +66,7 @@ $(function() {
 <div class="title">Crash Course: poly </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md122"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md132"></a>
 Introduction</h1>
 <p>Static polymorphism is a very powerful tool in C++, albeit sometimes cumbersome to obtain.<br  />
  This module aims to make it simple and easy to use.</p>
@@ -75,7 +75,7 @@ Introduction</h1>
  What users get is an object that can be passed around as such and not through a reference or a pointer, as happens when it comes to working with dynamic polymorphism.</p>
 <p>Since the <code>poly</code> class template makes use of <code><a class="el" href="namespaceentt.html#a4846741b8f485584c196304f588b94ad" title="Alias declaration for the most common use case.">entt::any</a></code> internally, it also supports most of its feature. Among the most important, the possibility to create aliases to existing and thus unmanaged objects. This allows users to exploit the static polymorphism while maintaining ownership of objects.<br  />
  Likewise, the <code>poly</code> class template also benefits from the small buffer optimization offered by the <code><a class="el" href="namespaceentt.html#a4846741b8f485584c196304f588b94ad" title="Alias declaration for the most common use case.">entt::any</a></code> class and therefore minimizes the number of allocations, avoiding them altogether where possible.</p>
-<h2><a class="anchor" id="autotoc_md123"></a>
+<h2><a class="anchor" id="autotoc_md133"></a>
 Other libraries</h2>
 <p>There are some very interesting libraries regarding static polymorphism.<br  />
  Among all, the two that I prefer are:</p>
@@ -86,13 +86,13 @@ Other libraries</h2>
 <p>The former is admittedly an experimental library, with many interesting ideas. I've some doubts about the usefulness of some feature in real world projects, but perhaps my lack of experience comes into play here. In my opinion, its only flaw is the API which I find slightly more cumbersome than other solutions.<br  />
  The latter was undoubtedly a source of inspiration for this module, although I opted for different choices in the implementation of both the final API and some feature.</p>
 <p>Either way, the authors are gurus of the C++ community, people I only have to learn from.</p>
-<h1><a class="anchor" id="autotoc_md124"></a>
+<h1><a class="anchor" id="autotoc_md134"></a>
 Concept and implementation</h1>
 <p>The first thing to do to create a <em>type-erasing polymorphic object wrapper</em> (to use the terminology introduced by Eric Niebler) is to define a <em>concept</em> that types will have to adhere to.<br  />
  For this purpose, the library offers a single class that supports both deduced and fully defined interfaces. Although having interfaces deduced automatically is convenient and allows users to write less code in most cases, this has some limitations and it's therefore useful to be able to get around the deduction by providing a custom definition for the static virtual table.</p>
 <p>Once the interface is defined, it will be sufficient to provide a generic implementation to fullfill the concept.<br  />
  Also in this case, the library allows customizations based on types or families of types, so as to be able to go beyond the generic case where necessary.</p>
-<h2><a class="anchor" id="autotoc_md125"></a>
+<h2><a class="anchor" id="autotoc_md135"></a>
 Deduced interface</h2>
 <p>This is how a concept with a deduced interface is introduced:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>Drawable: <a class="code" href="structentt_1_1type__list.html">entt::type_list</a>&lt;&gt; {</div>
@@ -103,7 +103,7 @@ Deduced interface</h2>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">};</div>
-<div class="ttc" id="astructentt_1_1type__list_html"><div class="ttname"><a href="structentt_1_1type__list.html">entt::type_list</a></div><div class="ttdoc">A class to use to push around lists of types, nothing more.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00128">type_traits.hpp:128</a></div></div>
+<div class="ttc" id="astructentt_1_1type__list_html"><div class="ttname"><a href="structentt_1_1type__list.html">entt::type_list</a></div><div class="ttdoc">A class to use to push around lists of types, nothing more.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00110">type_traits.hpp:110</a></div></div>
 </div><!-- fragment --><p>It's recognizable by the fact that it inherits from an empty type list.<br  />
  Functions can also be const, accept any number of paramters and return a type other than <code>void</code>:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>Drawable: <a class="code" href="structentt_1_1type__list.html">entt::type_list</a>&lt;&gt; {</div>
@@ -119,14 +119,14 @@ Deduced interface</h2>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>Drawable: <a class="code" href="structentt_1_1type__list.html">entt::type_list</a>&lt;&gt; {</div>
 <div class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Base&gt;</div>
 <div class="line">    <span class="keyword">struct </span>type: Base {</div>
-<div class="line">        <span class="keywordtype">bool</span> draw()<span class="keyword"> const </span>{ entt::poly_call&lt;0&gt;(*<span class="keyword">this</span>); }</div>
+<div class="line">        <span class="keywordtype">void</span> draw()<span class="keyword"> const </span>{ entt::poly_call&lt;0&gt;(*<span class="keyword">this</span>); }</div>
 <div class="line">    };</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">};</div>
 </div><!-- fragment --><p>Once the <em>concept</em> is defined, users must provide a generic implementation of it in order to tell the system how any type can satisfy its requirements. This is done via an alias template within the concept itself.<br  />
  The index passed as a template parameter to either <code>invoke</code> or <code>poly_call</code> refers to how this alias is defined.</p>
-<h2><a class="anchor" id="autotoc_md126"></a>
+<h2><a class="anchor" id="autotoc_md136"></a>
 Defined interface</h2>
 <p>A fully defined concept is no different to one for which the interface is deduced, with the only difference that the list of types is not empty this time:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>Drawable: <a class="code" href="structentt_1_1type__list.html">entt::type_list</a>&lt;void()&gt; {</div>
@@ -157,7 +157,7 @@ Defined interface</h2>
 <p>In other words, it's not possible to make use of functions not belonging to the interface, even if they are present in the types that fulfill the concept.<br  />
  Similarly, it's not possible to deduce a function in the static virtual table with a function type different from that of the associated member function in the interface itself.</p>
 <p>Explicitly defining a static virtual table suppresses the deduction step and allows maximum flexibility when providing the implementation for a concept.</p>
-<h2><a class="anchor" id="autotoc_md127"></a>
+<h2><a class="anchor" id="autotoc_md137"></a>
 Fullfill a concept</h2>
 <p>The <code>impl</code> alias template of a concept is used to define how it's fulfilled:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>Drawable: <a class="code" href="structentt_1_1type__list.html">entt::type_list</a>&lt;&gt; {</div>
@@ -166,7 +166,7 @@ Fullfill a concept</h2>
 <div class="line">    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
 <div class="line">    <span class="keyword">using</span> impl = <a class="code" href="structentt_1_1value__list.html">entt::value_list&lt;&amp;Type::draw&gt;</a>;</div>
 <div class="line">};</div>
-<div class="ttc" id="astructentt_1_1value__list_html"><div class="ttname"><a href="structentt_1_1value__list.html">entt::value_list</a></div><div class="ttdoc">A class to use to push around lists of constant values, nothing more.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00324">type_traits.hpp:324</a></div></div>
+<div class="ttc" id="astructentt_1_1value__list_html"><div class="ttname"><a href="structentt_1_1value__list.html">entt::value_list</a></div><div class="ttdoc">A class to use to push around lists of constant values, nothing more.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00285">type_traits.hpp:285</a></div></div>
 </div><!-- fragment --><p>In this case, it's stated that the <code>draw</code> method of a generic type will be enough to satisfy the requirements of the <code>Drawable</code> concept.<br  />
  Both member functions and free functions are supported to fullfill concepts:</p>
 <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
@@ -181,7 +181,7 @@ Fullfill a concept</h2>
 </div><!-- fragment --><p>Likewise, as long as the parameter types and return type support conversions to and from those of the function type referenced in the static virtual table, the actual implementation may differ in its function type since it's erased internally.<br  />
  Moreover, the <code>self</code> parameter isn't strictly required by the system and can be left out for free functions if not required.</p>
 <p>Refer to the inline documentation for more details.</p>
-<h1><a class="anchor" id="autotoc_md128"></a>
+<h1><a class="anchor" id="autotoc_md138"></a>
 Inheritance</h1>
 <p><em>Concept inheritance</em> is straightforward due to how poly looks like in <code>EnTT</code>. Therefore, it's quite easy to build hierarchies of concepts if necessary.<br  />
  The only constraint is that all concepts in a hierarchy must belong to the same <em>family</em>, that is, they must be either all deduced or all defined.</p>
@@ -199,7 +199,7 @@ Inheritance</h1>
 <div class="line">        <a class="code" href="structentt_1_1value__list.html">entt::value_list&lt;&amp;Type::erase&gt;</a></div>
 <div class="line">    &gt;;</div>
 <div class="line">};</div>
-<div class="ttc" id="anamespaceentt_html_a1344cc62598091397018354e6905e431"><div class="ttname"><a href="namespaceentt.html#a1344cc62598091397018354e6905e431">entt::value_list_cat_t</a></div><div class="ttdeci">typename value_list_cat&lt; List... &gt;::type value_list_cat_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00422">type_traits.hpp:422</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a1344cc62598091397018354e6905e431"><div class="ttname"><a href="namespaceentt.html#a1344cc62598091397018354e6905e431">entt::value_list_cat_t</a></div><div class="ttdeci">typename value_list_cat&lt; List... &gt;::type value_list_cat_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00374">type_traits.hpp:374</a></div></div>
 </div><!-- fragment --><p>The static virtual table is empty and must remain so.<br  />
  On the other hand, <code>type</code> no longer inherits from <code>Base</code> and instead forwards its template parameter to the type exposed by the <em>base class</em>. Internally, the size of the static virtual table of the base class is used as an offset for the local indexes.<br  />
  Finally, by means of the <code>value_list_cat_t</code> utility, the implementation consists in appending the new functions to the previous list.</p>
@@ -214,10 +214,10 @@ Inheritance</h1>
 <div class="line">&gt; {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">};</div>
-<div class="ttc" id="anamespaceentt_html_a546467a3662e9a915d5d519ad565e801"><div class="ttname"><a href="namespaceentt.html#a546467a3662e9a915d5d519ad565e801">entt::type_list_cat_t</a></div><div class="ttdeci">typename type_list_cat&lt; List... &gt;::type type_list_cat_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00226">type_traits.hpp:226</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a546467a3662e9a915d5d519ad565e801"><div class="ttname"><a href="namespaceentt.html#a546467a3662e9a915d5d519ad565e801">entt::type_list_cat_t</a></div><div class="ttdeci">typename type_list_cat&lt; List... &gt;::type type_list_cat_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00199">type_traits.hpp:199</a></div></div>
 </div><!-- fragment --><p>Similar to above, <code>type_list_cat_t</code> is used to concatenate the underlying static virtual table with the new function types.<br  />
  Everything else is the same as already shown instead.</p>
-<h1><a class="anchor" id="autotoc_md129"></a>
+<h1><a class="anchor" id="autotoc_md139"></a>
 Static polymorphism in the wild</h1>
 <p>Once the <em>concept</em> and implementation have been introduced, it will be possible to use the <code>poly</code> class template to contain instances that meet the requirements:</p>
 <div class="fragment"><div class="line"><span class="keyword">using</span> drawable = <a class="code" href="classentt_1_1basic__poly.html">entt::poly&lt;Drawable&gt;</a>;</div>
@@ -237,7 +237,7 @@ Static polymorphism in the wild</h1>
 <div class="line"> </div>
 <div class="line">instance = square{};</div>
 <div class="line">instance-&gt;draw();</div>
-<div class="ttc" id="aclassentt_1_1basic__poly_html"><div class="ttname"><a href="classentt_1_1basic__poly.html">entt::basic_poly</a></div><div class="ttdoc">Static polymorphism made simple and within everyone's reach.</div><div class="ttdef"><b>Definition:</b> <a href="poly_8hpp_source.html#l00181">poly.hpp:181</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__poly_html"><div class="ttname"><a href="classentt_1_1basic__poly.html">entt::basic_poly</a></div><div class="ttdoc">Static polymorphism made simple and within everyone's reach.</div><div class="ttdef"><b>Definition:</b> <a href="poly_8hpp_source.html#l00192">poly.hpp:192</a></div></div>
 </div><!-- fragment --><p>The <code>poly</code> class template offers a wide range of constructors, from the default one (which will return an uninitialized <code>poly</code> object) to the copy and move constructors, as well as the ability to create objects in-place.<br  />
  Among others, there is also a constructor that allows users to wrap unmanaged objects in a <code>poly</code> instance (either const or non-const ones):</p>
 <div class="fragment"><div class="line">circle shape;</div>
@@ -247,7 +247,7 @@ Static polymorphism in the wild</h1>
 </div><!-- fragment --><p>In both cases, although the interface of the <code>poly</code> object doesn't change, it won't construct any element or take care of destroying the referenced objects.</p>
 <p>Note also how the underlying concept is accessed via a call to <code>operator-&gt;</code> and not directly as <code>instance.draw()</code>.<br  />
  This allows users to decouple the API of the wrapper from that of the concept. Therefore, where <code>instance.data()</code> will invoke the <code>data</code> member function of the poly object, <code>instance-&gt;data()</code> will map directly to the functionality exposed by the underlying concept.</p>
-<h1><a class="anchor" id="autotoc_md130"></a>
+<h1><a class="anchor" id="autotoc_md140"></a>
 Storage size and alignment requirement</h1>
 <p>Under the hood, the <code>poly</code> class template makes use of <code><a class="el" href="namespaceentt.html#a4846741b8f485584c196304f588b94ad" title="Alias declaration for the most common use case.">entt::any</a></code>. Therefore, it can take advantage of the possibility of defining at compile-time the size of the storage suitable for the small buffer optimization as well as the alignment requirements:</p>
 <div class="fragment"><div class="line"><a class="code" href="classentt_1_1basic__poly.html">entt::basic_poly</a>&lt;Drawable, <span class="keyword">sizeof</span>(<span class="keywordtype">double</span>[4]), <span class="keyword">alignof</span>(<span class="keywordtype">double</span>[4])&gt;</div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -82,17 +82,17 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ad0c73c2e1f47b41454d922951b800c86"><td class="memItemLeft" align="right" valign="top"><a id="ad0c73c2e1f47b41454d922951b800c86"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1poly__vtable.html#ad0c73c2e1f47b41454d922951b800c86">type</a> = decltype(make_vtable(Concept{}))</td></tr>
-<tr class="memdesc:ad0c73c2e1f47b41454d922951b800c86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual table type. <br /></td></tr>
-<tr class="separator:ad0c73c2e1f47b41454d922951b800c86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1114a981955e596da36603282cee2e4d"><td class="memItemLeft" align="right" valign="top"><a id="a1114a981955e596da36603282cee2e4d"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1poly__vtable.html#a1114a981955e596da36603282cee2e4d">type</a> = std::conditional_t&lt; is_mono_v, std::tuple_element_t&lt; 0u, vtable_type &gt;, const vtable_type * &gt;</td></tr>
+<tr class="memdesc:a1114a981955e596da36603282cee2e4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual table type. <br /></td></tr>
+<tr class="separator:a1114a981955e596da36603282cee2e4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a1cf1b279c051f86db9412af890c97267"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
-<tr class="memitem:a1cf1b279c051f86db9412af890c97267"><td class="memTemplItemLeft" align="right" valign="top">static const auto *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1poly__vtable.html#a1cf1b279c051f86db9412af890c97267">instance</a> ()</td></tr>
-<tr class="memdesc:a1cf1b279c051f86db9412af890c97267"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a static virtual table for a specific concept and type.  <a href="classentt_1_1poly__vtable.html#a1cf1b279c051f86db9412af890c97267">More...</a><br /></td></tr>
-<tr class="separator:a1cf1b279c051f86db9412af890c97267"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb72fb3a81dd22f2ca36b87adebfff46"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
+<tr class="memitem:afb72fb3a81dd22f2ca36b87adebfff46"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classentt_1_1poly__vtable.html#a1114a981955e596da36603282cee2e4d">type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1poly__vtable.html#afb72fb3a81dd22f2ca36b87adebfff46">instance</a> ()</td></tr>
+<tr class="memdesc:afb72fb3a81dd22f2ca36b87adebfff46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a static virtual table for a specific concept and type.  <a href="classentt_1_1poly__vtable.html#afb72fb3a81dd22f2ca36b87adebfff46">More...</a><br /></td></tr>
+<tr class="separator:afb72fb3a81dd22f2ca36b87adebfff46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Concept, std::size_t Len, std::size_t Align&gt;<br />
@@ -108,10 +108,10 @@ class entt::poly_vtable&lt; Concept, Len, Align &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00052">52</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00048">48</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a1cf1b279c051f86db9412af890c97267"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1cf1b279c051f86db9412af890c97267">&#9670;&nbsp;</a></span>instance()</h2>
+<a id="afb72fb3a81dd22f2ca36b87adebfff46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb72fb3a81dd22f2ca36b87adebfff46">&#9670;&nbsp;</a></span>instance()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -124,7 +124,7 @@ template&lt;typename Type &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const auto* <a class="el" href="classentt_1_1poly__vtable.html">entt::poly_vtable</a>&lt; Concept, Len, Align &gt;::instance </td>
+          <td class="memname">static <a class="el" href="classentt_1_1poly__vtable.html#a1114a981955e596da36603282cee2e4d">type</a> <a class="el" href="classentt_1_1poly__vtable.html">entt::poly_vtable</a>&lt; Concept, Len, Align &gt;::instance </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -146,7 +146,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A static virtual table for the given concept and type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00113">113</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00112">112</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>

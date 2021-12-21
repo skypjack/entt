@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -102,9 +102,13 @@ Collaboration diagram for entt::basic_poly&lt; Concept, Len, Align &gt;:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:ad3c8c25e48b14267dc3fc0de326a9660"><td class="memItemLeft" align="right" valign="top"><a id="ad3c8c25e48b14267dc3fc0de326a9660"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#ad3c8c25e48b14267dc3fc0de326a9660">concept_type</a> = typename Concept::template <a class="el" href="classentt_1_1basic__poly.html#a392edd88757ee2d0f5d405c8844ee20d">type</a>&lt; <a class="el" href="structentt_1_1poly__base.html">poly_base</a>&lt; <a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> &gt; &gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#ad3c8c25e48b14267dc3fc0de326a9660">concept_type</a> = typename Concept::template <a class="el" href="classentt_1_1basic__poly.html#aa745ccb8b2728d24dd88dccc9663a293">type</a>&lt; <a class="el" href="structentt_1_1poly__base.html">poly_base</a>&lt; <a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> &gt; &gt;</td></tr>
 <tr class="memdesc:ad3c8c25e48b14267dc3fc0de326a9660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept type. <br /></td></tr>
 <tr class="separator:ad3c8c25e48b14267dc3fc0de326a9660"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf0092d4a0a8976a742ff76a68851054"><td class="memItemLeft" align="right" valign="top"><a id="abf0092d4a0a8976a742ff76a68851054"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#abf0092d4a0a8976a742ff76a68851054">vtable_type</a> = typename <a class="el" href="classentt_1_1poly__vtable.html">poly_vtable</a>&lt; Concept, Len, Align &gt;::<a class="el" href="classentt_1_1basic__poly.html#aa745ccb8b2728d24dd88dccc9663a293">type</a></td></tr>
+<tr class="memdesc:abf0092d4a0a8976a742ff76a68851054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual table type. <br /></td></tr>
+<tr class="separator:abf0092d4a0a8976a742ff76a68851054"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -112,36 +116,27 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a809e0991b76093a22fd879a4ebff359b">basic_poly</a> ()</td></tr>
 <tr class="memdesc:a809e0991b76093a22fd879a4ebff359b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:a809e0991b76093a22fd879a4ebff359b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a04b9cbafaace96e5b314bc35271b2b"><td class="memTemplParams" colspan="2">template&lt;typename Type , typename... Args&gt; </td></tr>
-<tr class="memitem:a0a04b9cbafaace96e5b314bc35271b2b"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a0a04b9cbafaace96e5b314bc35271b2b">basic_poly</a> (std::in_place_type_t&lt; Type &gt;, Args &amp;&amp;... args)</td></tr>
-<tr class="memdesc:a0a04b9cbafaace96e5b314bc35271b2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a poly by directly initializing the new object.  <a href="classentt_1_1basic__poly.html#a0a04b9cbafaace96e5b314bc35271b2b">More...</a><br /></td></tr>
-<tr class="separator:a0a04b9cbafaace96e5b314bc35271b2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed074839fc14e757f761d89606895062"><td class="memTemplParams" colspan="2">template&lt;typename Type , typename... Args&gt; </td></tr>
+<tr class="memitem:aed074839fc14e757f761d89606895062"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#aed074839fc14e757f761d89606895062">basic_poly</a> (std::in_place_type_t&lt; Type &gt;, Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:aed074839fc14e757f761d89606895062"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a poly by directly initializing the new object.  <a href="classentt_1_1basic__poly.html#aed074839fc14e757f761d89606895062">More...</a><br /></td></tr>
+<tr class="separator:aed074839fc14e757f761d89606895062"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75dc28220ce2957bbe011a2ee576e543"><td class="memTemplParams" colspan="2">template&lt;typename Type , typename  = std::enable_if_t&lt;!std::is_same_v&lt;std::remove_cv_t&lt;std::remove_reference_t&lt;Type&gt;&gt;, basic_poly&gt;&gt;&gt; </td></tr>
 <tr class="memitem:a75dc28220ce2957bbe011a2ee576e543"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a75dc28220ce2957bbe011a2ee576e543">basic_poly</a> (Type &amp;&amp;value)</td></tr>
 <tr class="memdesc:a75dc28220ce2957bbe011a2ee576e543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a poly from a given value.  <a href="classentt_1_1basic__poly.html#a75dc28220ce2957bbe011a2ee576e543">More...</a><br /></td></tr>
 <tr class="separator:a75dc28220ce2957bbe011a2ee576e543"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3547b2e7f57ce84b4bded12fdf602974"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a3547b2e7f57ce84b4bded12fdf602974">basic_poly</a> (const <a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> &amp;other)=default</td></tr>
-<tr class="memdesc:a3547b2e7f57ce84b4bded12fdf602974"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="classentt_1_1basic__poly.html#a3547b2e7f57ce84b4bded12fdf602974">More...</a><br /></td></tr>
-<tr class="separator:a3547b2e7f57ce84b4bded12fdf602974"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ff234f9a90b74cd96b1ba679a691d1b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a7ff234f9a90b74cd96b1ba679a691d1b">basic_poly</a> (<a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:a7ff234f9a90b74cd96b1ba679a691d1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor.  <a href="classentt_1_1basic__poly.html#a7ff234f9a90b74cd96b1ba679a691d1b">More...</a><br /></td></tr>
-<tr class="separator:a7ff234f9a90b74cd96b1ba679a691d1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4fbdbece21f20a1e9bf374bde809cad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#aa4fbdbece21f20a1e9bf374bde809cad">operator=</a> (<a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> other)</td></tr>
-<tr class="memdesc:aa4fbdbece21f20a1e9bf374bde809cad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assignment operator.  <a href="classentt_1_1basic__poly.html#aa4fbdbece21f20a1e9bf374bde809cad">More...</a><br /></td></tr>
-<tr class="separator:aa4fbdbece21f20a1e9bf374bde809cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a392edd88757ee2d0f5d405c8844ee20d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1type__info.html">type_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a392edd88757ee2d0f5d405c8844ee20d">type</a> () const</td></tr>
-<tr class="memdesc:a392edd88757ee2d0f5d405c8844ee20d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the type of the contained object.  <a href="classentt_1_1basic__poly.html#a392edd88757ee2d0f5d405c8844ee20d">More...</a><br /></td></tr>
-<tr class="separator:a392edd88757ee2d0f5d405c8844ee20d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa745ccb8b2728d24dd88dccc9663a293"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1type__info.html">type_info</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#aa745ccb8b2728d24dd88dccc9663a293">type</a> () const</td></tr>
+<tr class="memdesc:aa745ccb8b2728d24dd88dccc9663a293"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the object type if any, <code>type_id&lt;void&gt;()</code> otherwise.  <a href="classentt_1_1basic__poly.html#aa745ccb8b2728d24dd88dccc9663a293">More...</a><br /></td></tr>
+<tr class="separator:aa745ccb8b2728d24dd88dccc9663a293"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2f41ea9e4b95871dc2f79db6855c122"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#ac2f41ea9e4b95871dc2f79db6855c122">data</a> () const</td></tr>
 <tr class="memdesc:ac2f41ea9e4b95871dc2f79db6855c122"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an opaque pointer to the contained instance.  <a href="classentt_1_1basic__poly.html#ac2f41ea9e4b95871dc2f79db6855c122">More...</a><br /></td></tr>
 <tr class="separator:ac2f41ea9e4b95871dc2f79db6855c122"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f8e50be01a338fb93fc28b1e69865ad"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a2f8e50be01a338fb93fc28b1e69865ad">data</a> ()</td></tr>
 <tr class="memdesc:a2f8e50be01a338fb93fc28b1e69865ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an opaque pointer to the contained instance.  <a href="classentt_1_1basic__poly.html#a2f8e50be01a338fb93fc28b1e69865ad">More...</a><br /></td></tr>
 <tr class="separator:a2f8e50be01a338fb93fc28b1e69865ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b00c5352e6d8680c6a4fa5490bf2266"><td class="memTemplParams" colspan="2">template&lt;typename Type , typename... Args&gt; </td></tr>
-<tr class="memitem:a0b00c5352e6d8680c6a4fa5490bf2266"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a0b00c5352e6d8680c6a4fa5490bf2266">emplace</a> (Args &amp;&amp;... args)</td></tr>
-<tr class="memdesc:a0b00c5352e6d8680c6a4fa5490bf2266"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the contained object by creating a new instance directly.  <a href="classentt_1_1basic__poly.html#a0b00c5352e6d8680c6a4fa5490bf2266">More...</a><br /></td></tr>
-<tr class="separator:a0b00c5352e6d8680c6a4fa5490bf2266"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6aaa4ef03f6f2a599abcf633412d6a8d"><td class="memTemplParams" colspan="2">template&lt;typename Type , typename... Args&gt; </td></tr>
+<tr class="memitem:a6aaa4ef03f6f2a599abcf633412d6a8d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a6aaa4ef03f6f2a599abcf633412d6a8d">emplace</a> (Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:a6aaa4ef03f6f2a599abcf633412d6a8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the contained object by creating a new instance directly.  <a href="classentt_1_1basic__poly.html#a6aaa4ef03f6f2a599abcf633412d6a8d">More...</a><br /></td></tr>
+<tr class="separator:a6aaa4ef03f6f2a599abcf633412d6a8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43ab35169a0fdb31f7f5db5e5ad0e17d"><td class="memItemLeft" align="right" valign="top"><a id="a43ab35169a0fdb31f7f5db5e5ad0e17d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a43ab35169a0fdb31f7f5db5e5ad0e17d">reset</a> ()</td></tr>
 <tr class="memdesc:a43ab35169a0fdb31f7f5db5e5ad0e17d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys contained object. <br /></td></tr>
@@ -168,9 +163,6 @@ Friends</h2></td></tr>
 struct&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a4f532417307014ab3c9eb0070beaf7fc">poly_base&lt; basic_poly &gt;</a></td></tr>
 <tr class="memdesc:a4f532417307014ab3c9eb0070beaf7fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A poly base is allowed to snoop into a poly object. <br /></td></tr>
 <tr class="separator:a4f532417307014ab3c9eb0070beaf7fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d8089bd47b9dd58e760b14d503a1927"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__poly.html#a9d8089bd47b9dd58e760b14d503a1927">swap</a> (<a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> &amp;lhs, <a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> &amp;rhs)</td></tr>
-<tr class="memdesc:a9d8089bd47b9dd58e760b14d503a1927"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swaps two poly objects.  <a href="classentt_1_1basic__poly.html#a9d8089bd47b9dd58e760b14d503a1927">More...</a><br /></td></tr>
-<tr class="separator:a9d8089bd47b9dd58e760b14d503a1927"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Concept, std::size_t Len, std::size_t Align&gt;<br />
@@ -190,10 +182,10 @@ class entt::basic_poly&lt; Concept, Len, Align &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00181">181</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00192">192</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a0a04b9cbafaace96e5b314bc35271b2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a04b9cbafaace96e5b314bc35271b2b">&#9670;&nbsp;</a></span>basic_poly() <span class="overload">[1/4]</span></h2>
+<a id="aed074839fc14e757f761d89606895062"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed074839fc14e757f761d89606895062">&#9670;&nbsp;</a></span>basic_poly() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -245,12 +237,12 @@ template&lt;typename Type , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00204">204</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00214">214</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a75dc28220ce2957bbe011a2ee576e543"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75dc28220ce2957bbe011a2ee576e543">&#9670;&nbsp;</a></span>basic_poly() <span class="overload">[2/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a75dc28220ce2957bbe011a2ee576e543">&#9670;&nbsp;</a></span>basic_poly() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -291,81 +283,7 @@ template&lt;typename Type , typename  = std::enable_if_t&lt;!std::is_same_v&lt;s
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00215">215</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a3547b2e7f57ce84b4bded12fdf602974"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3547b2e7f57ce84b4bded12fdf602974">&#9670;&nbsp;</a></span>basic_poly() <span class="overload">[3/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__poly.html">entt::basic_poly</a>&lt; Concept, Len, Align &gt;::<a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1basic__poly.html">basic_poly</a>&lt; Concept, Len, Align &gt; &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Copy constructor. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>The instance to copy from. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a7ff234f9a90b74cd96b1ba679a691d1b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ff234f9a90b74cd96b1ba679a691d1b">&#9670;&nbsp;</a></span>basic_poly() <span class="overload">[4/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__poly.html">entt::basic_poly</a>&lt; Concept, Len, Align &gt;::<a class="el" href="classentt_1_1basic__poly.html">basic_poly</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1basic__poly.html">basic_poly</a>&lt; Concept, Len, Align &gt; &amp;&amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Move constructor. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>The instance to move from. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00229">229</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00224">224</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
@@ -398,7 +316,7 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 <p>Aliasing constructor. </p>
 <dl class="section return"><dt>Returns</dt><dd>A poly that shares a reference to an unmanaged object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00318">318</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00291">291</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
@@ -430,7 +348,7 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 <p>Aliasing constructor. </p>
 <dl class="section return"><dt>Returns</dt><dd>A poly that shares a reference to an unmanaged object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00325">325</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00299">299</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
@@ -462,7 +380,7 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 <p>Returns an opaque pointer to the contained instance. </p>
 <dl class="section return"><dt>Returns</dt><dd>An opaque pointer the contained instance, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00262">262</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00244">244</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
@@ -494,12 +412,12 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 <p>Returns an opaque pointer to the contained instance. </p>
 <dl class="section return"><dt>Returns</dt><dd>An opaque pointer the contained instance, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00257">257</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00239">239</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a0b00c5352e6d8680c6a4fa5490bf2266"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b00c5352e6d8680c6a4fa5490bf2266">&#9670;&nbsp;</a></span>emplace()</h2>
+<a id="a6aaa4ef03f6f2a599abcf633412d6a8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6aaa4ef03f6f2a599abcf633412d6a8d">&#9670;&nbsp;</a></span>emplace()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -541,7 +459,7 @@ template&lt;typename Type , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00273">273</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00255">255</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
@@ -573,7 +491,7 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 <p>Returns false if a poly is empty, true otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>False if the poly is empty, true otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00286">286</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00270">270</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
@@ -605,7 +523,7 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 <p>Returns a pointer to the underlying concept. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying concept. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00294">294</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00278">278</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
@@ -637,12 +555,12 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 <p>Returns a pointer to the underlying concept. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying concept. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00299">299</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00283">283</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>
-<a id="aa4fbdbece21f20a1e9bf374bde809cad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa4fbdbece21f20a1e9bf374bde809cad">&#9670;&nbsp;</a></span>operator=()</h2>
+<a id="aa745ccb8b2728d24dd88dccc9663a293"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa745ccb8b2728d24dd88dccc9663a293">&#9670;&nbsp;</a></span>type()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -653,46 +571,7 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1basic__poly.html">basic_poly</a>&amp; <a class="el" href="classentt_1_1basic__poly.html">entt::basic_poly</a>&lt; Concept, Len, Align &gt;::operator= </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1basic__poly.html">basic_poly</a>&lt; Concept, Len, Align &gt;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assignment operator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>The instance to assign from. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>This poly object. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00240">240</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a392edd88757ee2d0f5d405c8844ee20d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a392edd88757ee2d0f5d405c8844ee20d">&#9670;&nbsp;</a></span>type()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classentt_1_1type__info.html">type_info</a> <a class="el" href="classentt_1_1basic__poly.html">entt::basic_poly</a>&lt; Concept, Len, Align &gt;::type </td>
+          <td class="memname">const <a class="el" href="classentt_1_1type__info.html">type_info</a>&amp; <a class="el" href="classentt_1_1basic__poly.html">entt::basic_poly</a>&lt; Concept, Len, Align &gt;::type </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -705,60 +584,10 @@ template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the type of the contained object. </p>
-<dl class="section return"><dt>Returns</dt><dd>The type of the contained object, if any. </dd></dl>
+<p>Returns the object type if any, <code>type_id&lt;void&gt;()</code> otherwise. </p>
+<dl class="section return"><dt>Returns</dt><dd>The object type if any, <code>type_id&lt;void&gt;()</code> otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00249">249</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="a9d8089bd47b9dd58e760b14d503a1927"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d8089bd47b9dd58e760b14d503a1927">&#9670;&nbsp;</a></span>swap</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Concept , std::size_t Len, std::size_t Align&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void swap </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1basic__poly.html">basic_poly</a>&lt; Concept, Len, Align &gt; &amp;&#160;</td>
-          <td class="paramname"><em>lhs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classentt_1_1basic__poly.html">basic_poly</a>&lt; Concept, Len, Align &gt; &amp;&#160;</td>
-          <td class="paramname"><em>rhs</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Swaps two poly objects. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">lhs</td><td>A valid poly object. </td></tr>
-    <tr><td class="paramname">rhs</td><td>A valid poly object. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00308">308</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="poly_8hpp_source.html#l00231">231</a> of file <a class="el" href="poly_8hpp_source.html">poly.hpp</a>.</p>
 
 </div>
 </div>

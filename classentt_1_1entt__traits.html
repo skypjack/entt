@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -69,6 +69,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="classentt_1_1entt__traits-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">entt::entt_traits&lt; Type &gt; Class Template Reference</div>  </div>
@@ -104,33 +105,43 @@ Public Types</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> = Type</td></tr>
 <tr class="memdesc:a9898ec0342dfd6bdb937981e15e5fd65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value type. <br /></td></tr>
 <tr class="separator:a9898ec0342dfd6bdb937981e15e5fd65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c56e48588b138d9ed3ec0bff3ca872a"><td class="memItemLeft" align="right" valign="top"><a id="a7c56e48588b138d9ed3ec0bff3ca872a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a7c56e48588b138d9ed3ec0bff3ca872a">entity_type</a> = typename traits_type::entity_type</td></tr>
-<tr class="memdesc:a7c56e48588b138d9ed3ec0bff3ca872a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity type. <br /></td></tr>
-<tr class="separator:a7c56e48588b138d9ed3ec0bff3ca872a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a455de7d5fcbcd138fb4b431305175ef0"><td class="memItemLeft" align="right" valign="top"><a id="a455de7d5fcbcd138fb4b431305175ef0"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a455de7d5fcbcd138fb4b431305175ef0">version_type</a> = typename traits_type::version_type</td></tr>
-<tr class="memdesc:a455de7d5fcbcd138fb4b431305175ef0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying version type. <br /></td></tr>
-<tr class="separator:a455de7d5fcbcd138fb4b431305175ef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef8b11d00ad40835bd3e9e1e33800b4a"><td class="memItemLeft" align="right" valign="top"><a id="aef8b11d00ad40835bd3e9e1e33800b4a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#aef8b11d00ad40835bd3e9e1e33800b4a">difference_type</a> = typename traits_type::difference_type</td></tr>
-<tr class="memdesc:aef8b11d00ad40835bd3e9e1e33800b4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Difference type. <br /></td></tr>
-<tr class="separator:aef8b11d00ad40835bd3e9e1e33800b4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d427b42c48fa8e384adf2e1bc858c7e"><td class="memItemLeft" align="right" valign="top"><a id="a1d427b42c48fa8e384adf2e1bc858c7e"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a> = typename base_type::entity_type</td></tr>
+<tr class="memdesc:a1d427b42c48fa8e384adf2e1bc858c7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity type. <br /></td></tr>
+<tr class="separator:a1d427b42c48fa8e384adf2e1bc858c7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad44954f9ad1b9a20bf997b9a8ba33c3a"><td class="memItemLeft" align="right" valign="top"><a id="ad44954f9ad1b9a20bf997b9a8ba33c3a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#ad44954f9ad1b9a20bf997b9a8ba33c3a">version_type</a> = typename base_type::version_type</td></tr>
+<tr class="memdesc:ad44954f9ad1b9a20bf997b9a8ba33c3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying version type. <br /></td></tr>
+<tr class="separator:ad44954f9ad1b9a20bf997b9a8ba33c3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a3797423cba124a5d52a7fcd247b16842"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a7c56e48588b138d9ed3ec0bff3ca872a">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a3797423cba124a5d52a7fcd247b16842">to_integral</a> (const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> value)</td></tr>
+<tr class="memitem:a3797423cba124a5d52a7fcd247b16842"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a3797423cba124a5d52a7fcd247b16842">to_integral</a> (const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> value)</td></tr>
 <tr class="memdesc:a3797423cba124a5d52a7fcd247b16842"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an entity to its underlying type.  <a href="classentt_1_1entt__traits.html#a3797423cba124a5d52a7fcd247b16842">More...</a><br /></td></tr>
 <tr class="separator:a3797423cba124a5d52a7fcd247b16842"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a391b8de07d30bc1b9dd719b6886ddfe0"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a7c56e48588b138d9ed3ec0bff3ca872a">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a391b8de07d30bc1b9dd719b6886ddfe0">to_entity</a> (const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> value)</td></tr>
+<tr class="memitem:a391b8de07d30bc1b9dd719b6886ddfe0"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a391b8de07d30bc1b9dd719b6886ddfe0">to_entity</a> (const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> value)</td></tr>
 <tr class="memdesc:a391b8de07d30bc1b9dd719b6886ddfe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the entity part once converted to the underlying type.  <a href="classentt_1_1entt__traits.html#a391b8de07d30bc1b9dd719b6886ddfe0">More...</a><br /></td></tr>
 <tr class="separator:a391b8de07d30bc1b9dd719b6886ddfe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedb75689bab1bf13e99a8267662b7bc6"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a455de7d5fcbcd138fb4b431305175ef0">version_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#aedb75689bab1bf13e99a8267662b7bc6">to_version</a> (const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> value)</td></tr>
+<tr class="memitem:aedb75689bab1bf13e99a8267662b7bc6"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#ad44954f9ad1b9a20bf997b9a8ba33c3a">version_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#aedb75689bab1bf13e99a8267662b7bc6">to_version</a> (const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> value)</td></tr>
 <tr class="memdesc:aedb75689bab1bf13e99a8267662b7bc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the version part once converted to the underlying type.  <a href="classentt_1_1entt__traits.html#aedb75689bab1bf13e99a8267662b7bc6">More...</a><br /></td></tr>
 <tr class="separator:aedb75689bab1bf13e99a8267662b7bc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93f3a6be2f545d7df0532a51dd65238d"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a93f3a6be2f545d7df0532a51dd65238d">construct</a> (const <a class="el" href="classentt_1_1entt__traits.html#a7c56e48588b138d9ed3ec0bff3ca872a">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>=traits_type::entity_mask, const <a class="el" href="classentt_1_1entt__traits.html#a455de7d5fcbcd138fb4b431305175ef0">version_type</a> version=traits_type::version_mask)</td></tr>
-<tr class="memdesc:a93f3a6be2f545d7df0532a51dd65238d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an identifier from its parts.  <a href="classentt_1_1entt__traits.html#a93f3a6be2f545d7df0532a51dd65238d">More...</a><br /></td></tr>
-<tr class="separator:a93f3a6be2f545d7df0532a51dd65238d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fae029105adcdb4d570290a04399202"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a3fae029105adcdb4d570290a04399202">construct</a> (const <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a> <a class="el" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>, const <a class="el" href="classentt_1_1entt__traits.html#ad44954f9ad1b9a20bf997b9a8ba33c3a">version_type</a> version)</td></tr>
+<tr class="memdesc:a3fae029105adcdb4d570290a04399202"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an identifier from its parts.  <a href="classentt_1_1entt__traits.html#a3fae029105adcdb4d570290a04399202">More...</a><br /></td></tr>
+<tr class="separator:a3fae029105adcdb4d570290a04399202"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaba051e9884c8122ee8de8260a14fa68"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#aaba051e9884c8122ee8de8260a14fa68">combine</a> (const <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a> lhs, const <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a> rhs)</td></tr>
+<tr class="memdesc:aaba051e9884c8122ee8de8260a14fa68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combines two identifiers in a single one.  <a href="classentt_1_1entt__traits.html#aaba051e9884c8122ee8de8260a14fa68">More...</a><br /></td></tr>
+<tr class="separator:aaba051e9884c8122ee8de8260a14fa68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a376f015afde8d69c3e6f52a5da9429d1"><td class="memItemLeft" align="right" valign="top"><a id="a376f015afde8d69c3e6f52a5da9429d1"></a>
+static constexpr <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a376f015afde8d69c3e6f52a5da9429d1">reserved</a> = base_type::entity_mask | (base_type::version_mask &lt;&lt; base_type::entity_shift)</td></tr>
+<tr class="memdesc:a376f015afde8d69c3e6f52a5da9429d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserved identifier. <br /></td></tr>
+<tr class="separator:a376f015afde8d69c3e6f52a5da9429d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16382ceec002b305cf6c48a2a913836a"><td class="memItemLeft" align="right" valign="top"><a id="a16382ceec002b305cf6c48a2a913836a"></a>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1entt__traits.html#a16382ceec002b305cf6c48a2a913836a">page_size</a> = 4096</td></tr>
+<tr class="memdesc:a16382ceec002b305cf6c48a2a913836a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Page size, default is <code>ENTT_SPARSE_PAGE</code>. <br /></td></tr>
+<tr class="separator:a16382ceec002b305cf6c48a2a913836a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Type&gt;<br />
@@ -144,10 +155,61 @@ class entt::entt_traits&lt; Type &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00077">77</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00062">62</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a93f3a6be2f545d7df0532a51dd65238d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a93f3a6be2f545d7df0532a51dd65238d">&#9670;&nbsp;</a></span>construct()</h2>
+<a id="aaba051e9884c8122ee8de8260a14fa68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaba051e9884c8122ee8de8260a14fa68">&#9670;&nbsp;</a></span>combine()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> <a class="el" href="classentt_1_1entt__traits.html">entt::entt_traits</a>&lt; Type &gt;::combine </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a>&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a>&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Combines two identifiers in a single one. </p>
+<p>The returned identifier is a copy of the first element except for its version, which is taken from the second element.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lhs</td><td>The identifier from which to take the entity part. </td></tr>
+    <tr><td class="paramname">rhs</td><td>The identifier from which to take the version part. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A properly constructed identifier. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00128">128</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3fae029105adcdb4d570290a04399202"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fae029105adcdb4d570290a04399202">&#9670;&nbsp;</a></span>construct()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,14 +222,14 @@ template&lt;typename Type &gt; </div>
         <tr>
           <td class="memname">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a> <a class="el" href="classentt_1_1entt__traits.html">entt::entt_traits</a>&lt; Type &gt;::construct </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#a7c56e48588b138d9ed3ec0bff3ca872a">entity_type</a>&#160;</td>
-          <td class="paramname"><em>entity</em> = <code>traits_type::entity_mask</code>, </td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a>&#160;</td>
+          <td class="paramname"><em>entity</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#a455de7d5fcbcd138fb4b431305175ef0">version_type</a>&#160;</td>
-          <td class="paramname"><em>version</em> = <code>traits_type::version_mask</code>&#160;</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#ad44954f9ad1b9a20bf997b9a8ba33c3a">version_type</a>&#160;</td>
+          <td class="paramname"><em>version</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -194,7 +256,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A properly constructed identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00128">128</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00114">114</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -210,7 +272,7 @@ template&lt;typename Type &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a7c56e48588b138d9ed3ec0bff3ca872a">entity_type</a> <a class="el" href="classentt_1_1entt__traits.html">entt::entt_traits</a>&lt; Type &gt;::to_entity </td>
+          <td class="memname">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a> <a class="el" href="classentt_1_1entt__traits.html">entt::entt_traits</a>&lt; Type &gt;::to_entity </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a>&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -233,7 +295,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The integral representation of the entity part. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00104">104</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00091">91</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -249,7 +311,7 @@ template&lt;typename Type &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a7c56e48588b138d9ed3ec0bff3ca872a">entity_type</a> <a class="el" href="classentt_1_1entt__traits.html">entt::entt_traits</a>&lt; Type &gt;::to_integral </td>
+          <td class="memname">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a1d427b42c48fa8e384adf2e1bc858c7e">entity_type</a> <a class="el" href="classentt_1_1entt__traits.html">entt::entt_traits</a>&lt; Type &gt;::to_integral </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a>&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -272,7 +334,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The integral representation of the given value. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00095">95</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00082">82</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +350,7 @@ template&lt;typename Type &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static constexpr <a class="el" href="classentt_1_1entt__traits.html#a455de7d5fcbcd138fb4b431305175ef0">version_type</a> <a class="el" href="classentt_1_1entt__traits.html">entt::entt_traits</a>&lt; Type &gt;::to_version </td>
+          <td class="memname">static constexpr <a class="el" href="classentt_1_1entt__traits.html#ad44954f9ad1b9a20bf997b9a8ba33c3a">version_type</a> <a class="el" href="classentt_1_1entt__traits.html">entt::entt_traits</a>&lt; Type &gt;::to_version </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classentt_1_1entt__traits.html#a9898ec0342dfd6bdb937981e15e5fd65">value_type</a>&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -311,7 +373,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The integral representation of the version part. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00113">113</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_8hpp_source.html#l00100">100</a> of file <a class="el" href="entity_8hpp_source.html">entity.hpp</a>.</p>
 
 </div>
 </div>

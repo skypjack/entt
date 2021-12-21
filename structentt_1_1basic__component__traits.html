@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.8.1</span>
+   &#160;<span id="projectnumber">3.9.0</span>
    </div>
   </td>
  </tr>
@@ -67,7 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="structentt_1_1basic__component__traits-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">entt::basic_component_traits Struct Reference</div>  </div>
@@ -88,21 +88,25 @@ Inheritance diagram for entt::basic_component_traits:</div>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
-Public Types</h2></td></tr>
-<tr class="memitem:af33aa4f747fb2a108434048c9661c686"><td class="memItemLeft" align="right" valign="top"><a id="af33aa4f747fb2a108434048c9661c686"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__component__traits.html#af33aa4f747fb2a108434048c9661c686">in_place_delete</a> = std::false_type</td></tr>
-<tr class="memdesc:af33aa4f747fb2a108434048c9661c686"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer stability, default is <code>std::false_type</code>. <br /></td></tr>
-<tr class="separator:af33aa4f747fb2a108434048c9661c686"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe1f44f482b1155e7a924bd720fe6528"><td class="memItemLeft" align="right" valign="top"><a id="abe1f44f482b1155e7a924bd720fe6528"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__component__traits.html#abe1f44f482b1155e7a924bd720fe6528">ignore_if_empty</a> = std::true_type</td></tr>
-<tr class="memdesc:abe1f44f482b1155e7a924bd720fe6528"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty type optimization, default is <code>ENTT_IGNORE_IF_EMPTY</code>. <br /></td></tr>
-<tr class="separator:abe1f44f482b1155e7a924bd720fe6528"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a4ca4508bcd9833ab7c3354704144c90b"><td class="memItemLeft" align="right" valign="top"><a id="a4ca4508bcd9833ab7c3354704144c90b"></a>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__component__traits.html#a4ca4508bcd9833ab7c3354704144c90b">in_place_delete</a> = false</td></tr>
+<tr class="memdesc:a4ca4508bcd9833ab7c3354704144c90b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer stability, default is <code>false</code>. <br /></td></tr>
+<tr class="separator:a4ca4508bcd9833ab7c3354704144c90b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e58d8aa7b15b837cbfb0963cc0c3d46"><td class="memItemLeft" align="right" valign="top"><a id="a2e58d8aa7b15b837cbfb0963cc0c3d46"></a>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__component__traits.html#a2e58d8aa7b15b837cbfb0963cc0c3d46">ignore_if_empty</a> = true</td></tr>
+<tr class="memdesc:a2e58d8aa7b15b837cbfb0963cc0c3d46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty type optimization, default is <code>ENTT_IGNORE_IF_EMPTY</code>. <br /></td></tr>
+<tr class="separator:a2e58d8aa7b15b837cbfb0963cc0c3d46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b00cb76e92fe28071c08f0b07d37539"><td class="memItemLeft" align="right" valign="top"><a id="a4b00cb76e92fe28071c08f0b07d37539"></a>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__component__traits.html#a4b00cb76e92fe28071c08f0b07d37539">page_size</a> = 1024</td></tr>
+<tr class="memdesc:a4b00cb76e92fe28071c08f0b07d37539"><td class="mdescLeft">&#160;</td><td class="mdescRight">Page size, default is <code>ENTT_PACKED_PAGE</code>. <br /></td></tr>
+<tr class="separator:a4b00cb76e92fe28071c08f0b07d37539"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Commonly used default traits for all types. </p>
 
-<p class="definition">Definition at line <a class="el" href="component_8hpp_source.html#l00013">13</a> of file <a class="el" href="component_8hpp_source.html">component.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="component_8hpp_source.html#l00010">10</a> of file <a class="el" href="component_8hpp_source.html">component.hpp</a>.</p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>src/entt/entity/<a class="el" href="component_8hpp_source.html">component.hpp</a></li>
 </ul>
