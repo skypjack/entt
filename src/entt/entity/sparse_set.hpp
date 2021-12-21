@@ -220,7 +220,7 @@ protected:
     virtual void move_and_pop(const std::size_t, const std::size_t) {}
 
     /**
-     * @brief Erase an entity from a sparse set.
+     * @brief Erases an entity from a sparse set.
      * @param entt A valid identifier.
      */
     virtual void swap_and_pop(const Entity entt) {
@@ -239,7 +239,7 @@ protected:
     }
 
     /**
-     * @brief Erase an entity from a sparse set.
+     * @brief Erases an entity from a sparse set.
      * @param entt A valid identifier.
      */
     virtual void in_place_pop(const Entity entt) {

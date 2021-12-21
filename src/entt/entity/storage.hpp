@@ -269,20 +269,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         return container[idx] + fast_mod(pos, comp_traits::page_size);
     }
 
-    void release_unused_pages() {
-        auto &&container = packed.first();
-        auto page_allocator{packed.second()};
-        const auto in_use = (base_type::size() + comp_traits::page_size - 1u) / comp_traits::page_size;
-
-        for(auto pos = in_use, last = container.size(); pos < last; ++pos) {
-            alloc_traits::deallocate(page_allocator, container[pos], comp_traits::page_size);
-        }
-
-        container.resize(in_use);
-    }
-
-    void release_all_pages() {
-        for(size_type pos{}, last = base_type::size(); pos < last; ++pos) {
+    void shrink_to_size(const std::size_t sz) {
+        for(auto pos = sz, last = base_type::size(); pos < last; ++pos) {
             if constexpr(comp_traits::in_place_delete) {
                 if(base_type::at(pos) != tombstone) {
                     std::destroy_at(std::addressof(element_at(pos)));
@@ -294,10 +282,13 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
         auto &&container = packed.first();
         auto page_allocator{packed.second()};
+        const auto from = (sz + comp_traits::page_size - 1u) / comp_traits::page_size;
 
-        for(size_type pos{}, last = container.size(); pos < last; ++pos) {
+        for(auto pos = from, last = container.size(); pos < last; ++pos) {
             alloc_traits::deallocate(page_allocator, container[pos], comp_traits::page_size);
         }
+
+        container.resize(from);
     }
 
     template<typename... Args>
@@ -315,9 +306,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             emplace(*first, generator());
         }
 
-        const auto req = base_type::size() + std::distance(first, last);
-        base_type::reserve(req);
-        reserve(req);
+        reserve(base_type::size() + std::distance(first, last));
 
         for(; first != last; ++first) {
             emplace(*first, generator());
@@ -355,20 +344,17 @@ protected:
     }
 
     /**
-     * @brief Erase an element from a storage.
+     * @brief Erases an element from a storage.
      * @param entt A valid identifier.
      */
     void swap_and_pop(const Entity entt) override {
-        const auto pos = base_type::index(entt);
-        const auto last = base_type::size() - 1u;
-
-        auto &target = element_at(pos);
-        auto &elem = element_at(last);
+        auto &target = element_at(base_type::index(entt));
+        auto &last = element_at(base_type::size() - 1u);
 
         // support for nosy destructors
         [[maybe_unused]] auto unused = std::move(target);
-        target = std::move(elem);
-        std::destroy_at(std::addressof(elem));
+        target = std::move(last);
+        std::destroy_at(std::addressof(last));
 
         base_type::swap_and_pop(entt);
     }
@@ -462,7 +448,7 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_storage() override {
-        release_all_pages();
+        shrink_to_size(0u);
     }
 
     /**
@@ -473,7 +459,7 @@ public:
     basic_storage &operator=(basic_storage &&other) ENTT_NOEXCEPT {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.second() == other.packed.second(), "Copying a sparse set is not allowed");
 
-        release_all_pages();
+        shrink_to_size(0u);
         base_type::operator=(std::move(other));
         packed.first() = std::move(other.packed.first());
         propagate_on_container_move_assignment(packed.second(), other.packed.second());
@@ -508,9 +494,8 @@ public:
      * @param cap Desired capacity.
      */
     void reserve(const size_type cap) override {
-        base_type::reserve(cap);
-
-        if(cap > base_type::size()) {
+        if(cap != 0u) {
+            base_type::reserve(cap);
             assure_at_least(cap - 1u);
         }
     }
@@ -527,7 +512,7 @@ public:
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() override {
         base_type::shrink_to_fit();
-        release_unused_pages();
+        shrink_to_size(base_type::size());
     }
 
     /**
@@ -1064,10 +1049,8 @@ public:
     void insert(It first, It last, Args &&...args) {
         Type::insert(first, last, std::forward<Args>(args)...);
 
-        if(!construction.empty()) {
-            for(; first != last; ++first) {
-                construction.publish(*owner, *first);
-            }
+        for(auto it = construction.empty() ? last : first; it != last; ++it) {
+            construction.publish(*owner, *it);
         }
     }
 
