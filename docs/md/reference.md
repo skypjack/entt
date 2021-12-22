@@ -61,6 +61,8 @@ I hope this list can grow much more in the future:
   * [Legion](https://github.com/TomGillen/legion): a chunk based archetype ECS.
   * [Shipyard](https://github.com/leudz/shipyard): it borrows some ideas from
     `EnTT` and offers a sparse sets based ECS with grouping functionalities.
+  * [Sparsey](https://github.com/LechintanTudor/sparsey): sparse set based ECS
+    written in Rust.
   * [Specs](https://github.com/amethyst/specs): a parallel ECS based mainly on
     hierarchical bitsets that allows different types of storage as needed.
 
