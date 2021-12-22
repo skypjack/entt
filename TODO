@@ -5,7 +5,6 @@
 
 WIP:
 * add the possibility of disabling entities without deleting components thanks to the new full check
-* add registry::storage id -> basic_sparse_set (no template arg), add example of use
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime events (dispatcher/emitter), runtime context variables...
 * runtime_view/registry, remove reference to basic_sparse_set<E>

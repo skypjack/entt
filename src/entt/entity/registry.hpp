@@ -337,7 +337,7 @@ public:
     /**
      * @brief Returns the storage for a given component type.
      * @tparam Component Type of component of which to return the storage.
-     * @param id Optional name used to map the storage for a given component.
+     * @param id Optional name used to map the storage within the registry.
      * @return The storage for the given component type.
      */
     template<typename Component>
@@ -346,19 +346,38 @@ public:
     }
 
     /**
-     * @copybrief storage
+     * @brief Returns the storage for a given component type.
      *
      * @warning
      * If a storage for the given component doesn't exist yet, a temporary
      * placeholder is returned instead.
      *
      * @tparam Component Type of component of which to return the storage.
-     * @param id Optional name used to map the storage for a given component.
+     * @param id Optional name used to map the storage within the registry.
      * @return The storage for the given component type.
      */
     template<typename Component>
     [[nodiscard]] decltype(auto) storage(const id_type id = type_hash<Component>::value()) const {
         return assure<Component>(id);
+    }
+
+    /**
+     * @brief Returns the storage associated with a given name, if any.
+     * @param id Name used to map the storage within the registry.
+     * @return The requested storage if it exists, a null pointer otherwise.
+     */
+    [[nodiscard]] base_type *storage(const id_type id) {
+        return const_cast<base_type *>(std::as_const(*this).storage(id));
+    }
+
+    /**
+     * @brief Returns the storage associated with a given name, if any.
+     * @param id Name used to map the storage within the registry.
+     * @return The requested storage if it exists, a null pointer otherwise.
+     */
+    [[nodiscard]] const base_type *storage(const id_type id) const {
+        const auto it = pools.find(id);
+        return it == pools.end() ? nullptr : it->second.get();
     }
 
     /**

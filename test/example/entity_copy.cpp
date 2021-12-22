@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
+#include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>
+
+enum class my_entity : entt::id_type {};
 
 TEST(Example, EntityCopy) {
     using namespace entt::literals;
@@ -35,4 +38,31 @@ TEST(Example, EntityCopy) {
 
     ASSERT_EQ(registry.get<int>(dst), 42);
     ASSERT_EQ(registry.get<char>(dst), 'c');
+}
+
+TEST(Example, DifferentRegistryTypes) {
+    using namespace entt::literals;
+
+    entt::basic_registry<entt::entity> registry{};
+    entt::basic_registry<my_entity> other{};
+
+    static_cast<void>(registry.storage<double>());
+    static_cast<void>(other.storage<int>());
+
+    const auto src = registry.create();
+    const auto dst = other.create();
+
+    registry.emplace<int>(src, 42);
+    registry.emplace<char>(src, 'c');
+
+    for(auto [id, storage]: registry.storage()) {
+        if(auto *pool = other.storage(id); pool && storage.contains(src)) {
+            pool->emplace(dst, storage.get(src));
+        }
+    }
+
+    ASSERT_TRUE((registry.all_of<int, char>(src)));
+    ASSERT_FALSE(other.all_of<char>(dst));
+    ASSERT_TRUE(other.all_of<int>(dst));
+    ASSERT_EQ(other.get<int>(dst), 42);
 }
