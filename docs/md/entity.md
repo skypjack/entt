@@ -1028,7 +1028,7 @@ and multi type specializations as well as feature-based ones:
 ```cpp
 template<>
 struct entt::component_traits<position>: basic_component_traits {
-    using in_place_delete = std::true_type;
+    static constexpr auto in_place_delete = true;
 };
 ```
 
@@ -1085,7 +1085,7 @@ struct transform {
 
 template<>
 struct entt::component_traits<transform>: basic_component_traits {
-    using in_place_delete = std::true_type;
+    static constexpr auto in_place_delete = true;
 };
 ```
 
