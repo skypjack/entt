@@ -20,12 +20,16 @@ I hope this list can grow much more in the future:
   * [Minecraft Earth](https://www.minecraft.net/en-us/about-earth) by
     [Mojang](https://mojang.com/): an augmented reality game for mobile, that
     lets users bring Minecraft into the real world.
+  * Apparently [Diablo II: Resurrected](https://diablo2.blizzard.com/) by
+    [Blizzard](https://www.blizzard.com/): monsters, heroes, items, spells, all
+    resurrected. Thanks unknown insider.
+  * [Apparently](https://www.youtube.com/watch?v=P8xvOA3ikrQ&t=1105s)
+    [Call of Duty: Vanguard](https://www.callofduty.com/vanguard) by
+    [Sledgehammer Games](https://www.sledgehammergames.com/): I can neither
+    confirm nor deny but there is a license I know in the credits.
   * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
     [Tilted Phoques](https://github.com/tiltedphoques): Skyrim and Fallout 4 mod
     to play online.
-  * [Apparently](https://www.youtube.com/watch?v=P8xvOA3ikrQ&t=1105s)
-    [Call of Duty: Vanguard](https://www.callofduty.com/vanguard): I can neither
-    confirm nor deny but there is a license I know in the credits.
   * [Antkeeper](https://github.com/antkeeper/antkeeper-source): an ant colony
     simulation [game](https://antkeeper.com/).
   * [Openblack](https://github.com/openblack/openblack): open source
