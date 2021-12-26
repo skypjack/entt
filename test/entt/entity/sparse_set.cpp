@@ -1246,6 +1246,14 @@ TEST(SparseSet, ThrowingAllocator) {
     ASSERT_TRUE(set.contains(entt::entity{0}));
     ASSERT_EQ(set.capacity(), 1u);
 
+    test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
+
+    ASSERT_THROW(set.emplace(entt::entity{1}), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_TRUE(set.contains(entt::entity{0}));
+    ASSERT_FALSE(set.contains(entt::entity{1}));
+    ASSERT_EQ(set.capacity(), 1u);
+
     entt::entity entities[2u]{entt::entity{1}, entt::entity{ENTT_SPARSE_PAGE}};
     test::throwing_allocator<entt::entity>::trigger_after_allocate = true;
 

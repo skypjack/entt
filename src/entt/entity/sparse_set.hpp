@@ -274,8 +274,8 @@ protected:
         ENTT_ASSERT(entity_traits::to_version(elem) == entity_traits::to_version(tombstone), "Slot not available");
 
         if(free_list == null) {
-            elem = entity_traits::combine(static_cast<typename entity_traits::entity_type>(packed.size()), entity_traits::to_integral(entt));
             packed.push_back(entt);
+            elem = entity_traits::combine(static_cast<typename entity_traits::entity_type>(packed.size() - 1u), entity_traits::to_integral(entt));
         } else {
             elem = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
             free_list = std::exchange(packed[static_cast<size_type>(entity_traits::to_entity(free_list))], entt);
