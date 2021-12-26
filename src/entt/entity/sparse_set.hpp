@@ -322,7 +322,8 @@ public:
         : basic_sparse_set{type_id<void>(), pol, allocator} {}
 
     /**
-     * @brief Constructs an empty container with the given policy and allocator.
+     * @brief Constructs an empty container with the given value type, policy
+     * and allocator.
      * @param value Returned value type, if any.
      * @param pol Type of deletion policy.
      * @param allocator The allocator to use (possibly default-constructed).
