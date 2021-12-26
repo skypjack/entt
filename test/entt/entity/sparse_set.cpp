@@ -263,12 +263,12 @@ TEST(SparseSet, Emplace) {
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
     ASSERT_TRUE(set.empty());
+    ASSERT_TRUE(set.emplace(entities[0u]));
 
-    set.emplace(entities[0u]);
     set.erase(entities[0u]);
 
-    set.emplace(entities[1u]);
-    set.emplace(entities[0u]);
+    ASSERT_TRUE(set.emplace(entities[1u]));
+    ASSERT_TRUE(set.emplace(entities[0u]));
 
     ASSERT_DEATH(set.emplace(traits_type::combine(3, 1)), "");
     ASSERT_DEATH(set.emplace(entities[1u]), "");
@@ -279,8 +279,9 @@ TEST(SparseSet, Emplace) {
     ASSERT_EQ(set.index(entities[1u]), 0u);
 
     set.erase(std::begin(entities), std::end(entities));
-    set.emplace(entities[1u]);
-    set.emplace(entities[0u]);
+
+    ASSERT_TRUE(set.emplace(entities[1u]));
+    ASSERT_TRUE(set.emplace(entities[0u]));
 
     ASSERT_EQ(set.at(0u), entities[1u]);
     ASSERT_EQ(set.at(1u), entities[0u]);
@@ -292,14 +293,13 @@ TEST(SparseSet, EmplaceOutOfBounds) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[2u]{entt::entity{0}, entt::entity{ENTT_SPARSE_PAGE}};
 
-    set.emplace(entities[0u]);
-
+    ASSERT_TRUE(set.emplace(entities[0u]));
     ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
     ASSERT_EQ(set.index(entities[0u]), 0u);
 
     set.erase(entities[0u]);
-    set.emplace(entities[1u]);
 
+    ASSERT_TRUE(set.emplace(entities[1u]));
     ASSERT_EQ(set.extent(), 2u * ENTT_SPARSE_PAGE);
     ASSERT_EQ(set.index(entities[1u]), 0u);
 }
@@ -309,8 +309,10 @@ TEST(SparseSet, Insert) {
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
     set.emplace(entt::entity{12});
-    set.insert(std::end(entities), std::end(entities));
-    set.insert(std::begin(entities), std::end(entities));
+
+    ASSERT_EQ(set.insert(std::end(entities), std::end(entities)), 0u);
+    ASSERT_EQ(set.insert(std::begin(entities), std::end(entities)), 2u);
+
     set.emplace(entt::entity{24});
 
     ASSERT_TRUE(set.contains(entities[0u]));
@@ -332,7 +334,8 @@ TEST(SparseSet, Insert) {
     ASSERT_EQ(set.data()[set.index(entt::entity{24})], entt::entity{24});
 
     set.erase(std::begin(entities), std::end(entities));
-    set.insert(std::rbegin(entities), std::rend(entities));
+
+    ASSERT_EQ(set.insert(std::rbegin(entities), std::rend(entities)), 2u);
 
     ASSERT_EQ(set.size(), 4u);
     ASSERT_EQ(set.at(1u), entities[0u]);

@@ -950,7 +950,10 @@ class sigh_storage_mixin final: public Type {
     void try_emplace(const typename Type::entity_type entt, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::try_emplace(entt, value);
-        construction.publish(*owner, entt);
+
+        if(Type::contains(entt)) {
+            construction.publish(*owner, entt);
+        }
     }
 
 public:

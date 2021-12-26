@@ -661,10 +661,11 @@ public:
      *
      * @param entt A valid identifier.
      * @param value Optional opaque value to forward to mixins, if any.
+     * @return True in case of success, false otherwise.
      */
-    void emplace(const entity_type entt, const void *value = nullptr) {
+    bool emplace(const entity_type entt, const void *value = nullptr) {
         try_emplace(entt, value);
-        ENTT_ASSERT(contains(entt), "Emplace did not take place");
+        return contains(entt);
     }
 
     /**
@@ -677,18 +678,23 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @return Number of entities actually assigned to the sparse set.
      */
     template<typename It>
-    void insert(It first, It last) {
+    size_type insert(It first, It last) {
+        size_type count{};
+
         for(; first != last && free_list != null; ++first) {
-            emplace(*first);
+            count += emplace(*first);
         }
 
         reserve(packed.size() + std::distance(first, last));
 
         for(; first != last; ++first) {
-            emplace(*first);
+            count += emplace(*first);
         }
+
+        return count;
     }
 
     /**
@@ -740,13 +746,13 @@ public:
      */
     template<typename It>
     size_type remove(It first, It last) {
-        size_type found{};
+        size_type count{};
 
         for(; first != last; ++first) {
-            found += remove(*first);
+            count += remove(*first);
         }
 
-        return found;
+        return count;
     }
 
     /*! @brief Removes all tombstones from the packed array of a sparse set. */
