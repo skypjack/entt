@@ -772,6 +772,49 @@ TEST(Storage, Compact) {
     ASSERT_TRUE(pool.empty());
 }
 
+TEST(Storage, Policy) {
+    entt::storage<stable_type> pool{};
+    entt::entity entities[3u]{entt::entity{0}, entt::entity{1}, entt::entity{2}};
+
+    pool.emplace(entities[0u], stable_type{0});
+    pool.emplace(entities[1u], stable_type{1});
+    pool.emplace(entities[2u], stable_type{2});
+    pool.erase(entities[1u]);
+
+    ASSERT_EQ(pool.size(), 3u);
+    ASSERT_EQ(pool.index(entities[0u]), 0u);
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(pool.index(entities[2u]), 2u);
+    ASSERT_EQ(pool.get(entities[0u]).value, 0);
+    ASSERT_EQ(pool.get(entities[2u]).value, 2);
+
+    pool.policy(entt::deletion_policy::swap_and_pop);
+
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.index(entities[0u]), 0u);
+    ASSERT_EQ(pool.index(entities[2u]), 1u);
+    ASSERT_EQ(pool.get(entities[0u]).value, 0);
+    ASSERT_EQ(pool.get(entities[2u]).value, 2);
+
+    pool.erase(entities[0u]);
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_FALSE(pool.contains(entities[0u]));
+    ASSERT_EQ(pool.index(entities[2u]), 0u);
+    ASSERT_EQ(pool.get(entities[2u]).value, 2);
+
+    pool.policy(entt::deletion_policy::in_place);
+    pool.erase(entities[2u]);
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_FALSE(pool.contains(entities[2u]));
+
+    pool.policy(entt::deletion_policy::swap_and_pop);
+
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_TRUE(pool.empty());
+}
+
 TEST(Storage, ShrinkToFit) {
     entt::storage<int> pool;
 

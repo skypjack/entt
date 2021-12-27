@@ -412,6 +412,18 @@ public:
     }
 
     /**
+     * @brief Sets the deletion policy of a sparse set.
+     * @param pol The deletion policy of the sparse set.
+     */
+    void policy(const deletion_policy pol) ENTT_NOEXCEPT {
+        if(pol != mode && mode == deletion_policy::in_place) {
+            compact();
+        }
+
+        mode = pol;
+    }
+
+    /**
      * @brief Returns the next slot available for insertion.
      * @return The next slot available for insertion.
      */
