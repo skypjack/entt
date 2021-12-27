@@ -1497,12 +1497,8 @@ public:
     /*! @copydoc try_ctx */
     template<typename Type>
     [[nodiscard]] Type *try_ctx() {
-        if constexpr(std::is_const_v<Type>) {
-            return std::as_const(*this).template try_ctx<Type>();
-        } else {
-            auto it = vars.find(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
-            return it == vars.end() ? nullptr : any_cast<Type>(&it->second);
-        }
+        auto it = vars.find(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
+        return it == vars.end() ? nullptr : any_cast<Type>(&it->second);
     }
 
     /**
