@@ -661,7 +661,7 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        if constexpr(is_iterator_type_v<typename basic_common_type::iterator, It>) {
+        if constexpr(is_iterator_type_v<typename base_type::iterator, It>) {
             for(; first != last; ++first) {
                 destroy(*first, entity_traits::to_version(*first) + 1u);
             }
@@ -1151,13 +1151,13 @@ public:
      * @return A newly created view.
      */
     template<typename Component, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_view<Entity, get_t<std::add_const_t<Component>, std::add_const_t<Other>...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_view<entity_type, get_t<std::add_const_t<Component>, std::add_const_t<Other>...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) const {
         return {assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<Exclude>()...};
     }
 
     /*! @copydoc view */
     template<typename Component, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_view<Entity, get_t<Component, Other...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) {
+    [[nodiscard]] basic_view<entity_type, get_t<Component, Other...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) {
         return {assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<Exclude>()...};
     }
 
@@ -1185,9 +1185,9 @@ public:
      * @return A newly created runtime view.
      */
     template<typename ItComp, typename ItExcl = id_type *>
-    [[nodiscard]] basic_runtime_view<Entity> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
-        std::vector<const basic_common_type *> component{};
-        std::vector<const basic_common_type *> filter{};
+    [[nodiscard]] basic_runtime_view<entity_type> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
+        std::vector<const base_type *> component{};
+        std::vector<const base_type *> filter{};
 
         component.reserve(std::distance(first, last));
         filter.reserve(std::distance(from, to));
@@ -1230,7 +1230,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
+    [[nodiscard]] basic_group<entity_type, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only groups are not supported");
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
 
@@ -1312,7 +1312,7 @@ public:
 
     /*! @copydoc group */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, owned_t<std::add_const_t<Owned>...>, get_t<std::add_const_t<Get>...>, exclude_t<Exclude...>> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_group<entity_type, owned_t<std::add_const_t<Owned>...>, get_t<std::add_const_t<Get>...>, exclude_t<Exclude...>> group_if_exists(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
             return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))
                    && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
@@ -1330,13 +1330,13 @@ public:
 
     /*! @copydoc group */
     template<typename... Owned, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, owned_t<Owned...>, get_t<>, exclude_t<Exclude...>> group(exclude_t<Exclude...> = {}) {
+    [[nodiscard]] basic_group<entity_type, owned_t<Owned...>, get_t<>, exclude_t<Exclude...>> group(exclude_t<Exclude...> = {}) {
         return group<Owned...>(get_t<>{}, exclude<Exclude...>);
     }
 
     /*! @copydoc group */
     template<typename... Owned, typename... Exclude>
-    [[nodiscard]] basic_group<Entity, owned_t<std::add_const_t<Owned>...>, get_t<>, exclude_t<Exclude...>> group_if_exists(exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_group<entity_type, owned_t<std::add_const_t<Owned>...>, get_t<>, exclude_t<Exclude...>> group_if_exists(exclude_t<Exclude...> = {}) const {
         return group_if_exists<std::add_const_t<Owned>...>(get_t<>{}, exclude<Exclude...>);
     }
 
@@ -1359,7 +1359,7 @@ public:
      * @return True if the group can be sorted, false otherwise.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] bool sortable(const basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) ENTT_NOEXCEPT {
+    [[nodiscard]] bool sortable(const basic_group<entity_type, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) ENTT_NOEXCEPT {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         auto pred = [size](const auto &gdata) { return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) && (size < gdata.size); };
         return std::find_if(groups.cbegin(), groups.cend(), std::move(pred)) == groups.cend();
@@ -1551,7 +1551,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, std::unique_ptr<basic_common_type>, identity> pools{};
+    dense_hash_map<id_type, std::unique_ptr<base_type>, identity> pools{};
     dense_hash_map<id_type, basic_any<0u>, identity> vars{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
