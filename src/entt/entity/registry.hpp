@@ -1478,8 +1478,7 @@ public:
      */
     template<typename Type, typename... Args>
     [[nodiscard]] Type &ctx_or_set(Args &&...args) {
-        auto *elem = try_ctx<Type>();
-        return elem ? *elem : set<Type>(std::forward<Args>(args)...);
+        return any_cast<Type &>(vars.try_emplace(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(), std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
     }
 
     /**
@@ -1491,7 +1490,7 @@ public:
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> *try_ctx() const {
         auto it = vars.find(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
-        return it == vars.cend() ? nullptr : any_cast<Type>(&it->second);
+        return it == vars.cend() ? nullptr : any_cast<std::add_const_t<Type>>(&it->second);
     }
 
     /*! @copydoc try_ctx */
@@ -1513,17 +1512,13 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> &ctx() const {
-        auto *value = try_ctx<Type>();
-        ENTT_ASSERT(value != nullptr, "Invalid instance");
-        return *value;
+        return any_cast<std::add_const_t<Type> &>(vars.at(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()));
     }
 
     /*! @copydoc ctx */
     template<typename Type>
     [[nodiscard]] Type &ctx() {
-        auto *value = try_ctx<Type>();
-        ENTT_ASSERT(value != nullptr, "Invalid instance");
-        return *value;
+        return any_cast<Type &>(vars.at(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()));
     }
 
     /**
