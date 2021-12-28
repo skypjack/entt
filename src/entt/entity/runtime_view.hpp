@@ -99,7 +99,16 @@ private:
  */
 
 /**
- * @brief Runtime view.
+ * @brief Runtime view implementation.
+ *
+ * Primary template isn't defined on purpose. All the specializations give a
+ * compile-time error, but for a few reasonable cases.
+ */
+template<typename>
+class basic_runtime_view;
+
+/**
+ * @brief Generic runtime view.
  *
  * Runtime views iterate over those entities that have at least all the given
  * components in their bags. During initialization, a runtime view looks at the
@@ -135,11 +144,10 @@ private:
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Entity>
-class basic_runtime_view final {
-    using basic_common_type = basic_sparse_set<Entity>;
-
+template<typename Entity, typename Allocator>
+class basic_runtime_view<basic_sparse_set<Entity, Allocator>> final {
     [[nodiscard]] bool valid() const {
         return !pools.empty() && pools.front();
     }
@@ -149,8 +157,10 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Common type among all storage types. */
+    using base_type = basic_sparse_set<Entity, Allocator>;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::runtime_view_iterator<basic_common_type>;
+    using iterator = internal::runtime_view_iterator<base_type>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_runtime_view() ENTT_NOEXCEPT
@@ -162,7 +172,7 @@ public:
      * @param cpools The storage for the types to iterate.
      * @param epools The storage for the types used to filter the view.
      */
-    basic_runtime_view(std::vector<const basic_common_type *> cpools, std::vector<const basic_common_type *> epools) ENTT_NOEXCEPT
+    basic_runtime_view(std::vector<const base_type *> cpools, std::vector<const base_type *> epools) ENTT_NOEXCEPT
         : pools{std::move(cpools)},
           filter{std::move(epools)} {
         auto candidate = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
@@ -243,8 +253,8 @@ public:
     }
 
 private:
-    std::vector<const basic_common_type *> pools;
-    std::vector<const basic_common_type *> filter;
+    std::vector<const base_type *> pools;
+    std::vector<const base_type *> filter;
 };
 
 } // namespace entt

@@ -7,7 +7,7 @@ WIP:
 * add the possibility of disabling entities without deleting components thanks to the new full check
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime events (dispatcher/emitter), runtime context variables...
-* runtime_view/registry, remove reference to basic_sparse_set<E>
+* registry: remove reference to basic_sparse_set<E>
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
 * custom allocators all over
 

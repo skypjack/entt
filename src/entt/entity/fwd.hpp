@@ -103,7 +103,7 @@ template<typename Get, typename Exclude = exclude_t<>>
 using view = basic_view<entity, Get, Exclude>;
 
 /*! @brief Alias declaration for the most common use case. */
-using runtime_view = basic_runtime_view<entity>;
+using runtime_view = basic_runtime_view<sparse_set>;
 
 /**
  * @brief Alias declaration for the most common use case.

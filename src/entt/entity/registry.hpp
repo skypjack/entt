@@ -1185,7 +1185,7 @@ public:
      * @return A newly created runtime view.
      */
     template<typename ItComp, typename ItExcl = id_type *>
-    [[nodiscard]] basic_runtime_view<entity_type> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
+    [[nodiscard]] basic_runtime_view<base_type> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
         std::vector<const base_type *> component{};
         std::vector<const base_type *> filter{};
 
