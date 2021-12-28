@@ -20,7 +20,7 @@ template<typename, typename, typename, typename = void>
 class basic_view;
 
 template<typename>
-class basic_runtime_view;
+struct basic_runtime_view;
 
 template<typename, typename, typename, typename>
 class basic_group;

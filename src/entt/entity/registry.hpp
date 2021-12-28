@@ -1193,13 +1193,17 @@ public:
         filter.reserve(std::distance(from, to));
 
         for(; first != last; ++first) {
-            const auto it = pools.find(*first);
-            component.emplace_back(it == pools.cend() ? nullptr : it->second.get());
+            if(const auto it = pools.find(*first); it == pools.cend()) {
+                return {};
+            } else {
+                component.emplace_back(it->second.get());
+            }
         }
 
         for(; from != to; ++from) {
-            const auto it = pools.find(*from);
-            filter.emplace_back(it == pools.cend() ? nullptr : it->second.get());
+            if(const auto it = pools.find(*from); it != pools.cend()) {
+                filter.emplace_back(it->second.get());
+            }
         }
 
         return {std::move(component), std::move(filter)};

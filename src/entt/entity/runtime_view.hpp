@@ -105,7 +105,7 @@ private:
  * compile-time error, but for a few reasonable cases.
  */
 template<typename>
-class basic_runtime_view;
+struct basic_runtime_view;
 
 /**
  * @brief Generic runtime view.
@@ -147,12 +147,7 @@ class basic_runtime_view;
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Allocator>
-class basic_runtime_view<basic_sparse_set<Entity, Allocator>> final {
-    [[nodiscard]] bool valid() const {
-        return !pools.empty() && pools.front();
-    }
-
-public:
+struct basic_runtime_view<basic_sparse_set<Entity, Allocator>> final {
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -188,7 +183,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const {
-        return valid() ? pools.front()->size() : size_type{};
+        return pools.empty() ? size_type{} : pools.front()->size();
     }
 
     /**
@@ -202,7 +197,7 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     [[nodiscard]] iterator begin() const {
-        return valid() ? iterator{pools, filter, pools[0]->begin()} : iterator{};
+        return pools.empty() ? iterator{} : iterator{pools, filter, pools[0]->begin()};
     }
 
     /**
@@ -217,7 +212,7 @@ public:
      * given components.
      */
     [[nodiscard]] iterator end() const {
-        return valid() ? iterator{pools, filter, pools[0]->end()} : iterator{};
+        return pools.empty() ? iterator{} : iterator{pools, filter, pools[0]->end()};
     }
 
     /**
@@ -226,7 +221,8 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return valid() && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *curr) { return curr->contains(entt); })
+        return !pools.empty()
+               && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *curr) { return curr->contains(entt); })
                && std::none_of(filter.cbegin(), filter.cend(), [entt](const auto *curr) { return curr && curr->contains(entt); });
     }
 
