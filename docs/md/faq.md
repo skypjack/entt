@@ -149,15 +149,14 @@ more details.
 ## The standard and the non-copyable types
 
 `EnTT` uses internally the trait `std::is_copy_constructible_v` to check if a
-component is actually copyable. This trait doesn't check if an object can
-actually be copied but only verifies if there is a copy constructor
-available.<br/>
-This can lead to surprising results due to some idiosyncrasies of the standard
-mainly related to the need to guarantee backward compatibility.
+component is actually copyable. However, this trait doesn't really check whether
+a type is actually copyable. Instead, it just checks that a suitable copy
+constructor and copy operator exist.<br/>
+This can lead to surprising results due to some idiosyncrasies of the standard.
 
-For example, `std::vector` defines a copy constructor no matter if its value
-type is copyable or not. As a result, `std::is_copy_constructible_v` is true
-for the following specialization:
+For example, `std::vector` defines a copy constructor that is conditionally
+enabled depending on whether the value type is copyable or not. As a result,
+`std::is_copy_constructible_v` returns true for the following specialization:
 
 ```cpp
 struct type {
@@ -165,21 +164,30 @@ struct type {
 };
 ```
 
-When trying to assign an instance of this type to an entity in the ECS part,
-this may trigger a compilation error because we cannot really make a copy of
-it.<br/>
-As a workaround, users can mark the type explicitly as non-copyable:
+However, the copy constructor is effectively disabled upon specialization.
+Therefore, trying to assign an instance of this type to an entity may trigger a
+compilation error.<br/>
+As a workaround, users can mark the type explicitly as non-copyable. This also
+suppresses the implicit generation of the move constructor and operator, which
+will therefore have to be defaulted accordingly:
 
 ```cpp
 struct type {
     type(const type &) = delete;
+    type(type &&) = default;
+
     type & operator=(const type &) = delete;
+    type & operator=(type &&) = default;
 
     std::vector<std::unique_ptr<action>> vec;
 };
 ```
 
-Unfortunately, this will also disable aggregate initialization.
+Note that aggregate initialization is also disabled as a consequence.<br/>
+Fortunately, this type of trick is quite rare. The bad news is that there is no
+way to deal with it at the library level, this being due to the design of the
+language. On the other hand, the fact that the language itself also offers a way
+to mitigate the problem makes it manageable.
 
 ## Which functions trigger which signals
 
