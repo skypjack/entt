@@ -656,7 +656,6 @@ public:
      * @return An opaque pointer to the element assigned to the entity, if any.
      */
     const void *get(const entity_type entt) const ENTT_NOEXCEPT {
-        ENTT_ASSERT(contains(entt), "Set does not contain entity");
         return get_at(index(entt));
     }
 
