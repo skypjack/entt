@@ -1694,8 +1694,8 @@ thrown away.<br/>
 To iterate a runtime view, either use it in a range-for loop:
 
 ```cpp
-entt::id_type types[] = { entt::type_hash<position>::value(), entt::type_hash<velocity>::value() };
-auto view = registry.runtime_view(std::cbegin(types), std::cend(types));
+entt::runtime_view view{};
+view.iterate(registry.storage<position>()).iterate(registry.storage<velocity>());
 
 for(auto entity: view) {
     // ...
@@ -1705,25 +1705,25 @@ for(auto entity: view) {
 Or rely on the `each` member function to iterate entities:
 
 ```cpp
-entt::id_type types[] = { entt::type_hash<position>::value(), entt::type_hash<velocity>::value() };
-
-registry.runtime_view(std::cbegin(types), std::cend(types)).each([](auto entity) {
-    // ...
-});
+entt::runtime_view{}
+    .iterate(registry.storage<position>())
+    .iterate(registry.storage<velocity>())
+    .each([](auto entity) {
+        // ...
+    });
 ```
 
 Performance are exactly the same in both cases.<br/>
 Filtering entities by components is also supported for this kind of views:
 
 ```cpp
-entt::id_type components[] = { entt::type_hash<position>::value() };
-entt::id_type filter[] = { entt::type_hash<velocity>::value() };
-auto view = registry.runtime_view(std::cbegin(components), std::cend(components), std::cbegin(filter), std::cend(filter));
+entt::runtime_view view{};
+view.iterate(registry.storage<position>()).exclude(registry.storage<velocity>());
 ```
 
-**Note**: runtime views are meant for all those cases where users don't know at
-compile-time what components to _use_ to iterate entities. If possible, don't
-use runtime views as their performance are inferior to those of the other views.
+Runtime views are meant for when users don't know at compile-time what types to
+_use_ to iterate entities. The `storage` member function of a registry could be
+useful in this regard.
 
 ## Groups
 

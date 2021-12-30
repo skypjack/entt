@@ -1162,54 +1162,6 @@ public:
     }
 
     /**
-     * @brief Returns a runtime view for the given components.
-     *
-     * @sa view
-     *
-     * Runtime views are to be used when users want to construct a view from
-     * some external inputs and don't know at compile-time what are the required
-     * components.
-     *
-     * @tparam ItComp Type of input iterator for the components to use to
-     * construct the view.
-     * @tparam ItExcl Type of input iterator for the components to use to filter
-     * the view.
-     * @param first An iterator to the first element of the range of components
-     * to use to construct the view.
-     * @param last An iterator past the last element of the range of components
-     * to use to construct the view.
-     * @param from An iterator to the first element of the range of components
-     * to use to filter the view.
-     * @param to An iterator past the last element of the range of components to
-     * use to filter the view.
-     * @return A newly created runtime view.
-     */
-    template<typename ItComp, typename ItExcl = id_type *>
-    [[nodiscard]] basic_runtime_view<base_type> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
-        std::vector<const base_type *> component{};
-        std::vector<const base_type *> filter{};
-
-        component.reserve(std::distance(first, last));
-        filter.reserve(std::distance(from, to));
-
-        for(; first != last; ++first) {
-            if(const auto it = pools.find(*first); it == pools.cend()) {
-                return {};
-            } else {
-                component.emplace_back(it->second.get());
-            }
-        }
-
-        for(; from != to; ++from) {
-            if(const auto it = pools.find(*from); it != pools.cend()) {
-                filter.emplace_back(it->second.get());
-            }
-        }
-
-        return {std::move(component), std::move(filter)};
-    }
-
-    /**
      * @brief Returns a group for the given components.
      *
      * Groups are created on the fly and share with the registry its internal

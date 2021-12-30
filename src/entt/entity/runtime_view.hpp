@@ -163,19 +163,28 @@ struct basic_runtime_view<basic_sparse_set<Entity, Allocator>> final {
           filter{} {}
 
     /**
-     * @brief Constructs a runtime view from a set of storage classes.
-     * @param cpools The storage for the types to iterate.
-     * @param epools The storage for the types used to filter the view.
+     * @brief Appends an opaque storage object to a runtime view.
+     * @param base An opaque reference to a storage object.
+     * @return This runtime view.
      */
-    basic_runtime_view(std::vector<const base_type *> cpools, std::vector<const base_type *> epools) ENTT_NOEXCEPT
-        : pools{std::move(cpools)},
-          filter{std::move(epools)} {
-        auto candidate = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
-            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
-        });
+    basic_runtime_view &iterate(const base_type &base) {
+        if(pools.empty() || !(base.size() < pools[0u]->size())) {
+            pools.push_back(&base);
+        } else {
+            pools.push_back(std::exchange(pools[0u], &base));
+        }
 
-        // brings the best candidate (if any) on front of the vector
-        std::rotate(pools.begin(), candidate, pools.end());
+        return *this;
+    }
+
+    /**
+     * @brief Adds an opaque storage object as a filter of a runtime view.
+     * @param base An opaque reference to a storage object.
+     * @return This runtime view.
+     */
+    basic_runtime_view &exclude(const base_type &base) {
+        filter.push_back(&base);
+        return *this;
     }
 
     /**
