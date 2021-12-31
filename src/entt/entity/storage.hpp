@@ -247,7 +247,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         return packed.first()[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
-    auto assure_at_least(const std::size_t pos) {
+    auto *assure_at_least(const std::size_t pos) {
         auto &&container = packed.first();
         const auto idx = pos / comp_traits::page_size;
 
@@ -345,29 +345,25 @@ protected:
 
     /**
      * @brief Erases an element from a storage.
-     * @param entt A valid identifier.
+     * @param pos A valid position of an element within a storage.
      */
-    void swap_and_pop(const Entity entt) override {
-        auto &target = element_at(base_type::index(entt));
-        auto &last = element_at(base_type::size() - 1u);
-
+    void swap_and_pop(const std::size_t pos) override {
+        auto &elem = element_at(base_type::size() - 1u);
         // support for nosy destructors
-        [[maybe_unused]] auto unused = std::move(target);
-        target = std::move(last);
-        std::destroy_at(std::addressof(last));
-
-        base_type::swap_and_pop(entt);
+        [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
+        base_type::swap_and_pop(pos);
+        std::destroy_at(std::addressof(elem));
     }
 
     /**
      * @brief Erases an element from a storage.
-     * @param entt A valid identifier.
+     * @param pos A valid position of an element within a storage.
      */
-    void in_place_pop(const Entity entt) override {
-        const auto pos = base_type::index(entt);
-        base_type::in_place_pop(entt);
+    void in_place_pop(const std::size_t pos) override {
+        auto &elem = element_at(pos);
+        base_type::in_place_pop(pos);
         // support for nosy destructors
-        std::destroy_at(std::addressof(element_at(pos)));
+        std::destroy_at(std::addressof(elem));
     }
 
     /**
@@ -933,17 +929,19 @@ public:
 template<typename Type>
 class sigh_storage_mixin final: public Type {
     /*! @copydoc basic_sparse_set::swap_and_pop */
-    void swap_and_pop(const typename Type::entity_type entt) final {
+    void swap_and_pop(const std::size_t pos) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        const auto entt = Type::operator[](pos);
         destruction.publish(*owner, entt);
-        Type::swap_and_pop(entt);
+        Type::swap_and_pop(Type::index(entt));
     }
 
     /*! @copydoc basic_sparse_set::in_place_pop */
-    void in_place_pop(const typename Type::entity_type entt) final {
+    void in_place_pop(const std::size_t pos) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        const auto entt = Type::operator[](pos);
         destruction.publish(*owner, entt);
-        Type::in_place_pop(entt);
+        Type::in_place_pop(Type::index(entt));
     }
 
     /*! @copydoc basic_sparse_set::try_emplace */

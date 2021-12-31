@@ -180,7 +180,7 @@ class basic_sparse_set {
     using sparse_container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using packed_container_type = std::vector<Entity, alloc>;
 
-    [[nodiscard]] auto sparse_ptr(const Entity entt) const {
+    [[nodiscard]] auto *sparse_ptr(const Entity entt) const {
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
         const auto page = pos / entity_traits::page_size;
         return (page < sparse.size() && sparse[page]) ? (sparse[page] + fast_mod(pos, entity_traits::page_size)) : nullptr;
@@ -190,6 +190,25 @@ class basic_sparse_set {
         ENTT_ASSERT(sparse_ptr(entt), "Invalid element");
         const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
         return sparse[pos / entity_traits::page_size][fast_mod(pos, entity_traits::page_size)];
+    }
+
+    [[nodiscard]] auto &assure_at_least(const Entity entt) {
+        const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
+        const auto page = pos / entity_traits::page_size;
+
+        if(!(page < sparse.size())) {
+            sparse.resize(page + 1u, nullptr);
+        }
+
+        if(!sparse[page]) {
+            auto page_allocator{packed.get_allocator()};
+            sparse[page] = alloc_traits::allocate(page_allocator, entity_traits::page_size);
+            std::uninitialized_fill(sparse[page], sparse[page] + entity_traits::page_size, null);
+        }
+
+        auto &elem = sparse[page][fast_mod(pos, entity_traits::page_size)];
+        ENTT_ASSERT(entity_traits::to_version(elem) == entity_traits::to_version(tombstone), "Slot not available");
+        return elem;
     }
 
     void release_sparse_pages() {
@@ -221,18 +240,13 @@ protected:
 
     /**
      * @brief Erases an entity from a sparse set.
-     * @param entt A valid identifier.
+     * @param pos A valid position of an element within a sparse set.
      */
-    virtual void swap_and_pop(const Entity entt) {
-        auto &ref = sparse_ref(entt);
-        const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
-        ENTT_ASSERT(packed[pos] == entt, "Invalid identifier");
-
-        packed[pos] = packed.back();
-        auto &elem = sparse_ref(packed.back());
-        elem = entity_traits::combine(entity_traits::to_integral(ref), entity_traits::to_integral(elem));
+    virtual void swap_and_pop(const std::size_t pos) {
+        sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(packed.back()));
         // lazy self-assignment guard
-        ref = null;
+        sparse_ref(packed[pos]) = null;
+        packed[pos] = packed.back();
         // unnecessary but it helps to detect nasty bugs
         ENTT_ASSERT((packed.back() = tombstone, true), "");
         packed.pop_back();
@@ -240,16 +254,11 @@ protected:
 
     /**
      * @brief Erases an entity from a sparse set.
-     * @param entt A valid identifier.
+     * @param pos A valid position of an element within a sparse set.
      */
-    virtual void in_place_pop(const Entity entt) {
-        auto &ref = sparse_ref(entt);
-        const auto pos = static_cast<size_type>(entity_traits::to_entity(ref));
-        ENTT_ASSERT(packed[pos] == entt, "Invalid identifier");
-
+    virtual void in_place_pop(const std::size_t pos) {
+        sparse_ref(packed[pos]) = null;
         packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
-        // lazy self-assignment guard
-        ref = null;
     }
 
     /**
@@ -257,23 +266,7 @@ protected:
      * @param entt A valid identifier.
      */
     virtual void try_emplace(const Entity entt, const void * = nullptr) {
-        const auto pos = static_cast<size_type>(entity_traits::to_entity(entt));
-        const auto page = pos / entity_traits::page_size;
-
-        if(!(page < sparse.size())) {
-            sparse.resize(page + 1u, nullptr);
-        }
-
-        if(!sparse[page]) {
-            auto page_allocator{packed.get_allocator()};
-            sparse[page] = alloc_traits::allocate(page_allocator, entity_traits::page_size);
-            std::uninitialized_fill(sparse[page], sparse[page] + entity_traits::page_size, null);
-        }
-
-        auto &elem = sparse[page][fast_mod(pos, entity_traits::page_size)];
-        ENTT_ASSERT(entity_traits::to_version(elem) == entity_traits::to_version(tombstone), "Slot not available");
-
-        if(free_list == null) {
+        if(auto &elem = assure_at_least(entt); free_list == null) {
             packed.push_back(entt);
             elem = entity_traits::combine(static_cast<typename entity_traits::entity_type>(packed.size() - 1u), entity_traits::to_integral(entt));
         } else {
@@ -719,8 +712,7 @@ public:
      * @param entt A valid identifier.
      */
     void erase(const entity_type entt) {
-        ENTT_ASSERT(contains(entt), "Set does not contain entity");
-        (mode == deletion_policy::in_place) ? in_place_pop(entt) : swap_and_pop(entt);
+        (mode == deletion_policy::in_place) ? in_place_pop(index(entt)) : swap_and_pop(index(entt));
         ENTT_ASSERT(!contains(entt), "Destruction did not take place");
     }
 
