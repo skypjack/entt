@@ -236,7 +236,7 @@ protected:
     virtual void swap_at(const std::size_t, const std::size_t) {}
 
     /*! @brief Moves an entity in a sparse set. */
-    virtual void move_and_pop(const std::size_t, const std::size_t) {}
+    virtual void move_element(const std::size_t, const std::size_t) {}
 
     /**
      * @brief Erases an entity from a sparse set.
@@ -761,23 +761,23 @@ public:
 
     /*! @brief Removes all tombstones from the packed array of a sparse set. */
     void compact() {
-        size_type next = packed.size();
-        for(; next && packed[next - 1u] == tombstone; --next) {}
+        size_type from = packed.size();
+        for(; from && packed[from - 1u] == tombstone; --from) {}
 
-        for(auto *it = &free_list; *it != null && next; it = std::addressof(packed[entity_traits::to_entity(*it)])) {
-            if(const size_type pos = entity_traits::to_entity(*it); pos < next) {
-                --next;
-                move_and_pop(next, pos);
-                std::swap(packed[next], packed[pos]);
-                const auto entity = static_cast<typename entity_traits::entity_type>(pos);
-                sparse_ref(packed[pos]) = entity_traits::combine(entity, entity_traits::to_integral(packed[pos]));
-                *it = entity_traits::combine(static_cast<typename entity_traits::entity_type>(next), entity_traits::reserved);
-                for(; next && packed[next - 1u] == tombstone; --next) {}
+        for(auto *it = &free_list; *it != null && from; it = std::addressof(packed[entity_traits::to_entity(*it)])) {
+            if(const size_type to = entity_traits::to_entity(*it); to < from) {
+                --from;
+                move_element(from, to);
+                std::swap(packed[from], packed[to]);
+                const auto entity = static_cast<typename entity_traits::entity_type>(to);
+                sparse_ref(packed[to]) = entity_traits::combine(entity, entity_traits::to_integral(packed[to]));
+                *it = entity_traits::combine(static_cast<typename entity_traits::entity_type>(from), entity_traits::reserved);
+                for(; from && packed[from - 1u] == tombstone; --from) {}
             }
         }
 
         free_list = tombstone;
-        packed.resize(next);
+        packed.resize(from);
     }
 
     /**

@@ -337,10 +337,11 @@ protected:
      * @param from A valid position of an element within a storage.
      * @param to A valid position of an element within a storage.
      */
-    void move_and_pop(const std::size_t from, const std::size_t to) final {
+    void move_element(const std::size_t from, const std::size_t to) final {
         auto &elem = element_at(from);
         construct(assure_at_least(to), std::move(elem));
         std::destroy_at(std::addressof(elem));
+        base_type::move_element(from, to);
     }
 
     /**
