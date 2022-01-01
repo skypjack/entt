@@ -671,7 +671,7 @@ public:
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
         const auto pos = base_type::slot();
-        auto elem = assure_at_least(pos);
+        auto *elem = assure_at_least(pos);
         construct(elem, std::forward<Args>(args)...);
 
         ENTT_TRY {
