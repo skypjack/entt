@@ -666,11 +666,12 @@ public:
      *
      * @param entt A valid identifier.
      * @param value Optional opaque value to forward to mixins, if any.
-     * @return True in case of success, false otherwise.
+     * @return Iterator pointing to the emplaced element in case of success, the
+     * `end()` iterator otherwise.
      */
-    bool emplace(const entity_type entt, const void *value = nullptr) {
+    iterator emplace(const entity_type entt, const void *value = nullptr) {
         try_emplace(entt, value);
-        return contains(entt);
+        return find(entt);
     }
 
     /**
@@ -683,23 +684,24 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @return Number of entities actually assigned to the sparse set.
+     * @return Iterator pointing to the first element inserted in case of
+     * success, the `end()` iterator otherwise.
      */
     template<typename It>
-    size_type insert(It first, It last) {
-        size_type count{};
+    iterator insert(It first, It last) {
+        auto it = first;
 
-        for(; first != last && free_list != null; ++first) {
-            count += emplace(*first);
+        for(; it != last && free_list != null; ++it) {
+            emplace(*it);
         }
 
-        reserve(packed.size() + std::distance(first, last));
+        reserve(packed.size() + std::distance(it, last));
 
-        for(; first != last; ++first) {
-            count += emplace(*first);
+        for(; it != last; ++it) {
+            emplace(*it);
         }
 
-        return count;
+        return first == last ? end() : find(*first);
     }
 
     /**

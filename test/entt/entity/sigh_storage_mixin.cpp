@@ -47,7 +47,7 @@ TEST(SighStorageMixin, GenericType) {
     pool.on_construct().connect<&listener>(on_construct);
     pool.on_destroy().connect<&listener>(on_destroy);
 
-    ASSERT_TRUE(base.emplace(entities[0u]));
+    ASSERT_NE(base.emplace(entities[0u]), base.end());
 
     pool.emplace(entities[1u]);
 
@@ -65,7 +65,7 @@ TEST(SighStorageMixin, GenericType) {
     ASSERT_EQ(on_destroy.value, 2);
     ASSERT_TRUE(pool.empty());
 
-    ASSERT_EQ(base.insert(std::begin(entities), std::end(entities)), 2u);
+    ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_EQ(pool.get(entities[0u]), 0);
     ASSERT_EQ(pool.get(entities[1u]), 0);
@@ -113,7 +113,7 @@ TEST(SighStorageMixin, EmptyType) {
     pool.on_construct().connect<&listener>(on_construct);
     pool.on_destroy().connect<&listener>(on_destroy);
 
-    ASSERT_TRUE(base.emplace(entities[0u]));
+    ASSERT_NE(base.emplace(entities[0u]), base.end());
 
     pool.emplace(entities[1u]);
 
@@ -131,7 +131,7 @@ TEST(SighStorageMixin, EmptyType) {
     ASSERT_EQ(on_destroy.value, 2);
     ASSERT_TRUE(pool.empty());
 
-    ASSERT_EQ(base.insert(std::begin(entities), std::end(entities)), 2u);
+    ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
@@ -179,7 +179,7 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
     pool.on_construct().connect<&listener>(on_construct);
     pool.on_destroy().connect<&listener>(on_destroy);
 
-    ASSERT_FALSE(base.emplace(entities[0u]));
+    ASSERT_EQ(base.emplace(entities[0u]), base.end());
 
     pool.emplace(entities[1u], 3);
 
@@ -196,7 +196,7 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
     ASSERT_EQ(on_destroy.value, 1);
     ASSERT_TRUE(pool.empty());
 
-    ASSERT_EQ(base.insert(std::begin(entities), std::end(entities)), 0u);
+    ASSERT_EQ(base.insert(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
