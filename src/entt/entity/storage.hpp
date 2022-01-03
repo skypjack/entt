@@ -270,13 +270,15 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     void shrink_to_size(const std::size_t sz) {
-        for(auto pos = sz, last = base_type::size(); pos < last; ++pos) {
-            if constexpr(comp_traits::in_place_delete) {
+        if(base_type::slot() == base_type::size()) {
+            for(auto pos = sz, last = base_type::size(); pos < last; ++pos) {
+                std::destroy_at(std::addressof(element_at(pos)));
+            }
+        } else {
+            for(auto pos = sz, last = base_type::size(); pos < last; ++pos) {
                 if(base_type::at(pos) != tombstone) {
                     std::destroy_at(std::addressof(element_at(pos)));
                 }
-            } else {
-                std::destroy_at(std::addressof(element_at(pos)));
             }
         }
 
