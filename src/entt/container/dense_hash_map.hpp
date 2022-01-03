@@ -909,7 +909,7 @@ public:
      */
     void rehash(const size_type count) {
         auto value = (std::max)(count, minimum_capacity);
-        value = (std::max)(value, static_cast<size_type>(size() / max_load_factor()));
+        value = std::max<size_type>(value, size() / max_load_factor());
 
         if(const auto sz = next_power_of_two(value); sz != bucket_count()) {
             sparse.first().resize(sz);
