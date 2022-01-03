@@ -123,9 +123,7 @@ public:
     }
 
     /*! @brief Constructs an empty hashed string. */
-    constexpr basic_hashed_string() ENTT_NOEXCEPT
-        : str{nullptr},
-          hash{} {}
+    constexpr basic_hashed_string() ENTT_NOEXCEPT = default;
 
     /**
      * @brief Constructs a hashed string from an array of const characters.
@@ -189,8 +187,9 @@ public:
     }
 
 private:
-    const value_type *str;
-    hash_type hash;
+    const value_type *str = {};
+    hash_type hash{};
+    std::size_t size{};
 };
 
 /**
