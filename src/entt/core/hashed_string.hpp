@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include "../config/config.h"
 #include "fwd.hpp"
 
@@ -56,6 +57,11 @@ struct fnv1a_traits<std::uint64_t> {
  */
 template<typename Char>
 class basic_hashed_string {
+public:
+    /*! @brief Unsigned integer type. */
+    using size_type = std::uint32_t;
+
+private:
     using hs_traits = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
@@ -67,24 +73,28 @@ class basic_hashed_string {
 
     struct helper_result {
         id_type hash;
-        std::size_t size;
+        size_type size;
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr helper_result helper(const Char *curr) ENTT_NOEXCEPT {
         auto result = helper_result{hs_traits::offset, 0};
+        std::size_t size{};
 
         while(*curr != 0) {
             result.hash = (result.hash ^ static_cast<hs_traits::type>(*(curr++))) * hs_traits::prime;
-            ++result.size;
+            ++size;
         }
 
+        ENTT_ASSERT(size <= std::numeric_limits<size_type>::max(), "string size cannot fit in size_type");
+
+        result.size = static_cast<size_type>(size);
         return result;
     }
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    [[nodiscard]] static constexpr helper_result helper(Char const *curr, std::size_t size) ENTT_NOEXCEPT {
-        auto result = helper_result{hs_traits::offset, size};
+    [[nodiscard]] static constexpr helper_result helper(Char const *curr, size_type size) ENTT_NOEXCEPT {
+        auto result = helper_result{hs_traits::offset, static_cast<size_type>(size)};
 
         while(size-- > 0) {
             result.hash = (result.hash ^ static_cast<hs_traits::type>(*(curr++))) * hs_traits::prime;
@@ -105,7 +115,7 @@ public:
      * @param size Length of the string to hash.
      * @return The numeric representation of the string.
      */
-    [[nodiscard]] static constexpr hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr hash_type value(const value_type *str, size_type size) ENTT_NOEXCEPT {
         return helper(str, size).hash;
     }
 
@@ -124,7 +134,7 @@ public:
      * @param str Human-readable identifer.
      * @return The numeric representation of the string.
      */
-    template<std::size_t N>
+    template<size_type N>
     [[nodiscard]] static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
         /* NOTE: `str` is expected to be an string literal, 
            and the size of it (`N`) contains then null terminator,
@@ -162,7 +172,7 @@ public:
      * @param ptr Human-readable identifer.
      * @param size The size of the string.
      */
-    constexpr basic_hashed_string(value_type const *const ptr, std::size_t const size) ENTT_NOEXCEPT
+    constexpr basic_hashed_string(value_type const *const ptr, size_type const size) ENTT_NOEXCEPT
         : basic_hashed_string(ptr, helper(ptr, size)) {}
 
     /**
@@ -179,9 +189,10 @@ public:
      * @tparam N Number of characters of the identifier.
      * @param curr Human-readable identifer.
      */
-    template<std::size_t N>
+    template<size_type N>
     constexpr basic_hashed_string(const value_type (&curr)[N]) ENTT_NOEXCEPT
-        : basic_hashed_string(&curr[0], helper(&curr[0], N - 1)) {}
+        : basic_hashed_string(&curr[0], helper(&curr[0], N - 1)) {
+    }
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
@@ -228,14 +239,14 @@ public:
      * @brief Returns the size a hashed string.
      * @return The size of the instance.
      */
-    [[nodiscard]] constexpr std::size_t size() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr size_type size() const ENTT_NOEXCEPT {
         return len;
     }
 
 private:
     const value_type *str = {};
     hash_type hash{};
-    std::size_t len{};
+    size_type len{};
 };
 
 /**
@@ -248,7 +259,7 @@ private:
  * @tparam N Number of characters of the identifier.
  * @param str Human-readable identifer.
  */
-template<typename Char, std::size_t N>
+template<typename Char, typename basic_hashed_string<Char>::size_type N>
 basic_hashed_string(const Char (&str)[N]) -> basic_hashed_string<Char>;
 
 /**
@@ -339,8 +350,9 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-[[nodiscard]] constexpr entt::hashed_string operator"" _hs(const char *str, std::size_t size) ENTT_NOEXCEPT {
-    return entt::hashed_string{str, size};
+[[nodiscard]] constexpr entt::hashed_string operator"" _hs(const char *str, std::size_t const size) ENTT_NOEXCEPT {
+    ENTT_ASSERT(size <= std::numeric_limits<entt::hashed_string::size_type>::max(), "string size cannot fit in size_type");
+    return entt::hashed_string{str, static_cast<entt::hashed_string::size_type>(size)};
 }
 
 /**
@@ -348,8 +360,9 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-[[nodiscard]] constexpr entt::hashed_wstring operator"" _hs(const wchar_t *str, std::size_t size) ENTT_NOEXCEPT {
-    return entt::hashed_wstring{str, size};
+[[nodiscard]] constexpr entt::hashed_wstring operator"" _hs(const wchar_t *str, std::size_t const size) ENTT_NOEXCEPT {
+    ENTT_ASSERT(size <= std::numeric_limits<entt::hashed_wstring::size_type>::max(), "string size cannot fit in size_type");
+    return entt::hashed_wstring{str, static_cast<entt::hashed_wstring::size_type>(size)};
 }
 
 /**
@@ -357,8 +370,9 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed wstring.
  */
-[[nodiscard]] constexpr entt::hashed_wstring operator"" _hws(const wchar_t *str, std::size_t size) ENTT_NOEXCEPT {
-    return entt::hashed_wstring{str, size};
+[[nodiscard]] constexpr entt::hashed_wstring operator"" _hws(const wchar_t *str, std::size_t const size) ENTT_NOEXCEPT {
+    ENTT_ASSERT(size <= std::numeric_limits<entt::hashed_wstring::size_type>::max(), "string size cannot fit in size_type");
+    return entt::hashed_wstring{str, static_cast<entt::hashed_wstring::size_type>(size)};
 }
 
 } // namespace literals
