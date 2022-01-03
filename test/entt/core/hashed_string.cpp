@@ -68,6 +68,7 @@ TEST(HashedString, Empty) {
 
     ASSERT_EQ(static_cast<hash_type>(hs), hash_type{});
     ASSERT_EQ(static_cast<const char *>(hs), nullptr);
+    ASSERT_EQ(hs.size(), 0);
 }
 
 TEST(HashedString, Correctness) {
@@ -112,6 +113,8 @@ TEST(HashedString, Constexprness) {
 
     static_assert(entt::hashed_string{"foo"} > "bar"_hs);
     static_assert(entt::hashed_string{"foo"} >= "foo"_hs);
+
+    static_assert(entt::hashed_string{"my.png", 2} == "my"_hs);
 }
 
 TEST(HashedWString, Functionalities) {
@@ -138,7 +141,9 @@ TEST(HashedWString, Functionalities) {
     ASSERT_EQ(hws.value(), foobar_v);
 
     ASSERT_EQ(foo_hws, L"foo"_hws);
+    ASSERT_EQ(foo_hws, L"foo"_hs);
     ASSERT_NE(bar_hws, L"foo"_hws);
+    ASSERT_NE(bar_hws, L"foo"_hs);
 }
 
 TEST(HashedWString, Empty) {
@@ -148,6 +153,7 @@ TEST(HashedWString, Empty) {
 
     ASSERT_EQ(static_cast<hash_type>(hws), hash_type{});
     ASSERT_EQ(static_cast<const wchar_t *>(hws), nullptr);
+    ASSERT_EQ(hws.size(), 0);
 }
 
 TEST(HashedWString, Correctness) {
@@ -192,4 +198,6 @@ TEST(HashedWString, Constexprness) {
 
     static_assert(entt::hashed_wstring{L"foo"} > L"bar"_hws);
     static_assert(entt::hashed_wstring{L"foo"} >= L"foo"_hws);
+
+    static_assert(entt::hashed_wstring{L"my.png", 2} == L"my"_hws);
 }

@@ -60,19 +60,37 @@ class basic_hashed_string {
 
     struct const_wrapper {
         // non-explicit constructor on purpose
-        constexpr const_wrapper(const Char *curr) ENTT_NOEXCEPT: str{curr} {}
+        constexpr const_wrapper(const Char *curr) ENTT_NOEXCEPT
+            : str{curr} {}
         const Char *str;
     };
 
+    struct helper_result {
+        id_type hash;
+        std::size_t size;
+    };
+
     // Fowler–Noll–Vo hash function v. 1a - the good
-    [[nodiscard]] static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
-        auto value = hs_traits::offset;
+    [[nodiscard]] static constexpr helper_result helper(const Char *curr) ENTT_NOEXCEPT {
+        auto result = helper_result{hs_traits::offset, 0};
 
         while(*curr != 0) {
-            value = (value ^ static_cast<hs_traits::type>(*(curr++))) * hs_traits::prime;
+            result.hash = (result.hash ^ static_cast<hs_traits::type>(*(curr++))) * hs_traits::prime;
+            ++result.size;
         }
 
-        return value;
+        return result;
+    }
+
+    // Fowler–Noll–Vo hash function v. 1a - the good
+    [[nodiscard]] static constexpr helper_result helper(Char const *curr, std::size_t size) ENTT_NOEXCEPT {
+        auto result = helper_result{hs_traits::offset, size};
+
+        while(size-- > 0) {
+            result.hash = (result.hash ^ static_cast<hs_traits::type>(*(curr++))) * hs_traits::prime;
+        }
+
+        return result;
     }
 
 public:
@@ -88,9 +106,7 @@ public:
      * @return The numeric representation of the string.
      */
     [[nodiscard]] static constexpr hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        id_type partial{hs_traits::offset};
-        while(size--) { partial = (partial ^ (str++)[0]) * hs_traits::prime; }
-        return partial;
+        return helper(str, size).hash;
     }
 
     /**
@@ -110,7 +126,10 @@ public:
      */
     template<std::size_t N>
     [[nodiscard]] static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
-        return helper(str);
+        /* NOTE: `str` is expected to be an string literal, 
+           and the size of it (`N`) contains then null terminator,
+           which we dont hash. */
+        return helper(str, N - 1).hash;
     }
 
     /**
@@ -119,11 +138,32 @@ public:
      * @return The numeric representation of the string.
      */
     [[nodiscard]] static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
-        return helper(wrapper.str);
+        return helper(wrapper.str).hash;
     }
 
     /*! @brief Constructs an empty hashed string. */
     constexpr basic_hashed_string() ENTT_NOEXCEPT = default;
+
+private:
+    explicit constexpr basic_hashed_string(value_type const *const ptr, helper_result const result) ENTT_NOEXCEPT
+        : str{ptr},
+          hash{result.hash},
+          len{result.size} {}
+
+public:
+    /**
+     * @brief Constructs a hashed string from a string given it's size.
+     *
+     * Example of use:
+     * @code{.cpp}
+     * entt::hashed_string{"my.png", 2} == "my"_hs;
+     * @endcode
+     *
+     * @param ptr Human-readable identifer.
+     * @param size The size of the string.
+     */
+    constexpr basic_hashed_string(value_type const *const ptr, std::size_t const size) ENTT_NOEXCEPT
+        : basic_hashed_string(ptr, helper(ptr, size)) {}
 
     /**
      * @brief Constructs a hashed string from an array of const characters.
@@ -141,8 +181,7 @@ public:
      */
     template<std::size_t N>
     constexpr basic_hashed_string(const value_type (&curr)[N]) ENTT_NOEXCEPT
-        : str{curr},
-          hash{helper(curr)} {}
+        : basic_hashed_string(&curr[0], helper(&curr[0], N - 1)) {}
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
@@ -154,8 +193,7 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
-        : str{wrapper.str},
-          hash{helper(wrapper.str)} {}
+        : basic_hashed_string{wrapper.str, helper(wrapper.str)} {}
 
     /**
      * @brief Returns the human-readable representation of a hashed string.
@@ -186,10 +224,18 @@ public:
         return value();
     }
 
+    /**
+     * @brief Returns the size a hashed string.
+     * @return The size of the instance.
+     */
+    [[nodiscard]] constexpr std::size_t size() const ENTT_NOEXCEPT {
+        return len;
+    }
+
 private:
     const value_type *str = {};
     hash_type hash{};
-    std::size_t size{};
+    std::size_t len{};
 };
 
 /**
@@ -293,8 +339,17 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-[[nodiscard]] constexpr entt::hashed_string operator"" _hs(const char *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_string{str};
+[[nodiscard]] constexpr entt::hashed_string operator"" _hs(const char *str, std::size_t size) ENTT_NOEXCEPT {
+    return entt::hashed_string{str, size};
+}
+
+/**
+ * @brief User defined literal for hashed strings.
+ * @param str The literal without its suffix.
+ * @return A properly initialized hashed string.
+ */
+[[nodiscard]] constexpr entt::hashed_wstring operator"" _hs(const wchar_t *str, std::size_t size) ENTT_NOEXCEPT {
+    return entt::hashed_wstring{str, size};
 }
 
 /**
@@ -302,8 +357,8 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed wstring.
  */
-[[nodiscard]] constexpr entt::hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_wstring{str};
+[[nodiscard]] constexpr entt::hashed_wstring operator"" _hws(const wchar_t *str, std::size_t size) ENTT_NOEXCEPT {
+    return entt::hashed_wstring{str, size};
 }
 
 } // namespace literals
