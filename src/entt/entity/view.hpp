@@ -258,7 +258,7 @@ public:
     basic_view(storage_type<Component> &...component, const storage_type<Exclude> &...epool) ENTT_NOEXCEPT
         : pools{&component...},
           filter{&epool...},
-          view{(std::min)({&static_cast<const base_type &>(component)...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); })} {}
+          view{std::min<const base_type *>({&component...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); })} {}
 
     /**
      * @brief Creates a new view driven by a given component in its iterations.
