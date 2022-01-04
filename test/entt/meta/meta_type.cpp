@@ -37,6 +37,7 @@ struct abstract_t {
     virtual ~abstract_t() = default;
 
     virtual void func(int) {}
+    void base_only(int) {}
 };
 
 struct concrete_t: base_t, abstract_t {
@@ -124,7 +125,8 @@ struct MetaType: ::testing::Test {
 
         entt::meta<abstract_t>()
             .type("abstract"_hs)
-            .func<&abstract_t::func>("func"_hs);
+            .func<&abstract_t::func>("func"_hs)
+            .func<&abstract_t::base_only>("base_only"_hs);
 
         entt::meta<concrete_t>()
             .type("concrete"_hs)
@@ -337,6 +339,16 @@ TEST_F(MetaType, Invoke) {
 
     ASSERT_TRUE(type.invoke("member"_hs, instance));
     ASSERT_FALSE(type.invoke("rebmem"_hs, {}));
+}
+
+TEST_F(MetaType, InvokeFromBase) {
+    using namespace entt::literals;
+
+    auto type = entt::resolve<concrete_t>();
+    concrete_t instance{};
+
+    ASSERT_TRUE(type.invoke("base_only"_hs, instance, 42));
+    ASSERT_FALSE(type.invoke("ylno_esab"_hs, {}, 'c'));
 }
 
 TEST_F(MetaType, OverloadedFunc) {
