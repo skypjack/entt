@@ -4,7 +4,8 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* add the possibility of disabling entities without deleting components thanks to the new full check
+* investigate: meta as_type_t<T> for getters and the like
+* investigate: add the possibility of disabling entities without deleting components thanks to the new full check
 * fast-contains for sparse sets (low prio but nice-to-have)
 * runtime events (dispatcher/emitter), runtime context variables...
 * registry: remove reference to basic_sparse_set<E>
