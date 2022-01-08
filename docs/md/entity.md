@@ -1007,9 +1007,15 @@ However, the underlying model with its independent pools helps introduce storage
 with different deletion policies, so that users can best choose type by
 type.<br/>
 In particular, the library offers out of the box support for in-place deletion,
-thus offering storage with completely stable pointers. To do so, it's required
-to specialize the `component_traits` class.<br/>
-The definition common to all components is the following:
+thus offering storage with completely stable pointers. There are two options to
+achieve it:
+
+* A compile-time method, which is to specialize the `component_traits` class.
+* A runtime method, which is to set the deletion policy for a pool manually.
+
+Also, there is no problem changing the deletion policy at runtime, even when a
+compile-time policy exists.<br/>
+The compile-time definition common to all components is the following:
 
 ```cpp
 struct basic_component_traits {
@@ -1034,24 +1040,26 @@ struct entt::component_traits<position>: basic_component_traits {
 
 This will ensure in-place deletion for the `position` component without further
 user intervention.<br/>
+Changing the deletion policy at runtime is instead reduced to a direct call on
+the pool itself:
+
+```cpp
+registry.storage<position>().policy(entt::deletion_policy::in_place);
+```
+
 Views and groups adapt accordingly when they detect a storage with a different
 deletion policy than the default. No specific action is required from the user
 once in-place deletion is enabled. In particular:
 
-* Groups are incompatible with stable storage and will trigger a compile-time
-  error if detected.
-
+* Groups are incompatible with stable storage and will trigger a runtime error.
 * Multi type views are completely transparent to storage policies.
-
 * Single type views for stable storage types offer the same interface of multi
   type views. For example, only `size_hint` is available.
 
-In other words, the more generic version of a view will be provided in case of
-stable storage, even for single components, always supported by an appropriate
-iteration policy if required.<br/>
-The latter will be such that in no case will a tombstone be returned from the
-view itself, regardless of the iteration method. Similarly, no non-existent
-components will be accessed, which could result in an UB otherwise.
+In other words, the more generic version of a view is provided in case of stable
+storage, even for a single type view.<br/>
+In no case a tombstone is returned from the view itself. Likewise, non-existent
+components aren't returned, which could otherwise result in an UB.
 
 ### Hierarchies and the like
 
