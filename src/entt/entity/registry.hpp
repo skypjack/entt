@@ -182,13 +182,12 @@ class basic_registry {
 
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
-        // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-        static_assert(!std::disjunction_v<std::bool_constant<component_traits<Owned>::in_place_delete>...>, "Groups do not support in-place delete");
         std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t> current{};
 
         template<typename Component>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
             [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
+            ENTT_ASSERT(((std::get<storage_type<Owned> &>(cpools).policy() == deletion_policy::swap_and_pop) && ...), "Groups do not support in-place delete");
 
             const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<storage_type<Owned> &>(cpools).contains(entt)) && ...)
                                   && ((std::is_same_v<Component, Get> || owner.assure<Get>().contains(entt)) && ...)
@@ -210,7 +209,10 @@ class basic_registry {
             if constexpr(sizeof...(Owned) == 0) {
                 current.remove(entt);
             } else {
-                if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
+                const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
+                ENTT_ASSERT(((std::get<storage_type<Owned> &>(cpools).policy() == deletion_policy::swap_and_pop) && ...), "Groups do not support in-place delete");
+
+                if(std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = --current;
                     (std::get<storage_type<Owned> &>(cpools).swap_elements(std::get<storage_type<Owned> &>(cpools).data()[pos], entt), ...);
                 }
