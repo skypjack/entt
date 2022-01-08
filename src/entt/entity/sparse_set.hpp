@@ -223,21 +223,15 @@ class basic_sparse_set {
         }
     }
 
-protected:
-    /**
-     * @brief Returns the element assigned to an entity.
-     * @return An opaque pointer to the element assigned to the entity.
-     */
-    virtual const void *get_at(const std::size_t) const ENTT_NOEXCEPT {
+private:
+    virtual const void *get_at(const std::size_t) const {
         return nullptr;
     }
 
-    /*! @brief Swaps two entities in a sparse set. */
     virtual void swap_at(const std::size_t, const std::size_t) {}
-
-    /*! @brief Moves an entity in a sparse set. */
     virtual void move_element(const std::size_t, const std::size_t) {}
 
+protected:
     /**
      * @brief Erases an entity from a sparse set.
      * @param pos A valid position of an element within a sparse set.
@@ -783,7 +777,7 @@ public:
     }
 
     /**
-     * @copybrief swap_at
+     * @brief Swaps two entities in a sparse set.
      *
      * For what it's worth, this function affects both the internal sparse array
      * and the internal packed array. Users should not care of that anyway.

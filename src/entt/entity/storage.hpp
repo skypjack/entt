@@ -321,7 +321,7 @@ protected:
      * @param pos A valid position of an element within a storage.
      * @return An opaque pointer to the element assigned to the entity.
      */
-    const void *get_at(const std::size_t pos) const ENTT_NOEXCEPT override {
+    const void *get_at(const std::size_t pos) const override {
         return std::addressof(element_at(pos));
     }
 
@@ -343,7 +343,6 @@ protected:
         auto &elem = element_at(from);
         construct(assure_at_least(to), std::move(elem));
         std::destroy_at(std::addressof(elem));
-        base_type::move_element(from, to);
     }
 
     /**
