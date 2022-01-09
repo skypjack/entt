@@ -315,36 +315,22 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         }
     }
 
-protected:
-    /**
-     * @brief Returns the element assigned to an entity.
-     * @param pos A valid position of an element within a storage.
-     * @return An opaque pointer to the element assigned to the entity.
-     */
-    const void *get_at(const std::size_t pos) const override {
+private:
+    const void *get_at(const std::size_t pos) const final {
         return std::addressof(element_at(pos));
     }
 
-    /**
-     * @brief Swaps two elements in a storage.
-     * @param lhs A valid position of an element within a storage.
-     * @param rhs A valid position of an element within a storage.
-     */
     void swap_at(const std::size_t lhs, const std::size_t rhs) final {
         std::swap(element_at(lhs), element_at(rhs));
     }
 
-    /**
-     * @brief Moves an element within a storage.
-     * @param from A valid position of an element within a storage.
-     * @param to A valid position of an element within a storage.
-     */
     void move_element(const std::size_t from, const std::size_t to) final {
         auto &elem = element_at(from);
         construct(assure_at_least(to), std::move(elem));
         std::destroy_at(std::addressof(elem));
     }
 
+protected:
     /**
      * @brief Erases an element from a storage.
      * @param pos A valid position of an element within a storage.
