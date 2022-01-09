@@ -247,7 +247,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         return packed.first()[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
-    auto *assure_at_least(const std::size_t pos) {
+    auto assure_at_least(const std::size_t pos) {
         auto &&container = packed.first();
         const auto idx = pos / comp_traits::page_size;
 
@@ -293,15 +293,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         container.resize(from);
     }
 
-    template<typename... Args>
-    void construct(typename alloc_traits::pointer ptr, Args &&...args) {
-        if constexpr(std::is_aggregate_v<value_type>) {
-            alloc_traits::construct(packed.second(), to_address(ptr), Type{std::forward<Args>(args)...});
-        } else {
-            alloc_traits::construct(packed.second(), to_address(ptr), std::forward<Args>(args)...);
-        }
-    }
-
     template<typename It, typename Generator>
     void consume_range(It first, It last, Generator generator) {
         for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
@@ -326,7 +317,7 @@ private:
 
     void move_element(const std::size_t from, const std::size_t to) final {
         auto &elem = element_at(from);
-        construct(assure_at_least(to), std::move(elem));
+        alloc_traits::construct(packed.second(), to_address(assure_at_least(to)), std::move(elem));
         std::destroy_at(std::addressof(elem));
     }
 
@@ -658,8 +649,13 @@ public:
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
         const auto pos = base_type::slot();
-        auto *elem = assure_at_least(pos);
-        construct(elem, std::forward<Args>(args)...);
+        auto elem = assure_at_least(pos);
+
+        if constexpr(std::is_aggregate_v<value_type>) {
+            alloc_traits::construct(packed.second(), to_address(elem), Type{std::forward<Args>(args)...});
+        } else {
+            alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
+        }
 
         ENTT_TRY {
             base_type::try_emplace(entt);
