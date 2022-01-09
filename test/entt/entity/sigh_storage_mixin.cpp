@@ -183,7 +183,8 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
 
     pool.emplace(entities[1u], 3);
 
-    ASSERT_EQ(on_construct.value, 1);
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(on_construct.value, 2);
     ASSERT_EQ(on_destroy.value, 0);
     ASSERT_FALSE(pool.empty());
 
@@ -192,7 +193,8 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
 
     base.erase(entities[1u]);
 
-    ASSERT_EQ(on_construct.value, 1);
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_EQ(on_construct.value, 2);
     ASSERT_EQ(on_destroy.value, 1);
     ASSERT_TRUE(pool.empty());
 
@@ -204,7 +206,8 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
 
     pool.insert(std::begin(entities), std::end(entities), 3);
 
-    ASSERT_EQ(on_construct.value, 3);
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 1);
     ASSERT_FALSE(pool.empty());
 
@@ -213,7 +216,8 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
 
     pool.erase(std::begin(entities), std::end(entities));
 
-    ASSERT_EQ(on_construct.value, 3);
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 3);
     ASSERT_TRUE(pool.empty());
 }
