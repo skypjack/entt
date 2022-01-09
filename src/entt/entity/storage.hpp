@@ -912,7 +912,6 @@ public:
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    /*! @copydoc basic_sparse_set::swap_and_pop */
     void swap_and_pop(const std::size_t pos) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         const auto entt = Type::operator[](pos);
@@ -920,7 +919,6 @@ class sigh_storage_mixin final: public Type {
         Type::swap_and_pop(Type::index(entt));
     }
 
-    /*! @copydoc basic_sparse_set::in_place_pop */
     void in_place_pop(const std::size_t pos) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         const auto entt = Type::operator[](pos);
@@ -928,7 +926,6 @@ class sigh_storage_mixin final: public Type {
         Type::in_place_pop(Type::index(entt));
     }
 
-    /*! @copydoc basic_sparse_set::try_emplace */
     void try_emplace(const typename Type::entity_type entt, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::try_emplace(entt, value);
