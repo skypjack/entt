@@ -1004,18 +1004,11 @@ within the storage, making direct access almost impossible (be it via pointer or
 index).
 
 However, the underlying model with its independent pools helps introduce storage
-with different deletion policies, so that users can best choose type by
-type.<br/>
-In particular, the library offers out of the box support for in-place deletion,
-thus offering storage with completely stable pointers. There are two options to
-achieve it:
-
-* A compile-time method, which is to specialize the `component_traits` class.
-* A runtime method, which is to set the deletion policy for a pool manually.
-
-Also, there is no problem changing the deletion policy at runtime, even when a
-compile-time policy exists.<br/>
-The compile-time definition common to all components is the following:
+with different deletion policies. In particular, the library offers out of the
+box support for in-place deletion, thus offering storage with completely stable
+pointers.<br/>
+This is done by specializing the `component_traits` class. The compile-time
+definition common to all components is the following:
 
 ```cpp
 struct basic_component_traits {
@@ -1040,18 +1033,11 @@ struct entt::component_traits<position>: basic_component_traits {
 
 This will ensure in-place deletion for the `position` component without further
 user intervention.<br/>
-Changing the deletion policy at runtime is instead reduced to a direct call on
-the pool itself:
-
-```cpp
-registry.storage<position>().policy(entt::deletion_policy::in_place);
-```
-
 Views and groups adapt accordingly when they detect a storage with a different
 deletion policy than the default. No specific action is required from the user
 once in-place deletion is enabled. In particular:
 
-* Groups are incompatible with stable storage and will trigger a runtime error.
+* Groups are incompatible with stable storage and will even refuse to compile.
 * Multi type views are completely transparent to storage policies.
 * Single type views for stable storage types offer the same interface of multi
   type views. For example, only `size_hint` is available.

@@ -753,42 +753,6 @@ TEST(SparseSet, Compact) {
     ASSERT_TRUE(set.empty());
 }
 
-TEST(SparseSet, Policy) {
-    entt::sparse_set set{entt::deletion_policy::in_place};
-    entt::entity entities[3u]{entt::entity{0}, entt::entity{1}, entt::entity{2}};
-
-    set.insert(std::begin(entities), std::end(entities));
-    set.erase(entities[1u]);
-
-    ASSERT_EQ(set.size(), 3u);
-    ASSERT_EQ(set.index(entities[0u]), 0u);
-    ASSERT_FALSE(set.contains(entities[1u]));
-    ASSERT_EQ(set.index(entities[2u]), 2u);
-
-    set.policy(entt::deletion_policy::swap_and_pop);
-
-    ASSERT_EQ(set.size(), 2u);
-    ASSERT_EQ(set.index(entities[0u]), 0u);
-    ASSERT_EQ(set.index(entities[2u]), 1u);
-
-    set.erase(entities[0u]);
-
-    ASSERT_EQ(set.size(), 1u);
-    ASSERT_FALSE(set.contains(entities[0u]));
-    ASSERT_EQ(set.index(entities[2u]), 0u);
-
-    set.policy(entt::deletion_policy::in_place);
-    set.erase(entities[2u]);
-
-    ASSERT_EQ(set.size(), 1u);
-    ASSERT_FALSE(set.contains(entities[2u]));
-
-    set.policy(entt::deletion_policy::swap_and_pop);
-
-    ASSERT_EQ(set.size(), 0u);
-    ASSERT_TRUE(set.empty());
-}
-
 TEST(SparseSet, SwapEntity) {
     using traits_type = entt::entt_traits<entt::entity>;
 
