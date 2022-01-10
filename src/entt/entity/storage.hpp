@@ -326,23 +326,17 @@ protected:
      * @brief Erases an element from a storage.
      * @param pos A valid position of an element within a storage.
      */
-    void swap_and_pop(const std::size_t pos) override {
-        auto &elem = element_at(base_type::size() - 1u);
-        // support for nosy destructors
-        [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
-        base_type::swap_and_pop(pos);
-        std::destroy_at(std::addressof(elem));
-    }
-
-    /**
-     * @brief Erases an element from a storage.
-     * @param pos A valid position of an element within a storage.
-     */
-    void in_place_pop(const std::size_t pos) override {
-        auto &elem = element_at(pos);
-        base_type::in_place_pop(pos);
-        // support for nosy destructors
-        std::destroy_at(std::addressof(elem));
+    void pop_at(const std::size_t pos) override {
+        if constexpr(comp_traits::in_place_delete) {
+            std::destroy_at(std::addressof(element_at(pos)));
+            base_type::pop_at(pos);
+        } else {
+            auto &elem = element_at(base_type::size() - 1u);
+            // support chained destructors i.e. parent-to-child propagation
+            [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
+            std::destroy_at(std::addressof(elem));
+            base_type::pop_at(pos);
+        }
     }
 
     /**
@@ -912,18 +906,11 @@ public:
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    void swap_and_pop(const std::size_t pos) final {
+    void pop_at(const std::size_t pos) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         const auto entt = Type::operator[](pos);
         destruction.publish(*owner, entt);
-        Type::swap_and_pop(Type::index(entt));
-    }
-
-    void in_place_pop(const std::size_t pos) final {
-        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        const auto entt = Type::operator[](pos);
-        destruction.publish(*owner, entt);
-        Type::in_place_pop(Type::index(entt));
+        Type::pop_at(Type::index(entt));
     }
 
     void try_emplace(const typename Type::entity_type entt, const void *value) final {

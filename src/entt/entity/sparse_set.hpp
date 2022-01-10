@@ -236,23 +236,19 @@ protected:
      * @brief Erases an entity from a sparse set.
      * @param pos A valid position of an element within a sparse set.
      */
-    virtual void swap_and_pop(const std::size_t pos) {
-        sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(packed.back()));
-        // lazy self-assignment guard
-        sparse_ref(packed[pos]) = null;
-        packed[pos] = packed.back();
-        // unnecessary but it helps to detect nasty bugs
-        ENTT_ASSERT((packed.back() = tombstone, true), "");
-        packed.pop_back();
-    }
-
-    /**
-     * @brief Erases an entity from a sparse set.
-     * @param pos A valid position of an element within a sparse set.
-     */
-    virtual void in_place_pop(const std::size_t pos) {
-        sparse_ref(packed[pos]) = null;
-        packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
+    virtual void pop_at(const std::size_t pos) {
+        if(mode == deletion_policy::in_place) {
+            sparse_ref(packed[pos]) = null;
+            packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
+        } else {
+            sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(packed.back()));
+            // lazy self-assignment guard
+            sparse_ref(packed[pos]) = null;
+            packed[pos] = packed.back();
+            // unnecessary but it helps to detect nasty bugs
+            ENTT_ASSERT((packed.back() = tombstone, true), "");
+            packed.pop_back();
+        }
     }
 
     /**
@@ -696,7 +692,7 @@ public:
      * @param entt A valid identifier.
      */
     void erase(const entity_type entt) {
-        (mode == deletion_policy::in_place) ? in_place_pop(index(entt)) : swap_and_pop(index(entt));
+        pop_at(index(entt));
         ENTT_ASSERT(!contains(entt), "Destruction did not take place");
     }
 
