@@ -995,6 +995,7 @@ public:
      */
     template<typename... Args>
     decltype(auto) emplace(const entity_type entt, Args &&...args) {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::emplace(entt, std::forward<Args>(args)...);
         construction.publish(*owner, entt);
         return this->get(entt);
@@ -1009,6 +1010,7 @@ public:
      */
     template<typename... Func>
     decltype(auto) patch(const entity_type entt, Func &&...func) {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::patch(entt, std::forward<Func>(func)...);
         update.publish(*owner, entt);
         return this->get(entt);
@@ -1026,6 +1028,7 @@ public:
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...args) {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::insert(first, last, std::forward<Args>(args)...);
 
         for(auto it = construction.empty() ? last : first; it != last; ++it) {

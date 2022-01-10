@@ -1153,6 +1153,9 @@ TEST(MultiComponentView, SameComponentTypes) {
     typename entt::storage_traits<entt::entity, int>::storage_type other;
     entt::basic_view view{storage, other};
 
+    storage.bind(entt::forward_as_any(registry));
+    other.bind(entt::forward_as_any(registry));
+
     const entt::entity e0{42u};
     const entt::entity e1{3u};
 
