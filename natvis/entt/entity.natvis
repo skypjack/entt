@@ -68,18 +68,46 @@
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
 			<Item Name="[policy]">mode,en</Item>
-			<ExpandedItem IncludeView="simple">packed,view(simple)</ExpandedItem>
-			<CustomListItems ExcludeView="simple">
-				<Variable Name="pos" InitialValue="0" />
-				<Variable Name="last" InitialValue="packed.size()"/>
-				<Loop>
-					<Break Condition="pos == last"/>
-					<If Condition="*((entity_traits::entity_type *)&amp;packed[pos]) &lt; ~entity_traits::entity_mask">
-						<Item Name="[{ pos }]">packed[pos]</Item>
-					</If>
-					<Exec>++pos</Exec>
-				</Loop>
-			</CustomListItems>
+			<Synthetic Name="[sparse]">
+				<DisplayString>{ sparse.size() * entity_traits::page_size }</DisplayString>
+				<Expand>
+					<ExpandedItem IncludeView="simple">sparse,view(simple)</ExpandedItem>
+					<CustomListItems ExcludeView="simple">
+						<Variable Name="pos" InitialValue="0"/>
+						<Variable Name="page" InitialValue="0"/>
+						<Variable Name="offset" InitialValue="0"/>
+						<Variable Name="last" InitialValue="sparse.size() * entity_traits::page_size"/>
+						<Variable Name="count" InitialValue="packed.size()"/>
+						<Loop>
+							<Break Condition="pos == last || !count"/>
+							<Exec>page = pos / entity_traits::page_size</Exec>
+							<Exec>offset = pos &amp; (entity_traits::page_size - 1)</Exec>
+							<If Condition="sparse[page] &amp;&amp; (*((entity_traits::entity_type *)&amp;sparse[page][offset]) &lt; ~entity_traits::entity_mask)">
+								<Item Name="[{ pos }]">*((entity_traits::entity_type *)&amp;sparse[page][offset]) &amp; entity_traits::entity_mask</Item>
+								<Exec>--count</Exec>
+							</If>
+							<Exec>++pos</Exec>
+						</Loop>
+					</CustomListItems>
+				</Expand>
+			</Synthetic>
+			<Synthetic Name="[packed]">
+				<DisplayString>{ packed.size() }</DisplayString>
+				<Expand>
+					<ExpandedItem IncludeView="simple">packed,view(simple)</ExpandedItem>
+					<CustomListItems ExcludeView="simple">
+						<Variable Name="pos" InitialValue="0"/>
+						<Variable Name="last" InitialValue="packed.size()"/>
+						<Loop>
+							<Break Condition="pos == last"/>
+							<If Condition="*((entity_traits::entity_type *)&amp;packed[pos]) &lt; ~entity_traits::entity_mask">
+								<Item Name="[{ pos }]">packed[pos]</Item>
+							</If>
+							<Exec>++pos</Exec>
+						</Loop>
+					</CustomListItems>
+				</Expand>
+			</Synthetic>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_storage&lt;*&gt;">
