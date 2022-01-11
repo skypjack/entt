@@ -324,18 +324,18 @@ private:
 protected:
     /**
      * @brief Erases an element from a storage.
-     * @param pos A valid position of an element within a storage.
+     * @param entt A valid identifier.
      */
-    void pop_at(const std::size_t pos) override {
+    void try_erase(const Entity entt) override {
         if constexpr(comp_traits::in_place_delete) {
-            std::destroy_at(std::addressof(element_at(pos)));
-            base_type::pop_at(pos);
+            std::destroy_at(std::addressof(element_at(base_type::index(entt))));
+            base_type::try_erase(entt);
         } else {
             auto &elem = element_at(base_type::size() - 1u);
             // support chained destructors i.e. parent-to-child propagation
-            [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
+            [[maybe_unused]] auto unused = std::exchange(element_at(base_type::index(entt)), std::move(elem));
             std::destroy_at(std::addressof(elem));
-            base_type::pop_at(pos);
+            base_type::try_erase(entt);
         }
     }
 
@@ -906,11 +906,10 @@ public:
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    void pop_at(const std::size_t pos) final {
+    void try_erase(const typename Type::entity_type entt) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        const auto entt = Type::operator[](pos);
         destruction.publish(*owner, entt);
-        Type::pop_at(Type::index(entt));
+        Type::try_erase(entt);
     }
 
     void try_emplace(const typename Type::entity_type entt, const void *value) final {

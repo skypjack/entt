@@ -234,21 +234,23 @@ private:
 protected:
     /**
      * @brief Erases an entity from a sparse set.
-     * @param pos A valid position of an element within a sparse set.
+     * @param entt A valid identifier.
      */
-    virtual void pop_at(const std::size_t pos) {
+    virtual void try_erase(const Entity entt) {
+        const auto pos = index(entt);
+
         if(mode == deletion_policy::in_place) {
-            sparse_ref(packed[pos]) = null;
             packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
         } else {
-            sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(packed.back()));
-            // lazy self-assignment guard
-            sparse_ref(packed[pos]) = null;
             packed[pos] = packed.back();
+            sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(packed.back()));
             // unnecessary but it helps to detect nasty bugs
             ENTT_ASSERT((packed.back() = tombstone, true), "");
             packed.pop_back();
         }
+
+        // lazy self-assignment guard
+        sparse_ref(entt) = null;
     }
 
     /**
@@ -692,7 +694,8 @@ public:
      * @param entt A valid identifier.
      */
     void erase(const entity_type entt) {
-        pop_at(index(entt));
+        ENTT_ASSERT(contains(entt), "Set does not contain entity");
+        try_erase(entt);
         ENTT_ASSERT(!contains(entt), "Destruction did not take place");
     }
 
