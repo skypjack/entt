@@ -237,9 +237,7 @@ protected:
      * @param entt A valid identifier.
      */
     virtual void try_erase(const Entity entt) {
-        const auto pos = index(entt);
-
-        if(mode == deletion_policy::in_place) {
+        if(const auto pos = index(entt); mode == deletion_policy::in_place) {
             packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
         } else {
             packed[pos] = packed.back();

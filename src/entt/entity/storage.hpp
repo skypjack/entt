@@ -327,16 +327,12 @@ protected:
      * @param entt A valid identifier.
      */
     void try_erase(const Entity entt) override {
-        if constexpr(comp_traits::in_place_delete) {
-            std::destroy_at(std::addressof(element_at(base_type::index(entt))));
-            base_type::try_erase(entt);
-        } else {
-            auto &elem = element_at(base_type::size() - 1u);
-            // support chained destructors i.e. parent-to-child propagation
-            [[maybe_unused]] auto unused = std::exchange(element_at(base_type::index(entt)), std::move(elem));
-            std::destroy_at(std::addressof(elem));
-            base_type::try_erase(entt);
-        }
+        const auto pos = base_type::index(entt);
+        auto &elem = element_at(comp_traits::in_place_delete ? pos : (base_type::size() - 1u));
+        // support chained destructors i.e. parent-to-child propagation
+        [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
+        std::destroy_at(std::addressof(elem));
+        base_type::try_erase(entt);
     }
 
     /**

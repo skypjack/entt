@@ -65,6 +65,11 @@ struct entt::component_traits<empty_stable_type>: basic_component_traits {
     static constexpr auto in_place_delete = true;
 };
 
+template<>
+struct entt::component_traits<std::unordered_set<char>>: basic_component_traits {
+    static constexpr auto in_place_delete = true;
+};
+
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
     return lhs.value == rhs.value;
 }
@@ -810,11 +815,30 @@ TEST(Storage, AggregatesMustWork) {
     entt::storage<aggregate_type>{}.emplace(entt::entity{0}, 42);
 }
 
-TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
+TEST(Storage, SelfMoveSupport) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::unordered_set<int>> pool;
-    pool.emplace(entt::entity{0}).insert(42);
-    pool.erase(entt::entity{0});
+    entt::entity entity{};
+
+    ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
+
+    pool.emplace(entity).insert(42);
+    pool.erase(entity);
+
+    ASSERT_FALSE(pool.contains(entity));
+}
+
+TEST(Storage, SelfMoveSupportInPlaceDelete) {
+    // see #37 - this test shouldn't crash, that's all
+    entt::storage<std::unordered_set<char>> pool;
+    entt::entity entity{};
+
+    ASSERT_EQ(pool.policy(), entt::deletion_policy::in_place);
+
+    pool.emplace(entity).insert(42);
+    pool.erase(entity);
+
+    ASSERT_FALSE(pool.contains(entity));
 }
 
 TEST(Storage, Iterator) {
