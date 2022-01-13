@@ -638,25 +638,23 @@ public:
      */
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
-        const auto pos = base_type::slot();
-        auto elem = assure_at_least(pos);
-
-        if constexpr(std::is_aggregate_v<value_type>) {
-            alloc_traits::construct(packed.second(), to_address(elem), Type{std::forward<Args>(args)...});
-        } else {
-            alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
-        }
+        // support chained constructors i.e. parent-to-child propagation
+        base_type::try_emplace(entt);
+        const auto pos = base_type::index(entt);
 
         ENTT_TRY {
-            base_type::try_emplace(entt);
-            ENTT_ASSERT(pos == base_type::index(entt), "Misplaced component");
+            if constexpr(std::is_aggregate_v<value_type>) {
+                alloc_traits::construct(packed.second(), to_address(assure_at_least(pos)), Type{std::forward<Args>(args)...});
+            } else {
+                alloc_traits::construct(packed.second(), to_address(assure_at_least(pos)), std::forward<Args>(args)...);
+            }
         }
         ENTT_CATCH {
-            std::destroy_at(std::addressof(*elem));
+            base_type::try_erase(entt);
             ENTT_THROW;
         }
 
-        return *elem;
+        return element_at(pos);
     }
 
     /**

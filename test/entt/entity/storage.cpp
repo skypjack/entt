@@ -55,6 +55,20 @@ private:
     entt::entity target{entt::null};
 };
 
+struct crete_from_constructor {
+    crete_from_constructor(entt::storage<crete_from_constructor> &ref, entt::entity other)
+        : child{other} {
+        if(child != entt::null) {
+            ref.emplace(child, ref, entt::null);
+        }
+    }
+
+    crete_from_constructor(crete_from_constructor &&other) ENTT_NOEXCEPT = default;
+    crete_from_constructor &operator=(crete_from_constructor &&other) ENTT_NOEXCEPT = default;
+
+    entt::entity child;
+};
+
 template<>
 struct entt::component_traits<stable_type>: basic_component_traits {
     static constexpr auto in_place_delete = true;
@@ -1537,6 +1551,17 @@ TEST(Storage, UpdateFromDestructor) {
     test(entt::entity{0u});
 }
 
+TEST(Storage, CreateFromConstructor) {
+    entt::storage<crete_from_constructor> pool;
+    const entt::entity entity{0u};
+    const entt::entity other{1u};
+
+    pool.emplace(entity, pool, other);
+
+    ASSERT_EQ(pool.get(entity).child, other);
+    ASSERT_EQ(pool.get(other).child, static_cast<entt::entity>(entt::null));
+}
+
 TEST(Storage, CustomAllocator) {
     auto test = [](auto pool, auto alloc) {
         ASSERT_EQ(pool.get_allocator(), alloc);
@@ -1608,12 +1633,6 @@ TEST(Storage, ThrowingAllocator) {
 
     ASSERT_EQ(pool.capacity(), 0u);
 
-    test::throwing_allocator<int>::trigger_on_allocate = true;
-
-    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator<int>::exception_type);
-    ASSERT_FALSE(pool.contains(entt::entity{0}));
-    ASSERT_TRUE(pool.empty());
-
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
     ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator<entt::entity>::exception_type);
@@ -1625,6 +1644,12 @@ TEST(Storage, ThrowingAllocator) {
     ASSERT_THROW(base.emplace(entt::entity{0}), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_FALSE(base.contains(entt::entity{0}));
     ASSERT_TRUE(base.empty());
+
+    test::throwing_allocator<int>::trigger_on_allocate = true;
+
+    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator<int>::exception_type);
+    ASSERT_FALSE(pool.contains(entt::entity{0}));
+    ASSERT_TRUE(pool.empty());
 
     pool.emplace(entt::entity{0}, 0);
     const entt::entity entities[2u]{entt::entity{1}, entt::entity{ENTT_SPARSE_PAGE}};
