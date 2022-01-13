@@ -310,11 +310,11 @@ TEST(Storage, InsertEmptyType) {
     const empty_stable_type values[2u]{};
     pool.insert(std::rbegin(entities), std::rend(entities), std::begin(values));
 
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.at(0u), entities[0u]);
-    ASSERT_EQ(pool.at(1u), entities[1u]);
-    ASSERT_EQ(pool.index(entities[0u]), 0u);
-    ASSERT_EQ(pool.index(entities[1u]), 1u);
+    ASSERT_EQ(pool.size(), 4u);
+    ASSERT_EQ(pool.at(2u), entities[1u]);
+    ASSERT_EQ(pool.at(3u), entities[0u]);
+    ASSERT_EQ(pool.index(entities[0u]), 3u);
+    ASSERT_EQ(pool.index(entities[1u]), 2u);
 }
 
 TEST(Storage, Erase) {

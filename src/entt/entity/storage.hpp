@@ -852,17 +852,17 @@ public:
      * @tparam Args Types of optional arguments.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param args Parameters to use to construct an object for the entity.
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...) {
-        for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
-            emplace(*first);
-        }
-
-        base_type::reserve(base_type::size() + std::distance(first, last));
-
-        for(; first != last; ++first) {
-            emplace(*first);
+        if constexpr(std::is_invocable_v<decltype(&base_type::try_insert), base_type &, It, It>) {
+            base_type::try_insert(first, last);
+        } else {
+            for(; first != last; ++first) {
+                entity_type curr[1u]{*first};
+                base_type::try_insert(curr, curr + 1u);
+            }
         }
     }
 
