@@ -293,16 +293,36 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         container.resize(from);
     }
 
-    template<typename It, typename Generator>
-    void consume_range(It first, It last, Generator generator) {
-        for(const auto sz = base_type::size(); first != last && base_type::slot() != sz; ++first) {
-            emplace(*first, generator());
-        }
+    template<typename It, typename Builder>
+    void consume_range(It first, It last, Builder builder) {
+        if constexpr(std::is_invocable_v<decltype(&basic_storage::try_insert), basic_storage &, It, It>) {
+            base_type::try_insert(first, last);
 
-        reserve(base_type::size() + std::distance(first, last));
+            ENTT_TRY {
+                for(; first != last; ++first) {
+                    builder(to_address(assure_at_least(base_type::index(*first))));
+                }
+            }
+            ENTT_CATCH {
+                for(; first != last; ++first) {
+                    base_type::try_erase(*first);
+                }
 
-        for(; first != last; ++first) {
-            emplace(*first, generator());
+                ENTT_THROW;
+            }
+        } else {
+            for(; first != last; ++first) {
+                entity_type curr[1u]{*first};
+                base_type::try_insert(curr, curr + 1u);
+
+                ENTT_TRY {
+                    builder(to_address(assure_at_least(base_type::index(*first))));
+                }
+                ENTT_CATCH {
+                    base_type::try_erase(*first);
+                    ENTT_THROW;
+                }
+            }
         }
     }
 
@@ -687,7 +707,9 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        consume_range(std::move(first), std::move(last), [&value]() -> decltype(auto) { return value; });
+        consume_range(std::move(first), std::move(last), [&value, this](auto *elem) {
+            alloc_traits::construct(packed.second(), elem, value);
+        });
     }
 
     /**
@@ -704,7 +726,9 @@ public:
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
-        consume_range(std::move(first), std::move(last), [&from]() -> decltype(auto) { return *(from++); });
+        consume_range(std::move(first), std::move(last), [&from, this](auto *elem) {
+            alloc_traits::construct(packed.second(), elem, *(from++));
+        });
     }
 
     /**
@@ -856,7 +880,7 @@ public:
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...) {
-        if constexpr(std::is_invocable_v<decltype(&base_type::try_insert), base_type &, It, It>) {
+        if constexpr(std::is_invocable_v<decltype(&basic_storage::try_insert), basic_storage &, It, It>) {
             base_type::try_insert(first, last);
         } else {
             for(; first != last; ++first) {
