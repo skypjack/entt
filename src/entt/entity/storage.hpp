@@ -828,11 +828,9 @@ public:
      *
      * @tparam Args Types of arguments to use to construct the object.
      * @param entt A valid identifier.
-     * @param args Parameters to use to construct an object for the entity.
      */
     template<typename... Args>
-    void emplace(const entity_type entt, Args &&...args) {
-        [[maybe_unused]] const value_type elem{std::forward<Args>(args)...};
+    void emplace(const entity_type entt, Args &&...) {
         base_type::try_emplace(entt);
     }
 
