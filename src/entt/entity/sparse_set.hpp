@@ -282,7 +282,7 @@ protected:
         }
         ENTT_CATCH {
             for(; first != it; ++first) {
-                sparse_ref(*it) = null;
+                sparse_ref(*first) = null;
             }
 
             ENTT_THROW;
