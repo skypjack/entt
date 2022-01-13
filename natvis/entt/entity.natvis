@@ -77,14 +77,12 @@
 						<Variable Name="page" InitialValue="0"/>
 						<Variable Name="offset" InitialValue="0"/>
 						<Variable Name="last" InitialValue="sparse.size() * entity_traits::page_size"/>
-						<Variable Name="count" InitialValue="packed.size()"/>
 						<Loop>
-							<Break Condition="pos == last || !count"/>
+							<Break Condition="pos == last"/>
 							<Exec>page = pos / entity_traits::page_size</Exec>
 							<Exec>offset = pos &amp; (entity_traits::page_size - 1)</Exec>
 							<If Condition="sparse[page] &amp;&amp; (*((entity_traits::entity_type *)&amp;sparse[page][offset]) &lt; ~entity_traits::entity_mask)">
 								<Item Name="[{ pos }]">*((entity_traits::entity_type *)&amp;sparse[page][offset]) &amp; entity_traits::entity_mask</Item>
-								<Exec>--count</Exec>
 							</If>
 							<Exec>++pos</Exec>
 						</Loop>
