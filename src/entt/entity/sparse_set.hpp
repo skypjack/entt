@@ -265,6 +265,30 @@ protected:
         }
     }
 
+    /**
+     * @brief Assigns one or more entities to a sparse set.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    virtual void try_insert(const Entity *first, const Entity *last) {
+        auto *it = first;
+
+        ENTT_TRY {
+            for(auto pos = packed.size(); it != last; ++it, ++pos) {
+                assure_at_least(*it) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(*it));
+            }
+
+            packed.insert(packed.end(), first, last);
+        }
+        ENTT_CATCH {
+            for(; first != it; ++first) {
+                sparse_ref(*it) = null;
+            }
+
+            ENTT_THROW;
+        }
+    }
+
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
