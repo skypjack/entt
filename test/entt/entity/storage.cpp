@@ -648,23 +648,40 @@ TEST(Storage, EmptyTypeFromBase) {
 
     ASSERT_NE(base.emplace(entities[0u], &instance), base.end());
 
+    ASSERT_EQ(pool.size(), 1u);
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
     ASSERT_EQ(base.get(entities[0u]), nullptr);
+    ASSERT_EQ(base.index(entities[0u]), 0u);
 
     base.erase(entities[0u]);
 
     ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
 
+    ASSERT_EQ(pool.size(), 3u);
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
+    ASSERT_EQ(base.index(entities[0u]), 1u);
+    ASSERT_EQ(base.index(entities[1u]), 2u);
+
+    base.erase(std::begin(entities), std::end(entities));
+
+    ASSERT_NE(base.insert(std::rbegin(entities), std::rend(entities)), base.end());
+
+    ASSERT_EQ(pool.size(), 5u);
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_TRUE(pool.contains(entities[1u]));
+    ASSERT_EQ(base.index(entities[0u]), 4u);
+    ASSERT_EQ(base.index(entities[1u]), 3u);
 
     base.erase(std::begin(entities), std::end(entities));
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_TRUE(*base.begin() == entt::tombstone);
-    ASSERT_TRUE(*(++base.begin()) == entt::tombstone);
+    ASSERT_EQ(pool.size(), 5u);
+
+    for(std::size_t pos{}, last = base.size(); pos != last; ++pos) {
+        ASSERT_TRUE(base[pos] == entt::tombstone);
+    }
 }
 
 TEST(Storage, NonDefaultConstructibleTypeFromBase) {

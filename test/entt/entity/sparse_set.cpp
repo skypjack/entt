@@ -337,11 +337,11 @@ TEST(SparseSet, Insert) {
 
     ASSERT_NE(set.insert(std::rbegin(entities), std::rend(entities)), set.end());
 
-    ASSERT_EQ(set.size(), 4u);
-    ASSERT_EQ(set.at(1u), entities[0u]);
-    ASSERT_EQ(set.at(2u), entities[1u]);
-    ASSERT_EQ(set.index(entities[0u]), 1u);
-    ASSERT_EQ(set.index(entities[1u]), 2u);
+    ASSERT_EQ(set.size(), 6u);
+    ASSERT_EQ(set.at(4u), entities[1u]);
+    ASSERT_EQ(set.at(5u), entities[0u]);
+    ASSERT_EQ(set.index(entities[0u]), 5u);
+    ASSERT_EQ(set.index(entities[1u]), 4u);
 }
 
 TEST(SparseSet, Erase) {
@@ -409,7 +409,10 @@ TEST(SparseSet, StableErase) {
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.emplace(entities[0u]);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
+
     set.erase(set.begin(), set.end());
 
     ASSERT_FALSE(set.empty());
@@ -422,7 +425,10 @@ TEST(SparseSet, StableErase) {
     ASSERT_TRUE(set.at(2u) == entt::tombstone);
     ASSERT_EQ(set.slot(), 0u);
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.emplace(entities[0u]);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
+
     set.erase(entities, entities + 2u);
 
     ASSERT_FALSE(set.empty());
@@ -443,7 +449,10 @@ TEST(SparseSet, StableErase) {
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.slot(), 2u);
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.emplace(entities[0u]);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
+
     std::swap(entities[1u], entities[2u]);
     set.erase(entities, entities + 2u);
 
@@ -478,7 +487,10 @@ TEST(SparseSet, StableErase) {
 
     ASSERT_EQ(set.size(), 0u);
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.emplace(entities[0u]);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
+
     set.erase(entities[2u]);
 
     ASSERT_DEATH(set.erase(entities[2u]), "");
@@ -593,7 +605,9 @@ TEST(SparseSet, StableRemove) {
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.emplace(entities[0u]);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
 
     ASSERT_EQ(set.remove(set.begin(), set.end()), 3u);
     ASSERT_EQ(set.remove(set.begin(), set.end()), 0u);
@@ -608,7 +622,9 @@ TEST(SparseSet, StableRemove) {
     ASSERT_TRUE(set.at(2u) == entt::tombstone);
     ASSERT_EQ(set.slot(), 0u);
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.emplace(entities[0u]);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
 
     ASSERT_EQ(set.remove(entities, entities + 2u), 2u);
     ASSERT_EQ(set.remove(entities, entities + 2u), 0u);
@@ -631,7 +647,10 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.slot(), 2u);
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.emplace(entities[0u]);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
+
     std::swap(entities[1u], entities[2u]);
 
     ASSERT_EQ(set.remove(entities, entities + 2u), 2u);
@@ -668,7 +687,9 @@ TEST(SparseSet, StableRemove) {
 
     ASSERT_EQ(set.size(), 0u);
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.emplace(entities[0u]);
+    set.emplace(entities[1u]);
+    set.emplace(entities[2u]);
 
     ASSERT_EQ(set.remove(entities[2u]), 1u);
     ASSERT_EQ(set.remove(entities[2u]), 0u);
@@ -1000,6 +1021,7 @@ TEST(SparseSet, SortRange) {
     ASSERT_EQ(set[3u], entities[2u]);
 
     set.clear();
+    set.compact();
     set.insert(std::begin(entities), std::end(entities));
     set.sort_n(0u, std::less{});
 
@@ -1263,10 +1285,10 @@ TEST(SparseSet, ThrowingAllocator) {
     ASSERT_THROW(set.insert(std::begin(entities), std::end(entities)), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
     ASSERT_TRUE(set.contains(entt::entity{0}));
-    ASSERT_TRUE(set.contains(entt::entity{1}));
+    ASSERT_FALSE(set.contains(entt::entity{1}));
     ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
-    ASSERT_EQ(set.capacity(), 3u);
-    ASSERT_EQ(set.size(), 2u);
+    ASSERT_EQ(set.capacity(), 1u);
+    ASSERT_EQ(set.size(), 1u);
 
     set.emplace(entities[1u]);
 

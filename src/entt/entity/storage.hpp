@@ -349,7 +349,6 @@ protected:
     void try_erase(const Entity entt) override {
         const auto pos = base_type::index(entt);
         auto &elem = element_at(comp_traits::in_place_delete ? pos : (base_type::size() - 1u));
-        // support chained destructors i.e. parent-to-child propagation
         [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
         std::destroy_at(std::addressof(elem));
         base_type::try_erase(entt);
@@ -369,6 +368,19 @@ protected:
             if constexpr(std::is_default_constructible_v<value_type>) {
                 emplace(entt);
             }
+        }
+    }
+
+    /**
+     * @brief Assigns one or more entities to a storage.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    void try_insert([[maybe_unused]] const Entity *first, [[maybe_unused]] const Entity *last) override {
+        if constexpr(std::is_default_constructible_v<value_type>) {
+            consume_range(first, last, [this](auto *elem) mutable {
+                alloc_traits::construct(packed.second(), elem);
+            });
         }
     }
 
@@ -629,9 +641,6 @@ public:
 
     /**
      * @brief Returns the object assigned to an entity as a tuple.
-     *
-     * @sa get
-     *
      * @param entt A valid identifier.
      * @return The object assigned to the entity as a tuple.
      */
@@ -658,23 +667,23 @@ public:
      */
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
-        // support chained constructors i.e. parent-to-child propagation
         base_type::try_emplace(entt);
-        const auto pos = base_type::index(entt);
 
         ENTT_TRY {
+            auto elem = assure_at_least(base_type::index(entt));
+
             if constexpr(std::is_aggregate_v<value_type>) {
-                alloc_traits::construct(packed.second(), to_address(assure_at_least(pos)), Type{std::forward<Args>(args)...});
+                alloc_traits::construct(packed.second(), to_address(elem), Type{std::forward<Args>(args)...});
             } else {
-                alloc_traits::construct(packed.second(), to_address(assure_at_least(pos)), std::forward<Args>(args)...);
+                alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
             }
+
+            return *elem;
         }
         ENTT_CATCH {
             base_type::try_erase(entt);
             ENTT_THROW;
         }
-
-        return element_at(pos);
     }
 
     /**
@@ -932,6 +941,15 @@ class sigh_storage_mixin final: public Type {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::try_emplace(entt, value);
         construction.publish(*owner, entt);
+    }
+
+    void try_insert(const typename Type::entity_type *first, const typename Type::entity_type *last) final {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        Type::try_insert(first, last);
+
+        for(auto it = construction.empty() ? last : first; it != last; ++it) {
+            construction.publish(*owner, *it);
+        }
     }
 
 public:

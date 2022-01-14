@@ -691,16 +691,13 @@ public:
      */
     template<typename It>
     iterator insert(It first, It last) {
-        auto it = first;
-
-        for(; it != last && free_list != null; ++it) {
-            emplace(*it);
-        }
-
-        reserve(packed.size() + std::distance(it, last));
-
-        for(; it != last; ++it) {
-            emplace(*it);
+        if constexpr(std::is_invocable_v<decltype(&basic_sparse_set::try_insert), basic_sparse_set &, It, It>) {
+            try_insert(first, last);
+        } else {
+            for(auto it = first; it != last; ++it) {
+                entity_type curr[1u]{*it};
+                try_insert(curr, curr + 1u);
+            }
         }
 
         return first == last ? end() : find(*first);
