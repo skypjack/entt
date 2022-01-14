@@ -254,38 +254,15 @@ protected:
     /**
      * @brief Assigns an entity to a sparse set.
      * @param entt A valid identifier.
+     * @param force_back Force back insertion.
      */
-    virtual void try_emplace(const Entity entt, const void * = nullptr) {
-        if(auto &elem = assure_at_least(entt); free_list == null) {
+    virtual void try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
+        if(auto &elem = assure_at_least(entt); free_list == null || force_back) {
             packed.push_back(entt);
             elem = entity_traits::combine(static_cast<typename entity_traits::entity_type>(packed.size() - 1u), entity_traits::to_integral(entt));
         } else {
             elem = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
             free_list = std::exchange(packed[static_cast<size_type>(entity_traits::to_entity(free_list))], entt);
-        }
-    }
-
-    /**
-     * @brief Assigns one or more entities to a sparse set.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    virtual void try_insert(const Entity *first, const Entity *last) {
-        auto *it = first;
-
-        ENTT_TRY {
-            for(auto pos = packed.size(); it != last; ++it, ++pos) {
-                assure_at_least(*it) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(*it));
-            }
-
-            packed.insert(packed.end(), first, last);
-        }
-        ENTT_CATCH {
-            for(; first != it; ++first) {
-                sparse_ref(*first) = null;
-            }
-
-            ENTT_THROW;
         }
     }
 
@@ -672,7 +649,7 @@ public:
      * `end()` iterator otherwise.
      */
     iterator emplace(const entity_type entt, const void *value = nullptr) {
-        try_emplace(entt, value);
+        try_emplace(entt, false, value);
         return find(entt);
     }
 
@@ -691,13 +668,8 @@ public:
      */
     template<typename It>
     iterator insert(It first, It last) {
-        if constexpr(std::is_invocable_v<decltype(&basic_sparse_set::try_insert), basic_sparse_set &, It, It>) {
-            try_insert(first, last);
-        } else {
-            for(auto it = first; it != last; ++it) {
-                entity_type curr[1u]{*it};
-                try_insert(curr, curr + 1u);
-            }
+        for(auto it = first; it != last; ++it) {
+            try_emplace(*it, true);
         }
 
         return first == last ? end() : find(*first);

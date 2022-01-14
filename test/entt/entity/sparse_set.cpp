@@ -1285,10 +1285,10 @@ TEST(SparseSet, ThrowingAllocator) {
     ASSERT_THROW(set.insert(std::begin(entities), std::end(entities)), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
     ASSERT_TRUE(set.contains(entt::entity{0}));
-    ASSERT_FALSE(set.contains(entt::entity{1}));
+    ASSERT_TRUE(set.contains(entt::entity{1}));
     ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
-    ASSERT_EQ(set.capacity(), 1u);
-    ASSERT_EQ(set.size(), 1u);
+    ASSERT_EQ(set.capacity(), 2u);
+    ASSERT_EQ(set.size(), 2u);
 
     set.emplace(entities[1u]);
 

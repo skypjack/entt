@@ -293,36 +293,18 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         container.resize(from);
     }
 
-    template<typename It, typename Builder>
-    void consume_range(It first, It last, Builder builder) {
-        if constexpr(std::is_invocable_v<decltype(&basic_storage::try_insert), basic_storage &, It, It>) {
-            base_type::try_insert(first, last);
+    template<typename... Args>
+    decltype(auto) emplace_element(const Entity entt, const bool force_back, Args &&...args) {
+        base_type::try_emplace(entt, force_back);
 
-            ENTT_TRY {
-                for(; first != last; ++first) {
-                    builder(to_address(assure_at_least(base_type::index(*first))));
-                }
-            }
-            ENTT_CATCH {
-                for(; first != last; ++first) {
-                    base_type::try_erase(*first);
-                }
-
-                ENTT_THROW;
-            }
-        } else {
-            for(; first != last; ++first) {
-                entity_type curr[1u]{*first};
-                base_type::try_insert(curr, curr + 1u);
-
-                ENTT_TRY {
-                    builder(to_address(assure_at_least(base_type::index(*first))));
-                }
-                ENTT_CATCH {
-                    base_type::try_erase(*first);
-                    ENTT_THROW;
-                }
-            }
+        ENTT_TRY {
+            auto elem = assure_at_least(base_type::index(entt));
+            alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
+            return *elem;
+        }
+        ENTT_CATCH {
+            base_type::try_erase(entt);
+            ENTT_THROW;
         }
     }
 
@@ -358,29 +340,17 @@ protected:
      * @brief Assigns an entity to a storage.
      * @param entt A valid identifier.
      * @param value Optional opaque value.
+     * @param force_back Force back insertion.
      */
-    void try_emplace([[maybe_unused]] const Entity entt, const void *value) override {
+    void try_emplace([[maybe_unused]] const Entity entt, const bool force_back, const void *value) override {
         if(value) {
             if constexpr(std::is_copy_constructible_v<value_type>) {
-                emplace(entt, *static_cast<const value_type *>(value));
+                emplace_element(entt, force_back, *static_cast<const value_type *>(value));
             }
         } else {
             if constexpr(std::is_default_constructible_v<value_type>) {
-                emplace(entt);
+                emplace_element(entt, force_back);
             }
-        }
-    }
-
-    /**
-     * @brief Assigns one or more entities to a storage.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    void try_insert([[maybe_unused]] const Entity *first, [[maybe_unused]] const Entity *last) override {
-        if constexpr(std::is_default_constructible_v<value_type>) {
-            consume_range(first, last, [this](auto *elem) mutable {
-                alloc_traits::construct(packed.second(), elem);
-            });
         }
     }
 
@@ -667,22 +637,10 @@ public:
      */
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
-        base_type::try_emplace(entt);
-
-        ENTT_TRY {
-            auto elem = assure_at_least(base_type::index(entt));
-
-            if constexpr(std::is_aggregate_v<value_type>) {
-                alloc_traits::construct(packed.second(), to_address(elem), Type{std::forward<Args>(args)...});
-            } else {
-                alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
-            }
-
-            return *elem;
-        }
-        ENTT_CATCH {
-            base_type::try_erase(entt);
-            ENTT_THROW;
+        if constexpr(std::is_aggregate_v<value_type>) {
+            return emplace_element(entt, false, Type{std::forward<Args>(args)...});
+        } else {
+            return emplace_element(entt, false, std::forward<Args>(args)...);
         }
     }
 
@@ -716,9 +674,9 @@ public:
      */
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
-        consume_range(std::move(first), std::move(last), [&value, this](auto *elem) {
-            alloc_traits::construct(packed.second(), elem, value);
-        });
+        for(; first != last; ++first) {
+            emplace_element(*first, true, value);
+        }
     }
 
     /**
@@ -735,9 +693,9 @@ public:
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
-        consume_range(std::move(first), std::move(last), [&from, this](auto *elem) {
-            alloc_traits::construct(packed.second(), elem, *(from++));
-        });
+        for(; first != last; ++first, ++from) {
+            emplace_element(*first, true, *from);
+        }
     }
 
     /**
@@ -864,7 +822,7 @@ public:
      */
     template<typename... Args>
     void emplace(const entity_type entt, Args &&...) {
-        base_type::try_emplace(entt);
+        base_type::try_emplace(entt, false);
     }
 
     /**
@@ -889,13 +847,8 @@ public:
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...) {
-        if constexpr(std::is_invocable_v<decltype(&basic_storage::try_insert), basic_storage &, It, It>) {
-            base_type::try_insert(first, last);
-        } else {
-            for(; first != last; ++first) {
-                entity_type curr[1u]{*first};
-                base_type::try_insert(curr, curr + 1u);
-            }
+        for(; first != last; ++first) {
+            base_type::try_emplace(*first, true);
         }
     }
 
@@ -937,19 +890,10 @@ class sigh_storage_mixin final: public Type {
         Type::try_erase(entt);
     }
 
-    void try_emplace(const typename Type::entity_type entt, const void *value) final {
+    void try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        Type::try_emplace(entt, value);
+        Type::try_emplace(entt, force_back, value);
         construction.publish(*owner, entt);
-    }
-
-    void try_insert(const typename Type::entity_type *first, const typename Type::entity_type *last) final {
-        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        Type::try_insert(first, last);
-
-        for(auto it = construction.empty() ? last : first; it != last; ++it) {
-            construction.publish(*owner, *it);
-        }
     }
 
 public:

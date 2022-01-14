@@ -1673,14 +1673,15 @@ TEST(Storage, ThrowingAllocator) {
     test::throwing_allocator<entt::entity>::trigger_after_allocate = true;
 
     ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), 0), test::throwing_allocator<entt::entity>::exception_type);
-    ASSERT_FALSE(pool.contains(entt::entity{1}));
+    ASSERT_TRUE(pool.contains(entt::entity{1}));
     ASSERT_FALSE(pool.contains(entt::entity{ENTT_SPARSE_PAGE}));
 
+    pool.erase(entt::entity{1});
     const int components[2u]{1, ENTT_SPARSE_PAGE};
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
     ASSERT_THROW(pool.insert(std::begin(entities), std::end(entities), std::begin(components)), test::throwing_allocator<entt::entity>::exception_type);
-    ASSERT_FALSE(pool.contains(entt::entity{1}));
+    ASSERT_TRUE(pool.contains(entt::entity{1}));
     ASSERT_FALSE(pool.contains(entt::entity{ENTT_SPARSE_PAGE}));
 }
 
