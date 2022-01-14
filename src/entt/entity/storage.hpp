@@ -843,7 +843,6 @@ public:
      * @tparam Args Types of optional arguments.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to construct an object for the entity.
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...) {
