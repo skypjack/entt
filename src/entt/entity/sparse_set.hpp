@@ -237,6 +237,8 @@ protected:
      * @param entt A valid identifier.
      */
     virtual void try_erase(const Entity entt) {
+        ENTT_ASSERT(contains(entt), "Set does not contain entity");
+
         if(const auto pos = index(entt); mode == deletion_policy::in_place) {
             packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
         } else {
@@ -257,6 +259,8 @@ protected:
      * @param force_back Force back insertion.
      */
     virtual void try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
+        ENTT_ASSERT(!contains(entt), "Set already contains entity");
+
         if(auto &elem = assure_at_least(entt); free_list == null || force_back) {
             packed.push_back(entt);
             elem = entity_traits::combine(static_cast<typename entity_traits::entity_type>(packed.size() - 1u), entity_traits::to_integral(entt));
@@ -685,9 +689,7 @@ public:
      * @param entt A valid identifier.
      */
     void erase(const entity_type entt) {
-        ENTT_ASSERT(contains(entt), "Set does not contain entity");
         try_erase(entt);
-        ENTT_ASSERT(!contains(entt), "Destruction did not take place");
     }
 
     /**
