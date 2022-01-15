@@ -241,9 +241,8 @@ class dense_hash_map final {
     static constexpr float default_threshold = 0.875f;
     static constexpr std::size_t minimum_capacity = 8u;
 
-    using allocator_traits = std::allocator_traits<Allocator>;
-    using alloc = typename allocator_traits::template rebind_alloc<std::pair<const Key, Type>>;
-    using alloc_traits = typename std::allocator_traits<alloc>;
+    using alloc_traits = std::allocator_traits<Allocator>;
+    static_assert(std::is_same_v<typename alloc_traits::value_type, std::pair<const Key, Type>>);
 
     using node_type = internal::dense_hash_map_node<const Key, Type>;
     using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
@@ -302,14 +301,14 @@ class dense_hash_map final {
             for(; *curr != last; curr = &packed.first()[*curr].next) {}
             *curr = pos;
 
-            using node_allocator_traits = typename alloc_traits::template rebind_traits<decltype(node_type::element)>;
-            typename node_allocator_traits::allocator_type allocator = packed.first().get_allocator();
+            using node_alloc_traits = typename alloc_traits::template rebind_traits<decltype(node_type::element)>;
+            typename node_alloc_traits::allocator_type allocator = packed.first().get_allocator();
             auto *ptr = std::addressof(packed.first()[pos].element);
 
             std::destroy_at(ptr);
             packed.first()[pos].next = packed.first().back().next;
             // no exception guarantees when mapped type has a throwing move constructor (we're technically doomed)
-            node_allocator_traits::construct(allocator, ptr, std::move(packed.first().back().element));
+            node_alloc_traits::construct(allocator, ptr, std::move(packed.first().back().element));
         }
 
         packed.first().pop_back();

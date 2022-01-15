@@ -36,13 +36,13 @@ class storage_iterator final {
     friend storage_iterator<const Container>;
 
     using container_type = std::remove_const_t<Container>;
-    using allocator_traits = std::allocator_traits<typename container_type::allocator_type>;
+    using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
     using comp_traits = component_traits<typename container_type::value_type>;
 
     using iterator_traits = std::iterator_traits<std::conditional_t<
         std::is_const_v<Container>,
-        typename allocator_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::const_pointer,
-        typename allocator_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::pointer>>;
+        typename alloc_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::const_pointer,
+        typename alloc_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::pointer>>;
 
 public:
     using difference_type = typename iterator_traits::difference_type;
@@ -235,12 +235,11 @@ template<typename... CLhs, typename... CRhs>
  */
 template<typename Entity, typename Type, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
-    using allocator_traits = std::allocator_traits<Allocator>;
-    using alloc = typename allocator_traits::template rebind_alloc<Type>;
-    using alloc_traits = typename std::allocator_traits<alloc>;
+    using alloc_traits = std::allocator_traits<Allocator>;
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
 
     using comp_traits = component_traits<Type>;
-    using underlying_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
+    using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
@@ -424,7 +423,7 @@ public:
      * @return This storage.
      */
     basic_storage &operator=(basic_storage &&other) ENTT_NOEXCEPT {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.second() == other.packed.second(), "Copying a sparse set is not allowed");
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.second() == other.packed.second(), "Copying a storage is not allowed");
 
         shrink_to_size(0u);
         base_type::operator=(std::move(other));
@@ -716,19 +715,22 @@ public:
     }
 
 private:
-    compressed_pair<container_type, alloc> packed;
+    compressed_pair<container_type, allocator_type> packed;
 };
 
 /*! @copydoc basic_storage */
 template<typename Entity, typename Type, typename Allocator>
 class basic_storage<Entity, Type, Allocator, std::enable_if_t<ignore_as_empty_v<Type>>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
-    using allocator_traits = std::allocator_traits<Allocator>;
+    using alloc_traits = std::allocator_traits<Allocator>;
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
+
     using comp_traits = component_traits<Type>;
+    using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
 
 public:
     /*! @brief Base type. */
-    using base_type = basic_sparse_set<Entity, typename allocator_traits::template rebind_alloc<Entity>>;
+    using base_type = underlying_type;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */

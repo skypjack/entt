@@ -1581,9 +1581,6 @@ TEST(Storage, CreateFromConstructor) {
 
 TEST(Storage, CustomAllocator) {
     auto test = [](auto pool, auto alloc) {
-        ASSERT_EQ(pool.get_allocator(), alloc);
-        ASSERT_FALSE(pool.get_allocator() != alloc);
-
         pool.reserve(1u);
 
         ASSERT_NE(pool.capacity(), 0u);
@@ -1628,8 +1625,8 @@ TEST(Storage, CustomAllocator) {
 
     test::throwing_allocator<entt::entity> allocator{};
 
-    test(entt::basic_storage<entt::entity, int, test::throwing_allocator<entt::entity>>{allocator}, allocator);
-    test(entt::basic_storage<entt::entity, std::true_type, test::throwing_allocator<entt::entity>>{allocator}, allocator);
+    test(entt::basic_storage<entt::entity, int, test::throwing_allocator<int>>{allocator}, allocator);
+    test(entt::basic_storage<entt::entity, std::true_type, test::throwing_allocator<std::true_type>>{allocator}, allocator);
 }
 
 TEST(Storage, ThrowingAllocator) {

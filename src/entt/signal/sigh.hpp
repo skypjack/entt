@@ -57,12 +57,6 @@ class sigh<Ret(Args...), Allocator> {
     /*! @brief A sink is allowed to modify a signal. */
     friend class sink<sigh<Ret(Args...), Allocator>>;
 
-    using allocator_traits = std::allocator_traits<Allocator>;
-    using alloc = typename allocator_traits::template rebind_alloc<delegate<Ret(Args...)>>;
-    using alloc_traits = typename std::allocator_traits<alloc>;
-
-    using container_type = std::vector<delegate<Ret(Args...)>, alloc>;
-
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
@@ -221,7 +215,7 @@ public:
     }
 
 private:
-    container_type calls;
+    std::vector<delegate<Ret(Args...)>, Allocator> calls;
 };
 
 /**
