@@ -100,11 +100,11 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
 public:
     /*! @brief Character type. */
-    using value_type = typename basic_hashed_string::value_type;
+    using value_type = typename base_type::value_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename basic_hashed_string::size_type;
+    using size_type = typename base_type::size_type;
     /*! @brief Unsigned integer type. */
-    using hash_type = typename basic_hashed_string::hash_type;
+    using hash_type = typename base_type::hash_type;
 
     /**
      * @brief Returns directly the numeric representation of a string view.
