@@ -38,6 +38,8 @@ TEST(HashedString, Functionalities) {
     ASSERT_STREQ(static_cast<const char *>(bar_hs), bar);
     ASSERT_STREQ(foo_hs.data(), "foo");
     ASSERT_STREQ(bar_hs.data(), bar);
+    ASSERT_EQ(foo_hs.size(), 3u);
+    ASSERT_EQ(bar_hs.size(), 3u);
 
     ASSERT_EQ(foo_hs, foo_hs);
     ASSERT_NE(foo_hs, bar_hs);
@@ -66,6 +68,7 @@ TEST(HashedString, Empty) {
 
     entt::hashed_string hs{};
 
+    ASSERT_EQ(hs.size(), 0u);
     ASSERT_EQ(static_cast<hash_type>(hs), hash_type{});
     ASSERT_EQ(static_cast<const char *>(hs), nullptr);
 }
@@ -75,8 +78,16 @@ TEST(HashedString, Correctness) {
     std::string_view view{"foobar__", 6};
 
     ASSERT_EQ(entt::hashed_string{foobar}, foobar_v);
+    ASSERT_EQ((entt::hashed_string{view.data(), view.size()}), foobar_v);
+    ASSERT_EQ(entt::hashed_string{"foobar"}, foobar_v);
+
     ASSERT_EQ(entt::hashed_string::value(foobar), foobar_v);
     ASSERT_EQ(entt::hashed_string::value(view.data(), view.size()), foobar_v);
+    ASSERT_EQ(entt::hashed_string::value("foobar"), foobar_v);
+
+    ASSERT_EQ(entt::hashed_string{foobar}.size(), 6u);
+    ASSERT_EQ((entt::hashed_string{view.data(), view.size()}).size(), 6u);
+    ASSERT_EQ(entt::hashed_string{"foobar"}.size(), 6u);
 }
 
 TEST(HashedString, Order) {
@@ -104,6 +115,9 @@ TEST(HashedString, Constexprness) {
     static_assert(entt::hashed_string::value("quux") == "quux"_hs);
     static_assert(entt::hashed_string::value("foobar") == foobar_v);
 
+    static_assert(entt::hashed_string{"quux", 4} == "quux"_hs);
+    static_assert(entt::hashed_string{view.data(), view.size()} == foobar_v);
+
     static_assert(entt::hashed_string::value("quux", 4) == "quux"_hs);
     static_assert(entt::hashed_string::value(view.data(), view.size()) == foobar_v);
 
@@ -128,6 +142,8 @@ TEST(HashedWString, Functionalities) {
     ASSERT_STREQ(static_cast<const wchar_t *>(bar_hws), bar);
     ASSERT_STREQ(foo_hws.data(), L"foo");
     ASSERT_STREQ(bar_hws.data(), bar);
+    ASSERT_EQ(foo_hws.size(), 3u);
+    ASSERT_EQ(bar_hws.size(), 3u);
 
     ASSERT_EQ(foo_hws, foo_hws);
     ASSERT_NE(foo_hws, bar_hws);
@@ -146,6 +162,7 @@ TEST(HashedWString, Empty) {
 
     entt::hashed_wstring hws{};
 
+    ASSERT_EQ(hws.size(), 0u);
     ASSERT_EQ(static_cast<hash_type>(hws), hash_type{});
     ASSERT_EQ(static_cast<const wchar_t *>(hws), nullptr);
 }
@@ -155,8 +172,16 @@ TEST(HashedWString, Correctness) {
     std::wstring_view view{L"foobar__", 6};
 
     ASSERT_EQ(entt::hashed_wstring{foobar}, foobar_v);
+    ASSERT_EQ((entt::hashed_wstring{view.data(), view.size()}), foobar_v);
+    ASSERT_EQ(entt::hashed_wstring{L"foobar"}, foobar_v);
+
     ASSERT_EQ(entt::hashed_wstring::value(foobar), foobar_v);
     ASSERT_EQ(entt::hashed_wstring::value(view.data(), view.size()), foobar_v);
+    ASSERT_EQ(entt::hashed_wstring::value(L"foobar"), foobar_v);
+
+    ASSERT_EQ(entt::hashed_wstring{foobar}.size(), 6u);
+    ASSERT_EQ((entt::hashed_wstring{view.data(), view.size()}).size(), 6u);
+    ASSERT_EQ(entt::hashed_wstring{L"foobar"}.size(), 6u);
 }
 
 TEST(HashedWString, Order) {
@@ -183,6 +208,9 @@ TEST(HashedWString, Constexprness) {
 
     static_assert(entt::hashed_wstring::value(L"quux") == L"quux"_hws);
     static_assert(entt::hashed_wstring::value(L"foobar") == foobar_v);
+
+    static_assert(entt::hashed_wstring{L"quux", 4} == L"quux"_hws);
+    static_assert(entt::hashed_wstring{view.data(), view.size()} == foobar_v);
 
     static_assert(entt::hashed_wstring::value(L"quux", 4) == L"quux"_hws);
     static_assert(entt::hashed_wstring::value(view.data(), view.size()) == foobar_v);

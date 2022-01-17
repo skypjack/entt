@@ -32,6 +32,13 @@ struct fnv1a_traits<std::uint64_t> {
     static constexpr std::uint64_t prime = 1099511628211ull;
 };
 
+template<typename Char>
+struct basic_hashed_string {
+    const Char *repr;
+    std::size_t length;
+    id_type hash;
+};
+
 } // namespace internal
 
 /**
@@ -55,62 +62,65 @@ struct fnv1a_traits<std::uint64_t> {
  * @tparam Char Character type.
  */
 template<typename Char>
-class basic_hashed_string {
+class basic_hashed_string: internal::basic_hashed_string<Char> {
+    using base_type = internal::basic_hashed_string<Char>;
     using hs_traits = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
-        constexpr const_wrapper(const Char *curr) ENTT_NOEXCEPT: str{curr} {}
-        const Char *str;
+        constexpr const_wrapper(const Char *str) ENTT_NOEXCEPT: repr{str} {}
+        const Char *repr;
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    [[nodiscard]] static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
-        auto value = hs_traits::offset;
+    [[nodiscard]] static constexpr auto helper(const Char *str) ENTT_NOEXCEPT {
+        base_type base{str, 0u, hs_traits::offset};
 
-        while(*curr != 0) {
-            value = (value ^ static_cast<hs_traits::type>(*(curr++))) * hs_traits::prime;
+        for(; str[base.length]; ++base.length) {
+            base.hash = (base.hash ^ static_cast<hs_traits::type>(str[base.length])) * hs_traits::prime;
         }
 
-        return value;
+        return base;
+    }
+
+    // Fowler–Noll–Vo hash function v. 1a - the good
+    [[nodiscard]] static constexpr auto helper(const Char *str, const std::size_t len) ENTT_NOEXCEPT {
+        base_type base{str, len, hs_traits::offset};
+
+        for(size_type pos{}; pos < len; ++pos) {
+            base.hash = (base.hash ^ static_cast<hs_traits::type>(str[pos])) * hs_traits::prime;
+        }
+
+        return base;
     }
 
 public:
     /*! @brief Character type. */
     using value_type = Char;
     /*! @brief Unsigned integer type. */
-    using hash_type = id_type;
+    using size_type = decltype(base_type::length);
+    /*! @brief Unsigned integer type. */
+    using hash_type = decltype(base_type::hash);
 
     /**
      * @brief Returns directly the numeric representation of a string view.
      * @param str Human-readable identifer.
-     * @param size Length of the string to hash.
+     * @param len Length of the string to hash.
      * @return The numeric representation of the string.
      */
-    [[nodiscard]] static constexpr hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        id_type partial{hs_traits::offset};
-        while(size--) { partial = (partial ^ (str++)[0]) * hs_traits::prime; }
-        return partial;
+    [[nodiscard]] static constexpr hash_type value(const value_type *str, const size_type len) ENTT_NOEXCEPT {
+        return basic_hashed_string{str, len};
     }
 
     /**
      * @brief Returns directly the numeric representation of a string.
-     *
-     * Forcing template resolution avoids implicit conversions. An
-     * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
-     * Example of use:
-     * @code{.cpp}
-     * const auto value = basic_hashed_string<char>::value("my.png");
-     * @endcode
-     *
      * @tparam N Number of characters of the identifier.
      * @param str Human-readable identifer.
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
     [[nodiscard]] static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
-        return helper(str);
+        return basic_hashed_string{str};
     }
 
     /**
@@ -118,33 +128,30 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      * @return The numeric representation of the string.
      */
-    [[nodiscard]] static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
-        return helper(wrapper.str);
+    [[nodiscard]] static constexpr hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
+        return basic_hashed_string{wrapper};
     }
 
     /*! @brief Constructs an empty hashed string. */
     constexpr basic_hashed_string() ENTT_NOEXCEPT
-        : str{nullptr},
-          hash{} {}
+        : base_type{} {}
+
+    /**
+     * @brief Constructs a hashed string from a string view.
+     * @param str Human-readable identifer.
+     * @param len Length of the string to hash.
+     */
+    constexpr basic_hashed_string(const value_type *str, const size_type len) ENTT_NOEXCEPT
+        : base_type{helper(str, len)} {}
 
     /**
      * @brief Constructs a hashed string from an array of const characters.
-     *
-     * Forcing template resolution avoids implicit conversions. An
-     * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
-     * Example of use:
-     * @code{.cpp}
-     * basic_hashed_string<char> hs{"my.png"};
-     * @endcode
-     *
      * @tparam N Number of characters of the identifier.
-     * @param curr Human-readable identifer.
+     * @param str Human-readable identifer.
      */
     template<std::size_t N>
-    constexpr basic_hashed_string(const value_type (&curr)[N]) ENTT_NOEXCEPT
-        : str{curr},
-          hash{helper(curr)} {}
+    constexpr basic_hashed_string(const value_type (&str)[N]) ENTT_NOEXCEPT
+        : base_type{helper(str)} {}
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
@@ -156,23 +163,30 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
-        : str{wrapper.str},
-          hash{helper(wrapper.str)} {}
+        : base_type{helper(wrapper.repr)} {}
+
+    /**
+     * @brief Returns the size a hashed string.
+     * @return The size of the hashed string.
+     */
+    [[nodiscard]] constexpr size_type size() const ENTT_NOEXCEPT {
+        return base_type::length;
+    }
 
     /**
      * @brief Returns the human-readable representation of a hashed string.
-     * @return The string used to initialize the instance.
+     * @return The string used to initialize the hashed string.
      */
     [[nodiscard]] constexpr const value_type *data() const ENTT_NOEXCEPT {
-        return str;
+        return base_type::repr;
     }
 
     /**
      * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
+     * @return The numeric representation of the hashed string.
      */
     [[nodiscard]] constexpr hash_type value() const ENTT_NOEXCEPT {
-        return hash;
+        return base_type::hash;
     }
 
     /*! @copydoc data */
@@ -182,23 +196,24 @@ public:
 
     /**
      * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
+     * @return The numeric representation of the hashed string.
      */
     [[nodiscard]] constexpr operator hash_type() const ENTT_NOEXCEPT {
         return value();
     }
-
-private:
-    const value_type *str;
-    hash_type hash;
 };
 
 /**
  * @brief Deduction guide.
- *
- * It allows to deduce the character type of the hashed string directly from a
- * human-readable identifer provided to the constructor.
- *
+ * @tparam Char Character type.
+ * @param str Human-readable identifer.
+ * @param len Length of the string to hash.
+ */
+template<typename Char>
+basic_hashed_string(const Char *str, const std::size_t len) -> basic_hashed_string<Char>;
+
+/**
+ * @brief Deduction guide.
  * @tparam Char Character type.
  * @tparam N Number of characters of the identifier.
  * @param str Human-readable identifer.
