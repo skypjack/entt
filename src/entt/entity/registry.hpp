@@ -38,7 +38,7 @@ namespace entt {
 namespace internal {
 
 template<typename It>
-class storage_proxy_iterator {
+class storage_proxy_iterator final {
     template<typename Other>
     friend class storage_proxy_iterator;
 

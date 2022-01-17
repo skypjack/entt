@@ -1467,7 +1467,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 /*! @brief Opaque iterator for sequence containers. */
-class meta_sequence_container::meta_iterator {
+class meta_sequence_container::meta_iterator final {
     enum class operation : std::uint8_t {
         incr,
         deref
@@ -1667,7 +1667,7 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 }
 
 /*! @brief Opaque iterator for associative containers. */
-class meta_associative_container::meta_iterator {
+class meta_associative_container::meta_iterator final {
     enum class operation : std::uint8_t {
         incr,
         deref

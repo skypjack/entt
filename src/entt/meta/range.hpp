@@ -15,7 +15,7 @@ namespace entt {
 namespace internal {
 
 template<typename Type, typename Node>
-struct meta_range_iterator {
+struct meta_range_iterator final {
     using difference_type = std::ptrdiff_t;
     using value_type = Type;
     using pointer = input_iterator_pointer<value_type>;
@@ -70,7 +70,7 @@ private:
  * @tparam Node Type of meta nodes iterated.
  */
 template<typename Type, typename Node = typename Type::node_type>
-struct meta_range {
+struct meta_range final {
     /*! @brief Node type. */
     using node_type = Node;
     /*! @brief Input iterator type. */

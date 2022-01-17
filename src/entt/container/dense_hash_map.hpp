@@ -39,7 +39,7 @@ struct dense_hash_map_node final {
 };
 
 template<typename It>
-class dense_hash_map_iterator {
+class dense_hash_map_iterator final {
     friend dense_hash_map_iterator<const std::remove_pointer_t<It> *>;
 
     using iterator_traits = std::iterator_traits<decltype(std::addressof(std::declval<It>()->element))>;
@@ -157,7 +157,7 @@ template<typename ILhs, typename IRhs>
 }
 
 template<typename It>
-class dense_hash_map_local_iterator {
+class dense_hash_map_local_iterator final {
     friend dense_hash_map_local_iterator<const std::remove_pointer_t<It> *>;
 
     using iterator_traits = std::iterator_traits<decltype(std::addressof(std::declval<It>()->element))>;
