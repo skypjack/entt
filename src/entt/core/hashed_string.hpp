@@ -34,9 +34,13 @@ struct fnv1a_traits<std::uint64_t> {
 
 template<typename Char>
 struct basic_hashed_string {
-    const Char *repr;
-    std::size_t length;
-    id_type hash;
+    using value_type = Char;
+    using size_type = std::size_t;
+    using hash_type = id_type;
+
+    const value_type *repr;
+    size_type length;
+    hash_type hash;
 };
 
 } // namespace internal
@@ -96,11 +100,11 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
 public:
     /*! @brief Character type. */
-    using value_type = Char;
+    using value_type = typename basic_hashed_string::value_type;
     /*! @brief Unsigned integer type. */
-    using size_type = decltype(base_type::length);
+    using size_type = typename basic_hashed_string::size_type;
     /*! @brief Unsigned integer type. */
-    using hash_type = decltype(base_type::hash);
+    using hash_type = typename basic_hashed_string::hash_type;
 
     /**
      * @brief Returns directly the numeric representation of a string view.
