@@ -236,6 +236,7 @@ class basic_registry {
             cpool->bind(forward_as_any(*this));
         }
 
+        ENTT_ASSERT(cpool->type() == type_id<Component>(), "Unexpected type");
         return static_cast<storage_type<Component> &>(*cpool);
     }
 
@@ -244,6 +245,7 @@ class basic_registry {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
 
         if(const auto it = pools.find(id); it != pools.cend()) {
+            ENTT_ASSERT(it->second->type() == type_id<Component>(), "Unexpected type");
             return static_cast<const storage_type<Component> &>(*it->second);
         }
 
