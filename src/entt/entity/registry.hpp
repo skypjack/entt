@@ -663,6 +663,8 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+
         if constexpr(is_iterator_type_v<typename base_type::iterator, It>) {
             for(; first != last; ++first) {
                 destroy(*first, entity_traits::to_version(*first) + 1u);
@@ -836,12 +838,16 @@ public:
      */
     template<typename Component, typename... Other, typename It>
     size_type remove(It first, It last) {
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
         size_type count{};
 
-        for(const auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
-            const auto entity = *first;
-            ENTT_ASSERT(valid(entity), "Invalid entity");
-            count += (std::get<storage_type<Component> &>(cpools).remove(entity) + ... + std::get<storage_type<Other> &>(cpools).remove(entity));
+        if constexpr(is_iterator_type_v<typename base_type::iterator, It> && sizeof...(Other) != 0u) {
+            for(const auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
+                const auto entity = *first;
+                count += (std::get<storage_type<Component> &>(cpools).remove(entity) + ... + std::get<storage_type<Other> &>(cpools).remove(entity));
+            }
+        } else {
+            count = (assure<Component>().remove(first, last) + ... + assure<Other>().remove(first, last));
         }
 
         return count;
@@ -877,10 +883,15 @@ public:
      */
     template<typename Component, typename... Other, typename It>
     void erase(It first, It last) {
-        for(const auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
-            const auto entity = *first;
-            ENTT_ASSERT(valid(entity), "Invalid entity");
-            (std::get<storage_type<Component> &>(cpools).erase(entity), (std::get<storage_type<Other> &>(cpools).erase(entity), ...));
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+
+        if constexpr(is_iterator_type_v<typename base_type::iterator, It> && sizeof...(Other) != 0u) {
+            for(const auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
+                const auto entity = *first;
+                (std::get<storage_type<Component> &>(cpools).erase(entity), (std::get<storage_type<Other> &>(cpools).erase(entity), ...));
+            }
+        } else {
+            (assure<Component>().erase(first, last), (assure<Other>().erase(first, last), ...));
         }
     }
 
