@@ -56,8 +56,8 @@ TEST(Example, DifferentRegistryTypes) {
     registry.emplace<char>(src, 'c');
 
     for(auto [id, storage]: registry.storage()) {
-        if(auto *pool = other.storage(id); pool && storage.contains(src)) {
-            pool->emplace(dst, storage.get(src));
+        if(auto it = other.storage(id); it != other.storage().end() && storage.contains(src)) {
+            it->second.emplace(dst, storage.get(src));
         }
     }
 

@@ -1881,14 +1881,14 @@ TEST(Registry, RuntimePools) {
     static_assert(std::is_same_v<decltype(registry.storage<empty_type>()), typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
     static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
 
-    static_assert(std::is_same_v<decltype(registry.storage("other"_hs)), typename entt::storage_traits<entt::entity, empty_type>::storage_type::base_type *>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)), const typename entt::storage_traits<entt::entity, empty_type>::storage_type::base_type *>);
+    static_assert(std::is_same_v<decltype(registry.storage("other"_hs)->second), typename entt::storage_traits<entt::entity, empty_type>::storage_type::base_type &>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)->second), const typename entt::storage_traits<entt::entity, empty_type>::storage_type::base_type &>);
 
     ASSERT_DEATH([[maybe_unused]] auto &&unused = registry.storage<int>("other"_hs), "");
     ASSERT_DEATH([[maybe_unused]] auto &&unused = std::as_const(registry).storage<int>("other"_hs), "");
 
-    ASSERT_EQ(registry.storage("other"_hs), &storage);
-    ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), nullptr);
+    ASSERT_NE(registry.storage("other"_hs), registry.storage().end());
+    ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), registry.storage().end());
 
     ASSERT_EQ(&registry.storage<empty_type>("other"_hs), &storage);
     ASSERT_NE(&std::as_const(registry).storage<empty_type>(), &storage);

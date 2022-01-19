@@ -337,6 +337,26 @@ public:
     }
 
     /**
+     * @brief Finds the storage associated with a given name, if any.
+     * @param id Name used to map the storage within the registry.
+     * @return An iterator to the given storage if it's found, past the end
+     * iterator otherwise.
+     */
+    [[nodiscard]] auto storage(const id_type id) {
+        return internal::storage_proxy_iterator{pools.find(id)};
+    }
+
+    /**
+     * @brief Finds the storage associated with a given name, if any.
+     * @param id Name used to map the storage within the registry.
+     * @return An iterator to the given storage if it's found, past the end
+     * iterator otherwise.
+     */
+    [[nodiscard]] auto storage(const id_type id) const {
+        return internal::storage_proxy_iterator{pools.find(id)};
+    }
+
+    /**
      * @brief Returns the storage for a given component type.
      * @tparam Component Type of component of which to return the storage.
      * @param id Optional name used to map the storage within the registry.
@@ -361,25 +381,6 @@ public:
     template<typename Component>
     [[nodiscard]] decltype(auto) storage(const id_type id = type_hash<Component>::value()) const {
         return assure<Component>(id);
-    }
-
-    /**
-     * @brief Returns the storage associated with a given name, if any.
-     * @param id Name used to map the storage within the registry.
-     * @return The requested storage if it exists, a null pointer otherwise.
-     */
-    [[nodiscard]] base_type *storage(const id_type id) {
-        return const_cast<base_type *>(std::as_const(*this).storage(id));
-    }
-
-    /**
-     * @brief Returns the storage associated with a given name, if any.
-     * @param id Name used to map the storage within the registry.
-     * @return The requested storage if it exists, a null pointer otherwise.
-     */
-    [[nodiscard]] const base_type *storage(const id_type id) const {
-        const auto it = pools.find(id);
-        return it == pools.end() ? nullptr : it->second.get();
     }
 
     /**
