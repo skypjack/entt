@@ -236,7 +236,7 @@ template<typename ILhs, typename IRhs>
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Type, typename Hash, typename KeyEqual, typename Allocator>
-class dense_hash_set final {
+class dense_hash_set {
     static constexpr float default_threshold = 0.875f;
     static constexpr std::size_t minimum_capacity = 8u;
 

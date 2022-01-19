@@ -147,7 +147,7 @@ struct basic_runtime_view;
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Allocator>
-struct basic_runtime_view<basic_sparse_set<Entity, Allocator>> final {
+struct basic_runtime_view<basic_sparse_set<Entity, Allocator>> {
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
