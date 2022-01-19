@@ -417,7 +417,7 @@ know who has participated so far.
 
 # License
 
-Code and documentation Copyright (c) 2017-2021 Michele Caini.<br/>
+Code and documentation Copyright (c) 2017-2022 Michele Caini.<br/>
 Colorful logo Copyright (c) 2018-2021 Richard Caseres.
 
 Code released under
