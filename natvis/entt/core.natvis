@@ -15,10 +15,11 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_hashed_string&lt;*&gt;">
-		<DisplayString Condition="str != nullptr">{{ hash={ hash } }}</DisplayString>
+		<DisplayString Condition="base_type::repr != nullptr">{{ hash={ base_type::hash } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<Item Name="[data]">str,na</Item>
+			<Item Name="[data]">base_type::repr,na</Item>
+			<Item Name="[length]">base_type::length</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::type_info">
