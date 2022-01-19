@@ -1165,8 +1165,8 @@ if(entt::type_id<velocity>() == base.type()) {
 ```
 
 Furthermore, all features rely on internal functions that forward the calls to
-the mixins. The latter can then make use of any context variables, which can be
-set via `bind`:
+the mixins. The latter can then make use of any information, which can be set
+via `bind`:
 
 ```cpp
 base.bind(entt::forward_as_any(registry));
