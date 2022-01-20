@@ -911,39 +911,38 @@ use the preferred tool.
 
 ## Context variables
 
-It is often convenient to assign context variables to a registry, so as to make
-it the only _source of truth_ of an application.<br/>
-This is possible by means of a member function named `set` to use to create a
-context variable from a given type. Either `ctx` or `try_ctx` can be used to
-retrieve the newly created instance, while `unset` is meant to clear the
-variable if needed:
+Each registry has a _context_ associated with it, which is an `any` object map
+accessible by type for convenience.<br/>
+The context is returned via the `ctx` functions and offers a minimal set of
+features including the following:
 
 ```cpp
 // creates a new context variable initialized with the given values
-registry.set<my_type>(42, 'c');
+registry.ctx().emplace<my_type>(42, 'c');
 
 // gets the context variable as a non-const reference from a non-const registry
-auto &var = registry.ctx<my_type>();
+auto &var = registry.ctx().at<my_type>();
 
 // gets the context variable as a const reference from either a const or a non-const registry
-const auto &cvar = registry.ctx<const my_type>();
+const auto &cvar = registry.ctx().at<const my_type>();
 
 // unsets the context variable
-registry.unset<my_type>();
+registry.ctx().erase<my_type>();
 ```
 
 The type of a context variable must be such that it's default constructible and
-can be moved. The `set` member function either creates a new instance of the
-context variable or overwrites an already existing one if any.<br/>
-The `try_ctx` member function returns a pointer to the context variable if it
-exists, otherwise it returns a null pointer. As `ctx`, it supports both const
-and non-const types and requires a const one when used on a const registry:
+can be moved.<br/>
+For all users who want to use the context but don't want to create elements, the
+`contains` and `find` functions are also available:
 
 ```cpp
-if(auto *cptr = registry.try_ctx<const my_type>(); cptr) {
-    // uses the context variable associated with the registry, if any
-}
+const bool contains = registry.ctx().contains<my_type>();
+const my_type *value = registry.ctx().find<const my_type>();
 ```
+
+Both support constant types, as does `at`. Furthermore, since the context is
+essentially a map of `any`s, it offers full support for references and allows
+users to hook externally managed objects to the registry itself.
 
 ### Aliased properties
 
@@ -955,13 +954,13 @@ lvalue is necessarily provided as an argument:
 
 ```cpp
 time clock;
-registry.set<my_type &>(clock);
+registry.ctx().emplace<my_type &>(clock);
 ```
 
 Read-only aliased properties are created using const types instead:
 
 ```cpp
-registry.set<const my_type &>(clock);
+registry.ctx().emplace<const my_type &>(clock);
 ```
 
 From the point of view of the user, there are no differences between a variable
@@ -970,12 +969,11 @@ variables aren't accesible as non-const references:
 
 ```cpp
 // read-only variables only support const access
-const my_type *ptr = registry.try_ctx<const my_type>();
-const my_type &var = registry.ctx<const my_type>();
+const my_type *ptr = registry.ctx().find<const my_type>();
+const my_type &var = registry.ctx().at<const my_type>();
 ```
 
-Aliased properties can be unset and are overwritten when `set` is invoked, as it
-happens with standard variables.
+Aliased properties can also be erased as it happens with any other variable.
 
 ## Pointer stability
 

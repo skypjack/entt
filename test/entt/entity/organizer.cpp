@@ -358,17 +358,17 @@ TEST(Organizer, Prepare) {
 
     const auto graph = organizer.graph();
 
-    ASSERT_EQ(registry.try_ctx<int>(), nullptr);
-    ASSERT_EQ(registry.try_ctx<char>(), nullptr);
-    ASSERT_EQ(registry.try_ctx<double>(), nullptr);
+    ASSERT_FALSE(registry.ctx().contains<int>());
+    ASSERT_FALSE(registry.ctx().contains<char>());
+    ASSERT_FALSE(registry.ctx().contains<double>());
 
     for(auto &&vertex: graph) {
         vertex.prepare(registry);
     }
 
-    ASSERT_EQ(registry.try_ctx<int>(), nullptr);
-    ASSERT_EQ(registry.try_ctx<char>(), nullptr);
-    ASSERT_NE(registry.try_ctx<double>(), nullptr);
+    ASSERT_FALSE(registry.ctx().contains<int>());
+    ASSERT_FALSE(registry.ctx().contains<char>());
+    ASSERT_TRUE(registry.ctx().contains<double>());
 }
 
 TEST(Organizer, Dependencies) {
@@ -422,10 +422,10 @@ TEST(Organizer, ToArgsIntegrity) {
     entt::registry registry;
 
     organizer.emplace<&to_args_integrity>();
-    registry.set<std::size_t>(42u);
+    registry.ctx().emplace<std::size_t>(42u);
 
     auto graph = organizer.graph();
     graph[0u].callback()(graph[0u].data(), registry);
 
-    ASSERT_EQ(registry.ctx<std::size_t>(), 0u);
+    ASSERT_EQ(registry.ctx().at<std::size_t>(), 0u);
 }

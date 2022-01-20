@@ -131,7 +131,7 @@ class basic_organizer final {
         } else if constexpr(internal::is_view_v<Type>) {
             return as_view{reg};
         } else {
-            return reg.template ctx_or_set<std::remove_reference_t<Type>>();
+            return reg.ctx().template emplace<std::remove_reference_t<Type>>();
         }
     }
 

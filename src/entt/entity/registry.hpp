@@ -158,6 +158,54 @@ template<typename ILhs, typename IRhs>
     return !(lhs < rhs);
 }
 
+class registry_context {
+    template<typename Type>
+    [[nodiscard]] id_type type_to_key() const ENTT_NOEXCEPT {
+        return type_id<std::remove_const_t<std::remove_reference_t<Type>>>().hash();
+    }
+
+public:
+    template<typename Type, typename... Args>
+    Type &emplace(Args &&...args) {
+        return any_cast<Type &>(data.try_emplace(type_to_key<Type>(), std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
+    }
+
+    template<typename Type>
+    void erase() {
+        data.erase(type_to_key<Type>());
+    }
+
+    template<typename Type>
+    [[nodiscard]] std::add_const_t<Type> &at() const {
+        return any_cast<std::add_const_t<Type> &>(data.at(type_to_key<Type>()));
+    }
+
+    template<typename Type>
+    [[nodiscard]] Type &at() {
+        return any_cast<Type &>(data.at(type_to_key<Type>()));
+    }
+
+    template<typename Type>
+    [[nodiscard]] std::add_const_t<Type> *find() const {
+        auto it = data.find(type_to_key<Type>());
+        return it == data.cend() ? nullptr : any_cast<std::add_const_t<Type>>(&it->second);
+    }
+
+    template<typename Type>
+    [[nodiscard]] Type *find() {
+        auto it = data.find(type_to_key<Type>());
+        return it == data.end() ? nullptr : any_cast<Type>(&it->second);
+    }
+
+    template<typename Type>
+    [[nodiscard]] bool contains() const {
+        return data.contains(type_to_key<Type>());
+    }
+
+private:
+    dense_hash_map<id_type, basic_any<0u>, identity> data;
+};
+
 } // namespace internal
 
 /**
@@ -281,6 +329,8 @@ public:
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
     using base_type = basic_common_type;
+    /*! @brief Context type. */
+    using context = internal::registry_context;
 
     /*! @brief Default constructor. */
     basic_registry() = default;
@@ -291,10 +341,10 @@ public:
      */
     basic_registry(basic_registry &&other) ENTT_NOEXCEPT
         : pools{std::move(other.pools)},
-          vars{std::move(other.vars)},
           groups{std::move(other.groups)},
           entities{std::move(other.entities)},
-          free_list{other.free_list} {
+          free_list{other.free_list},
+          vars{std::move(other.vars)} {
         for(auto &&curr: pools) {
             curr.second->bind(forward_as_any(*this));
         }
@@ -307,10 +357,10 @@ public:
      */
     basic_registry &operator=(basic_registry &&other) ENTT_NOEXCEPT {
         pools = std::move(other.pools);
-        vars = std::move(other.vars);
         groups = std::move(other.groups);
         entities = std::move(other.entities);
         free_list = other.free_list;
+        vars = std::move(other.vars);
 
         for(auto &&curr: pools) {
             curr.second->bind(forward_as_any(*this));
@@ -1409,118 +1459,24 @@ public:
     }
 
     /**
-     * @brief Binds an object to the context of the registry.
-     *
-     * If the value already exists it is overwritten, otherwise a new instance
-     * of the given type is created and initialized with the arguments provided.
-     *
-     * @tparam Type Type of object to set.
-     * @tparam Args Types of arguments to use to construct the object.
-     * @param args Parameters to use to initialize the value.
-     * @return A reference to the newly created object.
+     * @brief Returns the context object, that is, a general purpose container.
+     * @return The context object, that is, a general purpose container.
      */
-    template<typename Type, typename... Args>
-    Type &set(Args &&...args) {
-        auto &&elem = vars[type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()];
-        elem.template emplace<Type>(std::forward<Args>(args)...);
-        return any_cast<Type &>(elem);
-    }
-
-    /**
-     * @brief Unsets a context variable if it exists.
-     * @tparam Type Type of object to set.
-     */
-    template<typename Type>
-    void unset() {
-        vars.erase(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
-    }
-
-    /**
-     * @brief Binds an object to the context of the registry.
-     *
-     * In case the context doesn't contain the given object, the parameters
-     * provided are used to construct it.
-     *
-     * @tparam Type Type of object to set.
-     * @tparam Args Types of arguments to use to construct the object.
-     * @param args Parameters to use to initialize the object.
-     * @return A reference to the object in the context of the registry.
-     */
-    template<typename Type, typename... Args>
-    [[nodiscard]] Type &ctx_or_set(Args &&...args) {
-        return any_cast<Type &>(vars.try_emplace(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value(), std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
-    }
-
-    /**
-     * @brief Returns a pointer to an object in the context of the registry.
-     * @tparam Type Type of object to get.
-     * @return A pointer to the object if it exists in the context of the
-     * registry, a null pointer otherwise.
-     */
-    template<typename Type>
-    [[nodiscard]] std::add_const_t<Type> *try_ctx() const {
-        auto it = vars.find(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
-        return it == vars.cend() ? nullptr : any_cast<std::add_const_t<Type>>(&it->second);
-    }
-
-    /*! @copydoc try_ctx */
-    template<typename Type>
-    [[nodiscard]] Type *try_ctx() {
-        auto it = vars.find(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
-        return it == vars.end() ? nullptr : any_cast<Type>(&it->second);
-    }
-
-    /**
-     * @brief Returns a reference to an object in the context of the registry.
-     *
-     * @warning
-     * Attempting to get a context variable that doesn't exist results in
-     * undefined behavior.
-     *
-     * @tparam Type Type of object to get.
-     * @return A valid reference to the object in the context of the registry.
-     */
-    template<typename Type>
-    [[nodiscard]] std::add_const_t<Type> &ctx() const {
-        return any_cast<std::add_const_t<Type> &>(vars.at(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()));
+    context &ctx() ENTT_NOEXCEPT {
+        return vars;
     }
 
     /*! @copydoc ctx */
-    template<typename Type>
-    [[nodiscard]] Type &ctx() {
-        return any_cast<Type &>(vars.at(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()));
-    }
-
-    /**
-     * @brief Visits a registry and returns the type info for its context
-     * variables.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const type_info &);
-     * @endcode
-     *
-     * Returned identifiers are those of the context variables currently set.
-     *
-     * @sa type_info
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void ctx(Func func) const {
-        for(auto &&curr: vars) {
-            func(curr.second.type());
-        }
+    const context &ctx() const ENTT_NOEXCEPT {
+        return vars;
     }
 
 private:
     dense_hash_map<id_type, std::unique_ptr<base_type>, identity> pools{};
-    dense_hash_map<id_type, basic_any<0u>, identity> vars{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
     entity_type free_list{tombstone};
+    context vars;
 };
 
 } // namespace entt
