@@ -4,6 +4,7 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
+* Making the most of range-destroy: disable this optimization, free pools make it possible to implement it on user side when needed
 * investigate: meta as_type_t<T> for getters and the like
 * investigate: add the possibility of disabling entities without deleting components thanks to the new full check
 * fast-contains for sparse sets (low prio but nice-to-have)
