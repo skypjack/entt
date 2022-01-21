@@ -1868,7 +1868,9 @@ TEST(Registry, RuntimePools) {
     const auto entity = registry.create();
 
     static_assert(std::is_same_v<decltype(registry.storage<empty_type>()), typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
+    static_assert(std::is_same_v<decltype(registry.storage<const empty_type>()), const typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
     static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).storage<const empty_type>()), const typename entt::storage_traits<entt::entity, empty_type>::storage_type &>);
 
     static_assert(std::is_same_v<decltype(registry.storage("other"_hs)->second), typename entt::storage_traits<entt::entity, empty_type>::storage_type::base_type &>);
     static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)->second), const typename entt::storage_traits<entt::entity, empty_type>::storage_type::base_type &>);

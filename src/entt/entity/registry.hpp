@@ -413,8 +413,12 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Component>
-    decltype(auto) storage(const id_type id = type_hash<Component>::value()) {
-        return assure<Component>(id);
+    decltype(auto) storage(const id_type id = type_hash<std::remove_const_t<Component>>::value()) {
+        if constexpr(std::is_const_v<Component>) {
+            return std::as_const(*this).template storage<std::remove_const_t<Component>>(id);
+        } else {
+            return assure<Component>(id);
+        }
     }
 
     /**
@@ -429,8 +433,8 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Component>
-    decltype(auto) storage(const id_type id = type_hash<Component>::value()) const {
-        return assure<Component>(id);
+    decltype(auto) storage(const id_type id = type_hash<std::remove_const_t<Component>>::value()) const {
+        return assure<std::remove_const_t<Component>>(id);
     }
 
     /**
