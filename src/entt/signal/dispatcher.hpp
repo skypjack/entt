@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
-#include "../container/dense_hash_map.hpp"
+#include "../container/dense_map.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/utility.hpp"
@@ -256,7 +256,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, std::unique_ptr<basic_pool>, identity> pools;
+    dense_map<id_type, std::unique_ptr<basic_pool>, identity> pools;
 };
 
 } // namespace entt

@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
-#include "../container/dense_hash_map.hpp"
+#include "../container/dense_map.hpp"
 #include "../core/type_traits.hpp"
 #include "component.hpp"
 #include "entity.hpp"
@@ -553,7 +553,7 @@ public:
     }
 
 private:
-    dense_hash_map<entity_type, std::pair<entity_type, bool>> remloc;
+    dense_map<entity_type, std::pair<entity_type, bool>> remloc;
     basic_registry<entity_type> *reg;
 };
 

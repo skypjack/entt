@@ -8,8 +8,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include "../container/dense_hash_map.hpp"
-#include "../container/dense_hash_set.hpp"
+#include "../container/dense_map.hpp"
+#include "../container/dense_set.hpp"
 #include "meta.hpp"
 #include "type_traits.hpp"
 
@@ -251,23 +251,23 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
     : internal::basic_meta_associative_container_traits<std::unordered_set<Key, Args...>> {};
 
 /**
- * @brief Meta associative container traits for `dense_hash_map`s of any type.
+ * @brief Meta associative container traits for `dense_map`s of any type.
  * @tparam Key The key type of the elements.
  * @tparam Type The value type of the elements.
  * @tparam Args Other arguments.
  */
 template<typename Key, typename Type, typename... Args>
-struct meta_associative_container_traits<dense_hash_map<Key, Type, Args...>>
-    : internal::basic_meta_associative_container_traits<dense_hash_map<Key, Type, Args...>> {};
+struct meta_associative_container_traits<dense_map<Key, Type, Args...>>
+    : internal::basic_meta_associative_container_traits<dense_map<Key, Type, Args...>> {};
 
 /**
- * @brief Meta associative container traits for `dense_hash_set`s of any type.
+ * @brief Meta associative container traits for `dense_set`s of any type.
  * @tparam Type The value type of the elements.
  * @tparam Args Other arguments.
  */
 template<typename Type, typename... Args>
-struct meta_associative_container_traits<dense_hash_set<Type, Args...>>
-    : internal::basic_meta_associative_container_traits<dense_hash_set<Type, Args...>> {};
+struct meta_associative_container_traits<dense_set<Type, Args...>>
+    : internal::basic_meta_associative_container_traits<dense_set<Type, Args...>> {};
 
 } // namespace entt
 

@@ -11,14 +11,14 @@ template<
     typename = std::hash<Key>,
     typename = std::equal_to<Key>,
     typename = std::allocator<std::pair<const Key, Type>>>
-class dense_hash_map;
+class dense_map;
 
 template<
     typename Type,
     typename = std::hash<Type>,
     typename = std::equal_to<Type>,
     typename = std::allocator<Type>>
-class dense_hash_set;
+class dense_set;
 
 } // namespace entt
 

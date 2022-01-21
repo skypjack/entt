@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
-#include "../container/dense_hash_map.hpp"
+#include "../container/dense_map.hpp"
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
 #include "../core/fwd.hpp"
@@ -203,7 +203,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, basic_any<0u>, identity> data;
+    dense_map<id_type, basic_any<0u>, identity> data;
 };
 
 } // namespace internal
@@ -1451,7 +1451,7 @@ public:
     }
 
 private:
-    dense_hash_map<id_type, std::unique_ptr<base_type>, identity> pools{};
+    dense_map<id_type, std::unique_ptr<base_type>, identity> pools{};
     std::vector<group_data> groups{};
     std::vector<entity_type> entities{};
     entity_type free_list{tombstone};

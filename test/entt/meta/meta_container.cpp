@@ -275,8 +275,8 @@ TEST_F(MetaContainer, StdSet) {
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST_F(MetaContainer, DenseHashMap) {
-    entt::dense_hash_map<int, char> map{};
+TEST_F(MetaContainer, DenseMap) {
+    entt::dense_map<int, char> map{};
     auto any = entt::forward_as_meta(map);
     auto view = any.as_associative_container();
 
@@ -322,8 +322,8 @@ TEST_F(MetaContainer, DenseHashMap) {
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST_F(MetaContainer, DenseHashSet) {
-    entt::dense_hash_set<int> set{};
+TEST_F(MetaContainer, DenseSet) {
+    entt::dense_set<int> set{};
     auto any = entt::forward_as_meta(set);
     auto view = any.as_associative_container();
 
