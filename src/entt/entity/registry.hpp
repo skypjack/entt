@@ -718,18 +718,8 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-
-        if constexpr(is_iterator_type_v<typename base_type::iterator, It>) {
-            for(; first != last; ++first) {
-                destroy(*first, entity_traits::to_version(*first) + 1u);
-            }
-        } else {
-            for(auto &&curr: pools) {
-                curr.second->remove(first, last);
-            }
-
-            release(first, last);
+        for(; first != last; ++first) {
+            destroy(*first, entity_traits::to_version(*first) + 1u);
         }
     }
 
@@ -885,24 +875,17 @@ public:
      * @sa remove
      *
      * @tparam Component Types of components to remove.
-     * @tparam Other Other types of components to remove.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @return The number of components actually removed.
      */
-    template<typename Component, typename... Other, typename It>
+    template<typename... Component, typename It>
     size_type remove(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
         size_type count{};
 
-        if constexpr(is_iterator_type_v<typename base_type::iterator, It> && sizeof...(Other) != 0u) {
-            for(const auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
-                const auto entity = *first;
-                count += (std::get<storage_type<Component> &>(cpools).remove(entity) + ... + std::get<storage_type<Other> &>(cpools).remove(entity));
-            }
-        } else {
-            count = (assure<Component>().remove(first, last) + ... + assure<Other>().remove(first, last));
+        for(; first != last; ++first) {
+            count += remove<Component...>(*first);
         }
 
         return count;
@@ -931,22 +914,14 @@ public:
      * @sa erase
      *
      * @tparam Component Types of components to erase.
-     * @tparam Other Other types of components to erase.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename Component, typename... Other, typename It>
+    template<typename... Component, typename It>
     void erase(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-
-        if constexpr(is_iterator_type_v<typename base_type::iterator, It> && sizeof...(Other) != 0u) {
-            for(const auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
-                const auto entity = *first;
-                (std::get<storage_type<Component> &>(cpools).erase(entity), (std::get<storage_type<Other> &>(cpools).erase(entity), ...));
-            }
-        } else {
-            (assure<Component>().erase(first, last), (assure<Other>().erase(first, last), ...));
+        for(; first != last; ++first) {
+            erase<Component...>(*first);
         }
     }
 
