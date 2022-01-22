@@ -487,33 +487,6 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is of the
- * required iterator type, false otherwise.
- * @tparam Type The type to test.
- * @tparam It Required iterator type.
- */
-template<typename Type, typename It, typename = void>
-struct is_iterator_type: std::false_type {};
-
-/*! @copydoc is_iterator_type */
-template<typename Type, typename It>
-struct is_iterator_type<Type, It, std::enable_if_t<is_iterator_v<Type> && std::is_same_v<Type, It>>>
-    : std::true_type {};
-
-/*! @copydoc is_iterator_type */
-template<typename Type, typename It>
-struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, std::void_t<typename It::iterator_type>>>
-    : is_iterator_type<Type, typename It::iterator_type> {};
-
-/**
- * @brief Helper variable template.
- * @tparam Type The type to test.
- * @tparam It Required iterator type.
- */
-template<typename Type, typename It>
-inline constexpr bool is_iterator_type_v = is_iterator_type<Type, It>::value;
-
-/**
  * @brief Provides the member constant `value` to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test

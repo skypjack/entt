@@ -152,16 +152,6 @@ TEST(TypeTraits, IsIterator) {
     static_assert(entt::is_iterator_v<std::vector<int>::reverse_iterator>);
 }
 
-TEST(TypeTraits, IsIteratorType) {
-    static_assert(!entt::is_iterator_type_v<void, std::vector<int>::iterator>);
-    static_assert(!entt::is_iterator_type_v<std::vector<int>::iterator, std::vector<int>::const_iterator>);
-    static_assert(!entt::is_iterator_type_v<std::vector<int>::iterator, int *>);
-
-    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::vector<int>::iterator>);
-    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::reverse_iterator<std::vector<int>::iterator>>);
-    static_assert(entt::is_iterator_type_v<std::vector<int>::iterator, std::reverse_iterator<std::reverse_iterator<std::vector<int>::iterator>>>);
-}
-
 TEST(TypeTraits, IsEBCOEligible) {
     static_assert(entt::is_ebco_eligible_v<not_comparable>);
     static_assert(!entt::is_ebco_eligible_v<nlohmann_json_like>);
