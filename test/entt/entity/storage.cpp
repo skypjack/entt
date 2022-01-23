@@ -891,6 +891,9 @@ TEST(Storage, Iterator) {
     ASSERT_EQ(end, pool.end());
     ASSERT_NE(begin, end);
 
+    ASSERT_EQ(begin.index(), 0);
+    ASSERT_EQ(end.index(), -1);
+
     ASSERT_EQ(begin++, pool.begin());
     ASSERT_EQ(begin--, pool.end());
 
@@ -917,8 +920,14 @@ TEST(Storage, Iterator) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, pool.end());
 
+    ASSERT_EQ(begin.index(), 0);
+    ASSERT_EQ(end.index(), -1);
+
     pool.emplace(entt::entity{42}, 3);
     begin = pool.begin();
+
+    ASSERT_EQ(begin.index(), 1);
+    ASSERT_EQ(end.index(), -1);
 
     ASSERT_EQ(begin[0u], boxed_int{3});
     ASSERT_EQ(begin[1u], boxed_int{42});
@@ -942,6 +951,9 @@ TEST(Storage, ConstIterator) {
     ASSERT_EQ(cbegin, pool.cbegin());
     ASSERT_EQ(cend, pool.cend());
     ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(cbegin.index(), 0);
+    ASSERT_EQ(cend.index(), -1);
 
     ASSERT_EQ(cbegin++, pool.cbegin());
     ASSERT_EQ(cbegin--, pool.cend());
@@ -969,8 +981,14 @@ TEST(Storage, ConstIterator) {
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, pool.cend());
 
+    ASSERT_EQ(cbegin.index(), 0);
+    ASSERT_EQ(cend.index(), -1);
+
     pool.emplace(entt::entity{42}, 3);
     cbegin = pool.cbegin();
+
+    ASSERT_EQ(cbegin.index(), 1);
+    ASSERT_EQ(cend.index(), -1);
 
     ASSERT_EQ(cbegin[0u], boxed_int{3});
     ASSERT_EQ(cbegin[1u], boxed_int{42});
@@ -994,6 +1012,9 @@ TEST(Storage, ReverseIterator) {
     ASSERT_EQ(begin, pool.rbegin());
     ASSERT_EQ(end, pool.rend());
     ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 0);
 
     ASSERT_EQ(begin++, pool.rbegin());
     ASSERT_EQ(begin--, pool.rend());
@@ -1021,8 +1042,14 @@ TEST(Storage, ReverseIterator) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, pool.rend());
 
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 0);
+
     pool.emplace(entt::entity{42}, 3);
-    begin = pool.rbegin();
+    end = pool.rend();
+
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 1);
 
     ASSERT_EQ(begin[0u], boxed_int{42});
     ASSERT_EQ(begin[1u], boxed_int{3});
@@ -1046,6 +1073,9 @@ TEST(Storage, ConstReverseIterator) {
     ASSERT_EQ(cbegin, pool.crbegin());
     ASSERT_EQ(cend, pool.crend());
     ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(cbegin.base().index(), -1);
+    ASSERT_EQ(cend.base().index(), 0);
 
     ASSERT_EQ(cbegin++, pool.crbegin());
     ASSERT_EQ(cbegin--, pool.crend());
@@ -1072,6 +1102,18 @@ TEST(Storage, ConstReverseIterator) {
 
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, pool.crend());
+
+    ASSERT_EQ(cbegin.base().index(), -1);
+    ASSERT_EQ(cend.base().index(), 0);
+
+    pool.emplace(entt::entity{42}, 3);
+    cend = pool.crend();
+
+    ASSERT_EQ(cbegin.base().index(), -1);
+    ASSERT_EQ(cend.base().index(), 1);
+
+    ASSERT_EQ(cbegin[0u], boxed_int{42});
+    ASSERT_EQ(cbegin[1u], boxed_int{3});
 }
 
 TEST(Storage, IteratorConversion) {

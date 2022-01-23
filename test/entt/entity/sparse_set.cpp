@@ -832,6 +832,9 @@ TEST(SparseSet, Iterator) {
     ASSERT_EQ(end, set.cend());
     ASSERT_NE(begin, end);
 
+    ASSERT_EQ(begin.index(), 0);
+    ASSERT_EQ(end.index(), -1);
+
     ASSERT_EQ(begin++, set.begin());
     ASSERT_EQ(begin--, set.end());
 
@@ -861,8 +864,14 @@ TEST(SparseSet, Iterator) {
     ASSERT_EQ(*begin, entt::entity{3});
     ASSERT_EQ(*begin.operator->(), entt::entity{3});
 
+    ASSERT_EQ(begin.index(), 0);
+    ASSERT_EQ(end.index(), -1);
+
     set.emplace(entt::entity{42});
     begin = set.begin();
+
+    ASSERT_EQ(begin.index(), 1);
+    ASSERT_EQ(end.index(), -1);
 
     ASSERT_EQ(begin[0u], entt::entity{42});
     ASSERT_EQ(begin[1u], entt::entity{3});
@@ -886,6 +895,9 @@ TEST(SparseSet, ReverseIterator) {
     ASSERT_EQ(begin, set.crbegin());
     ASSERT_EQ(end, set.crend());
     ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 0);
 
     ASSERT_EQ(begin++, set.rbegin());
     ASSERT_EQ(begin--, set.rend());
@@ -916,8 +928,14 @@ TEST(SparseSet, ReverseIterator) {
     ASSERT_EQ(*begin, entt::entity{3});
     ASSERT_EQ(*begin.operator->(), entt::entity{3});
 
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 0);
+
     set.emplace(entt::entity{42});
-    begin = set.rbegin();
+    end = set.rend();
+
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 1);
 
     ASSERT_EQ(begin[0u], entt::entity{3});
     ASSERT_EQ(begin[1u], entt::entity{42});

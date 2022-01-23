@@ -89,7 +89,7 @@ struct sparse_set_iterator final {
     }
 
     [[nodiscard]] difference_type index() const ENTT_NOEXCEPT {
-        return offset;
+        return offset - 1;
     }
 
 private:
