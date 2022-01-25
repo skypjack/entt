@@ -75,13 +75,11 @@ struct sparse_set_iterator final {
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const {
-        const auto pos = offset - value - 1;
-        return packed->data()[pos];
+        return packed->data()[index() - value];
     }
 
     [[nodiscard]] pointer operator->() const {
-        const auto pos = offset - 1;
-        return packed->data() + pos;
+        return packed->data() + index();
     }
 
     [[nodiscard]] reference operator*() const {
@@ -231,14 +229,17 @@ private:
     virtual void move_element(const std::size_t, const std::size_t) {}
 
 protected:
+    /*! @brief Random access iterator type. */
+    using basic_iterator = internal::sparse_set_iterator<packed_container_type>;
+
     /**
      * @brief Erases an entity from a sparse set.
-     * @param entt A valid identifier.
+     * @param it Iterator to the element to remove.
      */
-    virtual void try_erase(const Entity entt) {
-        ENTT_ASSERT(contains(entt), "Set does not contain entity");
+    virtual void try_erase(const basic_iterator it) {
+        auto &ref = sparse_ref(*it);
 
-        if(const auto pos = index(entt); mode == deletion_policy::in_place) {
+        if(const auto pos = static_cast<size_type>(it.index()); mode == deletion_policy::in_place) {
             packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
         } else {
             packed[pos] = packed.back();
@@ -249,23 +250,27 @@ protected:
         }
 
         // lazy self-assignment guard
-        sparse_ref(entt) = null;
+        ref = null;
     }
 
     /**
      * @brief Assigns an entity to a sparse set.
      * @param entt A valid identifier.
      * @param force_back Force back insertion.
+     * @return Iterator pointing to the emplaced element.
      */
-    virtual void try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
+    virtual basic_iterator try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
         ENTT_ASSERT(!contains(entt), "Set already contains entity");
 
         if(auto &elem = assure_at_least(entt); free_list == null || force_back) {
             packed.push_back(entt);
             elem = entity_traits::combine(static_cast<typename entity_traits::entity_type>(packed.size() - 1u), entity_traits::to_integral(entt));
+            return begin();
         } else {
+            const auto pos = static_cast<size_type>(entity_traits::to_entity(free_list));
             elem = entity_traits::combine(entity_traits::to_integral(free_list), entity_traits::to_integral(entt));
-            free_list = std::exchange(packed[static_cast<size_type>(entity_traits::to_entity(free_list))], entt);
+            free_list = std::exchange(packed[pos], entt);
+            return --(end() - pos);
         }
     }
 
@@ -281,7 +286,7 @@ public:
     /*! @brief Pointer type to contained entities. */
     using pointer = typename packed_container_type::const_pointer;
     /*! @brief Random access iterator type. */
-    using iterator = internal::sparse_set_iterator<packed_container_type>;
+    using iterator = basic_iterator;
     /*! @brief Constant random access iterator type. */
     using const_iterator = iterator;
     /*! @brief Reverse iterator type. */
@@ -652,8 +657,7 @@ public:
      * `end()` iterator otherwise.
      */
     iterator emplace(const entity_type entt, const void *value = nullptr) {
-        try_emplace(entt, false, value);
-        return find(entt);
+        return try_emplace(entt, false, value);
     }
 
     /**
@@ -688,7 +692,7 @@ public:
      * @param entt A valid identifier.
      */
     void erase(const entity_type entt) {
-        try_erase(entt);
+        try_erase(--(end() - index(entt)));
     }
 
     /**

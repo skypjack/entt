@@ -99,12 +99,12 @@ public:
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-        const auto pos = offset - value - 1;
+        const auto pos = index() - value;
         return (*packed)[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-        const auto pos = offset - 1;
+        const auto pos = index();
         return (*packed)[pos / comp_traits::page_size] + fast_mod(pos, comp_traits::page_size);
     }
 
@@ -268,6 +268,22 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         return container[idx] + fast_mod(pos, comp_traits::page_size);
     }
 
+    template<typename... Args>
+    auto emplace_element(const Entity entt, const bool force_back, Args &&...args) {
+        const auto it = base_type::try_emplace(entt, force_back);
+
+        ENTT_TRY {
+            auto elem = assure_at_least(static_cast<size_type>(it.index()));
+            alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
+        }
+        ENTT_CATCH {
+            base_type::try_erase(it);
+            ENTT_THROW;
+        }
+
+        return it;
+    }
+
     void shrink_to_size(const std::size_t sz) {
         if(const auto length = base_type::size(); base_type::slot() == length) {
             for(auto pos = sz; pos < length; ++pos) {
@@ -292,21 +308,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         container.resize(from);
     }
 
-    template<typename... Args>
-    decltype(auto) emplace_element(const Entity entt, const bool force_back, Args &&...args) {
-        base_type::try_emplace(entt, force_back);
-
-        ENTT_TRY {
-            auto elem = assure_at_least(base_type::index(entt));
-            alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
-            return *elem;
-        }
-        ENTT_CATCH {
-            base_type::try_erase(entt);
-            ENTT_THROW;
-        }
-    }
-
 private:
     const void *get_at(const std::size_t pos) const final {
         return std::addressof(element_at(pos));
@@ -325,14 +326,14 @@ private:
 protected:
     /**
      * @brief Erases an element from a storage.
-     * @param entt A valid identifier.
+     * @param it Iterator to the element to remove.
      */
-    void try_erase(const Entity entt) override {
-        const auto pos = base_type::index(entt);
+    void try_erase(const typename underlying_type::basic_iterator it) override {
+        const auto pos = static_cast<size_type>(it.index());
         auto &elem = element_at(comp_traits::in_place_delete ? pos : (base_type::size() - 1u));
         [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
         std::destroy_at(std::addressof(elem));
-        base_type::try_erase(entt);
+        base_type::try_erase(it);
     }
 
     /**
@@ -341,14 +342,18 @@ protected:
      * @param value Optional opaque value.
      * @param force_back Force back insertion.
      */
-    void try_emplace([[maybe_unused]] const Entity entt, const bool force_back, const void *value) override {
+    typename underlying_type::basic_iterator try_emplace([[maybe_unused]] const Entity entt, const bool force_back, const void *value) override {
         if(value) {
             if constexpr(std::is_copy_constructible_v<value_type>) {
-                emplace_element(entt, force_back, *static_cast<const value_type *>(value));
+                return emplace_element(entt, force_back, *static_cast<const value_type *>(value));
+            } else {
+                return base_type::end();
             }
         } else {
             if constexpr(std::is_default_constructible_v<value_type>) {
-                emplace_element(entt, force_back);
+                return emplace_element(entt, force_back);
+            } else {
+                return base_type::end();
             }
         }
     }
@@ -637,9 +642,11 @@ public:
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
         if constexpr(std::is_aggregate_v<value_type>) {
-            return emplace_element(entt, false, Type{std::forward<Args>(args)...});
+            const auto it = emplace_element(entt, false, Type{std::forward<Args>(args)...});
+            return element_at(static_cast<size_type>(it.index()));
         } else {
-            return emplace_element(entt, false, std::forward<Args>(args)...);
+            const auto it = emplace_element(entt, false, std::forward<Args>(args)...);
+            return element_at(static_cast<size_type>(it.index()));
         }
     }
 
@@ -885,16 +892,18 @@ public:
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    void try_erase(const typename Type::entity_type entt) final {
+    void try_erase(const typename Type::basic_iterator it) override {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        const auto entt = *it;
         destruction.publish(*owner, entt);
-        Type::try_erase(entt);
+        Type::try_erase(Type::find(entt));
     }
 
-    void try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
+    typename Type::basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::try_emplace(entt, force_back, value);
         construction.publish(*owner, entt);
+        return Type::find(entt);
     }
 
 public:
