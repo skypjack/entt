@@ -28,6 +28,8 @@ I hope this list can grow much more in the future:
     ECS that uses sparse sets to keep track of entities in systems.
   * [EntityX](https://github.com/alecthomas/entityx): a bitset based ECS that
     uses a single large matrix of components indexed with entities.
+  * [Gaia-ECS](https://github.com/richardbiely/gaia-ecs): a chunk based
+    archetype ECS.
   * [Polypropylene](https://github.com/pmbittner/Polypropylene): a hybrid
     solution between an ECS and dynamic mixins.
 
