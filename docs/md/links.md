@@ -84,6 +84,8 @@ I hope this list can grow much more in the future:
     space ship through a large 2D open world.
   * [PokeMaster](https://github.com/utilForever/PokeMaster): Pokemon Battle
     simulator using C++ with some reinforcement learning.
+  * [HomeHearth](https://youtu.be/GrEWl8npL9Y): choose your hero, protect the
+    town, before it's too late.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
