@@ -256,7 +256,7 @@ class dense_hash_map {
     [[nodiscard]] auto constrained_find(const Other &key, std::size_t bucket) {
         for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
             if(packed.second()(it->first, key)) {
-                return begin() + it.index();
+                return begin() + static_cast<typename iterator::difference_type>(it.index());
             }
         }
 
@@ -267,7 +267,7 @@ class dense_hash_map {
     [[nodiscard]] auto constrained_find(const Other &key, std::size_t bucket) const {
         for(auto it = cbegin(bucket), last = cend(bucket); it != last; ++it) {
             if(packed.second()(it->first, key)) {
-                return cbegin() + it.index();
+                return cbegin() + static_cast<typename iterator::difference_type>(it.index());
             }
         }
 
