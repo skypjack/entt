@@ -5,6 +5,8 @@
 
 WIP:
 * reintroduce swap-and-pop vs in-place-pop difference for perf reasons
+* iterator based try_emplace vs try_insert for perf reasons
+* make clear check free_list, then set it to null and shrink
 * runtime events (dispatcher/emitter), runtime context variables...
 * registry: remove reference to basic_sparse_set<E>
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
