@@ -902,13 +902,13 @@ public:
 
     /*! @brief Clears a sparse set. */
     void clear() {
-        if(mode == deletion_policy::in_place) {
+        if(free_list == null) {
+            try_erase(begin(), size());
+        } else {
             for(auto &&entity: *this) {
-                // honor the modality and filter all tombstones
+                // tombstone filter
                 remove(entity);
             }
-        } else {
-            try_erase(begin(), size());
         }
     }
 
