@@ -325,7 +325,7 @@ private:
 
 protected:
     /**
-     * @brief Erases an element from a storage.
+     * @brief Erases elements from a storage.
      * @param it Iterator to the first element to erase.
      * @param count Number of elements to erase.
      */

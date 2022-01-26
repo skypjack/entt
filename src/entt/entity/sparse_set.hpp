@@ -233,7 +233,7 @@ protected:
     using basic_iterator = internal::sparse_set_iterator<packed_container_type>;
 
     /**
-     * @brief Erases an entity from a sparse set.
+     * @brief Erases entities from a sparse set.
      * @param it Iterator to the first element to erase.
      * @param count Number of elements to erase.
      */
