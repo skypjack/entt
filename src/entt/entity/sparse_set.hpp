@@ -240,8 +240,8 @@ protected:
     virtual void try_erase(basic_iterator it, const std::size_t count) {
         if(mode == deletion_policy::in_place) {
             for(const auto last = it + count; it != last; ++it) {
-                packed[it.index()] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(it.index()), entity_traits::reserved));
                 sparse_ref(*it) = null;
+                packed[it.index()] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(it.index()), entity_traits::reserved));
             }
         } else {
             for(const auto last = it + count; it != last; ++it) {
