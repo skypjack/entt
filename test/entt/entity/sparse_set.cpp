@@ -811,6 +811,26 @@ TEST(SparseSet, Clear) {
     set.clear();
 
     ASSERT_TRUE(set.empty());
+    ASSERT_EQ(set.size(), 0u);
+}
+
+TEST(SparseSet, StableClear) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+
+    set.emplace(entt::entity{3});
+    set.emplace(entt::entity{42});
+    set.emplace(entt::entity{9});
+
+    ASSERT_FALSE(set.empty());
+
+    set.clear();
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 3u);
+
+    ASSERT_EQ(set.find(entt::entity{3}), set.end());
+    ASSERT_EQ(set.find(entt::entity{42}), set.end());
+    ASSERT_EQ(set.find(entt::entity{9}), set.end());
 }
 
 TEST(SparseSet, Iterator) {
