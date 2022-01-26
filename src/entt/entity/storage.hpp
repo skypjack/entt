@@ -277,7 +277,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
         }
         ENTT_CATCH {
-            base_type::try_erase(it);
+            base_type::try_erase(it, it + 1u);
             ENTT_THROW;
         }
 
@@ -326,14 +326,17 @@ private:
 protected:
     /**
      * @brief Erases an element from a storage.
-     * @param it Iterator to the element to remove.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
      */
-    void try_erase(const typename underlying_type::basic_iterator it) override {
-        const auto pos = static_cast<size_type>(it.index());
-        auto &elem = element_at(comp_traits::in_place_delete ? pos : (base_type::size() - 1u));
-        [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
-        std::destroy_at(std::addressof(elem));
-        base_type::try_erase(it);
+    void try_erase(const typename underlying_type::basic_iterator first, const typename underlying_type::basic_iterator last) override {
+        for(auto it = first; it != last; ++it) {
+            const auto pos = static_cast<size_type>(it.index());
+            auto &elem = element_at(comp_traits::in_place_delete ? pos : (base_type::size() - 1u));
+            [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
+            std::destroy_at(std::addressof(elem));
+            base_type::try_erase(it, it + 1u);
+        }
     }
 
     /**
@@ -892,11 +895,15 @@ public:
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    void try_erase(const typename Type::basic_iterator it) override {
+    void try_erase(const typename Type::basic_iterator first, const typename Type::basic_iterator last) override {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        const auto entt = *it;
-        destruction.publish(*owner, entt);
-        Type::try_erase(Type::find(entt));
+
+        for(auto it = first; it != last; ++it) {
+            const auto entt = *it;
+            destruction.publish(*owner, entt);
+            const auto curr = Type::find(entt);
+            Type::try_erase(curr, curr + 1u);
+        }
     }
 
     typename Type::basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {

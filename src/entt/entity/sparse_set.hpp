@@ -234,23 +234,27 @@ protected:
 
     /**
      * @brief Erases an entity from a sparse set.
-     * @param it Iterator to the element to remove.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
      */
-    virtual void try_erase(const basic_iterator it) {
-        auto &ref = sparse_ref(*it);
+    virtual void try_erase(const basic_iterator first, const basic_iterator last) {
+        for(auto it = first; it != last; ++it) {
+            const auto pos = static_cast<size_type>(it.index());
+            auto &ref = sparse_ref(*it);
 
-        if(const auto pos = static_cast<size_type>(it.index()); mode == deletion_policy::in_place) {
-            packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
-        } else {
-            packed[pos] = packed.back();
-            sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(packed.back()));
-            // unnecessary but it helps to detect nasty bugs
-            ENTT_ASSERT((packed.back() = tombstone, true), "");
-            packed.pop_back();
+            if(mode == deletion_policy::in_place) {
+                packed[pos] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::reserved));
+            } else {
+                packed[pos] = packed.back();
+                sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), entity_traits::to_integral(packed.back()));
+                // unnecessary but it helps to detect nasty bugs
+                ENTT_ASSERT((packed.back() = tombstone, true), "");
+                packed.pop_back();
+            }
+
+            // lazy self-assignment guard
+            ref = null;
         }
-
-        // lazy self-assignment guard
-        ref = null;
     }
 
     /**
@@ -692,7 +696,8 @@ public:
      * @param entt A valid identifier.
      */
     void erase(const entity_type entt) {
-        try_erase(--(end() - index(entt)));
+        const auto it = --(end() - index(entt));
+        try_erase(it, it + 1u);
     }
 
     /**
@@ -706,8 +711,12 @@ public:
      */
     template<typename It>
     void erase(It first, It last) {
-        for(; first != last; ++first) {
-            erase(*first);
+        if constexpr(std::is_same_v<It, basic_iterator>) {
+            try_erase(first, last);
+        } else {
+            for(; first != last; ++first) {
+                erase(*first);
+            }
         }
     }
 
@@ -894,9 +903,13 @@ public:
 
     /*! @brief Clears a sparse set. */
     void clear() {
-        for(auto &&entity: *this) {
-            // honor the modality and filter all tombstones
-            remove(entity);
+        if(mode == deletion_policy::in_place) {
+            for(auto &&entity: *this) {
+                // honor the modality and filter all tombstones
+                remove(entity);
+            }
+        } else {
+            try_erase(begin(), end());
         }
     }
 
