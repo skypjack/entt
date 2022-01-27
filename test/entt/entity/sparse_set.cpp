@@ -789,6 +789,7 @@ TEST(SparseSet, Clear) {
     set.emplace(entt::entity{3});
     set.emplace(entt::entity{42});
     set.emplace(entt::entity{9});
+    set.erase(entt::entity{42});
 
     ASSERT_FALSE(set.empty());
 
@@ -796,6 +797,10 @@ TEST(SparseSet, Clear) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+
+    ASSERT_EQ(set.find(entt::entity{3}), set.end());
+    ASSERT_EQ(set.find(entt::entity{42}), set.end());
+    ASSERT_EQ(set.find(entt::entity{9}), set.end());
 }
 
 TEST(SparseSet, StableClear) {
@@ -804,6 +809,7 @@ TEST(SparseSet, StableClear) {
     set.emplace(entt::entity{3});
     set.emplace(entt::entity{42});
     set.emplace(entt::entity{9});
+    set.erase(entt::entity{42});
 
     ASSERT_FALSE(set.empty());
 
