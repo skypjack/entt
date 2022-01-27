@@ -423,7 +423,6 @@ TEST(SparseSet, StableErase) {
     ASSERT_TRUE(set.at(0u) == entt::tombstone);
     ASSERT_TRUE(set.at(1u) == entt::tombstone);
     ASSERT_TRUE(set.at(2u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 0u);
 
     set.emplace(entities[0u]);
     set.emplace(entities[1u]);
@@ -439,7 +438,6 @@ TEST(SparseSet, StableErase) {
     ASSERT_EQ(*set.begin(), entities[2u]);
     ASSERT_TRUE(set.at(0u) == entt::tombstone);
     ASSERT_TRUE(set.at(1u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 1u);
 
     set.erase(entities[2u]);
 
@@ -447,7 +445,6 @@ TEST(SparseSet, StableErase) {
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.slot(), 2u);
 
     set.emplace(entities[0u]);
     set.emplace(entities[1u]);
@@ -463,7 +460,6 @@ TEST(SparseSet, StableErase) {
     ASSERT_EQ(set.at(1u), entities[2u]);
     ASSERT_TRUE(set.at(2u) == entt::tombstone);
     ASSERT_EQ(*++set.begin(), entities[2u]);
-    ASSERT_EQ(set.slot(), 0u);
 
     set.compact();
 
@@ -474,14 +470,12 @@ TEST(SparseSet, StableErase) {
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entities[2u]));
     ASSERT_TRUE(set.at(0u) == entities[2u]);
     ASSERT_EQ(*set.begin(), entities[2u]);
-    ASSERT_EQ(set.slot(), 1u);
 
     set.clear();
 
     ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_TRUE(set.at(0u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 0u);
 
     set.compact();
 
@@ -497,7 +491,6 @@ TEST(SparseSet, StableErase) {
     ASSERT_NE(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
     ASSERT_NE(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.slot(), 2u);
 
     set.erase(entities[0u]);
     set.erase(entities[1u]);
@@ -508,7 +501,6 @@ TEST(SparseSet, StableErase) {
     ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_TRUE(*set.begin() == entt::tombstone);
-    ASSERT_EQ(set.slot(), 1u);
 
     set.emplace(entities[0u]);
 
@@ -620,7 +612,6 @@ TEST(SparseSet, StableRemove) {
     ASSERT_TRUE(set.at(0u) == entt::tombstone);
     ASSERT_TRUE(set.at(1u) == entt::tombstone);
     ASSERT_TRUE(set.at(2u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 0u);
 
     set.emplace(entities[0u]);
     set.emplace(entities[1u]);
@@ -637,7 +628,6 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(*set.begin(), entities[2u]);
     ASSERT_TRUE(set.at(0u) == entt::tombstone);
     ASSERT_TRUE(set.at(1u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 1u);
 
     ASSERT_EQ(set.remove(entities[2u]), 1u);
     ASSERT_EQ(set.remove(entities[2u]), 0u);
@@ -645,7 +635,6 @@ TEST(SparseSet, StableRemove) {
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 3u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.slot(), 2u);
 
     set.emplace(entities[0u]);
     set.emplace(entities[1u]);
@@ -663,7 +652,6 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(set.at(1u), entities[2u]);
     ASSERT_TRUE(set.at(2u) == entt::tombstone);
     ASSERT_EQ(*++set.begin(), entities[2u]);
-    ASSERT_EQ(set.slot(), 0u);
 
     set.compact();
 
@@ -674,14 +662,12 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entities[2u]));
     ASSERT_TRUE(set.at(0u) == entities[2u]);
     ASSERT_EQ(*set.begin(), entities[2u]);
-    ASSERT_EQ(set.slot(), 1u);
 
     set.clear();
 
     ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_TRUE(set.at(0u) == entt::tombstone);
-    ASSERT_EQ(set.slot(), 0u);
 
     set.compact();
 
@@ -697,7 +683,6 @@ TEST(SparseSet, StableRemove) {
     ASSERT_NE(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
     ASSERT_NE(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.slot(), 2u);
 
     ASSERT_EQ(set.remove(entities[0u]), 1u);
     ASSERT_EQ(set.remove(entities[1u]), 1u);
@@ -708,7 +693,6 @@ TEST(SparseSet, StableRemove) {
     ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_TRUE(*set.begin() == entt::tombstone);
-    ASSERT_EQ(set.slot(), 1u);
 
     set.emplace(entities[0u]);
 

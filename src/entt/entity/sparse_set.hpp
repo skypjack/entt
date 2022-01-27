@@ -408,14 +408,6 @@ public:
     }
 
     /**
-     * @brief Returns the next slot available for insertion.
-     * @return The next slot available for insertion.
-     */
-    [[nodiscard]] size_type slot() const ENTT_NOEXCEPT {
-        return free_list == null ? packed.size() : static_cast<size_type>(entity_traits::to_entity(free_list));
-    }
-
-    /**
      * @brief Increases the capacity of a sparse set.
      *
      * If the new capacity is greater than the current capacity, new storage is
