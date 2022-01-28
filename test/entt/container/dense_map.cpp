@@ -19,7 +19,7 @@ struct transparent_equal_to {
     }
 };
 
-TEST(DenseHashMap, Functionalities) {
+TEST(DenseMap, Functionalities) {
     entt::dense_map<std::size_t, std::size_t, entt::identity, transparent_equal_to> map;
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = map.get_allocator());
@@ -85,7 +85,7 @@ TEST(DenseHashMap, Functionalities) {
     ASSERT_FALSE(map.contains(0u));
 }
 
-TEST(DenseHashMap, Contructors) {
+TEST(DenseMap, Contructors) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<int, int> map;
 
@@ -106,7 +106,7 @@ TEST(DenseHashMap, Contructors) {
     ASSERT_EQ(other.bucket_count(), 4u * minimum_bucket_count);
 }
 
-TEST(DenseHashMap, Copy) {
+TEST(DenseMap, Copy) {
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
     map.max_load_factor(map.max_load_factor() - .05f);
     map.emplace(3u, 42u);
@@ -138,7 +138,7 @@ TEST(DenseHashMap, Copy) {
     ASSERT_EQ((++other.begin(3u))->first, 3u);
 }
 
-TEST(DenseHashMap, Move) {
+TEST(DenseMap, Move) {
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
     map.max_load_factor(map.max_load_factor() - .05f);
     map.emplace(3u, 42u);
@@ -170,7 +170,7 @@ TEST(DenseHashMap, Move) {
     ASSERT_EQ((++other.begin(3u))->first, 3u);
 }
 
-TEST(DenseHashMap, Iterator) {
+TEST(DenseMap, Iterator) {
     using iterator = typename entt::dense_map<int, int>::iterator;
 
     static_assert(std::is_same_v<iterator::value_type, std::pair<const int, int>>);
@@ -223,7 +223,7 @@ TEST(DenseHashMap, Iterator) {
     ASSERT_EQ(begin[1u].second, 3);
 }
 
-TEST(DenseHashMap, ConstIterator) {
+TEST(DenseMap, ConstIterator) {
     using iterator = typename entt::dense_map<int, int>::const_iterator;
 
     static_assert(std::is_same_v<iterator::value_type, std::pair<const int, int>>);
@@ -276,7 +276,7 @@ TEST(DenseHashMap, ConstIterator) {
     ASSERT_EQ(cbegin[1u].second, 3);
 }
 
-TEST(DenseHashMap, IteratorConversion) {
+TEST(DenseMap, IteratorConversion) {
     entt::dense_map<int, int> map;
     map.emplace(3, 42);
 
@@ -301,7 +301,7 @@ TEST(DenseHashMap, IteratorConversion) {
     ASSERT_NE(++cit, it);
 }
 
-TEST(DenseHashMap, Insert) {
+TEST(DenseMap, Insert) {
     entt::dense_map<int, int> map;
     typename entt::dense_map<int, int>::iterator it;
     bool result;
@@ -380,7 +380,7 @@ TEST(DenseHashMap, Insert) {
     ASSERT_EQ(map.find(9)->second, 10);
 }
 
-TEST(DenseHashMap, InsertRehash) {
+TEST(DenseMap, InsertRehash) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
 
@@ -414,7 +414,7 @@ TEST(DenseHashMap, InsertRehash) {
     }
 }
 
-TEST(DenseHashMap, InsertSameBucket) {
+TEST(DenseMap, InsertSameBucket) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
 
@@ -434,7 +434,7 @@ TEST(DenseHashMap, InsertSameBucket) {
     ASSERT_EQ(map.cbegin(6u), map.cend(6u));
 }
 
-TEST(DenseHashMap, InsertOrAssign) {
+TEST(DenseMap, InsertOrAssign) {
     entt::dense_map<int, int> map;
     typename entt::dense_map<int, int>::iterator it;
     bool result;
@@ -497,7 +497,7 @@ TEST(DenseHashMap, InsertOrAssign) {
     ASSERT_EQ(it->second, 99);
 }
 
-TEST(DenseHashMap, Emplace) {
+TEST(DenseMap, Emplace) {
     entt::dense_map<int, int> map;
     typename entt::dense_map<int, int>::iterator it;
     bool result;
@@ -583,7 +583,7 @@ TEST(DenseHashMap, Emplace) {
     ASSERT_EQ(it->second, 2);
 }
 
-TEST(DenseHashMap, EmplaceRehash) {
+TEST(DenseMap, EmplaceRehash) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
 
@@ -618,7 +618,7 @@ TEST(DenseHashMap, EmplaceRehash) {
     }
 }
 
-TEST(DenseHashMap, EmplaceSameBucket) {
+TEST(DenseMap, EmplaceSameBucket) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
 
@@ -638,7 +638,7 @@ TEST(DenseHashMap, EmplaceSameBucket) {
     ASSERT_EQ(map.cbegin(6u), map.cend(6u));
 }
 
-TEST(DenseHashMap, TryEmplace) {
+TEST(DenseMap, TryEmplace) {
     entt::dense_map<int, int> map;
     typename entt::dense_map<int, int>::iterator it;
     bool result;
@@ -666,7 +666,7 @@ TEST(DenseHashMap, TryEmplace) {
     ASSERT_EQ(it->second, 2);
 }
 
-TEST(DenseHashMap, TryEmplaceRehash) {
+TEST(DenseMap, TryEmplaceRehash) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
 
@@ -700,7 +700,7 @@ TEST(DenseHashMap, TryEmplaceRehash) {
     }
 }
 
-TEST(DenseHashMap, TryEmplaceSameBucket) {
+TEST(DenseMap, TryEmplaceSameBucket) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
 
@@ -720,7 +720,7 @@ TEST(DenseHashMap, TryEmplaceSameBucket) {
     ASSERT_EQ(map.cbegin(6u), map.cend(6u));
 }
 
-TEST(DenseHashMap, Erase) {
+TEST(DenseMap, Erase) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
 
@@ -770,7 +770,7 @@ TEST(DenseHashMap, Erase) {
     ASSERT_EQ(map.size(), 0u);
 }
 
-TEST(DenseHashMap, EraseFromBucket) {
+TEST(DenseMap, EraseFromBucket) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
 
@@ -861,7 +861,7 @@ TEST(DenseHashMap, EraseFromBucket) {
     ASSERT_FALSE(map.contains(4u * minimum_bucket_count + 2u));
 }
 
-TEST(DenseHashMap, Swap) {
+TEST(DenseMap, Swap) {
     entt::dense_map<int, int> map;
     entt::dense_map<int, int> other;
 
@@ -880,7 +880,7 @@ TEST(DenseHashMap, Swap) {
     ASSERT_TRUE(other.contains(0));
 }
 
-TEST(DenseHashMap, Indexing) {
+TEST(DenseMap, Indexing) {
     entt::dense_map<int, int> map;
     const auto key = 1;
 
@@ -896,7 +896,7 @@ TEST(DenseHashMap, Indexing) {
     ASSERT_EQ(map.at(key), 99);
 }
 
-TEST(DenseHashMap, LocalIterator) {
+TEST(DenseMap, LocalIterator) {
     using iterator = typename entt::dense_map<std::size_t, std::size_t, entt::identity>::local_iterator;
 
     static_assert(std::is_same_v<iterator::value_type, std::pair<const std::size_t, std::size_t>>);
@@ -924,7 +924,7 @@ TEST(DenseHashMap, LocalIterator) {
     ASSERT_EQ(++begin, map.end(3u));
 }
 
-TEST(DenseHashMap, ConstLocalIterator) {
+TEST(DenseMap, ConstLocalIterator) {
     using iterator = typename entt::dense_map<std::size_t, std::size_t, entt::identity>::const_local_iterator;
 
     static_assert(std::is_same_v<iterator::value_type, std::pair<const std::size_t, std::size_t>>);
@@ -952,7 +952,7 @@ TEST(DenseHashMap, ConstLocalIterator) {
     ASSERT_EQ(++cbegin, map.end(3u));
 }
 
-TEST(DenseHashMap, LocalIteratorConversion) {
+TEST(DenseMap, LocalIteratorConversion) {
     entt::dense_map<int, int> map;
     map.emplace(3, 42);
 
@@ -971,7 +971,7 @@ TEST(DenseHashMap, LocalIteratorConversion) {
     ASSERT_NE(++cit, it);
 }
 
-TEST(DenseHashMap, Rehash) {
+TEST(DenseMap, Rehash) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
     map[32u] = 99u;
@@ -1054,7 +1054,7 @@ TEST(DenseHashMap, Rehash) {
     ASSERT_EQ(map.bucket_size(3u), 0u);
 }
 
-TEST(DenseHashMap, Reserve) {
+TEST(DenseMap, Reserve) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<int, int> map;
 
