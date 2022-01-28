@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	<Type Name="entt::dense_hash_map&lt;*&gt;">
+	<Type Name="entt::dense_map&lt;*&gt;">
 		<Intrinsic Name="size" Expression="packed.first_base::value.size()"/>
 		<Intrinsic Name="bucket_count" Expression="sparse.first_base::value.size()"/>
 		<DisplayString>{{ size={ size() } }}</DisplayString>
@@ -15,7 +15,7 @@
 			</IndexListItems>
 		</Expand>
 	</Type>
-	<Type Name="entt::dense_hash_set&lt;*&gt;">
+	<Type Name="entt::dense_set&lt;*&gt;">
 		<Intrinsic Name="size" Expression="packed.first_base::value.size()"/>
 		<Intrinsic Name="bucket_count" Expression="sparse.first_base::value.size()"/>
 		<DisplayString>{{ size={ size() } }}</DisplayString>
