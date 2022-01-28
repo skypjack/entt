@@ -1695,7 +1695,7 @@ TEST(Storage, ThrowingAllocator) {
 
         pool_allocator_type::trigger_on_allocate = true;
 
-        ASSERT_THROW(pool.emplace(entt::entity{0}, 0), pool_allocator_type::exception_type);
+        ASSERT_THROW(pool.emplace(entt::entity{0}, 0), typename pool_allocator_type::exception_type);
         ASSERT_FALSE(pool.contains(entt::entity{0}));
         ASSERT_NO_THROW(pool.compact());
         ASSERT_TRUE(pool.empty());
