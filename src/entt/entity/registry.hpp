@@ -914,14 +914,21 @@ public:
      * @sa erase
      *
      * @tparam Component Types of components to erase.
+     * @tparam Other Other types of components to erase.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename... Component, typename It>
+    template<typename Component, typename... Other, typename It>
     void erase(It first, It last) {
-        for(; first != last; ++first) {
-            erase<Component...>(*first);
+        if constexpr(sizeof...(Other) == 0u) {
+            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+            assure<Component>().erase(std::move(first), std::move(last));
+        } else {
+            for(auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
+                ENTT_ASSERT(valid(*first), "Invalid entity");
+                std::apply([entt = *first](auto &...curr) { (curr.erase(entt), ...); }, cpools);
+            }
         }
     }
 
