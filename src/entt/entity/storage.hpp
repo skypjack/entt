@@ -277,7 +277,12 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
         }
         ENTT_CATCH {
-            base_type::try_erase(it, 1u);
+            if constexpr(comp_traits::in_place_delete) {
+                base_type::in_place_pop(it, it + 1u);
+            } else {
+                base_type::swap_and_pop(it, it + 1u);
+            }
+
             ENTT_THROW;
         }
 
@@ -324,16 +329,28 @@ private:
 protected:
     /**
      * @brief Erases elements from a storage.
-     * @param it Iterator to the first element to erase.
-     * @param count Number of elements to erase.
+     * @param first An iterator to the first element to erase.
+     * @param last An iterator past the last element to erase.
      */
-    void try_erase(typename underlying_type::basic_iterator it, const std::size_t count) override {
-        for(const auto last = it + count; it != last; ++it) {
-            const auto pos = static_cast<size_type>(it.index());
-            auto &elem = element_at(comp_traits::in_place_delete ? pos : (base_type::size() - 1u));
-            [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
+    void swap_and_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
+        for(; first != last; ++first) {
+            auto &elem = element_at(base_type::size() - 1u);
+            // destroying on exit allows reentrant destructors
+            [[maybe_unused]] auto unused = std::exchange(element_at(static_cast<size_type>(first.index())), std::move(elem));
             std::destroy_at(std::addressof(elem));
-            base_type::try_erase(it, 1u);
+            base_type::swap_and_pop(first, first + 1u);
+        }
+    }
+
+    /**
+     * @brief Erases elements from a storage.
+     * @param first An iterator to the first element to erase.
+     * @param last An iterator past the last element to erase.
+     */
+    void in_place_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
+        for(; first != last; ++first) {
+            base_type::in_place_pop(first, first + 1u);
+            std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
         }
     }
 
@@ -893,14 +910,24 @@ public:
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    void try_erase(typename Type::basic_iterator it, const std::size_t count) override {
+    template<typename Func>
+    void notify_destruction(typename Type::basic_iterator first, typename Type::basic_iterator last, Func func) {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
 
-        for(const auto last = it + count; it != last; ++it) {
-            const auto entt = *it;
+        for(; first != last; ++first) {
+            const auto entt = *first;
             destruction.publish(*owner, entt);
-            Type::try_erase(Type::find(entt), 1u);
+            const auto it = Type::find(entt);
+            func(it, it + 1u);
         }
+    }
+
+    void swap_and_pop(typename Type::basic_iterator first, typename Type::basic_iterator last) final {
+        notify_destruction(std::move(first), std::move(last), [this](auto... args) { Type::swap_and_pop(args...); });
+    }
+
+    void in_place_pop(typename Type::basic_iterator first, typename Type::basic_iterator last) final {
+        notify_destruction(std::move(first), std::move(last), [this](auto... args) { Type::in_place_pop(args...); });
     }
 
     typename Type::basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
