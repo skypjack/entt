@@ -910,7 +910,7 @@ public:
             }
         }
 
-        free_list = null;
+        free_list = tombstone;
         packed.clear();
     }
 
