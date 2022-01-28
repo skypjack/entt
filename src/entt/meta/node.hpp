@@ -71,10 +71,10 @@ struct meta_ctor_node {
 struct meta_data_node {
     using size_type = std::size_t;
     id_type id;
+    const meta_traits traits;
     meta_data_node *next;
     meta_prop_node *prop;
     const size_type arity;
-    const meta_traits traits;
     meta_type_node *const type;
     meta_type (*const arg)(const size_type) ENTT_NOEXCEPT;
     bool (*const set)(meta_handle, meta_any);
@@ -84,10 +84,10 @@ struct meta_data_node {
 struct meta_func_node {
     using size_type = std::size_t;
     id_type id;
+    const meta_traits traits;
     meta_func_node *next;
     meta_prop_node *prop;
     const size_type arity;
-    const meta_traits traits;
     meta_type_node *const ret;
     meta_type (*const arg)(const size_type) ENTT_NOEXCEPT;
     meta_any (*const invoke)(meta_handle, meta_any *const);
@@ -104,10 +104,10 @@ struct meta_type_node {
     using size_type = std::size_t;
     const type_info *info;
     id_type id;
+    const meta_traits traits;
     meta_type_node *next;
     meta_prop_node *prop;
     const size_type size_of;
-    const meta_traits traits;
     meta_any (*const default_constructor)();
     double (*const conversion_helper)(void *, const void *);
     const meta_template_node *const templ;
@@ -168,9 +168,6 @@ public:
         static meta_type_node node{
             &type_id<Type>(),
             {},
-            nullptr,
-            nullptr,
-            size_of_v<Type>,
             internal::meta_traits::is_none
                 | (std::is_arithmetic_v<Type> ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)
                 | (std::is_array_v<Type> ? internal::meta_traits::is_array : internal::meta_traits::is_none)
@@ -180,6 +177,9 @@ public:
                 | (is_meta_pointer_like_v<Type> ? internal::meta_traits::is_meta_pointer_like : internal::meta_traits::is_none)
                 | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_meta_sequence_container : internal::meta_traits::is_none)
                 | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::is_meta_associative_container : internal::meta_traits::is_none),
+            nullptr,
+            nullptr,
+            size_of_v<Type>,
             meta_default_constructor(),
             meta_conversion_helper(),
             meta_template_info()
