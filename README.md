@@ -86,7 +86,7 @@ Here is a brief, yet incomplete list of what it offers today:
 * The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free runtime **reflection system**.
 * **Static polymorphism** made simple and within everyone's reach.
-* A few homemade containers, like a sparse set based **dense hash map**.
+* A few homemade containers, like a sparse set based **hash map**.
 * A **cooperative scheduler** for processes of any type.
 * All that is needed for **resource management** (cache, loaders, handles).
 * Delegates, **signal handlers** and a tiny event dispatcher.
