@@ -874,21 +874,28 @@ public:
      *
      * @sa remove
      *
-     * @tparam Component Types of components to remove.
+     * @tparam Component Type of component to remove.
+     * @tparam Other Other types of components to remove.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @return The number of components actually removed.
      */
-    template<typename... Component, typename It>
+    template<typename Component, typename... Other, typename It>
     size_type remove(It first, It last) {
-        size_type count{};
+        if constexpr(sizeof...(Other) == 0u) {
+            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+            return assure<Component>().remove(std::move(first), std::move(last));
+        } else {
+            size_type count{};
 
-        for(; first != last; ++first) {
-            count += remove<Component...>(*first);
+            for(auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
+                ENTT_ASSERT(valid(*first), "Invalid entity");
+                count += std::apply([entt = *first](auto &...curr) { return (curr.remove(entt) + ... + 0u); }, cpools);
+            }
+
+            return count;
         }
-
-        return count;
     }
 
     /**
