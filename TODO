@@ -4,7 +4,6 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* make clear check free_list, then set it to null and shrink
 * iterator based try_emplace vs try_insert for perf reasons
 * runtime events (dispatcher/emitter), runtime context variables...
 * registry: remove reference to basic_sparse_set<E>

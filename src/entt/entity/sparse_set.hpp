@@ -899,14 +899,19 @@ public:
 
     /*! @brief Clears a sparse set. */
     void clear() {
-        if(free_list == null) {
-            erase(begin(), end());
+        if(const auto last = end(); free_list == null) {
+            in_place_pop(begin(), last);
         } else {
             for(auto &&entity: *this) {
-                // tombstone filter
-                remove(entity);
+                // tombstone filter on itself
+                if(const auto it = find(entity); it != last) {
+                    in_place_pop(it, it + 1u);
+                }
             }
         }
+
+        free_list = null;
+        packed.clear();
     }
 
     /**

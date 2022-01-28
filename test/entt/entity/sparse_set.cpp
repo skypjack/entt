@@ -473,13 +473,8 @@ TEST(SparseSet, StableErase) {
 
     set.clear();
 
-    ASSERT_EQ(set.size(), 1u);
-    ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_TRUE(set.at(0u) == entt::tombstone);
-
-    set.compact();
-
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
 
     set.emplace(entities[0u]);
     set.emplace(entities[1u]);
@@ -665,13 +660,8 @@ TEST(SparseSet, StableRemove) {
 
     set.clear();
 
-    ASSERT_EQ(set.size(), 1u);
-    ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
-    ASSERT_TRUE(set.at(0u) == entt::tombstone);
-
-    set.compact();
-
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
 
     set.emplace(entities[0u]);
     set.emplace(entities[1u]);
@@ -784,43 +774,26 @@ TEST(SparseSet, SwapEntity) {
 }
 
 TEST(SparseSet, Clear) {
-    entt::sparse_set set;
+    auto test = [](auto set) {
+        set.emplace(entt::entity{3});
+        set.emplace(entt::entity{42});
+        set.emplace(entt::entity{9});
+        set.erase(entt::entity{42});
 
-    set.emplace(entt::entity{3});
-    set.emplace(entt::entity{42});
-    set.emplace(entt::entity{9});
-    set.erase(entt::entity{42});
+        ASSERT_FALSE(set.empty());
 
-    ASSERT_FALSE(set.empty());
+        set.clear();
 
-    set.clear();
+        ASSERT_TRUE(set.empty());
+        ASSERT_EQ(set.size(), 0u);
 
-    ASSERT_TRUE(set.empty());
-    ASSERT_EQ(set.size(), 0u);
+        ASSERT_EQ(set.find(entt::entity{3}), set.end());
+        ASSERT_EQ(set.find(entt::entity{42}), set.end());
+        ASSERT_EQ(set.find(entt::entity{9}), set.end());
+    };
 
-    ASSERT_EQ(set.find(entt::entity{3}), set.end());
-    ASSERT_EQ(set.find(entt::entity{42}), set.end());
-    ASSERT_EQ(set.find(entt::entity{9}), set.end());
-}
-
-TEST(SparseSet, StableClear) {
-    entt::sparse_set set{entt::deletion_policy::in_place};
-
-    set.emplace(entt::entity{3});
-    set.emplace(entt::entity{42});
-    set.emplace(entt::entity{9});
-    set.erase(entt::entity{42});
-
-    ASSERT_FALSE(set.empty());
-
-    set.clear();
-
-    ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 3u);
-
-    ASSERT_EQ(set.find(entt::entity{3}), set.end());
-    ASSERT_EQ(set.find(entt::entity{42}), set.end());
-    ASSERT_EQ(set.find(entt::entity{9}), set.end());
+    test(entt::sparse_set{});
+    test(entt::sparse_set{entt::deletion_policy::in_place});
 }
 
 TEST(SparseSet, Iterator) {

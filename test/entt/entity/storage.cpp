@@ -422,10 +422,6 @@ TEST(Storage, StableErase) {
 
     pool.clear();
 
-    ASSERT_EQ(pool.size(), 1u);
-
-    pool.compact();
-
     ASSERT_EQ(pool.size(), 0u);
 
     pool.emplace(entities[0u], stable_type{0});
@@ -559,10 +555,6 @@ TEST(Storage, StableRemove) {
     ASSERT_EQ(pool.begin()->value, 1);
 
     pool.clear();
-
-    ASSERT_EQ(pool.size(), 1u);
-
-    pool.compact();
 
     ASSERT_EQ(pool.size(), 0u);
 
@@ -1658,11 +1650,7 @@ TEST(Storage, CustomAllocator) {
         pool.clear();
 
         ASSERT_NE(pool.capacity(), 0u);
-        ASSERT_EQ(pool.size(), pool.policy() == entt::deletion_policy::in_place ? 2u : 0u);
-
-        pool.shrink_to_fit();
-
-        ASSERT_EQ(pool.capacity(), pool.policy() == entt::deletion_policy::in_place ? ENTT_PACKED_PAGE : 0u);
+        ASSERT_EQ(pool.size(), 0u);
     };
 
     test::throwing_allocator<entt::entity> allocator{};
