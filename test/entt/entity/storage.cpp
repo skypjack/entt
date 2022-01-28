@@ -940,6 +940,8 @@ TEST(Storage, ConstIterator) {
     cbegin = pool.cend();
     std::swap(cbegin, cend);
 
+    ASSERT_EQ(cbegin, std::as_const(pool).begin());
+    ASSERT_EQ(cend, std::as_const(pool).end());
     ASSERT_EQ(cbegin, pool.cbegin());
     ASSERT_EQ(cend, pool.cend());
     ASSERT_NE(cbegin, cend);
@@ -1062,6 +1064,8 @@ TEST(Storage, ConstReverseIterator) {
     cbegin = pool.crend();
     std::swap(cbegin, cend);
 
+    ASSERT_EQ(cbegin, std::as_const(pool).rbegin());
+    ASSERT_EQ(cend, std::as_const(pool).rend());
     ASSERT_EQ(cbegin, pool.crbegin());
     ASSERT_EQ(cend, pool.crend());
     ASSERT_NE(cbegin, cend);
