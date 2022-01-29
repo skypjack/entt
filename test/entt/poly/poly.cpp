@@ -4,6 +4,51 @@
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
 
+struct Deduced
+    : entt::type_list<> {
+    template<typename Base>
+    struct type: Base {
+        void incr() {
+            entt::poly_call<0>(*this);
+        }
+
+        void set(int v) {
+            entt::poly_call<1>(*this, v);
+        }
+
+        int get() const {
+            return entt::poly_call<2>(*this);
+        }
+
+        void decr() {
+            entt::poly_call<3>(*this);
+        }
+
+        int mul(int v) const {
+            return static_cast<int>(entt::poly_call<4>(*this, v));
+        }
+    };
+
+    template<typename Type>
+    struct members {
+        static void decr(Type &self) {
+            self.set(self.get() - 1);
+        }
+
+        static double mul(const Type &self, double v) {
+            return v * self.get();
+        }
+    };
+
+    template<typename Type>
+    using impl = entt::value_list<
+        &Type::incr,
+        &Type::set,
+        &Type::get,
+        &members<Type>::decr,
+        &members<Type>::mul>;
+};
+
 struct Defined
     : entt::type_list<
           void(),
@@ -83,15 +128,35 @@ struct impl {
     int value{};
 };
 
-struct alignas(64u) over_aligned: impl {};
+template<typename Type>
+struct Poly: testing::Test {
+    using basic = entt::poly<Type>;
+    using zeroed = entt::basic_poly<Type, 0>;
 
-TEST(PolyDefined, Functionalities) {
+    struct alignas(64u) over_aligned: impl {};
+    static constexpr auto alignment = alignof(over_aligned);
+
+    static inline entt::basic_poly<Type, alignment, alignment> sbo[2] = {over_aligned{}, over_aligned{}};
+    static inline entt::basic_poly<Type, alignment> nosbo[2] = {over_aligned{}, over_aligned{}};
+};
+
+template<typename Type>
+using PolyDeathTest = Poly<Type>;
+
+using PolyTypes = ::testing::Types<Deduced, Defined>;
+
+TYPED_TEST_SUITE(Poly, PolyTypes);
+TYPED_TEST_SUITE(PolyDeathTest, PolyTypes);
+
+TYPED_TEST(Poly, Functionalities) {
+    using poly_type = typename TestFixture::basic;
+
     impl instance{};
 
-    entt::poly<Defined> empty{};
-    entt::poly<Defined> in_place{std::in_place_type<impl>, 3};
-    entt::poly<Defined> alias{std::in_place_type<impl &>, instance};
-    entt::poly<Defined> value{impl{}};
+    poly_type empty{};
+    poly_type in_place{std::in_place_type<impl>, 3};
+    poly_type alias{std::in_place_type<impl &>, instance};
+    poly_type value{impl{}};
 
     ASSERT_FALSE(empty);
     ASSERT_TRUE(in_place);
@@ -119,7 +184,7 @@ TEST(PolyDefined, Functionalities) {
     ASSERT_TRUE(empty);
     ASSERT_EQ(empty->get(), 3);
 
-    entt::poly<Defined> ref = in_place.as_ref();
+    poly_type ref = in_place.as_ref();
 
     ASSERT_TRUE(ref);
     ASSERT_NE(ref.data(), nullptr);
@@ -128,17 +193,17 @@ TEST(PolyDefined, Functionalities) {
     ASSERT_EQ(ref.type(), entt::type_id<impl>());
     ASSERT_EQ(ref->get(), 3);
 
-    entt::poly<Defined> null{};
+    poly_type null{};
     std::swap(empty, null);
 
     ASSERT_FALSE(empty);
 
-    entt::poly<Defined> copy = in_place;
+    poly_type copy = in_place;
 
     ASSERT_TRUE(copy);
     ASSERT_EQ(copy->get(), 3);
 
-    entt::poly<Defined> move = std::move(copy);
+    poly_type move = std::move(copy);
 
     ASSERT_TRUE(move);
     ASSERT_TRUE(copy);
@@ -150,8 +215,10 @@ TEST(PolyDefined, Functionalities) {
     ASSERT_EQ(move.type(), entt::type_id<void>());
 }
 
-TEST(PolyDefined, Owned) {
-    entt::poly<Defined> poly{impl{}};
+TYPED_TEST(Poly, Owned) {
+    using poly_type = typename TestFixture::basic;
+
+    poly_type poly{impl{}};
     auto *ptr = static_cast<impl *>(poly.data());
 
     ASSERT_TRUE(poly);
@@ -174,9 +241,11 @@ TEST(PolyDefined, Owned) {
     ASSERT_EQ(poly->mul(3), 3);
 }
 
-TEST(PolyDefined, Reference) {
+TYPED_TEST(Poly, Reference) {
+    using poly_type = typename TestFixture::basic;
+
     impl instance{};
-    entt::poly<Defined> poly{std::in_place_type<impl &>, instance};
+    poly_type poly{std::in_place_type<impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_NE(poly.data(), nullptr);
@@ -198,9 +267,11 @@ TEST(PolyDefined, Reference) {
     ASSERT_EQ(poly->mul(3), 3);
 }
 
-TEST(PolyDefined, ConstReference) {
+TYPED_TEST(Poly, ConstReference) {
+    using poly_type = typename TestFixture::basic;
+
     impl instance{};
-    entt::poly<Defined> poly{std::in_place_type<const impl &>, instance};
+    poly_type poly{std::in_place_type<const impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_EQ(poly.data(), nullptr);
@@ -217,16 +288,20 @@ TEST(PolyDefined, ConstReference) {
     ASSERT_EQ(poly->mul(3), 0);
 }
 
-TEST(PolyDefinedDeathTest, ConstReference) {
+TYPED_TEST(PolyDeathTest, ConstReference) {
+    using poly_type = typename TestFixture::basic;
+
     impl instance{};
-    entt::poly<Defined> poly{std::in_place_type<const impl &>, instance};
+    poly_type poly{std::in_place_type<const impl &>, instance};
 
     ASSERT_TRUE(poly);
     ASSERT_DEATH(poly->set(1), "");
 }
 
-TEST(PolyDefined, AsRef) {
-    entt::poly<Defined> poly{impl{}};
+TYPED_TEST(Poly, AsRef) {
+    using poly_type = typename TestFixture::basic;
+
+    poly_type poly{impl{}};
     auto ref = poly.as_ref();
     auto cref = std::as_const(poly).as_ref();
 
@@ -256,16 +331,19 @@ TEST(PolyDefined, AsRef) {
     ASSERT_NE(cref.data(), nullptr);
 }
 
-TEST(PolyDefined, SBOVsZeroedSBOSize) {
-    entt::poly<Defined> sbo{impl{}};
+TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
+    using poly_type = typename TestFixture::basic;
+    using zeroed_type = typename TestFixture::zeroed;
+
+    poly_type sbo{impl{}};
     const auto broken = sbo.data();
-    entt::poly<Defined> other = std::move(sbo);
+    poly_type other = std::move(sbo);
 
     ASSERT_NE(broken, other.data());
 
-    entt::basic_poly<Defined, 0u> dyn{impl{}};
+    zeroed_type dyn{impl{}};
     const auto valid = dyn.data();
-    entt::basic_poly<Defined, 0u> same = std::move(dyn);
+    zeroed_type same = std::move(dyn);
 
     ASSERT_EQ(valid, same.data());
 
@@ -275,26 +353,34 @@ TEST(PolyDefined, SBOVsZeroedSBOSize) {
     ASSERT_EQ(same->get(), 1);
 }
 
-TEST(PolyDefined, Alignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+TYPED_TEST(Poly, SboAlignment) {
+    using poly_type = typename TestFixture::basic;
 
-    auto test = [](auto *target, auto cb) {
-        const auto *data = target[0].data();
+    const auto *data = TestFixture::sbo[0].data();
 
-        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[0u].data()) % alignment) == 0u);
-        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[0u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[1u].data()) % alignment) == 0u);
 
-        std::swap(target[0], target[1]);
+    std::swap(TestFixture::sbo[0], TestFixture::sbo[1]);
 
-        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[0u].data()) % alignment) == 0u);
-        ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(target[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[0u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[1u].data()) % alignment) == 0u);
 
-        cb(data, target[1].data());
-    };
+    ASSERT_NE(data, TestFixture::sbo[1].data());
+}
 
-    entt::basic_poly<Defined, alignment> nosbo[2] = {over_aligned{}, over_aligned{}};
-    test(nosbo, [](auto *pre, auto *post) { ASSERT_EQ(pre, post); });
+TYPED_TEST(Poly, NoSboAlignment) {
+    using poly_type = typename TestFixture::basic;
 
-    entt::basic_poly<Defined, alignment, alignment> sbo[2] = {over_aligned{}, over_aligned{}};
-    test(sbo, [](auto *pre, auto *post) { ASSERT_NE(pre, post); });
+    const auto *data = TestFixture::nosbo[0].data();
+
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[0u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[1u].data()) % alignment) == 0u);
+
+    std::swap(TestFixture::nosbo[0], TestFixture::nosbo[1]);
+
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[0u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[1u].data()) % alignment) == 0u);
+
+    ASSERT_EQ(data, TestFixture::nosbo[1].data());
 }
