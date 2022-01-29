@@ -1,7 +1,7 @@
 # Contributing
 
 First of all, thank you very much for taking the time to contribute to the
-`EnTT` framework.<br/>
+`EnTT` library.<br/>
 How to do it mostly depends on the type of contribution:
 
 * If you have a question, **please** ensure there isn't already an answer for
@@ -28,7 +28,7 @@ How to do it mostly depends on the type of contribution:
 * If you found a bug and you wrote a patch to fix it, open a new
   [pull request](https://github.com/skypjack/entt/pulls) with your code.
   **Please**, add some tests to avoid regressions in future if possible, it
-  would be really appreciated. Note that the `EnTT` framework has a
+  would be really appreciated. Note that the `EnTT` library has a
   [coverage at 100%](https://coveralls.io/github/skypjack/entt?branch=master)
   (at least it was at 100% at the time I wrote this file) and this is the reason
   for which you can be confident with using it in a production environment.
