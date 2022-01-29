@@ -359,6 +359,7 @@ protected:
      * @param entt A valid identifier.
      * @param value Optional opaque value.
      * @param force_back Force back insertion.
+     * @return Iterator pointing to the emplaced element.
      */
     typename underlying_type::basic_iterator try_emplace([[maybe_unused]] const Entity entt, const bool force_back, const void *value) override {
         if(value) {
