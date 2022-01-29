@@ -54,13 +54,8 @@ jobs:
     strategy:
       matrix:
         compiler: [g++, clang++]
-        id_type: [uint32, uint64]
+        id_type: ["std::uint32_t", "std::uint64_t"]
         cxx_std: [cxx_std_17, cxx_std_20]
-        include:
-          - id_type: uint64
-            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
-          - cxx_std: cxx_std_20
-            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
 
     runs-on: ubuntu-latest
 
@@ -71,7 +66,7 @@ jobs:
       env:
         CXX: ${{ matrix.compiler }}
       run: |
-        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_CXX_STD=${{ matrix.cxx_std }} -DENTT_ID_TYPE=${{ matrix.id_type }} ..
         make -j4
     - name: Run tests
       working-directory: build
@@ -111,13 +106,8 @@ jobs:
 
     strategy:
       matrix:
-        id_type: [uint32, uint64]
+        id_type: ["std::uint32_t", "std::uint64_t"]
         cxx_std: [cxx_std_17, cxx_std_20]
-        include:
-          - id_type: uint64
-            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
-          - cxx_std: cxx_std_20
-            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
 
     runs-on: windows-latest
 
@@ -126,7 +116,7 @@ jobs:
     - name: Compile tests
       working-directory: build
       run: |
-        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_CXX_STD=${{ matrix.cxx_std }} -DENTT_ID_TYPE=${{ matrix.id_type }} ..
         cmake --build . -j 4
     - name: Run tests
       working-directory: build
@@ -156,13 +146,8 @@ jobs:
 
     strategy:
       matrix:
-        id_type: [uint32, uint64]
+        id_type: ["std::uint32_t", "std::uint64_t"]
         cxx_std: [cxx_std_17, cxx_std_20]
-        include:
-          - id_type: uint64
-            id_type_variable: -DENTT_ID_TYPE=std::uint64_t
-          - cxx_std: cxx_std_20
-            cxx_std_variable: -DENTT_CXX_STD=cxx_std_20
 
     runs-on: macOS-latest
 
@@ -171,7 +156,7 @@ jobs:
     - name: Compile tests
       working-directory: build
       run: |
-        cmake -DENTT_BUILD_TESTING=ON ${{ matrix.id_type_variable }} ${{ matrix.cxx_std_variable }} ..
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_CXX_STD=${{ matrix.cxx_std }} -DENTT_ID_TYPE=${{ matrix.id_type }} ..
         make -j4
     - name: Run tests
       working-directory: build
