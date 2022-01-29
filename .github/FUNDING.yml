@@ -1,12 +1,4 @@
 # These are supported funding model platforms
 
 github: skypjack
-patreon:
-open_collective:
-ko_fi:
-tidelift:
-community_bridge:
-liberapay:
-issuehunt:
-otechie:
-custom: https://www.paypal.me/skypjack
+custom: ["https://www.paypal.me/skypjack", PayPal]
