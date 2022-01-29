@@ -26,7 +26,7 @@ struct Enum: testing::Test {
 
 using EnumTypes = ::testing::Types<detected, registered>;
 
-TYPED_TEST_SUITE(Enum, EnumTypes);
+TYPED_TEST_SUITE(Enum, EnumTypes, );
 
 TYPED_TEST(Enum, Functionalities) {
     using enum_type = typename TestFixture::type;

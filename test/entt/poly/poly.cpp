@@ -145,8 +145,8 @@ using PolyDeathTest = Poly<Type>;
 
 using PolyTypes = ::testing::Types<Deduced, Defined>;
 
-TYPED_TEST_SUITE(Poly, PolyTypes);
-TYPED_TEST_SUITE(PolyDeathTest, PolyTypes);
+TYPED_TEST_SUITE(Poly, PolyTypes, );
+TYPED_TEST_SUITE(PolyDeathTest, PolyTypes, );
 
 TYPED_TEST(Poly, Functionalities) {
     using poly_type = typename TestFixture::basic;
@@ -335,9 +335,9 @@ TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
     using poly_type = typename TestFixture::basic;
     using zeroed_type = typename TestFixture::zeroed;
 
-    poly_type sbo{impl{}};
-    const auto broken = sbo.data();
-    poly_type other = std::move(sbo);
+    poly_type poly{impl{}};
+    const auto broken = poly.data();
+    poly_type other = std::move(poly);
 
     ASSERT_NE(broken, other.data());
 
@@ -354,33 +354,29 @@ TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
 }
 
 TYPED_TEST(Poly, SboAlignment) {
-    using poly_type = typename TestFixture::basic;
-
     const auto *data = TestFixture::sbo[0].data();
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[0u].data()) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[0u].data()) % TestFixture::alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[1u].data()) % TestFixture::alignment) == 0u);
 
     std::swap(TestFixture::sbo[0], TestFixture::sbo[1]);
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[0u].data()) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[0u].data()) % TestFixture::alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::sbo[1u].data()) % TestFixture::alignment) == 0u);
 
     ASSERT_NE(data, TestFixture::sbo[1].data());
 }
 
 TYPED_TEST(Poly, NoSboAlignment) {
-    using poly_type = typename TestFixture::basic;
-
     const auto *data = TestFixture::nosbo[0].data();
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[0u].data()) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[0u].data()) % TestFixture::alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[1u].data()) % TestFixture::alignment) == 0u);
 
     std::swap(TestFixture::nosbo[0], TestFixture::nosbo[1]);
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[0u].data()) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[0u].data()) % TestFixture::alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(TestFixture::nosbo[1u].data()) % TestFixture::alignment) == 0u);
 
     ASSERT_EQ(data, TestFixture::nosbo[1].data());
 }

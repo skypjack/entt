@@ -830,14 +830,12 @@ TEST(Registry, View) {
 
 TEST(Registry, NonOwningGroupInitOnFirstUse) {
     entt::registry registry;
-    auto create = [&](auto... component) {
-        const auto entity = registry.create();
-        (registry.emplace<decltype(component)>(entity, component), ...);
-    };
+    entt::entity entities[3u];
 
-    create(0, 'c');
-    create(0);
-    create(0, 'c');
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<int>(std::begin(entities), std::end(entities), 0);
+    registry.emplace<char>(entities[0u], 'c');
+    registry.emplace<char>(entities[2u], 'c');
 
     std::size_t cnt{};
     auto group = registry.group<>(entt::get<int, char>);
@@ -849,15 +847,13 @@ TEST(Registry, NonOwningGroupInitOnFirstUse) {
 
 TEST(Registry, NonOwningGroupInitOnEmplace) {
     entt::registry registry;
+    entt::entity entities[3u];
     auto group = registry.group<>(entt::get<int, char>);
-    auto create = [&](auto... component) {
-        const auto entity = registry.create();
-        (registry.emplace<decltype(component)>(entity, component), ...);
-    };
 
-    create(0, 'c');
-    create(0);
-    create(0, 'c');
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<int>(std::begin(entities), std::end(entities), 0);
+    registry.emplace<char>(entities[0u], 'c');
+    registry.emplace<char>(entities[2u], 'c');
 
     std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
@@ -868,14 +864,12 @@ TEST(Registry, NonOwningGroupInitOnEmplace) {
 
 TEST(Registry, FullOwningGroupInitOnFirstUse) {
     entt::registry registry;
-    auto create = [&](auto... component) {
-        const auto entity = registry.create();
-        (registry.emplace<decltype(component)>(entity, component), ...);
-    };
+    entt::entity entities[3u];
 
-    create(0, 'c');
-    create(0);
-    create(0, 'c');
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<int>(std::begin(entities), std::end(entities), 0);
+    registry.emplace<char>(entities[0u], 'c');
+    registry.emplace<char>(entities[2u], 'c');
 
     std::size_t cnt{};
     auto group = registry.group<int, char>();
@@ -889,15 +883,13 @@ TEST(Registry, FullOwningGroupInitOnFirstUse) {
 
 TEST(Registry, FullOwningGroupInitOnEmplace) {
     entt::registry registry;
+    entt::entity entities[3u];
     auto group = registry.group<int, char>();
-    auto create = [&](auto... component) {
-        const auto entity = registry.create();
-        (registry.emplace<decltype(component)>(entity, component), ...);
-    };
 
-    create(0, 'c');
-    create(0);
-    create(0, 'c');
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<int>(std::begin(entities), std::end(entities), 0);
+    registry.emplace<char>(entities[0u], 'c');
+    registry.emplace<char>(entities[2u], 'c');
 
     std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
@@ -910,14 +902,12 @@ TEST(Registry, FullOwningGroupInitOnEmplace) {
 
 TEST(Registry, PartialOwningGroupInitOnFirstUse) {
     entt::registry registry;
-    auto create = [&](auto... component) {
-        const auto entity = registry.create();
-        (registry.emplace<decltype(component)>(entity, component), ...);
-    };
+    entt::entity entities[3u];
 
-    create(0, 'c');
-    create(0);
-    create(0, 'c');
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<int>(std::begin(entities), std::end(entities), 0);
+    registry.emplace<char>(entities[0u], 'c');
+    registry.emplace<char>(entities[2u], 'c');
 
     std::size_t cnt{};
     auto group = registry.group<int>(entt::get<char>);
@@ -931,15 +921,13 @@ TEST(Registry, PartialOwningGroupInitOnFirstUse) {
 
 TEST(Registry, PartialOwningGroupInitOnEmplace) {
     entt::registry registry;
+    entt::entity entities[3u];
     auto group = registry.group<int>(entt::get<char>);
-    auto create = [&](auto... component) {
-        const auto entity = registry.create();
-        (registry.emplace<decltype(component)>(entity, component), ...);
-    };
 
-    create(0, 'c');
-    create(0);
-    create(0, 'c');
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<int>(std::begin(entities), std::end(entities), 0);
+    registry.emplace<char>(entities[0u], 'c');
+    registry.emplace<char>(entities[2u], 'c');
 
     std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
@@ -1924,7 +1912,7 @@ TEST(RegistryDeathTest, RuntimePools) {
     using namespace entt::literals;
 
     entt::registry registry;
-    auto &storage = registry.storage<empty_type>("other"_hs);
+    registry.storage<empty_type>("other"_hs);
 
     ASSERT_DEATH(registry.storage<int>("other"_hs), "");
     ASSERT_DEATH(std::as_const(registry).storage<int>("other"_hs), "");

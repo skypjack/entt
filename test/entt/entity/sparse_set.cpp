@@ -262,8 +262,6 @@ TEST(SparseSet, Pagination) {
 }
 
 TEST(SparseSet, Emplace) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
