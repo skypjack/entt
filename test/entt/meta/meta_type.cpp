@@ -169,6 +169,8 @@ struct MetaType: ::testing::Test {
     }
 };
 
+using MetaTypeDeathTest = MetaType;
+
 TEST_F(MetaType, Resolve) {
     using namespace entt::literals;
 
@@ -661,6 +663,10 @@ TEST_F(MetaType, NameCollision) {
     ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().type("quux"_hs));
     ASSERT_FALSE(entt::resolve("clazz"_hs));
     ASSERT_TRUE(entt::resolve("quux"_hs));
+}
+
+TEST_F(MetaTypeDeathTest, NameCollision) {
+    using namespace entt::literals;
 
     ASSERT_DEATH(entt::meta<clazz_t>().type("abstract"_hs), "");
 }

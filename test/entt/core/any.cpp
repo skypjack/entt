@@ -67,6 +67,8 @@ struct Any: ::testing::Test {
     }
 };
 
+using AnyDeathTest = Any;
+
 TEST_F(Any, SBO) {
     entt::any any{'c'};
 
@@ -1174,9 +1176,7 @@ TEST_F(Any, AnyCast) {
     ASSERT_EQ(*entt::any_cast<int>(&any), 42);
     ASSERT_EQ(*entt::any_cast<int>(&cany), 42);
     ASSERT_EQ(entt::any_cast<int &>(any), 42);
-    ASSERT_DEATH(entt::any_cast<double &>(any), "");
     ASSERT_EQ(entt::any_cast<const int &>(cany), 42);
-    ASSERT_DEATH(entt::any_cast<const double &>(cany), "");
 
     not_copyable instance{};
     instance.payload = 42.;
@@ -1184,10 +1184,24 @@ TEST_F(Any, AnyCast) {
     entt::any cref{entt::forward_as_any(std::as_const(instance).payload)};
 
     ASSERT_EQ(entt::any_cast<not_copyable>(std::move(ref)).payload, 42.);
-    ASSERT_DEATH(entt::any_cast<not_copyable>(std::as_const(ref).as_ref()), "");
     ASSERT_EQ(entt::any_cast<double>(std::move(cref)), 42.);
-    ASSERT_DEATH(entt::any_cast<double>(entt::any{42}), "");
     ASSERT_EQ(entt::any_cast<int>(entt::any{42}), 42);
+}
+
+TEST_F(AnyDeathTest, AnyCast) {
+    entt::any any{42};
+    const auto &cany = any;
+
+    ASSERT_DEATH(entt::any_cast<double &>(any), "");
+    ASSERT_DEATH(entt::any_cast<const double &>(cany), "");
+
+    not_copyable instance{};
+    instance.payload = 42.;
+    entt::any ref{entt::forward_as_any(instance)};
+    entt::any cref{entt::forward_as_any(std::as_const(instance).payload)};
+
+    ASSERT_DEATH(entt::any_cast<not_copyable>(std::as_const(ref).as_ref()), "");
+    ASSERT_DEATH(entt::any_cast<double>(entt::any{42}), "");
 }
 
 TEST_F(Any, MakeAny) {

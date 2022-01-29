@@ -203,18 +203,21 @@ TEST(PolyDeduced, ConstReference) {
     ASSERT_EQ(instance.value, 0);
     ASSERT_EQ(poly->get(), 0);
 
+    ASSERT_EQ(instance.value, 0);
+    ASSERT_EQ(poly->get(), 0);
+    ASSERT_EQ(poly->mul(3), 0);
+
+    ASSERT_EQ(instance.value, 0);
+    ASSERT_EQ(poly->get(), 0);
+    ASSERT_EQ(poly->mul(3), 0);
+}
+
+TEST(PolyDeducedDeathTest, ConstReference) {
+    impl instance{};
+    entt::poly<Deduced> poly{std::in_place_type<const impl &>, instance};
+
+    ASSERT_TRUE(poly);
     ASSERT_DEATH(poly->set(1), "");
-    ASSERT_DEATH(poly->incr(), "");
-
-    ASSERT_EQ(instance.value, 0);
-    ASSERT_EQ(poly->get(), 0);
-    ASSERT_EQ(poly->mul(3), 0);
-
-    ASSERT_DEATH(poly->decr(), "");
-
-    ASSERT_EQ(instance.value, 0);
-    ASSERT_EQ(poly->get(), 0);
-    ASSERT_EQ(poly->mul(3), 0);
 }
 
 TEST(PolyDeduced, AsRef) {

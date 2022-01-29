@@ -253,9 +253,7 @@ TEST(Storage, EmptyType) {
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_EQ(pool.type(), entt::type_id<empty_stable_type>());
-
     ASSERT_TRUE(pool.contains(entt::entity{99}));
-    ASSERT_DEATH(pool.get(entt::entity{}), "");
 
     entt::storage<empty_stable_type> other{std::move(pool)};
 
@@ -326,7 +324,6 @@ TEST(Storage, Erase) {
     pool.emplace(entities[2u]);
     pool.erase(std::begin(entities), std::end(entities));
 
-    ASSERT_DEATH(pool.erase(std::begin(entities), std::end(entities)), "");
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entities[0u], 0);
@@ -339,7 +336,6 @@ TEST(Storage, Erase) {
 
     pool.erase(entities[2u]);
 
-    ASSERT_DEATH(pool.erase(entities[2u]), "");
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entities[0u], 0);
@@ -356,22 +352,15 @@ TEST(Storage, StableErase) {
     entt::storage<stable_type> pool;
     entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
 
-    ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entt::tombstone), "");
-    ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entt::null), "");
-
     pool.emplace(entities[0u], stable_type{0});
     pool.emplace(entities[1u], stable_type{1});
     pool.emplace(entities[2u], stable_type{2});
 
     pool.erase(std::begin(entities), std::end(entities));
 
-    ASSERT_DEATH(pool.erase(std::begin(entities), std::end(entities)), "");
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 3u);
     ASSERT_TRUE(pool.at(2u) == entt::tombstone);
-    ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entt::tombstone), "");
-    ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entt::null), "");
-    ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entities[1u]), "");
 
     pool.emplace(entities[2u], stable_type{2});
     pool.emplace(entities[0u], stable_type{0});
@@ -395,7 +384,6 @@ TEST(Storage, StableErase) {
 
     pool.erase(entities[2u]);
 
-    ASSERT_DEATH(pool.erase(entities[2u]), "");
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 3u);
     ASSERT_FALSE(pool.contains(entities[0u]));
@@ -429,12 +417,9 @@ TEST(Storage, StableErase) {
     pool.emplace(entities[2u], stable_type{1});
     pool.erase(entities[2u]);
 
-    ASSERT_DEATH(pool.erase(entities[2u]), "");
-
     pool.erase(entities[0u]);
     pool.erase(entities[1u]);
 
-    ASSERT_DEATH(pool.erase(entities, entities + 2u), "");
     ASSERT_EQ(pool.size(), 3u);
     ASSERT_TRUE(pool.at(2u) == entt::tombstone);
 
@@ -504,9 +489,6 @@ TEST(Storage, StableRemove) {
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 3u);
     ASSERT_TRUE(pool.at(2u) == entt::tombstone);
-    ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entt::tombstone), "");
-    ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entt::null), "");
-    ASSERT_DEATH([[maybe_unused]] auto &&value = pool.get(entities[1u]), "");
 
     pool.emplace(entities[2u], stable_type{2});
     pool.emplace(entities[0u], stable_type{0});

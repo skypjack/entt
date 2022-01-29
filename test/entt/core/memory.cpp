@@ -60,6 +60,9 @@ TEST(Memory, NextPowerOfTwo) {
     ASSERT_EQ(entt::next_power_of_two(33u), 64u);
     ASSERT_EQ(entt::next_power_of_two(std::pow(2, 16)), std::pow(2, 16));
     ASSERT_EQ(entt::next_power_of_two(std::pow(2, 16) + 1u), std::pow(2, 17));
+}
+
+TEST(MemoryDeathTest, NextPowerOfTwo) {
     ASSERT_DEATH(static_cast<void>(entt::next_power_of_two((std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)) + 1)), "");
 }
 

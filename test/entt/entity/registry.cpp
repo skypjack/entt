@@ -237,9 +237,7 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(traits_type::to_version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 0u);
-    ASSERT_DEATH(registry.release(e2), "");
     ASSERT_NO_FATAL_FAILURE(registry.destroy(e2));
-    ASSERT_DEATH(registry.destroy(e2), "");
     ASSERT_EQ(traits_type::to_version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 1u);
 
@@ -528,10 +526,18 @@ TEST(Registry, DestroyVersion) {
     registry.destroy(e0);
     registry.destroy(e1, 3);
 
-    ASSERT_DEATH(registry.destroy(e0), "");
-    ASSERT_DEATH(registry.destroy(e1, 3), "");
     ASSERT_EQ(registry.current(e0), 1u);
     ASSERT_EQ(registry.current(e1), 3u);
+}
+
+TEST(RegistryDeathTest, DestroyVersion) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.destroy(entity);
+
+    ASSERT_DEATH(registry.destroy(entity), "");
+    ASSERT_DEATH(registry.destroy(entity, 3), "");
 }
 
 TEST(Registry, RangeDestroy) {
@@ -646,10 +652,18 @@ TEST(Registry, ReleaseVersion) {
     registry.release(entities[0u]);
     registry.release(entities[1u], 3);
 
-    ASSERT_DEATH(registry.release(entities[0u]), "");
-    ASSERT_DEATH(registry.release(entities[1u], 3), "");
     ASSERT_EQ(registry.current(entities[0u]), 1u);
     ASSERT_EQ(registry.current(entities[1u]), 3u);
+}
+
+TEST(RegistryDeathTest, ReleaseVersion) {
+    entt::registry registry;
+    entt::entity entity = registry.create();
+
+    registry.release(entity);
+
+    ASSERT_DEATH(registry.release(entity), "");
+    ASSERT_DEATH(registry.release(entity, 3), "");
 }
 
 TEST(Registry, RangeRelease) {
@@ -1422,9 +1436,6 @@ TEST(Registry, Erase) {
 
     registry.erase<int>(iview.begin(), iview.end());
 
-    ASSERT_DEATH(registry.erase<int>(entities[0u]), "");
-    ASSERT_DEATH(registry.erase<int>(entities[1u]), "");
-
     ASSERT_FALSE(registry.any_of<int>(entities[2u]));
     ASSERT_NO_FATAL_FAILURE(registry.erase<int>(iview.rbegin(), iview.rend()));
 
@@ -1440,13 +1451,21 @@ TEST(Registry, Erase) {
 
     registry.erase<int, char>(std::begin(entities), std::end(entities));
 
-    ASSERT_DEATH((registry.erase<int, char>(std::begin(entities), std::end(entities))), "");
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
 
     ASSERT_FALSE(registry.orphan(entities[0u]));
     ASSERT_TRUE(registry.orphan(entities[1u]));
     ASSERT_TRUE(registry.orphan(entities[2u]));
+}
+
+TEST(RegistryDeathTest, Erase) {
+    entt::registry registry;
+    const entt::entity entities[1u]{registry.create()};
+
+    ASSERT_FALSE((registry.any_of<int>(entities[0u])));
+    ASSERT_DEATH((registry.erase<int>(std::begin(entities), std::end(entities))), "");
+    ASSERT_DEATH(registry.erase<int>(entities[0u]), "");
 }
 
 TEST(Registry, StableErase) {
@@ -1483,9 +1502,6 @@ TEST(Registry, StableErase) {
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 
     registry.erase<int>(iview.begin(), iview.end());
-
-    ASSERT_DEATH(registry.erase<int>(entities[0u]), "");
-    ASSERT_DEATH(registry.erase<int>(entities[1u]), "");
 
     ASSERT_FALSE(registry.any_of<int>(entities[2u]));
 
@@ -1875,9 +1891,6 @@ TEST(Registry, RuntimePools) {
     static_assert(std::is_same_v<decltype(registry.storage("other"_hs)->second), typename entt::storage_traits<entt::entity, empty_type>::storage_type::base_type &>);
     static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)->second), const typename entt::storage_traits<entt::entity, empty_type>::storage_type::base_type &>);
 
-    ASSERT_DEATH(registry.storage<int>("other"_hs), "");
-    ASSERT_DEATH(std::as_const(registry).storage<int>("other"_hs), "");
-
     ASSERT_NE(registry.storage("other"_hs), registry.storage().end());
     ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), registry.storage().end());
 
@@ -1905,6 +1918,16 @@ TEST(Registry, RuntimePools) {
 
     ASSERT_FALSE(storage.contains(entity));
     ASSERT_FALSE(registry.any_of<empty_type>(entity));
+}
+
+TEST(RegistryDeathTest, RuntimePools) {
+    using namespace entt::literals;
+
+    entt::registry registry;
+    auto &storage = registry.storage<empty_type>("other"_hs);
+
+    ASSERT_DEATH(registry.storage<int>("other"_hs), "");
+    ASSERT_DEATH(std::as_const(registry).storage<int>("other"_hs), "");
 }
 
 TEST(Registry, StorageProxy) {

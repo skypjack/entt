@@ -153,6 +153,8 @@ struct MetaData: ::testing::Test {
     }
 };
 
+using MetaDataDeathTest = MetaData;
+
 TEST_F(MetaData, Functionalities) {
     using namespace entt::literals;
 
@@ -607,10 +609,18 @@ TEST_F(MetaData, AsConstRef) {
     ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
-    ASSERT_DEATH(data.get(instance).cast<int &>() = 3, "");
     ASSERT_EQ(data.get(instance).cast<const int &>(), 0);
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
     ASSERT_EQ(instance.i, 0);
+}
+
+TEST_F(MetaDataDeathTest, AsConstRef) {
+    using namespace entt::literals;
+
+    clazz_t instance{};
+    auto data = entt::resolve<clazz_t>().data("ci"_hs);
+
+    ASSERT_DEATH(data.get(instance).cast<int &>() = 3, "");
 }
 
 TEST_F(MetaData, SetGetBaseData) {
@@ -670,6 +680,10 @@ TEST_F(MetaData, NameCollision) {
     ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().data<&clazz_t::j>("cj"_hs));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("cj"_hs));
+}
+
+TEST_F(MetaDataDeathTest, NameCollision) {
+    using namespace entt::literals;
 
     ASSERT_DEATH(entt::meta<clazz_t>().data<&clazz_t::j>("i"_hs), "");
 }

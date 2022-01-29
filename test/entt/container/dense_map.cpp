@@ -885,8 +885,6 @@ TEST(DenseMap, Indexing) {
     const auto key = 1;
 
     ASSERT_FALSE(map.contains(key));
-    ASSERT_DEATH([[maybe_unused]] auto value = std::as_const(map).at(key), "");
-    ASSERT_DEATH([[maybe_unused]] auto value = map.at(key), "");
 
     map[key] = 99;
 
@@ -894,6 +892,13 @@ TEST(DenseMap, Indexing) {
     ASSERT_EQ(map[std::move(key)], 99);
     ASSERT_EQ(std::as_const(map).at(key), 99);
     ASSERT_EQ(map.at(key), 99);
+}
+
+TEST(DenseMapDeathTest, Indexing) {
+    entt::dense_map<int, int> map;
+
+    ASSERT_DEATH([[maybe_unused]] auto value = std::as_const(map).at(0), "");
+    ASSERT_DEATH([[maybe_unused]] auto value = map.at(42), "");
 }
 
 TEST(DenseMap, LocalIterator) {
