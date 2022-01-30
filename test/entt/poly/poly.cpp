@@ -4,49 +4,67 @@
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
 
+template<typename Base>
+struct common_type: Base {
+    void incr() {
+        entt::poly_call<0>(*this);
+    }
+
+    void set(int v) {
+        entt::poly_call<1>(*this, v);
+    }
+
+    int get() const {
+        return entt::poly_call<2>(*this);
+    }
+
+    void decr() {
+        entt::poly_call<3>(*this);
+    }
+
+    int mul(int v) const {
+        return entt::poly_call<4>(*this, v);
+    }
+
+    int rand() const {
+        return entt::poly_call<5>(*this);
+    }
+};
+
+template<typename Type>
+struct common_members {
+    static void decr(Type &self) {
+        self.set(self.get() - 1);
+    }
+
+    static double mul(const Type &self, double v) {
+        return v * self.get();
+    }
+};
+
+static int absolutely_random() {
+    return 42;
+}
+
+template<typename Type>
+using common_impl = entt::value_list<
+    &Type::incr,
+    &Type::set,
+    &Type::get,
+    &common_members<Type>::decr,
+    &common_members<Type>::mul,
+    &absolutely_random>;
+
 struct Deduced
     : entt::type_list<> {
     template<typename Base>
-    struct type: Base {
-        void incr() {
-            entt::poly_call<0>(*this);
-        }
-
-        void set(int v) {
-            entt::poly_call<1>(*this, v);
-        }
-
-        int get() const {
-            return entt::poly_call<2>(*this);
-        }
-
-        void decr() {
-            entt::poly_call<3>(*this);
-        }
-
-        int mul(int v) const {
-            return static_cast<int>(entt::poly_call<4>(*this, v));
-        }
-    };
+    using type = common_type<Base>;
 
     template<typename Type>
-    struct members {
-        static void decr(Type &self) {
-            self.set(self.get() - 1);
-        }
-
-        static double mul(const Type &self, double v) {
-            return v * self.get();
-        }
-    };
+    using members = common_members<Type>;
 
     template<typename Type>
-    using impl = entt::value_list<
-        &Type::incr,
-        &Type::set,
-        &Type::get,
-        &members<Type>::decr,
-        &members<Type>::mul>;
+    using impl = common_impl<Type>;
 };
 
 struct Defined
@@ -55,48 +73,43 @@ struct Defined
           void(int),
           int() const,
           void(),
-          int(int) const> {
+          int(int) const,
+          int() const> {
+    template<typename Base>
+    using type = common_type<Base>;
+
+    template<typename Type>
+    using members = common_members<Type>;
+
+    template<typename Type>
+    using impl = common_impl<Type>;
+};
+
+struct DeducedEmbedded
+    : entt::type_list<> {
     template<typename Base>
     struct type: Base {
-        void incr() {
-            entt::poly_call<0>(*this);
-        }
-
-        void set(int v) {
-            entt::poly_call<1>(*this, v);
-        }
-
         int get() const {
-            return entt::poly_call<2>(*this);
-        }
-
-        void decr() {
-            entt::poly_call<3>(*this);
-        }
-
-        int mul(int v) const {
-            return entt::poly_call<4>(*this, v);
+            return entt::poly_call<0>(*this);
         }
     };
 
     template<typename Type>
-    struct members {
-        static void decr(Type &self) {
-            self.decrement();
-        }
+    using impl = entt::value_list<&Type::get>;
+};
 
-        static double mul(const Type &self, double v) {
-            return self.multiply(v);
+struct DefinedEmbedded
+    : entt::type_list<int()> {
+    template<typename Base>
+    struct type: Base {
+        // non-const get on purpose
+        int get() {
+            return entt::poly_call<0>(*this);
         }
     };
 
     template<typename Type>
-    using impl = entt::value_list<
-        &Type::incr,
-        &Type::set,
-        &Type::get,
-        &members<Type>::decr,
-        &members<Type>::mul>;
+    using impl = entt::value_list<&Type::get>;
 };
 
 struct impl {
@@ -117,14 +130,6 @@ struct impl {
         return value;
     }
 
-    void decrement() {
-        --value;
-    }
-
-    double multiply(double v) const {
-        return v * value;
-    }
-
     int value{};
 };
 
@@ -143,6 +148,15 @@ using PolyTypes = ::testing::Types<Deduced, Defined>;
 
 TYPED_TEST_SUITE(Poly, PolyTypes, );
 TYPED_TEST_SUITE(PolyDeathTest, PolyTypes, );
+
+template<typename Type>
+struct PolyEmbedded: testing::Test {
+    using type = entt::basic_poly<Type>;
+};
+
+using PolyEmbeddedTypes = ::testing::Types<DeducedEmbedded, DefinedEmbedded>;
+
+TYPED_TEST_SUITE(PolyEmbedded, PolyEmbeddedTypes, );
 
 TYPED_TEST(Poly, Functionalities) {
     using poly_type = typename TestFixture::template type<>;
@@ -167,6 +181,8 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_EQ(alias.data(), &instance);
     ASSERT_EQ(std::as_const(alias).data(), &instance);
 
+    ASSERT_EQ(value->rand(), 42);
+
     empty = impl{};
 
     ASSERT_TRUE(empty);
@@ -178,7 +194,7 @@ TYPED_TEST(Poly, Functionalities) {
     empty.template emplace<impl>(3);
 
     ASSERT_TRUE(empty);
-    ASSERT_EQ(empty->get(), 3);
+    ASSERT_EQ(std::as_const(empty)->get(), 3);
 
     poly_type ref = in_place.as_ref();
 
@@ -211,6 +227,22 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_EQ(move.type(), entt::type_id<void>());
 }
 
+TYPED_TEST(PolyEmbedded, EmbeddedVtable) {
+    using poly_type = typename TestFixture::type;
+
+    poly_type poly{impl{}};
+    auto *ptr = static_cast<impl *>(poly.data());
+
+    ASSERT_TRUE(poly);
+    ASSERT_NE(poly.data(), nullptr);
+    ASSERT_NE(std::as_const(poly).data(), nullptr);
+    ASSERT_EQ(poly->get(), 0);
+
+    ptr->value = 2;
+
+    ASSERT_EQ(poly->get(), 2);
+}
+
 TYPED_TEST(Poly, Owned) {
     using poly_type = typename TestFixture::template type<>;
 
@@ -227,7 +259,7 @@ TYPED_TEST(Poly, Owned) {
     poly->incr();
 
     ASSERT_EQ(ptr->value, 2);
-    ASSERT_EQ(poly->get(), 2);
+    ASSERT_EQ(std::as_const(poly)->get(), 2);
     ASSERT_EQ(poly->mul(3), 6);
 
     poly->decr();
@@ -253,7 +285,7 @@ TYPED_TEST(Poly, Reference) {
     poly->incr();
 
     ASSERT_EQ(instance.value, 2);
-    ASSERT_EQ(poly->get(), 2);
+    ASSERT_EQ(std::as_const(poly)->get(), 2);
     ASSERT_EQ(poly->mul(3), 6);
 
     poly->decr();
@@ -276,7 +308,7 @@ TYPED_TEST(Poly, ConstReference) {
     ASSERT_EQ(poly->get(), 0);
 
     ASSERT_EQ(instance.value, 0);
-    ASSERT_EQ(poly->get(), 0);
+    ASSERT_EQ(std::as_const(poly)->get(), 0);
     ASSERT_EQ(poly->mul(3), 0);
 
     ASSERT_EQ(instance.value, 0);

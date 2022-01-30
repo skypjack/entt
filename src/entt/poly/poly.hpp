@@ -152,6 +152,7 @@ struct poly_base {
         auto &poly = static_cast<Poly &>(self);
 
         if constexpr(std::is_function_v<std::remove_pointer_t<decltype(poly.vtable)>>) {
+            static_assert(Member == 0u, "Unknown member");
             return poly.vtable(poly.storage, std::forward<Args>(args)...);
         } else {
             return std::get<Member>(*poly.vtable)(poly.storage, std::forward<Args>(args)...);
