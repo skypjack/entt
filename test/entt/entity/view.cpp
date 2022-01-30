@@ -324,17 +324,15 @@ TEST(SingleComponentView, Find) {
 
 TEST(SingleComponentView, EmptyTypes) {
     entt::registry registry;
-    auto create = [&](auto... component) {
-        const auto entt = registry.create();
-        (registry.emplace<decltype(component)>(entt, component), ...);
-        return entt;
-    };
+    entt::entity entities[2u];
 
-    const auto entity = create(0, empty_type{});
-    create('c');
+    registry.create(std::begin(entities), std::end(entities));
+    registry.emplace<int>(entities[0u], 0);
+    registry.emplace<empty_type>(entities[0u]);
+    registry.emplace<char>(entities[1u], 'c');
 
-    registry.view<empty_type>().each([entity](const auto entt) {
-        ASSERT_EQ(entity, entt);
+    registry.view<empty_type>().each([&](const auto entt) {
+        ASSERT_EQ(entities[0u], entt);
     });
 
     registry.view<empty_type>().each([check = true]() mutable {
@@ -344,11 +342,11 @@ TEST(SingleComponentView, EmptyTypes) {
 
     for(auto [entt]: registry.view<empty_type>().each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        ASSERT_EQ(entity, entt);
+        ASSERT_EQ(entities[0u], entt);
     }
 
-    registry.view<int>().each([entity](const auto entt, int) {
-        ASSERT_EQ(entity, entt);
+    registry.view<int>().each([&](const auto entt, int) {
+        ASSERT_EQ(entities[0u], entt);
     });
 
     registry.view<int>().each([check = true](int) mutable {
@@ -359,7 +357,7 @@ TEST(SingleComponentView, EmptyTypes) {
     for(auto [entt, iv]: registry.view<int>().each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
-        ASSERT_EQ(entity, entt);
+        ASSERT_EQ(entities[0u], entt);
     }
 }
 

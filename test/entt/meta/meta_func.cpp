@@ -131,6 +131,22 @@ struct MetaFunc: ::testing::Test {
     void TearDown() override {
         entt::meta_reset();
     }
+
+    std::size_t reset_and_check() {
+        std::size_t count = 0;
+
+        for(auto func: entt::resolve<func_t>().func()) {
+            count += static_cast<bool>(func);
+        }
+
+        SetUp();
+
+        for(auto func: entt::resolve<func_t>().func()) {
+            count -= static_cast<bool>(func);
+        }
+
+        return count;
+    };
 };
 
 using MetaFuncDeathTest = MetaFunc;
@@ -567,23 +583,7 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
 TEST_F(MetaFunc, ReRegistration) {
     using namespace entt::literals;
 
-    auto reset_and_check = [this]() {
-        int count = 0;
-
-        for(auto func: entt::resolve<func_t>().func()) {
-            count += static_cast<bool>(func);
-        }
-
-        SetUp();
-
-        for(auto func: entt::resolve<func_t>().func()) {
-            count -= static_cast<bool>(func);
-        }
-
-        ASSERT_EQ(count, 0);
-    };
-
-    reset_and_check();
+    ASSERT_EQ(reset_and_check(), 0u);
 
     func_t instance{};
     auto type = entt::resolve<func_t>();
@@ -607,5 +607,5 @@ TEST_F(MetaFunc, ReRegistration) {
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0));
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0, 0));
 
-    reset_and_check();
+    ASSERT_EQ(reset_and_check(), 0u);
 }

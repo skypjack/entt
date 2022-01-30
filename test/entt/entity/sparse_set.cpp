@@ -784,26 +784,41 @@ TEST(SparseSetDeathTest, SwapEntity) {
 }
 
 TEST(SparseSet, Clear) {
-    auto test = [](auto set) {
-        set.emplace(entt::entity{3});
-        set.emplace(entt::entity{42});
-        set.emplace(entt::entity{9});
-        set.erase(entt::entity{42});
+    entt::sparse_set set{entt::deletion_policy::in_place};
 
-        ASSERT_FALSE(set.empty());
+    set.emplace(entt::entity{3});
+    set.emplace(entt::entity{42});
+    set.emplace(entt::entity{9});
+    set.erase(entt::entity{42});
 
-        set.clear();
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 3u);
+    ASSERT_EQ(*set.begin(), entt::entity{9});
 
-        ASSERT_TRUE(set.empty());
-        ASSERT_EQ(set.size(), 0u);
+    set.clear();
 
-        ASSERT_EQ(set.find(entt::entity{3}), set.end());
-        ASSERT_EQ(set.find(entt::entity{42}), set.end());
-        ASSERT_EQ(set.find(entt::entity{9}), set.end());
-    };
+    ASSERT_TRUE(set.empty());
+    ASSERT_EQ(set.size(), 0u);
 
-    test(entt::sparse_set{});
-    test(entt::sparse_set{entt::deletion_policy::in_place});
+    ASSERT_EQ(set.find(entt::entity{3}), set.end());
+    ASSERT_EQ(set.find(entt::entity{9}), set.end());
+
+    set.emplace(entt::entity{3});
+    set.emplace(entt::entity{42});
+    set.emplace(entt::entity{9});
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 3u);
+    ASSERT_EQ(*set.begin(), entt::entity{9});
+
+    set.clear();
+
+    ASSERT_TRUE(set.empty());
+    ASSERT_EQ(set.size(), 0u);
+
+    ASSERT_EQ(set.find(entt::entity{3}), set.end());
+    ASSERT_EQ(set.find(entt::entity{42}), set.end());
+    ASSERT_EQ(set.find(entt::entity{9}), set.end());
 }
 
 TEST(SparseSet, Iterator) {
