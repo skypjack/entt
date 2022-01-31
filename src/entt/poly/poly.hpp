@@ -30,11 +30,11 @@ struct poly_inspector {
      * @param args The arguments to pass to the function.
      * @return A poly inspector convertible to any type.
      */
-    template<auto Member, typename... Args>
+    template<std::size_t Member, typename... Args>
     poly_inspector invoke(Args &&...args) const;
 
     /*! @copydoc invoke */
-    template<auto Member, typename... Args>
+    template<std::size_t Member, typename... Args>
     poly_inspector invoke(Args &&...args);
 };
 
@@ -135,7 +135,7 @@ struct poly_base {
      * @param args The arguments to pass to the function.
      * @return The return value of the invoked function, if any.
      */
-    template<auto Member, typename... Args>
+    template<std::size_t Member, typename... Args>
     [[nodiscard]] decltype(auto) invoke(const poly_base &self, Args &&...args) const {
         const auto &poly = static_cast<const Poly &>(self);
 
@@ -147,7 +147,7 @@ struct poly_base {
     }
 
     /*! @copydoc invoke */
-    template<auto Member, typename... Args>
+    template<std::size_t Member, typename... Args>
     [[nodiscard]] decltype(auto) invoke(poly_base &self, Args &&...args) {
         auto &poly = static_cast<Poly &>(self);
 
@@ -169,7 +169,7 @@ struct poly_base {
  * @param args The arguments to pass to the function.
  * @return The return value of the invoked function, if any.
  */
-template<auto Member, typename Poly, typename... Args>
+template<std::size_t Member, typename Poly, typename... Args>
 decltype(auto) poly_call(Poly &&self, Args &&...args) {
     return std::forward<Poly>(self).template invoke<Member>(self, std::forward<Args>(args)...);
 }
