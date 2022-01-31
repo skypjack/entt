@@ -37,21 +37,21 @@ inline constexpr bool enum_as_bitmask_v = enum_as_bitmask<Type>::value;
 template<typename Type>
 [[nodiscard]] constexpr std::enable_if_t<std::is_enum_v<Type> && entt::enum_as_bitmask_v<Type>, Type>
 operator|(const Type lhs, const Type rhs) ENTT_NOEXCEPT {
-    return Type{static_cast<std::underlying_type_t<Type>>(lhs) | static_cast<std::underlying_type_t<Type>>(rhs)};
+    return static_cast<Type>(static_cast<std::underlying_type_t<Type>>(lhs) | static_cast<std::underlying_type_t<Type>>(rhs));
 }
 
 /*! @copydoc operator| */
 template<typename Type>
 [[nodiscard]] constexpr std::enable_if_t<std::is_enum_v<Type> && entt::enum_as_bitmask_v<Type>, Type>
 operator&(const Type lhs, const Type rhs) ENTT_NOEXCEPT {
-    return Type{static_cast<std::underlying_type_t<Type>>(lhs) & static_cast<std::underlying_type_t<Type>>(rhs)};
+    return static_cast<Type>(static_cast<std::underlying_type_t<Type>>(lhs) & static_cast<std::underlying_type_t<Type>>(rhs));
 }
 
 /*! @copydoc operator| */
 template<typename Type>
 [[nodiscard]] constexpr std::enable_if_t<std::is_enum_v<Type> && entt::enum_as_bitmask_v<Type>, Type>
 operator^(const Type lhs, const Type rhs) ENTT_NOEXCEPT {
-    return Type{static_cast<std::underlying_type_t<Type>>(lhs) ^ static_cast<std::underlying_type_t<Type>>(rhs)};
+    return static_cast<Type>(static_cast<std::underlying_type_t<Type>>(lhs) ^ static_cast<std::underlying_type_t<Type>>(rhs));
 }
 
 /**
@@ -64,7 +64,7 @@ operator^(const Type lhs, const Type rhs) ENTT_NOEXCEPT {
 template<typename Type>
 [[nodiscard]] constexpr std::enable_if_t<std::is_enum_v<Type> && entt::enum_as_bitmask_v<Type>, Type>
 operator~(const Type value) ENTT_NOEXCEPT {
-    return Type{~static_cast<std::underlying_type_t<Type>>(value)};
+    return static_cast<Type>(~static_cast<std::underlying_type_t<Type>>(value));
 }
 
 /*! @copydoc operator~ */
@@ -93,20 +93,6 @@ template<typename Type>
 constexpr std::enable_if_t<std::is_enum_v<Type> && entt::enum_as_bitmask_v<Type>, Type &>
 operator^=(Type &lhs, const Type rhs) ENTT_NOEXCEPT {
     return (lhs = (lhs ^ rhs));
-}
-
-/*! @copydoc operator| */
-template<typename Type>
-[[nodiscard]] constexpr std::enable_if_t<std::is_enum_v<Type> && entt::enum_as_bitmask_v<Type>, Type>
-operator==(const Type lhs, const Type rhs) ENTT_NOEXCEPT {
-    return (static_cast<std::underlying_type_t<Type>>(lhs) == static_cast<std::underlying_type_t<Type>>(rhs));
-}
-
-/*! @copydoc operator| */
-template<typename Type>
-[[nodiscard]] constexpr std::enable_if_t<std::is_enum_v<Type> && entt::enum_as_bitmask_v<Type>, Type>
-operator!=(const Type lhs, const Type rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
 }
 
 #endif

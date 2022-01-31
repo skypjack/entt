@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <gtest/gtest.h>
 #include <entt/core/enum.hpp>
 #include <entt/core/type_traits.hpp>
@@ -9,7 +10,8 @@ enum class detected {
     _entt_enum_as_bitmask
 };
 
-enum class registered {
+// small type on purpose
+enum class registered : std::uint8_t {
     foo = 0x01,
     bar = 0x02,
     quux = 0x04
