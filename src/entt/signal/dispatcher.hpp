@@ -64,10 +64,8 @@ class dispatcher {
             return sink_type{signal};
         }
 
-        template<typename... Args>
-        void trigger(Args &&...args) {
-            Event instance{std::forward<Args>(args)...};
-            signal.publish(instance);
+        void trigger(Event event) {
+            signal.publish(event);
         }
 
         template<typename... Args>
@@ -139,7 +137,7 @@ public:
      */
     template<typename Event, typename... Args>
     void trigger(Args &&...args) {
-        assure<Event>().trigger(std::forward<Args>(args)...);
+        assure<Event>().trigger(Event{std::forward<Args>(args)...});
     }
 
     /**
