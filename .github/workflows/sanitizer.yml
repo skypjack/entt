@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
 
-  linux:
+  clang:
     timeout-minutes: 10
 
     strategy:
