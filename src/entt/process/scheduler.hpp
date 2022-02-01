@@ -2,6 +2,7 @@
 #define ENTT_PROCESS_SCHEDULER_HPP
 
 #include <algorithm>
+#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
