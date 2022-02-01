@@ -1,6 +1,7 @@
 #ifndef ENTT_CORE_FWD_HPP
 #define ENTT_CORE_FWD_HPP
 
+#include <cstdint>
 #include <type_traits>
 #include "../config/config.h"
 
