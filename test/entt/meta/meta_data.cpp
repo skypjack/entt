@@ -1,9 +1,12 @@
 #include <cstdlib>
 #include <string>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/core/type_traits.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
+#include <entt/meta/node.hpp>
 #include <entt/meta/resolve.hpp>
 
 struct base_t {

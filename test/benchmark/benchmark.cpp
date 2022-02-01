@@ -1,8 +1,8 @@
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <iostream>
-#include <iterator>
+#include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/registry.hpp>
@@ -15,7 +15,7 @@ struct position {
 struct velocity: position {};
 struct stable_position: position {};
 
-template<std::size_t>
+template<auto>
 struct comp { int x; };
 
 template<>

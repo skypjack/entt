@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/utility.hpp>

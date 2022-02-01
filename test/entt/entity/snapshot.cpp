@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <map>
 #include <queue>
 #include <tuple>
@@ -308,7 +309,7 @@ TEST(Snapshot, Continuous) {
     });
 
     src.view<map_component>().each([&entities](auto, auto &map_component) {
-        for(size_t i = 0; i < entities.size(); ++i) {
+        for(std::size_t i = 0; i < entities.size(); ++i) {
             map_component.keys.insert({entities[i], int(i)});
             map_component.values.insert({int(i), entities[i]});
             map_component.both.insert({entities[entities.size() - i - 1], entities[i]});

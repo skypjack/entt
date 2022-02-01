@@ -1,4 +1,4 @@
-#include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/type_traits.hpp>
 #include <entt/signal/dispatcher.hpp>

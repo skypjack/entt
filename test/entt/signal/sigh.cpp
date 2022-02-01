@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 #include <entt/signal/sigh.hpp>
 #include "../common/throwing_allocator.hpp"
-#include "../common/throwing_type.hpp"
 
 struct sigh_listener {
     static void f(int &v) {

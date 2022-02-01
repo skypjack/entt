@@ -1,11 +1,10 @@
 #include <functional>
-#include <iterator>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 

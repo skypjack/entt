@@ -1,4 +1,5 @@
 #include <functional>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
 #include <entt/process/scheduler.hpp>

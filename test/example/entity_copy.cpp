@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <entt/core/utility.hpp>
+#include <entt/core/hashed_string.hpp>
 #include <entt/entity/registry.hpp>
 
 enum class my_entity : entt::id_type {};

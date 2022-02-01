@@ -1,7 +1,7 @@
-#include <cstddef>
+#include <cstdint>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/enum.hpp>
-#include <entt/core/type_traits.hpp>
 
 enum class detected {
     foo = 0x01,

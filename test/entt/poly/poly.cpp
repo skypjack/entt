@@ -1,6 +1,8 @@
-#include <functional>
-#include <type_traits>
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 #include <gtest/gtest.h>
+#include <entt/core/type_info.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
 

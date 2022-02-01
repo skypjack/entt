@@ -2,6 +2,7 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/config/config.h>
 #include <entt/core/compressed_pair.hpp>
 
 struct empty_type {};

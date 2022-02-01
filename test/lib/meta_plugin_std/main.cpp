@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <cr.h>
+#include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>

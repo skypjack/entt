@@ -1,5 +1,7 @@
-#include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
+#include <entt/core/type_traits.hpp>
+#include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/utility.hpp>
 

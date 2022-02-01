@@ -1,7 +1,7 @@
 #include <algorithm>
-#include <iterator>
+#include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
-#include <entt/core/type_info.hpp>
 #include <entt/entity/component.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>

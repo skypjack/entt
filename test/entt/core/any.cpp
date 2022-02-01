@@ -1,10 +1,14 @@
 #include <algorithm>
-#include <string>
+#include <cstdint>
+#include <cstring>
+#include <iterator>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/any.hpp>
+#include <entt/core/type_info.hpp>
 
 struct empty {
     ~empty() {
@@ -1434,11 +1438,11 @@ TEST_F(Any, DeducedArrayType) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<const char *>());
-    ASSERT_EQ((strcmp("array of char", entt::any_cast<const char *>(any))), 0);
+    ASSERT_EQ((std::strcmp("array of char", entt::any_cast<const char *>(any))), 0);
 
     any = "another array of char";
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<const char *>());
-    ASSERT_EQ((strcmp("another array of char", entt::any_cast<const char *>(any))), 0);
+    ASSERT_EQ((std::strcmp("another array of char", entt::any_cast<const char *>(any))), 0);
 }

@@ -1,5 +1,6 @@
+#include <cstring>
 #include <tuple>
-#include <string>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>

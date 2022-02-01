@@ -1,5 +1,4 @@
 #include <iterator>
-#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/component.hpp>
 #include <entt/entity/registry.hpp>

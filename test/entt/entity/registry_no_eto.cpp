@@ -1,3 +1,5 @@
+#include <tuple>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 

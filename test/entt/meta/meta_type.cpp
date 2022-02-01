@@ -1,10 +1,14 @@
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/core/type_info.hpp>
+#include <entt/core/utility.hpp>
 #include <entt/meta/container.hpp>
+#include <entt/meta/ctx.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/pointer.hpp>

@@ -2,6 +2,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <cereal/archives/json.hpp>
+#include <entt/core/hashed_string.hpp>
 #include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>

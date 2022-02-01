@@ -1,3 +1,4 @@
+#include <memory>
 #include <gtest/gtest.h>
 #include <entt/locator/locator.hpp>
 

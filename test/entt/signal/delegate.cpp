@@ -1,5 +1,6 @@
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/signal/delegate.hpp>
 

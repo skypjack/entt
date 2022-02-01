@@ -1,6 +1,4 @@
-#include <cstddef>
-#include <tuple>
-#include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/observer.hpp>
 #include <entt/entity/registry.hpp>

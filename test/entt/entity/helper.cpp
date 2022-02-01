@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/helper.hpp>

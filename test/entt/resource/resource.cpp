@@ -1,8 +1,13 @@
+#include <memory>
 #include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
+#include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/resource/cache.hpp>
+#include <entt/resource/handle.hpp>
+#include <entt/resource/loader.hpp>
 
 struct resource {
     virtual ~resource() = default;

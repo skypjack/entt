@@ -1,10 +1,13 @@
-#include <cstdint>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
 #include <gtest/gtest.h>
+#include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/entity/component.hpp>
 #include <entt/entity/entity.hpp>

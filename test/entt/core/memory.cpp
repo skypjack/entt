@@ -1,6 +1,9 @@
 #include <cmath>
+#include <cstddef>
 #include <limits>
 #include <memory>
+#include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/memory.hpp>
 

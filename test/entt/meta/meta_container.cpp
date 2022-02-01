@@ -1,3 +1,8 @@
+#include <array>
+#include <map>
+#include <set>
+#include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/container.hpp>
