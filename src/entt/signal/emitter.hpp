@@ -13,6 +13,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/utility.hpp"
+#include "fwd.hpp"
 
 namespace entt {
 
