@@ -453,7 +453,7 @@ public:
         if(value_or_instance) {
             const auto &calls = signal->calls;
             const auto it = std::find_if(calls.cbegin(), calls.cend(), [value_or_instance](const auto &delegate) {
-                return delegate.instance() == value_or_instance;
+                return delegate.data() == value_or_instance;
             });
 
             other.offset = std::distance(it, calls.cend());
@@ -572,7 +572,7 @@ public:
     void disconnect(Type *value_or_instance) {
         if(value_or_instance) {
             auto &calls = signal->calls;
-            auto predicate = [value_or_instance](const auto &delegate) { return delegate.instance() == value_or_instance; };
+            auto predicate = [value_or_instance](const auto &delegate) { return delegate.data() == value_or_instance; };
             calls.erase(std::remove_if(calls.begin(), calls.end(), std::move(predicate)), calls.end());
         }
     }
