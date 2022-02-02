@@ -16,16 +16,18 @@ jobs:
             exe: g++-8
           - pkg: g++-9
             exe: g++-9
-          - pkg: g++
-            exe: g++
+          - pkg: g++-10
+            exe: g++-10
           - pkg: clang-8
             exe: clang++-8
           - pkg: clang-9
             exe: clang++-9
           - pkg: clang-10
             exe: clang++-10
-          - pkg: clang
-            exe: clang++
+          - pkg: clang-11
+            exe: clang++-11
+          - pkg: clang-12
+            exe: clang++-12
 
     runs-on: ubuntu-latest
 
