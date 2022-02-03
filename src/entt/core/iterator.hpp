@@ -15,7 +15,7 @@ namespace entt {
 template<typename Type>
 struct input_iterator_pointer final {
     /*! @brief Pointer type. */
-    using pointer = decltype(std::addressof(std::declval<Type &>()));
+    using pointer = Type *;
 
     /*! @brief Default copy constructor, deleted on purpose. */
     input_iterator_pointer(const input_iterator_pointer &) = delete;
