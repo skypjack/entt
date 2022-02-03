@@ -158,48 +158,42 @@ template<typename ILhs, typename IRhs>
     return !(lhs < rhs);
 }
 
-class registry_context {
-    template<typename Type>
-    [[nodiscard]] id_type type_to_key() const ENTT_NOEXCEPT {
-        return type_id<std::remove_const_t<std::remove_reference_t<Type>>>().hash();
-    }
-
-public:
+struct registry_context {
     template<typename Type, typename... Args>
     Type &emplace(Args &&...args) {
-        return any_cast<Type &>(data.try_emplace(type_to_key<Type>(), std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
+        return any_cast<Type &>(data.try_emplace(type_id<Type>().hash(), std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
     }
 
     template<typename Type>
     void erase() {
-        data.erase(type_to_key<Type>());
+        data.erase(type_id<Type>().hash());
     }
 
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> &at() const {
-        return any_cast<std::add_const_t<Type> &>(data.at(type_to_key<Type>()));
+        return any_cast<std::add_const_t<Type> &>(data.at(type_id<Type>().hash()));
     }
 
     template<typename Type>
     [[nodiscard]] Type &at() {
-        return any_cast<Type &>(data.at(type_to_key<Type>()));
+        return any_cast<Type &>(data.at(type_id<Type>().hash()));
     }
 
     template<typename Type>
     [[nodiscard]] std::add_const_t<Type> *find() const {
-        auto it = data.find(type_to_key<Type>());
+        auto it = data.find(type_id<Type>().hash());
         return it == data.cend() ? nullptr : any_cast<std::add_const_t<Type>>(&it->second);
     }
 
     template<typename Type>
     [[nodiscard]] Type *find() {
-        auto it = data.find(type_to_key<Type>());
+        auto it = data.find(type_id<Type>().hash());
         return it == data.end() ? nullptr : any_cast<Type>(&it->second);
     }
 
     template<typename Type>
     [[nodiscard]] bool contains() const {
-        return data.contains(type_to_key<Type>());
+        return data.contains(type_id<Type>().hash());
     }
 
 private:
