@@ -160,40 +160,47 @@ template<typename ILhs, typename IRhs>
 
 struct registry_context {
     template<typename Type, typename... Args>
+    Type &emplace_hint(const id_type id, Args &&...args) {
+        return any_cast<Type &>(data.try_emplace(id, std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
+    }
+
+    template<typename Type, typename... Args>
     Type &emplace(Args &&...args) {
-        return any_cast<Type &>(data.try_emplace(type_id<Type>().hash(), std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
+        return emplace_hint<Type>(type_id<Type>().hash(), std::forward<Args>(args)...);
     }
 
     template<typename Type>
-    void erase() {
-        data.erase(type_id<Type>().hash());
+    bool erase(const id_type id = type_id<Type>().hash()) {
+        const auto it = data.find(id);
+        return it != data.end() && it->second.type() == type_id<Type>() ? (data.erase(it), true) : false;
     }
 
     template<typename Type>
-    [[nodiscard]] std::add_const_t<Type> &at() const {
-        return any_cast<std::add_const_t<Type> &>(data.at(type_id<Type>().hash()));
+    [[nodiscard]] std::add_const_t<Type> &at(const id_type id = type_id<Type>().hash()) const {
+        return any_cast<std::add_const_t<Type> &>(data.at(id));
     }
 
     template<typename Type>
-    [[nodiscard]] Type &at() {
-        return any_cast<Type &>(data.at(type_id<Type>().hash()));
+    [[nodiscard]] Type &at(const id_type id = type_id<Type>().hash()) {
+        return any_cast<Type &>(data.at(id));
     }
 
     template<typename Type>
-    [[nodiscard]] std::add_const_t<Type> *find() const {
-        auto it = data.find(type_id<Type>().hash());
-        return it == data.cend() ? nullptr : any_cast<std::add_const_t<Type>>(&it->second);
+    [[nodiscard]] std::add_const_t<Type> *find(const id_type id = type_id<Type>().hash()) const {
+        const auto it = data.find(id);
+        return it != data.cend() ? any_cast<std::add_const_t<Type>>(&it->second) : nullptr;
     }
 
     template<typename Type>
-    [[nodiscard]] Type *find() {
-        auto it = data.find(type_id<Type>().hash());
-        return it == data.end() ? nullptr : any_cast<Type>(&it->second);
+    [[nodiscard]] Type *find(const id_type id = type_id<Type>().hash()) {
+        const auto it = data.find(id);
+        return it != data.end() ? any_cast<Type>(&it->second) : nullptr;
     }
 
     template<typename Type>
-    [[nodiscard]] bool contains() const {
-        return data.contains(type_id<Type>().hash());
+    [[nodiscard]] bool contains(const id_type id = type_id<Type>().hash()) const {
+        const auto it = data.find(id);
+        return it != data.end() && it->second.type() == type_id<Type>();
     }
 
 private:
