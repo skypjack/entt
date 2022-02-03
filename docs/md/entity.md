@@ -870,37 +870,45 @@ use the preferred tool.
 ## Context variables
 
 Each registry has a _context_ associated with it, which is an `any` object map
-accessible by type for convenience.<br/>
+accessible by both type and _name_ for convenience. The _name_ isn't really a
+name though. In fact, it's a numeric id of type `id_type` to be used as a key
+for the variable. Any value is accepted, even runtime ones.<br/>
 The context is returned via the `ctx` functions and offers a minimal set of
 feature including the following:
 
 ```cpp
-// creates a new context variable initialized with the given values
+// creates a new context variable by type
 registry.ctx().emplace<my_type>(42, 'c');
 
-// gets the context variable as a non-const reference from a non-const registry
+// creates a new context variable with a name
+registry.ctx().emplace_hint<my_type>("my_variable"_hs, 42, 'c');
+
+// gets the context variable by type as a non-const reference from a non-const registry
 auto &var = registry.ctx().at<my_type>();
 
-// gets the context variable as a const reference from either a const or a non-const registry
-const auto &cvar = registry.ctx().at<const my_type>();
+// gets the context variable by name as a const reference from either a const or a non-const registry
+const auto &cvar = registry.ctx().at<const my_type>("my_variable"_hs);
 
-// unsets the context variable
+// resets the context variable by type
 registry.ctx().erase<my_type>();
+
+// resets the context variable associated with the given name
+registry.ctx().erase<my_type>("my_variable"_hs);
 ```
 
 The type of a context variable must be such that it's default constructible and
-can be moved.<br/>
+can be moved. If the supplied type doesn't match that of the variable when using
+a _name_, the operation will fail.<br/>
 For all users who want to use the context but don't want to create elements, the
 `contains` and `find` functions are also available:
 
 ```cpp
 const bool contains = registry.ctx().contains<my_type>();
-const my_type *value = registry.ctx().find<const my_type>();
+const my_type *value = registry.ctx().find<const my_type>("my_variable"_hs);
 ```
 
-Both support constant types, as does `at`. Furthermore, since the context is
-essentially a map of `any`s, it offers full support for references and allows
-users to hook externally managed objects to the registry itself.
+Also in this case, both functions support constant types and accept a _name_ for
+the variable to look up, as does `at`.
 
 ### Aliased properties
 
@@ -931,7 +939,8 @@ const my_type *ptr = registry.ctx().find<const my_type>();
 const my_type &var = registry.ctx().at<const my_type>();
 ```
 
-Aliased properties can also be erased as it happens with any other variable.
+Aliased properties can be erased as it happens with any other variable.
+Similarly, they can also be associated with user-generated _names_ (or ids).
 
 ## Pointer stability
 
