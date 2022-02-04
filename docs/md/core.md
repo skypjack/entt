@@ -6,16 +6,15 @@
 # Table of Contents
 
 * [Introduction](#introduction)
-* [Unique sequential identifiers](#unique-sequential-identifiers)
-  * [Compile-time generator](#compile-time-generator)
-  * [Runtime generator](#runtime-generator)
+* [Any as in any type](#any-as-in-any-type)
+  * [Small buffer optimization](#small-buffer-optimization)
+  * [Alignment requirement](#alignment-requirement)
+* [Compressed pair](#compressed-pair)
+* [Enum as bitmask](#enum-as-bitmask)
 * [Hashed strings](#hashed-strings)
   * [Wide characters](wide-characters)
   * [Conflicts](#conflicts)
 * [Monostate](#monostate)
-* [Any as in any type](#any-as-in-any-type)
-  * [Small buffer optimization](#small-buffer-optimization)
-  * [Alignment requirement](#alignment-requirement)
 * [Type support](#type-support)
   * [Built-in RTTI support](#built-in-rtti-support)
     * [Type info](#type-info)
@@ -28,8 +27,9 @@
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
     * [Type list and value list](#type-list-and-value-list)
-* [Compressed pair](#compressed-pair)
-* [Enum as bitmask](#enum-as-bitmask)
+* [Unique sequential identifiers](#unique-sequential-identifiers)
+  * [Compile-time generator](#compile-time-generator)
+  * [Runtime generator](#runtime-generator)
 * [Utilities](#utilities)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -41,185 +41,6 @@
 of the library itself.<br/>
 Hardly users will include these features in their code, but it's worth
 describing what `EnTT` offers so as not to reinvent the wheel in case of need.
-
-# Unique sequential identifiers
-
-Sometimes it's useful to be able to give unique, sequential numeric identifiers
-to types either at compile-time or runtime.<br/>
-There are plenty of different solutions for this out there and I could have used
-one of them. However, I decided to spend my time to define a couple of tools
-that fully embraces what the modern C++ has to offer.
-
-## Compile-time generator
-
-To generate sequential numeric identifiers at compile-time, `EnTT` offers the
-`identifier` class template:
-
-```cpp
-// defines the identifiers for the given types
-using id = entt::identifier<a_type, another_type>;
-
-// ...
-
-switch(a_type_identifier) {
-case id::type<a_type>:
-    // ...
-    break;
-case id::type<another_type>:
-    // ...
-    break;
-default:
-    // ...
-}
-```
-
-This is all what this class template has to offer: a `type` inline variable that
-contains a numeric identifier for the given type. It can be used in any context
-where constant expressions are required.
-
-As long as the list remains unchanged, identifiers are also guaranteed to be
-stable across different runs. In case they have been used in a production
-environment and a type has to be removed, one can just use a placeholder to left
-the other identifiers unchanged:
-
-```cpp
-template<typename> struct ignore_type {};
-
-using id = entt::identifier<
-    a_type_still_valid,
-    ignore_type<a_type_no_longer_valid>,
-    another_type_still_valid
->;
-```
-
-Perhaps a bit ugly to see in a codebase but it gets the job done at least.
-
-## Runtime generator
-
-To generate sequential numeric identifiers at runtime, `EnTT` offers the
-`family` class template:
-
-```cpp
-// defines a custom generator
-using id = entt::family<struct my_tag>;
-
-// ...
-
-const auto a_type_id = id::type<a_type>;
-const auto another_type_id = id::type<another_type>;
-```
-
-This is all what a _family_ has to offer: a `type` inline variable that contains
-a numeric identifier for the given type.<br/>
-The generator is customizable, so as to get different _sequences_ for different
-purposes if needed.
-
-Please, note that identifiers aren't guaranteed to be stable across different
-runs. Indeed it mostly depends on the flow of execution.
-
-# Hashed strings
-
-A hashed string is a zero overhead unique identifier. Users can use
-human-readable identifiers in the codebase while using their numeric
-counterparts at runtime, thus without affecting performance.<br/>
-The class has an implicit `constexpr` constructor that chews a bunch of
-characters. Once created, all what one can do with it is getting back the
-original string through the `data` member function or converting the instance
-into a number.<br/>
-The good part is that a hashed string can be used wherever a constant expression
-is required and no _string-to-number_ conversion will take place at runtime if
-used carefully.
-
-Example of use:
-
-```cpp
-auto load(entt::hashed_string::hash_type resource) {
-    // uses the numeric representation of the resource to load and return it
-}
-
-auto resource = load(entt::hashed_string{"gui/background"});
-```
-
-There is also a _user defined literal_ dedicated to hashed strings to make them
-more user-friendly:
-
-```cpp
-using namespace entt::literals;
-constexpr auto str = "text"_hs;
-```
-
-To use it, remember that all user defined literals in `EnTT` are enclosed in the
-`entt::literals` namespace. Therefore, the entire namespace or selectively the
-literal of interest must be explicitly included before each use, a bit like
-`std::literals`.<br/>
-Finally, in case users need to create hashed strings at runtime, this class also
-offers the necessary functionalities:
-
-```cpp
-std::string orig{"text"};
-
-// create a full-featured hashed string...
-entt::hashed_string str{orig.c_str()};
-
-// ... or compute only the unique identifier
-const auto hash = entt::hashed_string::value(orig.c_str());
-```
-
-This possibility shouldn't be exploited in tight loops, since the computation
-takes place at runtime and no longer at compile-time and could therefore impact
-performance to some degrees.
-
-## Wide characters
-
-The hashed string has a design that is close to that of an `std::basic_string`.
-It means that `hashed_string` is nothing more than an alias for
-`basic_hashed_string<char>`. For those who want to use the C++ type for wide
-character representation, there exists also the alias `hashed_wstring` for
-`basic_hashed_string<wchar_t>`.<br/>
-In this case, the user defined literal to use to create hashed strings on the
-fly is `_hws`:
-
-```cpp
-constexpr auto str = L"text"_hws;
-```
-
-Note that the hash type of the `hashed_wstring` is the same of its counterpart.
-
-## Conflicts
-
-The hashed string class uses internally FNV-1a to compute the numeric
-counterpart of a string. Because of the _pigeonhole principle_, conflicts are
-possible. This is a fact.<br/>
-There is no silver bullet to solve the problem of conflicts when dealing with
-hashing functions. In this case, the best solution seemed to be to give up.
-That's all.<br/>
-After all, human-readable unique identifiers aren't something strictly defined
-and over which users have not the control. Choosing a slightly different
-identifier is probably the best solution to make the conflict disappear in this
-case.
-
-# Monostate
-
-The monostate pattern is often presented as an alternative to a singleton based
-configuration system. This is exactly its purpose in `EnTT`. Moreover, this
-implementation is thread safe by design (hopefully).<br/>
-Keys are represented by hashed strings, values are basic types like `int`s or
-`bool`s. Values of different types can be associated to each key, even more than
-one at a time. Because of this, users must pay attention to use the same type
-both during an assignment and when they try to read back their data. Otherwise,
-they will probably incur in unexpected results.
-
-Example of use:
-
-```cpp
-entt::monostate<entt::hashed_string{"mykey"}>{} = true;
-entt::monostate<"mykey"_hs>{} = 42;
-
-// ...
-
-const bool b = entt::monostate<"mykey"_hs>{};
-const int i = entt::monostate<entt::hashed_string{"mykey"}>{};
-```
 
 # Any as in any type
 
@@ -384,6 +205,190 @@ using my_any = entt::basic_any<sizeof(double[4]), alignof(double[4])>;
 Note that the alignment requirements as well as the size of the internal storage
 are directly part of the type and therefore contribute to define different types
 that won't be able to interoperate with each other.
+
+# Compressed pair
+
+Primarily designed for internal use and far from being feature complete, the
+`compressed_pair` class does exactly what it promises: it tries to reduce the
+size of a pair by exploiting _Empty Base Class Optimization_ (or _EBCO_).<br/>
+This class **is not** a drop-in replacement for `std::pair`. However, it offers
+enough functionalities to be a good alternative for when reducing memory usage
+is more important than having some cool and probably useless feature.
+
+Although the API is very close to that of `std::pair` (apart from the fact that
+the template parameters are inferred from the constructor and therefore there is
+no` entt::make_compressed_pair`), the major difference is that `first` and
+`second` are functions for implementation needs:
+
+```cpp
+entt::compressed_pair pair{0, 3.};
+pair.first() = 42;
+```
+
+There isn't much to describe then. It's recommended to rely on documentation and
+intuition. At the end of the day, it's just a pair and nothing more.
+
+# Enum as bitmask
+
+Sometimes it's useful to be able to use enums as bitmasks. However, enum classes
+aren't really suitable for the purpose out of the box. Main problem is that they
+don't convert implicitly to their underlying type.<br/>
+All that remains is to make a choice between using old-fashioned enums (with all
+their problems that I don't want to discuss here) or writing _ugly_ code.
+
+Fortunately, there is also a third way: adding enough operators in the global
+scope to treat enum classes as bitmask transparently.<br/>
+The ultimate goal is to be able to write code like the following (or maybe
+something more meaningful, but this should give a grasp and remain simple at the
+same time):
+
+```cpp
+enum class my_flag {
+    unknown = 0x01,
+    enabled = 0x02,
+    disabled = 0x04
+};
+
+const my_flag flags = my_flag::enabled;
+const bool is_enabled = !!(flags & my_flag::enabled);
+```
+
+The problem with adding all operators to the global scope is that these will
+come into play even when not required, with the risk of introducing errors that
+are difficult to deal with.<br/>
+However, C++ offers enough tools to get around this problem. In particular, the
+library requires users to register all enum classes for which bitmask support
+should be enabled:
+
+```cpp
+template<>
+struct entt::enum_as_bitmask<my_flag>
+    : std::true_type
+{};
+```
+
+This is handy when dealing with enum classes defined by third party libraries
+and over which the users have no control. However, it's also verbose and can be
+avoided by adding a specific value to the enum class itself:
+
+```cpp
+enum class my_flag {
+    unknown = 0x01,
+    enabled = 0x02,
+    disabled = 0x04,
+    _entt_enum_as_bitmask
+};
+```
+
+In this case, there is no need to specialize the `enum_as_bitmask` traits, since
+`EnTT` will automatically detect the flag and enable the bitmask support.<br/>
+Once the enum class has been registered (in one way or the other) all the most
+common operators will be available, such as `&`, `|` but also `&=` and `|=`.
+Refer to the official documentation for the full list of operators.
+
+# Hashed strings
+
+A hashed string is a zero overhead unique identifier. Users can use
+human-readable identifiers in the codebase while using their numeric
+counterparts at runtime, thus without affecting performance.<br/>
+The class has an implicit `constexpr` constructor that chews a bunch of
+characters. Once created, all what one can do with it is getting back the
+original string through the `data` member function or converting the instance
+into a number.<br/>
+The good part is that a hashed string can be used wherever a constant expression
+is required and no _string-to-number_ conversion will take place at runtime if
+used carefully.
+
+Example of use:
+
+```cpp
+auto load(entt::hashed_string::hash_type resource) {
+    // uses the numeric representation of the resource to load and return it
+}
+
+auto resource = load(entt::hashed_string{"gui/background"});
+```
+
+There is also a _user defined literal_ dedicated to hashed strings to make them
+more user-friendly:
+
+```cpp
+using namespace entt::literals;
+constexpr auto str = "text"_hs;
+```
+
+To use it, remember that all user defined literals in `EnTT` are enclosed in the
+`entt::literals` namespace. Therefore, the entire namespace or selectively the
+literal of interest must be explicitly included before each use, a bit like
+`std::literals`.<br/>
+Finally, in case users need to create hashed strings at runtime, this class also
+offers the necessary functionalities:
+
+```cpp
+std::string orig{"text"};
+
+// create a full-featured hashed string...
+entt::hashed_string str{orig.c_str()};
+
+// ... or compute only the unique identifier
+const auto hash = entt::hashed_string::value(orig.c_str());
+```
+
+This possibility shouldn't be exploited in tight loops, since the computation
+takes place at runtime and no longer at compile-time and could therefore impact
+performance to some degrees.
+
+## Wide characters
+
+The hashed string has a design that is close to that of an `std::basic_string`.
+It means that `hashed_string` is nothing more than an alias for
+`basic_hashed_string<char>`. For those who want to use the C++ type for wide
+character representation, there exists also the alias `hashed_wstring` for
+`basic_hashed_string<wchar_t>`.<br/>
+In this case, the user defined literal to use to create hashed strings on the
+fly is `_hws`:
+
+```cpp
+constexpr auto str = L"text"_hws;
+```
+
+Note that the hash type of the `hashed_wstring` is the same of its counterpart.
+
+## Conflicts
+
+The hashed string class uses internally FNV-1a to compute the numeric
+counterpart of a string. Because of the _pigeonhole principle_, conflicts are
+possible. This is a fact.<br/>
+There is no silver bullet to solve the problem of conflicts when dealing with
+hashing functions. In this case, the best solution seemed to be to give up.
+That's all.<br/>
+After all, human-readable unique identifiers aren't something strictly defined
+and over which users have not the control. Choosing a slightly different
+identifier is probably the best solution to make the conflict disappear in this
+case.
+
+# Monostate
+
+The monostate pattern is often presented as an alternative to a singleton based
+configuration system. This is exactly its purpose in `EnTT`. Moreover, this
+implementation is thread safe by design (hopefully).<br/>
+Keys are represented by hashed strings, values are basic types like `int`s or
+`bool`s. Values of different types can be associated to each key, even more than
+one at a time. Because of this, users must pay attention to use the same type
+both during an assignment and when they try to read back their data. Otherwise,
+they will probably incur in unexpected results.
+
+Example of use:
+
+```cpp
+entt::monostate<entt::hashed_string{"mykey"}>{} = true;
+entt::monostate<"mykey"_hs>{} = 42;
+
+// ...
+
+const bool b = entt::monostate<"mykey"_hs>{};
+const int i = entt::monostate<entt::hashed_string{"mykey"}>{};
+```
 
 # Type support
 
@@ -704,85 +709,80 @@ Many of these functionalities also exist in their version dedicated to value
 lists. We therefore have `value_list_element[_v]` as well as
 `value_list_cat[_t]`and so on.
 
-# Compressed pair
+# Unique sequential identifiers
 
-Primarily designed for internal use and far from being feature complete, the
-`compressed_pair` class does exactly what it promises: it tries to reduce the
-size of a pair by exploiting _Empty Base Class Optimization_ (or _EBCO_).<br/>
-This class **is not** a drop-in replacement for `std::pair`. However, it offers
-enough functionalities to be a good alternative for when reducing memory usage
-is more important than having some cool and probably useless feature.
+Sometimes it's useful to be able to give unique, sequential numeric identifiers
+to types either at compile-time or runtime.<br/>
+There are plenty of different solutions for this out there and I could have used
+one of them. However, I decided to spend my time to define a couple of tools
+that fully embraces what the modern C++ has to offer.
 
-Although the API is very close to that of `std::pair` (apart from the fact that
-the template parameters are inferred from the constructor and therefore there is
-no` entt::make_compressed_pair`), the major difference is that `first` and
-`second` are functions for implementation needs:
+## Compile-time generator
 
-```cpp
-entt::compressed_pair pair{0, 3.};
-pair.first() = 42;
-```
-
-There isn't much to describe then. It's recommended to rely on documentation and
-intuition. At the end of the day, it's just a pair and nothing more.
-
-# Enum as bitmask
-
-Sometimes it's useful to be able to use enums as bitmasks. However, enum classes
-aren't really suitable for the purpose out of the box. Main problem is that they
-don't convert implicitly to their underlying type.<br/>
-All that remains is to make a choice between using old-fashioned enums (with all
-their problems that I don't want to discuss here) or writing _ugly_ code.
-
-Fortunately, there is also a third way: adding enough operators in the global
-scope to treat enum classes as bitmask transparently.<br/>
-The ultimate goal is to be able to write code like the following (or maybe
-something more meaningful, but this should give a grasp and remain simple at the
-same time):
+To generate sequential numeric identifiers at compile-time, `EnTT` offers the
+`identifier` class template:
 
 ```cpp
-enum class my_flag {
-    unknown = 0x01,
-    enabled = 0x02,
-    disabled = 0x04
-};
+// defines the identifiers for the given types
+using id = entt::identifier<a_type, another_type>;
 
-const my_flag flags = my_flag::enabled;
-const bool is_enabled = !!(flags & my_flag::enabled);
+// ...
+
+switch(a_type_identifier) {
+case id::type<a_type>:
+    // ...
+    break;
+case id::type<another_type>:
+    // ...
+    break;
+default:
+    // ...
+}
 ```
 
-The problem with adding all operators to the global scope is that these will
-come into play even when not required, with the risk of introducing errors that
-are difficult to deal with.<br/>
-However, C++ offers enough tools to get around this problem. In particular, the
-library requires users to register all enum classes for which bitmask support
-should be enabled:
+This is all what this class template has to offer: a `type` inline variable that
+contains a numeric identifier for the given type. It can be used in any context
+where constant expressions are required.
+
+As long as the list remains unchanged, identifiers are also guaranteed to be
+stable across different runs. In case they have been used in a production
+environment and a type has to be removed, one can just use a placeholder to left
+the other identifiers unchanged:
 
 ```cpp
-template<>
-struct entt::enum_as_bitmask<my_flag>
-    : std::true_type
-{};
+template<typename> struct ignore_type {};
+
+using id = entt::identifier<
+    a_type_still_valid,
+    ignore_type<a_type_no_longer_valid>,
+    another_type_still_valid
+>;
 ```
 
-This is handy when dealing with enum classes defined by third party libraries
-and over which the users have no control. However, it's also verbose and can be
-avoided by adding a specific value to the enum class itself:
+Perhaps a bit ugly to see in a codebase but it gets the job done at least.
+
+## Runtime generator
+
+To generate sequential numeric identifiers at runtime, `EnTT` offers the
+`family` class template:
 
 ```cpp
-enum class my_flag {
-    unknown = 0x01,
-    enabled = 0x02,
-    disabled = 0x04,
-    _entt_enum_as_bitmask
-};
+// defines a custom generator
+using id = entt::family<struct my_tag>;
+
+// ...
+
+const auto a_type_id = id::type<a_type>;
+const auto another_type_id = id::type<another_type>;
 ```
 
-In this case, there is no need to specialize the `enum_as_bitmask` traits, since
-`EnTT` will automatically detect the flag and enable the bitmask support.<br/>
-Once the enum class has been registered (in one way or the other) all the most
-common operators will be available, such as `&`, `|` but also `&=` and `|=`.
-Refer to the official documentation for the full list of operators.
+This is all what a _family_ has to offer: a `type` inline variable that contains
+a numeric identifier for the given type.<br/>
+The generator is customizable, so as to get different _sequences_ for different
+purposes if needed.
+
+Please, note that identifiers aren't guaranteed to be stable across different
+runs. Indeed it mostly depends on the flow of execution.
 
 # Utilities
 
