@@ -6,6 +6,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/memory.hpp>
+#include "../common/throwing_allocator.hpp"
 
 struct test_allocator: std::allocator<int> {
     using base = std::allocator<int>;
@@ -76,4 +77,20 @@ TEST(Memory, FastMod) {
     ASSERT_EQ(fast_mod_of_zero, 0u);
     ASSERT_EQ(entt::fast_mod(7u, 8u), 7u);
     ASSERT_EQ(entt::fast_mod(8u, 8u), 0u);
+}
+
+TEST(Memory, AllocateUnique) {
+    test::throwing_allocator<double> allocator{};
+    test::throwing_allocator<int>::trigger_on_allocate = true;
+
+    ASSERT_THROW((entt::allocate_unique<int>(allocator, 0)), test::throwing_allocator<int>::exception_type);
+
+    std::unique_ptr<int, entt::allocation_deleter<test::throwing_allocator<int>>> ptr = entt::allocate_unique<int>(allocator, 42);
+
+    ASSERT_TRUE(ptr);
+    ASSERT_EQ(*ptr, 42);
+
+    ptr.reset();
+
+    ASSERT_FALSE(ptr);
 }

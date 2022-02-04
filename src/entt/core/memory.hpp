@@ -103,6 +103,63 @@ constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[ma
     return value & (mod - 1u);
 }
 
+/**
+ * @brief General purpose deleter for allocator-aware unique pointers.
+ * @tparam Args Types of arguments to use to construct the object.
+ */
+template<typename Allocator>
+struct allocation_deleter: private Allocator {
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
+    /*! @brief Pointer type. */
+    using pointer = typename std::allocator_traits<Allocator>::pointer;
+
+    /**
+     * @brief Inherited constructors.
+     * @param allocator The allocator to use.
+     */
+    allocation_deleter(const allocator_type &allocator)
+        : Allocator{allocator} {}
+
+    /**
+     * @brief Destroys the pointed object and deallocates its memory.
+     * @param ptr A valid pointer to an object of the given type.
+     */
+    void operator()(pointer ptr) {
+        using alloc_traits = typename std::allocator_traits<Allocator>;
+        alloc_traits::destroy(*this, to_address(ptr));
+        alloc_traits::deallocate(*this, ptr, 1u);
+    }
+};
+
+/**
+ * @brief Allows `std::unique_ptr` to use allocators.
+ * @tparam Type Type of object to allocate for and to construct.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Args Types of arguments to use to construct the object.
+ * @param allocator The allocator to use.
+ * @param args Parameters to use to construct an object for the entity.
+ * @return A properly initialized unique pointer with a custom deleter.
+ */
+template<typename Type, typename Allocator, typename... Args>
+auto allocate_unique(Allocator &allocator, Args &&...args) {
+    using alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<Type>;
+    using alloc_traits = typename std::allocator_traits<alloc>;
+
+    alloc type_allocator{allocator};
+    auto ptr = alloc_traits::allocate(type_allocator, 1u);
+
+    ENTT_TRY {
+        alloc_traits::construct(type_allocator, to_address(ptr), std::forward<Args>(args)...);
+    }
+    ENTT_CATCH {
+        alloc_traits::deallocate(type_allocator, ptr, 1u);
+        ENTT_THROW;
+    }
+
+    return std::unique_ptr<Type, allocation_deleter<alloc>>{ptr, type_allocator};
+}
+
 } // namespace entt
 
 #endif
