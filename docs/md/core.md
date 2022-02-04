@@ -14,6 +14,9 @@
 * [Hashed strings](#hashed-strings)
   * [Wide characters](wide-characters)
   * [Conflicts](#conflicts)
+* [Memory](#memory)
+  * [Power of two and fast modulus](#power-of-two-and-fast-modulus)
+  * [Allocator aware unique pointers](#allocator-aware-unique-pointers)
 * [Monostate](#monostate)
 * [Type support](#type-support)
   * [Built-in RTTI support](#built-in-rtti-support)
@@ -366,6 +369,54 @@ After all, human-readable unique identifiers aren't something strictly defined
 and over which users have not the control. Choosing a slightly different
 identifier is probably the best solution to make the conflict disappear in this
 case.
+
+# Memory
+
+There are a handful of tools within EnTT to interact with memory in one way or
+another.<br/>
+Some are geared towards simplifying the implementation of (internal or external)
+allocator aware containers. Others, on the other hand, are designed to help the
+developer with everyday problems.
+
+The former are very specific and for niche problems. These are tools designed to
+unwrap fancy or plain pointers (`to_address`) or to help forget the meaning of
+acronyms like _POCCA_, _POCMA_ or _POCS_.<br/>
+I won't describe them here in detail. Instead, I recommend reading the inline
+documentation to those interested in the subject.
+
+## Power of two and fast modulus
+
+Finding out if a number is a power of two (`is_power_of_two`) or what the next
+power of two is given a random value (`next_power_of_two`) is very useful at
+times.<br/>
+For example, it helps to allocate memory in pages having a size suitable for the
+fast modulus:
+
+```cpp
+const std::size_t result = entt::fast_mod(value, modulus);
+```
+
+Where `modulus` is necessarily a power of two. Perhaps not everyone knows that
+this type of operation is far superior in terms of performance to the basic
+modulus and for this reason preferred in many areas.
+
+## Allocator aware unique pointers
+
+A nasty thing in C++ (at least up to C++20) is the fact that shared pointers
+support allocators while unique pointers don't.<br/>
+There is a proposal at the moment that also shows among the other things how
+this can be implemented without any compiler support.
+
+The `allocate_unique` function follows this proposal, making a virtue out of
+necessity:
+
+```cpp
+std::unique_ptr<my_type, entt::allocation_deleter<my_type>> ptr = entt::allocate_unique<my_type>(allocator, arguments);
+```
+
+Although the internal implementation is slightly different from what is proposed
+for the standard, this function offers an API that is a drop-in replacement for
+the same feature.
 
 # Monostate
 
