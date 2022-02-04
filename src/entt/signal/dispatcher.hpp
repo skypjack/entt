@@ -40,9 +40,6 @@ class dispatcher {
     struct pool_handler final: basic_pool {
         static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
 
-        using signal_type = sigh<void(Event &)>;
-        using sink_type = typename signal_type::sink_type;
-
         void publish() override {
             const auto length = events.size();
 
@@ -61,7 +58,8 @@ class dispatcher {
             events.clear();
         }
 
-        [[nodiscard]] sink_type bucket() ENTT_NOEXCEPT {
+        [[nodiscard]] auto bucket() ENTT_NOEXCEPT {
+            using sink_type = typename sigh<void(Event &)>::sink_type;
             return sink_type{signal};
         }
 
@@ -79,7 +77,7 @@ class dispatcher {
         }
 
     private:
-        signal_type signal{};
+        sigh<void(Event &)> signal{};
         std::vector<Event> events;
     };
 
