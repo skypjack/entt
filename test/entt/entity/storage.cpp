@@ -1158,7 +1158,7 @@ TEST(Storage, Iterable) {
 }
 
 TEST(Storage, ConstIterable) {
-    using iterator = typename entt::storage<boxed_int>::const_iterable::const_iterator;
+    using iterator = typename entt::storage<boxed_int>::const_iterable::iterator;
 
     static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity, const boxed_int &>>);
     static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity, const boxed_int &>>);
@@ -1200,7 +1200,7 @@ TEST(Storage, IterableIteratorConversion) {
     pool.emplace(entt::entity{3}, 42);
 
     typename entt::storage<boxed_int>::iterable::iterator it = pool.each().begin();
-    typename entt::storage<boxed_int>::const_iterable::const_iterator cit = it;
+    typename entt::storage<boxed_int>::const_iterable::iterator cit = it;
 
     static_assert(std::is_same_v<decltype(*it), std::tuple<entt::entity, boxed_int &>>);
     static_assert(std::is_same_v<decltype(*cit), std::tuple<entt::entity, const boxed_int &>>);

@@ -37,4 +37,8 @@ TEST(Iterator, IterableAdaptor) {
     ASSERT_EQ(*iterable.cbegin(), 1);
     ASSERT_EQ(*++iterable.cbegin(), 2);
     ASSERT_EQ(++iterable.cbegin(), --iterable.end());
+
+    for(auto value: entt::iterable_adaptor<const int *, const void *>{vec.data(), vec.data() + 1u}) {
+        ASSERT_EQ(value, 1);
+    }
 }
