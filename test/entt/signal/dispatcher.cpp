@@ -1,5 +1,6 @@
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/signal/dispatcher.hpp>
 
@@ -31,7 +32,7 @@ TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher;
     receiver receiver;
 
-    dispatcher.trigger<one_more_event>(42);
+    dispatcher.trigger(one_more_event{42});
     dispatcher.enqueue<one_more_event>(42);
     dispatcher.update<one_more_event>();
 
@@ -41,7 +42,7 @@ TEST(Dispatcher, Functionalities) {
 
     ASSERT_EQ(receiver.cnt, 1);
 
-    dispatcher.enqueue<another_event>();
+    dispatcher.enqueue(another_event{});
     dispatcher.update<another_event>();
 
     ASSERT_EQ(receiver.cnt, 1);
@@ -55,7 +56,7 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.clear<an_event>();
     dispatcher.update();
 
-    dispatcher.enqueue<an_event>();
+    dispatcher.enqueue(an_event{});
     dispatcher.clear();
     dispatcher.update();
 
@@ -105,4 +106,39 @@ TEST(Dispatcher, OpaqueDisconnect) {
     dispatcher.trigger<an_event>();
 
     ASSERT_EQ(receiver.cnt, 1);
+}
+
+TEST(Dispatcher, NamedQueue) {
+    using namespace entt::literals;
+
+    entt::dispatcher dispatcher;
+    receiver receiver;
+
+    dispatcher.sink<an_event>("named"_hs).connect<&receiver::receive>(receiver);
+    dispatcher.trigger<an_event>();
+
+    ASSERT_EQ(receiver.cnt, 0);
+
+    dispatcher.trigger("named"_hs, an_event{});
+
+    ASSERT_EQ(receiver.cnt, 1);
+
+    dispatcher.enqueue<an_event>();
+    dispatcher.enqueue(an_event{});
+    dispatcher.enqueue_hint<an_event>("named"_hs);
+    dispatcher.enqueue_hint("named"_hs, an_event{});
+    dispatcher.update<an_event>();
+
+    ASSERT_EQ(receiver.cnt, 1);
+
+    dispatcher.clear<an_event>();
+    dispatcher.update<an_event>("named"_hs);
+
+    ASSERT_EQ(receiver.cnt, 3);
+
+    dispatcher.enqueue_hint<an_event>("named"_hs);
+    dispatcher.clear<an_event>("named"_hs);
+    dispatcher.update<an_event>("named"_hs);
+
+    ASSERT_EQ(receiver.cnt, 3);
 }

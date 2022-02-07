@@ -82,8 +82,8 @@ class dispatcher {
     };
 
     template<typename Event>
-    [[nodiscard]] pool_handler<Event> &assure() {
-        if(auto &&ptr = pools[type_hash<Event>::value()]; !ptr) {
+    [[nodiscard]] pool_handler<Event> &assure(const id_type id) {
+        if(auto &&ptr = pools[id]; !ptr) {
             auto *cpool = new pool_handler<Event>{};
             ptr.reset(cpool);
             return *cpool;
@@ -103,7 +103,7 @@ public:
     dispatcher &operator=(dispatcher &&) = default;
 
     /**
-     * @brief Returns a sink object for the given event.
+     * @brief Returns a sink object for the given event and queue.
      *
      * A sink is an opaque object used to connect listeners to events.
      *
@@ -117,69 +117,77 @@ public:
      * @sa sink
      *
      * @tparam Event Type of event of which to get the sink.
+     * @param id Name used to map the event queue within the dispatcher.
      * @return A temporary sink object.
      */
     template<typename Event>
-    [[nodiscard]] auto sink() {
-        return assure<Event>().bucket();
+    [[nodiscard]] auto sink(const id_type id = type_hash<Event>::value()) {
+        return assure<Event>(id).bucket();
     }
 
     /**
-     * @brief Triggers an immediate event of the given type.
-     *
-     * All the listeners registered for the given type are immediately notified.
-     * The event is discarded after the execution.
-     *
-     * @tparam Event Type of event to trigger.
-     * @tparam Args Types of arguments to use to construct the event.
-     * @param args Arguments to use to construct the event.
-     */
-    template<typename Event, typename... Args>
-    void trigger(Args &&...args) {
-        assure<Event>().trigger(Event{std::forward<Args>(args)...});
-    }
-
-    /**
-     * @brief Triggers an immediate event of the given type.
-     *
-     * All the listeners registered for the given type are immediately notified.
-     * The event is discarded after the execution.
-     *
+     * @brief Triggers an immediate event of a given type.
      * @tparam Event Type of event to trigger.
      * @param event An instance of the given type of event.
      */
     template<typename Event>
-    void trigger(Event &&event) {
-        assure<std::decay_t<Event>>().trigger(std::forward<Event>(event));
+    void trigger(Event &&event = {}) {
+        trigger(type_hash<std::decay_t<Event>>::value(), std::forward<Event>(event));
+    }
+
+    /**
+     * @brief Triggers an immediate event on a queue of a given type.
+     * @tparam Event Type of event to trigger.
+     * @param event An instance of the given type of event.
+     * @param id Name used to map the event queue within the dispatcher.
+     */
+    template<typename Event>
+    void trigger(const id_type id, Event &&event = {}) {
+        assure<std::decay_t<Event>>(id).trigger(std::forward<Event>(event));
     }
 
     /**
      * @brief Enqueues an event of the given type.
-     *
-     * An event of the given type is queued. No listener is invoked. Use the
-     * `update` member function to notify listeners when ready.
-     *
      * @tparam Event Type of event to enqueue.
      * @tparam Args Types of arguments to use to construct the event.
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
     void enqueue(Args &&...args) {
-        assure<Event>().enqueue(std::forward<Args>(args)...);
+        enqueue_hint<Event>(type_hash<Event>::value(), std::forward<Args>(args)...);
     }
 
     /**
      * @brief Enqueues an event of the given type.
-     *
-     * An event of the given type is queued. No listener is invoked. Use the
-     * `update` member function to notify listeners when ready.
-     *
      * @tparam Event Type of event to enqueue.
      * @param event An instance of the given type of event.
      */
     template<typename Event>
     void enqueue(Event &&event) {
-        assure<std::decay_t<Event>>().enqueue(std::forward<Event>(event));
+        enqueue_hint(type_hash<std::decay_t<Event>>::value(), std::forward<Event>(event));
+    }
+
+    /**
+     * @brief Enqueues an event of the given type.
+     * @tparam Event Type of event to enqueue.
+     * @tparam Args Types of arguments to use to construct the event.
+     * @param id Name used to map the event queue within the dispatcher.
+     * @param args Arguments to use to construct the event.
+     */
+    template<typename Event, typename... Args>
+    void enqueue_hint(const id_type id, Args &&...args) {
+        assure<Event>(id).enqueue(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Enqueues an event of the given type.
+     * @tparam Event Type of event to enqueue.
+     * @param id Name used to map the event queue within the dispatcher.
+     * @param event An instance of the given type of event.
+     */
+    template<typename Event>
+    void enqueue_hint(const id_type id, Event &&event) {
+        assure<std::decay_t<Event>>(id).enqueue(std::forward<Event>(event));
     }
 
     /**
@@ -207,45 +215,33 @@ public:
     }
 
     /**
-     * @brief Discards all the events queued so far.
-     *
-     * If no types are provided, the dispatcher will clear all the existing
-     * pools.
-     *
-     * @tparam Event Type of events to discard.
+     * @brief Discards all the events stored so far in a given queue.
+     * @tparam Event Type of event to discard.
+     * @param id Name used to map the event queue within the dispatcher.
      */
-    template<typename... Event>
+    template<typename Event>
+    void clear(const id_type id = type_hash<Event>::value()) {
+        assure<Event>(id).clear();
+    }
+
+    /*! @brief Discards all the events queued so far. */
     void clear() {
-        if constexpr(sizeof...(Event) == 0) {
-            for(auto &&cpool: pools) {
-                cpool.second->clear();
-            }
-        } else {
-            (assure<Event>().clear(), ...);
+        for(auto &&cpool: pools) {
+            cpool.second->clear();
         }
     }
 
     /**
-     * @brief Delivers all the pending events of the given type.
-     *
-     * This method is blocking and it doesn't return until all the events are
-     * delivered to the registered listeners. It's responsibility of the users
-     * to reduce at a minimum the time spent in the bodies of the listeners.
-     *
-     * @tparam Event Type of events to send.
+     * @brief Delivers all the pending events of a given queue.
+     * @tparam Event Type of event to send.
+     * @param id Name used to map the event queue within the dispatcher.
      */
     template<typename Event>
-    void update() {
-        assure<Event>().publish();
+    void update(const id_type id = type_hash<Event>::value()) {
+        assure<Event>(id).publish();
     }
 
-    /**
-     * @brief Delivers all the pending events.
-     *
-     * This method is blocking and it doesn't return until all the events are
-     * delivered to the registered listeners. It's responsibility of the users
-     * to reduce at a minimum the time spent in the bodies of the listeners.
-     */
+    /*! @brief Delivers all the pending events. */
     void update() const {
         for(auto &&cpool: pools) {
             cpool.second->publish();

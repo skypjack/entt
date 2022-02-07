@@ -11,6 +11,7 @@
   * [Lambda support](#lambda-support)
 * [Signals](#signals)
 * [Event dispatcher](#event-dispatcher)
+  * [Named queues](#named-queues)
 * [Event emitter](#event-emitter)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -375,23 +376,20 @@ signal.collect(std::ref(collector));
 
 # Event dispatcher
 
-The event dispatcher class is designed so as to be used in a loop. It allows
-users both to trigger immediate events or to queue events to be published all
-together once per tick.<br/>
-This class shares part of its API with the one of the signal handler, but it
-doesn't require that all the types of events are specified when declared:
+The event dispatcher class allows users to trigger immediate events or to queue
+and publish them all together later.<br/>
+This class lazily instantiates its queues. Therefore, it's not necessary to
+_announce_ the event types in advance:
 
 ```cpp
 // define a general purpose dispatcher
 entt::dispatcher dispatcher{};
 ```
 
-In order to register an instance of a class to a dispatcher, its type must
-expose one or more member functions the arguments of which are such that `E &`
-can be converted to them for each type of event `E`, no matter what the return
-value is.<br/>
-The name of the member function aimed to receive the event must be provided to
-the `connect` member function of the sink in charge for the specific event:
+A listener registered with a dispatcher is such that its type offers one or more
+member functions that take arguments of type `Event &` for any type of event,
+regardless of the return value.<br/>
+These functions are linked directly via `connect` to a _sink_:
 
 ```cpp
 struct an_event { int value; };
@@ -409,8 +407,8 @@ dispatcher.sink<an_event>().connect<&listener::receive>(listener);
 dispatcher.sink<another_event>().connect<&listener::method>(listener);
 ```
 
-The `disconnect` member function follows the same pattern and can be used to
-remove one listener at a time or all of them at once:
+The `disconnect` member function is used to remove one listener at a time or all
+of them at once:
 
 ```cpp
 dispatcher.sink<an_event>().disconnect<&listener::receive>(listener);
@@ -418,14 +416,10 @@ dispatcher.sink<another_event>().disconnect(listener);
 ```
 
 The `trigger` member function serves the purpose of sending an immediate event
-to all the listeners registered so far. It offers a convenient approach that
-relieves users from having to create the event itself. Instead, it's enough to
-specify the type of event and provide all the parameters required to construct
-it.<br/>
-As an example:
+to all the listeners registered so far:
 
 ```cpp
-dispatcher.trigger<an_event>(42);
+dispatcher.trigger(an_event{42});
 dispatcher.trigger<another_event>();
 ```
 
@@ -434,16 +428,14 @@ method can be used to push around urgent messages like an _is terminating_
 notification on a mobile app.
 
 On the other hand, the `enqueue` member function queues messages together and
-allows to maintain control over the moment they are sent to listeners. The
-signature of this method is more or less the same of `trigger`:
+helps to maintain control over the moment they are sent to listeners:
 
 ```cpp
 dispatcher.enqueue<an_event>(42);
-dispatcher.enqueue<another_event>();
+dispatcher.enqueue(another_event{});
 ```
 
-Events are stored aside until the `update` member function is invoked, then all
-the messages that are still pending are sent to the listeners at once:
+Events are stored aside until the `update` member function is invoked:
 
 ```cpp
 // emits all the events of the given type at once
@@ -455,6 +447,30 @@ dispatcher.update();
 
 This way users can embed the dispatcher in a loop and literally dispatch events
 once per tick to their systems.
+
+## Named queues
+
+All queues within a dispatcher are associated by default with an event type and
+then retrieved from it.<br/>
+However, it's possible to create queues with different _names_ (and therefore
+also multiple queues for a single type). In fact, more or less all functions
+also take an additional parameter. As an example:
+
+```cpp
+dispatcher.sink<an_event>("custom"_hs).connect<&listener::receive>(listener);
+```
+
+In this case, the term _name_ is misused as these are actual numeric identifiers
+of type `id_type`.<br/>
+An exception to this rule is the `enqueue` function. There is no additional
+parameter for it but rather a different function:
+
+```cpp
+dispatcher.enqueue_hint<an_event>("custom"_hs, 42);
+```
+
+This is mainly due to the template argument deduction rules and unfortunately
+there is no real (elegant) way to avoid it.
 
 # Event emitter
 
