@@ -600,6 +600,10 @@ inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::v
 template<typename Type, typename = void>
 struct is_std_hashable: std::false_type {};
 
+/*! @brief Specialization required to get around an issue with clang-cl. */
+template<>
+struct is_std_hashable<void>: std::false_type {};
+
 /*! @copydoc is_std_hashable */
 template<typename Type>
 struct is_std_hashable<Type, std::enable_if_t<std::is_same_v<decltype(std::declval<const std::hash<Type> &>()(*std::declval<Type *>())), std::size_t>>>
