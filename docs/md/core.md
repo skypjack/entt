@@ -7,6 +7,7 @@
 
 * [Introduction](#introduction)
 * [Any as in any type](#any-as-in-any-type)
+  * [Hashing of any objects](#hashing-of-any-objects)
   * [Small buffer optimization](#small-buffer-optimization)
   * [Alignment requirement](#alignment-requirement)
 * [Compressed pair](#compressed-pair)
@@ -49,7 +50,7 @@ describing what `EnTT` offers so as not to reinvent the wheel in case of need.
 
 `EnTT` comes with its own `any` type. It may seem redundant considering that
 C++17 introduced `std::any`, but it is not (hopefully).<br/>
-In fact, the _type_ returned by an `std::any` is a const reference to an
+First of all, the _type_ returned by an `std::any` is a const reference to an
 `std::type_info`, an implementation defined class that's not something everyone
 wants to see in a software. Furthermore, there is no way to connect it with the
 type system of the library and therefore with its integrated RTTI support.<br/>
@@ -84,9 +85,9 @@ entt::any any = entt::make_any<int>(42);
 In both cases, the `any` class takes the burden of destroying the contained
 element when required, regardless of the storage strategy used for the specific
 object.<br/>
-Furthermore, an instance of `any` is not tied to an actual type. Therefore, the
-wrapper will be reconfigured by assigning it an object of a different type than
-the one contained, so as to be able to handle the new instance.
+Furthermore, an instance of `any` isn't tied to an actual type. Therefore, the
+wrapper is reconfigured when it's assigned a new object of a type other than
+the one it contains.
 
 There exists also a way to directly assign a value to the variable contained by
 an `entt::any`, without necessarily replacing it. This is especially useful when
@@ -151,7 +152,7 @@ In this case, it doesn't matter if the original container actually holds an
 object or acts already as a reference for unmanaged elements, the new instance
 thus created won't create copies and will only serve as a reference for the
 original item.<br/>
-This means that, starting from the example above, both `ref` and` other` will
+This means that, starting from the example above, both `ref` and `other` will
 point to the same object, whether it's initially contained in `other` or already
 an unmanaged element.
 
@@ -166,6 +167,29 @@ functions in all respects similar to their most famous counterparts.<br/>
 The only difference is that, in the case of `EnTT`, these won't raise exceptions
 but will only trigger an assert in debug mode, otherwise resulting in undefined
 behavior in case of misuse in release mode.
+
+## Hashing of any objects
+
+As for the `any` class, the hashing topic deserves a section of its own.<br/>
+It's indeed possible to extract the hash value (as in `std::hash`) of an object
+managed by `any`:
+
+```cpp
+const std::size_t hash = any.hash();
+```
+
+However, there are some limitations:
+
+* The instance of `any` **must** not be empty, otherwise the returned value is
+  that of `std::hash<std::nullptr_t>{}({})`.
+
+* The underlying object **must** support this operation, otherwise the returned
+  value is that of `std::hash<std::nullptr_t>{}({})`.
+
+Unfortunately, it's not possible to trigger a compile-time error in these cases.
+This would prevent users from using non-hashable types with `any`.<br/>
+A compromise has therefore been made that could change over time but which
+appears to be acceptable today for the conceivable uses of this feature.
 
 ## Small buffer optimization
 
