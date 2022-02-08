@@ -102,29 +102,6 @@ TEST(TypeTraits, ValueList) {
     static_assert(entt::value_list_element_v<0u, other> == 1);
 }
 
-TEST(TypeTraits, IsEqualityComparable) {
-    static_assert(entt::is_equality_comparable_v<int>);
-    static_assert(entt::is_equality_comparable_v<const int>);
-    static_assert(entt::is_equality_comparable_v<std::vector<int>>);
-    static_assert(entt::is_equality_comparable_v<std::vector<std::vector<int>>>);
-    static_assert(entt::is_equality_comparable_v<std::unordered_map<int, int>>);
-    static_assert(entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, char>>>);
-    static_assert(entt::is_equality_comparable_v<std::pair<const int, int>>);
-    static_assert(entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, char>>>);
-    static_assert(entt::is_equality_comparable_v<std::vector<not_comparable>::iterator>);
-    static_assert(entt::is_equality_comparable_v<nlohmann_json_like>);
-
-    static_assert(!entt::is_equality_comparable_v<not_comparable>);
-    static_assert(!entt::is_equality_comparable_v<const not_comparable>);
-    static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
-    static_assert(!entt::is_equality_comparable_v<std::vector<std::vector<not_comparable>>>);
-    static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>);
-    static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>);
-    static_assert(!entt::is_equality_comparable_v<std::pair<const int, not_comparable>>);
-    static_assert(!entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, not_comparable>>>);
-    static_assert(!entt::is_equality_comparable_v<void>);
-}
-
 TEST(TypeTraits, IsApplicable) {
     static_assert(entt::is_applicable_v<void(int, char), std::tuple<double, char>>);
     static_assert(!entt::is_applicable_v<void(int, char), std::tuple<int>>);
@@ -163,6 +140,38 @@ TEST(TypeTraits, IsTransparent) {
     static_assert(entt::is_transparent_v<std::less<void>>);
     static_assert(!entt::is_transparent_v<std::logical_not<double>>);
     static_assert(entt::is_transparent_v<std::logical_not<void>>);
+}
+
+TEST(TypeTraits, IsEqualityComparable) {
+    static_assert(entt::is_equality_comparable_v<int>);
+    static_assert(entt::is_equality_comparable_v<const int>);
+    static_assert(entt::is_equality_comparable_v<std::vector<int>>);
+    static_assert(entt::is_equality_comparable_v<std::vector<std::vector<int>>>);
+    static_assert(entt::is_equality_comparable_v<std::unordered_map<int, int>>);
+    static_assert(entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, char>>>);
+    static_assert(entt::is_equality_comparable_v<std::pair<const int, int>>);
+    static_assert(entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, char>>>);
+    static_assert(entt::is_equality_comparable_v<std::vector<not_comparable>::iterator>);
+    static_assert(entt::is_equality_comparable_v<nlohmann_json_like>);
+
+    static_assert(!entt::is_equality_comparable_v<not_comparable>);
+    static_assert(!entt::is_equality_comparable_v<const not_comparable>);
+    static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::vector<std::vector<not_comparable>>>);
+    static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>);
+    static_assert(!entt::is_equality_comparable_v<std::pair<const int, not_comparable>>);
+    static_assert(!entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, not_comparable>>>);
+    static_assert(!entt::is_equality_comparable_v<void>);
+}
+
+TEST(TypeTraits, IsStdHashable) {
+    static_assert(entt::is_std_hashable_v<int>);
+    static_assert(entt::is_std_hashable_v<char>);
+    static_assert(entt::is_std_hashable_v<double>);
+    static_assert(!entt::is_std_hashable_v<nlohmann_json_like>);
+    static_assert(!entt::is_std_hashable_v<not_comparable>);
+    static_assert(!entt::is_std_hashable_v<void>);
 }
 
 TEST(TypeTraits, ConstnessAs) {
