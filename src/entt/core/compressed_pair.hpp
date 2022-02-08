@@ -255,9 +255,20 @@ inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Sec
 #if !defined __clang_major__ || __clang_major__ > 6
 namespace std {
 
+/**
+ * @brief `std::tuple_size` specialization for `entt::compressed_pair`.
+ * @tparam First The type of the first element that the pair stores.
+ * @tparam Second The type of the second element that the pair stores.
+ */
 template<typename First, typename Second>
 struct tuple_size<entt::compressed_pair<First, Second>>: integral_constant<size_t, 2u> {};
 
+/**
+ * @brief `std::tuple_element` specialization for `entt::compressed_pair`.
+ * @tparam Index The index of the type to return.
+ * @tparam First The type of the first element that the pair stores.
+ * @tparam Second The type of the second element that the pair stores.
+ */
 template<size_t Index, typename First, typename Second>
 struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
     static_assert(Index < 2u, "Index out of bounds");
