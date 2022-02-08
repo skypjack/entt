@@ -4,6 +4,7 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
+* any: avoid operations when trivially-*
 * runtime events (emitter)
 * iterator based try_emplace vs try_insert for perf reasons
 * registry: remove reference to basic_sparse_set<E>

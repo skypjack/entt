@@ -1076,6 +1076,33 @@ TEST_F(MetaAny, CompareVoid) {
     ASSERT_TRUE(entt::meta_any{} != any);
 }
 
+TEST_F(MetaAny, Hashable) {
+    const int value = 42;
+    entt::meta_any any{value};
+    const entt::meta_any ref{std::in_place_type<const int &>, value};
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(ref);
+
+    ASSERT_EQ(any.hash(), std::hash<int>{}(value));
+    ASSERT_EQ(std::hash<int>{}(value), std::hash<entt::meta_any>{}(ref));
+    ASSERT_EQ(ref.hash(), std::hash<entt::meta_any>{}(any));
+}
+
+TEST_F(MetaAny, NotHashable) {
+    const not_comparable_t value{};
+    entt::meta_any any{value};
+    const entt::meta_any ref{std::in_place_type<const not_comparable_t &>, value};
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(ref);
+
+    ASSERT_EQ(any.hash(), std::hash<std::nullptr_t>{}({}));
+    ASSERT_EQ(std::hash<std::nullptr_t>{}({}), std::hash<entt::any>{}(ref));
+    ASSERT_EQ(ref.hash(), std::hash<entt::any>{}(any));
+    ASSERT_EQ(any.hash(), entt::any{}.hash());
+}
+
 TEST_F(MetaAny, TryCast) {
     entt::meta_any any{fat_t{}};
 

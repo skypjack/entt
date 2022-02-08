@@ -2,6 +2,7 @@
 #define ENTT_META_META_HPP
 
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -283,21 +284,15 @@ public:
         return *this;
     }
 
-    /**
-     * @brief Returns the type of the underlying object.
-     * @return The type of the underlying object, if any.
-     */
+    /*! @copydoc any::type */
     [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
-    /**
-     * @brief Returns an opaque pointer to the contained instance.
-     * @return An opaque pointer the contained instance, if any.
-     */
+    /*! @copydoc any::data */
     [[nodiscard]] const void *data() const ENTT_NOEXCEPT {
         return storage.data();
     }
 
-    /*! @copydoc data */
+    /*! @copydoc any::data */
     [[nodiscard]] void *data() ENTT_NOEXCEPT {
         return storage.data();
     }
@@ -469,12 +464,7 @@ public:
         return false;
     }
 
-    /**
-     * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the wrapper.
-     * @tparam Args Types of arguments to use to construct the new instance.
-     * @param args Parameters to use to construct the instance.
-     */
+    /*! @copydoc any::emplace */
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         release();
@@ -483,21 +473,13 @@ public:
         node = internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve();
     }
 
-    /**
-     * @brief Copy assigns a value to the contained object without replacing it.
-     * @param other The value to assign to the contained object.
-     * @return True in case of success, false otherwise.
-     */
+    /*! @copydoc any::assign */
     bool assign(const meta_any &other);
 
-    /**
-     * @brief Move assigns a value to the contained object without replacing it.
-     * @param other The value to assign to the contained object.
-     * @return True in case of success, false otherwise.
-     */
+    /*! @copydoc any::assign */
     bool assign(meta_any &&other);
 
-    /*! @brief Destroys contained object */
+    /*! @copydoc any::reset */
     void reset() {
         release();
         vtable = &basic_vtable<void>;
@@ -562,34 +544,29 @@ public:
         return !(node == nullptr);
     }
 
-    /**
-     * @brief Checks if two wrappers differ in their content.
-     * @param other Wrapper with which to compare.
-     * @return False if the two objects differ in their content, true otherwise.
-     */
+    /*! @copydoc any::operator== */
     [[nodiscard]] bool operator==(const meta_any &other) const {
         return (!node && !other.node) || (node && other.node && *node->info == *other.node->info && storage == other.storage);
     }
 
-    /**
-     * @brief Aliasing constructor.
-     * @return A wrapper that shares a reference to an unmanaged object.
-     */
+    /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() ENTT_NOEXCEPT {
         return meta_any{*this, storage.as_ref()};
     }
 
-    /*! @copydoc as_ref */
+    /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const ENTT_NOEXCEPT {
         return meta_any{*this, storage.as_ref()};
     }
 
-    /**
-     * @brief Returns true if a wrapper owns its object, false otherwise.
-     * @return True if the wrapper owns its object, false otherwise.
-     */
+    /*! @copydoc any::owner */
     [[nodiscard]] bool owner() const ENTT_NOEXCEPT {
         return storage.owner();
+    }
+
+    /*! @copydoc any::hash */
+    [[nodiscard]] std::size_t hash() const ENTT_NOEXCEPT {
+        return storage.hash();
     }
 
 private:
@@ -1866,5 +1843,22 @@ inline bool meta_associative_container::erase(meta_any key) {
 }
 
 } // namespace entt
+
+namespace std {
+
+/*! @brief `std::hash` specialization for `entt::meta_any`. */
+template<>
+struct hash<entt::meta_any> {
+    /**
+     * @brief Returns the hash value of the parameter.
+     * @param any The object to return the hash for.
+     * @return The hash value of the parameter.
+     */
+    [[nodiscard]] std::size_t operator()(const entt::meta_any &any) const ENTT_NOEXCEPT {
+        return any.hash();
+    }
+};
+
+} // namespace std
 
 #endif
