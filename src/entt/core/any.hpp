@@ -395,14 +395,14 @@ public:
      * returned once converted to `const void *`.
      *
      * @return The hash value of the contained object or its address if any,
-     * `std::hash<std::nullptr_t>{}({})` otherwise.
+     * `std::hash<const void *>{}({})` otherwise.
      */
     [[nodiscard]] std::size_t hash() const ENTT_NOEXCEPT {
         if(std::size_t value{}; vtable && vtable(operation::hash, *this, &value)) {
             return value;
         }
 
-        return std::hash<std::nullptr_t>{}({});
+        return std::hash<const void *>{}(nullptr);
     }
 
 private:

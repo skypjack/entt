@@ -1192,8 +1192,8 @@ TEST_F(Any, NotHashable) {
     ASSERT_TRUE(any);
     ASSERT_TRUE(ref);
 
-    ASSERT_EQ(any.hash(), std::hash<std::nullptr_t>{}({}));
-    ASSERT_EQ(std::hash<std::nullptr_t>{}({}), std::hash<entt::any>{}(ref));
+    ASSERT_EQ(any.hash(), std::hash<const void *>{}(nullptr));
+    ASSERT_EQ(std::hash<const void *>{}(nullptr), std::hash<entt::any>{}(ref));
     ASSERT_EQ(ref.hash(), std::hash<entt::any>{}(any));
     ASSERT_EQ(any.hash(), entt::any{}.hash());
 }

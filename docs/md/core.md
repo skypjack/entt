@@ -181,10 +181,10 @@ const std::size_t hash = any.hash();
 However, there are some limitations:
 
 * The instance of `any` **must** not be empty, otherwise the returned value is
-  that of `std::hash<std::nullptr_t>{}({})`.
+  that of `std::hash<const void *>{}(nullptr)`.
 
 * The underlying object **must** support this operation, otherwise the returned
-  value is that of `std::hash<std::nullptr_t>{}({})`.
+  value is that of `std::hash<const void *>{}(nullptr)`.
 
 Unfortunately, it's not possible to trigger a compile-time error in these cases.
 This would prevent users from using non-hashable types with `any`.<br/>
