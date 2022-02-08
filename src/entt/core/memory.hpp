@@ -116,10 +116,10 @@ struct allocation_deleter: private Allocator {
 
     /**
      * @brief Inherited constructors.
-     * @param allocator The allocator to use.
+     * @param alloc The allocator to use.
      */
-    allocation_deleter(const allocator_type &allocator)
-        : Allocator{allocator} {}
+    allocation_deleter(const allocator_type &alloc)
+        : Allocator{alloc} {}
 
     /**
      * @brief Destroys the pointed object and deallocates its memory.
