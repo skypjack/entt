@@ -50,7 +50,7 @@ class basic_any {
         const Type *element = nullptr;
 
         if constexpr(in_situ<Type>) {
-            element = (value.mode == policy::owner) ? ENTT_LAUNDER(reinterpret_cast<const Type *>(&value.storage)) : static_cast<const Type *>(value.instance);
+            element = value.owner() ? ENTT_LAUNDER(reinterpret_cast<const Type *>(&value.storage)) : static_cast<const Type *>(value.instance);
         } else {
             element = static_cast<const Type *>(value.instance);
         }
@@ -63,7 +63,7 @@ class basic_any {
             break;
         case operation::move:
             if constexpr(in_situ<Type>) {
-                if(value.mode == policy::owner) {
+                if(value.owner()) {
                     return new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(element))};
                 }
             }
@@ -204,7 +204,7 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
-        if(vtable && mode == policy::owner) {
+        if(vtable && owner()) {
             vtable(operation::destroy, *this, nullptr);
         }
     }
@@ -337,7 +337,7 @@ public:
 
     /*! @brief Destroys contained object */
     void reset() {
-        if(vtable && mode == policy::owner) {
+        if(vtable && owner()) {
             vtable(operation::destroy, *this, nullptr);
         }
 

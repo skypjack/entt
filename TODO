@@ -4,7 +4,6 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* any: avoid operations when trivially-*
 * runtime events (emitter)
 * iterator based try_emplace vs try_insert for perf reasons
 * registry: remove reference to basic_sparse_set<E>
@@ -12,7 +11,6 @@ WIP:
 * custom allocators all over
 
 WIP:
-* customizable any_vtable, sfinae-friendly definition and op::custom for user-def
 * resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * add user data to type_info
 * write documentation for custom storages and views!!
