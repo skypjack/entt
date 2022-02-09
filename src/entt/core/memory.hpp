@@ -143,6 +143,8 @@ struct allocation_deleter: private Allocator {
  */
 template<typename Type, typename Allocator, typename... Args>
 auto allocate_unique(Allocator &allocator, Args &&...args) {
+    static_assert(!std::is_array_v<Type>, "Array types are not supported");
+
     using alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<Type>;
     using alloc_traits = typename std::allocator_traits<alloc>;
 
