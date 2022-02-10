@@ -81,12 +81,14 @@ jobs:
 
     strategy:
       matrix:
-        toolset: [clang-cl, default, v141]
+        toolset: [default, v141, v142, clang-cl]
         include:
-          - toolset: clang-cl
-            toolset_option: -T"ClangCl"
           - toolset: v141
             toolset_option: -T"v141"
+          - toolset: v142
+            toolset_option: -T"v142"
+          - toolset: clang-cl
+            toolset_option: -T"ClangCl"
 
     runs-on: windows-latest
 
