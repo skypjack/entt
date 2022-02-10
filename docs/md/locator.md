@@ -14,62 +14,43 @@
 # Introduction
 
 Usually service locators are tightly bound to the services they expose and it's
-hard to define a general purpose solution. This template based implementation
-tries to fill the gap and to get rid of the burden of defining a different
-specific locator for each application.<br/>
-This class is tiny, partially unsafe and thus risky to use. Moreover it doesn't
-fit probably most of the scenarios in which a service locator is required. Look
-at it as a small tool that can sometimes be useful if users know how to handle
-it.
+hard to define a general purpose solution.<br/>
+This tiny class tries to fill the gap and to get rid of the burden of defining a
+different specific locator for each application.
 
 # Service locator
 
-The API is straightforward. The basic idea is that services are implemented by
-means of interfaces and rely on polymorphism.<br/>
-The locator is instantiated with the base type of the service if any and a
-concrete implementation is provided along with all the parameters required to
-initialize it. As an example:
+The service locator API tries to mimic that of `std::optional` and adds some
+extra functionalities on top of it such as allocator support.<br/>
+There are a couple of functions to set up a service, namely `emplace` and
+`allocate_emplace`:
 
 ```cpp
-// the service has no base type, a locator is used to treat it as a kind of singleton
-entt::service_locator<my_service>::set(params...);
-
-// sets up an opaque service
-entt::service_locator<audio_interface>::set<audio_implementation>(params...);
-
-// resets (destroys) the service
-entt::service_locator<audio_interface>::reset();
+entt::locator<interface>::emplace<service>(argument);
+entt::locator<interface>::allocate_emplace<service>(allocator, argument);
 ```
 
-The locator can also be queried to know if an active service is currently set
-and to retrieve it if necessary (either as a pointer or as a reference):
+The difference is that the latter expects an allocator as the first argument and
+uses it to allocate the service itself.<br/>
+Once a service has been set up, it's retrieved using the value function:
 
 ```cpp
-// no service currently set
-auto empty = entt::service_locator<audio_interface>::empty();
-
-// gets a (possibly empty) shared pointer to the service ...
-std::shared_ptr<audio_interface> ptr = entt::service_locator<audio_interface>::get();
-
-// ... or a reference, but it's undefined behaviour if the service isn't set yet
-audio_interface &ref = entt::service_locator<audio_interface>::ref();
+interface &service = entt::locator<interface>::value();
 ```
 
-A common use is to wrap the different locators in a container class, creating
-aliases for the various services:
+Since the service may not be set (and therefore this function may result in an
+undefined behavior), the `has_value` and `value_or` functions are also available
+to test a service locator and to get a fallback service in case there is none:
 
 ```cpp
-struct locator {
-    using camera = entt::service_locator<camera_interface>;
-    using audio = entt::service_locator<audio_interface>;
-    // ...
-};
-
-// ...
-
-void init() {
-    locator::camera::set<camera_null>();
-    locator::audio::set<audio_implementation>(params...);
+if(entt::locator<interface>::has_value()) {
     // ...
 }
+
+interface &service = entt::locator<interface>::value_or<fallback_impl>(argument);
 ```
+
+All arguments are used only if necessary, that is, if a service doesn't already
+exist and therefore the fallback service is constructed and returned. In all
+other cases, they are discarded.<br/>
+Finally, to reset a service, use the `reset` function.

@@ -10,94 +10,102 @@ namespace entt {
 /**
  * @brief Service locator, nothing more.
  *
- * A service locator can be used to do what it promises: locate services.<br/>
+ * A service locator is used to do what it promises: locate services.<br/>
  * Usually service locators are tightly bound to the services they expose and
- * thus it's hard to define a general purpose class to do that. This template
- * based implementation tries to fill the gap and to get rid of the burden of
- * defining a different specific locator for each application.
+ * thus it's hard to define a general purpose class to do that. This tiny class
+ * tries to fill the gap and to get rid of the burden of defining a different
+ * specific locator for each application.
  *
- * @tparam Service Type of service managed by the locator.
+ * @note
+ * Users shouldn't retain references to a service. The recommended way is to
+ * retrieve the service implementation currently set each and every time the
+ * need for it arises. The risk is to incur in unexpected behaviors otherwise.
+ *
+ * @tparam Service Service type.
  */
 template<typename Service>
-struct service_locator {
-    /*! @brief Type of service offered. */
-    using service_type = Service;
+struct locator {
+    /*! @brief Service type. */
+    using type = Service;
 
     /*! @brief Default constructor, deleted on purpose. */
-    service_locator() = delete;
+    locator() = delete;
     /*! @brief Default destructor, deleted on purpose. */
-    ~service_locator() = delete;
+    ~locator() = delete;
 
     /**
-     * @brief Tests if a valid service implementation is set.
-     * @return True if the service is set, false otherwise.
+     * @brief Checks whether a service locator contains a value.
+     * @return True if the service locator contains a value, false otherwise.
      */
-    [[nodiscard]] static bool empty() ENTT_NOEXCEPT {
-        return !static_cast<bool>(service);
+    [[nodiscard]] static bool has_value() ENTT_NOEXCEPT {
+        return (service != nullptr);
     }
 
     /**
-     * @brief Returns a weak pointer to a service implementation, if any.
-     *
-     * Clients of a service shouldn't retain references to it. The recommended
-     * way is to retrieve the service implementation currently set each and
-     * every time the need of using it arises. Otherwise users can incur in
-     * unexpected behaviors.
-     *
-     * @return A reference to the service implementation currently set, if any.
-     */
-    [[nodiscard]] static std::weak_ptr<Service> get() ENTT_NOEXCEPT {
-        return service;
-    }
-
-    /**
-     * @brief Returns a weak reference to a service implementation, if any.
-     *
-     * Clients of a service shouldn't retain references to it. The recommended
-     * way is to retrieve the service implementation currently set each and
-     * every time the need of using it arises. Otherwise users can incur in
-     * unexpected behaviors.
+     * @brief Returns a reference to a valid service, if any.
      *
      * @warning
-     * In case no service implementation has been set, a call to this function
-     * results in undefined behavior.
+     * Invoking this function can result in undefined behavior if the service
+     * hasn't been set yet.
      *
-     * @return A reference to the service implementation currently set, if any.
+     * @return A reference to the service currently set, if any.
      */
-    [[nodiscard]] static Service &ref() ENTT_NOEXCEPT {
+    [[nodiscard]] static Service &value() ENTT_NOEXCEPT {
+        ENTT_ASSERT(has_value(), "Service not available");
         return *service;
     }
 
     /**
-     * @brief Sets or replaces a service.
-     * @tparam Impl Type of the new service to use.
-     * @tparam Args Types of arguments to use to construct the service.
-     * @param args Parameters to use to construct the service.
+     * @brief Returns a service if available or sets it from a fallback type.
+     *
+     * Arguments are used only if a service doesn't already exist. In all other
+     * cases, they are discarded.
+     *
+     * @tparam Args Types of arguments to use to construct the fallback service.
+     * @tparam Impl Fallback service type.
+     * @param args Parameters to use to construct the fallback service.
+     * @return A reference to a valid service.
      */
     template<typename Impl = Service, typename... Args>
-    static void set(Args &&...args) {
-        service = std::make_shared<Impl>(std::forward<Args>(args)...);
+    [[nodiscard]] static Service &value_or(Args &&...args) ENTT_NOEXCEPT {
+        return service ? *service : emplace<Impl>(std::forward<Args>(args)...);
     }
 
     /**
      * @brief Sets or replaces a service.
-     * @param ptr Service to use to replace the current one.
+     * @tparam Impl Service type.
+     * @tparam Args Types of arguments to use to construct the service.
+     * @param args Parameters to use to construct the service.
+     * @return A reference to a valid service.
      */
-    static void set(std::shared_ptr<Service> ptr) {
-        ENTT_ASSERT(static_cast<bool>(ptr), "Null service not allowed");
-        service = std::move(ptr);
+    template<typename Impl = Service, typename... Args>
+    static Service &emplace(Args &&...args) {
+        service = std::make_shared<Impl>(std::forward<Args>(args)...);
+        return *service;
     }
 
     /**
-     * @brief Resets a service.
-     *
-     * The service is no longer valid after a reset.
+     * @brief Sets or replaces a service using a given allocator.
+     * @tparam Impl Service type.
+     * @tparam Allocator Type of allocator used to manage memory and elements.
+     * @tparam Args Types of arguments to use to construct the service.
+     * @param alloc The allocator to use.
+     * @param args Parameters to use to construct the service.
+     * @return A reference to a valid service.
      */
+    template<typename Impl = Service, typename Allocator, typename... Args>
+    static Service &allocate_emplace(Allocator alloc, Args &&...args) {
+        service = std::allocate_shared<Impl>(alloc, std::forward<Args>(args)...);
+        return *service;
+    }
+
+    /*! @brief Resets a service. */
     static void reset() {
         service.reset();
     }
 
 private:
+    // std::shared_ptr because of its type erased allocator which is pretty useful here
     inline static std::shared_ptr<Service> service = nullptr;
 };
 

@@ -1,4 +1,4 @@
-* long term feature: shared_ptr less locator and resource cache
+* long term feature: resource cache
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * add examples (and credits) from @alanjfs :)
