@@ -13,15 +13,13 @@ struct position {
 };
 
 struct velocity: position {};
-struct stable_position: position {};
+
+struct stable_position: position {
+    static constexpr auto in_place_delete = true;
+};
 
 template<auto>
 struct comp { int x; };
-
-template<>
-struct entt::component_traits<stable_position>: basic_component_traits {
-    static constexpr auto in_place_delete = true;
-};
 
 struct timer final {
     timer()

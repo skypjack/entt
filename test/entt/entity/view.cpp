@@ -11,12 +11,8 @@
 struct empty_type {};
 
 struct stable_type {
-    int value;
-};
-
-template<>
-struct entt::component_traits<stable_type>: basic_component_traits {
     static constexpr auto in_place_delete = true;
+    int value;
 };
 
 TEST(SingleComponentView, Functionalities) {

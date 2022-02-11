@@ -184,6 +184,7 @@ SETUP_BASIC_TEST(utility entt/core/utility.cpp)
 
 # Test entity
 
+SETUP_BASIC_TEST(component entt/entity/component.cpp)
 SETUP_BASIC_TEST(entity entt/entity/entity.cpp)
 SETUP_BASIC_TEST(group entt/entity/group.cpp)
 SETUP_BASIC_TEST(handle entt/entity/handle.cpp)

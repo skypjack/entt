@@ -27,6 +27,7 @@
     * [Organizer](#organizer)
   * [Context variables](#context-variables)
     * [Aliased properties](#aliased-properties)
+  * [Component traits](#component-traits)
   * [Pointer stability](#pointer-stability)
     * [In-place delete](#in-place-delete)
     * [Hierarchies and the like](#hierarchies-and-the-like)
@@ -942,6 +943,38 @@ const my_type &var = registry.ctx().at<const my_type>();
 Aliased properties can be erased as it happens with any other variable.
 Similarly, they can also be associated with user-generated _names_ (or ids).
 
+## Component traits
+
+In `EnTT`, almost everything is customizable. Components are no exception.<br/>
+In this case, the _standardized_ way to access all component properties is the
+`component_traits` class.
+
+Various parts of the library access component properties through this class. It
+makes it possible to use any type as a component, as long as its specialization
+of `component_traits` implements all the required functionalities.<br/>
+The non-specialized version of this class contains the following members:
+
+* `in_place_delete`: `Type::in_place_delete` if present, false otherwise.
+* `ignore_if_empty`: `Type::ignore_if_empty` if present, `ENTT_IGNORE_IF_EMPTY`
+  otherwise.
+* `page_size`: `Type::ignore_if_empty` if present, `ENTT_PACKED_PAGE` otherwise.
+
+Where `Type` is any type of component. All properties can be customized by
+specializing the above class and defining all its members, or by adding only
+those of interest to a component definition:
+
+```cpp
+struct transform {
+    static constexpr auto in_place_delete = true;
+    // ... other data members ...
+};
+```
+
+The `component_traits` class template will take care of correctly extracting the
+properties from the supplied type to pass them to the rest of the library.<br/>
+In the case of a direct specialization, the class is also _sfinae-friendly_. It
+supports single and multi type specializations as well as feature-based ones.
+
 ## Pointer stability
 
 The ability to achieve pointer stability for one, several or all components is a
@@ -962,33 +995,9 @@ In other words, pointer stability is not automatic but is enabled on request.
 ### In-place delete
 
 The library offers out of the box support for in-place deletion, thus offering
-storage with completely stable pointers.<br/>
-This is achieved by specializing the `component_traits` class. The compile-time
-definition common to all components is the following:
-
-```cpp
-struct basic_component_traits {
-    static constexpr auto in_place_delete = false;
-    static constexpr auto ignore_if_empty = ENTT_IGNORE_IF_EMPTY;
-    static constexpr auto page_size = ENTT_PACKED_PAGE;
-};
-```
-
-Where `in_place_delete` instructs the library on the deletion policy for a given
-type while `ignore_if_empty` selectively disables empty type optimization and
-`page_size` dictates the storage behavior for non-empty types.<br/>
-The `component_traits` class template is _sfinae-friendly_, it supports single
-and multi type specializations as well as feature-based ones:
-
-```cpp
-template<>
-struct entt::component_traits<position>: basic_component_traits {
-    static constexpr auto in_place_delete = true;
-};
-```
-
-This will ensure in-place deletion for the `position` component without further
-user intervention.<br/>
+storage with completely stable pointers. This is achieved by specializing the
+`component_traits` class or by adding the required properties to the component
+definition when needed.<br/>
 Views and groups adapt accordingly when they detect a storage with a different
 deletion policy than the default. In particular:
 
@@ -1028,13 +1037,10 @@ advantages:
 
 ```cpp
 struct transform {
+    static constexpr auto in_place_delete = true;
+
     transform *parent;
     // ... other data members ...
-};
-
-template<>
-struct entt::component_traits<transform>: basic_component_traits {
-    static constexpr auto in_place_delete = true;
 };
 ```
 

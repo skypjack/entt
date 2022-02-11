@@ -12,13 +12,16 @@
 #include "../common/throwing_allocator.hpp"
 #include "../common/throwing_type.hpp"
 
-struct empty_stable_type {};
+struct empty_stable_type {
+    static constexpr auto in_place_delete = true;
+};
 
 struct boxed_int {
     int value;
 };
 
 struct stable_type {
+    static constexpr auto in_place_delete = true;
     int value;
 };
 
@@ -72,18 +75,10 @@ struct crete_from_constructor {
 };
 
 template<>
-struct entt::component_traits<stable_type>: basic_component_traits {
+struct entt::component_traits<std::unordered_set<char>> {
     static constexpr auto in_place_delete = true;
-};
-
-template<>
-struct entt::component_traits<empty_stable_type>: basic_component_traits {
-    static constexpr auto in_place_delete = true;
-};
-
-template<>
-struct entt::component_traits<std::unordered_set<char>>: basic_component_traits {
-    static constexpr auto in_place_delete = true;
+    static constexpr auto ignore_if_empty = ENTT_IGNORE_IF_EMPTY;
+    static constexpr auto page_size = ENTT_PACKED_PAGE;
 };
 
 bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
