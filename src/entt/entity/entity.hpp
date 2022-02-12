@@ -320,7 +320,7 @@ template<typename Entity>
  * @brief Compile-time constant for null entities.
  *
  * There exist implicit conversions from this variable to identifiers of any
- * allowed type. Similarly, there exist comparision operators between the null
+ * allowed type. Similarly, there exist comparison operators between the null
  * entity and any other identifier.
  */
 inline constexpr null_t null{};
@@ -329,7 +329,7 @@ inline constexpr null_t null{};
  * @brief Compile-time constant for tombstone entities.
  *
  * There exist implicit conversions from this variable to identifiers of any
- * allowed type. Similarly, there exist comparision operators between the
+ * allowed type. Similarly, there exist comparison operators between the
  * tombstone entity and any other identifier.
  */
 inline constexpr tombstone_t tombstone{};

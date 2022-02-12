@@ -10,7 +10,7 @@
 * [Concept and implementation](#concept-and-implementation)
   * [Deduced interface](#deduced-interface)
   * [Defined interface](#defined-interface)
-  * [Fullfill a concept](#fullfill-a-concept)
+  * [Fulfill a concept](#fulfill-a-concept)
 * [Inheritance](#inheritance)
 * [Static polymorphism in the wild](#static-polymorphism-in-the-wild)
 * [Storage size and alignment requirement](#storage-size-and-alignment-requirement)
@@ -24,8 +24,8 @@ Static polymorphism is a very powerful tool in C++, albeit sometimes cumbersome
 to obtain.<br/>
 This module aims to make it simple and easy to use.
 
-The library allows to define _concepts_ as interfaces to fullfill with concrete
-classes withouth having to inherit from a common base.<br/>
+The library allows to define _concepts_ as interfaces to fulfill with concrete
+classes without having to inherit from a common base.<br/>
 This is, among others, one of the advantages of static polymorphism in general
 and of a generic wrapper like that offered by the `poly` class template in
 particular.<br/>
@@ -74,7 +74,7 @@ limitations and it's therefore useful to be able to get around the deduction by
 providing a custom definition for the static virtual table.
 
 Once the interface is defined, it will be sufficient to provide a generic
-implementation to fullfill the concept.<br/>
+implementation to fulfill the concept.<br/>
 Also in this case, the library allows customizations based on types or families
 of types, so as to be able to go beyond the generic case where necessary.
 
@@ -94,7 +94,7 @@ struct Drawable: entt::type_list<> {
 ```
 
 It's recognizable by the fact that it inherits from an empty type list.<br/>
-Functions can also be const, accept any number of paramters and return a type
+Functions can also be const, accept any number of parameters and return a type
 other than `void`:
 
 ```cpp
@@ -187,7 +187,7 @@ the interface itself.
 Explicitly defining a static virtual table suppresses the deduction step and
 allows maximum flexibility when providing the implementation for a concept.
 
-## Fullfill a concept
+## Fulfill a concept
 
 The `impl` alias template of a concept is used to define how it's fulfilled:
 
@@ -202,7 +202,7 @@ struct Drawable: entt::type_list<> {
 
 In this case, it's stated that the `draw` method of a generic type will be
 enough to satisfy the requirements of the `Drawable` concept.<br/>
-Both member functions and free functions are supported to fullfill concepts:
+Both member functions and free functions are supported to fulfill concepts:
 
 ```cpp
 template<typename Type>

@@ -85,7 +85,7 @@ TEST(DenseMap, Functionalities) {
     ASSERT_FALSE(map.contains(0u));
 }
 
-TEST(DenseMap, Contructors) {
+TEST(DenseMap, Constructors) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<int, int> map;
 

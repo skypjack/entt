@@ -38,8 +38,8 @@ message(VERBOSE "*")
 # Compiler stuff
 #
 
-option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." OFF)
-option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if availbale." OFF)
+option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if available." OFF)
+option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if available." OFF)
 
 if(ENTT_USE_LIBCPP)
     if(NOT WIN32)
