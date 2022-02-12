@@ -111,7 +111,7 @@ Even worse, some approaches tend to heavily affect other functionalities like
 the construction and destruction of components to favor iterations, even when it
 isn't strictly required. In fact, slightly worse performance along non-critical
 paths are the right price to pay to reduce memory usage and have overall better
-perfomance.<br/>
+performance.<br/>
 `EnTT` follows a completely different approach. It gets the best out from the
 basic data structures and gives users the possibility to pay more for higher
 performance where needed.
@@ -530,7 +530,7 @@ the observer, no matter if they matched the given rule.<br/>
 In the example above, whenever the component `sprite` of an entity is updated,
 the observer probes the entity itself to verify that it has at least `position`
 and has not `velocity` before to store it aside. If one of the two conditions of
-the filter isn't respected, the entity is discared, no matter what.
+the filter isn't respected, the entity is discarded, no matter what.
 
 A `where` clause accepts a theoretically unlimited number of types as well as
 multiple elements in the exclusion list. Moreover, every matcher can have its
@@ -932,7 +932,7 @@ registry.ctx().emplace<const my_type &>(clock);
 
 From the point of view of the user, there are no differences between a variable
 that is managed by the registry and an aliased property. However, read-only
-variables aren't accesible as non-const references:
+variables aren't accessible as non-const references:
 
 ```cpp
 // read-only variables only support const access
@@ -1813,7 +1813,7 @@ also called _nested groups_, such as:
 Fortunately, these are also very common cases if not the most common ones.<br/>
 It allows to increase performance on a greater number of component combinations.
 
-Two nested groups are such that they own at least one componet type and the list
+Two nested groups are such that they own at least one component type and the list
 of component types involved by one of them is contained entirely in that of the
 other. More specifically, this applies independently to all component lists used
 to define a group.<br/>
@@ -2062,7 +2062,7 @@ groups or as free types with multi type views and groups in general.
 # Empty type optimization
 
 An empty type `T` is such that `std::is_empty_v<T>` returns true. They are also
-the same types for which _empty base optimization_ (EBO) is possibile.<br/>
+the same types for which _empty base optimization_ (EBO) is possible.<br/>
 `EnTT` handles these types in a special way, optimizing both in terms of
 performance and memory usage. However, this also has consequences that are worth
 mentioning.

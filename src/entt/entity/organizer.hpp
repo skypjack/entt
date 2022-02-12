@@ -163,7 +163,7 @@ class basic_organizer final {
         const auto length = vertices.size();
         std::vector<bool> edges(length * length, false);
 
-        // creates the ajacency matrix
+        // creates the adjacency matrix
         for(const auto &deps: dependencies) {
             const auto last = deps.second.cend();
             auto it = deps.second.cbegin();

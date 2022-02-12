@@ -86,7 +86,7 @@ TEST(DenseSet, Functionalities) {
     ASSERT_FALSE(set.contains(0u));
 }
 
-TEST(DenseSet, Contructors) {
+TEST(DenseSet, Constructors) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<int> set;
 

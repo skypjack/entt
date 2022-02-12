@@ -54,7 +54,7 @@ struct basic_hashed_string {
  * @brief Zero overhead unique identifier.
  *
  * A hashed string is a compile-time tool that allows users to use
- * human-readable identifers in the codebase while using their numeric
+ * human-readable identifiers in the codebase while using their numeric
  * counterparts at runtime.<br/>
  * Because of that, a hashed string can also be used in constant expressions if
  * required.
@@ -108,7 +108,7 @@ public:
 
     /**
      * @brief Returns directly the numeric representation of a string view.
-     * @param str Human-readable identifer.
+     * @param str Human-readable identifier.
      * @param len Length of the string to hash.
      * @return The numeric representation of the string.
      */
@@ -119,7 +119,7 @@ public:
     /**
      * @brief Returns directly the numeric representation of a string.
      * @tparam N Number of characters of the identifier.
-     * @param str Human-readable identifer.
+     * @param str Human-readable identifier.
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
@@ -142,7 +142,7 @@ public:
 
     /**
      * @brief Constructs a hashed string from a string view.
-     * @param str Human-readable identifer.
+     * @param str Human-readable identifier.
      * @param len Length of the string to hash.
      */
     constexpr basic_hashed_string(const value_type *str, const size_type len) ENTT_NOEXCEPT
@@ -151,7 +151,7 @@ public:
     /**
      * @brief Constructs a hashed string from an array of const characters.
      * @tparam N Number of characters of the identifier.
-     * @param str Human-readable identifer.
+     * @param str Human-readable identifier.
      */
     template<std::size_t N>
     constexpr basic_hashed_string(const value_type (&str)[N]) ENTT_NOEXCEPT
@@ -210,7 +210,7 @@ public:
 /**
  * @brief Deduction guide.
  * @tparam Char Character type.
- * @param str Human-readable identifer.
+ * @param str Human-readable identifier.
  * @param len Length of the string to hash.
  */
 template<typename Char>
@@ -220,7 +220,7 @@ basic_hashed_string(const Char *str, const std::size_t len) -> basic_hashed_stri
  * @brief Deduction guide.
  * @tparam Char Character type.
  * @tparam N Number of characters of the identifier.
- * @param str Human-readable identifer.
+ * @param str Human-readable identifier.
  */
 template<typename Char, std::size_t N>
 basic_hashed_string(const Char (&str)[N]) -> basic_hashed_string<Char>;

@@ -528,7 +528,7 @@ public:
     }
 
     /**
-     * @brief Assigns a meta funcion to a meta type.
+     * @brief Assigns a meta function to a meta type.
      *
      * Both member functions and free functions can be assigned to a meta
      * type.<br/>

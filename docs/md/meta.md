@@ -416,7 +416,7 @@ to case. In particular:
   ```
 
 * The `resize` member function allows to resize the wrapped container and
-  returns true in case of succes:
+  returns true in case of success:
 
   ```cpp
   const bool ok = view.resize(3u);
