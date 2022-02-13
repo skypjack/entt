@@ -125,7 +125,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    constexpr compressed_pair(compressed_pair &&other) ENTT_NOEXCEPT = default;
+    constexpr compressed_pair(compressed_pair &&other) = default;
 
     /**
      * @brief Constructs a pair from its values.
@@ -163,7 +163,7 @@ public:
      * @param other The instance to move from.
      * @return This compressed pair object.
      */
-    constexpr compressed_pair &operator=(compressed_pair &&other) ENTT_NOEXCEPT = default;
+    constexpr compressed_pair &operator=(compressed_pair &&other) = default;
 
     /**
      * @brief Returns the first element that a pair stores.
