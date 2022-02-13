@@ -8,6 +8,7 @@
 #include <entt/core/memory.hpp>
 #include "../common/basic_test_allocator.hpp"
 #include "../common/throwing_allocator.hpp"
+#include "../common/tracked_memory_resource.hpp"
 
 TEST(Memory, ToAddress) {
     std::shared_ptr<int> shared = std::make_shared<int>();
@@ -81,3 +82,20 @@ TEST(Memory, AllocateUnique) {
 
     ASSERT_FALSE(ptr);
 }
+
+#if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
+
+TEST(Memory, UsesAllocatorConstruction) {
+    using string_type = typename test::tracked_memory_resource::string_type;
+
+    test::tracked_memory_resource memory_resource{};
+    std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
+    const char *str = "a string long enough to force an allocation (hopefully)";
+
+    std::unique_ptr<string_type, entt::allocation_deleter<std::pmr::polymorphic_allocator<string_type>>> ptr = entt::allocate_unique<string_type>(allocator, str);
+
+    ASSERT_GT(memory_resource.do_allocate_counter(), 1u);
+    ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
+}
+
+#endif
