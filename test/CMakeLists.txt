@@ -3,6 +3,12 @@
 #
 
 include(FetchContent)
+include(CheckCXXSourceCompiles)
+
+check_cxx_source_compiles("
+    #include<version>
+    int main() { return 0; }
+" ENTT_HAS_HEADER_VERSION)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -67,6 +73,14 @@ function(SETUP_TARGET TARGET_NAME)
             NOMINMAX
             ${ARGN}
     )
+
+    if(ENTT_HAS_HEADER_VERSION)
+        target_compile_definitions(
+            ${TARGET_NAME}
+            PRIVATE
+                ENTT_HAS_HEADER_VERSION
+        )
+    endif()
 endfunction()
 
 add_library(odr OBJECT odr.cpp)
