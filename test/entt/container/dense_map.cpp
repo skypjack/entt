@@ -9,6 +9,7 @@
 #include <entt/container/dense_map.hpp>
 #include <entt/core/memory.hpp>
 #include <entt/core/utility.hpp>
+#include "../common/throwing_allocator.hpp"
 
 struct transparent_equal_to {
     using is_transparent = void;
@@ -1074,4 +1075,19 @@ TEST(DenseMap, Reserve) {
 
     ASSERT_EQ(map.bucket_count(), 2 * minimum_bucket_count);
     ASSERT_EQ(map.bucket_count(), entt::next_power_of_two(std::ceil(minimum_bucket_count / map.max_load_factor())));
+}
+
+TEST(DenseMap, ThrowingAllocator) {
+    using allocator = test::throwing_allocator<std::pair<const std::size_t, std::size_t>>;
+    using packed_allocator = test::throwing_allocator<entt::internal::dense_map_node<const std::size_t, std::size_t>>;
+    using packed_exception = typename packed_allocator::exception_type;
+
+    static constexpr std::size_t minimum_bucket_count = 8u;
+    entt::dense_map<std::size_t, std::size_t, std::hash<std::size_t>, std::equal_to<std::size_t>, allocator> map{};
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_EQ(map.bucket_count(), minimum_bucket_count);
+    ASSERT_THROW(map.reserve(2u * map.bucket_count()), packed_exception);
+    ASSERT_EQ(map.bucket_count(), minimum_bucket_count);
 }

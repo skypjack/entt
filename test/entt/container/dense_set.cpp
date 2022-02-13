@@ -9,6 +9,7 @@
 #include <entt/container/dense_set.hpp>
 #include <entt/core/memory.hpp>
 #include <entt/core/utility.hpp>
+#include "../common/throwing_allocator.hpp"
 
 struct transparent_equal_to {
     using is_transparent = void;
@@ -815,4 +816,19 @@ TEST(DenseSet, Reserve) {
 
     ASSERT_EQ(set.bucket_count(), 2 * minimum_bucket_count);
     ASSERT_EQ(set.bucket_count(), entt::next_power_of_two(std::ceil(minimum_bucket_count / set.max_load_factor())));
+}
+
+TEST(DenseSet, ThrowingAllocator) {
+    using allocator = test::throwing_allocator<std::size_t>;
+    using packed_allocator = test::throwing_allocator<entt::internal::dense_set_node<std::size_t>>;
+    using packed_exception = typename packed_allocator::exception_type;
+
+    static constexpr std::size_t minimum_bucket_count = 8u;
+    entt::dense_set<std::size_t, std::hash<std::size_t>, std::equal_to<std::size_t>, allocator> set{};
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
+    ASSERT_THROW(set.reserve(2u * set.bucket_count()), packed_exception);
+    ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
 }
