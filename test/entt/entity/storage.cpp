@@ -11,6 +11,7 @@
 #include <entt/entity/storage.hpp>
 #include "../common/throwing_allocator.hpp"
 #include "../common/throwing_type.hpp"
+#include "../common/tracked_memory_resource.hpp"
 
 struct empty_stable_type {
     static constexpr auto in_place_delete = true;
@@ -1756,3 +1757,24 @@ TEST(Storage, ThrowingComponent) {
     ASSERT_EQ(pool.at(0u), entt::entity{42});
     ASSERT_EQ(pool.get(entt::entity{42}), 42);
 }
+
+#if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
+
+TEST(Storage, UsesAllocatorConstruction) {
+    using string_type = typename test::tracked_memory_resource::string_type;
+
+    test::tracked_memory_resource memory_resource{};
+    entt::basic_storage<entt::entity, string_type, std::pmr::polymorphic_allocator<string_type>> pool{&memory_resource};
+    const char *str = "a string long enough to force an allocation (hopefully)";
+    const entt::entity entity{};
+
+    pool.emplace(entity);
+    pool.erase(entity);
+    memory_resource.reset();
+    pool.emplace(entity, str);
+
+    ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
+    ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
+}
+
+#endif
