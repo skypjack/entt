@@ -273,27 +273,6 @@ class dense_set {
         return cend();
     }
 
-    template<typename Arg>
-    [[nodiscard]] auto get_or_emplace(Arg &&arg) {
-        const auto hash = sparse.second()(arg);
-        auto index = hash_to_bucket(hash);
-
-        if(auto it = constrained_find(arg, index); it != end()) {
-            return std::make_pair(it, false);
-        }
-
-        if(const auto count = size() + 1u; count > (bucket_count() * max_load_factor())) {
-            rehash(bucket_count() * 2u);
-            index = hash_to_bucket(hash);
-        }
-
-        packed.first().emplace_back(sparse.first()[index], std::forward<Arg>(arg));
-        // update goes after emplace to enforce exception guarantees
-        sparse.first()[index] = size() - 1u;
-
-        return std::make_pair(--end(), true);
-    }
-
     template<typename Other>
     bool do_erase(const Other &value) {
         for(size_type *curr = sparse.first().data() + bucket(value); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].next) {
@@ -557,6 +536,10 @@ public:
 
     /**
      * @brief Constructs an element in-place, if it does not exist.
+     *
+     * The element is also constructed when the container already has the key,
+     * in which case the newly constructed object is destroyed immediately.
+     *
      * @tparam Args Types of arguments to forward to the constructor of the
      * element.
      * @param args Arguments to forward to the constructor of the element.
@@ -566,11 +549,24 @@ public:
      */
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
-        if constexpr(((sizeof...(Args) == 1u) && ... && std::is_same_v<std::remove_const_t<std::remove_reference_t<Args>>, value_type>)) {
-            return get_or_emplace(std::forward<Args>(args)...);
-        } else {
-            return get_or_emplace(value_type{std::forward<Args>(args)...});
+        auto &node = packed.first().emplace_back(packed.first().size(), std::forward<Args>(args)...);
+        const auto hash = sparse.second()(node.element);
+        auto index = hash_to_bucket(hash);
+
+        if(auto it = constrained_find(node.element, index); it != end()) {
+            packed.first().pop_back();
+            return std::make_pair(it, false);
         }
+
+        // update goes after emplace to enforce exception guarantees
+        node.next = std::exchange(sparse.first()[index], size() - 1u);
+
+        if(const auto count = size() + 1u; count > (bucket_count() * max_load_factor())) {
+            rehash(bucket_count() * 2u);
+            index = hash_to_bucket(hash);
+        }
+
+        return std::make_pair(--end(), true);
     }
 
     /**

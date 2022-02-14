@@ -4,7 +4,7 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* dense map/set: support uses-allocator construction
+* dense map/set: support uses-allocator construction (single arg, multi-arg, key construction)
 * runtime events (emitter)
 * iterator based try_emplace vs try_insert for perf reasons
 * registry: remove reference to basic_sparse_set<E>
