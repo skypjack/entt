@@ -50,7 +50,7 @@ class basic_any {
         const Type *element = nullptr;
 
         if constexpr(in_situ<Type>) {
-            element = value.owner() ? ENTT_LAUNDER(reinterpret_cast<const Type *>(&value.storage)) : static_cast<const Type *>(value.instance);
+            element = value.owner() ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
         } else {
             element = static_cast<const Type *>(value.instance);
         }
