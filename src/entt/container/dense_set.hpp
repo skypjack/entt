@@ -27,22 +27,63 @@ namespace entt {
 
 namespace internal {
 
-template<typename Type>
-struct dense_set_node final {
+template<typename Type, typename Allocator>
+struct dense_set_node final: Allocator {
+    using allocator_type = Allocator;
+
     template<typename... Args>
     dense_set_node(const std::size_t pos, Args &&...args)
-        : next{pos},
-          element{std::forward<Args>(args)...} {}
+        : dense_set_node{std::allocator_arg, Allocator{}, pos, std::forward<Args>(args)...} {
+    }
+
+    template<typename... Args>
+    dense_set_node(std::allocator_arg_t, const allocator_type &allocator, const std::size_t pos, Args &&...args)
+        : Allocator{allocator},
+          next{pos} {
+        std::allocator_traits<allocator_type>::construct(*this, reinterpret_cast<Type *>(&instance), std::forward<Args>(args)...);
+    }
+
+    dense_set_node(const dense_set_node &other)
+        : dense_set_node{std::allocator_arg, Allocator{}, other} {
+    }
+
+    dense_set_node(std::allocator_arg_t, const allocator_type &allocator, const dense_set_node &other)
+        : Allocator{allocator},
+          next{other.next} {
+        std::allocator_traits<allocator_type>::construct(*this, reinterpret_cast<Type *>(&instance), other.element());
+    }
+
+    dense_set_node(dense_set_node &&other) ENTT_NOEXCEPT
+        : dense_set_node{std::allocator_arg, Allocator{}, std::move(other)} {
+    }
+
+    dense_set_node(std::allocator_arg_t, const allocator_type &allocator, dense_set_node &&other) ENTT_NOEXCEPT
+        : Allocator{allocator},
+          next{other.next} {
+        std::allocator_traits<allocator_type>::construct(*this, reinterpret_cast<Type *>(&instance), std::move(other.element()));
+    }
+
+    ~dense_set_node() ENTT_NOEXCEPT {
+        std::destroy_at(reinterpret_cast<const Type *>(&instance));
+    }
+
+    const Type &element() const ENTT_NOEXCEPT {
+        return *reinterpret_cast<const Type *>(&instance);
+    }
+
+    Type &element() ENTT_NOEXCEPT {
+        return *reinterpret_cast<Type *>(&instance);
+    }
 
     std::size_t next;
-    Type element;
+    std::aligned_storage_t<sizeof(Type)> instance;
 };
 
 template<typename It>
 class dense_set_iterator final {
     friend dense_set_iterator<const std::remove_pointer_t<It> *>;
 
-    using iterator_traits = std::iterator_traits<decltype(std::addressof(std::as_const(std::declval<It>()->element)))>;
+    using iterator_traits = std::iterator_traits<decltype(std::addressof(std::as_const(std::declval<It>()->element())))>;
 
 public:
     using value_type = typename iterator_traits::value_type;
@@ -97,11 +138,11 @@ public:
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const {
-        return it[value].element;
+        return it[value].element();
     }
 
     [[nodiscard]] pointer operator->() const {
-        return std::addressof(it->element);
+        return std::addressof(it->element());
     }
 
     [[nodiscard]] reference operator*() const {
@@ -160,7 +201,7 @@ template<typename It>
 class dense_set_local_iterator final {
     friend dense_set_local_iterator<const std::remove_pointer_t<It> *>;
 
-    using iterator_traits = std::iterator_traits<decltype(std::addressof(std::as_const(std::declval<It>()->element)))>;
+    using iterator_traits = std::iterator_traits<decltype(std::addressof(std::as_const(std::declval<It>()->element())))>;
 
 public:
     using value_type = typename iterator_traits::value_type;
@@ -190,7 +231,7 @@ public:
     }
 
     [[nodiscard]] pointer operator->() const {
-        return std::addressof(it[offset].element);
+        return std::addressof(it[offset].element());
     }
 
     [[nodiscard]] reference operator*() const {
@@ -243,7 +284,7 @@ class dense_set {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
 
-    using node_type = internal::dense_set_node<Type>;
+    using node_type = internal::dense_set_node<Type, Allocator>;
     using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
@@ -276,7 +317,7 @@ class dense_set {
     template<typename Other>
     bool do_erase(const Other &value) {
         for(size_type *curr = sparse.first().data() + bucket(value); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].next) {
-            if(packed.second()(packed.first()[*curr].element, value)) {
+            if(packed.second()(packed.first()[*curr].element(), value)) {
                 const auto index = *curr;
                 *curr = packed.first()[*curr].next;
                 move_and_pop(index);
@@ -289,12 +330,13 @@ class dense_set {
 
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
-            size_type *curr = sparse.first().data() + bucket(packed.first().back().element);
+            size_type *curr = sparse.first().data() + bucket(packed.first().back().element());
             for(; *curr != last; curr = &packed.first()[*curr].next) {}
             *curr = pos;
 
             // basic exception guarantees when value type has a throwing move constructor
-            packed.first()[pos] = std::move(packed.first().back());
+            packed.first()[pos].element() = std::move(packed.first().back().element());
+            packed.first()[pos].next = packed.first().back().next;
         }
 
         packed.first().pop_back();
@@ -550,10 +592,10 @@ public:
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
         auto &node = packed.first().emplace_back(packed.first().size(), std::forward<Args>(args)...);
-        const auto hash = sparse.second()(node.element);
+        const auto hash = sparse.second()(node.element());
         auto index = hash_to_bucket(hash);
 
-        if(auto it = constrained_find(node.element, index); it != end()) {
+        if(auto it = constrained_find(node.element(), index); it != end()) {
             packed.first().pop_back();
             return std::make_pair(it, false);
         }
@@ -801,7 +843,7 @@ public:
             std::fill(sparse.first().begin(), sparse.first().end(), std::numeric_limits<size_type>::max());
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
-                const auto index = bucket(packed.first()[pos].element);
+                const auto index = bucket(packed.first()[pos].element());
                 packed.first()[pos].next = std::exchange(sparse.first()[index], pos);
             }
         }

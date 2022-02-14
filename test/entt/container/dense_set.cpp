@@ -10,6 +10,7 @@
 #include <entt/core/memory.hpp>
 #include <entt/core/utility.hpp>
 #include "../common/throwing_allocator.hpp"
+#include "../common/tracked_memory_resource.hpp"
 
 struct transparent_equal_to {
     using is_transparent = void;
@@ -820,7 +821,7 @@ TEST(DenseSet, Reserve) {
 
 TEST(DenseSet, ThrowingAllocator) {
     using allocator = test::throwing_allocator<std::size_t>;
-    using packed_allocator = test::throwing_allocator<entt::internal::dense_set_node<std::size_t>>;
+    using packed_allocator = test::throwing_allocator<entt::internal::dense_set_node<std::size_t, test::throwing_allocator<std::size_t>>>;
     using packed_exception = typename packed_allocator::exception_type;
 
     static constexpr std::size_t minimum_bucket_count = 8u;
@@ -832,3 +833,25 @@ TEST(DenseSet, ThrowingAllocator) {
     ASSERT_THROW(set.reserve(2u * set.bucket_count()), packed_exception);
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
 }
+
+#if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
+
+TEST(DenseSet, UsesAllocatorConstruction) {
+    using string_type = typename test::tracked_memory_resource::string_type;
+    using allocator = std::pmr::polymorphic_allocator<string_type>;
+
+    test::tracked_memory_resource memory_resource{};
+    entt::dense_set<string_type, std::hash<string_type>, std::equal_to<string_type>, allocator> set{&memory_resource};
+    const char *str = "a string long enough to force an allocation (hopefully)";
+
+    set.reserve(1u);
+    memory_resource.reset();
+    set.emplace(str);
+
+    ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
+    ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
+
+    entt::dense_set<string_type, std::hash<string_type>, std::equal_to<string_type>, allocator> other{std::move(set)};
+}
+
+#endif
