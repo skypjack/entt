@@ -34,6 +34,7 @@ class dispatcher {
         virtual void publish() = 0;
         virtual void disconnect(void *) = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
+        virtual size_t size() = 0;
     };
 
     template<typename Event>
@@ -74,6 +75,10 @@ class dispatcher {
             } else {
                 events.emplace_back(std::forward<Args>(args)...);
             }
+        }
+
+        size_t size() const {
+            return events.size();
         }
 
     private:
@@ -246,6 +251,31 @@ public:
         for(auto &&cpool: pools) {
             cpool.second->publish();
         }
+    }
+
+    /**
+     * @brief Returns the count of pending events for the specified type.
+     *
+     * This method returns the count of pending events for the specified
+     * type.
+     */
+    template<typename Event>
+    size_t size() const {
+        return assure<Event>().size();
+    }
+
+    /**
+     * @brief Returns the total count of pending events.
+     *
+     * This method counts all pending events across all registered event
+     * types.
+     */
+    size_t size() const {
+        size_t events = 0;
+        for(auto &&cpool: pools) {
+            events += cpool.second->size();
+        }
+        return events;
     }
 
 private:
