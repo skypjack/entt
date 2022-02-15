@@ -7,7 +7,7 @@
 		<DisplayString>{{ type={ "$T1" } }}</DisplayString>
 		<Expand>
 			<Item Name="[empty]">fn == nullptr</Item>
-			<Item Name="[data]">data</Item>
+			<Item Name="[data]">instance</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::dispatcher">
