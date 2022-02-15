@@ -64,11 +64,11 @@ class poly_vtable {
     static auto vtable_entry(Ret (inspector::*)(Args...) const) -> Ret (*)(const basic_any<Len, Align> &, Args...);
 
     template<auto... Candidate>
-    static auto make_vtable(value_list<Candidate...>)
+    static auto make_vtable(value_list<Candidate...>) ENTT_NOEXCEPT
         -> decltype(std::make_tuple(vtable_entry(Candidate)...));
 
     template<typename... Func>
-    [[nodiscard]] static constexpr auto make_vtable(type_list<Func...>) {
+    [[nodiscard]] static constexpr auto make_vtable(type_list<Func...>) ENTT_NOEXCEPT {
         if constexpr(sizeof...(Func) == 0u) {
             return decltype(make_vtable(typename Concept::template impl<inspector>{})){};
         } else if constexpr((std::is_function_v<Func> && ...)) {
@@ -77,7 +77,7 @@ class poly_vtable {
     }
 
     template<typename Type, auto Candidate, typename Ret, typename Any, typename... Args>
-    static void fill_vtable_entry(Ret (*&entry)(Any &, Args...)) {
+    static void fill_vtable_entry(Ret (*&entry)(Any &, Args...)) ENTT_NOEXCEPT {
         if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
             entry = +[](Any &, Args... args) -> Ret {
                 return std::invoke(Candidate, std::forward<Args>(args)...);
@@ -90,7 +90,7 @@ class poly_vtable {
     }
 
     template<typename Type, auto... Index>
-    [[nodiscard]] static auto fill_vtable(std::index_sequence<Index...>) {
+    [[nodiscard]] static auto fill_vtable(std::index_sequence<Index...>) ENTT_NOEXCEPT {
         vtable_type impl{};
         (fill_vtable_entry<Type, value_list_element_v<Index, typename Concept::template impl<Type>>>(std::get<Index>(impl)), ...);
         return impl;
@@ -109,7 +109,7 @@ public:
      * @return A static virtual table for the given concept and type.
      */
     template<typename Type>
-    [[nodiscard]] static type instance() {
+    [[nodiscard]] static type instance() ENTT_NOEXCEPT {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Type differs from its decayed form");
         static const vtable_type vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
 
