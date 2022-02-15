@@ -62,7 +62,7 @@ public:
      * @param res Unrelated and unmanaged resources.
      */
     template<typename Other>
-    resource_handle(const resource_handle<Other> &other, resource_type &res) noexcept
+    resource_handle(const resource_handle<Other> &other, resource_type &res) ENTT_NOEXCEPT
         : resource{other.resource, std::addressof(res)} {}
 
     /**
