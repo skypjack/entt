@@ -57,7 +57,7 @@ public:
         : it{iter} {}
 
     template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
-    dense_map_iterator(const dense_map_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other)
+    dense_map_iterator(const dense_map_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other) ENTT_NOEXCEPT
         : it{other.it} {}
 
     dense_map_iterator &operator++() ENTT_NOEXCEPT {
@@ -96,15 +96,15 @@ public:
         return (*this + -value);
     }
 
-    [[nodiscard]] reference operator[](const difference_type value) const {
+    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         return it[value].element;
     }
 
-    [[nodiscard]] pointer operator->() const {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return std::addressof(it->element);
     }
 
-    [[nodiscard]] reference operator*() const {
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 
@@ -176,7 +176,7 @@ public:
           offset{pos} {}
 
     template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
-    dense_map_local_iterator(const dense_map_local_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other)
+    dense_map_local_iterator(const dense_map_local_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other) ENTT_NOEXCEPT
         : it{other.it},
           offset{other.offset} {}
 
@@ -189,11 +189,11 @@ public:
         return ++(*this), orig;
     }
 
-    [[nodiscard]] pointer operator->() const {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return std::addressof(it[offset].element);
     }
 
-    [[nodiscard]] reference operator*() const {
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 
@@ -406,14 +406,14 @@ public:
      * @brief Default move constructor.
      * @param other The instance to move from.
      */
-    dense_map(dense_map &&other) ENTT_NOEXCEPT = default;
+    dense_map(dense_map &&other) = default;
 
     /**
      * @brief Allocator-extended move constructor.
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    dense_map(dense_map &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+    dense_map(dense_map &&other, const allocator_type &allocator)
         : sparse{sparse_container_type{std::move(other.sparse.first()), allocator}, std::move(other.sparse.second())},
           // cannot move the container directly due to a nasty issue of apple clang :(
           packed{packed_container_type{std::make_move_iterator(other.packed.first().begin()), std::make_move_iterator(other.packed.first().end()), allocator}, std::move(other.packed.second())},
@@ -442,7 +442,7 @@ public:
      * @param other The instance to move from.
      * @return This container.
      */
-    dense_map &operator=(dense_map &&other) ENTT_NOEXCEPT = default;
+    dense_map &operator=(dense_map &&other) = default;
 
     /**
      * @brief Returns the associated allocator.
