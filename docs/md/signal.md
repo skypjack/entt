@@ -362,7 +362,7 @@ case:
 struct my_collector {
     std::vector<int> vec{};
 
-    bool operator()(int v) noexcept {
+    bool operator()(int v) {
         vec.push_back(v);
         return true;
     }
