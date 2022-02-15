@@ -24,7 +24,7 @@ namespace entt {
  * @tparam Service Service type.
  */
 template<typename Service>
-struct locator {
+struct locator final {
     /*! @brief Service type. */
     using type = Service;
 
@@ -67,7 +67,7 @@ struct locator {
      * @return A reference to a valid service.
      */
     template<typename Impl = Service, typename... Args>
-    [[nodiscard]] static Service &value_or(Args &&...args) ENTT_NOEXCEPT {
+    [[nodiscard]] static Service &value_or(Args &&...args) {
         return service ? *service : emplace<Impl>(std::forward<Args>(args)...);
     }
 
@@ -100,7 +100,7 @@ struct locator {
     }
 
     /*! @brief Resets a service. */
-    static void reset() {
+    static void reset() ENTT_NOEXCEPT {
         service.reset();
     }
 
