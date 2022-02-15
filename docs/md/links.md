@@ -27,6 +27,9 @@ I hope this list can grow much more in the future:
     [Call of Duty: Vanguard](https://www.callofduty.com/vanguard) by
     [Sledgehammer Games](https://www.sledgehammergames.com/): I can neither
     confirm nor deny but there is a license I know in the credits.
+  * Apparently [D&D Dark Alliance](https://darkalliance.wizards.com) by
+    [Wizards of the Coast](https://company.wizards.com): your party, their
+    funeral.
   * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
     [Tilted Phoques](https://github.com/tiltedphoques): Skyrim and Fallout 4 mod
     to play online.
