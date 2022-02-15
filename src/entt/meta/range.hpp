@@ -85,7 +85,7 @@ struct meta_range final {
      * @brief Constructs a meta range from a given node.
      * @param head The underlying node with which to construct the range.
      */
-    meta_range(node_type *head)
+    meta_range(node_type *head) ENTT_NOEXCEPT
         : node{head} {}
 
     /**

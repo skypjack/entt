@@ -1486,7 +1486,7 @@ public:
      * @param iter The actual iterator with which to build the meta iterator.
      */
     template<typename It>
-    explicit meta_iterator(It iter)
+    explicit meta_iterator(It iter) ENTT_NOEXCEPT
         : vtable{&basic_vtable<It>},
           handle{std::move(iter)} {}
 
@@ -1515,7 +1515,7 @@ public:
      * @brief Access operator for accessing the pointed opaque object.
      * @return The element to which the iterator points.
      */
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] pointer operator->() const {
         return operator*();
     }
 
@@ -1693,7 +1693,7 @@ public:
      * @param iter The actual iterator with which to build the meta iterator.
      */
     template<bool KeyOnly, typename It>
-    meta_iterator(std::integral_constant<bool, KeyOnly>, It iter)
+    meta_iterator(std::integral_constant<bool, KeyOnly>, It iter) ENTT_NOEXCEPT
         : vtable{&basic_vtable<KeyOnly, It>},
           handle{std::move(iter)} {}
 
@@ -1722,7 +1722,7 @@ public:
      * @brief Access operator for accessing the pointed opaque object.
      * @return The element to which the iterator points.
      */
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] pointer operator->() const {
         return operator*();
     }
 
