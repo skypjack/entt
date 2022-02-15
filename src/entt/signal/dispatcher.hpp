@@ -225,7 +225,7 @@ public:
     }
 
     /*! @brief Discards all the events queued so far. */
-    void clear() {
+    void clear() ENTT_NOEXCEPT {
         for(auto &&cpool: pools) {
             cpool.second->clear();
         }

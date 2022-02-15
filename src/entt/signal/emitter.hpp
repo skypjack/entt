@@ -157,7 +157,7 @@ public:
         friend class emitter;
 
         /*! @brief Default constructor. */
-        connection() = default;
+        connection() ENTT_NOEXCEPT = default;
 
         /**
          * @brief Creates a connection that wraps its underlying instance.
@@ -171,7 +171,7 @@ public:
     emitter() = default;
 
     /*! @brief Default destructor. */
-    virtual ~emitter() {
+    virtual ~emitter() ENTT_NOEXCEPT {
         static_assert(std::is_base_of_v<emitter<Derived>, Derived>, "Incorrect use of the class template");
     }
 
