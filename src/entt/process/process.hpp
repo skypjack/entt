@@ -166,7 +166,7 @@ public:
     using delta_type = Delta;
 
     /*! @brief Default destructor. */
-    virtual ~process() {
+    virtual ~process() ENTT_NOEXCEPT {
         static_assert(std::is_base_of_v<process, Derived>, "Incorrect use of the class template");
     }
 

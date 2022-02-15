@@ -53,7 +53,7 @@ class scheduler {
     };
 
     struct continuation {
-        continuation(process_handler *ref)
+        continuation(process_handler *ref) ENTT_NOEXCEPT
             : handler{ref} {}
 
         template<typename Proc, typename... Args>
