@@ -340,7 +340,8 @@ class basic_continuous_loader {
             }
         }
 
-        std::swap(container, other);
+        using std::swap;
+        swap(container, other);
     }
 
     template<typename Container>
