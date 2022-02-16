@@ -317,7 +317,8 @@ private:
     }
 
     void swap_at(const std::size_t lhs, const std::size_t rhs) final {
-        std::swap(element_at(lhs), element_at(rhs));
+        using std::swap;
+        swap(element_at(lhs), element_at(rhs));
     }
 
     void move_element(const std::size_t from, const std::size_t to) final {

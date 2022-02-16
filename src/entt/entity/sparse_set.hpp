@@ -752,7 +752,10 @@ public:
             if(const size_type to = entity_traits::to_entity(*it); to < from) {
                 --from;
                 move_element(from, to);
-                std::swap(packed[from], packed[to]);
+
+                using std::swap;
+                swap(packed[from], packed[to]);
+                
                 const auto entity = static_cast<typename entity_traits::entity_type>(to);
                 sparse_ref(packed[to]) = entity_traits::combine(entity, entity_traits::to_integral(packed[to]));
                 *it = entity_traits::combine(static_cast<typename entity_traits::entity_type>(from), entity_traits::reserved);
@@ -790,7 +793,9 @@ public:
         swap_at(static_cast<size_type>(from), static_cast<size_type>(to));
         entt = entity_traits::combine(to, entity_traits::to_integral(packed[from]));
         other = entity_traits::combine(from, entity_traits::to_integral(packed[to]));
-        std::swap(packed[from], packed[to]);
+
+        using std::swap;
+        swap(packed[from], packed[to]);
     }
 
     /**
