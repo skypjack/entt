@@ -89,6 +89,8 @@ I hope this list can grow much more in the future:
     simulator using C++ with some reinforcement learning.
   * [HomeHearth](https://youtu.be/GrEWl8npL9Y): choose your hero, protect the
     town, before it's too late.
+  * [City Builder Game](https://github.com/PhiGei2000/CityBuilderGame): a simple
+    city-building game using C++ and OpenGL.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
