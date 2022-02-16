@@ -37,8 +37,8 @@ struct dense_set_node final: Allocator {
     }
 
     template<typename... Args>
-    dense_set_node(std::allocator_arg_t, const allocator_type &allocator, const std::size_t pos, Args &&...args)
-        : Allocator{allocator},
+    dense_set_node(std::allocator_arg_t, const allocator_type &alloc, const std::size_t pos, Args &&...args)
+        : Allocator{alloc},
           next{pos} {
         std::allocator_traits<allocator_type>::construct(*this, reinterpret_cast<Type *>(&instance), std::forward<Args>(args)...);
     }
@@ -47,8 +47,8 @@ struct dense_set_node final: Allocator {
         : dense_set_node{std::allocator_arg, Allocator{}, other} {
     }
 
-    dense_set_node(std::allocator_arg_t, const allocator_type &allocator, const dense_set_node &other)
-        : Allocator{allocator},
+    dense_set_node(std::allocator_arg_t, const allocator_type &alloc, const dense_set_node &other)
+        : Allocator{alloc},
           next{other.next} {
         std::allocator_traits<allocator_type>::construct(*this, reinterpret_cast<Type *>(&instance), other.element());
     }
@@ -57,8 +57,8 @@ struct dense_set_node final: Allocator {
         : dense_set_node{std::allocator_arg, Allocator{}, std::move(other)} {
     }
 
-    dense_set_node(std::allocator_arg_t, const allocator_type &allocator, dense_set_node &&other)
-        : Allocator{allocator},
+    dense_set_node(std::allocator_arg_t, const allocator_type &alloc, dense_set_node &&other)
+        : Allocator{alloc},
           next{other.next} {
         std::allocator_traits<allocator_type>::construct(*this, reinterpret_cast<Type *>(&instance), std::move(other.element()));
     }
