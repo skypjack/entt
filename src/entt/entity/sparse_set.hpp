@@ -74,15 +74,15 @@ struct sparse_set_iterator final {
         return (*this + -value);
     }
 
-    [[nodiscard]] reference operator[](const difference_type value) const {
+    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         return packed->data()[index() - value];
     }
 
-    [[nodiscard]] pointer operator->() const {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return packed->data() + index();
     }
 
-    [[nodiscard]] reference operator*() const {
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 
@@ -585,7 +585,7 @@ public:
      * @return The version for the given identifier if present, the tombstone
      * version otherwise.
      */
-    [[nodiscard]] version_type current(const entity_type entt) const {
+    [[nodiscard]] version_type current(const entity_type entt) const ENTT_NOEXCEPT {
         const auto elem = sparse_ptr(entt);
         constexpr auto fallback = entity_traits::to_version(tombstone);
         return elem ? entity_traits::to_version(*elem) : fallback;

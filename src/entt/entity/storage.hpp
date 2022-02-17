@@ -170,11 +170,11 @@ public:
 
     extended_storage_iterator() = default;
 
-    extended_storage_iterator(It base, Other... other) ENTT_NOEXCEPT
+    extended_storage_iterator(It base, Other... other)
         : it{base, other...} {}
 
     template<typename... Args, typename = std::enable_if_t<(!std::is_same_v<Other, Args> && ...) && (std::is_constructible_v<Other, Args> && ...)>>
-    extended_storage_iterator(const extended_storage_iterator<It, Args...> &other) ENTT_NOEXCEPT
+    extended_storage_iterator(const extended_storage_iterator<It, Args...> &other)
         : it{other.it} {}
 
     extended_storage_iterator &operator++() ENTT_NOEXCEPT {

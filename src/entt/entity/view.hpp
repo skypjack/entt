@@ -28,7 +28,7 @@ namespace internal {
 
 template<typename Type, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
-    [[nodiscard]] bool valid() const {
+    [[nodiscard]] bool valid() const ENTT_NOEXCEPT {
         return ((Component != 0u) || (*it != tombstone))
                && std::apply([entt = *it](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
                && std::apply([entt = *it](const auto *...curr) { return (!curr->contains(entt) && ...); }, filter);
@@ -42,11 +42,7 @@ public:
     using reference = typename std::iterator_traits<iterator_type>::reference;
     using iterator_category = std::forward_iterator_tag;
 
-    view_iterator() ENTT_NOEXCEPT
-        : it{},
-          last{},
-          pools{},
-          filter{} {}
+    view_iterator() ENTT_NOEXCEPT = default;
 
     view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) ENTT_NOEXCEPT
         : it{curr},
@@ -68,11 +64,11 @@ public:
         return ++(*this), orig;
     }
 
-    [[nodiscard]] pointer operator->() const {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return &*it;
     }
 
-    [[nodiscard]] reference operator*() const {
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 
@@ -106,7 +102,7 @@ struct extended_view_iterator final {
 
     extended_view_iterator() = default;
 
-    extended_view_iterator(It from, std::tuple<Storage *...> storage) ENTT_NOEXCEPT
+    extended_view_iterator(It from, std::tuple<Storage *...> storage)
         : it{from},
           pools{storage} {}
 
@@ -328,7 +324,7 @@ public:
      *
      * @return An iterator to the first entity of the view.
      */
-    [[nodiscard]] iterator begin() const {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return iterator{view->begin(), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
     }
 
@@ -341,7 +337,7 @@ public:
      *
      * @return An iterator to the entity following the last entity of the view.
      */
-    [[nodiscard]] iterator end() const {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return iterator{view->end(), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
     }
 
@@ -350,7 +346,7 @@ public:
      * @return The first entity of the view if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type front() const {
+    [[nodiscard]] entity_type front() const ENTT_NOEXCEPT {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -360,7 +356,7 @@ public:
      * @return The last entity of the view if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type back() const {
+    [[nodiscard]] entity_type back() const ENTT_NOEXCEPT {
         auto it = view->rbegin();
         for(const auto last = view->rend(); it != last && !contains(*it); ++it) {}
         return it == view->rend() ? null : *it;
@@ -372,7 +368,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    [[nodiscard]] iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const ENTT_NOEXCEPT {
         return contains(entt) ? iterator{view->find(entt), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter} : end();
     }
 
@@ -398,7 +394,7 @@ public:
      * @param entt A valid identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    [[nodiscard]] bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
         return std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
                && std::apply([entt](const auto *...curr) { return (!curr->contains(entt) && ...); }, filter);
     }
@@ -669,7 +665,7 @@ public:
      * @return The first entity of the view if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type front() const {
+    [[nodiscard]] entity_type front() const ENTT_NOEXCEPT {
         return empty() ? null : *begin();
     }
 
@@ -678,7 +674,7 @@ public:
      * @return The last entity of the view if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type back() const {
+    [[nodiscard]] entity_type back() const ENTT_NOEXCEPT {
         return empty() ? null : *rbegin();
     }
 
@@ -688,7 +684,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    [[nodiscard]] iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const ENTT_NOEXCEPT {
         return contains(entt) ? view->find(entt) : end();
     }
 
@@ -723,7 +719,7 @@ public:
      * @param entt A valid identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    [[nodiscard]] bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
         return view->contains(entt);
     }
 

@@ -59,7 +59,7 @@ public:
         : it{iter} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    storage_proxy_iterator(const storage_proxy_iterator<Other> &other)
+    storage_proxy_iterator(const storage_proxy_iterator<Other> &other) ENTT_NOEXCEPT
         : it{other.it} {}
 
     storage_proxy_iterator &operator++() ENTT_NOEXCEPT {
@@ -98,15 +98,15 @@ public:
         return (*this + -value);
     }
 
-    [[nodiscard]] reference operator[](const difference_type value) const {
+    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         return {it[value].first, *it[value].second};
     }
 
-    [[nodiscard]] reference operator*() const {
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
         return {it->first, *it->second};
     }
 
-    [[nodiscard]] pointer operator->() const {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return operator*();
     }
 
@@ -340,7 +340,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_registry(basic_registry &&other) ENTT_NOEXCEPT
+    basic_registry(basic_registry &&other)
         : pools{std::move(other.pools)},
           groups{std::move(other.groups)},
           entities{std::move(other.entities)},
@@ -356,7 +356,7 @@ public:
      * @param other The instance to move from.
      * @return This registry.
      */
-    basic_registry &operator=(basic_registry &&other) ENTT_NOEXCEPT {
+    basic_registry &operator=(basic_registry &&other) {
         pools = std::move(other.pools);
         groups = std::move(other.groups);
         entities = std::move(other.entities);

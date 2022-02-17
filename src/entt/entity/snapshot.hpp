@@ -71,10 +71,10 @@ public:
         : reg{&source} {}
 
     /*! @brief Default move constructor. */
-    basic_snapshot(basic_snapshot &&) = default;
+    basic_snapshot(basic_snapshot &&) ENTT_NOEXCEPT = default;
 
     /*! @brief Default move assignment operator. @return This snapshot. */
-    basic_snapshot &operator=(basic_snapshot &&) = default;
+    basic_snapshot &operator=(basic_snapshot &&) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Puts aside all the entities from the underlying registry.
@@ -202,10 +202,10 @@ public:
     }
 
     /*! @brief Default move constructor. */
-    basic_snapshot_loader(basic_snapshot_loader &&) = default;
+    basic_snapshot_loader(basic_snapshot_loader &&) ENTT_NOEXCEPT = default;
 
     /*! @brief Default move assignment operator. @return This loader. */
-    basic_snapshot_loader &operator=(basic_snapshot_loader &&) = default;
+    basic_snapshot_loader &operator=(basic_snapshot_loader &&) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Restores entities that were in use during serialization.

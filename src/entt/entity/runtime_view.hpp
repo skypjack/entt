@@ -58,21 +58,21 @@ public:
         return ++(*this), orig;
     }
 
-    runtime_view_iterator &operator--() ENTT_NOEXCEPT {
+    runtime_view_iterator &operator--() {
         while(--it != (*pools)[0]->begin() && !valid()) {}
         return *this;
     }
 
-    runtime_view_iterator operator--(int) ENTT_NOEXCEPT {
+    runtime_view_iterator operator--(int) {
         runtime_view_iterator orig = *this;
         return operator--(), orig;
     }
 
-    [[nodiscard]] pointer operator->() const {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return it.operator->();
     }
 
-    [[nodiscard]] reference operator*() const {
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 

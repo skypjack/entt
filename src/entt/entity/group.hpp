@@ -80,7 +80,7 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
 
         extended_group_iterator() = default;
 
-        extended_group_iterator(typename basic_common_type::iterator from, const std::tuple<storage_type<Get> *...> &args) ENTT_NOEXCEPT
+        extended_group_iterator(typename basic_common_type::iterator from, const std::tuple<storage_type<Get> *...> &args)
             : it{from},
               pools{args} {}
 
@@ -255,7 +255,7 @@ public:
      * @return The first entity of the group if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type front() const {
+    [[nodiscard]] entity_type front() const ENTT_NOEXCEPT {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -265,7 +265,7 @@ public:
      * @return The last entity of the group if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type back() const {
+    [[nodiscard]] entity_type back() const ENTT_NOEXCEPT {
         const auto it = rbegin();
         return it != rend() ? *it : null;
     }
@@ -276,7 +276,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    [[nodiscard]] iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const ENTT_NOEXCEPT {
         const auto it = *this ? handler->find(entt) : iterator{};
         return it != end() && *it == entt ? it : end();
     }
@@ -303,7 +303,7 @@ public:
      * @param entt A valid identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    [[nodiscard]] bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
         return *this && handler->contains(entt);
     }
 
@@ -540,7 +540,7 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
         extended_group_iterator() = default;
 
         template<typename... Other>
-        extended_group_iterator(typename basic_common_type::iterator from, const std::tuple<Other...> &other, const std::tuple<storage_type<Get> *...> &cpools) ENTT_NOEXCEPT
+        extended_group_iterator(typename basic_common_type::iterator from, const std::tuple<Other...> &other, const std::tuple<storage_type<Get> *...> &cpools)
             : it{from},
               owned{std::get<OIt>(other)...},
               get{cpools} {}
@@ -695,7 +695,7 @@ public:
      * @return The first entity of the group if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type front() const {
+    [[nodiscard]] entity_type front() const ENTT_NOEXCEPT {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -705,7 +705,7 @@ public:
      * @return The last entity of the group if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type back() const {
+    [[nodiscard]] entity_type back() const ENTT_NOEXCEPT {
         const auto it = rbegin();
         return it != rend() ? *it : null;
     }
@@ -716,7 +716,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    [[nodiscard]] iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const ENTT_NOEXCEPT {
         const auto it = *this ? std::get<0>(pools)->find(entt) : iterator{};
         return it != end() && it >= begin() && *it == entt ? it : end();
     }
@@ -743,7 +743,7 @@ public:
      * @param entt A valid identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    [[nodiscard]] bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
         return *this && std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < (*length));
     }
 
