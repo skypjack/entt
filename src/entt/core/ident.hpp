@@ -40,7 +40,7 @@ namespace entt {
 template<typename... Types>
 class identifier {
     template<typename Type, std::size_t... Index>
-    [[nodiscard]] static constexpr id_type get(std::index_sequence<Index...>) {
+    [[nodiscard]] static constexpr id_type get(std::index_sequence<Index...>) ENTT_NOEXCEPT {
         static_assert(std::disjunction_v<std::is_same<Type, Types>...>, "Invalid type");
         return (0 + ... + (std::is_same_v<Type, type_list_element_t<Index, type_list<std::decay_t<Types>...>>> ? id_type{Index} : id_type{}));
     }

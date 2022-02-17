@@ -192,7 +192,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_any(basic_any &&other) ENTT_NOEXCEPT
+    basic_any(basic_any &&other)
         : instance{},
           info{other.info},
           vtable{other.vtable},
@@ -229,7 +229,7 @@ public:
      * @param other The instance to move from.
      * @return This any object.
      */
-    basic_any &operator=(basic_any &&other) ENTT_NOEXCEPT {
+    basic_any &operator=(basic_any &&other) {
         reset();
 
         if(other.vtable) {
