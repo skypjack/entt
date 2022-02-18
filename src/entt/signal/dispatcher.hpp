@@ -77,7 +77,7 @@ class dispatcher {
             }
         }
 
-        std::size_t size() const ENTT_NOEXCEPT {
+        std::size_t size() const ENTT_NOEXCEPT override {
             return events.size();
         }
 
