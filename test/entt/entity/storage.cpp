@@ -1765,13 +1765,12 @@ TEST(Storage, UsesAllocatorConstruction) {
 
     test::tracked_memory_resource memory_resource{};
     entt::basic_storage<entt::entity, string_type, std::pmr::polymorphic_allocator<string_type>> pool{&memory_resource};
-    const char *str = "a string long enough to force an allocation (hopefully)";
     const entt::entity entity{};
 
     pool.emplace(entity);
     pool.erase(entity);
     memory_resource.reset();
-    pool.emplace(entity, str);
+    pool.emplace(entity, test::tracked_memory_resource::default_value);
 
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);

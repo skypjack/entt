@@ -33,6 +33,8 @@ public:
     using string_type = std::pmr::string;
     using size_type = std::size_t;
 
+    static constexpr const char *default_value = "a string long enough to force an allocation (hopefully)";
+
     size_type do_allocate_counter() const ENTT_NOEXCEPT {
         return alloc_counter;
     }

@@ -90,9 +90,9 @@ TEST(Memory, UsesAllocatorConstruction) {
 
     test::tracked_memory_resource memory_resource{};
     std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
-    const char *str = "a string long enough to force an allocation (hopefully)";
 
-    std::unique_ptr<string_type, entt::allocation_deleter<std::pmr::polymorphic_allocator<string_type>>> ptr = entt::allocate_unique<string_type>(allocator, str);
+    using type = std::unique_ptr<string_type, entt::allocation_deleter<std::pmr::polymorphic_allocator<string_type>>>;
+    type ptr = entt::allocate_unique<string_type>(allocator, test::tracked_memory_resource::default_value);
 
     ASSERT_GT(memory_resource.do_allocate_counter(), 1u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
