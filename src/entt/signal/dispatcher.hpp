@@ -99,7 +99,7 @@ class dispatcher {
 
 public:
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_type;
+    using size_type = std::size_t;
 
     /*! @brief Default constructor. */
     dispatcher() = default;
