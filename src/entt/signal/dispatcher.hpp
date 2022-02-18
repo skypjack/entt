@@ -263,6 +263,7 @@ public:
      * type.
      *
      * @tparam Event Type of event for which to return the count.
+     * @param id Name used to map the event queue within the dispatcher.
      * @return The total count of pending Event.
      */
     template<typename Event>
