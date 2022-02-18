@@ -7,7 +7,8 @@
 namespace entt {
 
 template<
-    typename Key, typename Type,
+    typename Key,
+    typename Type,
     typename = std::hash<Key>,
     typename = std::equal_to<Key>,
     typename = std::allocator<std::pair<const Key, Type>>>
