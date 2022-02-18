@@ -755,7 +755,7 @@ public:
 
                 using std::swap;
                 swap(packed[from], packed[to]);
-                
+
                 const auto entity = static_cast<typename entity_traits::entity_type>(to);
                 sparse_ref(packed[to]) = entity_traits::combine(entity, entity_traits::to_integral(packed[to]));
                 *it = entity_traits::combine(static_cast<typename entity_traits::entity_type>(from), entity_traits::reserved);

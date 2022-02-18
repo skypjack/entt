@@ -855,11 +855,11 @@ public:
     }
 
     /**
-    * @brief Updates the instance assigned to a given entity in-place.
-    * @tparam Func Types of the function objects to invoke.
-    * @param entt A valid identifier.
-    * @param func Valid function objects.
-    */
+     * @brief Updates the instance assigned to a given entity in-place.
+     * @tparam Func Types of the function objects to invoke.
+     * @param entt A valid identifier.
+     * @param func Valid function objects.
+     */
     template<typename... Func>
     void patch([[maybe_unused]] const entity_type entt, Func &&...func) {
         ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
