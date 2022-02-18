@@ -1760,6 +1760,20 @@ TEST(Storage, ThrowingComponent) {
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
 
+TEST(Storage, NoUsesAllocatorConstruction) {
+    test::tracked_memory_resource memory_resource{};
+    entt::basic_storage<entt::entity, int, std::pmr::polymorphic_allocator<int>> pool{&memory_resource};
+    const entt::entity entity{};
+
+    pool.emplace(entity);
+    pool.erase(entity);
+    memory_resource.reset();
+    pool.emplace(entity, 0);
+
+    ASSERT_EQ(memory_resource.do_allocate_counter(), 0u);
+    ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
+}
+
 TEST(Storage, UsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
 
