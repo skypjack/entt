@@ -34,7 +34,7 @@ class dispatcher {
         virtual void publish() = 0;
         virtual void disconnect(void *) = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
-        virtual size_t size() = 0;
+        virtual std::size_t size() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -77,7 +77,7 @@ class dispatcher {
             }
         }
 
-        size_t size() const {
+        std::size_t size() const ENTT_NOEXCEPT {
             return events.size();
         }
 
@@ -98,6 +98,9 @@ class dispatcher {
     }
 
 public:
+    /*! @brief Unsigned integer type. */
+    using size_type = std::size_type;
+
     /*! @brief Default constructor. */
     dispatcher() = default;
 
@@ -258,9 +261,12 @@ public:
      *
      * This method returns the count of pending events for the specified
      * type.
+     *
+     * @tparam Event Type of event for which to return the count.
+     * @return The total count of pending Event.
      */
     template<typename Event>
-    size_t size() const {
+    size_type size() const ENTT_NOEXCEPT {
         return assure<Event>().size();
     }
 
@@ -269,12 +275,15 @@ public:
      *
      * This method counts all pending events across all registered event
      * types.
+     *
+     * @return The total count of pending events.
      */
-    size_t size() const {
-        size_t events = 0;
+    size_type size() const ENTT_NOEXCEPT {
+        size_type events = 0;
         for(auto &&cpool: pools) {
             events += cpool.second->size();
         }
+
         return events;
     }
 

@@ -28,19 +28,6 @@ struct receiver {
     int cnt{0};
 };
 
-struct generic_receiver {
-    template<typename Event>
-    void receive(const Event &) {
-        ++cnt;
-    }
-
-    void reset() {
-        cnt = 0;
-    }
-
-    int cnt{0};
-};
-
 TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher;
     receiver receiver;
@@ -87,11 +74,6 @@ TEST(Dispatcher, Functionalities) {
 
     ASSERT_EQ(receiver.cnt, 0);
 
-    generic_receiver receiver2;
-
-    dispatcher.sink<an_event>().connect<&generic_receiver::receive<an_event>>(receiver2);
-    dispatcher.sink<another_event>().connect<&generic_receiver::receive<another_event>>(receiver2);
-
     ASSERT_EQ(dispatcher.size<an_event>(), 0);
     ASSERT_EQ(dispatcher.size<another_event>(), 0);
     ASSERT_EQ(dispatcher.size(), 0);
@@ -116,7 +98,6 @@ TEST(Dispatcher, Functionalities) {
     ASSERT_EQ(dispatcher.size<an_event>(), 0);
     ASSERT_EQ(dispatcher.size<another_event>(), 0);
     ASSERT_EQ(dispatcher.size(), 0);
-    ASSERT_EQ(receiver2.cnt, 5);
 }
 
 TEST(Dispatcher, StopAndGo) {
