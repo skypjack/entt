@@ -4,7 +4,8 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* dense map/set: support uses-allocator construction (single arg, multi-arg, key construction)
+* uses-allocator construction: dense set (review), dense map, compressed pair, any (with allocator support), cache, dispatcher, poly, ...
+* process scheduler: reviews, use free lists internally
 * runtime events (emitter)
 * iterator based try_emplace vs try_insert for perf reasons
 * registry: remove reference to basic_sparse_set<E>
