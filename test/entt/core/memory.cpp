@@ -85,6 +85,17 @@ TEST(Memory, AllocateUnique) {
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
 
+TEST(Memory, NoUsesAllocatorConstruction) {
+    test::tracked_memory_resource memory_resource{};
+    std::pmr::polymorphic_allocator<int> allocator{&memory_resource};
+
+    using type = std::unique_ptr<int, entt::allocation_deleter<std::pmr::polymorphic_allocator<int>>>;
+    type ptr = entt::allocate_unique<int>(allocator, 0);
+
+    ASSERT_EQ(memory_resource.do_allocate_counter(), 1u);
+    ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
+}
+
 TEST(Memory, UsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
 
