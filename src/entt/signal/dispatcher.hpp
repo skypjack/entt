@@ -268,7 +268,7 @@ public:
      */
     template<typename Event>
     size_type size(const id_type id = type_hash<Event>::value()) const ENTT_NOEXCEPT {
-        return assure<Event>().size();
+        return assure<Event>(id).size();
     }
 
     /**
