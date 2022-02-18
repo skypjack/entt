@@ -279,7 +279,8 @@ public:
      * @return The total count of pending events.
      */
     size_type size() const ENTT_NOEXCEPT {
-        size_type events = 0;
+        size_type events{};
+
         for(auto &&cpool: pools) {
             events += cpool.second->size();
         }
