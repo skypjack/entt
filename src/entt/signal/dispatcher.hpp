@@ -267,7 +267,7 @@ public:
      * @return The total count of pending Event.
      */
     template<typename Event>
-    size_type size() const ENTT_NOEXCEPT {
+    size_type size(const id_type id = type_hash<Event>::value()) const ENTT_NOEXCEPT {
         return assure<Event>().size();
     }
 
