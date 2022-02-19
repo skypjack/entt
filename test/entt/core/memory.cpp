@@ -8,6 +8,7 @@
 #include <entt/core/memory.hpp>
 #include "../common/basic_test_allocator.hpp"
 #include "../common/throwing_allocator.hpp"
+#include "../common/throwing_type.hpp"
 #include "../common/tracked_memory_resource.hpp"
 
 TEST(Memory, ToAddress) {
@@ -68,7 +69,7 @@ TEST(Memory, FastMod) {
 }
 
 TEST(Memory, AllocateUnique) {
-    test::throwing_allocator<double> allocator{};
+    test::throwing_allocator<int> allocator{};
     test::throwing_allocator<int>::trigger_on_allocate = true;
 
     ASSERT_THROW((entt::allocate_unique<int>(allocator, 0)), test::throwing_allocator<int>::exception_type);
@@ -92,6 +93,7 @@ TEST(Memory, NoUsesAllocatorConstruction) {
     using type = std::unique_ptr<int, entt::allocation_deleter<std::pmr::polymorphic_allocator<int>>>;
     type ptr = entt::allocate_unique<int>(allocator, 0);
 
+    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
     ASSERT_EQ(memory_resource.do_allocate_counter(), 1u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }
@@ -105,6 +107,7 @@ TEST(Memory, UsesAllocatorConstruction) {
     using type = std::unique_ptr<string_type, entt::allocation_deleter<std::pmr::polymorphic_allocator<string_type>>>;
     type ptr = entt::allocate_unique<string_type>(allocator, test::tracked_memory_resource::default_value);
 
+    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
     ASSERT_GT(memory_resource.do_allocate_counter(), 1u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }

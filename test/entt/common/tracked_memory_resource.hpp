@@ -35,6 +35,10 @@ public:
 
     static constexpr const char *default_value = "a string long enough to force an allocation (hopefully)";
 
+    tracked_memory_resource()
+        : alloc_counter{},
+          dealloc_counter{} {}
+
     size_type do_allocate_counter() const ENTT_NOEXCEPT {
         return alloc_counter;
     }
@@ -49,8 +53,8 @@ public:
     }
 
 private:
-    size_type alloc_counter{};
-    size_type dealloc_counter{};
+    size_type alloc_counter;
+    size_type dealloc_counter;
 };
 
 } // namespace test
