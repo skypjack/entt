@@ -32,6 +32,9 @@ TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher;
     receiver receiver;
 
+    ASSERT_EQ(dispatcher.size<an_event>(), 0u);
+    ASSERT_EQ(dispatcher.size(), 0u);
+
     dispatcher.trigger(one_more_event{42});
     dispatcher.enqueue<one_more_event>(42);
     dispatcher.update<one_more_event>();
