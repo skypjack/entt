@@ -73,6 +73,31 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.trigger(std::as_const(event));
 
     ASSERT_EQ(receiver.cnt, 0);
+
+    ASSERT_EQ(dispatcher.size<an_event>(), 0);
+    ASSERT_EQ(dispatcher.size<another_event>(), 0);
+    ASSERT_EQ(dispatcher.size(), 0);
+
+    dispatcher.enqueue<an_event>();
+    dispatcher.enqueue<an_event>();
+
+    ASSERT_EQ(dispatcher.size<an_event>(), 2);
+    ASSERT_EQ(dispatcher.size<another_event>(), 0);
+    ASSERT_EQ(dispatcher.size(), 2);
+
+    dispatcher.enqueue<another_event>();
+    dispatcher.enqueue<another_event>();
+    dispatcher.enqueue<another_event>();
+
+    ASSERT_EQ(dispatcher.size<an_event>(), 2);
+    ASSERT_EQ(dispatcher.size<another_event>(), 3);
+    ASSERT_EQ(dispatcher.size(), 5);
+
+    dispatcher.update();
+
+    ASSERT_EQ(dispatcher.size<an_event>(), 0);
+    ASSERT_EQ(dispatcher.size<another_event>(), 0);
+    ASSERT_EQ(dispatcher.size(), 0);
 }
 
 TEST(Dispatcher, StopAndGo) {
