@@ -40,16 +40,24 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.trigger<an_event>();
     dispatcher.enqueue<an_event>();
 
+    ASSERT_EQ(dispatcher.size<one_more_event>(), 0u);
+    ASSERT_EQ(dispatcher.size<an_event>(), 1u);
+    ASSERT_EQ(dispatcher.size(), 1u);
     ASSERT_EQ(receiver.cnt, 1);
 
     dispatcher.enqueue(another_event{});
     dispatcher.update<another_event>();
 
+    ASSERT_EQ(dispatcher.size<another_event>(), 0u);
+    ASSERT_EQ(dispatcher.size<an_event>(), 1u);
+    ASSERT_EQ(dispatcher.size(), 1u);
     ASSERT_EQ(receiver.cnt, 1);
 
     dispatcher.update<an_event>();
     dispatcher.trigger<an_event>();
 
+    ASSERT_EQ(dispatcher.size<an_event>(), 0u);
+    ASSERT_EQ(dispatcher.size(), 0u);
     ASSERT_EQ(receiver.cnt, 3);
 
     dispatcher.enqueue<an_event>();
@@ -60,6 +68,8 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.clear();
     dispatcher.update();
 
+    ASSERT_EQ(dispatcher.size<an_event>(), 0u);
+    ASSERT_EQ(dispatcher.size(), 0u);
     ASSERT_EQ(receiver.cnt, 3);
 
     receiver.reset();
@@ -73,31 +83,6 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.trigger(std::as_const(event));
 
     ASSERT_EQ(receiver.cnt, 0);
-
-    ASSERT_EQ(dispatcher.size<an_event>(), 0);
-    ASSERT_EQ(dispatcher.size<another_event>(), 0);
-    ASSERT_EQ(dispatcher.size(), 0);
-
-    dispatcher.enqueue<an_event>();
-    dispatcher.enqueue<an_event>();
-
-    ASSERT_EQ(dispatcher.size<an_event>(), 2);
-    ASSERT_EQ(dispatcher.size<another_event>(), 0);
-    ASSERT_EQ(dispatcher.size(), 2);
-
-    dispatcher.enqueue<another_event>();
-    dispatcher.enqueue<another_event>();
-    dispatcher.enqueue<another_event>();
-
-    ASSERT_EQ(dispatcher.size<an_event>(), 2);
-    ASSERT_EQ(dispatcher.size<another_event>(), 3);
-    ASSERT_EQ(dispatcher.size(), 5);
-
-    dispatcher.update();
-
-    ASSERT_EQ(dispatcher.size<an_event>(), 0);
-    ASSERT_EQ(dispatcher.size<another_event>(), 0);
-    ASSERT_EQ(dispatcher.size(), 0);
 }
 
 TEST(Dispatcher, StopAndGo) {

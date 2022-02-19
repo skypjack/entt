@@ -97,6 +97,15 @@ class dispatcher {
         }
     }
 
+    template<typename Event>
+    [[nodiscard]] pool_handler<Event> *assure(const id_type id) const {
+        if(const auto it = pools.find(id); it != pools.end()) {
+            return static_cast<pool_handler<Event> *>(it->second.get());
+        }
+
+        return nullptr;
+    }
+
 public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
@@ -109,6 +118,32 @@ public:
 
     /*! @brief Default move assignment operator. @return This dispatcher. */
     dispatcher &operator=(dispatcher &&) = default;
+
+    /**
+     * @brief Returns the number of pending events for a given type.
+     * @tparam Event Type of event for which to return the count.
+     * @param id Name used to map the event queue within the dispatcher.
+     * @return The number of pending events for the given type.
+     */
+    template<typename Event>
+    size_type size(const id_type id = type_hash<Event>::value()) const ENTT_NOEXCEPT {
+        const auto *cpool = assure<Event>(id);
+        return cpool ? cpool->size() : 0u;
+    }
+
+    /**
+     * @brief Returns the total number of pending events.
+     * @return The total number of pending events.
+     */
+    size_type size() const ENTT_NOEXCEPT {
+        size_type events{};
+
+        for(auto &&cpool: pools) {
+            events += cpool.second->size();
+        }
+
+        return events;
+    }
 
     /**
      * @brief Returns a sink object for the given event and queue.
@@ -254,39 +289,6 @@ public:
         for(auto &&cpool: pools) {
             cpool.second->publish();
         }
-    }
-
-    /**
-     * @brief Returns the count of pending events for the specified type.
-     *
-     * This method returns the count of pending events for the specified
-     * type.
-     *
-     * @tparam Event Type of event for which to return the count.
-     * @param id Name used to map the event queue within the dispatcher.
-     * @return The total count of pending Event.
-     */
-    template<typename Event>
-    size_type size(const id_type id = type_hash<Event>::value()) const ENTT_NOEXCEPT {
-        return assure<Event>(id).size();
-    }
-
-    /**
-     * @brief Returns the total count of pending events.
-     *
-     * This method counts all pending events across all registered event
-     * types.
-     *
-     * @return The total count of pending events.
-     */
-    size_type size() const ENTT_NOEXCEPT {
-        size_type events{};
-
-        for(auto &&cpool: pools) {
-            events += cpool.second->size();
-        }
-
-        return events;
     }
 
 private:
