@@ -69,12 +69,14 @@ TEST(Memory, FastMod) {
 }
 
 TEST(Memory, AllocateUnique) {
-    test::throwing_allocator<int> allocator{};
-    test::throwing_allocator<int>::trigger_on_allocate = true;
+    test::throwing_allocator<test::throwing_type> allocator{};
+    test::throwing_allocator<test::throwing_type>::trigger_on_allocate = true;
+    test::throwing_type::trigger_on_value = 0;
 
-    ASSERT_THROW((entt::allocate_unique<int>(allocator, 0)), test::throwing_allocator<int>::exception_type);
+    ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, 0)), test::throwing_allocator<test::throwing_type>::exception_type);
+    ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, test::throwing_type{0})), test::throwing_type::exception_type);
 
-    std::unique_ptr<int, entt::allocation_deleter<test::throwing_allocator<int>>> ptr = entt::allocate_unique<int>(allocator, 42);
+    std::unique_ptr<test::throwing_type, entt::allocation_deleter<test::throwing_allocator<test::throwing_type>>> ptr = entt::allocate_unique<test::throwing_type>(allocator, 42);
 
     ASSERT_TRUE(ptr);
     ASSERT_EQ(*ptr, 42);
