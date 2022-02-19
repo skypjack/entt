@@ -821,7 +821,7 @@ TEST(DenseSet, Reserve) {
 
 TEST(DenseSet, ThrowingAllocator) {
     using allocator = test::throwing_allocator<std::size_t>;
-    using packed_allocator = test::throwing_allocator<entt::internal::dense_set_node<std::size_t, test::throwing_allocator<std::size_t>>>;
+    using packed_allocator = test::throwing_allocator<std::pair<std::size_t, std::size_t>>;
     using packed_exception = typename packed_allocator::exception_type;
 
     static constexpr std::size_t minimum_bucket_count = 8u;
@@ -836,22 +836,33 @@ TEST(DenseSet, ThrowingAllocator) {
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
 
+TEST(DenseSet, NoUsesAllocatorConstruction) {
+    using allocator = std::pmr::polymorphic_allocator<int>;
+
+    test::tracked_memory_resource memory_resource{};
+    entt::dense_set<int, std::hash<int>, std::equal_to<int>, allocator> set{&memory_resource};
+
+    set.reserve(1u);
+    memory_resource.reset();
+    set.emplace(0);
+
+    ASSERT_EQ(memory_resource.do_allocate_counter(), 0u);
+    ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
+}
+
 TEST(DenseSet, UsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
     using allocator = std::pmr::polymorphic_allocator<string_type>;
 
     test::tracked_memory_resource memory_resource{};
     entt::dense_set<string_type, std::hash<string_type>, std::equal_to<string_type>, allocator> set{&memory_resource};
-    const char *str = "a string long enough to force an allocation (hopefully)";
 
     set.reserve(1u);
     memory_resource.reset();
-    set.emplace(str);
+    set.emplace(test::tracked_memory_resource::default_value);
 
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
-
-    entt::dense_set<string_type, std::hash<string_type>, std::equal_to<string_type>, allocator> other{std::move(set)};
 }
 
 #endif
