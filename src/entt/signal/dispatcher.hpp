@@ -98,9 +98,9 @@ class dispatcher {
     }
 
     template<typename Event>
-    [[nodiscard]] pool_handler<Event> *assure(const id_type id) const {
+    [[nodiscard]] const pool_handler<Event> *assure(const id_type id) const {
         if(const auto it = pools.find(id); it != pools.end()) {
-            return static_cast<pool_handler<Event> *>(it->second.get());
+            return static_cast<const pool_handler<Event> *>(it->second.get());
         }
 
         return nullptr;
