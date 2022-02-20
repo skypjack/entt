@@ -138,7 +138,7 @@ struct allocation_deleter: private Allocator {
  * @tparam Allocator Type of allocator used to manage memory and elements.
  * @tparam Args Types of arguments to use to construct the object.
  * @param allocator The allocator to use.
- * @param args Parameters to use to construct an object for the entity.
+ * @param args Parameters to use to construct the object.
  * @return A properly initialized unique pointer with a custom deleter.
  */
 template<typename Type, typename Allocator, typename... Args>
