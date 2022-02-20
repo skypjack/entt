@@ -11,7 +11,7 @@ struct functions {
     void bar() {}
 };
 
-TEST(Utility, Identity) {
+TEST(Identity, Functionalities) {
     entt::identity identity;
     int value = 42;
 
@@ -20,7 +20,7 @@ TEST(Utility, Identity) {
     ASSERT_EQ(&identity(value), &value);
 }
 
-TEST(Utility, Overload) {
+TEST(Overload, Functionalities) {
     ASSERT_EQ(entt::overload<void(int)>(&functions::foo), static_cast<void (*)(int)>(&functions::foo));
     ASSERT_EQ(entt::overload<void()>(&functions::foo), static_cast<void (*)()>(&functions::foo));
 
@@ -36,7 +36,7 @@ TEST(Utility, Overload) {
     ASSERT_NO_FATAL_FAILURE((instance.*entt::overload<void()>(&functions::bar))());
 }
 
-TEST(Utility, Overloaded) {
+TEST(Overloaded, Functionalities) {
     int iv = 0;
     char cv = '\0';
 
@@ -51,7 +51,7 @@ TEST(Utility, Overloaded) {
     ASSERT_EQ(cv, 'c');
 }
 
-TEST(Utility, YCombinator) {
+TEST(YCombinator, Functionalities) {
     entt::y_combinator gauss([](const auto &self, auto value) -> unsigned int {
         return value ? (value + self(value - 1u)) : 0;
     });

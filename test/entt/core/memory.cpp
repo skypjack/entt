@@ -11,7 +11,7 @@
 #include "../common/throwing_type.hpp"
 #include "../common/tracked_memory_resource.hpp"
 
-TEST(Memory, ToAddress) {
+TEST(ToAddress, Functionalities) {
     std::shared_ptr<int> shared = std::make_shared<int>();
     auto *plain = std::addressof(*shared);
 
@@ -19,7 +19,7 @@ TEST(Memory, ToAddress) {
     ASSERT_EQ(entt::to_address(plain), plain);
 }
 
-TEST(Memory, PoccaPocmaAndPocs) {
+TEST(PoccaPocmaAndPocs, Functionalities) {
     test::basic_test_allocator<int> lhs, rhs;
     // honestly, I don't even know how one is supposed to test such a thing :)
     entt::propagate_on_container_copy_assignment(lhs, rhs);
@@ -27,7 +27,7 @@ TEST(Memory, PoccaPocmaAndPocs) {
     entt::propagate_on_container_swap(lhs, rhs);
 }
 
-TEST(Memory, IsPowerOfTwo) {
+TEST(IsPowerOfTwo, Functionalities) {
     // constexpr-ness guaranteed
     constexpr auto zero_is_power_of_two = entt::is_power_of_two(0u);
 
@@ -40,7 +40,7 @@ TEST(Memory, IsPowerOfTwo) {
     ASSERT_FALSE(entt::is_power_of_two(200u));
 }
 
-TEST(Memory, NextPowerOfTwo) {
+TEST(NextPowerOfTwo, Functionalities) {
     // constexpr-ness guaranteed
     constexpr auto next_power_of_two_of_zero = entt::next_power_of_two(0u);
 
@@ -55,11 +55,11 @@ TEST(Memory, NextPowerOfTwo) {
     ASSERT_EQ(entt::next_power_of_two(std::pow(2, 16) + 1u), std::pow(2, 17));
 }
 
-TEST(MemoryDeathTest, NextPowerOfTwo) {
+TEST(NextPowerOfTwoDeathTest, Functionalities) {
     ASSERT_DEATH(static_cast<void>(entt::next_power_of_two((std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)) + 1)), "");
 }
 
-TEST(Memory, FastMod) {
+TEST(FastMod, Functionalities) {
     // constexpr-ness guaranteed
     constexpr auto fast_mod_of_zero = entt::fast_mod(0u, 8u);
 
@@ -68,7 +68,7 @@ TEST(Memory, FastMod) {
     ASSERT_EQ(entt::fast_mod(8u, 8u), 0u);
 }
 
-TEST(Memory, AllocateUnique) {
+TEST(AllocateUnique, Functionalities) {
     test::throwing_allocator<test::throwing_type> allocator{};
     test::throwing_allocator<test::throwing_type>::trigger_on_allocate = true;
     test::throwing_type::trigger_on_value = 0;
@@ -88,7 +88,7 @@ TEST(Memory, AllocateUnique) {
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
 
-TEST(Memory, NoUsesAllocatorConstruction) {
+TEST(AllocateUnique, NoUsesAllocatorConstruction) {
     test::tracked_memory_resource memory_resource{};
     std::pmr::polymorphic_allocator<int> allocator{&memory_resource};
 
@@ -100,7 +100,7 @@ TEST(Memory, NoUsesAllocatorConstruction) {
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }
 
-TEST(Memory, UsesAllocatorConstruction) {
+TEST(AllocateUnique, UsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
 
     test::tracked_memory_resource memory_resource{};
