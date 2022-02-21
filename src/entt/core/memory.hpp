@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
@@ -160,6 +161,35 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
     }
 
     return std::unique_ptr<Type, allocation_deleter<alloc>>{ptr, type_allocator};
+}
+
+/**
+ * @brief Uses-allocator construction utility.
+ *
+ * Primarily intended for internal use. Unlike the standard version (waiting for
+ * C++20), this utility does not differentiate between pair and non-pair types.
+ *
+ * @tparam Type Type to return arguments for.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Args Types of arguments to use to construct the object.
+ * @param allocator The allocator to use.
+ * @param args Parameters to use to construct the object.
+ * @return The arguments needed to create an object of the given type.
+ */
+template<typename Type, typename Allocator, typename... Args>
+constexpr auto uses_allocator_construction_args(const Allocator &allocator, Args &&...args) ENTT_NOEXCEPT {
+    if constexpr(!std::uses_allocator_v<Type, Allocator> && std::is_constructible_v<Type, Args...>) {
+        return std::forward_as_tuple(std::forward<Args>(args)...);
+    } else {
+        static_assert(std::uses_allocator_v<Type, Allocator>, "Ill-formed request");
+
+        if constexpr(std::is_constructible_v<Type, std::allocator_arg_t, const Allocator &, Args...>) {
+            return std::tuple<std::allocator_arg_t, const Allocator &, Args &&...>(std::allocator_arg, allocator, std::forward<Args>(args)...);
+        } else {
+            static_assert(std::is_constructible_v<Type, Args..., const Allocator &>, "Ill-formed request");
+            return std::forward_as_tuple(std::forward<Args>(args)..., allocator);
+        }
+    }
 }
 
 } // namespace entt

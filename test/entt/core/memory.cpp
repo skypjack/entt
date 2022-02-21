@@ -2,8 +2,10 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/memory.hpp>
 #include "../common/basic_test_allocator.hpp"
@@ -115,3 +117,31 @@ TEST(AllocateUnique, UsesAllocatorConstruction) {
 }
 
 #endif
+
+TEST(UsesAllocatorConstructionArgs, NoUsesAllocatorConstruction) {
+    const auto args = entt::uses_allocator_construction_args<int>(std::allocator<int>{}, 42);
+
+    static_assert(std::tuple_size_v<decltype(args)> == 1u);
+    static_assert(std::is_same_v<decltype(args), const std::tuple<int &&>>);
+
+    ASSERT_EQ(std::get<0>(args), 42);
+}
+
+TEST(UsesAllocatorConstructionArgs, LeadingAllocatorConvetion) {
+    const auto args = entt::uses_allocator_construction_args<std::tuple<int, char>>(std::allocator<int>{}, 42, 'c');
+
+    static_assert(std::tuple_size_v<decltype(args)> == 4u);
+    static_assert(std::is_same_v<decltype(args), const std::tuple<std::allocator_arg_t, const std::allocator<int> &, int &&, char &&>>);
+
+    ASSERT_EQ(std::get<2>(args), 42);
+    ASSERT_EQ(std::get<3>(args), 'c');
+}
+
+TEST(UsesAllocatorConstructionArgs, TrailingAllocatorConvetion) {
+    const auto args = entt::uses_allocator_construction_args<std::vector<int>>(std::allocator<int>{}, 42);
+
+    static_assert(std::tuple_size_v<decltype(args)> == 2u);
+    static_assert(std::is_same_v<decltype(args), const std::tuple<int &&, const std::allocator<int> &>>);
+
+    ASSERT_EQ(std::get<0>(args), 42);
+}
