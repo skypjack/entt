@@ -164,10 +164,14 @@ auto allocate_unique(Allocator &allocator, Args &&...args) {
 }
 
 /**
- * @brief Uses-allocator construction utility.
+ * @brief Uses-allocator construction utility (waiting for C++20).
  *
- * Primarily intended for internal use. Unlike the standard version (waiting for
- * C++20), this utility does not differentiate between pair and non-pair types.
+ * Primarily intended for internal use. Prepares the argument list needed to
+ * create an object of a given type by means of uses-allocator construction.
+ *
+ * @warning
+ * Unlike the standard implementation, this utility does not differentiate
+ * between pair and non-pair types.
  *
  * @tparam Type Type to return arguments for.
  * @tparam Allocator Type of allocator used to manage memory and elements.
@@ -190,6 +194,24 @@ constexpr auto uses_allocator_construction_args(const Allocator &allocator, Args
             return std::forward_as_tuple(std::forward<Args>(args)..., allocator);
         }
     }
+}
+
+/**
+ * @brief Uses-allocator construction utility (waiting for C++20).
+ *
+ * Primarily intended for internal use. Creates an object of a given type by
+ * means of uses-allocator construction.
+ *
+ * @tparam Type Type of object to create.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Args Types of arguments to use to construct the object.
+ * @param allocator The allocator to use.
+ * @param args Parameters to use to construct the object.
+ * @return A newly created object of the given type.
+ */
+template<typename Type, typename Allocator, typename... Args>
+constexpr Type make_obj_using_allocator(const Allocator &allocator, Args &&...args) {
+    return std::make_from_tuple<Type>(uses_allocator_construction_args<Type>(allocator, std::forward<Args>(args)...));
 }
 
 } // namespace entt
