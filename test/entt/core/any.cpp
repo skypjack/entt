@@ -1171,33 +1171,6 @@ TEST_F(Any, CompareVoid) {
     ASSERT_FALSE(entt::any{} != any);
 }
 
-TEST_F(Any, Hashable) {
-    const int value = 42;
-    entt::any any{value};
-    const entt::any ref{std::in_place_type<const int &>, value};
-
-    ASSERT_TRUE(any);
-    ASSERT_TRUE(ref);
-
-    ASSERT_EQ(any.hash(), std::hash<int>{}(value));
-    ASSERT_EQ(std::hash<int>{}(value), std::hash<entt::any>{}(ref));
-    ASSERT_EQ(ref.hash(), std::hash<entt::any>{}(any));
-}
-
-TEST_F(Any, NotHashable) {
-    const not_comparable value{};
-    entt::any any{value};
-    const entt::any ref{std::in_place_type<const not_comparable &>, value};
-
-    ASSERT_TRUE(any);
-    ASSERT_TRUE(ref);
-
-    ASSERT_EQ(any.hash(), std::hash<const void *>{}(nullptr));
-    ASSERT_EQ(std::hash<const void *>{}(nullptr), std::hash<entt::any>{}(ref));
-    ASSERT_EQ(ref.hash(), std::hash<entt::any>{}(any));
-    ASSERT_EQ(any.hash(), entt::any{}.hash());
-}
-
 TEST_F(Any, AnyCast) {
     entt::any any{42};
     const auto &cany = any;

@@ -7,7 +7,6 @@
 
 * [Introduction](#introduction)
 * [Any as in any type](#any-as-in-any-type)
-  * [Hashing of any objects](#hashing-of-any-objects)
   * [Small buffer optimization](#small-buffer-optimization)
   * [Alignment requirement](#alignment-requirement)
 * [Compressed pair](#compressed-pair)
@@ -167,29 +166,6 @@ functions in all respects similar to their most famous counterparts.<br/>
 The only difference is that, in the case of `EnTT`, these won't raise exceptions
 but will only trigger an assert in debug mode, otherwise resulting in undefined
 behavior in case of misuse in release mode.
-
-## Hashing of any objects
-
-As for the `any` class, the hashing topic deserves a section of its own.<br/>
-It's indeed possible to extract the hash value (as in `std::hash`) of an object
-managed by `any`:
-
-```cpp
-const std::size_t hash = any.hash();
-```
-
-However, there are some limitations:
-
-* The instance of `any` **must** not be empty, otherwise the returned value is
-  that of `std::hash<const void *>{}(nullptr)`.
-
-* The underlying object **must** support this operation, otherwise the returned
-  value is that of `std::hash<const void *>{}(nullptr)`.
-
-Unfortunately, it's not possible to trigger a compile-time error in these cases.
-This would prevent users from using non-hashable types with `any`.<br/>
-A compromise has therefore been made that could change over time but which
-appears to be acceptable today for the conceivable uses of this feature.
 
 ## Small buffer optimization
 

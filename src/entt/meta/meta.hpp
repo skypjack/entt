@@ -2,7 +2,6 @@
 #define ENTT_META_META_HPP
 
 #include <cstddef>
-#include <functional>
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -562,11 +561,6 @@ public:
     /*! @copydoc any::owner */
     [[nodiscard]] bool owner() const ENTT_NOEXCEPT {
         return storage.owner();
-    }
-
-    /*! @copydoc any::hash */
-    [[nodiscard]] std::size_t hash() const ENTT_NOEXCEPT {
-        return storage.hash();
     }
 
 private:
@@ -1843,22 +1837,5 @@ inline bool meta_associative_container::erase(meta_any key) {
 }
 
 } // namespace entt
-
-namespace std {
-
-/*! @brief `std::hash` specialization for `entt::meta_any`. */
-template<>
-struct hash<entt::meta_any> {
-    /**
-     * @brief Returns the hash value of the parameter.
-     * @param any The object to return the hash for.
-     * @return The hash value of the parameter.
-     */
-    [[nodiscard]] std::size_t operator()(const entt::meta_any &any) const ENTT_NOEXCEPT {
-        return any.hash();
-    }
-};
-
-} // namespace std
 
 #endif

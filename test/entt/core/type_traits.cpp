@@ -165,15 +165,6 @@ TEST(IsEqualityComparable, Functionalities) {
     static_assert(!entt::is_equality_comparable_v<void>);
 }
 
-TEST(IsStdHashable, Functionalities) {
-    static_assert(entt::is_std_hashable_v<int>);
-    static_assert(entt::is_std_hashable_v<char>);
-    static_assert(entt::is_std_hashable_v<double>);
-    static_assert(!entt::is_std_hashable_v<nlohmann_json_like>);
-    static_assert(!entt::is_std_hashable_v<not_comparable>);
-    static_assert(!entt::is_std_hashable_v<void>);
-}
-
 TEST(ConstnessAs, Functionalities) {
     static_assert(std::is_same_v<entt::constness_as_t<int, char>, int>);
     static_assert(std::is_same_v<entt::constness_as_t<const int, char>, int>);

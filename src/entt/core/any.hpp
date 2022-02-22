@@ -2,7 +2,6 @@
 #define ENTT_CORE_ANY_HPP
 
 #include <cstddef>
-#include <functional>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -28,7 +27,6 @@ class basic_any {
         assign,
         destroy,
         compare,
-        hash,
         get
     };
 
@@ -96,12 +94,6 @@ class basic_any {
             } else {
                 return (element == other) ? other : nullptr;
             }
-        case operation::hash:
-            if constexpr(is_std_hashable_v<Type>) {
-                *static_cast<std::size_t *>(const_cast<void *>(other)) = std::hash<Type>{}(*element);
-                return element;
-            }
-            break;
         case operation::get:
             return element;
         }
@@ -388,23 +380,6 @@ public:
         return (mode == policy::owner);
     }
 
-    /**
-     * @brief Returns the hash value of the contained object.
-     *
-     * If the underlying object isn't _hashable_, the hash of its address is
-     * returned once converted to `const void *`.
-     *
-     * @return The hash value of the contained object or its address if any,
-     * `std::hash<const void *>{}({})` otherwise.
-     */
-    [[nodiscard]] std::size_t hash() const ENTT_NOEXCEPT {
-        if(std::size_t value{}; vtable && vtable(operation::hash, *this, &value)) {
-            return value;
-        }
-
-        return std::hash<const void *>{}(nullptr);
-    }
-
 private:
     union {
         const void *instance;
@@ -511,22 +486,5 @@ basic_any<Len, Align> forward_as_any(Type &&value) {
 }
 
 } // namespace entt
-
-namespace std {
-
-/*! @brief `std::hash` specialization for `entt::any`. */
-template<>
-struct hash<entt::any> {
-    /**
-     * @brief Returns the hash value of the parameter.
-     * @param any The object to return the hash for.
-     * @return The hash value of the parameter.
-     */
-    [[nodiscard]] std::size_t operator()(const entt::any &any) const ENTT_NOEXCEPT {
-        return any.hash();
-    }
-};
-
-} // namespace std
 
 #endif

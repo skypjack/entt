@@ -2,7 +2,6 @@
 #define ENTT_CORE_TYPE_TRAITS_HPP
 
 #include <cstddef>
-#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -591,30 +590,6 @@ struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() ==
  */
 template<typename Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
-
-/**
- * @brief Provides the member constant `value` to true if a given type is
- * _hashable_, false otherwise.
- * @tparam Type The type to test.
- */
-template<typename Type, typename = void>
-struct is_std_hashable: std::false_type {};
-
-/*! @brief Specialization required to get around an issue with clang-cl. */
-template<>
-struct is_std_hashable<void>: std::false_type {};
-
-/*! @copydoc is_std_hashable */
-template<typename Type>
-struct is_std_hashable<Type, std::enable_if_t<std::is_same_v<decltype(std::declval<const std::hash<Type> &>()(*std::declval<Type *>())), std::size_t>>>
-    : std::true_type {};
-
-/**
- * @brief Helper variable template.
- * @tparam Type The type to test.
- */
-template<typename Type>
-inline constexpr auto is_std_hashable_v = is_std_hashable<Type>::value;
 
 /**
  * @brief Transcribes the constness of a type to another type.
