@@ -51,14 +51,12 @@ struct my_loader final: entt::resource_loader<my_loader, my_resource> {
 ```
 
 Where `my_resource` is the type of resources it creates.<br/>
-A resource loader must also expose a public const member function named `load`
-that accepts a variable number of arguments and returns a shared pointer to a
-resource.<br/>
-As an example:
+It must also expose a public const member function named `load` that accepts a
+variable number of arguments and returns a resource handle:
 
 ```cpp
 struct my_loader: entt::resource_loader<my_loader, my_resource> {
-    std::shared_ptr<my_resource> load(int value) const {
+    entt::resource_handle<my_resource> load(int value) const {
         // ...
         return std::shared_ptr<my_resource>(new my_resource{ value });
     }
@@ -130,9 +128,9 @@ cache.load<my_loader>(identifier, 0);
 cache.load<my_loader>("another/identifier"_hs, 42);
 ```
 
-The function returns a handle to the resource, whether it already exists or is
-loaded. In case the loader returns an invalid pointer, the handle is invalid as
-well and therefore it can be easily used with an `if` statement:
+The function returns a resource handle, whether it already exists or is loaded.
+In case the loader returns an invalid pointer, the handle is invalid as well and
+therefore it can be easily used with an `if` statement:
 
 ```cpp
 if(entt::resource_handle handle = cache.load<my_loader>("another/identifier"_hs, 42); handle) {
@@ -154,8 +152,8 @@ existing resource if needed:
 auto handle = cache.reload<my_loader>("another/identifier"_hs, 42);
 ```
 
-As above, the function returns a handle to the resource that is invalid in case
-of errors. The `reload` member function is a kind of alias of the following
+As above, the function returns a resource handle that is invalid in case of
+errors. The `reload` member function is a kind of alias of the following
 snippet:
 
 ```cpp

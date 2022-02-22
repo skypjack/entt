@@ -27,7 +27,7 @@ struct derived_resource: resource {
 
 template<typename Resource>
 struct loader: entt::resource_loader<loader<Resource>, Resource> {
-    std::shared_ptr<Resource> load(int value) const {
+    entt::resource_handle<Resource> load(int value) const {
         auto res = std::shared_ptr<Resource>(new Resource);
         res->value = value;
         return res;
@@ -36,7 +36,7 @@ struct loader: entt::resource_loader<loader<Resource>, Resource> {
 
 template<typename Resource>
 struct broken_loader: entt::resource_loader<broken_loader<Resource>, Resource> {
-    std::shared_ptr<Resource> load(int) const {
+    entt::resource_handle<Resource> load(int) const {
         return nullptr;
     }
 };
