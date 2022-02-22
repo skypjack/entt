@@ -119,40 +119,43 @@ TEST(AllocateUnique, UsesAllocatorConstruction) {
 #endif
 
 TEST(UsesAllocatorConstructionArgs, NoUsesAllocatorConstruction) {
-    const auto args = entt::uses_allocator_construction_args<int>(std::allocator<int>{}, 42);
+    const auto value = 42;
+    const auto args = entt::uses_allocator_construction_args<int>(std::allocator<int>{}, value);
 
     static_assert(std::tuple_size_v<decltype(args)> == 1u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<int &&>>);
+    static_assert(std::is_same_v<decltype(args), const std::tuple<const int &>>);
 
-    ASSERT_EQ(std::get<0>(args), 42);
+    ASSERT_EQ(std::get<0>(args), value);
 }
 
 TEST(UsesAllocatorConstructionArgs, LeadingAllocatorConvention) {
-    const auto args = entt::uses_allocator_construction_args<std::tuple<int, char>>(std::allocator<int>{}, 42, 'c');
+    const auto value = 42;
+    const auto args = entt::uses_allocator_construction_args<std::tuple<int, char>>(std::allocator<int>{}, value, 'c');
 
     static_assert(std::tuple_size_v<decltype(args)> == 4u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<std::allocator_arg_t, const std::allocator<int> &, int &&, char &&>>);
+    static_assert(std::is_same_v<decltype(args), const std::tuple<std::allocator_arg_t, const std::allocator<int> &, const int &, char &&>>);
 
-    ASSERT_EQ(std::get<2>(args), 42);
-    ASSERT_EQ(std::get<3>(args), 'c');
+    ASSERT_EQ(std::get<2>(args), value);
 }
 
 TEST(UsesAllocatorConstructionArgs, TrailingAllocatorConvention) {
-    const auto args = entt::uses_allocator_construction_args<std::vector<int>>(std::allocator<int>{}, 42u);
+    const auto size = 42u;
+    const auto args = entt::uses_allocator_construction_args<std::vector<int>>(std::allocator<int>{}, size);
 
     static_assert(std::tuple_size_v<decltype(args)> == 2u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<unsigned int &&, const std::allocator<int> &>>);
+    static_assert(std::is_same_v<decltype(args), const std::tuple<const unsigned int &, const std::allocator<int> &>>);
 
-    ASSERT_EQ(std::get<0>(args), 42);
+    ASSERT_EQ(std::get<0>(args), size);
 }
 
 TEST(MakeObjUsingAllocator, Functionalities) {
+    const auto size = 42u;
     test::throwing_allocator<int>::trigger_on_allocate = true;
 
-    ASSERT_THROW((entt::make_obj_using_allocator<std::vector<int, test::throwing_allocator<int>>>(test::throwing_allocator<int>{}, 42u)), test::throwing_allocator<int>::exception_type);
+    ASSERT_THROW((entt::make_obj_using_allocator<std::vector<int, test::throwing_allocator<int>>>(test::throwing_allocator<int>{}, size)), test::throwing_allocator<int>::exception_type);
 
-    const auto vec = entt::make_obj_using_allocator<std::vector<int>>(std::allocator<int>{}, 42u);
+    const auto vec = entt::make_obj_using_allocator<std::vector<int>>(std::allocator<int>{}, size);
 
     ASSERT_FALSE(vec.empty());
-    ASSERT_EQ(vec.size(), 42u);
+    ASSERT_EQ(vec.size(), size);
 }
