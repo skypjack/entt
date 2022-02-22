@@ -98,7 +98,8 @@ public:
     }
 
     template<typename ILhs, typename IRhs>
-    friend auto operator-(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+    // auto is fine here but gcc 7.5.0 has a nasty issue with deduced return types and friend functions
+    friend /* auto */ std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
 
     template<typename ILhs, typename IRhs>
     friend bool operator==(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
@@ -111,7 +112,8 @@ private:
 };
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] auto operator-(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+// auto is fine here but gcc 7.5.0 has a nasty issue with deduced return types and friend functions
+[[nodiscard]] /* auto */ std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.it - rhs.it;
 }
 
