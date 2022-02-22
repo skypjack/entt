@@ -211,7 +211,7 @@ constexpr auto uses_allocator_construction_args(const Allocator &allocator, Args
  */
 template<typename Type, typename Allocator, typename... Args>
 constexpr Type make_obj_using_allocator(const Allocator &allocator, Args &&...args) {
-    return std::make_from_tuple<Type>(uses_allocator_construction_args<Type>(allocator, std::forward<Args>(args)...));
+    return std::make_from_tuple<Type>(entt::uses_allocator_construction_args<Type>(allocator, std::forward<Args>(args)...));
 }
 
 } // namespace entt
