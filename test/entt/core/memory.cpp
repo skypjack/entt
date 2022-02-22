@@ -127,7 +127,7 @@ TEST(UsesAllocatorConstructionArgs, NoUsesAllocatorConstruction) {
     ASSERT_EQ(std::get<0>(args), 42);
 }
 
-TEST(UsesAllocatorConstructionArgs, LeadingAllocatorConvetion) {
+TEST(UsesAllocatorConstructionArgs, LeadingAllocatorConvention) {
     const auto args = entt::uses_allocator_construction_args<std::tuple<int, char>>(std::allocator<int>{}, 42, 'c');
 
     static_assert(std::tuple_size_v<decltype(args)> == 4u);
@@ -137,7 +137,7 @@ TEST(UsesAllocatorConstructionArgs, LeadingAllocatorConvetion) {
     ASSERT_EQ(std::get<3>(args), 'c');
 }
 
-TEST(UsesAllocatorConstructionArgs, TrailingAllocatorConvetion) {
+TEST(UsesAllocatorConstructionArgs, TrailingAllocatorConvention) {
     const auto args = entt::uses_allocator_construction_args<std::vector<int>>(std::allocator<int>{}, 42u);
 
     static_assert(std::tuple_size_v<decltype(args)> == 2u);
