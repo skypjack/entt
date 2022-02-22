@@ -37,7 +37,7 @@ struct loader: entt::resource_loader<loader<Resource>, Resource> {
 template<typename Resource>
 struct broken_loader: entt::resource_loader<broken_loader<Resource>, Resource> {
     entt::resource_handle<Resource> load(int) const {
-        return nullptr;
+        return {};
     }
 };
 
