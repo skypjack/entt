@@ -5,6 +5,7 @@
 
 WIP:
 * uses-allocator construction: dense map, compressed pair, any (with allocator support), cache, dispatcher, poly, ...
+* add an ENTT_NOEXCEPT with args and use it to make ie compressed_pair conditionally noexcept
 * process scheduler: reviews, use free lists internally
 * runtime events (emitter)
 * iterator based try_emplace vs try_insert for perf reasons

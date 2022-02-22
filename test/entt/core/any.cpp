@@ -1293,6 +1293,23 @@ TEST_F(Any, NotCopyableType) {
     ASSERT_TRUE(copy.owner());
 }
 
+TEST_F(Any, NotCopyableValueType) {
+    std::vector<entt::any> vec{};
+    vec.emplace_back(std::in_place_type<not_copyable>);
+    vec.shrink_to_fit();
+
+    ASSERT_EQ(vec.size(), 1u);
+    ASSERT_EQ(vec.capacity(), 1u);
+    ASSERT_TRUE(vec[0u]);
+
+    // strong exception guarantee due to noexcept move ctor
+    vec.emplace_back(std::in_place_type<not_copyable>);
+
+    ASSERT_EQ(vec.size(), 2u);
+    ASSERT_TRUE(vec[0u]);
+    ASSERT_TRUE(vec[1u]);
+}
+
 TEST_F(Any, NotMovableType) {
     entt::any any{std::in_place_type<not_movable>};
     entt::any other{std::in_place_type<not_movable>};
