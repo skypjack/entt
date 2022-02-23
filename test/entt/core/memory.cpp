@@ -205,3 +205,33 @@ TEST(MakeObjUsingAllocator, Functionalities) {
     ASSERT_FALSE(vec.empty());
     ASSERT_EQ(vec.size(), size);
 }
+
+TEST(UninitializedConstructUsingAllocator, NoUsesAllocatorConstruction) {
+    std::aligned_storage_t<sizeof(int)> storage;
+    std::allocator<int> allocator{};
+
+    int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(&storage), allocator, 42);
+
+    ASSERT_EQ(*value, 42);
+}
+
+#if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
+
+TEST(UninitializedConstructUsingAllocator, UsesAllocatorConstruction) {
+    using string_type = typename test::tracked_memory_resource::string_type;
+
+    test::tracked_memory_resource memory_resource{};
+    std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
+    std::aligned_storage_t<sizeof(string_type)> storage;
+
+    string_type *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<string_type *>(&storage), allocator, test::tracked_memory_resource::default_value);
+
+    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
+    ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
+    ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
+    ASSERT_EQ(*value, test::tracked_memory_resource::default_value);
+
+    value->~string_type();
+}
+
+#endif

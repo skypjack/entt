@@ -265,6 +265,25 @@ constexpr Type make_obj_using_allocator(const Allocator &allocator, Args &&...ar
     return std::make_from_tuple<Type>(internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
 
+/**
+ * @brief Uses-allocator construction utility (waiting for C++20).
+ *
+ * Primarily intended for internal use. Creates an object of a given type by
+ * means of uses-allocator construction at an uninitialized memory location.
+ *
+ * @tparam Type Type of object to create.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Args Types of arguments to use to construct the object.
+ * @param value Memory location in which to place the object.
+ * @param allocator The allocator to use.
+ * @param args Parameters to use to construct the object.
+ * @return A pointer to the newly created object of the given type.
+ */
+template<typename Type, typename Allocator, typename... Args>
+constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
+    return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
+}
+
 } // namespace entt
 
 #endif
