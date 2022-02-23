@@ -25,8 +25,8 @@ class tracked_memory_resource: public std::pmr::memory_resource {
         std::pmr::get_default_resource()->deallocate(value, bytes, alignment);
     }
 
-    bool do_is_equal(const std::pmr::memory_resource &) const ENTT_NOEXCEPT override {
-        return true;
+    bool do_is_equal(const std::pmr::memory_resource &other) const ENTT_NOEXCEPT override {
+        return (this == &other);
     }
 
 public:
