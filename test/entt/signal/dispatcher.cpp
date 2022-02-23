@@ -32,6 +32,9 @@ TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher;
     receiver receiver;
 
+    ASSERT_EQ(dispatcher.size<an_event>(), 0u);
+    ASSERT_EQ(dispatcher.size(), 0u);
+
     dispatcher.trigger(one_more_event{42});
     dispatcher.enqueue<one_more_event>(42);
     dispatcher.update<one_more_event>();
@@ -40,16 +43,24 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.trigger<an_event>();
     dispatcher.enqueue<an_event>();
 
+    ASSERT_EQ(dispatcher.size<one_more_event>(), 0u);
+    ASSERT_EQ(dispatcher.size<an_event>(), 1u);
+    ASSERT_EQ(dispatcher.size(), 1u);
     ASSERT_EQ(receiver.cnt, 1);
 
     dispatcher.enqueue(another_event{});
     dispatcher.update<another_event>();
 
+    ASSERT_EQ(dispatcher.size<another_event>(), 0u);
+    ASSERT_EQ(dispatcher.size<an_event>(), 1u);
+    ASSERT_EQ(dispatcher.size(), 1u);
     ASSERT_EQ(receiver.cnt, 1);
 
     dispatcher.update<an_event>();
     dispatcher.trigger<an_event>();
 
+    ASSERT_EQ(dispatcher.size<an_event>(), 0u);
+    ASSERT_EQ(dispatcher.size(), 0u);
     ASSERT_EQ(receiver.cnt, 3);
 
     dispatcher.enqueue<an_event>();
@@ -60,6 +71,8 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.clear();
     dispatcher.update();
 
+    ASSERT_EQ(dispatcher.size<an_event>(), 0u);
+    ASSERT_EQ(dispatcher.size(), 0u);
     ASSERT_EQ(receiver.cnt, 3);
 
     receiver.reset();

@@ -34,6 +34,7 @@ class dispatcher {
         virtual void publish() = 0;
         virtual void disconnect(void *) = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
+        virtual std::size_t size() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -76,6 +77,10 @@ class dispatcher {
             }
         }
 
+        std::size_t size() const ENTT_NOEXCEPT override {
+            return events.size();
+        }
+
     private:
         sigh<void(Event &)> signal{};
         std::vector<Event> events;
@@ -92,7 +97,19 @@ class dispatcher {
         }
     }
 
+    template<typename Event>
+    [[nodiscard]] const pool_handler<Event> *assure(const id_type id) const {
+        if(const auto it = pools.find(id); it != pools.end()) {
+            return static_cast<const pool_handler<Event> *>(it->second.get());
+        }
+
+        return nullptr;
+    }
+
 public:
+    /*! @brief Unsigned integer type. */
+    using size_type = std::size_t;
+
     /*! @brief Default constructor. */
     dispatcher() = default;
 
@@ -101,6 +118,32 @@ public:
 
     /*! @brief Default move assignment operator. @return This dispatcher. */
     dispatcher &operator=(dispatcher &&) = default;
+
+    /**
+     * @brief Returns the number of pending events for a given type.
+     * @tparam Event Type of event for which to return the count.
+     * @param id Name used to map the event queue within the dispatcher.
+     * @return The number of pending events for the given type.
+     */
+    template<typename Event>
+    size_type size(const id_type id = type_hash<Event>::value()) const ENTT_NOEXCEPT {
+        const auto *cpool = assure<Event>(id);
+        return cpool ? cpool->size() : 0u;
+    }
+
+    /**
+     * @brief Returns the total number of pending events.
+     * @return The total number of pending events.
+     */
+    size_type size() const ENTT_NOEXCEPT {
+        size_type count{};
+
+        for(auto &&cpool: pools) {
+            count += cpool.second->size();
+        }
+
+        return count;
+    }
 
     /**
      * @brief Returns a sink object for the given event and queue.
