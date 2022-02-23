@@ -1,4 +1,3 @@
-* long term feature: resource cache
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * add examples (and credits) from @alanjfs :)
@@ -6,18 +5,18 @@
 WIP:
 * uses-allocator construction: dense map, compressed pair, any (with allocator support), cache, dispatcher, poly, storage/map/allocate_unique (with uninitialized_construct_using_allocator/construct_at), ...
 * add an ENTT_NOEXCEPT with args and use it to make ie compressed_pair conditionally noexcept
+* storage traits: mixin only, make views stop using traits, they can refer to storage<T> only
 * process scheduler: reviews, use free lists internally
 * runtime events (emitter)
 * iterator based try_emplace vs try_insert for perf reasons
 * registry: remove reference to basic_sparse_set<E>
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
+* entity-only and exclude-only views
 * custom allocators all over
 
 WIP:
-* resource, forward the id to the loader from the cache and if constexpr the call to load, update doc and describe customization points
 * add user data to type_info
 * write documentation for custom storages and views!!
 * make runtime views use opaque storage and therefore return also elements.
 * entity-aware observer, add observer functions aside observer class
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
-* snapshot: support for range-based archives
