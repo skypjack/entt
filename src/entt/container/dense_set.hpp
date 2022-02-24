@@ -359,12 +359,8 @@ public:
         rehash(bucket_count);
     }
 
-    /**
-     * @brief Copy constructor.
-     * @param other The instance to copy from.
-     */
-    dense_set(const dense_set &other)
-        : dense_set{other, alloc_traits::select_on_container_copy_construction(other.get_allocator())} {}
+    /*! @brief Default copy constructor. */
+    dense_set(const dense_set &) = default;
 
     /**
      * @brief Allocator-extended copy constructor.
@@ -372,17 +368,12 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(const dense_set &other, const allocator_type &allocator)
-        : sparse{sparse_container_type{other.sparse.first(), allocator}, other.sparse.second()},
-          // cannot copy the container directly due to a nasty issue of apple clang :(
-          packed{packed_container_type{other.packed.first().begin(), other.packed.first().end(), allocator}, other.packed.second()},
-          threshold{other.threshold} {
-    }
+        : sparse{std::piecewise_construct, std::forward_as_tuple(other.sparse.first(), allocator), std::forward_as_tuple(other.sparse.second())},
+          packed{std::piecewise_construct, std::forward_as_tuple(other.packed.first(), allocator), std::forward_as_tuple(other.packed.second())},
+          threshold{other.threshold} {}
 
-    /**
-     * @brief Default move constructor.
-     * @param other The instance to move from.
-     */
-    dense_set(dense_set &&other) = default;
+    /*! @brief Default move constructor. */
+    dense_set(dense_set &&) = default;
 
     /**
      * @brief Allocator-extended move constructor.
@@ -390,35 +381,20 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(dense_set &&other, const allocator_type &allocator)
-        : sparse{sparse_container_type{std::move(other.sparse.first()), allocator}, std::move(other.sparse.second())},
-          // cannot move the container directly due to a nasty issue of apple clang :(
-          packed{packed_container_type{std::make_move_iterator(other.packed.first().begin()), std::make_move_iterator(other.packed.first().end()), allocator}, std::move(other.packed.second())},
+        : sparse{std::piecewise_construct, std::forward_as_tuple(std::move(other.sparse.first()), allocator), std::forward_as_tuple(std::move(other.sparse.second()))},
+          packed{std::piecewise_construct, std::forward_as_tuple(std::move(other.packed.first()), allocator), std::forward_as_tuple(std::move(other.packed.second()))},
           threshold{other.threshold} {}
 
-    /*! @brief Default destructor. */
-    ~dense_set() = default;
-
     /**
-     * @brief Copy assignment operator.
-     * @param other The instance to copy from.
+     * @brief Default copy assignment operator.
      * @return This container.
      */
-    dense_set &operator=(const dense_set &other) {
-        threshold = other.threshold;
-        sparse.first().clear();
-        packed.first().clear();
-        rehash(other.bucket_count());
-        packed.first().reserve(other.packed.first().size());
-        insert(other.cbegin(), other.cend());
-        return *this;
-    }
-
+    dense_set &operator=(const dense_set &) = default;
     /**
      * @brief Default move assignment operator.
-     * @param other The instance to move from.
      * @return This container.
      */
-    dense_set &operator=(dense_set &&other) = default;
+    dense_set &operator=(dense_set &&) = default;
 
     /**
      * @brief Returns the associated allocator.
