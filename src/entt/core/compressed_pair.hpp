@@ -32,7 +32,7 @@ struct compressed_pair_element {
 
     template<typename... Args, std::size_t... Index>
     compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
-        : value{std::get<Index>(args)...} {}
+        : value{std::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] reference get() ENTT_NOEXCEPT {
         return value;
@@ -62,7 +62,7 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
 
     template<typename... Args, std::size_t... Index>
     compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
-        : base_type{std::get<Index>(args)...} {}
+        : base_type{std::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] reference get() ENTT_NOEXCEPT {
         return *this;
