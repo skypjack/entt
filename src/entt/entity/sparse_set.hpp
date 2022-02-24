@@ -96,7 +96,7 @@ private:
 };
 
 template<typename Type, typename Other>
-[[nodiscard]] auto operator-(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] std::ptrdiff_t operator-(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return rhs.index() - lhs.index();
 }
 

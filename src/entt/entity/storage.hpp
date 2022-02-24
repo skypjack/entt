@@ -122,7 +122,7 @@ private:
 };
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] auto operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] std::ptrdiff_t operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
     return rhs.index() - lhs.index();
 }
 
