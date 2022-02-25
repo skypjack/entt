@@ -229,10 +229,8 @@ class dense_set {
     static constexpr float default_threshold = 0.875f;
     static constexpr std::size_t minimum_capacity = 8u;
 
-    using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
-
     using node_type = std::pair<std::size_t, Type>;
+    using alloc_traits = std::allocator_traits<Allocator>;
     using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
@@ -278,13 +276,10 @@ class dense_set {
 
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
+            packed.first()[pos] = std::move(packed.first().back());
             size_type *curr = sparse.first().data() + bucket(packed.first().back().second);
             for(; *curr != last; curr = &packed.first()[*curr].first) {}
             *curr = pos;
-
-            // basic exception guarantees when value type has a throwing move constructor
-            packed.first()[pos].second = std::move(packed.first().back().second);
-            packed.first()[pos].first = packed.first().back().first;
         }
 
         packed.first().pop_back();
