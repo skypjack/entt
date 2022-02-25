@@ -774,7 +774,7 @@ These are the parameters that a free function or a member function can accept:
 
 * A possibly constant reference to a registry.
 * An `entt::basic_view` with any possible combination of types.
-* A possibly constant reference to any type `T` (that is, a context variable)
+* A possibly constant reference to any type `T` (that is, a context variable).
 
 The function type for free functions and decayed lambdas passed as parameters to
 `emplace` is `void(const void *, entt::registry &)` instead. The first parameter
