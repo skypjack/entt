@@ -1770,7 +1770,7 @@ TEST(Storage, NoUsesAllocatorConstruction) {
     memory_resource.reset();
     pool.emplace(entity, 0);
 
-    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
+    ASSERT_TRUE(pool.get_allocator().resource()->is_equal(memory_resource));
     ASSERT_EQ(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }
@@ -1787,7 +1787,7 @@ TEST(Storage, UsesAllocatorConstruction) {
     memory_resource.reset();
     pool.emplace(entity, test::tracked_memory_resource::default_value);
 
-    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
+    ASSERT_TRUE(pool.get_allocator().resource()->is_equal(memory_resource));
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }

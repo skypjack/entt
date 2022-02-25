@@ -97,7 +97,6 @@ TEST(AllocateUnique, NoUsesAllocatorConstruction) {
     using type = std::unique_ptr<int, entt::allocation_deleter<std::pmr::polymorphic_allocator<int>>>;
     type ptr = entt::allocate_unique<int>(allocator, 0);
 
-    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
     ASSERT_EQ(memory_resource.do_allocate_counter(), 1u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }
@@ -111,7 +110,6 @@ TEST(AllocateUnique, UsesAllocatorConstruction) {
     using type = std::unique_ptr<string_type, entt::allocation_deleter<std::pmr::polymorphic_allocator<string_type>>>;
     type ptr = entt::allocate_unique<string_type>(allocator, test::tracked_memory_resource::default_value);
 
-    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
     ASSERT_GT(memory_resource.do_allocate_counter(), 1u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }
@@ -226,7 +224,6 @@ TEST(UninitializedConstructUsingAllocator, UsesAllocatorConstruction) {
 
     string_type *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<string_type *>(&storage), allocator, test::tracked_memory_resource::default_value);
 
-    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
     ASSERT_EQ(*value, test::tracked_memory_resource::default_value);

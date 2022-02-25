@@ -846,7 +846,7 @@ TEST(DenseSet, NoUsesAllocatorConstruction) {
     memory_resource.reset();
     set.emplace(0);
 
-    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
+    ASSERT_TRUE(set.get_allocator().resource()->is_equal(memory_resource));
     ASSERT_EQ(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }
@@ -862,7 +862,7 @@ TEST(DenseSet, UsesAllocatorConstruction) {
     memory_resource.reset();
     set.emplace(test::tracked_memory_resource::default_value);
 
-    ASSERT_TRUE(memory_resource.is_equal(memory_resource));
+    ASSERT_TRUE(set.get_allocator().resource()->is_equal(memory_resource));
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }
