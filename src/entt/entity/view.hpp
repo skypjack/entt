@@ -28,6 +28,8 @@ namespace internal {
 
 template<typename Type, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
+    using iterator_type = typename Type::iterator;
+
     [[nodiscard]] bool valid() const ENTT_NOEXCEPT {
         return ((Component != 0u) || (*it != tombstone))
                && std::apply([entt = *it](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
@@ -35,7 +37,6 @@ class view_iterator final {
     }
 
 public:
-    using iterator_type = typename Type::iterator;
     using difference_type = typename std::iterator_traits<iterator_type>::difference_type;
     using value_type = typename std::iterator_traits<iterator_type>::value_type;
     using pointer = typename std::iterator_traits<iterator_type>::pointer;
