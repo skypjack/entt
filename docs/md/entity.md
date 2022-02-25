@@ -957,7 +957,7 @@ The non-specialized version of this class contains the following members:
 * `in_place_delete`: `Type::in_place_delete` if present, false otherwise.
 * `ignore_if_empty`: `Type::ignore_if_empty` if present, `ENTT_IGNORE_IF_EMPTY`
   otherwise.
-* `page_size`: `Type::ignore_if_empty` if present, `ENTT_PACKED_PAGE` otherwise.
+* `page_size`: `Type::page_size` if present, `ENTT_PACKED_PAGE` otherwise.
 
 Where `Type` is any type of component. All properties can be customized by
 specializing the above class and defining all its members, or by adding only
