@@ -17,6 +17,77 @@
 namespace entt {
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+struct basic_dispatcher_handler {
+    virtual ~basic_dispatcher_handler() = default;
+    virtual void publish() = 0;
+    virtual void disconnect(void *) = 0;
+    virtual void clear() ENTT_NOEXCEPT = 0;
+    virtual std::size_t size() const ENTT_NOEXCEPT = 0;
+};
+
+template<typename Event>
+struct dispatcher_handler final: basic_dispatcher_handler {
+    static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
+
+    void publish() override {
+        const auto length = events.size();
+
+        for(std::size_t pos{}; pos < length; ++pos) {
+            signal.publish(events[pos]);
+        }
+
+        events.erase(events.cbegin(), events.cbegin() + length);
+    }
+
+    void disconnect(void *instance) override {
+        bucket().disconnect(instance);
+    }
+
+    void clear() ENTT_NOEXCEPT override {
+        events.clear();
+    }
+
+    [[nodiscard]] auto bucket() ENTT_NOEXCEPT {
+        using sink_type = typename sigh<void(Event &)>::sink_type;
+        return sink_type{signal};
+    }
+
+    void trigger(Event event) {
+        signal.publish(event);
+    }
+
+    template<typename... Args>
+    void enqueue(Args &&...args) {
+        if constexpr(std::is_aggregate_v<Event>) {
+            events.push_back(Event{std::forward<Args>(args)...});
+        } else {
+            events.emplace_back(std::forward<Args>(args)...);
+        }
+    }
+
+    std::size_t size() const ENTT_NOEXCEPT override {
+        return events.size();
+    }
+
+private:
+    sigh<void(Event &)> signal{};
+    std::vector<Event> events;
+};
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
  * @brief Basic dispatcher implementation.
  *
  * A dispatcher can be used either to trigger an immediate event or to enqueue
@@ -29,78 +100,21 @@ namespace entt {
  * documentation of the latter for more details.
  */
 class dispatcher {
-    struct basic_pool {
-        virtual ~basic_pool() = default;
-        virtual void publish() = 0;
-        virtual void disconnect(void *) = 0;
-        virtual void clear() ENTT_NOEXCEPT = 0;
-        virtual std::size_t size() const ENTT_NOEXCEPT = 0;
-    };
-
     template<typename Event>
-    struct pool_handler final: basic_pool {
-        static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
-
-        void publish() override {
-            const auto length = events.size();
-
-            for(std::size_t pos{}; pos < length; ++pos) {
-                signal.publish(events[pos]);
-            }
-
-            events.erase(events.cbegin(), events.cbegin() + length);
-        }
-
-        void disconnect(void *instance) override {
-            bucket().disconnect(instance);
-        }
-
-        void clear() ENTT_NOEXCEPT override {
-            events.clear();
-        }
-
-        [[nodiscard]] auto bucket() ENTT_NOEXCEPT {
-            using sink_type = typename sigh<void(Event &)>::sink_type;
-            return sink_type{signal};
-        }
-
-        void trigger(Event event) {
-            signal.publish(event);
-        }
-
-        template<typename... Args>
-        void enqueue(Args &&...args) {
-            if constexpr(std::is_aggregate_v<Event>) {
-                events.push_back(Event{std::forward<Args>(args)...});
-            } else {
-                events.emplace_back(std::forward<Args>(args)...);
-            }
-        }
-
-        std::size_t size() const ENTT_NOEXCEPT override {
-            return events.size();
-        }
-
-    private:
-        sigh<void(Event &)> signal{};
-        std::vector<Event> events;
-    };
-
-    template<typename Event>
-    [[nodiscard]] pool_handler<Event> &assure(const id_type id) {
+    [[nodiscard]] internal::dispatcher_handler<Event> &assure(const id_type id) {
         if(auto &&ptr = pools[id]; !ptr) {
-            auto *cpool = new pool_handler<Event>{};
+            auto *cpool = new internal::dispatcher_handler<Event>{};
             ptr.reset(cpool);
             return *cpool;
         } else {
-            return static_cast<pool_handler<Event> &>(*ptr);
+            return static_cast<internal::dispatcher_handler<Event> &>(*ptr);
         }
     }
 
     template<typename Event>
-    [[nodiscard]] const pool_handler<Event> *assure(const id_type id) const {
+    [[nodiscard]] const internal::dispatcher_handler<Event> *assure(const id_type id) const {
         if(const auto it = pools.find(id); it != pools.end()) {
-            return static_cast<const pool_handler<Event> *>(it->second.get());
+            return static_cast<const internal::dispatcher_handler<Event> *>(it->second.get());
         }
 
         return nullptr;
@@ -292,7 +306,7 @@ public:
     }
 
 private:
-    dense_map<id_type, std::unique_ptr<basic_pool>, identity> pools;
+    dense_map<id_type, std::unique_ptr<internal::basic_dispatcher_handler>, identity> pools;
 };
 
 } // namespace entt
