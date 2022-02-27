@@ -313,8 +313,8 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-[[nodiscard]] constexpr entt::hashed_string operator"" _hs(const char *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_string{str};
+[[nodiscard]] constexpr hashed_string operator"" _hs(const char *str, std::size_t) ENTT_NOEXCEPT {
+    return hashed_string{str};
 }
 
 /**
@@ -322,8 +322,8 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed wstring.
  */
-[[nodiscard]] constexpr entt::hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_wstring{str};
+[[nodiscard]] constexpr hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
+    return hashed_wstring{str};
 }
 
 } // namespace literals
