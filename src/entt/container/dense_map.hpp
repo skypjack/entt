@@ -14,6 +14,7 @@
 #include <vector>
 #include "../config/config.h"
 #include "../core/compressed_pair.hpp"
+#include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
@@ -29,27 +30,45 @@ namespace internal {
 
 template<typename Key, typename Type>
 struct dense_map_node final {
+    using value_type = std::pair<Key, Type>;
+
     template<typename... Args>
     dense_map_node(const std::size_t pos, Args &&...args)
         : next{pos},
           element{std::forward<Args>(args)...} {}
 
+    template<typename Allocator, typename... Args>
+    dense_map_node(std::allocator_arg_t, const Allocator &allocator, const std::size_t pos, Args &&...args)
+        : next{pos},
+          element{entt::make_obj_using_allocator<value_type>(allocator, std::forward<Args>(args)...)} {}
+
+    template<typename Allocator>
+    dense_map_node(std::allocator_arg_t, const Allocator &allocator, const dense_map_node &other)
+        : next{other.next},
+          element{entt::make_obj_using_allocator<value_type>(allocator, other.element)} {}
+
+    template<typename Allocator>
+    dense_map_node(std::allocator_arg_t, const Allocator &allocator, dense_map_node &&other)
+        : next{other.next},
+          element{entt::make_obj_using_allocator<value_type>(allocator, std::move(other.element))} {}
+
     std::size_t next;
-    std::pair<Key, Type> element;
+    value_type element;
 };
 
 template<typename It>
 class dense_map_iterator final {
     friend dense_map_iterator<const std::remove_pointer_t<It> *>;
 
-    using iterator_traits = std::iterator_traits<decltype(std::addressof(std::declval<It>()->element))>;
+    using first_type = decltype(std::as_const(std::declval<It>()->element.first));
+    using second_type = decltype((std::declval<It>()->element.second));
 
 public:
-    using value_type = typename iterator_traits::value_type;
-    using pointer = typename iterator_traits::pointer;
-    using reference = typename iterator_traits::reference;
-    using difference_type = typename iterator_traits::difference_type;
-    using iterator_category = std::random_access_iterator_tag;
+    using value_type = std::pair<first_type, second_type>;
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::input_iterator_tag;
 
     dense_map_iterator() ENTT_NOEXCEPT = default;
 
@@ -97,20 +116,19 @@ public:
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-        return it[value].element;
+        return *dense_map_iterator{it + value};
     }
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-        return std::addressof(it->element);
+        return operator*();
     }
 
     [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-        return *operator->();
+        return value_type{it->element.first, it->element.second};
     }
 
     template<typename ILhs, typename IRhs>
-    // auto is fine here but gcc 7.5.0 has a nasty issue with deduced return types and friend functions
-    friend /* auto */ std::ptrdiff_t operator-(const dense_map_iterator<ILhs> &, const dense_map_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend std::ptrdiff_t operator-(const dense_map_iterator<ILhs> &, const dense_map_iterator<IRhs> &) ENTT_NOEXCEPT;
 
     template<typename ILhs, typename IRhs>
     friend bool operator==(const dense_map_iterator<ILhs> &, const dense_map_iterator<IRhs> &) ENTT_NOEXCEPT;
@@ -123,8 +141,7 @@ private:
 };
 
 template<typename ILhs, typename IRhs>
-// auto is fine here but gcc 7.5.0 has a nasty issue with deduced return types and friend functions
-[[nodiscard]] /* auto */ std::ptrdiff_t operator-(const dense_map_iterator<ILhs> &lhs, const dense_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] std::ptrdiff_t operator-(const dense_map_iterator<ILhs> &lhs, const dense_map_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.it - rhs.it;
 }
 
@@ -162,14 +179,15 @@ template<typename It>
 class dense_map_local_iterator final {
     friend dense_map_local_iterator<const std::remove_pointer_t<It> *>;
 
-    using iterator_traits = std::iterator_traits<decltype(std::addressof(std::declval<It>()->element))>;
+    using first_type = decltype(std::as_const(std::declval<It>()->element.first));
+    using second_type = decltype((std::declval<It>()->element.second));
 
 public:
-    using value_type = typename iterator_traits::value_type;
-    using pointer = typename iterator_traits::pointer;
-    using reference = typename iterator_traits::reference;
-    using difference_type = typename iterator_traits::difference_type;
-    using iterator_category = std::forward_iterator_tag;
+    using value_type = std::pair<first_type, second_type>;
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::input_iterator_tag;
 
     dense_map_local_iterator() ENTT_NOEXCEPT = default;
 
@@ -192,11 +210,11 @@ public:
     }
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-        return std::addressof(it[offset].element);
+        return operator*();
     }
 
     [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-        return *operator->();
+        return value_type{it[offset].element.first, it[offset].element.second};
     }
 
     [[nodiscard]] std::size_t index() const ENTT_NOEXCEPT {
@@ -243,10 +261,8 @@ class dense_map {
     static constexpr float default_threshold = 0.875f;
     static constexpr std::size_t minimum_capacity = 8u;
 
-    using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, std::pair<const Key, Type>>);
-
-    using node_type = internal::dense_map_node<const Key, Type>;
+    using node_type = internal::dense_map_node<Key, Type>;
+    using alloc_traits = typename std::allocator_traits<Allocator>;
     using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
@@ -276,41 +292,12 @@ class dense_map {
         return cend();
     }
 
-    template<typename... Args>
-    [[nodiscard]] auto get_or_emplace(const Key &key, Args &&...args) {
-        const auto hash = sparse.second()(key);
-        auto index = hash_to_bucket(hash);
-
-        if(auto it = constrained_find(key, index); it != end()) {
-            return std::make_pair(it, false);
-        }
-
-        if(const auto count = size() + 1u; count > (bucket_count() * max_load_factor())) {
-            rehash(bucket_count() * 2u);
-            index = hash_to_bucket(hash);
-        }
-
-        packed.first().emplace_back(sparse.first()[index], std::forward<Args>(args)...);
-        // update goes after emplace to enforce exception guarantees
-        sparse.first()[index] = size() - 1u;
-
-        return std::make_pair(--end(), true);
-    }
-
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
+            packed.first()[pos] = std::move(packed.first().back());
             size_type *curr = sparse.first().data() + bucket(packed.first().back().element.first);
             for(; *curr != last; curr = &packed.first()[*curr].next) {}
             *curr = pos;
-
-            using node_alloc_traits = typename alloc_traits::template rebind_traits<decltype(node_type::element)>;
-            typename node_alloc_traits::allocator_type allocator = packed.first().get_allocator();
-            auto *ptr = std::addressof(packed.first()[pos].element);
-
-            std::destroy_at(ptr);
-            packed.first()[pos].next = packed.first().back().next;
-            // no exception guarantees when mapped type has a throwing move constructor (we're technically doomed)
-            node_alloc_traits::construct(allocator, ptr, std::move(packed.first().back().element));
         }
 
         packed.first().pop_back();
@@ -385,12 +372,8 @@ public:
         rehash(bucket_count);
     }
 
-    /**
-     * @brief Copy constructor.
-     * @param other The instance to copy from.
-     */
-    dense_map(const dense_map &other)
-        : dense_map{other, alloc_traits::select_on_container_copy_construction(other.get_allocator())} {}
+    /*! @brief Default copy constructor. */
+    dense_map(const dense_map &) = default;
 
     /**
      * @brief Allocator-extended copy constructor.
@@ -398,17 +381,12 @@ public:
      * @param allocator The allocator to use.
      */
     dense_map(const dense_map &other, const allocator_type &allocator)
-        : sparse{sparse_container_type{other.sparse.first(), allocator}, other.sparse.second()},
-          // cannot copy the container directly due to a nasty issue of apple clang :(
-          packed{packed_container_type{other.packed.first().begin(), other.packed.first().end(), allocator}, other.packed.second()},
-          threshold{other.threshold} {
-    }
+        : sparse{std::piecewise_construct, std::forward_as_tuple(other.sparse.first(), allocator), std::forward_as_tuple(other.sparse.second())},
+          packed{std::piecewise_construct, std::forward_as_tuple(other.packed.first(), allocator), std::forward_as_tuple(other.packed.second())},
+          threshold{other.threshold} {}
 
-    /**
-     * @brief Default move constructor.
-     * @param other The instance to move from.
-     */
-    dense_map(dense_map &&other) = default;
+    /*! @brief Default move constructor. */
+    dense_map(dense_map &&) = default;
 
     /**
      * @brief Allocator-extended move constructor.
@@ -416,35 +394,21 @@ public:
      * @param allocator The allocator to use.
      */
     dense_map(dense_map &&other, const allocator_type &allocator)
-        : sparse{sparse_container_type{std::move(other.sparse.first()), allocator}, std::move(other.sparse.second())},
-          // cannot move the container directly due to a nasty issue of apple clang :(
-          packed{packed_container_type{std::make_move_iterator(other.packed.first().begin()), std::make_move_iterator(other.packed.first().end()), allocator}, std::move(other.packed.second())},
+        : sparse{std::piecewise_construct, std::forward_as_tuple(std::move(other.sparse.first()), allocator), std::forward_as_tuple(std::move(other.sparse.second()))},
+          packed{std::piecewise_construct, std::forward_as_tuple(std::move(other.packed.first()), allocator), std::forward_as_tuple(std::move(other.packed.second()))},
           threshold{other.threshold} {}
 
-    /*! @brief Default destructor. */
-    ~dense_map() = default;
-
     /**
-     * @brief Copy assignment operator.
-     * @param other The instance to copy from.
+     * @brief Default copy assignment operator.
      * @return This container.
      */
-    dense_map &operator=(const dense_map &other) {
-        threshold = other.threshold;
-        sparse.first().clear();
-        packed.first().clear();
-        rehash(other.bucket_count());
-        packed.first().reserve(other.packed.first().size());
-        insert(other.cbegin(), other.cend());
-        return *this;
-    }
+    dense_map &operator=(const dense_map &) = default;
 
     /**
      * @brief Default move assignment operator.
-     * @param other The instance to move from.
      * @return This container.
      */
-    dense_map &operator=(dense_map &&other) = default;
+    dense_map &operator=(dense_map &&) = default;
 
     /**
      * @brief Returns the associated allocator.
@@ -573,29 +537,31 @@ public:
      */
     template<typename Arg>
     std::pair<iterator, bool> insert_or_assign(const key_type &key, Arg &&value) {
-        auto result = try_emplace(key, std::forward<Arg>(value));
-
-        if(!result.second) {
-            result.first->second = std::forward<Arg>(value);
+        if(const auto it = find(key); it != end()) {
+            it->second = std::forward<Arg>(value);
+            return {it, false};
         }
 
-        return result;
+        return emplace(key, std::forward<Arg>(value));
     }
 
     /*! @copydoc insert_or_assign */
     template<typename Arg>
     std::pair<iterator, bool> insert_or_assign(key_type &&key, Arg &&value) {
-        auto result = try_emplace(std::move(key), std::forward<Arg>(value));
-
-        if(!result.second) {
-            result.first->second = std::forward<Arg>(value);
+        if(const auto it = find(key); it != end()) {
+            it->second = std::forward<Arg>(value);
+            return {it, false};
         }
 
-        return result;
+        return emplace(std::move(key), std::forward<Arg>(value));
     }
 
     /**
      * @brief Constructs an element in-place, if the key does not exist.
+     *
+     * The element is also constructed when the container already has the key,
+     * in which case the newly constructed object is destroyed immediately.
+     *
      * @tparam Args Types of arguments to forward to the constructor of the
      * element.
      * @param args Arguments to forward to the constructor of the element.
@@ -605,16 +571,22 @@ public:
      */
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
-        if constexpr(sizeof...(Args) == 0u) {
-            return get_or_emplace(key_type{});
-        } else if constexpr(sizeof...(Args) == 1u) {
-            return get_or_emplace(args.first..., std::forward<Args>(args)...);
-        } else if constexpr(sizeof...(Args) == 2u) {
-            return get_or_emplace(std::get<0u>(std::tie(args...)), std::forward<Args>(args)...);
-        } else {
-            static_assert(sizeof...(Args) == 3u, "Invalid arguments");
-            return emplace(std::pair<key_type, mapped_type>{std::forward<Args>(args)...});
+        auto &node = packed.first().emplace_back(packed.first().size(), std::forward<Args>(args)...);
+        const auto hash = sparse.second()(node.element.first);
+        auto index = hash_to_bucket(hash);
+
+        if(auto it = constrained_find(node.element.first, index); it != end()) {
+            packed.first().pop_back();
+            return std::make_pair(it, false);
         }
+
+        node.next = std::exchange(sparse.first()[index], size() - 1u);
+
+        if(size() > (bucket_count() * max_load_factor())) {
+            rehash(bucket_count() * 2u);
+        }
+
+        return std::make_pair(--end(), true);
     }
 
     /**
@@ -630,13 +602,13 @@ public:
      */
     template<typename... Args>
     std::pair<iterator, bool> try_emplace(const key_type &key, Args &&...args) {
-        return get_or_emplace(key, std::piecewise_construct, std::forward_as_tuple(key), std::forward_as_tuple(std::forward<Args>(args)...));
+        return emplace(std::piecewise_construct, std::forward_as_tuple(key), std::forward_as_tuple(std::forward<Args>(args)...));
     }
 
     /*! @copydoc try_emplace */
     template<typename... Args>
     std::pair<iterator, bool> try_emplace(key_type &&key, Args &&...args) {
-        return get_or_emplace(key, std::piecewise_construct, std::forward_as_tuple(std::move(key)), std::forward_as_tuple(std::forward<Args>(args)...));
+        return emplace(std::piecewise_construct, std::forward_as_tuple(std::move(key)), std::forward_as_tuple(std::forward<Args>(args)...));
     }
 
     /**
@@ -657,13 +629,11 @@ public:
      * @return An iterator following the last removed element.
      */
     iterator erase(const_iterator first, const_iterator last) {
-        const auto dist = std::distance(cbegin(), first);
-
-        for(auto rfirst = std::make_reverse_iterator(last), rlast = std::make_reverse_iterator(first); rfirst != rlast; ++rfirst) {
-            erase(rfirst->first);
+        for(; last != first; --last) {
+            erase((last - 1u)->first);
         }
 
-        return dist > static_cast<decltype(dist)>(size()) ? end() : (begin() + dist);
+        return (begin() + std::distance(cbegin(), last));
     }
 
     /**
@@ -956,5 +926,23 @@ private:
 };
 
 } // namespace entt
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace std {
+
+template<typename Key, typename Value, typename Allocator>
+struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
+    : std::true_type {};
+
+} // namespace std
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 #endif

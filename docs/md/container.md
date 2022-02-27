@@ -39,9 +39,20 @@ iterations.<br/>
 The implementation is based on _sparse sets_ and each bucket is identified by an
 implicit list within the packed array itself.
 
-The interface is in all respects similar to its counterpart in the standard
-library, that is, `std::unordered_map`.<br/>
-Therefore, there is no need to go into the API description.
+The interface is very close to its counterpart in the standard library, that is,
+`std::unordered_map`.<br/>
+However, both local and non-local iterators returned by a dense map belong to
+the input iterator category although they respectively model the concepts of a
+_forward iterator_ type and a _random access iterator_ type.<br/>
+This is because they return a pair of references rather than a reference to a
+pair. In other words, dense maps return a so called _proxy iterator_ the value
+type of which is:
+
+* `std::pair<const Key &, Type &>` for non-const iterator types.
+* `std::pair<const Key &, const Type &>` for const iterator types.
+
+This is quite different from what any standard library map returns and should be
+taken into account when looking for a drop-in replacement.
 
 ## Dense set
 

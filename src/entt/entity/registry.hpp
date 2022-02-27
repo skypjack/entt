@@ -42,15 +42,14 @@ class storage_proxy_iterator final {
     template<typename Other>
     friend class storage_proxy_iterator;
 
-    using iterator_traits = std::iterator_traits<It>;
-    using first_type = typename iterator_traits::value_type::first_type;
-    using second_type = typename iterator_traits::value_type::second_type::element_type;
+    using first_type = std::remove_reference_t<decltype(std::declval<It>()->first)>;
+    using second_type = std::remove_reference_t<decltype(std::declval<It>()->second)>;
 
 public:
-    using value_type = std::pair<first_type, constness_as_t<second_type, std::remove_reference_t<typename iterator_traits::reference>> &>;
+    using value_type = std::pair<first_type, constness_as_t<typename second_type::element_type, second_type> &>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = typename iterator_traits::difference_type;
+    using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
     storage_proxy_iterator() ENTT_NOEXCEPT = default;
