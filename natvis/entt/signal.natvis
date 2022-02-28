@@ -24,7 +24,7 @@
 			</Synthetic>
 		</Expand>
 	</Type>
-	<Type Name="entt::dispatcher::pool_handler&lt;*&gt;">
+	<Type Name="entt::internal::dispatcher_handler&lt;*&gt;">
 		<DisplayString>{{ size={ events.size() }, event={ "$T1" } }}</DisplayString>
 		<Expand>
 			<Item Name="[signal]">signal</Item>
