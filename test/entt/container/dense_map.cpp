@@ -1080,7 +1080,7 @@ TEST(DenseMap, Reserve) {
 }
 
 TEST(DenseMap, ThrowingAllocator) {
-    using allocator = test::throwing_allocator<std::pair<std::size_t, std::size_t>>;
+    using allocator = test::throwing_allocator<std::pair<const std::size_t, std::size_t>>;
     using packed_allocator = test::throwing_allocator<entt::internal::dense_map_node<std::size_t, std::size_t>>;
     using packed_exception = typename packed_allocator::exception_type;
 
@@ -1097,7 +1097,7 @@ TEST(DenseMap, ThrowingAllocator) {
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
 
 TEST(DenseMap, NoUsesAllocatorConstruction) {
-    using allocator = std::pmr::polymorphic_allocator<std::pair<int, int>>;
+    using allocator = std::pmr::polymorphic_allocator<std::pair<const int, int>>;
 
     test::tracked_memory_resource memory_resource{};
     entt::dense_map<int, int, std::hash<int>, std::equal_to<int>, allocator> map{&memory_resource};
@@ -1113,7 +1113,7 @@ TEST(DenseMap, NoUsesAllocatorConstruction) {
 
 TEST(DenseMap, KeyUsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
-    using allocator = std::pmr::polymorphic_allocator<std::pair<string_type, int>>;
+    using allocator = std::pmr::polymorphic_allocator<std::pair<const string_type, int>>;
 
     test::tracked_memory_resource memory_resource{};
     entt::dense_map<string_type, int, std::hash<string_type>, std::equal_to<string_type>, allocator> map{&memory_resource};
@@ -1136,7 +1136,7 @@ TEST(DenseMap, KeyUsesAllocatorConstruction) {
 
 TEST(DenseMap, ValueUsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
-    using allocator = std::pmr::polymorphic_allocator<std::pair<int, string_type>>;
+    using allocator = std::pmr::polymorphic_allocator<std::pair<const int, string_type>>;
 
     test::tracked_memory_resource memory_resource{};
     entt::dense_map<int, string_type, std::hash<int>, std::equal_to<int>, allocator> map{std::pmr::get_default_resource()};
