@@ -617,9 +617,8 @@ public:
      * @return An iterator following the removed element.
      */
     iterator erase(const_iterator pos) {
-        const auto dist = std::distance(cbegin(), pos);
         erase(pos->first);
-        return begin() + dist;
+        return begin() + (pos - cbegin());
     }
 
     /**
@@ -633,7 +632,7 @@ public:
             erase((last - 1u)->first);
         }
 
-        return (begin() + std::distance(cbegin(), last));
+        return (begin() + (last - cbegin()));
     }
 
     /**
