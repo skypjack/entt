@@ -274,7 +274,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
         ENTT_TRY {
             auto elem = assure_at_least(static_cast<size_type>(it.index()));
-            alloc_traits::construct(packed.second(), to_address(elem), std::forward<Args>(args)...);
+            entt::uninitialized_construct_using_allocator(to_address(elem), packed.second(), std::forward<Args>(args)...);
         }
         ENTT_CATCH {
             if constexpr(comp_traits::in_place_delete) {
@@ -323,7 +323,7 @@ private:
 
     void move_element(const std::size_t from, const std::size_t to) final {
         auto &elem = element_at(from);
-        alloc_traits::construct(packed.second(), to_address(assure_at_least(to)), std::move(elem));
+        entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), packed.second(), std::move(elem));
         std::destroy_at(std::addressof(elem));
     }
 
