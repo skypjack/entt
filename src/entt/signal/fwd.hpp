@@ -20,7 +20,7 @@ struct scoped_connection;
 template<typename>
 class sink;
 
-template<typename Type, typename = std::allocator<delegate<Type>>>
+template<typename Type, typename = std::allocator<Type *>>
 class sigh;
 
 } // namespace entt
