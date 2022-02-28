@@ -26,7 +26,7 @@
 			<Item Name="[max_load_factor]" ExcludeView="simple">threshold</Item>
 			<IndexListItems>
 				<Size>size()</Size>
-				<ValueNode>*reinterpret_cast&lt;$T1 *&gt;(&amp;packed.first_base::value[$i].instance)</ValueNode>
+				<ValueNode>packed.first_base::value[$i].second</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
