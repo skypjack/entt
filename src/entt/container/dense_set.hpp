@@ -536,9 +536,8 @@ public:
      * @return An iterator following the removed element.
      */
     iterator erase(const_iterator pos) {
-        const auto dist = std::distance(cbegin(), pos);
         erase(*pos);
-        return begin() + dist;
+        return begin() + (pos - cbegin());
     }
 
     /**
@@ -548,13 +547,11 @@ public:
      * @return An iterator following the last removed element.
      */
     iterator erase(const_iterator first, const_iterator last) {
-        const auto dist = std::distance(cbegin(), first);
-
-        for(auto rfirst = std::make_reverse_iterator(last), rlast = std::make_reverse_iterator(first); rfirst != rlast; ++rfirst) {
-            erase(*rfirst);
+        for(; last != first; --last) {
+            erase(last - 1u);
         }
 
-        return dist > static_cast<decltype(dist)>(size()) ? end() : (begin() + dist);
+        return (begin() + (last - cbegin()));
     }
 
     /**
