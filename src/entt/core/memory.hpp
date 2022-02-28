@@ -146,21 +146,21 @@ template<typename Type, typename Allocator, typename... Args>
 auto allocate_unique(Allocator &allocator, Args &&...args) {
     static_assert(!std::is_array_v<Type>, "Array types are not supported");
 
-    using alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<Type>;
-    using alloc_traits = typename std::allocator_traits<alloc>;
+    using alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<Type>;
+    using allocator_type = typename alloc_traits::allocator_type;
 
-    alloc type_allocator{allocator};
-    auto ptr = alloc_traits::allocate(type_allocator, 1u);
+    allocator_type alloc{allocator};
+    auto ptr = alloc_traits::allocate(alloc, 1u);
 
     ENTT_TRY {
-        alloc_traits::construct(type_allocator, to_address(ptr), std::forward<Args>(args)...);
+        alloc_traits::construct(alloc, to_address(ptr), std::forward<Args>(args)...);
     }
     ENTT_CATCH {
-        alloc_traits::deallocate(type_allocator, ptr, 1u);
+        alloc_traits::deallocate(alloc, ptr, 1u);
         ENTT_THROW;
     }
 
-    return std::unique_ptr<Type, allocation_deleter<alloc>>{ptr, type_allocator};
+    return std::unique_ptr<Type, allocation_deleter<allocator_type>>{ptr, alloc};
 }
 
 /**
