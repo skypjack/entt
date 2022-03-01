@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
 
   clang:
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     strategy:
       matrix:
