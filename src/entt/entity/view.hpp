@@ -774,25 +774,21 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(ignore_as_empty_v<std::remove_const_t<Component>>) {
-            if constexpr(std::is_invocable_v<Func>) {
-                for(size_type pos{}, last = size(); pos < last; ++pos) {
-                    func();
-                }
-            } else {
-                for(auto entity: *view) {
-                    func(entity);
-                }
+        if constexpr(is_applicable_v<Func, decltype(*each().begin())>) {
+            for(const auto pack: each()) {
+                std::apply(func, pack);
+            }
+        } else if constexpr(std::is_invocable_v<Func, Component &>) {
+            for(auto &&component: *std::get<0>(pools)) {
+                func(component);
+            }
+        } else if constexpr(std::is_invocable_v<Func, Entity>) {
+            for(auto entity: *view) {
+                func(entity);
             }
         } else {
-            if constexpr(is_applicable_v<Func, decltype(*each().begin())>) {
-                for(const auto pack: each()) {
-                    std::apply(func, pack);
-                }
-            } else {
-                for(auto &&component: *std::get<0>(pools)) {
-                    func(component);
-                }
+            for(size_type pos{}, last = size(); pos < last; ++pos) {
+                func();
             }
         }
     }
