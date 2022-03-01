@@ -310,6 +310,34 @@ TEST(SparseSet, EmplaceOutOfBounds) {
     ASSERT_EQ(set.index(entities[1u]), 0u);
 }
 
+TEST(SparseSet, Bump) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::sparse_set set;
+    entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, traits_type::construct(9, 3)};
+    set.insert(std::begin(entities), std::end(entities));
+
+    ASSERT_EQ(set.current(entities[0u]), 0u);
+    ASSERT_EQ(set.current(entities[1u]), 0u);
+    ASSERT_EQ(set.current(entities[2u]), 3u);
+
+    set.bump(entities[0u]);
+    set.bump(traits_type::construct(traits_type::to_entity(entities[1u]), 1));
+    set.bump(traits_type::construct(traits_type::to_entity(entities[2u]), 0));
+
+    ASSERT_EQ(set.current(entities[0u]), 0u);
+    ASSERT_EQ(set.current(entities[1u]), 1u);
+    ASSERT_EQ(set.current(entities[2u]), 0u);
+}
+
+TEST(SparseSetDeathTest, Bump) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+
+    ASSERT_DEATH(set.bump(entt::null), "");
+    ASSERT_DEATH(set.bump(entt::tombstone), "");
+    ASSERT_DEATH(set.bump(entt::entity{42}), "");
+}
+
 TEST(SparseSet, Insert) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
