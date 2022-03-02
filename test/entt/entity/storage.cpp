@@ -78,7 +78,6 @@ struct crete_from_constructor {
 template<>
 struct entt::component_traits<std::unordered_set<char>> {
     static constexpr auto in_place_delete = true;
-    static constexpr auto ignore_if_empty = ENTT_IGNORE_IF_EMPTY;
     static constexpr auto page_size = ENTT_PACKED_PAGE;
 };
 

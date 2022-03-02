@@ -955,9 +955,8 @@ of `component_traits` implements all the required functionalities.<br/>
 The non-specialized version of this class contains the following members:
 
 * `in_place_delete`: `Type::in_place_delete` if present, false otherwise.
-* `ignore_if_empty`: `Type::ignore_if_empty` if present, `ENTT_IGNORE_IF_EMPTY`
-  otherwise.
-* `page_size`: `Type::page_size` if present, `ENTT_PACKED_PAGE` otherwise.
+* `page_size`: `Type::page_size` if present, `ENTT_PACKED_PAGE` (for non-empty
+  types) or 0 (for empty types) otherwise.
 
 Where `Type` is any type of component. All properties can be customized by
 specializing the above class and defining all its members, or by adding only
@@ -2061,7 +2060,7 @@ groups or as free types with multi type views and groups in general.
 
 # Empty type optimization
 
-An empty type `T` is such that `std::is_empty_v<T>` returns true. They are also
+An empty type `T` is such that `std::is_empty_v<T>` returns true. They also are
 the same types for which _empty base optimization_ (EBO) is possible.<br/>
 `EnTT` handles these types in a special way, optimizing both in terms of
 performance and memory usage. However, this also has consequences that are worth
@@ -2078,11 +2077,10 @@ it is assigned to.
 
 More in general, none of the feature offered by the library is affected, but for
 the ones that require to return actual instances.<br/>
-This optimization can be disabled for the whole application by defining the
-`ENTT_NO_ETO` macro. In this case, empty types will be treated like all other
-types. Otherwise, users can also specialize the `component_traits` template
-class and in particular the `ignore_if_empty` alias, disabling this optimization
-for some types only.
+This optimization is disabled by defining the `ENTT_NO_ETO` macro. In this case,
+empty types are treated like all other types. Setting a page size at component
+level via the `component_traits` class template is another way to disable this
+optimization selectively rather than globally.
 
 # Multithreading
 
