@@ -1,3 +1,5 @@
+#include "config/config.h"
+#include "config/macro.h"
 #include "config/version.h"
 #include "container/dense_map.hpp"
 #include "container/dense_set.hpp"
