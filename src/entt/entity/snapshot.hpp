@@ -163,19 +163,27 @@ class basic_snapshot_loader {
 
     template<typename Type, typename Archive>
     void assign(Archive &archive) const {
-        const auto apply = [&, this](auto entt, auto &&...element) {
-            archive(entt, element...);
-            const auto entity = reg->valid(entt) ? entt : reg->create(entt);
-            ENTT_ASSERT(entity == entt, "Entity not available for use");
-            reg->template emplace<Type>(entt, std::move(element)...);
-        };
-
         typename entity_traits::entity_type length{};
+        entity_type entt;
+
         archive(length);
 
-        while(length--) {
-            using data_type = std::conditional_t<std::is_same_v<decltype(reg->template get<Type>({})), void>, std::tuple<Entity>, std::tuple<Entity, Type>>;
-            std::apply(apply, data_type{});
+        if constexpr(std::is_same_v<decltype(reg->template get<Type>({})), void>) {
+            while(length--) {
+                archive(entt);
+                const auto entity = reg->valid(entt) ? entt : reg->create(entt);
+                ENTT_ASSERT(entity == entt, "Entity not available for use");
+                reg->template emplace<Type>(entt);
+            }
+        } else {
+            Type instance;
+
+            while(length--) {
+                archive(entt, instance);
+                const auto entity = reg->valid(entt) ? entt : reg->create(entt);
+                ENTT_ASSERT(entity == entt, "Entity not available for use");
+                reg->template emplace<Type>(entt, std::move(instance));
+            }
         }
     }
 
@@ -345,15 +353,15 @@ class basic_continuous_loader {
         }
     }
 
-    template<typename Type, typename Member, typename... Other>
-    void update([[maybe_unused]] Member Type::*member, [[maybe_unused]] Other &...instance) {
-        if constexpr((!std::is_same_v<Other, Type> && ...)) {
+    template<typename Other, typename Type, typename Member>
+    void update([[maybe_unused]] Other &instance, [[maybe_unused]] Member Type::*member) {
+        if constexpr(!std::is_same_v<Other, Type>) {
             return;
         } else if constexpr(std::is_same_v<Member, entity_type>) {
-            ((instance.*member = map(instance.*member)), ...);
+            instance.*member = map(instance.*member);
         } else {
             // maybe a container? let's try...
-            update(0, instance.*member...);
+            update(0, instance.*member);
         }
     }
 
@@ -370,19 +378,26 @@ class basic_continuous_loader {
 
     template<typename Other, typename Archive, typename... Type, typename... Member>
     void assign(Archive &archive, [[maybe_unused]] Member Type::*...member) {
-        const auto apply = [&, this](auto entt, auto &&...element) {
-            archive(entt, element...);
-            (update(member, element...), ...);
-            restore(entt);
-            reg->template emplace_or_replace<Other>(map(entt), std::move(element)...);
-        };
-
         typename entity_traits::entity_type length{};
+        entity_type entt;
+
         archive(length);
 
-        while(length--) {
-            using data_type = std::conditional_t<std::is_same_v<decltype(reg->template get<Other>({})), void>, std::tuple<Entity>, std::tuple<Entity, Other>>;
-            std::apply(apply, data_type{});
+        if constexpr(std::is_same_v<decltype(reg->template get<Other>({})), void>) {
+            while(length--) {
+                archive(entt);
+                restore(entt);
+                reg->template emplace_or_replace<Other>(map(entt));
+            }
+        } else {
+            Other instance;
+
+            while(length--) {
+                archive(entt, instance);
+                (update(instance, member), ...);
+                restore(entt);
+                reg->template emplace_or_replace<Other>(map(entt), std::move(instance));
+            }
         }
     }
 
