@@ -1357,12 +1357,12 @@ public:
     /**
      * @brief Checks whether the given components belong to any group.
      * @tparam Component Types of components in which one is interested.
-     * @return True if the pools of the given components are sortable, false
+     * @return True if the pools of the given components are _free_, false
      * otherwise.
      */
     template<typename... Component>
-    [[nodiscard]] bool sortable() const {
-        return std::none_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::remove_const_t<Component>>::value()) || ...); });
+    [[nodiscard]] bool owned() const {
+        return std::any_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::remove_const_t<Component>>::value()) || ...); });
     }
 
     /**
@@ -1416,7 +1416,7 @@ public:
      */
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
-        ENTT_ASSERT(sortable<Component>(), "Cannot sort owned storage");
+        ENTT_ASSERT(!owned<Component>(), "Cannot sort owned storage");
         auto &cpool = assure<Component>();
 
         if constexpr(std::is_invocable_v<Compare, decltype(cpool.get({})), decltype(cpool.get({}))>) {
@@ -1448,7 +1448,7 @@ public:
      */
     template<typename To, typename From>
     void sort() {
-        ENTT_ASSERT(sortable<To>(), "Cannot sort owned storage");
+        ENTT_ASSERT(!owned<To>(), "Cannot sort owned storage");
         assure<To>().respect(assure<From>());
     }
 

@@ -874,7 +874,7 @@ TEST(Registry, NonOwningGroupInitOnFirstUse) {
     auto group = registry.group<>(entt::get<int, char>);
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_TRUE((registry.sortable<int, char>()));
+    ASSERT_FALSE((registry.owned<int, char>()));
     ASSERT_EQ(cnt, 2u);
 }
 
@@ -891,7 +891,7 @@ TEST(Registry, NonOwningGroupInitOnEmplace) {
     std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_TRUE((registry.sortable<int, char>()));
+    ASSERT_FALSE((registry.owned<int, char>()));
     ASSERT_EQ(cnt, 2u);
 }
 
@@ -908,9 +908,9 @@ TEST(Registry, FullOwningGroupInitOnFirstUse) {
     auto group = registry.group<int, char>();
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_FALSE(registry.sortable<int>());
-    ASSERT_FALSE(registry.sortable<char>());
-    ASSERT_TRUE(registry.sortable<double>());
+    ASSERT_TRUE(registry.owned<int>());
+    ASSERT_TRUE(registry.owned<char>());
+    ASSERT_FALSE(registry.owned<double>());
     ASSERT_EQ(cnt, 2u);
 }
 
@@ -927,9 +927,9 @@ TEST(Registry, FullOwningGroupInitOnEmplace) {
     std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_FALSE(registry.sortable<int>());
-    ASSERT_FALSE(registry.sortable<char>());
-    ASSERT_TRUE(registry.sortable<double>());
+    ASSERT_TRUE(registry.owned<int>());
+    ASSERT_TRUE(registry.owned<char>());
+    ASSERT_FALSE(registry.owned<double>());
     ASSERT_EQ(cnt, 2u);
 }
 
@@ -946,9 +946,9 @@ TEST(Registry, PartialOwningGroupInitOnFirstUse) {
     auto group = registry.group<int>(entt::get<char>);
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_FALSE((registry.sortable<int, char>()));
-    ASSERT_FALSE(registry.sortable<int>());
-    ASSERT_TRUE(registry.sortable<char>());
+    ASSERT_TRUE((registry.owned<int, char>()));
+    ASSERT_TRUE(registry.owned<int>());
+    ASSERT_FALSE(registry.owned<char>());
     ASSERT_EQ(cnt, 2u);
 }
 
@@ -965,9 +965,9 @@ TEST(Registry, PartialOwningGroupInitOnEmplace) {
     std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_FALSE((registry.sortable<int, char>()));
-    ASSERT_FALSE(registry.sortable<int>());
-    ASSERT_TRUE(registry.sortable<char>());
+    ASSERT_TRUE((registry.owned<int, char>()));
+    ASSERT_TRUE(registry.owned<int>());
+    ASSERT_FALSE(registry.owned<char>());
     ASSERT_EQ(cnt, 2u);
 }
 
