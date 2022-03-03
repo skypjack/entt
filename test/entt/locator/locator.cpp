@@ -1,6 +1,6 @@
+#include <memory>
 #include <gtest/gtest.h>
 #include <entt/locator/locator.hpp>
-#include "../common/throwing_allocator.hpp"
 
 struct base_service {
     virtual ~base_service() = default;

@@ -1,6 +1,5 @@
 #include <memory>
 #include <utility>
-#include <vector>
 #include <gtest/gtest.h>
 #include <entt/signal/sigh.hpp>
 

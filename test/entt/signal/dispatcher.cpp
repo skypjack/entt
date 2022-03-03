@@ -1,7 +1,6 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
-#include <entt/core/type_traits.hpp>
 #include <entt/signal/dispatcher.hpp>
 
 struct an_event {};

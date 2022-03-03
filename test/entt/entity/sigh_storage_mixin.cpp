@@ -1,6 +1,5 @@
 #include <iterator>
 #include <gtest/gtest.h>
-#include <entt/entity/component.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
 

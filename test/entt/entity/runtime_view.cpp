@@ -2,7 +2,7 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
-#include <entt/entity/component.hpp>
+#include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
 
