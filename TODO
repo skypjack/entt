@@ -4,7 +4,7 @@
 
 WIP:
 * get rid of storage_traits class template
-* uses-allocator construction: any (with allocator support), cache, dispatcher, poly, ...
+* uses-allocator construction: any (with allocator support), cache, poly, ...
 * add an ENTT_NOEXCEPT with args and use it to make ie compressed_pair conditionally noexcept
 * process scheduler: reviews, use free lists internally
 * runtime events (emitter)

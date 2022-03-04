@@ -1,6 +1,7 @@
 #ifndef ENTT_SIGNAL_DISPATCHER_HPP
 #define ENTT_SIGNAL_DISPATCHER_HPP
 
+#include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <type_traits>
@@ -8,6 +9,7 @@
 #include <vector>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
+#include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/utility.hpp"
@@ -31,9 +33,20 @@ struct basic_dispatcher_handler {
     virtual std::size_t size() const ENTT_NOEXCEPT = 0;
 };
 
-template<typename Event>
-struct dispatcher_handler final: basic_dispatcher_handler {
+template<typename Event, typename Allocator>
+class dispatcher_handler final: public basic_dispatcher_handler {
     static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
+
+    using alloc_traits = std::allocator_traits<Allocator>;
+    using signal_type = sigh<void(Event &), typename alloc_traits::template rebind_alloc<void (*)(Event &)>>;
+    using container_type = std::vector<Event, typename alloc_traits::template rebind_alloc<Event>>;
+
+public:
+    using allocator_type = Allocator;
+
+    dispatcher_handler(const allocator_type &allocator)
+        : signal{allocator},
+          events{allocator} {}
 
     void publish() override {
         const auto length = events.size();
@@ -76,8 +89,8 @@ struct dispatcher_handler final: basic_dispatcher_handler {
     }
 
 private:
-    sigh<void(Event &)> signal{};
-    std::vector<Event> events;
+    signal_type signal;
+    container_type events;
 };
 
 } // namespace internal
@@ -98,40 +111,103 @@ private:
  *
  * The dispatcher creates instances of the `sigh` class internally. Refer to the
  * documentation of the latter for more details.
+ *
+ * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-class dispatcher {
+template<typename Allocator>
+class basic_dispatcher {
     template<typename Event>
-    [[nodiscard]] internal::dispatcher_handler<Event> &assure(const id_type id) {
-        if(auto &&ptr = pools[id]; !ptr) {
-            auto *cpool = new internal::dispatcher_handler<Event>{};
-            ptr.reset(cpool);
-            return *cpool;
-        } else {
-            return static_cast<internal::dispatcher_handler<Event> &>(*ptr);
+    using handler_type = internal::dispatcher_handler<Event, Allocator>;
+
+    using key_type = id_type;
+    // std::shared_ptr because of its type erased allocator which is pretty useful here
+    using mapped_type = std::shared_ptr<internal::basic_dispatcher_handler>;
+
+    using alloc_traits = std::allocator_traits<Allocator>;
+    using container_allocator = typename alloc_traits::template rebind_alloc<std::pair<const key_type, mapped_type>>;
+    using container_type = dense_map<id_type, mapped_type, identity, std::equal_to<id_type>, container_allocator>;
+
+    template<typename Event>
+    [[nodiscard]] handler_type<Event> &assure(const id_type id) {
+        auto &&ptr = pools.first()[id];
+
+        if(!ptr) {
+            const auto &allocator = pools.second();
+            ptr = std::allocate_shared<handler_type<Event>>(allocator, allocator);
         }
+
+        return static_cast<handler_type<Event> &>(*ptr);
     }
 
     template<typename Event>
-    [[nodiscard]] const internal::dispatcher_handler<Event> *assure(const id_type id) const {
-        if(const auto it = pools.find(id); it != pools.end()) {
-            return static_cast<const internal::dispatcher_handler<Event> *>(it->second.get());
+    [[nodiscard]] const handler_type<Event> *assure(const id_type id) const {
+        auto &container = pools.first();
+
+        if(const auto it = container.find(id); it != container.end()) {
+            return static_cast<const handler_type<Event> *>(it->second.get());
         }
 
         return nullptr;
     }
 
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
 
     /*! @brief Default constructor. */
-    dispatcher() = default;
+    basic_dispatcher()
+        : basic_dispatcher{allocator_type{}} {}
 
-    /*! @brief Default move constructor. */
-    dispatcher(dispatcher &&) = default;
+    /**
+     * @brief Constructs a dispatcher with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_dispatcher(const allocator_type &allocator)
+        : pools{allocator, allocator} {}
 
-    /*! @brief Default move assignment operator. @return This dispatcher. */
-    dispatcher &operator=(dispatcher &&) = default;
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    basic_dispatcher(basic_dispatcher &&other) ENTT_NOEXCEPT
+        : pools{std::move(other.pools)} {}
+
+    /**
+     * @brief Allocator-extended move constructor.
+     * @param other The instance to move from.
+     * @param allocator The allocator to use.
+     */
+    basic_dispatcher(basic_dispatcher &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+        : pools{container_type{std::move(other.pools.first()), allocator}, allocator} {}
+
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to move from.
+     * @return This dispatcher.
+     */
+    basic_dispatcher &operator=(basic_dispatcher &&other) ENTT_NOEXCEPT {
+        pools = std::move(other.pools);
+        return *this;
+    }
+
+    /**
+     * @brief Exchanges the contents with those of a given dispatcher.
+     * @param other Dispatcher to exchange the content with.
+     */
+    void swap(basic_dispatcher &other) {
+        using std::swap;
+        swap(pools, other.pools);
+    }
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+        return pools.second();
+    }
 
     /**
      * @brief Returns the number of pending events for a given type.
@@ -152,7 +228,7 @@ public:
     size_type size() const ENTT_NOEXCEPT {
         size_type count{};
 
-        for(auto &&cpool: pools) {
+        for(auto &&cpool: pools.first()) {
             count += cpool.second->size();
         }
 
@@ -266,7 +342,7 @@ public:
      */
     template<typename Type>
     void disconnect(Type *value_or_instance) {
-        for(auto &&cpool: pools) {
+        for(auto &&cpool: pools.first()) {
             cpool.second->disconnect(value_or_instance);
         }
     }
@@ -283,7 +359,7 @@ public:
 
     /*! @brief Discards all the events queued so far. */
     void clear() ENTT_NOEXCEPT {
-        for(auto &&cpool: pools) {
+        for(auto &&cpool: pools.first()) {
             cpool.second->clear();
         }
     }
@@ -300,13 +376,13 @@ public:
 
     /*! @brief Delivers all the pending events. */
     void update() const {
-        for(auto &&cpool: pools) {
+        for(auto &&cpool: pools.first()) {
             cpool.second->publish();
         }
     }
 
 private:
-    dense_map<id_type, std::unique_ptr<internal::basic_dispatcher_handler>, identity> pools;
+    compressed_pair<container_type, allocator_type> pools;
 };
 
 } // namespace entt

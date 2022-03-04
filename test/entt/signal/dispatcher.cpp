@@ -1,3 +1,4 @@
+#include <memory>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
@@ -29,7 +30,11 @@ struct receiver {
 
 TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher;
+    entt::dispatcher other;
     receiver receiver;
+
+    ASSERT_NO_FATAL_FAILURE(entt::dispatcher{std::move(dispatcher)});
+    ASSERT_NO_FATAL_FAILURE(dispatcher = std::move(other));
 
     ASSERT_EQ(dispatcher.size<an_event>(), 0u);
     ASSERT_EQ(dispatcher.size(), 0u);
@@ -85,6 +90,32 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.trigger(std::as_const(event));
 
     ASSERT_EQ(receiver.cnt, 0);
+}
+
+TEST(Dispatcher, Swap) {
+    entt::dispatcher dispatcher;
+    entt::dispatcher other;
+    receiver receiver;
+
+    dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
+    dispatcher.enqueue<an_event>();
+
+    ASSERT_EQ(dispatcher.size(), 1u);
+    ASSERT_EQ(other.size(), 0u);
+    ASSERT_EQ(receiver.cnt, 0);
+
+    dispatcher.swap(other);
+    dispatcher.update();
+
+    ASSERT_EQ(dispatcher.size(), 0u);
+    ASSERT_EQ(other.size(), 1u);
+    ASSERT_EQ(receiver.cnt, 0);
+
+    other.update();
+
+    ASSERT_EQ(dispatcher.size(), 0u);
+    ASSERT_EQ(other.size(), 0u);
+    ASSERT_EQ(receiver.cnt, 1);
 }
 
 TEST(Dispatcher, StopAndGo) {
@@ -153,4 +184,24 @@ TEST(Dispatcher, NamedQueue) {
     dispatcher.update<an_event>("named"_hs);
 
     ASSERT_EQ(receiver.cnt, 3);
+}
+
+TEST(Dispatcher, CustomAllocator) {
+    std::allocator<char> allocator;
+    entt::dispatcher dispatcher{allocator};
+    receiver receiver;
+
+    ASSERT_EQ(dispatcher.get_allocator(), allocator);
+    ASSERT_FALSE(dispatcher.get_allocator() != allocator);
+
+    dispatcher.enqueue<an_event>();
+    decltype(dispatcher) other{std::move(dispatcher), allocator};
+
+    ASSERT_EQ(dispatcher.size(), 0u);
+    ASSERT_EQ(other.size<an_event>(), 1u);
+
+    dispatcher = std::move(other);
+
+    ASSERT_EQ(dispatcher.size<an_event>(), 1u);
+    ASSERT_EQ(other.size(), 0u);
 }
