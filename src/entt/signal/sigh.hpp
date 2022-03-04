@@ -81,7 +81,7 @@ public:
         : calls{allocator} {}
 
     /**
-     * @brief Default copy constructor.
+     * @brief Copy constructor.
      * @param other The instance to copy from.
      */
     sigh(const sigh &other)
@@ -96,7 +96,7 @@ public:
         : calls{other.calls, allocator} {}
 
     /**
-     * @brief Default move constructor.
+     * @brief Move constructor.
      * @param other The instance to move from.
      */
     sigh(sigh &&other) ENTT_NOEXCEPT
@@ -111,7 +111,7 @@ public:
         : calls{std::move(other.calls), allocator} {}
 
     /**
-     * @brief Default copy assignment operator.
+     * @brief Copy assignment operator.
      * @param other The instance to copy from.
      * @return This signal handler.
      */
@@ -121,7 +121,7 @@ public:
     }
 
     /**
-     * @brief Default move assignment operator.
+     * @brief Move assignment operator.
      * @param other The instance to move from.
      * @return This signal handler.
      */

@@ -531,53 +531,47 @@ TEST_F(SigH, UnboundMemberFunction) {
 
 TEST_F(SigH, CustomAllocator) {
     std::allocator<void (*)(int)> allocator;
-
-    auto test = [&](auto curr) {
-        ASSERT_EQ(curr.get_allocator(), allocator);
-        ASSERT_FALSE(curr.get_allocator() != allocator);
-        ASSERT_TRUE(curr.empty());
-
-        entt::sink sink{curr};
-        sigh_listener listener;
-        sink.template connect<&sigh_listener::g>(listener);
-
-        decltype(curr) copy{curr, allocator};
-        sink.disconnect(listener);
-
-        ASSERT_TRUE(curr.empty());
-        ASSERT_FALSE(copy.empty());
-
-        curr = copy;
-
-        ASSERT_FALSE(curr.empty());
-        ASSERT_FALSE(copy.empty());
-
-        decltype(curr) move{std::move(copy), allocator};
-
-        ASSERT_TRUE(copy.empty());
-        ASSERT_FALSE(move.empty());
-
-        sink = entt::sink{move};
-        sink.disconnect(&listener);
-
-        ASSERT_TRUE(copy.empty());
-        ASSERT_TRUE(move.empty());
-
-        sink.template connect<&sigh_listener::g>(listener);
-        copy.swap(move);
-
-        ASSERT_FALSE(copy.empty());
-        ASSERT_TRUE(move.empty());
-
-        sink = entt::sink{copy};
-        sink.disconnect();
-
-        ASSERT_TRUE(copy.empty());
-        ASSERT_TRUE(move.empty());
-    };
-
     entt::sigh<void(int), decltype(allocator)> sigh{allocator};
 
-    test(sigh);
-    test(std::move(sigh));
+    ASSERT_EQ(sigh.get_allocator(), allocator);
+    ASSERT_FALSE(sigh.get_allocator() != allocator);
+    ASSERT_TRUE(sigh.empty());
+
+    entt::sink sink{sigh};
+    sigh_listener listener;
+    sink.template connect<&sigh_listener::g>(listener);
+
+    decltype(sigh) copy{sigh, allocator};
+    sink.disconnect(listener);
+
+    ASSERT_TRUE(sigh.empty());
+    ASSERT_FALSE(copy.empty());
+
+    sigh = copy;
+
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_FALSE(copy.empty());
+
+    decltype(sigh) move{std::move(copy), allocator};
+
+    ASSERT_TRUE(copy.empty());
+    ASSERT_FALSE(move.empty());
+
+    sink = entt::sink{move};
+    sink.disconnect(&listener);
+
+    ASSERT_TRUE(copy.empty());
+    ASSERT_TRUE(move.empty());
+
+    sink.template connect<&sigh_listener::g>(listener);
+    copy.swap(move);
+
+    ASSERT_FALSE(copy.empty());
+    ASSERT_TRUE(move.empty());
+
+    sink = entt::sink{copy};
+    sink.disconnect();
+
+    ASSERT_TRUE(copy.empty());
+    ASSERT_TRUE(move.empty());
 }
