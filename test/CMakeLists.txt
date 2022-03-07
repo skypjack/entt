@@ -174,6 +174,10 @@ if(ENTT_BUILD_SNAPSHOT)
     target_include_directories(cereal PRIVATE ${cereal_INCLUDE_DIR})
 endif()
 
+# Test config
+
+SETUP_BASIC_TEST(version entt/config/version.cpp)
+
 # Test container
 
 SETUP_BASIC_TEST(dense_map entt/container/dense_map.cpp)
