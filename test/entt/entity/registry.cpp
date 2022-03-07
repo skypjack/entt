@@ -7,12 +7,21 @@
 #include <unordered_set>
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 
 struct empty_type {};
+
+struct no_eto_type {
+    static constexpr std::size_t page_size = ENTT_PACKED_PAGE;
+};
+
+bool operator==(const no_eto_type &lhs, const no_eto_type &rhs) {
+    return &lhs == &rhs;
+}
 
 struct stable_type {
     static constexpr auto in_place_delete = true;
@@ -2031,4 +2040,21 @@ TEST(Registry, StorageProxyIterator) {
 
     ASSERT_EQ(cit, registry.storage().begin());
     ASSERT_NE(cit, std::as_const(registry).storage().end());
+}
+
+TEST(Registry, NoEtoType) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<no_eto_type>(entity);
+    registry.emplace<int>(entity, 42);
+
+    ASSERT_NE(registry.storage<no_eto_type>().raw(), nullptr);
+    ASSERT_NE(registry.try_get<no_eto_type>(entity), nullptr);
+    ASSERT_EQ(registry.view<no_eto_type>().get(entity), std::as_const(registry).view<const no_eto_type>().get(entity));
+
+    auto view = registry.view<no_eto_type, int>();
+    auto cview = std::as_const(registry).view<const no_eto_type, const int>();
+
+    ASSERT_EQ((std::get<0>(view.get<no_eto_type, int>(entity))), (std::get<0>(cview.get<const no_eto_type, const int>(entity))));
 }
