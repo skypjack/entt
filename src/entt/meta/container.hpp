@@ -66,19 +66,23 @@ struct basic_meta_sequence_container_traits {
     }
 
     [[nodiscard]] static iterator begin(any &container) {
+        using std::begin;
+
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::begin(*cont)};
+            return iterator{begin(*cont)};
         }
 
-        return iterator{std::begin(any_cast<const Type &>(container))};
+        return iterator{begin(any_cast<const Type &>(container))};
     }
 
     [[nodiscard]] static iterator end(any &container) {
+        using std::end;
+
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::end(*cont)};
+            return iterator{end(*cont)};
         }
 
-        return iterator{std::end(any_cast<const Type &>(container))};
+        return iterator{end(any_cast<const Type &>(container))};
     }
 
     [[nodiscard]] static iterator insert([[maybe_unused]] any &container, [[maybe_unused]] iterator it, [[maybe_unused]] meta_any &value) {
@@ -135,19 +139,23 @@ struct basic_meta_associative_container_traits {
     }
 
     [[nodiscard]] static iterator begin(any &container) {
+        using std::begin;
+
         if(auto *const cont = any_cast<Type>(&container); cont) {
             return iterator{std::integral_constant<bool, key_only>{}, cont->begin()};
         }
 
-        return iterator{std::integral_constant<bool, key_only>{}, std::begin(any_cast<const Type &>(container))};
+        return iterator{std::integral_constant<bool, key_only>{}, begin(any_cast<const Type &>(container))};
     }
 
     [[nodiscard]] static iterator end(any &container) {
+        using std::end;
+
         if(auto *const cont = any_cast<Type>(&container); cont) {
             return iterator{std::integral_constant<bool, key_only>{}, cont->end()};
         }
 
-        return iterator{std::integral_constant<bool, key_only>{}, std::end(any_cast<const Type &>(container))};
+        return iterator{std::integral_constant<bool, key_only>{}, end(any_cast<const Type &>(container))};
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, [[maybe_unused]] meta_any &value) {
