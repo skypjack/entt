@@ -1,6 +1,8 @@
 #ifndef ENTT_CONFIG_CONFIG_H
 #define ENTT_CONFIG_CONFIG_H
 
+#include "version.h"
+
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
 #    define ENTT_THROW throw
@@ -20,11 +22,11 @@
 #    define ENTT_LAUNDER(expr) expr
 #endif
 
-#ifndef ENTT_USE_ATOMIC
-#    define ENTT_MAYBE_ATOMIC(Type) Type
-#else
+#ifdef ENTT_USE_ATOMIC
 #    include <atomic>
 #    define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
+#else
+#    define ENTT_MAYBE_ATOMIC(Type) Type
 #endif
 
 #ifndef ENTT_ID_TYPE
@@ -63,6 +65,10 @@
 #        define ENTT_PRETTY_FUNCTION_PREFIX '<'
 #        define ENTT_PRETTY_FUNCTION_SUFFIX '>'
 #    endif
+#endif
+
+#if defined _MSC_VER
+#    pragma detect_mismatch("entt.version", ENTT_VERSION)
 #endif
 
 #endif
