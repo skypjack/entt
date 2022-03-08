@@ -189,7 +189,6 @@ TEST(Dispatcher, NamedQueue) {
 TEST(Dispatcher, CustomAllocator) {
     std::allocator<char> allocator;
     entt::dispatcher dispatcher{allocator};
-    receiver receiver;
 
     ASSERT_EQ(dispatcher.get_allocator(), allocator);
     ASSERT_FALSE(dispatcher.get_allocator() != allocator);
