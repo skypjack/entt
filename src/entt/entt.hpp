@@ -27,6 +27,7 @@
 #include "entity/organizer.hpp"
 #include "entity/registry.hpp"
 #include "entity/runtime_view.hpp"
+#include "entity/sigh_storage_mixin.hpp"
 #include "entity/snapshot.hpp"
 #include "entity/sparse_set.hpp"
 #include "entity/storage.hpp"
