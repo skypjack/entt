@@ -1395,6 +1395,25 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.last, entities[0u]);
 }
 
+TEST(Registry, SignalWhenDestroying) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.on_destroy<double>().connect<&entt::registry::remove<char>>();
+    registry.emplace<double>(entity);
+    registry.emplace<int>(entity);
+
+    ASSERT_NE(registry.storage(entt::type_id<double>().hash()), registry.storage().end());
+    ASSERT_NE(registry.storage(entt::type_id<int>().hash()), registry.storage().end());
+    ASSERT_EQ(registry.storage(entt::type_id<char>().hash()), registry.storage().end());
+    ASSERT_TRUE(registry.valid(entity));
+
+    registry.destroy(entity);
+
+    ASSERT_NE(registry.storage(entt::type_id<char>().hash()), registry.storage().end());
+    ASSERT_FALSE(registry.valid(entity));
+}
+
 TEST(Registry, Insert) {
     entt::registry registry;
     entt::entity entities[3u];

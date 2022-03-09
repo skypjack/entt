@@ -701,8 +701,8 @@ public:
     version_type destroy(const entity_type entity, const version_type version) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
-        for(auto &&curr: pools) {
-            curr.second->remove(entity);
+        for(size_type pos = pools.size(); pos; --pos) {
+            pools.begin()[pos - 1u].second->remove(entity);
         }
 
         return release_entity(entity, version);
