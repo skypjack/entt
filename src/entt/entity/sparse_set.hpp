@@ -171,7 +171,7 @@ enum class deletion_policy : std::uint8_t {
 template<typename Entity, typename Allocator>
 class basic_sparse_set {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>);
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     using sparse_container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using packed_container_type = std::vector<Entity, Allocator>;
     using entity_traits = entt_traits<Entity>;

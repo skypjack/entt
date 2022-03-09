@@ -235,7 +235,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The type must be at least move constructible/assignable");
 
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using comp_traits = component_traits<Type>;
@@ -748,7 +748,7 @@ template<typename Entity, typename Type, typename Allocator>
 class basic_storage<Entity, Type, Allocator, std::enable_if_t<ignore_as_empty_v<Type>>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using comp_traits = component_traits<Type>;
 

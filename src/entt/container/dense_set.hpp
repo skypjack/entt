@@ -231,7 +231,7 @@ class dense_set {
 
     using node_type = std::pair<std::size_t, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 

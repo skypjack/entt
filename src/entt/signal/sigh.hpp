@@ -58,7 +58,7 @@ class sigh<Ret(Args...), Allocator> {
     friend class sink<sigh<Ret(Args...), Allocator>>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Ret (*)(Args...)>);
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Ret (*)(Args...)>, "Invalid value type");
     using container_type = std::vector<delegate<Ret(Args...)>, typename alloc_traits::template rebind_alloc<delegate<Ret(Args...)>>>;
 
 public:
