@@ -232,6 +232,8 @@ template<typename... CLhs, typename... CRhs>
  */
 template<typename Entity, typename Type, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
+    static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The type must be at least move constructible/assignable");
+
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
