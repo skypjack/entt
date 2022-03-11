@@ -1445,16 +1445,16 @@ class meta_sequence_container::meta_iterator final {
         deref
     };
 
-    using vtable_type = void(const operation, const any &, void *);
+    using vtable_type = void(const operation, const any &, const void *);
 
     template<typename It>
-    static void basic_vtable(const operation op, const any &value, void *other) {
+    static void basic_vtable(const operation op, const any &value, const void *other) {
         switch(op) {
         case operation::incr:
-            ++any_cast<It &>(const_cast<any &>(value));
+            any_cast<It &>(const_cast<any &>(value)) += *static_cast<const std::ptrdiff_t *>(other);
             break;
         case operation::deref:
-            static_cast<meta_any *>(other)->emplace<typename std::iterator_traits<It>::reference>(*any_cast<const It &>(value));
+            static_cast<meta_any *>(const_cast<void *>(other))->emplace<typename std::iterator_traits<It>::reference>(*any_cast<const It &>(value));
             break;
         }
     }
@@ -1486,7 +1486,8 @@ public:
 
     /*! @brief Pre-increment operator. @return This iterator. */
     meta_iterator &operator++() ENTT_NOEXCEPT {
-        return vtable(operation::incr, handle, nullptr), *this;
+        const std::ptrdiff_t diff{1};
+        return vtable(operation::incr, handle, &diff), *this;
     }
 
     /*! @brief Post-increment operator. @return This iterator. */
