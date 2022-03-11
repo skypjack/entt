@@ -74,8 +74,8 @@ private:
     bool (*clear_fn)(any &) = nullptr;
     iterator (*begin_fn)(any &) = nullptr;
     iterator (*end_fn)(any &) = nullptr;
-    iterator (*insert_fn)(any &, iterator, meta_any &) = nullptr;
-    iterator (*erase_fn)(any &, iterator) = nullptr;
+    iterator (*insert_fn)(any &, const any &, meta_any &) = nullptr;
+    iterator (*erase_fn)(any &, const any &) = nullptr;
     meta_any (*get_fn)(any &, size_type) = nullptr;
     any storage{};
 };
@@ -1440,6 +1440,9 @@ inline bool meta_any::assign(meta_any &&other) {
 
 /*! @brief Opaque iterator for sequence containers. */
 class meta_sequence_container::meta_iterator final {
+    /*! @brief Meta sequence containers are friends of their iterators. */
+    friend class meta_sequence_container;
+
     enum class operation : std::uint8_t {
         incr,
         deref
@@ -1566,14 +1569,6 @@ public:
         return !(*this == other);
     }
 
-    /**
-     * @brief Returns the underlying iterator.
-     * @return The underlying iterator.
-     */
-    any base() const ENTT_NOEXCEPT {
-        return handle.as_ref();
-    }
-
 private:
     vtable_type *vtable{};
     any handle{};
@@ -1635,7 +1630,7 @@ inline bool meta_sequence_container::clear() {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return insert_fn(storage, it, value);
+    return insert_fn(storage, it.handle, value);
 }
 
 /**
@@ -1644,7 +1639,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(iterato
  * @return A possibly invalid iterator following the last removed element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
-    return erase_fn(storage, it);
+    return erase_fn(storage, it.handle);
 }
 
 /**

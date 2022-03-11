@@ -85,13 +85,13 @@ struct basic_meta_sequence_container_traits {
         return iterator{end(any_cast<const Type &>(container))};
     }
 
-    [[nodiscard]] static iterator insert([[maybe_unused]] any &container, [[maybe_unused]] iterator it, [[maybe_unused]] meta_any &value) {
+    [[nodiscard]] static iterator insert([[maybe_unused]] any &container, [[maybe_unused]] const any &it, [[maybe_unused]] meta_any &value) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
                 // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
                 if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
                     const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                    return iterator{cont->insert(any_cast<const typename Type::iterator &>(it.base()), element ? *element : value.cast<typename Type::value_type>())};
+                    return iterator{cont->insert(any_cast<const typename Type::iterator &>(it), element ? *element : value.cast<typename Type::value_type>())};
                 }
             }
         }
@@ -99,10 +99,10 @@ struct basic_meta_sequence_container_traits {
         return {};
     }
 
-    [[nodiscard]] static iterator erase([[maybe_unused]] any &container, [[maybe_unused]] iterator it) {
+    [[nodiscard]] static iterator erase([[maybe_unused]] any &container, [[maybe_unused]] const any &it) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
-                return iterator{cont->erase(any_cast<const typename Type::iterator &>(it.base()))};
+                return iterator{cont->erase(any_cast<const typename Type::iterator &>(it))};
             }
         }
 
