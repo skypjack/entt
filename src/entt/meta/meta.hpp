@@ -48,7 +48,6 @@ public:
         : value_type_node{internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::value_type>>>::resolve()},
           size_fn{&meta_sequence_container_traits<Type>::size},
           resize_fn{&meta_sequence_container_traits<Type>::resize},
-          clear_fn{&meta_sequence_container_traits<Type>::clear},
           begin_fn{&meta_sequence_container_traits<Type>::begin},
           end_fn{&meta_sequence_container_traits<Type>::end},
           insert_fn{&meta_sequence_container_traits<Type>::insert},
@@ -71,7 +70,6 @@ private:
     internal::meta_type_node *value_type_node = nullptr;
     size_type (*size_fn)(const any &) ENTT_NOEXCEPT = nullptr;
     bool (*resize_fn)(any &, size_type) = nullptr;
-    bool (*clear_fn)(any &) = nullptr;
     iterator (*begin_fn)(any &) = nullptr;
     iterator (*end_fn)(any &) = nullptr;
     iterator (*insert_fn)(any &, const any &, meta_any &) = nullptr;
@@ -1604,7 +1602,7 @@ inline bool meta_sequence_container::resize(const size_type sz) {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
-    return clear_fn(storage);
+    return resize_fn(storage, 0u);
 }
 
 /**

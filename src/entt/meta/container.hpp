@@ -54,17 +54,6 @@ struct basic_meta_sequence_container_traits {
         return false;
     }
 
-    [[nodiscard]] static bool clear([[maybe_unused]] any &container) {
-        if constexpr(is_dynamic_sequence_container<Type>::value) {
-            if(auto *const cont = any_cast<Type>(&container); cont) {
-                cont->clear();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     [[nodiscard]] static iterator begin(any &container) {
         using std::begin;
 
