@@ -1484,16 +1484,42 @@ public:
         : vtable{&basic_vtable<It>},
           handle{std::move(iter)} {}
 
-    /*! @brief Pre-increment operator. @return This iterator. */
+    /**
+     * @brief Pre-increment operator.
+     * @return This iterator.
+     */
     meta_iterator &operator++() ENTT_NOEXCEPT {
         const std::ptrdiff_t diff{1};
-        return vtable(operation::incr, handle, &diff), *this;
+        vtable(operation::incr, handle, &diff);
+        return *this;
     }
 
-    /*! @brief Post-increment operator. @return This iterator. */
+    /**
+     * @brief Post-increment operator.
+     * @return This iterator.
+     */
     meta_iterator operator++(int) ENTT_NOEXCEPT {
         meta_iterator orig = *this;
         return ++(*this), orig;
+    }
+
+    /**
+     * @brief Pre-decrement operator.
+     * @return This iterator.
+     */
+    meta_iterator &operator--() ENTT_NOEXCEPT {
+        const std::ptrdiff_t diff{-1};
+        vtable(operation::incr, handle, &diff);
+        return *this;
+    }
+
+    /**
+     * @brief Post-decrement operator.
+     * @return This iterator.
+     */
+    meta_iterator operator--(int) ENTT_NOEXCEPT {
+        meta_iterator orig = *this;
+        return --(*this), orig;
     }
 
     /**
@@ -1692,12 +1718,19 @@ public:
         : vtable{&basic_vtable<KeyOnly, It>},
           handle{std::move(iter)} {}
 
-    /*! @brief Pre-increment operator. @return This iterator. */
+    /**
+     * @brief Pre-increment operator.
+     * @return This iterator.
+     */
     meta_iterator &operator++() ENTT_NOEXCEPT {
-        return vtable(operation::incr, handle, nullptr), *this;
+        vtable(operation::incr, handle, nullptr);
+        return *this;
     }
 
-    /*! @brief Post-increment operator. @return This iterator. */
+    /**
+     * @brief Post-increment operator.
+     * @return This iterator.
+     */
     meta_iterator operator++(int) ENTT_NOEXCEPT {
         meta_iterator orig = *this;
         return ++(*this), orig;

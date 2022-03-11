@@ -77,14 +77,16 @@ TEST_F(MetaContainer, SequenceContainerIterator) {
     ASSERT_FALSE(first == last);
     ASSERT_TRUE(first != last);
 
-    ASSERT_NE(first, last);
     ASSERT_EQ((first++)->cast<int>(), 2);
     ASSERT_EQ((++first)->cast<int>(), 4);
-    ASSERT_NE(first++, last);
-    ASSERT_EQ(first, last);
 
+    ASSERT_NE(first++, last);
     ASSERT_TRUE(first == last);
     ASSERT_FALSE(first != last);
+    ASSERT_EQ(first--, last);
+
+    ASSERT_EQ((first--)->cast<int>(), 4);
+    ASSERT_EQ((--first)->cast<int>(), 2);
 }
 
 TEST_F(MetaContainer, AssociativeContainerIterator) {
