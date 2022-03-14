@@ -54,15 +54,15 @@ struct basic_meta_sequence_container_traits {
         return false;
     }
 
-    [[nodiscard]] static iterator iter(any &container, const bool end) {
+    [[nodiscard]] static iterator iter(any &container, const bool as_end) {
         using std::begin;
 
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{begin(*cont), static_cast<typename iterator::difference_type>(end * cont->size())};
+            return iterator{begin(*cont), static_cast<typename iterator::difference_type>(as_end * cont->size())};
         }
 
         const Type &as_const = any_cast<const Type &>(container);
-        return iterator{begin(as_const), static_cast<typename iterator::difference_type>(end * as_const.size())};
+        return iterator{begin(as_const), static_cast<typename iterator::difference_type>(as_end * as_const.size())};
     }
 
     [[nodiscard]] static iterator insert([[maybe_unused]] any &container, [[maybe_unused]] const std::ptrdiff_t offset, [[maybe_unused]] meta_any &value) {
@@ -114,24 +114,16 @@ struct basic_meta_associative_container_traits {
         return false;
     }
 
-    [[nodiscard]] static iterator begin(any &container) {
+    [[nodiscard]] static iterator iter(any &container, const bool as_end) {
         using std::begin;
-
-        if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::integral_constant<bool, key_only>{}, cont->begin()};
-        }
-
-        return iterator{std::integral_constant<bool, key_only>{}, begin(any_cast<const Type &>(container))};
-    }
-
-    [[nodiscard]] static iterator end(any &container) {
         using std::end;
 
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::integral_constant<bool, key_only>{}, cont->end()};
+            return iterator{std::integral_constant<bool, key_only>{}, as_end ? end(*cont) : begin(*cont)};
         }
 
-        return iterator{std::integral_constant<bool, key_only>{}, end(any_cast<const Type &>(container))};
+        const auto &as_const = any_cast<const Type &>(container);
+        return iterator{std::integral_constant<bool, key_only>{}, as_end ? end(as_const) : begin(as_const)};
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, [[maybe_unused]] meta_any &value) {

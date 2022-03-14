@@ -111,8 +111,7 @@ struct meta_associative_container {
           value_type_node{internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::value_type>>>::resolve()},
           size_fn{&meta_associative_container_traits<Type>::size},
           clear_fn{&meta_associative_container_traits<Type>::clear},
-          begin_fn{&meta_associative_container_traits<Type>::begin},
-          end_fn{&meta_associative_container_traits<Type>::end},
+          iter_fn{&meta_associative_container_traits<Type>::iter},
           insert_fn{&meta_associative_container_traits<Type>::insert},
           erase_fn{&meta_associative_container_traits<Type>::erase},
           find_fn{&meta_associative_container_traits<Type>::find},
@@ -142,7 +141,7 @@ private:
     internal::meta_type_node *value_type_node = nullptr;
     size_type (*size_fn)(const any &) ENTT_NOEXCEPT = nullptr;
     bool (*clear_fn)(any &) = nullptr;
-    iterator (*begin_fn)(any &) = nullptr;
+    iterator (*iter_fn)(any &, const bool) = nullptr;
     iterator (*end_fn)(any &) = nullptr;
     bool (*insert_fn)(any &, meta_any &, meta_any &) = nullptr;
     bool (*erase_fn)(any &, meta_any &) = nullptr;
@@ -1527,10 +1526,10 @@ class meta_associative_container_iterator final {
         deref
     };
 
-    using vtable_type = void(const operation, const any &, void *);
+    using vtable_type = void(const operation, const any &, std::pair<meta_any, meta_any> *);
 
     template<bool KeyOnly, typename It>
-    static void basic_vtable(const operation op, const any &value, void *other) {
+    static void basic_vtable(const operation op, const any &value, std::pair<meta_any, meta_any> *other) {
         switch(op) {
         case operation::incr:
             ++any_cast<It &>(const_cast<any &>(value));
@@ -1538,10 +1537,10 @@ class meta_associative_container_iterator final {
         case operation::deref:
             const auto &it = any_cast<const It &>(value);
             if constexpr(KeyOnly) {
-                static_cast<std::pair<meta_any, meta_any> *>(other)->first.emplace<decltype(*it)>(*it);
+                other->first.emplace<decltype(*it)>(*it);
             } else {
-                static_cast<std::pair<meta_any, meta_any> *>(other)->first.emplace<decltype((it->first))>(it->first);
-                static_cast<std::pair<meta_any, meta_any> *>(other)->second.emplace<decltype((it->second))>(it->second);
+                other->first.emplace<decltype((it->first))>(it->first);
+                other->second.emplace<decltype((it->second))>(it->second);
             }
             break;
         }
@@ -1734,12 +1733,12 @@ inline bool meta_associative_container::clear() {
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
-    return begin_fn(storage);
+    return iter_fn(storage, false);
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
-    return end_fn(storage);
+    return iter_fn(storage, true);
 }
 
 /**
