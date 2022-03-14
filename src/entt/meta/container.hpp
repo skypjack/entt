@@ -58,11 +58,11 @@ struct basic_meta_sequence_container_traits {
         using std::begin;
 
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{begin(*cont), end ? static_cast<typename iterator::difference_type>(cont->size()) : 0};
+            return iterator{begin(*cont), static_cast<typename iterator::difference_type>(end * cont->size())};
         }
 
         const Type &as_const = any_cast<const Type &>(container);
-        return iterator{begin(as_const), end ? static_cast<typename iterator::difference_type>(as_const.size()) : 0};
+        return iterator{begin(as_const), static_cast<typename iterator::difference_type>(end * as_const.size())};
     }
 
     [[nodiscard]] static iterator insert([[maybe_unused]] any &container, [[maybe_unused]] const std::ptrdiff_t offset, [[maybe_unused]] meta_any &value) {
@@ -70,9 +70,10 @@ struct basic_meta_sequence_container_traits {
             if(auto *const cont = any_cast<Type>(&container); cont) {
                 // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
                 if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
+                    using std::begin;
                     const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                    const auto curr = cont->insert(cont->begin() + offset, element ? *element : value.cast<typename Type::value_type>());
-                    return iterator{curr, curr - cont->begin()};
+                    const auto curr = cont->insert(begin(*cont) + offset, element ? *element : value.cast<typename Type::value_type>());
+                    return iterator{curr, curr - begin(*cont)};
                 }
             }
         }
@@ -83,8 +84,9 @@ struct basic_meta_sequence_container_traits {
     [[nodiscard]] static iterator erase([[maybe_unused]] any &container, [[maybe_unused]] const std::ptrdiff_t offset) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
-                const auto curr = cont->erase(cont->begin() + offset);
-                return iterator{curr, curr - cont->begin()};
+                using std::begin;
+                const auto curr = cont->erase(begin(*cont) + offset);
+                return iterator{curr, curr - begin(*cont)};
             }
         }
 
