@@ -25,15 +25,28 @@ namespace entt {
 class meta_any;
 class meta_type;
 
-/*! @brief Proxy object for sequence containers. */
-class meta_sequence_container {
-    class meta_iterator;
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
 
-public:
+namespace internal {
+
+class meta_sequence_container_iterator;
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/*! @brief Proxy object for sequence containers. */
+struct meta_sequence_container {
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Meta iterator type. */
-    using iterator = meta_iterator;
+    using iterator = internal::meta_sequence_container_iterator;
 
     /*! @brief Default constructor. */
     meta_sequence_container() ENTT_NOEXCEPT = default;
@@ -1436,10 +1449,15 @@ inline bool meta_any::assign(meta_any &&other) {
     return index < arity() ? node->arg(index) : meta_type{};
 }
 
-/*! @brief Opaque iterator for sequence containers. */
-class meta_sequence_container::meta_iterator final {
-    /*! @brief Meta sequence containers are friends of their iterators. */
-    friend class meta_sequence_container;
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+class meta_sequence_container_iterator final {
+    friend struct meta_sequence_container;
 
     enum class operation : std::uint8_t {
         incr,
@@ -1452,7 +1470,7 @@ class meta_sequence_container::meta_iterator final {
     static void basic_vtable(const operation op, const any &value, const void *other) {
         switch(op) {
         case operation::incr:
-            any_cast<It &>(const_cast<any &>(value)) += *static_cast<const std::ptrdiff_t *>(other);
+            any_cast<It &>(const_cast<any &>(value)) += *static_cast<const difference_type *>(other);
             break;
         case operation::deref:
             static_cast<meta_any *>(const_cast<void *>(other))->emplace<typename std::iterator_traits<It>::reference>(*any_cast<const It &>(value));
@@ -1461,109 +1479,60 @@ class meta_sequence_container::meta_iterator final {
     }
 
 public:
-    /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
-    /*! @brief Type of elements returned by the iterator. */
     using value_type = meta_any;
-    /*! @brief Pointer type, it's a _safe_ temporary object. */
     using pointer = input_iterator_pointer<value_type>;
-    /*! @brief Reference type, it's **not** an actual reference. */
     using reference = value_type;
-    /*! @brief Iterator category. */
     using iterator_category = std::input_iterator_tag;
 
-    /*! @brief Default constructor. */
-    meta_iterator() ENTT_NOEXCEPT = default;
+    meta_sequence_container_iterator() ENTT_NOEXCEPT = default;
 
-    /**
-     * @brief Constructs a meta iterator from a given iterator.
-     * @tparam It Type of actual iterator with which to build the meta iterator.
-     * @param iter The actual iterator with which to build the meta iterator.
-     */
     template<typename It>
-    explicit meta_iterator(It iter) ENTT_NOEXCEPT
+    explicit meta_sequence_container_iterator(It iter) ENTT_NOEXCEPT
         : vtable{&basic_vtable<It>},
           handle{std::move(iter)} {}
 
-    /**
-     * @brief Pre-increment operator.
-     * @return This iterator.
-     */
-    meta_iterator &operator++() ENTT_NOEXCEPT {
-        const std::ptrdiff_t diff{1};
+    meta_sequence_container_iterator &operator++() ENTT_NOEXCEPT {
+        const difference_type diff{1};
         vtable(operation::incr, handle, &diff);
         return *this;
     }
 
-    /**
-     * @brief Post-increment operator.
-     * @return This iterator.
-     */
-    meta_iterator operator++(int) ENTT_NOEXCEPT {
-        meta_iterator orig = *this;
+    meta_sequence_container_iterator operator++(int) ENTT_NOEXCEPT {
+        meta_sequence_container_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    /**
-     * @brief Pre-decrement operator.
-     * @return This iterator.
-     */
-    meta_iterator &operator--() ENTT_NOEXCEPT {
-        const std::ptrdiff_t diff{-1};
+    meta_sequence_container_iterator &operator--() ENTT_NOEXCEPT {
+        const difference_type diff{-1};
         vtable(operation::incr, handle, &diff);
         return *this;
     }
 
-    /**
-     * @brief Post-decrement operator.
-     * @return This iterator.
-     */
-    meta_iterator operator--(int) ENTT_NOEXCEPT {
-        meta_iterator orig = *this;
+    meta_sequence_container_iterator operator--(int) ENTT_NOEXCEPT {
+        meta_sequence_container_iterator orig = *this;
         return --(*this), orig;
     }
 
-    /**
-     * @brief Indirection operator for accessing the pointed opaque object.
-     * @return The element to which the iterator points.
-     */
     [[nodiscard]] reference operator*() const {
         meta_any other;
         vtable(operation::deref, handle, &other);
         return other;
     }
 
-    /**
-     * @brief Access operator for accessing the pointed opaque object.
-     * @return The element to which the iterator points.
-     */
     [[nodiscard]] pointer operator->() const {
         return operator*();
     }
 
-    /**
-     * @brief Returns false if an iterator is invalid, true otherwise.
-     * @return False if the iterator is invalid, true otherwise.
-     */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return static_cast<bool>(handle);
     }
 
-    /**
-     * @brief Checks if two iterators refer to the same element.
-     * @param other The iterator with which to compare.
-     * @return True if the iterators refer to the same element, false otherwise.
-     */
-    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool operator==(const meta_sequence_container_iterator &other) const ENTT_NOEXCEPT {
         return handle == other.handle;
     }
 
-    /**
-     * @brief Checks if two iterators refer to the same element.
-     * @param other The iterator with which to compare.
-     * @return False if the iterators refer to the same element, true otherwise.
-     */
-    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool operator!=(const meta_sequence_container_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
     }
 
@@ -1571,6 +1540,13 @@ private:
     vtable_type *vtable{};
     any handle{};
 };
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief Returns the meta value type of a container.
