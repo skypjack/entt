@@ -85,8 +85,8 @@ private:
     bool (*resize_fn)(any &, size_type) = nullptr;
     iterator (*begin_fn)(any &) = nullptr;
     iterator (*end_fn)(any &) = nullptr;
-    iterator (*insert_fn)(any &, const any &, meta_any &) = nullptr;
-    iterator (*erase_fn)(any &, const any &) = nullptr;
+    iterator (*insert_fn)(any &, const std::ptrdiff_t, meta_any &) = nullptr;
+    iterator (*erase_fn)(any &, const std::ptrdiff_t) = nullptr;
     any storage{};
 };
 
@@ -1455,27 +1455,11 @@ namespace internal {
 class meta_sequence_container_iterator final {
     friend struct meta_sequence_container;
 
-    enum class operation : std::uint8_t {
-        incr,
-        deref
-    };
-
-    using vtable_type = void(const operation, const any &, const void *);
+    using deref_fn_type = meta_any(const any &, const std::ptrdiff_t);
 
     template<typename It>
-    static void basic_vtable(const operation op, const any &value, const void *other) {
-        switch(op) {
-        case operation::incr:
-            any_cast<It &>(const_cast<any &>(value)) += *static_cast<const difference_type *>(other);
-            break;
-        case operation::deref:
-            static_cast<meta_any *>(const_cast<void *>(other))->emplace<typename std::iterator_traits<It>::reference>(*any_cast<const It &>(value));
-            break;
-        }
-    }
-
-    void incr(const std::ptrdiff_t diff) {
-        vtable(operation::incr, handle, &diff);
+    static meta_any deref_fn(const any &value, const std::ptrdiff_t pos) {
+        return meta_any{std::in_place_type<typename std::iterator_traits<It>::reference>, any_cast<const It &>(value)[pos]};
     }
 
 public:
@@ -1488,32 +1472,33 @@ public:
     meta_sequence_container_iterator() ENTT_NOEXCEPT = default;
 
     template<typename It>
-    explicit meta_sequence_container_iterator(It iter) ENTT_NOEXCEPT
-        : vtable{&basic_vtable<It>},
+    explicit meta_sequence_container_iterator(It iter, const difference_type init) ENTT_NOEXCEPT
+        : deref{&deref_fn<It>},
+          offset{init},
           handle{std::move(iter)} {}
 
     meta_sequence_container_iterator &operator++() ENTT_NOEXCEPT {
-        return incr(1), *this;
+        return ++offset, *this;
     }
 
     meta_sequence_container_iterator operator++(int value) ENTT_NOEXCEPT {
         meta_sequence_container_iterator orig = *this;
-        return incr(++value), orig;
+        offset += ++value;
+        return orig;
     }
 
     meta_sequence_container_iterator &operator--() ENTT_NOEXCEPT {
-        return incr(-1), *this;
+        return --offset, *this;
     }
 
     meta_sequence_container_iterator operator--(int value) ENTT_NOEXCEPT {
         meta_sequence_container_iterator orig = *this;
-        return incr(-++value), orig;
+        offset -= ++value;
+        return orig;
     }
 
     [[nodiscard]] reference operator*() const {
-        meta_any other;
-        vtable(operation::deref, handle, &other);
-        return other;
+        return deref(handle, offset);
     }
 
     [[nodiscard]] pointer operator->() const {
@@ -1525,7 +1510,7 @@ public:
     }
 
     [[nodiscard]] bool operator==(const meta_sequence_container_iterator &other) const ENTT_NOEXCEPT {
-        return handle == other.handle;
+        return offset == other.offset;
     }
 
     [[nodiscard]] bool operator!=(const meta_sequence_container_iterator &other) const ENTT_NOEXCEPT {
@@ -1533,7 +1518,8 @@ public:
     }
 
 private:
-    vtable_type *vtable{};
+    deref_fn_type *deref{};
+    difference_type offset{};
     any handle{};
 };
 
@@ -1677,7 +1663,7 @@ inline bool meta_sequence_container::clear() {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return insert_fn(storage, it.handle, value);
+    return insert_fn(storage, it.offset, value);
 }
 
 /**
@@ -1686,7 +1672,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(iterato
  * @return A possibly invalid iterator following the last removed element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
-    return erase_fn(storage, it.handle);
+    return erase_fn(storage, it.offset);
 }
 
 /**
