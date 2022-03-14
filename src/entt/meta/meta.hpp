@@ -62,8 +62,7 @@ struct meta_sequence_container {
         : value_type_node{internal::meta_node<std::remove_const_t<std::remove_reference_t<typename Type::value_type>>>::resolve()},
           size_fn{&meta_sequence_container_traits<Type>::size},
           resize_fn{&meta_sequence_container_traits<Type>::resize},
-          begin_fn{&meta_sequence_container_traits<Type>::begin},
-          end_fn{&meta_sequence_container_traits<Type>::end},
+          iter_fn{&meta_sequence_container_traits<Type>::iter},
           insert_fn{&meta_sequence_container_traits<Type>::insert},
           erase_fn{&meta_sequence_container_traits<Type>::erase},
           storage{std::move(instance)} {}
@@ -83,8 +82,7 @@ private:
     internal::meta_type_node *value_type_node = nullptr;
     size_type (*size_fn)(const any &) ENTT_NOEXCEPT = nullptr;
     bool (*resize_fn)(any &, size_type) = nullptr;
-    iterator (*begin_fn)(any &) = nullptr;
-    iterator (*end_fn)(any &) = nullptr;
+    iterator (*iter_fn)(any &, const bool) = nullptr;
     iterator (*insert_fn)(any &, const std::ptrdiff_t, meta_any &) = nullptr;
     iterator (*erase_fn)(any &, const std::ptrdiff_t) = nullptr;
     any storage{};
@@ -1645,7 +1643,7 @@ inline bool meta_sequence_container::clear() {
  * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
-    return begin_fn(storage);
+    return iter_fn(storage, false);
 }
 
 /**
@@ -1653,7 +1651,7 @@ inline bool meta_sequence_container::clear() {
  * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
-    return end_fn(storage);
+    return iter_fn(storage, true);
 }
 
 /**

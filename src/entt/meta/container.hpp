@@ -54,25 +54,15 @@ struct basic_meta_sequence_container_traits {
         return false;
     }
 
-    [[nodiscard]] static iterator begin(any &container) {
+    [[nodiscard]] static iterator iter(any &container, const bool end) {
         using std::begin;
 
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{begin(*cont), 0};
-        }
-
-        return iterator{begin(any_cast<const Type &>(container)), 0};
-    }
-
-    [[nodiscard]] static iterator end(any &container) {
-        using std::end;
-
-        if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{end(*cont), static_cast<typename iterator::difference_type>(cont->size())};
+            return iterator{begin(*cont), end ? static_cast<typename iterator::difference_type>(cont->size()) : 0};
         }
 
         const Type &as_const = any_cast<const Type &>(container);
-        return iterator{end(as_const), static_cast<typename iterator::difference_type>(as_const.size())};
+        return iterator{begin(as_const), end ? static_cast<typename iterator::difference_type>(as_const.size()) : 0};
     }
 
     [[nodiscard]] static iterator insert([[maybe_unused]] any &container, [[maybe_unused]] const std::ptrdiff_t offset, [[maybe_unused]] meta_any &value) {
