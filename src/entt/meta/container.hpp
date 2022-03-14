@@ -127,25 +127,21 @@ struct basic_meta_associative_container_traits {
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, [[maybe_unused]] meta_any &value) {
-        if(auto *const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
-            if constexpr(is_key_only_meta_associative_container<Type>::value) {
-                return cont->insert(key.cast<const typename Type::key_type &>()).second;
-            } else {
-                if(value.allow_cast<const typename Type::mapped_type &>()) {
-                    return cont->emplace(key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>()).second;
-                }
-            }
-        }
+        auto *const cont = any_cast<Type>(&container);
 
-        return false;
+        if constexpr(is_key_only_meta_associative_container<Type>::value) {
+            return cont && key.allow_cast<const typename Type::key_type &>()
+                   && cont->insert(key.cast<const typename Type::key_type &>()).second;
+        } else {
+            return cont && key.allow_cast<const typename Type::key_type &>() && value.allow_cast<const typename Type::mapped_type &>()
+                   && cont->emplace(key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>()).second;
+        }
     }
 
     [[nodiscard]] static bool erase(any &container, meta_any &key) {
-        if(auto *const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
-            return (cont->erase(key.cast<const typename Type::key_type &>()) != cont->size());
-        }
-
-        return false;
+        auto *const cont = any_cast<Type>(&container);
+        return cont && key.allow_cast<const typename Type::key_type &>()
+               && (cont->erase(key.cast<const typename Type::key_type &>()) != cont->size());
     }
 
     [[nodiscard]] static iterator find(any &container, meta_any &key) {
