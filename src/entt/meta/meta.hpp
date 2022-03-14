@@ -66,7 +66,6 @@ struct meta_sequence_container {
           end_fn{&meta_sequence_container_traits<Type>::end},
           insert_fn{&meta_sequence_container_traits<Type>::insert},
           erase_fn{&meta_sequence_container_traits<Type>::erase},
-          get_fn{&meta_sequence_container_traits<Type>::get},
           storage{std::move(instance)} {}
 
     [[nodiscard]] inline meta_type value_type() const ENTT_NOEXCEPT;
@@ -88,7 +87,6 @@ private:
     iterator (*end_fn)(any &) = nullptr;
     iterator (*insert_fn)(any &, const any &, meta_any &) = nullptr;
     iterator (*erase_fn)(any &, const any &) = nullptr;
-    meta_any (*get_fn)(any &, size_type) = nullptr;
     any storage{};
 };
 
@@ -1476,6 +1474,10 @@ class meta_sequence_container_iterator final {
         }
     }
 
+    void incr(const std::ptrdiff_t diff) {
+        vtable(operation::incr, handle, &diff);
+    }
+
 public:
     using difference_type = std::ptrdiff_t;
     using value_type = meta_any;
@@ -1491,25 +1493,21 @@ public:
           handle{std::move(iter)} {}
 
     meta_sequence_container_iterator &operator++() ENTT_NOEXCEPT {
-        const difference_type diff{1};
-        vtable(operation::incr, handle, &diff);
-        return *this;
+        return incr(1), *this;
     }
 
-    meta_sequence_container_iterator operator++(int) ENTT_NOEXCEPT {
+    meta_sequence_container_iterator operator++(int value) ENTT_NOEXCEPT {
         meta_sequence_container_iterator orig = *this;
-        return ++(*this), orig;
+        return incr(++value), orig;
     }
 
     meta_sequence_container_iterator &operator--() ENTT_NOEXCEPT {
-        const difference_type diff{-1};
-        vtable(operation::incr, handle, &diff);
-        return *this;
+        return incr(-1), *this;
     }
 
-    meta_sequence_container_iterator operator--(int) ENTT_NOEXCEPT {
+    meta_sequence_container_iterator operator--(int value) ENTT_NOEXCEPT {
         meta_sequence_container_iterator orig = *this;
-        return --(*this), orig;
+        return incr(-++value), orig;
     }
 
     [[nodiscard]] reference operator*() const {
@@ -1698,7 +1696,9 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @return A reference to the requested element properly wrapped.
  */
 [[nodiscard]] inline meta_any meta_sequence_container::operator[](const size_type pos) {
-    return get_fn(storage, pos);
+    auto it = begin();
+    it.operator++(static_cast<int>(pos) - 1);
+    return *it;
 }
 
 /**

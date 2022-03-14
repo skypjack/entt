@@ -97,14 +97,6 @@ struct basic_meta_sequence_container_traits {
 
         return {};
     }
-
-    [[nodiscard]] static meta_any get(any &container, size_type pos) {
-        if(auto *const cont = any_cast<Type>(&container); cont) {
-            return meta_any{std::in_place_type<typename Type::reference>, (*cont)[pos]};
-        }
-
-        return meta_any{std::in_place_type<typename Type::const_reference>, any_cast<const Type &>(container)[pos]};
-    }
 };
 
 template<typename Type>
