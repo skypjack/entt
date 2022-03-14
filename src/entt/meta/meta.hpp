@@ -33,6 +33,7 @@ class meta_type;
 namespace internal {
 
 class meta_sequence_container_iterator;
+class meta_associative_container_iterator;
 
 } // namespace internal
 
@@ -92,14 +93,11 @@ private:
 };
 
 /*! @brief Proxy object for associative containers. */
-class meta_associative_container {
-    class meta_iterator;
-
-public:
+struct meta_associative_container {
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Meta iterator type. */
-    using iterator = meta_iterator;
+    using iterator = internal::meta_associative_container_iterator;
 
     /*! @brief Default constructor. */
     meta_associative_container() ENTT_NOEXCEPT = default;
@@ -1541,6 +1539,83 @@ private:
     any handle{};
 };
 
+class meta_associative_container_iterator final {
+    enum class operation : std::uint8_t {
+        incr,
+        deref
+    };
+
+    using vtable_type = void(const operation, const any &, void *);
+
+    template<bool KeyOnly, typename It>
+    static void basic_vtable(const operation op, const any &value, void *other) {
+        switch(op) {
+        case operation::incr:
+            ++any_cast<It &>(const_cast<any &>(value));
+            break;
+        case operation::deref:
+            const auto &it = any_cast<const It &>(value);
+            if constexpr(KeyOnly) {
+                static_cast<std::pair<meta_any, meta_any> *>(other)->first.emplace<decltype(*it)>(*it);
+            } else {
+                static_cast<std::pair<meta_any, meta_any> *>(other)->first.emplace<decltype((it->first))>(it->first);
+                static_cast<std::pair<meta_any, meta_any> *>(other)->second.emplace<decltype((it->second))>(it->second);
+            }
+            break;
+        }
+    }
+
+public:
+    using difference_type = std::ptrdiff_t;
+    using value_type = std::pair<meta_any, meta_any>;
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using iterator_category = std::input_iterator_tag;
+
+    meta_associative_container_iterator() ENTT_NOEXCEPT = default;
+
+    template<bool KeyOnly, typename It>
+    meta_associative_container_iterator(std::integral_constant<bool, KeyOnly>, It iter) ENTT_NOEXCEPT
+        : vtable{&basic_vtable<KeyOnly, It>},
+          handle{std::move(iter)} {}
+
+    meta_associative_container_iterator &operator++() ENTT_NOEXCEPT {
+        vtable(operation::incr, handle, nullptr);
+        return *this;
+    }
+
+    meta_associative_container_iterator operator++(int) ENTT_NOEXCEPT {
+        meta_associative_container_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    [[nodiscard]] reference operator*() const {
+        reference other;
+        vtable(operation::deref, handle, &other);
+        return other;
+    }
+
+    [[nodiscard]] pointer operator->() const {
+        return operator*();
+    }
+
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(handle);
+    }
+
+    [[nodiscard]] bool operator==(const meta_associative_container_iterator &other) const ENTT_NOEXCEPT {
+        return handle == other.handle;
+    }
+
+    [[nodiscard]] bool operator!=(const meta_associative_container_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
+    }
+
+private:
+    vtable_type *vtable{};
+    any handle{};
+};
+
 } // namespace internal
 
 /**
@@ -1633,126 +1708,6 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 [[nodiscard]] inline meta_sequence_container::operator bool() const ENTT_NOEXCEPT {
     return static_cast<bool>(storage);
 }
-
-/*! @brief Opaque iterator for associative containers. */
-class meta_associative_container::meta_iterator final {
-    enum class operation : std::uint8_t {
-        incr,
-        deref
-    };
-
-    using vtable_type = void(const operation, const any &, void *);
-
-    template<bool KeyOnly, typename It>
-    static void basic_vtable(const operation op, const any &value, void *other) {
-        switch(op) {
-        case operation::incr:
-            ++any_cast<It &>(const_cast<any &>(value));
-            break;
-        case operation::deref:
-            const auto &it = any_cast<const It &>(value);
-            if constexpr(KeyOnly) {
-                static_cast<std::pair<meta_any, meta_any> *>(other)->first.emplace<decltype(*it)>(*it);
-            } else {
-                static_cast<std::pair<meta_any, meta_any> *>(other)->first.emplace<decltype((it->first))>(it->first);
-                static_cast<std::pair<meta_any, meta_any> *>(other)->second.emplace<decltype((it->second))>(it->second);
-            }
-            break;
-        }
-    }
-
-public:
-    /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
-    /*! @brief Type of elements returned by the iterator. */
-    using value_type = std::pair<meta_any, meta_any>;
-    /*! @brief Pointer type, it's a _safe_ temporary object. */
-    using pointer = input_iterator_pointer<value_type>;
-    /*! @brief Reference type, it's **not** an actual reference. */
-    using reference = value_type;
-    /*! @brief Iterator category. */
-    using iterator_category = std::input_iterator_tag;
-
-    /*! @brief Default constructor. */
-    meta_iterator() ENTT_NOEXCEPT = default;
-
-    /**
-     * @brief Constructs an meta iterator from a given iterator.
-     * @tparam KeyOnly True if the container is also key-only, false otherwise.
-     * @tparam It Type of actual iterator with which to build the meta iterator.
-     * @param iter The actual iterator with which to build the meta iterator.
-     */
-    template<bool KeyOnly, typename It>
-    meta_iterator(std::integral_constant<bool, KeyOnly>, It iter) ENTT_NOEXCEPT
-        : vtable{&basic_vtable<KeyOnly, It>},
-          handle{std::move(iter)} {}
-
-    /**
-     * @brief Pre-increment operator.
-     * @return This iterator.
-     */
-    meta_iterator &operator++() ENTT_NOEXCEPT {
-        vtable(operation::incr, handle, nullptr);
-        return *this;
-    }
-
-    /**
-     * @brief Post-increment operator.
-     * @return This iterator.
-     */
-    meta_iterator operator++(int) ENTT_NOEXCEPT {
-        meta_iterator orig = *this;
-        return ++(*this), orig;
-    }
-
-    /**
-     * @brief Indirection operator for accessing the pointed opaque object.
-     * @return The element to which the iterator points.
-     */
-    [[nodiscard]] reference operator*() const {
-        reference other;
-        vtable(operation::deref, handle, &other);
-        return other;
-    }
-
-    /**
-     * @brief Access operator for accessing the pointed opaque object.
-     * @return The element to which the iterator points.
-     */
-    [[nodiscard]] pointer operator->() const {
-        return operator*();
-    }
-
-    /**
-     * @brief Returns false if an iterator is invalid, true otherwise.
-     * @return False if the iterator is invalid, true otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return static_cast<bool>(handle);
-    }
-
-    /**
-     * @brief Checks if two iterators refer to the same element.
-     * @param other The iterator with which to compare.
-     * @return True if the iterators refer to the same element, false otherwise.
-     */
-    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
-        return handle == other.handle;
-    }
-
-    /**
-     * @brief Checks if two iterators refer to the same element.
-     * @param other The iterator with which to compare.
-     * @return False if the iterators refer to the same element, true otherwise.
-     */
-    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
-
-private:
-    vtable_type *vtable{};
-    any handle{};
-};
 
 /**
  * @brief Returns true if a container is also key-only, false otherwise.
