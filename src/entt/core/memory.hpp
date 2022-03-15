@@ -173,7 +173,7 @@ namespace internal {
 template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
-    static constexpr auto args(const Allocator &allocator, Params &&...params) ENTT_NOEXCEPT {
+    static constexpr auto args([[maybe_unused]] const Allocator &allocator, Params &&...params) ENTT_NOEXCEPT {
         if constexpr(!std::uses_allocator_v<Type, Allocator> && std::is_constructible_v<Type, Params...>) {
             return std::forward_as_tuple(std::forward<Params>(params)...);
         } else {
