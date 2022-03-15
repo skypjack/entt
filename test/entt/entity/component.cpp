@@ -24,6 +24,7 @@ TEST(Component, DefaultParamsEmpty) {
 
     static_assert(!traits::in_place_delete);
     static_assert(traits::page_size == 0u);
+    static_assert(entt::ignore_as_empty_v<default_params_empty>);
 }
 
 TEST(Component, DefaultParamsNonEmpty) {
@@ -31,6 +32,7 @@ TEST(Component, DefaultParamsNonEmpty) {
 
     static_assert(!traits::in_place_delete);
     static_assert(traits::page_size == ENTT_PACKED_PAGE);
+    static_assert(!entt::ignore_as_empty_v<default_params_non_empty>);
 }
 
 TEST(Component, SelfContained) {
@@ -38,6 +40,7 @@ TEST(Component, SelfContained) {
 
     static_assert(traits::in_place_delete);
     static_assert(traits::page_size == 4u);
+    static_assert(!entt::ignore_as_empty_v<self_contained>);
 }
 
 TEST(Component, TraitsBased) {
@@ -45,4 +48,5 @@ TEST(Component, TraitsBased) {
 
     static_assert(!traits::in_place_delete);
     static_assert(traits::page_size == 8u);
+    static_assert(!entt::ignore_as_empty_v<traits_based>);
 }

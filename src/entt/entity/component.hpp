@@ -49,6 +49,13 @@ struct component_traits {
     static constexpr std::size_t page_size = internal::page_size<Type>::value;
 };
 
+/**
+ * @brief Helper variable template.
+ * @tparam Type Type of component.
+ */
+template<class Type>
+inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 0u);
+
 } // namespace entt
 
 #endif

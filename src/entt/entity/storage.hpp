@@ -743,7 +743,7 @@ private:
 
 /*! @copydoc basic_storage */
 template<typename Entity, typename Type, typename Allocator>
-class basic_storage<Entity, Type, Allocator, std::enable_if_t<component_traits<Type>::page_size == 0u>>
+class basic_storage<Entity, Type, Allocator, std::enable_if_t<ignore_as_empty_v<Type>>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>);
