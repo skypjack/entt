@@ -529,7 +529,7 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
     class extended_group_iterator final {
         template<typename Type>
         auto index_to_element(storage_type<Type> &cpool) const {
-            if constexpr(std::is_same_v<decltype(cpool.get({})), void>) {
+            if constexpr(ignore_as_empty_v<std::remove_const_t<Type>>) {
                 return std::make_tuple();
             } else {
                 return std::forward_as_tuple(cpool.rbegin()[it.index()]);

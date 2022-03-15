@@ -168,7 +168,7 @@ class basic_snapshot_loader {
 
         archive(length);
 
-        if constexpr(std::is_same_v<decltype(reg->template get<Type>({})), void>) {
+        if constexpr(ignore_as_empty_v<Type>) {
             while(length--) {
                 archive(entt);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
@@ -383,7 +383,7 @@ class basic_continuous_loader {
 
         archive(length);
 
-        if constexpr(std::is_same_v<decltype(reg->template get<Other>({})), void>) {
+        if constexpr(ignore_as_empty_v<Other>) {
             while(length--) {
                 archive(entt);
                 restore(entt);
