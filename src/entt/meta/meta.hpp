@@ -25,29 +25,15 @@ namespace entt {
 class meta_any;
 class meta_type;
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-namespace internal {
-
-class meta_sequence_container_iterator;
-class meta_associative_container_iterator;
-
-} // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
-
 /*! @brief Proxy object for sequence containers. */
-struct meta_sequence_container {
+class meta_sequence_container {
+    class meta_iterator;
+
+public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Meta iterator type. */
-    using iterator = internal::meta_sequence_container_iterator;
+    using iterator = meta_iterator;
 
     /*! @brief Default constructor. */
     meta_sequence_container() ENTT_NOEXCEPT = default;
@@ -89,11 +75,14 @@ private:
 };
 
 /*! @brief Proxy object for associative containers. */
-struct meta_associative_container {
+class meta_associative_container {
+    class meta_iterator;
+
+public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Meta iterator type. */
-    using iterator = internal::meta_associative_container_iterator;
+    using iterator = meta_iterator;
 
     /*! @brief Default constructor. */
     meta_associative_container() ENTT_NOEXCEPT = default;
@@ -1453,10 +1442,8 @@ inline bool meta_any::assign(meta_any &&other) {
  * Internal details not to be documented.
  */
 
-namespace internal {
-
-class meta_sequence_container_iterator final {
-    friend struct meta_sequence_container;
+class meta_sequence_container::meta_iterator final {
+    friend class meta_sequence_container;
 
     using deref_fn_type = meta_any(const any &, const std::ptrdiff_t);
 
@@ -1472,30 +1459,30 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    meta_sequence_container_iterator() ENTT_NOEXCEPT = default;
+    meta_iterator() ENTT_NOEXCEPT = default;
 
     template<typename It>
-    explicit meta_sequence_container_iterator(It iter, const difference_type init) ENTT_NOEXCEPT
+    explicit meta_iterator(It iter, const difference_type init) ENTT_NOEXCEPT
         : deref{&deref_fn<It>},
           offset{init},
           handle{std::move(iter)} {}
 
-    meta_sequence_container_iterator &operator++() ENTT_NOEXCEPT {
+    meta_iterator &operator++() ENTT_NOEXCEPT {
         return ++offset, *this;
     }
 
-    meta_sequence_container_iterator operator++(int value) ENTT_NOEXCEPT {
-        meta_sequence_container_iterator orig = *this;
+    meta_iterator operator++(int value) ENTT_NOEXCEPT {
+        meta_iterator orig = *this;
         offset += ++value;
         return orig;
     }
 
-    meta_sequence_container_iterator &operator--() ENTT_NOEXCEPT {
+    meta_iterator &operator--() ENTT_NOEXCEPT {
         return --offset, *this;
     }
 
-    meta_sequence_container_iterator operator--(int value) ENTT_NOEXCEPT {
-        meta_sequence_container_iterator orig = *this;
+    meta_iterator operator--(int value) ENTT_NOEXCEPT {
+        meta_iterator orig = *this;
         offset -= ++value;
         return orig;
     }
@@ -1512,11 +1499,11 @@ public:
         return static_cast<bool>(handle);
     }
 
-    [[nodiscard]] bool operator==(const meta_sequence_container_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
         return offset == other.offset;
     }
 
-    [[nodiscard]] bool operator!=(const meta_sequence_container_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
     }
 
@@ -1526,7 +1513,7 @@ private:
     any handle{};
 };
 
-class meta_associative_container_iterator final {
+class meta_associative_container::meta_iterator final {
     enum class operation : std::uint8_t {
         incr,
         deref
@@ -1559,20 +1546,20 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    meta_associative_container_iterator() ENTT_NOEXCEPT = default;
+    meta_iterator() ENTT_NOEXCEPT = default;
 
     template<bool KeyOnly, typename It>
-    meta_associative_container_iterator(std::integral_constant<bool, KeyOnly>, It iter) ENTT_NOEXCEPT
+    meta_iterator(std::integral_constant<bool, KeyOnly>, It iter) ENTT_NOEXCEPT
         : vtable{&basic_vtable<KeyOnly, It>},
           handle{std::move(iter)} {}
 
-    meta_associative_container_iterator &operator++() ENTT_NOEXCEPT {
+    meta_iterator &operator++() ENTT_NOEXCEPT {
         vtable(operation::incr, handle, nullptr);
         return *this;
     }
 
-    meta_associative_container_iterator operator++(int) ENTT_NOEXCEPT {
-        meta_associative_container_iterator orig = *this;
+    meta_iterator operator++(int) ENTT_NOEXCEPT {
+        meta_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -1590,11 +1577,11 @@ public:
         return static_cast<bool>(handle);
     }
 
-    [[nodiscard]] bool operator==(const meta_associative_container_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
         return handle == other.handle;
     }
 
-    [[nodiscard]] bool operator!=(const meta_associative_container_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
     }
 
@@ -1602,8 +1589,6 @@ private:
     vtable_type *vtable{};
     any handle{};
 };
-
-} // namespace internal
 
 /**
  * Internal details not to be documented.

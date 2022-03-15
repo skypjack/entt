@@ -3,9 +3,9 @@
 
 namespace entt {
 
-struct meta_sequence_container;
+class meta_sequence_container;
 
-struct meta_associative_container;
+class meta_associative_container;
 
 class meta_any;
 
