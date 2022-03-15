@@ -171,7 +171,14 @@ class meta_any {
                         *static_cast<meta_any *>(other) = any_cast<Type>(value);
                     } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
                         using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value)));
-                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value)));
+
+                        if constexpr(std::is_constructible_v<bool, Type>) {
+                            if(const auto &pointer_like = any_cast<const Type &>(value); pointer_like) {
+                                static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
+                            }
+                        } else {
+                            static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value)));
+                        }
                     }
                 }
                 break;

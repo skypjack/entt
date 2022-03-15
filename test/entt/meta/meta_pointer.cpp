@@ -400,3 +400,14 @@ TEST(MetaPointerLike, DereferenceArray) {
     ASSERT_FALSE(*array);
     ASSERT_FALSE(*array_of_array);
 }
+
+TEST(MetaPointerLike, DereferenceVerifiableNullPointerLike) {
+    auto test = [](entt::meta_any any) {
+        ASSERT_TRUE(any);
+        ASSERT_FALSE(*any);
+    };
+
+    test(entt::meta_any{static_cast<int *>(nullptr)});
+    test(entt::meta_any{std::shared_ptr<int>{}});
+    test(entt::meta_any{std::unique_ptr<int>{}});
+}
