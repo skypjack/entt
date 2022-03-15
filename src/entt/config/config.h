@@ -75,9 +75,6 @@
 #    pragma detect_mismatch("entt.version", ENTT_VERSION)
 #    pragma detect_mismatch("entt.noexcept", ENTT_XSTR(ENTT_TRY))
 #    pragma detect_mismatch("entt.id", ENTT_XSTR(ENTT_ID_TYPE))
-#    pragma detect_mismatch("entt.sparse", ENTT_XSTR(ENTT_SPARSE_PAGE))
-#    pragma detect_mismatch("entt.packed", ENTT_XSTR(ENTT_PACKED_PAGE))
-#    pragma detect_mismatch("entt.eto", ENTT_XSTR(ENTT_IGNORE_IF_EMPTY))
 #    pragma detect_mismatch("entt.nonstd", ENTT_XSTR(ENTT_NONSTD))
 #endif
 
