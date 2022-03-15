@@ -142,7 +142,6 @@ private:
     size_type (*size_fn)(const any &) ENTT_NOEXCEPT = nullptr;
     bool (*clear_fn)(any &) = nullptr;
     iterator (*iter_fn)(any &, const bool) = nullptr;
-    iterator (*end_fn)(any &) = nullptr;
     bool (*insert_fn)(any &, meta_any &, meta_any &) = nullptr;
     bool (*erase_fn)(any &, meta_any &) = nullptr;
     iterator (*find_fn)(any &, meta_any &) = nullptr;
