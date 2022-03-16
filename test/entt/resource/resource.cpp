@@ -151,6 +151,8 @@ TEST(Resource, ConstNonConstHandle) {
     static_assert(std::is_same_v<decltype(std::as_const(handle).get()), resource &>);
 
     ASSERT_TRUE(chandle);
+    ASSERT_EQ(handle, chandle);
+    ASSERT_NE(handle, entt::resource_handle<resource>{});
     ASSERT_EQ(handle.use_count(), 2u);
     ASSERT_EQ(chandle->value, 42);
 

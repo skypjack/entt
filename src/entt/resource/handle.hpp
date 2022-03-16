@@ -182,6 +182,24 @@ private:
     std::shared_ptr<value_type> resource;
 };
 
+/**
+ * @brief Compares two handles.
+ * @tparam Res Type of resource managed by the first handle.
+ * @tparam Other Type of resource managed by the second handle.
+ * @param lhs A valid handle.
+ * @param rhs A valid handle.
+ * @return True if both handles refer to the same resource, false otherwise.
+ */
+template<typename Res, typename Other>
+[[nodiscard]] bool operator==(const resource_handle<Res> &lhs, const resource_handle<Other> &rhs) ENTT_NOEXCEPT {
+    return lhs.operator->() == rhs.operator->();
+}
+
+template<typename ILhs, typename IRhs>
+[[nodiscard]] bool operator!=(const resource_handle<ILhs> &lhs, const resource_handle<IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
 } // namespace entt
 
 #endif
