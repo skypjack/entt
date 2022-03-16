@@ -28,10 +28,14 @@ class resource_handle {
     friend class resource_handle;
 
 public:
+    /*! @brief Value type. */
+    using value_type = Resource;
+    /*! @brief Reference type. */
+    using reference = value_type &;
+    /*! @brief Pointer type. */
+    using pointer = value_type *;
     /*! @brief Unsigned integer type. */
     using size_type = long;
-    /*! @brief Type of resources managed by a cache. */
-    using resource_type = Resource;
 
     /*! @brief Default constructor. */
     resource_handle() ENTT_NOEXCEPT = default;
@@ -40,7 +44,7 @@ public:
      * @brief Creates a handle from a shared pointer, namely a resource.
      * @param res A pointer to a properly initialized resource.
      */
-    resource_handle(std::shared_ptr<resource_type> res) ENTT_NOEXCEPT
+    resource_handle(std::shared_ptr<value_type> res) ENTT_NOEXCEPT
         : resource{std::move(res)} {}
 
     /**
@@ -62,7 +66,7 @@ public:
      * @param res Unrelated and unmanaged resources.
      */
     template<typename Other>
-    resource_handle(const resource_handle<Other> &other, resource_type &res) ENTT_NOEXCEPT
+    resource_handle(const resource_handle<Other> &other, value_type &res) ENTT_NOEXCEPT
         : resource{other.resource, std::addressof(res)} {}
 
     /**
@@ -70,7 +74,7 @@ public:
      * @tparam Other Type of resource managed by the received handle.
      * @param other The handle to copy from.
      */
-    template<typename Other, typename = std::enable_if_t<!std::is_same_v<resource_type, Other> && std::is_base_of_v<resource_type, Other>>>
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<value_type, Other> && std::is_base_of_v<value_type, Other>>>
     resource_handle(const resource_handle<Other> &other) ENTT_NOEXCEPT
         : resource{other.resource} {}
 
@@ -79,7 +83,7 @@ public:
      * @tparam Other Type of resource managed by the received handle.
      * @param other The handle to move from.
      */
-    template<typename Other, typename = std::enable_if_t<!std::is_same_v<resource_type, Other> && std::is_base_of_v<resource_type, Other>>>
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<value_type, Other> && std::is_base_of_v<value_type, Other>>>
     resource_handle(resource_handle<Other> &&other) ENTT_NOEXCEPT
         : resource{std::move(other.resource)} {}
 
@@ -104,7 +108,7 @@ public:
      * @return This resource handle.
      */
     template<typename Other>
-    std::enable_if_t<!std::is_same_v<resource_type, Other> && std::is_base_of_v<resource_type, Other>, resource_handle &>
+    std::enable_if_t<!std::is_same_v<value_type, Other> && std::is_base_of_v<value_type, Other>, resource_handle &>
     operator=(const resource_handle<Other> &other) ENTT_NOEXCEPT {
         resource = other.resource;
         return *this;
@@ -117,7 +121,7 @@ public:
      * @return This resource handle.
      */
     template<typename Other>
-    std::enable_if_t<!std::is_same_v<resource_type, Other> && std::is_base_of_v<resource_type, Other>, resource_handle &>
+    std::enable_if_t<!std::is_same_v<value_type, Other> && std::is_base_of_v<value_type, Other>, resource_handle &>
     operator=(resource_handle<Other> &&other) ENTT_NOEXCEPT {
         resource = std::move(other.resource);
         return *this;
@@ -131,17 +135,17 @@ public:
      *
      * @return A reference to the managed resource.
      */
-    [[nodiscard]] resource_type &get() const ENTT_NOEXCEPT {
+    [[nodiscard]] reference get() const ENTT_NOEXCEPT {
         return *resource;
     }
 
     /*! @copydoc get */
-    [[nodiscard]] operator resource_type &() const ENTT_NOEXCEPT {
+    [[nodiscard]] operator reference() const ENTT_NOEXCEPT {
         return get();
     }
 
     /*! @copydoc get */
-    [[nodiscard]] resource_type &operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
         return get();
     }
 
@@ -154,7 +158,7 @@ public:
      * @return A pointer to the managed resource or `nullptr` if the handle
      * contains no resource at all.
      */
-    [[nodiscard]] resource_type *operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
         return resource.get();
     }
 
@@ -175,7 +179,7 @@ public:
     }
 
 private:
-    std::shared_ptr<resource_type> resource;
+    std::shared_ptr<value_type> resource;
 };
 
 } // namespace entt
