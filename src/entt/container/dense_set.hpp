@@ -507,7 +507,7 @@ public:
             return std::make_pair(it, false);
         }
 
-        node.first = std::exchange(sparse.first()[index], size() - 1u);
+        std::swap(node.first, sparse.first()[index]);
 
         if(size() > (bucket_count() * max_load_factor())) {
             rehash(bucket_count() * 2u);

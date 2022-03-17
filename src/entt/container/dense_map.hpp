@@ -116,7 +116,7 @@ public:
     }
 
     [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-        return *dense_map_iterator{it + value};
+        return {it[value].element.first, it[value].element.second};
     }
 
     [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
@@ -124,7 +124,7 @@ public:
     }
 
     [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-        return value_type{it->element.first, it->element.second};
+        return {it->element.first, it->element.second};
     }
 
     template<typename ILhs, typename IRhs>
@@ -214,7 +214,7 @@ public:
     }
 
     [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-        return value_type{it[offset].element.first, it[offset].element.second};
+        return {it[offset].element.first, it[offset].element.second};
     }
 
     [[nodiscard]] std::size_t index() const ENTT_NOEXCEPT {
@@ -581,7 +581,7 @@ public:
             return std::make_pair(it, false);
         }
 
-        node.next = std::exchange(sparse.first()[index], size() - 1u);
+        std::swap(node.next, sparse.first()[index]);
 
         if(size() > (bucket_count() * max_load_factor())) {
             rehash(bucket_count() * 2u);
