@@ -196,11 +196,5 @@ TEST(Dispatcher, CustomAllocator) {
     dispatcher.enqueue<an_event>();
     decltype(dispatcher) other{std::move(dispatcher), allocator};
 
-    ASSERT_EQ(dispatcher.size(), 0u);
     ASSERT_EQ(other.size<an_event>(), 1u);
-
-    dispatcher = std::move(other);
-
-    ASSERT_EQ(dispatcher.size<an_event>(), 1u);
-    ASSERT_EQ(other.size(), 0u);
 }
