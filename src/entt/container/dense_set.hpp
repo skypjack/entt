@@ -261,20 +261,6 @@ class dense_set {
         return cend();
     }
 
-    template<typename Other>
-    bool do_erase(const Other &value) {
-        for(size_type *curr = sparse.first().data() + bucket(value); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].first) {
-            if(packed.second()(packed.first()[*curr].second, value)) {
-                const auto index = *curr;
-                *curr = packed.first()[*curr].first;
-                move_and_pop(index);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
             packed.first()[pos] = std::move(packed.first().back());
@@ -536,8 +522,9 @@ public:
      * @return An iterator following the removed element.
      */
     iterator erase(const_iterator pos) {
+        const auto diff = pos - cbegin();
         erase(*pos);
-        return begin() + (pos - cbegin());
+        return begin() + diff;
     }
 
     /**
@@ -560,7 +547,16 @@ public:
      * @return Number of elements removed (either 0 or 1).
      */
     size_type erase(const value_type &value) {
-        return do_erase(value);
+        for(size_type *curr = sparse.first().data() + bucket(value); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].first) {
+            if(packed.second()(packed.first()[*curr].second, value)) {
+                const auto index = *curr;
+                *curr = packed.first()[*curr].first;
+                move_and_pop(index);
+                return 1u;
+            }
+        }
+
+        return 0u;
     }
 
     /**
