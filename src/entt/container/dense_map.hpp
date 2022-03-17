@@ -618,8 +618,9 @@ public:
      * @return An iterator following the removed element.
      */
     iterator erase(const_iterator pos) {
+        const auto diff = pos - cbegin();
         erase(pos->first);
-        return begin() + (pos - cbegin());
+        return begin() + diff;
     }
 
     /**
@@ -647,11 +648,11 @@ public:
                 const auto index = *curr;
                 *curr = packed.first()[*curr].next;
                 move_and_pop(index);
-                return true;
+                return 1u;
             }
         }
 
-        return false;
+        return 0u;
     }
 
     /**
