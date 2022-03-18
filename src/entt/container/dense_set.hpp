@@ -235,10 +235,6 @@ class dense_set {
     using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
-    [[nodiscard]] std::size_t hash_to_bucket(const std::size_t hash) const ENTT_NOEXCEPT {
-        return fast_mod(hash, bucket_count());
-    }
-
     template<typename Other>
     [[nodiscard]] auto constrained_find(const Other &value, std::size_t bucket) {
         for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
@@ -499,8 +495,7 @@ public:
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
         auto &node = packed.first().emplace_back(std::piecewise_construct, std::make_tuple(packed.first().size()), std::forward_as_tuple(std::forward<Args>(args)...));
-        const auto hash = sparse.second()(node.second);
-        const auto index = hash_to_bucket(hash);
+        const auto index = bucket(node.second);
 
         if(auto it = constrained_find(node.second, index); it != end()) {
             packed.first().pop_back();
@@ -712,7 +707,7 @@ public:
      * @return The bucket for the given element.
      */
     [[nodiscard]] size_type bucket(const value_type &value) const {
-        return hash_to_bucket(sparse.second()(value));
+        return fast_mod(sparse.second()(value), bucket_count());
     }
 
     /**
