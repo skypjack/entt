@@ -724,6 +724,20 @@ TEST(DenseMap, TryEmplaceSameBucket) {
     ASSERT_EQ(map.cbegin(6u), map.cend(6u));
 }
 
+TEST(DenseMap, TryEmplaceMovableType) {
+    entt::dense_map<int, std::unique_ptr<int>> map;
+    std::unique_ptr<int> value = std::make_unique<int>(42);
+
+    ASSERT_TRUE(map.try_emplace(*value, std::move(value)).second);
+    ASSERT_FALSE(map.empty());
+    ASSERT_FALSE(value);
+
+    value = std::make_unique<int>(42);
+
+    ASSERT_FALSE(map.try_emplace(*value, std::move(value)).second);
+    ASSERT_TRUE(value);
+}
+
 TEST(DenseMap, Erase) {
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
