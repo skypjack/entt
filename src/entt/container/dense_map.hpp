@@ -268,6 +268,11 @@ class dense_map {
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
     template<typename Other>
+    [[nodiscard]] std::size_t key_to_bucket(const Other &key) const ENTT_NOEXCEPT {
+        return fast_mod(sparse.second()(key), bucket_count());
+    }
+
+    template<typename Other>
     [[nodiscard]] auto constrained_find(const Other &key, std::size_t bucket) {
         for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
             if(packed.second()(it->first, key)) {
@@ -289,15 +294,9 @@ class dense_map {
         return cend();
     }
 
-    void rehash_if_required() {
-        if(size() > (bucket_count() * max_load_factor())) {
-            rehash(bucket_count() * 2u);
-        }
-    }
-
     template<typename Other, typename... Args>
     [[nodiscard]] auto insert_or_do_nothing(Other &&key, Args &&...args) {
-        const auto index = bucket(key);
+        const auto index = key_to_bucket(key);
 
         if(auto it = constrained_find(key, index); it != end()) {
             return std::make_pair(it, false);
@@ -312,7 +311,7 @@ class dense_map {
 
     template<typename Other, typename Arg>
     [[nodiscard]] auto insert_or_overwrite(Other &&key, Arg &&value) {
-        const auto index = bucket(key);
+        const auto index = key_to_bucket(key);
 
         if(auto it = constrained_find(key, index); it != end()) {
             it->second = std::forward<Arg>(value);
@@ -329,12 +328,18 @@ class dense_map {
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
             packed.first()[pos] = std::move(packed.first().back());
-            size_type *curr = sparse.first().data() + bucket(packed.first().back().element.first);
+            size_type *curr = sparse.first().data() + key_to_bucket(packed.first().back().element.first);
             for(; *curr != last; curr = &packed.first()[*curr].next) {}
             *curr = pos;
         }
 
         packed.first().pop_back();
+    }
+
+    void rehash_if_required() {
+        if(size() > (bucket_count() * max_load_factor())) {
+            rehash(bucket_count() * 2u);
+        }
     }
 
 public:
@@ -596,7 +601,7 @@ public:
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
         auto &node = packed.first().emplace_back(packed.first().size(), std::forward<Args>(args)...);
-        const auto index = bucket(node.element.first);
+        const auto index = key_to_bucket(node.element.first);
 
         if(auto it = constrained_find(node.element.first, index); it != end()) {
             packed.first().pop_back();
@@ -662,7 +667,7 @@ public:
      * @return Number of elements removed (either 0 or 1).
      */
     size_type erase(const key_type &key) {
-        for(size_type *curr = sparse.first().data() + bucket(key); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].next) {
+        for(size_type *curr = sparse.first().data() + key_to_bucket(key); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].next) {
             if(packed.second()(packed.first()[*curr].element.first, key)) {
                 const auto index = *curr;
                 *curr = packed.first()[*curr].next;
@@ -728,12 +733,12 @@ public:
      * is found, a past-the-end iterator is returned.
      */
     [[nodiscard]] iterator find(const key_type &key) {
-        return constrained_find(key, bucket(key));
+        return constrained_find(key, key_to_bucket(key));
     }
 
     /*! @copydoc find */
     [[nodiscard]] const_iterator find(const key_type &key) const {
-        return constrained_find(key, bucket(key));
+        return constrained_find(key, key_to_bucket(key));
     }
 
     /**
@@ -747,14 +752,14 @@ public:
     template<typename Other>
     [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, iterator>>
     find(const Other &key) {
-        return constrained_find(key, bucket(key));
+        return constrained_find(key, key_to_bucket(key));
     }
 
     /*! @copydoc find */
     template<typename Other>
     [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, const_iterator>>
     find(const Other &key) const {
-        return constrained_find(key, bucket(key));
+        return constrained_find(key, key_to_bucket(key));
     }
 
     /**
@@ -864,7 +869,7 @@ public:
      * @return The bucket for the given key.
      */
     [[nodiscard]] size_type bucket(const key_type &key) const {
-        return fast_mod(sparse.second()(key), bucket_count());
+        return key_to_bucket(key);
     }
 
     /**
@@ -907,7 +912,7 @@ public:
             std::fill(sparse.first().begin(), sparse.first().end(), std::numeric_limits<size_type>::max());
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
-                const auto index = bucket(packed.first()[pos].element.first);
+                const auto index = key_to_bucket(packed.first()[pos].element.first);
                 packed.first()[pos].next = std::exchange(sparse.first()[index], pos);
             }
         }
