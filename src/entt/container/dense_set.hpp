@@ -236,6 +236,11 @@ class dense_set {
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
     template<typename Other>
+    [[nodiscard]] std::size_t value_to_bucket(const Other &value) const ENTT_NOEXCEPT {
+        return fast_mod(sparse.second()(value), bucket_count());
+    }
+
+    template<typename Other>
     [[nodiscard]] auto constrained_find(const Other &value, std::size_t bucket) {
         for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
             if(packed.second()(*it, value)) {
@@ -257,15 +262,36 @@ class dense_set {
         return cend();
     }
 
+    template<typename Other>
+    [[nodiscard]] auto insert_or_do_nothing(Other &&value) {
+        const auto index = value_to_bucket(value);
+
+        if(auto it = constrained_find(value, index); it != end()) {
+            return std::make_pair(it, false);
+        }
+
+        const auto next = std::exchange(sparse.first()[index], packed.first().size());
+        packed.first().emplace_back(next, std::forward<Other>(value));
+        rehash_if_required();
+
+        return std::make_pair(--end(), true);
+    }
+
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
             packed.first()[pos] = std::move(packed.first().back());
-            size_type *curr = sparse.first().data() + bucket(packed.first().back().second);
+            size_type *curr = sparse.first().data() + value_to_bucket(packed.first().back().second);
             for(; *curr != last; curr = &packed.first()[*curr].first) {}
             *curr = pos;
         }
 
         packed.first().pop_back();
+    }
+
+    void rehash_if_required() {
+        if(size() > (bucket_count() * max_load_factor())) {
+            rehash(bucket_count() * 2u);
+        }
     }
 
 public:
@@ -458,12 +484,12 @@ public:
      * insertion took place.
      */
     std::pair<iterator, bool> insert(const value_type &value) {
-        return emplace(value);
+        return insert_or_do_nothing(value);
     }
 
     /*! @copydoc insert */
     std::pair<iterator, bool> insert(value_type &&value) {
-        return emplace(std::move(value));
+        return insert_or_do_nothing(std::move(value));
     }
 
     /**
@@ -475,7 +501,7 @@ public:
     template<typename It>
     void insert(It first, It last) {
         for(; first != last; ++first) {
-            emplace(*first);
+            insert(*first);
         }
     }
 
@@ -494,21 +520,22 @@ public:
      */
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
-        auto &node = packed.first().emplace_back(std::piecewise_construct, std::make_tuple(packed.first().size()), std::forward_as_tuple(std::forward<Args>(args)...));
-        const auto index = bucket(node.second);
+        if constexpr(((sizeof...(Args) == 1u) && ... && std::is_same_v<std::remove_const_t<std::remove_reference_t<Args>>, value_type>)) {
+            return insert_or_do_nothing(std::forward<Args>(args)...);
+        } else {
+            auto &node = packed.first().emplace_back(std::piecewise_construct, std::make_tuple(packed.first().size()), std::forward_as_tuple(std::forward<Args>(args)...));
+            const auto index = value_to_bucket(node.second);
 
-        if(auto it = constrained_find(node.second, index); it != end()) {
-            packed.first().pop_back();
-            return std::make_pair(it, false);
+            if(auto it = constrained_find(node.second, index); it != end()) {
+                packed.first().pop_back();
+                return std::make_pair(it, false);
+            }
+
+            std::swap(node.first, sparse.first()[index]);
+            rehash_if_required();
+
+            return std::make_pair(--end(), true);
         }
-
-        std::swap(node.first, sparse.first()[index]);
-
-        if(size() > (bucket_count() * max_load_factor())) {
-            rehash(bucket_count() * 2u);
-        }
-
-        return std::make_pair(--end(), true);
     }
 
     /**
@@ -542,7 +569,7 @@ public:
      * @return Number of elements removed (either 0 or 1).
      */
     size_type erase(const value_type &value) {
-        for(size_type *curr = sparse.first().data() + bucket(value); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].first) {
+        for(size_type *curr = sparse.first().data() + value_to_bucket(value); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].first) {
             if(packed.second()(packed.first()[*curr].second, value)) {
                 const auto index = *curr;
                 *curr = packed.first()[*curr].first;
@@ -572,12 +599,12 @@ public:
      * element is found, a past-the-end iterator is returned.
      */
     [[nodiscard]] iterator find(const value_type &value) {
-        return constrained_find(value, bucket(value));
+        return constrained_find(value, value_to_bucket(value));
     }
 
     /*! @copydoc find */
     [[nodiscard]] const_iterator find(const value_type &value) const {
-        return constrained_find(value, bucket(value));
+        return constrained_find(value, value_to_bucket(value));
     }
 
     /**
@@ -590,14 +617,14 @@ public:
     template<typename Other>
     [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, iterator>>
     find(const Other &value) {
-        return constrained_find(value, bucket(value));
+        return constrained_find(value, value_to_bucket(value));
     }
 
     /*! @copydoc find */
     template<typename Other>
     [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, const_iterator>>
     find(const Other &value) const {
-        return constrained_find(value, bucket(value));
+        return constrained_find(value, value_to_bucket(value));
     }
 
     /**
@@ -707,7 +734,7 @@ public:
      * @return The bucket for the given element.
      */
     [[nodiscard]] size_type bucket(const value_type &value) const {
-        return fast_mod(sparse.second()(value), bucket_count());
+        return value_to_bucket(value);
     }
 
     /**
@@ -750,7 +777,7 @@ public:
             std::fill(sparse.first().begin(), sparse.first().end(), std::numeric_limits<size_type>::max());
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
-                const auto index = bucket(packed.first()[pos].second);
+                const auto index = value_to_bucket(packed.first()[pos].second);
                 packed.first()[pos].first = std::exchange(sparse.first()[index], pos);
             }
         }
