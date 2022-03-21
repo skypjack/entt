@@ -599,19 +599,27 @@ public:
      * insertion took place.
      */
     template<typename... Args>
-    std::pair<iterator, bool> emplace(Args &&...args) {
-        auto &node = packed.first().emplace_back(packed.first().size(), std::forward<Args>(args)...);
-        const auto index = key_to_bucket(node.element.first);
+    std::pair<iterator, bool> emplace([[maybe_unused]] Args &&...args) {
+        if constexpr(sizeof...(Args) == 0u) {
+            return insert_or_do_nothing(key_type{});
+        } else if constexpr(sizeof...(Args) == 1u) {
+            return insert_or_do_nothing(std::forward<Args>(args).first..., std::forward<Args>(args).second...);
+        } else if constexpr(sizeof...(Args) == 2u) {
+            return insert_or_do_nothing(std::forward<Args>(args)...);
+        } else {
+            auto &node = packed.first().emplace_back(packed.first().size(), std::forward<Args>(args)...);
+            const auto index = key_to_bucket(node.element.first);
 
-        if(auto it = constrained_find(node.element.first, index); it != end()) {
-            packed.first().pop_back();
-            return std::make_pair(it, false);
+            if(auto it = constrained_find(node.element.first, index); it != end()) {
+                packed.first().pop_back();
+                return std::make_pair(it, false);
+            }
+
+            std::swap(node.next, sparse.first()[index]);
+            rehash_if_required();
+
+            return std::make_pair(--end(), true);
         }
-
-        std::swap(node.next, sparse.first()[index]);
-        rehash_if_required();
-
-        return std::make_pair(--end(), true);
     }
 
     /**
