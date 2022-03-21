@@ -1,5 +1,5 @@
-#ifndef ENTT_CORE_FLAG_HPP
-#define ENTT_CORE_FLAG_HPP
+#ifndef ENTT_CORE_ENUM_HPP
+#define ENTT_CORE_ENUM_HPP
 
 #include <type_traits>
 #include "../config/config.h"
