@@ -146,11 +146,13 @@ I hope this list can grow much more in the future:
     oriented game engine.
   * [Becketron](https://github.com/Doctor-Foxling/Becketron): a game engine
     written mostly in C++.
-  * [Spatial Engine](https://github.com/luizgabriel/Spatial.Engine): A
+  * [Spatial Engine](https://github.com/luizgabriel/Spatial.Engine): a
     cross-platform engine created on top of google's filament rendering engine.
   * [Kaguya](https://github.com/KaiH0717/Kaguya): D3D12 Rendering Engine.
-  * [OpenAWE](https://github.com/OpenAWE-Project/OpenAWE): Open implementation
+  * [OpenAWE](https://github.com/OpenAWE-Project/OpenAWE): open implementation
     of the Alan Wake Engine.
+  * [Nazara Engine](https://github.com/DigitalPulseSoftware/NazaraEngine): fast,
+    cross-platform, object-oriented API to help in daily developer life.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
