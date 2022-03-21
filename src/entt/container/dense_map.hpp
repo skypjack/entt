@@ -534,12 +534,12 @@ public:
      * insertion took place.
      */
     std::pair<iterator, bool> insert(const value_type &value) {
-        return emplace(value);
+        return insert_or_do_nothing(value.first, value.second);
     }
 
     /*! @copydoc insert */
     std::pair<iterator, bool> insert(value_type &&value) {
-        return emplace(std::move(value));
+        return insert_or_do_nothing(std::move(value.first), std::move(value.second));
     }
 
     /**
@@ -549,7 +549,7 @@ public:
     template<typename Arg>
     std::enable_if_t<std::is_constructible_v<value_type, Arg &&>, std::pair<iterator, bool>>
     insert(Arg &&value) {
-        return emplace(std::forward<Arg>(value));
+        return insert_or_do_nothing(std::forward<Arg>(value).first, std::forward<Arg>(value).second);
     }
 
     /**
@@ -561,7 +561,7 @@ public:
     template<typename It>
     void insert(It first, It last) {
         for(; first != last; ++first) {
-            emplace(*first);
+            insert(*first);
         }
     }
 
