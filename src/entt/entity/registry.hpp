@@ -632,7 +632,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type release(const entity_type entity) {
-        return release(entity, entity_traits::to_version(entity) + 1u);
+        return release(entity, static_cast<version_type>(entity_traits::to_version(entity) + 1u));
     }
 
     /**
@@ -664,7 +664,7 @@ public:
     template<typename It>
     void release(It first, It last) {
         for(; first != last; ++first) {
-            release(*first, entity_traits::to_version(*first) + 1u);
+            release(*first);
         }
     }
 
@@ -682,7 +682,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entity) {
-        return destroy(entity, entity_traits::to_version(entity) + 1u);
+        return destroy(entity, static_cast<version_type>(entity_traits::to_version(entity) + 1u));
     }
 
     /**
@@ -719,7 +719,7 @@ public:
     template<typename It>
     void destroy(It first, It last) {
         for(; first != last; ++first) {
-            destroy(*first, entity_traits::to_version(*first) + 1u);
+            destroy(*first);
         }
     }
 
@@ -1080,7 +1080,7 @@ public:
                 curr.second->clear();
             }
 
-            each([this](const auto entity) { release_entity(entity, entity_traits::to_version(entity) + 1u); });
+            each([this](const auto entity) { release(entity); });
         } else {
             (assure<Component>().clear(), ...);
         }
