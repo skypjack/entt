@@ -17,13 +17,6 @@
 #    define ENTT_CATCH if(false)
 #endif
 
-#if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
-#    include <new>
-#    define ENTT_LAUNDER(expr) std::launder(expr)
-#else
-#    define ENTT_LAUNDER(expr) expr
-#endif
-
 #ifdef ENTT_USE_ATOMIC
 #    include <atomic>
 #    define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
