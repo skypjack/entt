@@ -195,6 +195,14 @@ template<typename Res, typename Other>
     return lhs.operator->() == rhs.operator->();
 }
 
+/**
+ * @brief Compares two handles.
+ * @tparam Res Type of resource managed by the first handle.
+ * @tparam Other Type of resource managed by the second handle.
+ * @param lhs A valid handle.
+ * @param rhs A valid handle.
+ * @return False if both handles refer to the same registry, true otherwise.
+ */
 template<typename ILhs, typename IRhs>
 [[nodiscard]] bool operator!=(const resource_handle<ILhs> &lhs, const resource_handle<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
