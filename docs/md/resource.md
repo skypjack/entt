@@ -41,40 +41,24 @@ As a minimal example:
 struct my_resource { const int value; };
 ```
 
-A _loader_ is a class the aim of which is to load a specific resource. It has to
-inherit directly from a dedicated base class as in the following example:
+The _loader_ is a callable type the aim of which is to load a specific resource:
 
 ```cpp
-struct my_loader final: entt::resource_loader<my_loader, my_resource> {
-    // ...
-};
-```
-
-Where `my_resource` is the type of resources it creates.<br/>
-It must also expose a public const member function named `load` that accepts a
-variable number of arguments and returns a resource handle:
-
-```cpp
-struct my_loader: entt::resource_loader<my_loader, my_resource> {
-    entt::resource_handle<my_resource> load(int value) const {
+struct my_loader final {
+    entt::resource_handle<my_resource> operator()(int value) const {
         // ...
         return std::shared_ptr<my_resource>(new my_resource{ value });
     }
 };
 ```
 
-In general, resource loaders should not have a state or retain data of any type.
-They should let the cache manage their resources instead.<br/>
-As a side note, base class and CRTP idiom aren't strictly required with the
-current implementation. One could argue that a cache can easily work with
-loaders of any type. However, future changes won't be breaking ones by forcing
-the use of a base class today and that's why the model is already in its place.
-
+Its function operator can accept any argument and should return a resource
+handle to the expected type (`my_resource` in the example).<br/>
 Finally, a cache is a specialization of a class template tailored to a specific
-resource:
+resource and loader:
 
 ```cpp
-using my_cache = entt::resource_cache<my_resource>;
+using my_cache = entt::resource_cache<my_resource, my_loader>;
 
 // ...
 
@@ -117,15 +101,15 @@ The class `hashed_string` is described in a dedicated section, so I won't go in
 details here.
 
 Resources are loaded and thus stored in a cache through the `load` member
-function. It accepts the loader to use as a template parameter, the resource
-identifier and the parameters used to construct the resource as arguments:
+function. It accepts the resource identifier and the parameters to use to create
+it:
 
 ```cpp
 // uses the identifier declared above
-cache.load<my_loader>(identifier, 0);
+cache.load(identifier, 0);
 
 // uses a hashed string directly
-cache.load<my_loader>("another/identifier"_hs, 42);
+cache.load("another/identifier"_hs, 42);
 ```
 
 The function returns a resource handle, whether it already exists or is loaded.
@@ -133,7 +117,7 @@ In case the loader returns an invalid pointer, the handle is invalid as well and
 therefore it can be easily used with an `if` statement:
 
 ```cpp
-if(entt::resource_handle handle = cache.load<my_loader>("another/identifier"_hs, 42); handle) {
+if(entt::resource_handle handle = cache.load("another/identifier"_hs, 42); handle) {
     // ...
 }
 ```
@@ -149,7 +133,7 @@ There exists also a member function to use to force a reload of an already
 existing resource if needed:
 
 ```cpp
-auto handle = cache.reload<my_loader>("another/identifier"_hs, 42);
+auto handle = cache.reload("another/identifier"_hs, 42);
 ```
 
 As above, the function returns a resource handle that is invalid in case of
@@ -158,7 +142,7 @@ snippet:
 
 ```cpp
 cache.discard(identifier);
-cache.load<my_loader>(identifier, 42);
+cache.load(identifier, 42);
 ```
 
 Where the `discard` member function is used to get rid of a resource if loaded.
@@ -220,7 +204,7 @@ The declaration is similar to that of `load`, a (possibly invalid) handle for
 the resource is returned also in this case:
 
 ```cpp
-if(auto handle = cache.temp<my_loader>(42); handle) {
+if(auto handle = cache.temp(42); handle) {
     // ...
 }
 ```

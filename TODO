@@ -3,8 +3,9 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* get rid of storage_traits class template
+* resource: tag dispatching loader example, allocator support
 * uses-allocator construction: any (with allocator support), cache, poly, ...
+* get rid of storage_traits class template
 * process scheduler: reviews, use free lists internally
 * runtime events (emitter)
 * iterator based try_emplace vs try_insert for perf reasons
