@@ -53,7 +53,6 @@
 #include "process/scheduler.hpp"
 #include "resource/cache.hpp"
 #include "resource/handle.hpp"
-#include "resource/loader.hpp"
 #include "signal/delegate.hpp"
 #include "signal/dispatcher.hpp"
 #include "signal/emitter.hpp"

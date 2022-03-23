@@ -3,7 +3,7 @@
 
 namespace entt {
 
-template<typename>
+template<typename, typename>
 class resource_cache;
 
 template<typename>

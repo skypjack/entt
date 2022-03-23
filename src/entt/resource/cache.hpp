@@ -5,11 +5,11 @@
 #include <utility>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
+#include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/utility.hpp"
 #include "fwd.hpp"
 #include "handle.hpp"
-#include "loader.hpp"
 
 namespace entt {
 
@@ -22,16 +22,19 @@ namespace entt {
  * large sized applications.
  *
  * @tparam Resource Type of resources managed by a cache.
+ * @tparam Loader Type of loader used to create the resources.
  */
-template<typename Resource>
+template<typename Resource, typename Loader>
 class resource_cache {
-    static_assert(std::is_same_v<Resource, std::remove_const_t<std::remove_reference_t<Resource>>>, "Invalid resource type");
+    static_assert(std::is_base_of_v<Resource, typename Loader::value_type>, "Invalid loader");
 
 public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Type of resources managed by a cache. */
+    /*! @brief Resource type. */
     using resource_type = Resource;
+    /*! @brief Loader type. */
+    using loader_type = Loader;
 
     /*! @brief Default constructor. */
     resource_cache() = default;
@@ -84,16 +87,15 @@ public:
      * If the resource cannot be loaded correctly, the returned handle will be
      * invalid and any use of it will result in undefined behavior.
      *
-     * @tparam Loader Type of loader to use to load the resource if required.
      * @tparam Args Types of arguments to use to load the resource if required.
      * @param id Unique resource identifier.
      * @param args Arguments to use to load the resource if required.
      * @return A handle for the given resource.
      */
-    template<typename Loader, typename... Args>
+    template<typename... Args>
     resource_handle<resource_type> load(const id_type id, Args &&...args) {
         if(auto it = resources.find(id); it == resources.cend()) {
-            if(auto handle = temp<Loader>(std::forward<Args>(args)...); handle) {
+            if(auto handle = temp(std::forward<Args>(args)...); handle) {
                 return (resources[id] = std::move(handle));
             }
         } else {
@@ -120,15 +122,14 @@ public:
      * If the resource cannot be loaded correctly, the returned handle will be
      * invalid and any use of it will result in undefined behavior.
      *
-     * @tparam Loader Type of loader to use to load the resource.
      * @tparam Args Types of arguments to use to load the resource.
      * @param id Unique resource identifier.
      * @param args Arguments to use to load the resource.
      * @return A handle for the given resource.
      */
-    template<typename Loader, typename... Args>
+    template<typename... Args>
     resource_handle<resource_type> reload(const id_type id, Args &&...args) {
-        return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
+        return (discard(id), load(id, std::forward<Args>(args)...));
     }
 
     /**
@@ -138,14 +139,13 @@ public:
      * properly the requested resource. The handle isn't stored aside and the
      * cache isn't in charge of the lifetime of the resource itself.
      *
-     * @tparam Loader Type of loader to use to load the resource.
      * @tparam Args Types of arguments to use to load the resource.
      * @param args Arguments to use to load the resource.
      * @return A handle for the given resource.
      */
-    template<typename Loader, typename... Args>
+    template<typename... Args>
     [[nodiscard]] resource_handle<resource_type> temp(Args &&...args) const {
-        return Loader{}.get(std::forward<Args>(args)...);
+        return loader_type{}(std::forward<Args>(args)...);
     }
 
     /**
