@@ -357,13 +357,13 @@ public:
     using key_equal = KeyEqual;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
-    /*! @brief Random access iterator type. */
+    /*! @brief Input iterator type. */
     using iterator = internal::dense_map_iterator<typename packed_container_type::pointer>;
-    /*! @brief Constant random access iterator type. */
+    /*! @brief Constant input iterator type. */
     using const_iterator = internal::dense_map_iterator<typename packed_container_type::const_pointer>;
-    /*! @brief Forward iterator type. */
+    /*! @brief Input iterator type. */
     using local_iterator = internal::dense_map_local_iterator<typename packed_container_type::pointer>;
-    /*! @brief Constant forward iterator type. */
+    /*! @brief Constant input iterator type. */
     using const_local_iterator = internal::dense_map_local_iterator<typename packed_container_type::const_pointer>;
 
     /*! @brief Default constructor. */
