@@ -42,11 +42,10 @@ class storage_proxy_iterator final {
     template<typename Other>
     friend class storage_proxy_iterator;
 
-    using first_type = std::remove_reference_t<decltype(std::declval<It>()->first)>;
-    using second_type = std::remove_reference_t<decltype(std::declval<It>()->second)>;
+    using mapped_type = std::remove_reference_t<decltype(std::declval<It>()->second)>;
 
 public:
-    using value_type = std::pair<first_type, constness_as_t<typename second_type::element_type, second_type> &>;
+    using value_type = std::pair<id_type, constness_as_t<typename mapped_type::element_type, mapped_type> &>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;

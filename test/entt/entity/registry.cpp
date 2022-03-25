@@ -1989,7 +1989,7 @@ TEST(Registry, StorageProxy) {
 
     for(auto [id, pool]: registry.storage()) {
         static_assert(std::is_same_v<decltype(pool), entt::sparse_set &>);
-        static_assert(std::is_same_v<decltype(id), const entt::id_type>);
+        static_assert(std::is_same_v<decltype(id), entt::id_type>);
 
         ASSERT_TRUE(pool.contains(entity));
         ASSERT_EQ(std::addressof(storage), std::addressof(pool));
@@ -1998,7 +1998,7 @@ TEST(Registry, StorageProxy) {
 
     for(auto &&curr: std::as_const(registry).storage()) {
         static_assert(std::is_same_v<decltype(curr.second), const entt::sparse_set &>);
-        static_assert(std::is_same_v<decltype(curr.first), const entt::id_type>);
+        static_assert(std::is_same_v<decltype(curr.first), entt::id_type>);
 
         ASSERT_TRUE(curr.second.contains(entity));
         ASSERT_EQ(std::addressof(storage), std::addressof(curr.second));
@@ -2059,6 +2059,35 @@ TEST(Registry, StorageProxyIterator) {
 
     ASSERT_EQ(cit, registry.storage().begin());
     ASSERT_NE(cit, std::as_const(registry).storage().end());
+}
+
+TEST(Registry, StorageProxyIteratorConversion) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    registry.emplace<int>(entity);
+
+    auto proxy = registry.storage();
+    auto cproxy = std::as_const(registry).storage();
+
+    typename decltype(proxy)::iterator it = proxy.begin();
+    typename decltype(cproxy)::iterator cit = it;
+
+    static_assert(std::is_same_v<decltype(*it), std::pair<entt::id_type, entt::sparse_set &>>);
+    static_assert(std::is_same_v<decltype(*cit), std::pair<entt::id_type, const entt::sparse_set &>>);
+
+    ASSERT_EQ(it->first, entt::type_id<int>().hash());
+    ASSERT_EQ((*it).second.type(), entt::type_id<int>());
+    ASSERT_EQ(it->first, cit->first);
+    ASSERT_EQ((*it).second.type(), (*cit).second.type());
+
+    ASSERT_EQ(it - cit, 0);
+    ASSERT_EQ(cit - it, 0);
+    ASSERT_LE(it, cit);
+    ASSERT_LE(cit, it);
+    ASSERT_GE(it, cit);
+    ASSERT_GE(cit, it);
+    ASSERT_EQ(it, cit);
+    ASSERT_NE(++cit, it);
 }
 
 TEST(Registry, NoEtoType) {
