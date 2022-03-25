@@ -1080,7 +1080,7 @@ public:
                 curr.second->clear();
             }
 
-            each([this](const auto entity) { release(entity); });
+            each([this](const auto entity) { this->release(entity); });
         } else {
             (assure<Component>().clear(), ...);
         }
