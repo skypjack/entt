@@ -29,7 +29,8 @@ namespace internal {
 
 template<typename It>
 class dense_set_iterator final {
-    friend dense_set_iterator<const std::remove_pointer_t<It> *>;
+    template<typename>
+    friend class dense_set_iterator;
 
     using iterator_traits = std::iterator_traits<decltype(std::addressof(std::as_const(std::declval<It>()->second)))>;
 
@@ -45,8 +46,8 @@ public:
     dense_set_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}
 
-    template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
-    dense_set_iterator(const dense_set_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other) ENTT_NOEXCEPT
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    dense_set_iterator(const dense_set_iterator<Other> &other) ENTT_NOEXCEPT
         : it{other.it} {}
 
     dense_set_iterator &operator++() ENTT_NOEXCEPT {
@@ -147,7 +148,8 @@ template<typename ILhs, typename IRhs>
 
 template<typename It>
 class dense_set_local_iterator final {
-    friend dense_set_local_iterator<const std::remove_pointer_t<It> *>;
+    template<typename>
+    friend class dense_set_local_iterator;
 
     using iterator_traits = std::iterator_traits<decltype(std::addressof(std::as_const(std::declval<It>()->second)))>;
 
@@ -164,8 +166,8 @@ public:
         : it{iter},
           offset{pos} {}
 
-    template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
-    dense_set_local_iterator(const dense_set_local_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other) ENTT_NOEXCEPT
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    dense_set_local_iterator(const dense_set_local_iterator<Other> &other) ENTT_NOEXCEPT
         : it{other.it},
           offset{other.offset} {}
 
@@ -308,13 +310,13 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Random access iterator type. */
-    using iterator = internal::dense_set_iterator<typename packed_container_type::pointer>;
+    using iterator = internal::dense_set_iterator<typename packed_container_type::iterator>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = internal::dense_set_iterator<typename packed_container_type::const_pointer>;
+    using const_iterator = internal::dense_set_iterator<typename packed_container_type::const_iterator>;
     /*! @brief Forward iterator type. */
-    using local_iterator = internal::dense_set_local_iterator<typename packed_container_type::pointer>;
+    using local_iterator = internal::dense_set_local_iterator<typename packed_container_type::iterator>;
     /*! @brief Constant forward iterator type. */
-    using const_local_iterator = internal::dense_set_local_iterator<typename packed_container_type::const_pointer>;
+    using const_local_iterator = internal::dense_set_local_iterator<typename packed_container_type::const_iterator>;
 
     /*! @brief Default constructor. */
     dense_set()
@@ -416,7 +418,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
-        return packed.first().data();
+        return packed.first().begin();
     }
 
     /*! @copydoc cbegin */
@@ -426,7 +428,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
-        return packed.first().data();
+        return packed.first().begin();
     }
 
     /**
@@ -440,7 +442,7 @@ public:
      * internal array.
      */
     [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
-        return packed.first().data() + size();
+        return packed.first().end();
     }
 
     /*! @copydoc cend */
@@ -450,7 +452,7 @@ public:
 
     /*! @copydoc end */
     [[nodiscard]] iterator end() ENTT_NOEXCEPT {
-        return packed.first().data() + size();
+        return packed.first().end();
     }
 
     /**
@@ -556,11 +558,13 @@ public:
      * @return An iterator following the last removed element.
      */
     iterator erase(const_iterator first, const_iterator last) {
-        for(; last != first; --last) {
-            erase(last - 1u);
+        const auto dist = first - cbegin();
+
+        for(auto from = last - cbegin(); from != dist; --from) {
+            erase(packed.first()[from - 1u].second);
         }
 
-        return (begin() + (last - cbegin()));
+        return (begin() + dist);
     }
 
     /**
@@ -655,7 +659,7 @@ public:
      * @return An iterator to the beginning of the given bucket.
      */
     [[nodiscard]] const_local_iterator cbegin(const size_type index) const {
-        return {packed.first().data(), sparse.first()[index]};
+        return {packed.first().begin(), sparse.first()[index]};
     }
 
     /**
@@ -673,7 +677,7 @@ public:
      * @return An iterator to the beginning of the given bucket.
      */
     [[nodiscard]] local_iterator begin(const size_type index) {
-        return {packed.first().data(), sparse.first()[index]};
+        return {packed.first().begin(), sparse.first()[index]};
     }
 
     /**
@@ -682,7 +686,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] const_local_iterator cend([[maybe_unused]] const size_type index) const {
-        return {packed.first().data(), std::numeric_limits<size_type>::max()};
+        return {packed.first().begin(), std::numeric_limits<size_type>::max()};
     }
 
     /**
@@ -700,7 +704,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] local_iterator end([[maybe_unused]] const size_type index) {
-        return {packed.first().data(), std::numeric_limits<size_type>::max()};
+        return {packed.first().begin(), std::numeric_limits<size_type>::max()};
     }
 
     /**
