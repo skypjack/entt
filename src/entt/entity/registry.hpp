@@ -51,7 +51,8 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    storage_proxy_iterator() ENTT_NOEXCEPT = default;
+    storage_proxy_iterator() ENTT_NOEXCEPT
+        : it{} {}
 
     storage_proxy_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}

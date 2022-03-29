@@ -37,7 +37,11 @@ public:
     using reference = typename iterator_type::reference;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    runtime_view_iterator() ENTT_NOEXCEPT = default;
+    runtime_view_iterator() ENTT_NOEXCEPT
+        : pools{},
+          filter{},
+          it{},
+          tombstone_check{} {}
 
     runtime_view_iterator(const std::vector<const Type *> &cpools, const std::vector<const Type *> &ignore, iterator_type curr) ENTT_NOEXCEPT
         : pools{&cpools},
