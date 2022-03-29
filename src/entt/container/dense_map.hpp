@@ -71,7 +71,8 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    dense_map_iterator() ENTT_NOEXCEPT = default;
+    dense_map_iterator() ENTT_NOEXCEPT
+        : it{} {}
 
     dense_map_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}
@@ -191,7 +192,9 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    dense_map_local_iterator() ENTT_NOEXCEPT = default;
+    dense_map_local_iterator() ENTT_NOEXCEPT
+        : it{},
+          offset{} {}
 
     dense_map_local_iterator(It iter, const std::size_t pos) ENTT_NOEXCEPT
         : it{iter},

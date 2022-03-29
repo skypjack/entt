@@ -41,7 +41,8 @@ public:
     using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
-    dense_set_iterator() ENTT_NOEXCEPT = default;
+    dense_set_iterator() ENTT_NOEXCEPT
+        : it{} {}
 
     dense_set_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}
@@ -160,7 +161,9 @@ public:
     using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::forward_iterator_tag;
 
-    dense_set_local_iterator() ENTT_NOEXCEPT = default;
+    dense_set_local_iterator() ENTT_NOEXCEPT
+        : it{},
+          offset{} {}
 
     dense_set_local_iterator(It iter, const std::size_t pos) ENTT_NOEXCEPT
         : it{iter},
