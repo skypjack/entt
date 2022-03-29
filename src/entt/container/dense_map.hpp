@@ -710,14 +710,14 @@ public:
      * @param key A key of an element to find.
      * @return A reference to the mapped value of the requested element.
      */
-    [[nodiscard]] Type &at(const key_type &key) {
+    [[nodiscard]] mapped_type &at(const key_type &key) {
         auto it = find(key);
         ENTT_ASSERT(it != end(), "Invalid key");
         return it->second;
     }
 
     /*! @copydoc at */
-    [[nodiscard]] const Type &at(const key_type &key) const {
+    [[nodiscard]] const mapped_type &at(const key_type &key) const {
         auto it = find(key);
         ENTT_ASSERT(it != cend(), "Invalid key");
         return it->second;
@@ -728,7 +728,7 @@ public:
      * @param key A key of an element to find or insert.
      * @return A reference to the mapped value of the requested element.
      */
-    [[nodiscard]] Type &operator[](const key_type &key) {
+    [[nodiscard]] mapped_type &operator[](const key_type &key) {
         return insert_or_do_nothing(key).first->second;
     }
 
@@ -737,7 +737,7 @@ public:
      * @param key A key of an element to find or insert.
      * @return A reference to the mapped value of the requested element.
      */
-    [[nodiscard]] Type &operator[](key_type &&key) {
+    [[nodiscard]] mapped_type &operator[](key_type &&key) {
         return insert_or_do_nothing(std::move(key)).first->second;
     }
 
