@@ -1459,7 +1459,10 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    meta_iterator() ENTT_NOEXCEPT = default;
+    meta_iterator() ENTT_NOEXCEPT
+        : deref{},
+          offset{},
+          handle{} {}
 
     template<typename It>
     explicit meta_iterator(It iter, const difference_type init) ENTT_NOEXCEPT
@@ -1508,9 +1511,9 @@ public:
     }
 
 private:
-    deref_fn_type *deref{};
-    difference_type offset{};
-    any handle{};
+    deref_fn_type *deref;
+    difference_type offset;
+    any handle;
 };
 
 class meta_associative_container::meta_iterator final {
@@ -1546,7 +1549,9 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    meta_iterator() ENTT_NOEXCEPT = default;
+    meta_iterator() ENTT_NOEXCEPT
+        : vtable{},
+          handle{} {}
 
     template<bool KeyOnly, typename It>
     meta_iterator(std::integral_constant<bool, KeyOnly>, It iter) ENTT_NOEXCEPT
@@ -1586,8 +1591,8 @@ public:
     }
 
 private:
-    vtable_type *vtable{};
-    any handle{};
+    vtable_type *vtable;
+    any handle;
 };
 
 /**
