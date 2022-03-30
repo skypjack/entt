@@ -307,8 +307,8 @@ class dense_map {
             return std::make_pair(it, false);
         }
 
-        const auto next = std::exchange(sparse.first()[index], packed.first().size());
-        packed.first().emplace_back(next, std::piecewise_construct, std::forward_as_tuple(std::forward<Other>(key)), std::forward_as_tuple(std::forward<Args>(args)...));
+        packed.first().emplace_back(sparse.first()[index], std::piecewise_construct, std::forward_as_tuple(std::forward<Other>(key)), std::forward_as_tuple(std::forward<Args>(args)...));
+        sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
         return std::make_pair(--end(), true);
@@ -323,8 +323,8 @@ class dense_map {
             return std::make_pair(it, false);
         }
 
-        const auto next = std::exchange(sparse.first()[index], packed.first().size());
-        packed.first().emplace_back(next, std::forward<Other>(key), std::forward<Arg>(value));
+        packed.first().emplace_back(sparse.first()[index], std::forward<Other>(key), std::forward<Arg>(value));
+        sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
         return std::make_pair(--end(), true);
