@@ -275,8 +275,8 @@ class dense_set {
             return std::make_pair(it, false);
         }
 
-        const auto next = std::exchange(sparse.first()[index], packed.first().size());
-        packed.first().emplace_back(next, std::forward<Other>(value));
+        packed.first().emplace_back(sparse.first()[index], std::forward<Other>(value));
+        sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
         return std::make_pair(--end(), true);

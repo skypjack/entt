@@ -832,6 +832,21 @@ TEST(DenseSet, ThrowingAllocator) {
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
     ASSERT_THROW(set.reserve(2u * set.bucket_count()), packed_exception);
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(set.emplace(), packed_exception);
+    ASSERT_FALSE(set.contains(0u));
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(set.emplace(std::size_t{}), packed_exception);
+    ASSERT_FALSE(set.contains(0u));
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(set.insert(0u), packed_exception);
+    ASSERT_FALSE(set.contains(0u));
 }
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
