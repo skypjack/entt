@@ -103,7 +103,7 @@ TEST(DenseSet, Constructors) {
     entt::dense_set<int> temp{set, set.get_allocator()};
     entt::dense_set<int> other{std::move(temp), set.get_allocator()};
 
-    ASSERT_EQ(other.size(), 1u);
+    ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(set.bucket_count(), 4u * minimum_bucket_count);
     ASSERT_EQ(other.bucket_count(), 4u * minimum_bucket_count);

@@ -104,7 +104,7 @@ TEST(DenseMap, Constructors) {
     entt::dense_map<int, int> temp{map, map.get_allocator()};
     entt::dense_map<int, int> other{std::move(temp), map.get_allocator()};
 
-    ASSERT_EQ(other.size(), 1u);
+    ASSERT_EQ(map.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(map.bucket_count(), 4u * minimum_bucket_count);
     ASSERT_EQ(other.bucket_count(), 4u * minimum_bucket_count);
