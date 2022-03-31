@@ -3,8 +3,8 @@
 * add examples (and credits) from @alanjfs :)
 
 WIP:
-* resource: tag dispatching loader example, allocator support
-* uses-allocator construction: any (with allocator support), cache, poly, ...
+* type_id(T &&)
+* uses-allocator construction: any (with allocator support), poly, ...
 * get rid of storage_traits class template
 * process scheduler: reviews, use free lists internally
 * runtime events (emitter)

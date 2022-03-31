@@ -170,7 +170,8 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/scheduler.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/cache.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/handle.hpp>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/loader.hpp>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/resource.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/delegate.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/dispatcher.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/emitter.hpp>

@@ -1,56 +1,288 @@
-#ifndef ENTT_RESOURCE_CACHE_HPP
-#define ENTT_RESOURCE_CACHE_HPP
+#ifndef ENTT_RESOURCE_RESOURCE_CACHE_HPP
+#define ENTT_RESOURCE_RESOURCE_CACHE_HPP
 
+#include <cstddef>
+#include <functional>
+#include <iterator>
+#include <memory>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
+#include "../core/iterator.hpp"
 #include "../core/utility.hpp"
 #include "fwd.hpp"
-#include "handle.hpp"
+#include "loader.hpp"
+#include "resource.hpp"
 
 namespace entt {
 
 /**
- * @brief Simple cache for resources of a given type.
- *
- * Minimal implementation of a cache for resources of a given type. It doesn't
- * offer much functionalities but it's suitable for small or medium sized
- * applications and can be freely inherited to add targeted functionalities for
- * large sized applications.
- *
- * @tparam Resource Type of resources managed by a cache.
- * @tparam Loader Type of loader used to create the resources.
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
  */
-template<typename Resource, typename Loader>
-class resource_cache {
-    static_assert(std::is_base_of_v<Resource, typename Loader::value_type>, "Invalid loader");
+
+namespace internal {
+
+template<typename Type, typename It>
+class resource_cache_iterator final {
+    template<typename, typename>
+    friend class resource_cache_iterator;
 
 public:
+    using value_type = std::pair<id_type, resource<Type>>;
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::input_iterator_tag;
+
+    resource_cache_iterator() ENTT_NOEXCEPT = default;
+
+    resource_cache_iterator(const It iter) ENTT_NOEXCEPT
+        : it{iter} {}
+
+    template<typename Other, typename = std::enable_if_t<std::is_const_v<Type>>>
+    resource_cache_iterator(const resource_cache_iterator<std::remove_const_t<Type>, Other> &other) ENTT_NOEXCEPT
+        : it{other.it} {}
+
+    resource_cache_iterator &operator++() ENTT_NOEXCEPT {
+        return ++it, *this;
+    }
+
+    resource_cache_iterator operator++(int) ENTT_NOEXCEPT {
+        resource_cache_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    resource_cache_iterator &operator--() ENTT_NOEXCEPT {
+        return --it, *this;
+    }
+
+    resource_cache_iterator operator--(int) ENTT_NOEXCEPT {
+        resource_cache_iterator orig = *this;
+        return operator--(), orig;
+    }
+
+    resource_cache_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+        it += value;
+        return *this;
+    }
+
+    resource_cache_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+        resource_cache_iterator copy = *this;
+        return (copy += value);
+    }
+
+    resource_cache_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+        return (*this += -value);
+    }
+
+    resource_cache_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+        return (*this + -value);
+    }
+
+    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+        return {it[value].first, resource<Type>{it[value].second}};
+    }
+
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+        return (*this)[0];
+    }
+
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+        return operator*();
+    }
+
+    template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+    friend std::ptrdiff_t operator-(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) ENTT_NOEXCEPT;
+
+    template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+    friend bool operator==(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) ENTT_NOEXCEPT;
+
+    template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+    friend bool operator<(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) ENTT_NOEXCEPT;
+
+private:
+    It it;
+};
+
+template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+[[nodiscard]] std::ptrdiff_t operator-(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.it - rhs.it;
+}
+
+template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+[[nodiscard]] bool operator==(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.it == rhs.it;
+}
+
+template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+[[nodiscard]] bool operator!=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+[[nodiscard]] bool operator<(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+    return lhs.it < rhs.it;
+}
+
+template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+[[nodiscard]] bool operator>(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+    return rhs < lhs;
+}
+
+template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+[[nodiscard]] bool operator<=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs > rhs);
+}
+
+template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
+[[nodiscard]] bool operator>=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+    return !(lhs < rhs);
+}
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
+ * @brief Basic cache for resources of any type.
+ * @tparam Type Type of resources managed by a cache.
+ * @tparam Loader Type of loader used to create the resources.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ */
+template<typename Type, typename Loader, typename Allocator>
+class resource_cache {
+    using alloc_traits = typename std::allocator_traits<Allocator>;
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
+    using container_allocator = typename alloc_traits::template rebind_alloc<std::pair<const id_type, typename Loader::result_type>>;
+    using container_type = dense_map<id_type, typename Loader::result_type, identity, std::equal_to<id_type>, container_allocator>;
+
+public:
+    /*! @brief Resource type. */
+    using value_type = Type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Resource type. */
-    using resource_type = Resource;
     /*! @brief Loader type. */
     using loader_type = Loader;
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
+    /*! @brief Input iterator type. */
+    using iterator = internal::resource_cache_iterator<Type, typename container_type::iterator>;
+    /*! @brief Constant input iterator type. */
+    using const_iterator = internal::resource_cache_iterator<const Type, typename container_type::const_iterator>;
 
     /*! @brief Default constructor. */
-    resource_cache() = default;
+    resource_cache()
+        : resource_cache{loader_type{}} {}
+
+    /**
+     * @brief Constructs an empty cache with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit resource_cache(const allocator_type &allocator)
+        : resource_cache{loader_type{}, allocator} {}
+
+    /**
+     * @brief Constructs an empty cache with a given allocator and loader.
+     * @param callable The loader to use.
+     * @param allocator The allocator to use.
+     */
+    explicit resource_cache(const loader_type &callable, const allocator_type &allocator = allocator_type{})
+        : pool{container_type{allocator}, callable} {}
+
+    /*! @brief Default copy constructor. */
+    resource_cache(const resource_cache &) = default;
+
+    /**
+     * @brief Allocator-extended copy constructor.
+     * @param other The instance to copy from.
+     * @param allocator The allocator to use.
+     */
+    resource_cache(const resource_cache &other, const allocator_type &allocator)
+        : pool{std::piecewise_construct, std::forward_as_tuple(other.pool.first(), allocator), std::forward_as_tuple(other.pool.second())} {}
 
     /*! @brief Default move constructor. */
     resource_cache(resource_cache &&) = default;
 
-    /*! @brief Default move assignment operator. @return This cache. */
+    /**
+     * @brief Allocator-extended move constructor.
+     * @param other The instance to move from.
+     * @param allocator The allocator to use.
+     */
+    resource_cache(resource_cache &&other, const allocator_type &allocator)
+        : pool{std::piecewise_construct, std::forward_as_tuple(std::move(other.pool.first()), allocator), std::forward_as_tuple(std::move(other.pool.second()))} {}
+
+    /**
+     * @brief Default copy assignment operator.
+     * @return This cache.
+     */
+    resource_cache &operator=(const resource_cache &) = default;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This cache.
+     */
     resource_cache &operator=(resource_cache &&) = default;
 
     /**
-     * @brief Number of resources managed by a cache.
-     * @return Number of resources currently stored.
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return resources.size();
+    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+        return pool.first().get_allocator();
+    }
+
+    /**
+     * @brief Returns an iterator to the beginning.
+     *
+     * The returned iterator points to the first instance of the cache. If the
+     * cache is empty, the returned iterator will be equal to `end()`.
+     *
+     * @return An iterator to the first instance of the internal cache.
+     */
+    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
+        return pool.first().begin();
+    }
+
+    /*! @copydoc cbegin */
+    [[nodiscard]] const_iterator begin() const ENTT_NOEXCEPT {
+        return cbegin();
+    }
+
+    /*! @copydoc begin */
+    [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
+        return pool.first().begin();
+    }
+
+    /**
+     * @brief Returns an iterator to the end.
+     *
+     * The returned iterator points to the element following the last instance
+     * of the cache. Attempting to dereference the returned iterator results in
+     * undefined behavior.
+     *
+     * @return An iterator to the element following the last instance of the
+     * internal cache.
+     */
+    [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
+        return pool.first().end();
+    }
+
+    /*! @copydoc cend */
+    [[nodiscard]] const_iterator end() const ENTT_NOEXCEPT {
+        return cend();
+    }
+
+    /*! @copydoc end */
+    [[nodiscard]] iterator end() ENTT_NOEXCEPT {
+        return pool.first().end();
     }
 
     /**
@@ -58,121 +290,79 @@ public:
      * @return True if the cache contains no resources, false otherwise.
      */
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        return resources.empty();
+        return pool.first().empty();
     }
 
     /**
-     * @brief Clears a cache and discards all its resources.
-     *
-     * Handles are not invalidated and the memory used by a resource isn't
-     * freed as long as at least a handle keeps the resource itself alive.
+     * @brief Number of resources managed by a cache.
+     * @return Number of resources currently stored.
      */
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+        return pool.first().size();
+    }
+
+    /*! @brief Clears a cache. */
     void clear() ENTT_NOEXCEPT {
-        resources.clear();
+        pool.first().clear();
     }
 
     /**
-     * @brief Loads the resource that corresponds to a given identifier.
+     * @brief Loads a resource, if its identifier does not exist.
      *
-     * In case an identifier isn't already present in the cache, it loads its
-     * resource and stores it aside for future uses. Arguments are forwarded
-     * directly to the loader in order to construct properly the requested
-     * resource.
-     *
-     * @note
-     * If the identifier is already present in the cache, this function does
-     * nothing and the arguments are simply discarded.
+     * Arguments are forwarded directly to the loader and _consumed_ only if the
+     * resource doesn't already exist.
      *
      * @warning
-     * If the resource cannot be loaded correctly, the returned handle will be
+     * If the resource isn't loaded correctly, the returned handle could be
      * invalid and any use of it will result in undefined behavior.
      *
      * @tparam Args Types of arguments to use to load the resource if required.
      * @param id Unique resource identifier.
      * @param args Arguments to use to load the resource if required.
-     * @return A handle for the given resource.
+     * @return A pair consisting of an iterator to the inserted element (or to
+     * the element that prevented the insertion) and a bool denoting whether the
+     * insertion took place.
      */
     template<typename... Args>
-    resource_handle<resource_type> load(const id_type id, Args &&...args) {
-        if(auto it = resources.find(id); it == resources.cend()) {
-            if(auto handle = temp(std::forward<Args>(args)...); handle) {
-                return (resources[id] = std::move(handle));
-            }
-        } else {
-            return it->second;
+    std::pair<iterator, bool> load(const id_type id, Args &&...args) {
+        if(auto it = pool.first().find(id); it != pool.first().end()) {
+            return {it, false};
         }
 
-        return {};
+        return pool.first().emplace(id, pool.second()(std::forward<Args>(args)...));
     }
 
     /**
-     * @brief Reloads a resource or loads it for the first time if not present.
-     *
-     * Equivalent to the following snippet (pseudocode):
-     *
-     * @code{.cpp}
-     * cache.discard(id);
-     * cache.load(id, args...);
-     * @endcode
-     *
-     * Arguments are forwarded directly to the loader in order to construct
-     * properly the requested resource.
+     * @brief Force loads a resource, if its identifier does not exist.
+     * @copydetails load
+     */
+    template<typename... Args>
+    std::pair<iterator, bool> force_load(const id_type id, Args &&...args) {
+        return {pool.first().insert_or_assign(id, pool.second()(std::forward<Args>(args)...)).first, true};
+    }
+
+    /**
+     * @brief Returns a handle for a given resource identifier.
      *
      * @warning
-     * If the resource cannot be loaded correctly, the returned handle will be
-     * invalid and any use of it will result in undefined behavior.
-     *
-     * @tparam Args Types of arguments to use to load the resource.
-     * @param id Unique resource identifier.
-     * @param args Arguments to use to load the resource.
-     * @return A handle for the given resource.
-     */
-    template<typename... Args>
-    resource_handle<resource_type> reload(const id_type id, Args &&...args) {
-        return (discard(id), load(id, std::forward<Args>(args)...));
-    }
-
-    /**
-     * @brief Creates a temporary handle for a resource.
-     *
-     * Arguments are forwarded directly to the loader in order to construct
-     * properly the requested resource. The handle isn't stored aside and the
-     * cache isn't in charge of the lifetime of the resource itself.
-     *
-     * @tparam Args Types of arguments to use to load the resource.
-     * @param args Arguments to use to load the resource.
-     * @return A handle for the given resource.
-     */
-    template<typename... Args>
-    [[nodiscard]] resource_handle<resource_type> temp(Args &&...args) const {
-        return loader_type{}(std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Creates a handle for a given resource identifier.
-     *
-     * A resource handle can be in a either valid or invalid state. In other
-     * terms, a resource handle is properly initialized with a resource if the
-     * cache contains the resource itself. Otherwise the returned handle is
-     * uninitialized and accessing it results in undefined behavior.
-     *
-     * @sa resource_handle
+     * There is no guarantee that the returned handle is valid.<br/>
+     * If it is not, any use will result in indefinite behavior.
      *
      * @param id Unique resource identifier.
      * @return A handle for the given resource.
      */
-    [[nodiscard]] resource_handle<const resource_type> handle(const id_type id) const {
-        if(auto it = resources.find(id); it != resources.cend()) {
-            return it->second;
+    [[nodiscard]] resource<const value_type> operator[](const id_type id) const {
+        if(auto it = pool.first().find(id); it != pool.first().cend()) {
+            return resource<const value_type>{it->second};
         }
 
         return {};
     }
 
-    /*! @copydoc handle */
-    [[nodiscard]] resource_handle<resource_type> handle(const id_type id) {
-        if(auto it = resources.find(id); it != resources.end()) {
-            return it->second;
+    /*! @copydoc operator[] */
+    [[nodiscard]] resource<value_type> operator[](const id_type id) {
+        if(auto it = pool.first().find(id); it != pool.first().end()) {
+            return resource<value_type>{it->second};
         }
 
         return {};
@@ -184,95 +374,49 @@ public:
      * @return True if the cache contains the resource, false otherwise.
      */
     [[nodiscard]] bool contains(const id_type id) const {
-        return (resources.find(id) != resources.cend());
+        return pool.first().contains(id);
     }
 
     /**
-     * @brief Discards the resource that corresponds to a given identifier.
-     *
-     * Handles are not invalidated and the memory used by the resource isn't
-     * freed as long as at least a handle keeps the resource itself alive.
-     *
+     * @brief Removes an element from a given position.
+     * @param pos An iterator to the element to remove.
+     * @return An iterator following the removed element.
+     */
+    iterator erase(const_iterator pos) {
+        const auto it = pool.first().begin();
+        return pool.first().erase(it + (pos - const_iterator{it}));
+    }
+
+    /**
+     * @brief Removes the given elements from a cache.
+     * @param first An iterator to the first element of the range of elements.
+     * @param last An iterator past the last element of the range of elements.
+     * @return An iterator following the last removed element.
+     */
+    iterator erase(const_iterator first, const_iterator last) {
+        const auto it = pool.first().begin();
+        return pool.first().erase(it + (first - const_iterator{it}), it + (last - const_iterator{it}));
+    }
+
+    /**
+     * @brief Removes the given elements from a cache.
      * @param id Unique resource identifier.
+     * @return Number of resources erased (either 0 or 1).
      */
-    void discard(const id_type id) {
-        if(auto it = resources.find(id); it != resources.end()) {
-            resources.erase(it);
-        }
+    size_type erase(const id_type id) {
+        return pool.first().erase(id);
     }
 
     /**
-     * @brief Iterates all resources.
-     *
-     * The function object is invoked for each element. It is provided with
-     * either the resource identifier, the resource handle or both of them.<br/>
-     * The signature of the function must be equivalent to one of the following
-     * forms:
-     *
-     * @code{.cpp}
-     * void(const entt::id_type);
-     * void(entt::resource_handle<const resource_type>);
-     * void(const entt::id_type, entt::resource_handle<const resource_type>);
-     * @endcode
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
+     * @brief Returns the loader used to create resources.
+     * @return The loader used to create resources.
      */
-    template<typename Func>
-    void each(Func func) const {
-        auto begin = resources.begin();
-        auto end = resources.end();
-
-        while(begin != end) {
-            auto curr = begin++;
-
-            if constexpr(std::is_invocable_v<Func, id_type>) {
-                func(curr->first);
-            } else if constexpr(std::is_invocable_v<Func, resource_handle<const resource_type>>) {
-                func(resource_handle<const resource_type>{curr->second});
-            } else {
-                func(curr->first, resource_handle<const resource_type>{curr->second});
-            }
-        }
-    }
-
-    /**
-     * @copybrief each
-     *
-     * The function object is invoked for each element. It is provided with
-     * either the resource identifier, the resource handle or both of them.<br/>
-     * The signature of the function must be equivalent to one of the following
-     * forms:
-     *
-     * @code{.cpp}
-     * void(const entt::id_type);
-     * void(entt::resource_handle<resource_type>);
-     * void(const entt::id_type, entt::resource_handle<resource_type>);
-     * @endcode
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void each(Func func) {
-        auto begin = resources.begin();
-        auto end = resources.end();
-
-        while(begin != end) {
-            auto curr = begin++;
-
-            if constexpr(std::is_invocable_v<Func, id_type>) {
-                func(curr->first);
-            } else if constexpr(std::is_invocable_v<Func, resource_handle<resource_type>>) {
-                func(curr->second);
-            } else {
-                func(curr->first, curr->second);
-            }
-        }
+    [[nodiscard]] loader_type loader() const {
+        return pool.second();
     }
 
 private:
-    dense_map<id_type, resource_handle<resource_type>, identity> resources;
+    compressed_pair<container_type, loader_type> pool;
 };
 
 } // namespace entt
