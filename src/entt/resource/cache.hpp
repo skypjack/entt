@@ -44,7 +44,7 @@ public:
     resource_cache_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}
 
-    template<typename Other, typename = std::enable_if_t<std::is_const_v<Type>>>
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
     resource_cache_iterator(const resource_cache_iterator<std::remove_const_t<Type>, Other> &other) ENTT_NOEXCEPT
         : it{other.it} {}
 
