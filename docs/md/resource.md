@@ -7,6 +7,9 @@
 
 * [Introduction](#introduction)
 * [The resource, the loader and the cache](#the-resource-the-loader-and-the-cache)
+  * [Resource handle](#resource-handle)
+  * [Loaders](#loader)
+  * [The cache class](#the-cache)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -21,21 +24,14 @@ Examples are loading everything on start, loading on request, predictive
 loading, and so on.
 
 `EnTT` doesn't pretend to offer a _one-fits-all_ solution for the different
-cases. Instead, it offers a minimal and perhaps trivial cache that can be useful
-most of the time during prototyping and sometimes even in a production
-environments.<br/>
-For those interested in the subject, the plan is to improve it considerably over
-time in terms of performance, memory usage and functionalities. Hoping to make
-it, of course, one step at a time.
+cases.<br/>
+Instead, the library offers a minimal, general purpose resource cache that might
+be useful in many cases.
 
 # The resource, the loader and the cache
 
-There are three main actors in the model: the resource, the loader and the
-cache.
-
-The _resource_ is whatever users want it to be. An image, a video, an audio,
-whatever. There are no limits.<br/>
-As a minimal example:
+Resource, loader and cache are the three main actors for the purpose.<br/>
+The _resource_ is an image, an audio, a video or any other type:
 
 ```cpp
 struct my_resource { const int value; };
@@ -45,17 +41,22 @@ The _loader_ is a callable type the aim of which is to load a specific resource:
 
 ```cpp
 struct my_loader final {
-    entt::resource_handle<my_resource> operator()(int value) const {
+    using result_type = std::shared_ptr<my_resource>;
+
+    result_type operator()(int value) const {
         // ...
-        return std::shared_ptr<my_resource>(new my_resource{ value });
+        return std::make_shared<my_resource>(value);
     }
 };
 ```
 
-Its function operator can accept any argument and should return a resource
-handle to the expected type (`my_resource` in the example).<br/>
+Its function operator can accept any arguments and should return a value of the
+declared result type (`std::shared_ptr<my_resource>` in the example).<br/>
+A loader can also overload its function call operator to make it possible to
+construct the same or another resource from different lists of arguments.
+
 Finally, a cache is a specialization of a class template tailored to a specific
-resource and loader:
+resource and (optionally) a loader:
 
 ```cpp
 using my_cache = entt::resource_cache<my_resource, my_loader>;
@@ -65,149 +66,127 @@ using my_cache = entt::resource_cache<my_resource, my_loader>;
 my_cache cache{};
 ```
 
-The idea is to create different caches for different types of resources and to
-manage each one independently in the most appropriate way.<br/>
+The cache is meant to be used to create different caches for different types of
+resources and to manage each one independently in the most appropriate way.<br/>
 As a (very) trivial example, audio tracks can survive in most of the scenes of
-an application while meshes can be associated with a single scene and then
-discarded when users leave it.
+an application while meshes can be associated with a single scene only, then
+discarded when a player leaves it.
 
-A cache offers a set of basic functionalities to query its internal state and to
-_organize_ it:
+## Resource handle
+
+Resources aren't returned directly to the caller. Instead, they are wrapped in a
+_resource handle_ identified by the `entt::resource` class template.<br/>
+For those who know the _flyweight design pattern_ already, that's exactly what
+it is. To all others, this is the time to brush up on some notions instead.
+
+A shared pointer could have been used as a resource handle. In fact, the default
+handle mostly maps the interface of its standard counterpart and only adds a few
+things to it.<br/>
+However, the handle in `EnTT` is designed as a standalone class template named
+`resource`. It boils down to the fact that specializing a class in the standard
+is often undefined behavior while having the ability to specialize the handle
+for one, more or all resource types could help over time.
+
+## Loaders
+
+A loader is a class that is responsible for _loading_ the resources.<br/>
+By default, it's just a callable object which forwards its arguments to the
+resource itself. That is, a _passthrough type_. All the work is demanded to the
+constructor(s) of the resource itself.<br/>
+Loaders also are fully customizable as expected.
+
+A custom loader is a class with at least one function call operator and a member
+type named `result_type`.<br/>
+The loader isn't required to return a resource handle. As long as `return_type`
+is suitable for constructing a handle, that's fine.
+
+When using the default handle, it expects a resource type which is convertible
+to or suitable for constructing an `std::shared_ptr<Type>` (where `Type` is the
+actual resource type).<br/>
+In other terms, the loader should return shared pointers to the given resource
+type. However, it isn't mandatory. Users can easily get around this constraint
+by specializing both the handle and the loader.
+
+A cache forwards all its arguments to the loader if required. This means that
+loaders can also support tag dispatching to offer different loading policies:
 
 ```cpp
-// gets the number of resources managed by a cache
-const auto size = cache.size();
+struct my_loader {
+    using result_type = std::shared_ptr<my_resource>;
 
-// checks if a cache contains at least a valid resource
-const auto empty = cache.empty();
+    struct from_disk_tag{};
+    struct from_network_tag{};
 
-// clears a cache and discards its content
-cache.clear();
+    template<typename Args>
+    result_type operator()(from_disk_tag, Args&&... args) {
+        // ...
+        return std::make_shared<my_resource>(std::forward<Args>(args)...);
+    }
+
+    template<typename Args>
+    result_type operator()(from_network_tag, Args&&... args) {
+        // ...
+        return std::make_shared<my_resource>(std::forward<Args>(args)...);
+    }
+}
 ```
 
-Besides these member functions, a cache contains what is needed to load, use and
-discard resources of the given type.<br/>
-Before exploring this part of the interface, it makes sense to mention how
-resources are identified. They have type `id_type` and therefore they can be
-created explicitly as in the following example:
+This makes the whole loading logic quite flexible and easy to extend over time.
+
+## The cache class
+
+The cache is the class that is asked to _connect the dots_.<br/>
+It loads the resources, store them aside and returns handles as needed:
 
 ```cpp
-constexpr auto identifier = "my/resource/identifier"_hs;
-// this is equivalent to the following
-constexpr entt::id_type hs = entt::hashed_string{"my/resource/identifier"};
+entt::resource_cache<my_resource, my_loader> cache{};
 ```
 
-The class `hashed_string` is described in a dedicated section, so I won't go in
-details here.
-
-Resources are loaded and thus stored in a cache through the `load` member
-function. It accepts the resource identifier and the parameters to use to create
-it:
-
-```cpp
-// uses the identifier declared above
-cache.load(identifier, 0);
-
-// uses a hashed string directly
-cache.load("another/identifier"_hs, 42);
-```
-
-The function returns a resource handle, whether it already exists or is loaded.
-In case the loader returns an invalid pointer, the handle is invalid as well and
-therefore it can be easily used with an `if` statement:
+Under the hood, a cache is nothing more than a map where the key value has type
+`entt::id_type` while the mapped value is whatever type its loader returns.<br/>
+For this reason, it offers most of the functionality a user would expect from a
+map, such as `empty` or `size` and so on. Similarly, it's an iterable type that
+also supports indexing by resource id:
 
 ```cpp
-if(entt::resource_handle handle = cache.load("another/identifier"_hs, 42); handle) {
+for(entt::resource<my_resource> curr: cache) {
+    // ...
+}
+
+if(entt::resource<my_resource> res = cache["resource/id"_hs]; res) {
     // ...
 }
 ```
 
-Before trying to load a resource, the `contains` member function can be used to
-know if a cache already contains a specific resource:
+Please, refer to the inline documentation for all the details about the other
+functions (for example `contains` or `erase`).
+
+Set aside the part of the API that this class shares with a map, it also adds
+something on top of it in order to address the most common requirements of a
+resource cache.<br/>
+In particular, it doesn't have an `emplace` member function which is replaced by
+`load` and `force_load` instead (where the former loads a new resource only if
+not present while the second triggers a forced loading in any case):
 
 ```cpp
-auto exists = cache.contains("my/identifier"_hs);
+auto ret = cache.load("resource/id"_hs);
+
+// true only if the resource was not already present
+const bool loaded = ret.second;
+
+// takes the resource handle pointed to by the returned iterator
+entt::resource<my_resource> res = *ret.first;
 ```
 
-There exists also a member function to use to force a reload of an already
-existing resource if needed:
+Note that the hashed string is used for convenience in the example above.<br/>
+Resource identifiers are nothing more than integral values. Therefore, plain
+numbers as well as non-class enum value are accepted.
 
-```cpp
-auto handle = cache.reload("another/identifier"_hs, 42);
-```
-
-As above, the function returns a resource handle that is invalid in case of
-errors. The `reload` member function is a kind of alias of the following
-snippet:
-
-```cpp
-cache.discard(identifier);
-cache.load(identifier, 42);
-```
-
-Where the `discard` member function is used to get rid of a resource if loaded.
-In case the cache doesn't contain a resource for the given identifier, `discard`
-does nothing and returns immediately.
-
-So far, so good. Resources are finally loaded and stored within the cache.<br/>
-They are returned to users in the form of handles. To get one of them later on:
-
-```cpp
-auto handle = cache.handle("my/identifier"_hs);
-```
-
-The idea behind a handle is the same of the flyweight pattern. In other terms,
-resources aren't copied around. Instead, instances are shared between handles.
-Users of a resource own a handle that guarantees that a resource isn't destroyed
-until all the handles are destroyed, even if the resource itself is removed from
-the cache.<br/>
-Handles are tiny objects both movable and copyable. They return the contained
-resource as a (possibly const) reference on request:
-
-* By means of the `get` member function:
-
-  ```cpp
-  auto &resource = handle.get();
-  ```
-
-* Using the proper cast operator:
-
-  ```cpp
-  auto &resource = handle;
-  ```
-
-* Through the dereference operator:
-
-  ```cpp
-  auto &resource = *handle;
-  ```
-
-The resource can also be accessed directly using the arrow operator if required:
-
-```cpp
-auto value = handle->value;
-```
-
-To test if a handle is still valid, the cast operator to `bool` allows users to
-use it in a guard:
-
-```cpp
-if(handle) {
-    // ...
-}
-```
-
-Finally, in case there is the need to load a resource and thus to get a handle
-without storing the resource itself in the cache, users can rely on the `temp`
-member function template.<br/>
-The declaration is similar to that of `load`, a (possibly invalid) handle for
-the resource is returned also in this case:
-
-```cpp
-if(auto handle = cache.temp(42); handle) {
-    // ...
-}
-```
-
-Do not forget to test the handle for validity. Otherwise, getting a reference to
-the resource it points may result in undefined behavior.
+Moreover, it's worth mentioning that both the iterators of a cache and its
+indexing operators return resource handles rather than instances of the mapped
+type.<br/>
+Since the cache has no control over the loader and a resource isn't required to
+also be convertible to bool, these handles can be invalid. This usually means an
+error in the user logic but it may also be an _expected_ event.<br/>
+It's therefore recommended to verify handles validity with a check in debug (for
+example, when loading) or an appropriate logic in retail.
