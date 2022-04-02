@@ -30,7 +30,8 @@ class resource {
 
 public:
     /*! @brief Default constructor. */
-    resource() ENTT_NOEXCEPT = default;
+    resource() ENTT_NOEXCEPT
+        : value{} {}
 
     /**
      * @brief Creates a handle from a weak pointer, namely a resource.
