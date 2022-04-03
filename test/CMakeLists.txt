@@ -86,6 +86,9 @@ endfunction()
 add_library(odr OBJECT odr.cpp)
 SETUP_TARGET(odr)
 
+add_executable(playground playground.cpp)
+SETUP_TARGET(playground)
+
 function(SETUP_BASIC_TEST TEST_NAME TEST_SOURCES)
     add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCES})
     target_link_libraries(${TEST_NAME} PRIVATE GTest::Main Threads::Threads)

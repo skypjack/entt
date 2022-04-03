@@ -22,6 +22,7 @@
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
+#include "polymorphic.hpp"
 #include "runtime_view.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
@@ -1020,6 +1021,19 @@ public:
         return view<Component...>().template get<Component...>(entity);
     }
 
+    /*! @copydoc get */
+    template<typename Component>
+    [[nodiscard]] std::remove_pointer_t<Component>* poly_get([[maybe_unused]] const entity_type entity) {
+        ENTT_ASSERT(valid(entity), "Invalid entity");
+        for (auto& pool : polymorphic_data.template assure<Component>().child_pools()) {
+            auto* component_ptr = pool.template try_get<Component>(entity);
+            if (component_ptr != nullptr) {
+                return component_ptr;
+            }
+        }
+        return nullptr;
+    }
+
     /**
      * @brief Returns a reference to the given component for an entity.
      *
@@ -1466,12 +1480,21 @@ public:
         return vars;
     }
 
+    auto& poly_data() ENTT_NOEXCEPT {
+        return polymorphic_data;
+    }
+
+    [[nodiscard]] const auto& poly_data() const ENTT_NOEXCEPT {
+        return polymorphic_data;
+    }
+
 private:
     dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
     std::vector<group_data> groups;
     std::vector<entity_type> epool;
     entity_type free_list;
     context vars;
+    poly_type_data<entity_type> polymorphic_data;
 };
 
 } // namespace entt
