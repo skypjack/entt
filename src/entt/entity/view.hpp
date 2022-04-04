@@ -577,9 +577,9 @@ public:
      * @tparam Comp Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
-    template<typename... Comp>
+    template<typename Comp = Component>
     [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
-        static_assert((std::is_same_v<Comp, Component> && ...), "Invalid component type");
+        static_assert(std::is_same_v<Comp, Component>, "Invalid component type");
         return *std::get<0>(pools);
     }
 
