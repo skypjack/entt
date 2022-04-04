@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <functional>
-#include <iterator>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -362,7 +361,7 @@ private:
 template<typename Ret, typename... Args, typename Allocator>
 class sink<sigh<Ret(Args...), Allocator>> {
     using signal_type = sigh<Ret(Args...), Allocator>;
-    using difference_type = typename std::iterator_traits<typename decltype(signal_type::calls)::iterator>::difference_type;
+    using difference_type = typename signal_type::container_type::difference_type;
 
     template<auto Candidate, typename Type>
     static void release(Type value_or_instance, void *signal) {
@@ -406,7 +405,7 @@ public:
         const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
 
         sink other{*this};
-        other.offset = std::distance(it, calls.cend());
+        other.offset = calls.cend() - it;
         return other;
     }
 
@@ -427,7 +426,7 @@ public:
         const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
 
         sink other{*this};
-        other.offset = std::distance(it, calls.cend());
+        other.offset = calls.cend() - it;
         return other;
     }
 
@@ -460,7 +459,7 @@ public:
                 return delegate.data() == value_or_instance;
             });
 
-            other.offset = std::distance(it, calls.cend());
+            other.offset = calls.cend() - it;
         }
 
         return other;
