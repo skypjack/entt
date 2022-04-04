@@ -28,7 +28,7 @@ namespace internal {
 
 template<typename Type, std::size_t Component, std::size_t Exclude>
 class view_iterator final {
-    using iterator_type = typename Type::iterator;
+    using iterator_type = typename Type::const_iterator;
 
     [[nodiscard]] bool valid() const ENTT_NOEXCEPT {
         return ((Component != 0u) || (*it != tombstone))
@@ -37,10 +37,10 @@ class view_iterator final {
     }
 
 public:
-    using difference_type = typename std::iterator_traits<iterator_type>::difference_type;
-    using value_type = typename std::iterator_traits<iterator_type>::value_type;
-    using pointer = typename std::iterator_traits<iterator_type>::pointer;
-    using reference = typename std::iterator_traits<iterator_type>::reference;
+    using value_type = typename iterator_type::value_type;
+    using pointer = typename iterator_type::pointer;
+    using reference = typename iterator_type::reference;
+    using difference_type = typename iterator_type::difference_type;
     using iterator_category = std::forward_iterator_tag;
 
     view_iterator() ENTT_NOEXCEPT = default;
