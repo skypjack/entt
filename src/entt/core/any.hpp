@@ -104,8 +104,8 @@ class basic_any {
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
         if constexpr(!std::is_void_v<Type>) {
+            info = &type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
             vtable = basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
-            info = &type_id<Type>();
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
