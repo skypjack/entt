@@ -32,13 +32,11 @@ class dense_set_iterator final {
     template<typename>
     friend class dense_set_iterator;
 
-    using iterator_traits = std::iterator_traits<decltype(std::addressof(std::as_const(std::declval<It>()->second)))>;
-
 public:
-    using value_type = typename iterator_traits::value_type;
-    using pointer = typename iterator_traits::pointer;
-    using reference = typename iterator_traits::reference;
-    using difference_type = typename iterator_traits::difference_type;
+    using value_type = typename It::value_type::second_type;
+    using pointer = const value_type *;
+    using reference = const value_type &;
+    using difference_type = std::ptrdiff_t;
     using iterator_category = std::random_access_iterator_tag;
 
     dense_set_iterator() ENTT_NOEXCEPT
@@ -152,13 +150,11 @@ class dense_set_local_iterator final {
     template<typename>
     friend class dense_set_local_iterator;
 
-    using iterator_traits = std::iterator_traits<decltype(std::addressof(std::as_const(std::declval<It>()->second)))>;
-
 public:
-    using value_type = typename iterator_traits::value_type;
-    using pointer = typename iterator_traits::pointer;
-    using reference = typename iterator_traits::reference;
-    using difference_type = typename iterator_traits::difference_type;
+    using value_type = typename It::value_type::second_type;
+    using pointer = const value_type *;
+    using reference = const value_type &;
+    using difference_type = std::ptrdiff_t;
     using iterator_category = std::forward_iterator_tag;
 
     dense_set_local_iterator() ENTT_NOEXCEPT
