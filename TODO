@@ -2,12 +2,17 @@
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * add examples (and credits) from @alanjfs :)
 
+EXAMPLES
+* filter on runtime values/variables (not only types)
+* support to polymorphic types (see #859)
+
 WIP:
-* type_id(T &&)
+* view/group: no storage_traits dependency -> use storage instead of components for the definition
+* resource<T>::operator</<=/>/>=
+* simplify emitter (see uvw), runtime events
+* basic_storage::bind for cross-registry setups
 * uses-allocator construction: any (with allocator support), poly, ...
-* get rid of storage_traits class template
 * process scheduler: reviews, use free lists internally
-* runtime events (emitter)
 * iterator based try_emplace vs try_insert for perf reasons
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
 * entity-only and exclude-only views
