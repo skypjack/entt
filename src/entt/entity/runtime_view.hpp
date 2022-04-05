@@ -20,9 +20,9 @@ namespace entt {
 
 namespace internal {
 
-template<typename Type>
+template<typename Set>
 class runtime_view_iterator final {
-    using iterator_type = typename Type::iterator;
+    using iterator_type = typename Set::iterator;
 
     [[nodiscard]] bool valid() const {
         return (!tombstone_check || *it != tombstone)
@@ -43,7 +43,7 @@ public:
           it{},
           tombstone_check{} {}
 
-    runtime_view_iterator(const std::vector<const Type *> &cpools, const std::vector<const Type *> &ignore, iterator_type curr) ENTT_NOEXCEPT
+    runtime_view_iterator(const std::vector<const Set *> &cpools, const std::vector<const Set *> &ignore, iterator_type curr) ENTT_NOEXCEPT
         : pools{&cpools},
           filter{&ignore},
           it{curr},
@@ -90,8 +90,8 @@ public:
     }
 
 private:
-    const std::vector<const Type *> *pools;
-    const std::vector<const Type *> *filter;
+    const std::vector<const Set *> *pools;
+    const std::vector<const Set *> *filter;
     iterator_type it;
     bool tombstone_check;
 };
