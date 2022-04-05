@@ -211,7 +211,7 @@ template<typename Type, typename... Other>
 struct type_list_unique<type_list<Type, Other...>> {
     /*! @brief A type list without duplicate types. */
     using type = std::conditional_t<
-        std::disjunction_v<std::is_same<Type, Other>...>,
+        (std::is_same_v<Type, Other> || ...),
         typename type_list_unique<type_list<Other...>>::type,
         type_list_cat_t<type_list<Type>, typename type_list_unique<type_list<Other...>>::type>>;
 };
