@@ -675,7 +675,7 @@ public:
      * @return Number of elements removed (either 0 or 1).
      */
     size_type erase(const key_type &key) {
-        for(size_type *curr = sparse.first().data() + key_to_bucket(key); *curr != std::numeric_limits<size_type>::max(); curr = &packed.first()[*curr].next) {
+        for(size_type *curr = sparse.first().data() + key_to_bucket(key); *curr != (std::numeric_limits<size_type>::max)(); curr = &packed.first()[*curr].next) {
             if(packed.second()(packed.first()[*curr].element.first, key)) {
                 const auto index = *curr;
                 *curr = packed.first()[*curr].next;
@@ -825,7 +825,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] const_local_iterator cend([[maybe_unused]] const size_type index) const {
-        return {packed.first().data(), std::numeric_limits<size_type>::max()};
+        return {packed.first().data(), (std::numeric_limits<size_type>::max)()};
     }
 
     /**
@@ -843,7 +843,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] local_iterator end([[maybe_unused]] const size_type index) {
-        return {packed.first().data(), std::numeric_limits<size_type>::max()};
+        return {packed.first().data(), (std::numeric_limits<size_type>::max)()};
     }
 
     /**
@@ -917,7 +917,7 @@ public:
 
         if(const auto sz = next_power_of_two(value); sz != bucket_count()) {
             sparse.first().resize(sz);
-            std::fill(sparse.first().begin(), sparse.first().end(), std::numeric_limits<size_type>::max());
+            std::fill(sparse.first().begin(), sparse.first().end(), (std::numeric_limits<size_type>::max)());
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
                 const auto index = key_to_bucket(packed.first()[pos].element.first);
