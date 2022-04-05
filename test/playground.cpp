@@ -9,14 +9,26 @@ template<>
 struct entt::poly_parent_types<shape> {
     using parent_types = type_list<>;
 };
-
 struct circle: public entt::inherit<shape> { void draw() const override { std::cout << "circle"; } };
 struct rectangle: public entt::inherit<shape> { void draw() const override { std::cout << "rectangle"; } };
 
-struct animal: public entt::inherit<> { virtual void name() const = 0; };
-struct cat: public entt::inherit<animal> { void name() const override { std::cout << "cat"; } };
-struct dog: public entt::inherit<animal> { void name() const override { std::cout << "dog"; } };
 
+struct animal { virtual void name() const = 0; };
+struct cat: public animal { void name() const override { std::cout << "cat"; } };
+struct dog: public animal { void name() const override { std::cout << "dog"; } };
+
+template<>
+struct entt::poly_parent_types<animal*> {
+    using parent_types = type_list<>;
+};
+template<>
+struct entt::poly_parent_types<cat*> {
+    using parent_types = type_list<animal*>;
+};
+template<>
+struct entt::poly_parent_types<dog*> {
+    using parent_types = type_list<animal*>;
+};
 
 int main() {
     entt::registry registry;
@@ -25,26 +37,38 @@ int main() {
 
     registry.emplace<circle>(entity);
     registry.emplace<rectangle>(entity);
-    registry.emplace<cat>(entity);
+    registry.emplace<cat*>(entity, new cat);
 
     registry.emplace<circle>(other);
-    registry.emplace<dog>(other);
+    registry.emplace<dog*>(other, new dog);
 
-    for (auto& pool : registry.poly_data().assure<shape>().pools())
-    {
-        for (auto ent : pool.pool()) {
-            std::cout << entt::to_entity(ent) << " -> ";
-            pool.try_get(ent)->draw();
-            std::cout << '\n';
-        }
-    }
+    std::cout << "\nall shapes\n";
+    registry.each_poly<shape>([](auto ent, auto& s) {
+        std::cout << entt::to_entity(ent) << " -> ";
+        s.draw();
+        std::cout << '\n';
+    });
 
     std::cout << "\nall shapes for entity " << entt::to_entity(entity) << "\n";
-    for (shape& shape : registry.poly_get_all<shape>(entity)) {
-        shape.draw();
+    for (shape& s : registry.poly_get_all<shape>(entity)) {
+        s.draw();
         std::cout << '\n';
     }
+
     std::cout << "any shape for entity " << entt::to_entity(entity) << " ";
     registry.poly_get_any<shape>(entity)->draw();
     std::cout << '\n';
+
+    std::cout << "\nall animals\n";
+    registry.each_poly<animal*>([](auto ent, auto* a) {
+        std::cout << entt::to_entity(ent) << " -> ";
+        a->name();
+        std::cout << '\n';
+    });
+
+    std::cout << "\nall animals for entity " << entt::to_entity(entity) << "\n";
+    for (animal* a : registry.poly_get_all<animal*>(entity)) {
+        a->name();
+        std::cout << '\n';
+    }
 }

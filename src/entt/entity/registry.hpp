@@ -1029,6 +1029,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] decltype(auto) poly_get_all([[maybe_unused]] const entity_type entity) {
+        ENTT_ASSERT(valid(entity), "Invalid entity");
         return polymorphic_data.template assure<Component>().each(entity);
     }
 
@@ -1036,12 +1037,45 @@ public:
      * @brief For given polymorphic component type find and return any child instance of this type, attached to a given entity
      * @tparam Component Polymorphic component type
      * @param entity Entity, to get components from
-     * @return Pointer to attached component or nullptr, if none attached. NOTE: will return pointer typed polymorphic components by value (as a single pointer)
+     * @return Pointer to attached component or nullptr, if none attached. NOTE: will return pointer type polymorphic components by value (as a single pointer)
      */
     template<typename Component>
     [[nodiscard]] decltype(auto) poly_get_any([[maybe_unused]] const entity_type entity) {
         auto all = poly_get_all<Component>(entity);
         return all.begin() != all.end() ? all.begin().operator->() : nullptr;
+    }
+
+    /**
+     * @brief For a given component type applies given func to all child instances of this type in registry.
+     * @tparam Component polymorphic component type
+     * @tparam Func type of given function
+     * @param func function to call for each component, parameters are (entity, component&) or only one of them, or even none. Note: for pointer type components the component parameter is a value instead of value (single pointer)
+     */
+    template<typename Component, typename Func>
+    void each_poly(Func func) {
+        for (auto& pool : polymorphic_data.template assure<Component>().pools()) {
+            for (auto& ent : pool.pool()) {
+                if constexpr(std::is_invocable_v<Func, entity_type, Component&>) {
+                    auto ptr = pool.try_get(ent);
+                    if constexpr(std::is_pointer_v<Component>) {
+                        func(ent, ptr);
+                    } else {
+                        func(ent, *ptr);
+                    }
+                } else if constexpr(std::is_invocable_v<Func, Component&>) {
+                    auto ptr = pool.try_get(ent);
+                    if constexpr(std::is_pointer_v<Component>) {
+                        func(ptr);
+                    } else {
+                        func(*ptr);
+                    }
+                } else if constexpr(std::is_invocable_v<Func, entity_type>) {
+                    func(ent);
+                } else {
+                    func();
+                }
+            }
+        }
     }
 
     /**
@@ -1490,10 +1524,15 @@ public:
         return vars;
     }
 
+    /**
+     * @brief Returns entt::poly_type_data object, that holds all information about polymorphic types in this registry
+     * @return object, that holds information about all polymorphic types in this registry
+     */
     auto& poly_data() ENTT_NOEXCEPT {
         return polymorphic_data;
     }
 
+    /** @copydoc poly_data */
     [[nodiscard]] const auto& poly_data() const ENTT_NOEXCEPT {
         return polymorphic_data;
     }
