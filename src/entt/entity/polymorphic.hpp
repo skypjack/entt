@@ -276,7 +276,7 @@ struct poly_any {
 };
 
 
-/** @brief private base class for entt::poly_pool_holder */
+/** @brief base class for entt::poly_pool_holder */
 template<typename Entity>
 class poly_pool_holder_base {
 public:
@@ -288,7 +288,7 @@ protected:
     void* (*getter_ptr)(void*, Entity) ENTT_NOEXCEPT;
 };
 
-/** @brief private base class for entt::poly_type */
+/** @brief base class for entt::poly_type */
 template<typename Entity>
 class poly_type_base {
 protected:
@@ -307,8 +307,11 @@ class poly_pool_holder : public poly_pool_holder_base<Entity> {
 public:
     using poly_pool_holder_base<Entity>::poly_pool_holder_base;
 
+    /** @brief entity type of the component pools */
     using entity_type = Entity;
+    /** @brief component type */
     using value_type = Type;
+    /** @brief pointer to the component, will be same as value_type, if component itself is a pointer */
     using pointer_type = std::remove_pointer_t<Type>*;
 
     /**
@@ -320,10 +323,12 @@ public:
         return pointer_type(this->getter_ptr(this->pool_ptr, ent));
     }
 
+    /** @brief returns underlying pool */
     inline auto& pool() ENTT_NOEXCEPT {
         return *this->pool_ptr;
     }
 
+    /** @copydoc pool */
     inline const auto& pool() const ENTT_NOEXCEPT {
         return *this->pool_ptr;
     }
@@ -342,10 +347,15 @@ class poly_type : public poly_type_base<Entity> {
     };
 
 public:
+    /** @brief entity type of the component pools */
     using entity_type = Entity;
+    /** @brief component type */
     using value_type = Type;
+    /** @brief type of the underlying pool container */
     using pools_container = typename poly_type_base<Entity>::child_pools_container;
+    /** @brief pool iterator type */
     using pools_iterator = internal::converting_iterator<cast_pool_holder, typename pools_container::iterator>;
+    /** @brief single entity component iterator type */
     using component_iterator = internal::poly_components_iterator<value_type, pools_iterator>;
 
     /**
