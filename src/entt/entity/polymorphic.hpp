@@ -5,6 +5,11 @@
 #include "../core/type_traits.hpp"
 
 
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace entt::internal {
 
 template<typename Convert, typename It>
@@ -62,7 +67,7 @@ private:
 };
 
 
-template<typename Type, typename PoolsIterator>
+template<typename PoolsIterator>
 class poly_components_iterator {
     using iterator_traits = typename std::iterator_traits<PoolsIterator>;
     using pool_holder_type = typename iterator_traits::value_type;
@@ -130,8 +135,12 @@ private:
     pointer current = nullptr;
 };
 
-
 } // namespace entt::internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 
 namespace entt {
@@ -340,9 +349,14 @@ public:
  */
 template<typename Entity, typename Type>
 class poly_type : public poly_type_base<Entity> {
+    /** @brief internally used to convert base_poly_pool_holder to a pool_poly_holder<Entity, Type> during the iteration */
     struct cast_pool_holder {
-        poly_pool_holder<Entity, Type>& operator()(poly_pool_holder_base<Entity>& holder) {
+        auto& operator()(poly_pool_holder_base<Entity>& holder) {
             return static_cast<poly_pool_holder<Entity, Type>&>(holder);
+        }
+
+        const auto& operator()(const poly_pool_holder_base<Entity>& holder) const {
+            return static_cast<const poly_pool_holder<Entity, Type>&>(holder);
         }
     };
 
@@ -355,8 +369,12 @@ public:
     using pools_container = typename poly_type_base<Entity>::child_pools_container;
     /** @brief pool iterator type */
     using pools_iterator = internal::converting_iterator<cast_pool_holder, typename pools_container::iterator>;
+    /** @brief const pool iterator type */
+    using const_pools_iterator = internal::converting_iterator<const cast_pool_holder, typename pools_container::iterator>;
     /** @brief single entity component iterator type */
-    using component_iterator = internal::poly_components_iterator<value_type, pools_iterator>;
+    using component_iterator = internal::poly_components_iterator<pools_iterator>;
+    /** @brief const single entity component iterator type */
+    using const_component_iterator = internal::poly_components_iterator<const_pools_iterator>;
 
     /**
      * @brief From a given set, makes a poly_storage_holder to hold child type and convert to parent type.
@@ -401,19 +419,34 @@ public:
         return poly_pool_holder<Entity, Type>(pool_ptr, get);
     }
 
+    /** @brief adds given storage pointer as a child type pool to this polymorphic type */
     template<typename Storage>
     void bind_child_storage(Storage* storage_ptr) {
         this->child_pool_holders.emplace_back(make_pool_holder(storage_ptr));
     }
 
-    iterable_adaptor<pools_iterator> pools() {
+    /** @brief returns an iterable to iterate through all pool holders */
+    [[nodiscard]] iterable_adaptor<pools_iterator> pools() {
         return { pools_iterator(this->child_pool_holders.begin()), pools_iterator(this->child_pool_holders.end()) };
     }
 
-    iterable_adaptor<component_iterator> each(const entity_type ent) {
+    /** @copydoc pools */
+    [[nodiscard]] iterable_adaptor<const_pools_iterator> pools() const {
+        return { const_pools_iterator(this->child_pool_holders.begin()), const_pools_iterator(this->child_pool_holders.end()) };
+    }
+
+    /** @brief returns an iterable to iterate through all polymorphic components, derived from this type, attached to a given entities */
+    [[nodiscard]] iterable_adaptor<component_iterator> each(const entity_type ent) {
         auto begin = pools_iterator(this->child_pool_holders.begin());
         auto end = pools_iterator(this->child_pool_holders.end());
         return { component_iterator(ent, begin, end), component_iterator(ent, end, end) };
+    }
+
+    /** @copydoc each */
+    [[nodiscard]] iterable_adaptor<const_component_iterator> each(const entity_type ent) const {
+        auto begin = const_pools_iterator(this->child_pool_holders.begin());
+        auto end = const_pools_iterator(this->child_pool_holders.end());
+        return { const_component_iterator(ent, begin, end), const_component_iterator(ent, end, end) };
     }
 };
 
@@ -431,14 +464,30 @@ struct poly_types_data {
         return types[id];
     }
 
+    /** @copydoc assure */
+    inline const auto& assure(const id_type id) const {
+        if(const auto it = types.find(id); it != types.cend()) {
+            return static_cast<const poly_type_base<Entity> &>(*it->second);
+        }
+        static poly_type_base<Entity> placeholder{};
+        return placeholder;
+    }
+
     /**
      * @tparam Type polymorphic type
      * @return poly_type for given type
      */
     template<typename Type>
     inline auto& assure() {
-        static_assert(is_poly_type_v<Type>);
-        return static_cast<poly_type<Entity, Type>&>(assure(type_id<Type>().hash()));
+        static_assert(is_poly_type_v<std::remove_const_t<Type>>);
+        return static_cast<poly_type<Entity, Type>&>(assure(type_id<std::remove_const_t<Type>>().hash()));
+    }
+
+    /** @copydoc assure */
+    template<typename Type>
+    inline const auto& assure() const {
+        static_assert(is_poly_type_v<std::remove_const_t<Type>>);
+        return static_cast<const poly_type<Entity, Type>&>(assure(type_id<std::remove_const_t<Type>>().hash()));
     }
 private:
     dense_map<id_type, poly_type_base<Entity>, identity> types{};

@@ -4,13 +4,13 @@
 #include <entt/entity/polymorphic.hpp>
 
 
-struct shape { virtual void draw() const = 0; };
+struct shape { virtual void draw() = 0; };
 template<>
 struct entt::poly_parent_types<shape> {
     using parent_types = type_list<>;
 };
-struct circle: public entt::inherit<shape> { void draw() const override { std::cout << "circle"; } };
-struct rectangle: public entt::inherit<shape> { void draw() const override { std::cout << "rectangle"; } };
+struct circle: public entt::inherit<shape> { void draw() override { std::cout << "circle"; } };
+struct rectangle: public entt::inherit<shape> { void draw() override { std::cout << "rectangle"; } };
 
 
 struct animal { virtual void name() const = 0; };
