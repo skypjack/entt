@@ -14,7 +14,7 @@ namespace entt::internal {
 
 template<typename Convert, typename It>
 struct converting_iterator {
-    using value_type = std::decay_t<decltype(std::declval<Convert>()(*std::declval<It>()))>;
+    using value_type = std::remove_reference_t<decltype(std::declval<Convert>()(*std::declval<It>()))>;
     using reference = value_type&;
     using pointer = value_type*;
     using difference_type = typename It::difference_type;
@@ -74,9 +74,9 @@ class poly_components_iterator {
 
 public:
     using entity_type = typename pool_holder_type::entity_type;
-    using value_type = typename pool_holder_type::value_type;
-    using pointer = typename pool_holder_type::pointer_type;
-    using reference = std::conditional_t<std::is_pointer_v<value_type>, value_type, value_type&>;
+    using pointer = std::conditional_t<std::is_const_v<pool_holder_type>, typename pool_holder_type::const_pointer_type, typename pool_holder_type::pointer_type>;
+    using value_type = std::conditional_t<std::is_pointer_v<typename pool_holder_type::value_type>, pointer, constness_as_t<typename pool_holder_type::value_type, pool_holder_type>>;
+    using reference = std::conditional_t<std::is_pointer_v<typename pool_holder_type::value_type>, pointer, value_type&>;
     using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::forward_iterator_tag;
 
@@ -85,7 +85,7 @@ public:
     poly_components_iterator(entity_type e, PoolsIterator pos, PoolsIterator last) ENTT_NOEXCEPT :
         ent(e), it(pos), end(last) {
         if (it != end) {
-            current = it->template try_get(ent);
+            current = it->try_get(ent);
             if(current == nullptr) {
                 ++(*this);
             }
@@ -95,7 +95,7 @@ public:
     poly_components_iterator &operator++() ENTT_NOEXCEPT {
         ++it;
         while (it != end) {
-            current = it->template try_get(ent);
+            current = it->try_get(ent);
             if (current != nullptr)
                 break;
             ++it;
@@ -322,6 +322,8 @@ public:
     using value_type = Type;
     /** @brief pointer to the component, will be same as value_type, if component itself is a pointer */
     using pointer_type = std::remove_pointer_t<Type>*;
+    /** @copydoc pointer_type */
+    using const_pointer_type = const std::remove_pointer_t<Type>*;
 
     /**
      * @brief gets child from a child pool as parent type reference by given entity
@@ -330,6 +332,11 @@ public:
      */
     inline pointer_type try_get(const Entity ent) ENTT_NOEXCEPT {
         return pointer_type(this->getter_ptr(this->pool_ptr, ent));
+    }
+
+    /** @copydoc try_get */
+    inline const_pointer_type try_get(const Entity ent) const ENTT_NOEXCEPT {
+        return const_cast<poly_pool_holder<Entity, Type>*>(this)->try_get(ent);
     }
 
     /** @brief returns underlying pool */
@@ -370,7 +377,7 @@ public:
     /** @brief pool iterator type */
     using pools_iterator = internal::converting_iterator<cast_pool_holder, typename pools_container::iterator>;
     /** @brief const pool iterator type */
-    using const_pools_iterator = internal::converting_iterator<const cast_pool_holder, typename pools_container::iterator>;
+    using const_pools_iterator = internal::converting_iterator<const cast_pool_holder, typename pools_container::const_iterator>;
     /** @brief single entity component iterator type */
     using component_iterator = internal::poly_components_iterator<pools_iterator>;
     /** @brief const single entity component iterator type */
@@ -432,7 +439,7 @@ public:
 
     /** @copydoc pools */
     [[nodiscard]] iterable_adaptor<const_pools_iterator> pools() const {
-        return { const_pools_iterator(this->child_pool_holders.begin()), const_pools_iterator(this->child_pool_holders.end()) };
+        return { const_pools_iterator(this->child_pool_holders.cbegin()), const_pools_iterator(this->child_pool_holders.cend()) };
     }
 
     /** @brief returns an iterable to iterate through all polymorphic components, derived from this type, attached to a given entities */
@@ -444,8 +451,8 @@ public:
 
     /** @copydoc each */
     [[nodiscard]] iterable_adaptor<const_component_iterator> each(const entity_type ent) const {
-        auto begin = const_pools_iterator(this->child_pool_holders.begin());
-        auto end = const_pools_iterator(this->child_pool_holders.end());
+        auto begin = const_pools_iterator(this->child_pool_holders.cbegin());
+        auto end = const_pools_iterator(this->child_pool_holders.cend());
         return { const_component_iterator(ent, begin, end), const_component_iterator(ent, end, end) };
     }
 };
@@ -455,7 +462,16 @@ public:
  * @tparam Entity
  */
 template<typename Entity>
-struct poly_types_data {
+class poly_types_data {
+    /**
+     * @brief converts const T* to T* const, used in assert,
+     * because first one looks much more intuitive, when the second is identical to const T for value types, but for pointers
+     */
+    template<typename T>
+    using sanitize_poly_type_t = std::conditional_t<std::is_pointer_v<T>,
+        constness_as_t<std::remove_const_t<std::remove_pointer_t<T>>*, std::remove_pointer_t<T>>, T>;
+
+public:
     /**
      * @param id type id of polymorphic type
      * @return poly_type for given type id
@@ -474,20 +490,23 @@ struct poly_types_data {
     }
 
     /**
-     * @tparam Type polymorphic type
+     * @tparam T polymorphic type
      * @return poly_type for given type
      */
-    template<typename Type>
-    inline auto& assure() {
-        static_assert(is_poly_type_v<std::remove_const_t<Type>>);
-        return static_cast<poly_type<Entity, Type>&>(assure(type_id<std::remove_const_t<Type>>().hash()));
+    template<typename T>
+    inline decltype(auto) assure() {
+        using type = sanitize_poly_type_t<T>;
+        using no_const_type = std::remove_const_t<type>;
+        static_assert(is_poly_type_v<no_const_type>);
+        return static_cast<constness_as_t<poly_type<Entity, no_const_type>, type>&>(assure(type_id<no_const_type>().hash()));
     }
 
     /** @copydoc assure */
-    template<typename Type>
+    template<typename T>
     inline const auto& assure() const {
-        static_assert(is_poly_type_v<std::remove_const_t<Type>>);
-        return static_cast<const poly_type<Entity, Type>&>(assure(type_id<std::remove_const_t<Type>>().hash()));
+        using no_const_type = std::remove_const_t<sanitize_poly_type_t<T>>;
+        static_assert(is_poly_type_v<no_const_type>);
+        return static_cast<const poly_type<Entity, no_const_type>&>(assure(type_id<no_const_type>().hash()));
     }
 private:
     dense_map<id_type, poly_type_base<Entity>, identity> types{};

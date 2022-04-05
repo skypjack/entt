@@ -43,14 +43,14 @@ int main() {
     registry.emplace<dog*>(other, new dog);
 
     std::cout << "\nall shapes\n";
-    registry.each_poly<shape>([](auto ent, auto& s) {
+    registry.each_poly<const shape>([](auto ent, auto& s) {
         std::cout << entt::to_entity(ent) << " -> ";
-        s.draw();
+        // s.draw();
         std::cout << '\n';
     });
 
     std::cout << "\nall shapes for entity " << entt::to_entity(entity) << "\n";
-    for (shape& s : registry.poly_get_all<shape>(entity)) {
+    for ( shape& s : registry.poly_get_all< shape>(entity)) {
         s.draw();
         std::cout << '\n';
     }
@@ -60,14 +60,14 @@ int main() {
     std::cout << '\n';
 
     std::cout << "\nall animals\n";
-    registry.each_poly<animal*>([](auto ent, auto* a) {
+    registry.each_poly<const animal*>([](auto ent, const animal* a) {
         std::cout << entt::to_entity(ent) << " -> ";
         a->name();
         std::cout << '\n';
     });
 
     std::cout << "\nall animals for entity " << entt::to_entity(entity) << "\n";
-    for (animal* a : registry.poly_get_all<animal*>(entity)) {
+    for (const animal* a : registry.poly_get_all<const animal*>(entity)) {
         a->name();
         std::cout << '\n';
     }
