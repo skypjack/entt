@@ -422,7 +422,7 @@ public:
  * @tparam Entity
  */
 template<typename Entity>
-struct poly_type_data {
+struct poly_types_data {
     /**
      * @param id type id of polymorphic type
      * @return poly_type for given type id

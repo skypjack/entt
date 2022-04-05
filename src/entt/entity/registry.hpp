@@ -1525,7 +1525,7 @@ public:
     }
 
     /**
-     * @brief Returns entt::poly_type_data object, that holds all information about polymorphic types in this registry
+     * @brief Returns entt::poly_types_data object, that holds all information about polymorphic types in this registry
      * @return object, that holds information about all polymorphic types in this registry
      */
     auto& poly_data() ENTT_NOEXCEPT {
@@ -1543,7 +1543,7 @@ private:
     std::vector<entity_type> epool;
     entity_type free_list;
     context vars;
-    poly_type_data<entity_type> polymorphic_data;
+    poly_types_data<entity_type> polymorphic_data;
 };
 
 } // namespace entt
