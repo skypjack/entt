@@ -1021,17 +1021,27 @@ public:
         return view<Component...>().template get<Component...>(entity);
     }
 
-    /*! @copydoc get */
+    /**
+     * @brief For given polymorphic component type iterate over all child instances of it, attached to a given entity
+     * @tparam Component Polymorphic component type
+     * @param entity Entity, to get components from
+     * @return Iterable to iterate each component
+     */
     template<typename Component>
-    [[nodiscard]] std::remove_pointer_t<Component>* poly_get([[maybe_unused]] const entity_type entity) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        for (auto& pool : polymorphic_data.template assure<Component>().child_pools()) {
-            auto* component_ptr = pool.template try_get<Component>(entity);
-            if (component_ptr != nullptr) {
-                return component_ptr;
-            }
-        }
-        return nullptr;
+    [[nodiscard]] decltype(auto) poly_get_all([[maybe_unused]] const entity_type entity) {
+        return polymorphic_data.template assure<Component>().each(entity);
+    }
+
+    /**
+     * @brief For given polymorphic component type find and return any child instance of this type, attached to a given entity
+     * @tparam Component Polymorphic component type
+     * @param entity Entity, to get components from
+     * @return Pointer to attached component or nullptr, if none attached. NOTE: will return pointer typed polymorphic components by value (as a single pointer)
+     */
+    template<typename Component>
+    [[nodiscard]] decltype(auto) poly_get_any([[maybe_unused]] const entity_type entity) {
+        auto all = poly_get_all<Component>(entity);
+        return all.begin() != all.end() ? all.begin().operator->() : nullptr;
     }
 
     /**
