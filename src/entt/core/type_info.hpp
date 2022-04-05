@@ -262,6 +262,12 @@ template<typename Type>
     }
 }
 
+/*! @copydoc type_id */
+template<typename Type>
+[[nodiscard]] const type_info &type_id(Type &&) ENTT_NOEXCEPT {
+    return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
+}
+
 } // namespace entt
 
 #endif

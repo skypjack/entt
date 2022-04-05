@@ -48,6 +48,11 @@ TEST(TypeInfo, Functionalities) {
     static_assert(std::is_copy_assignable_v<entt::type_info>);
     static_assert(std::is_move_assignable_v<entt::type_info>);
 
+    const int value = 42;
+
+    ASSERT_EQ(entt::type_id(value), entt::type_id<int>());
+    ASSERT_EQ(entt::type_id(42), entt::type_id<int>());
+
     ASSERT_EQ(entt::type_id<int>(), entt::type_id<int>());
     ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int &&>());
     ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int>());
