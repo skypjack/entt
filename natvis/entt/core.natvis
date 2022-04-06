@@ -23,7 +23,8 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::type_info">
-		<DisplayString>{{ name={ alias,na } }}</DisplayString>
+		<DisplayString Condition="seq != 0u">{{ name={ alias,na } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[hash]">identifier</Item>
 			<Item Name="[index]">seq</Item>
