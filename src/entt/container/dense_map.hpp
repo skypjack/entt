@@ -58,7 +58,8 @@ struct dense_map_node final {
 
 template<typename It>
 class dense_map_iterator final {
-    friend dense_map_iterator<const std::remove_pointer_t<It> *>;
+    template<typename>
+    friend class dense_map_iterator;
 
     using first_type = decltype(std::as_const(std::declval<It>()->element.first));
     using second_type = decltype((std::declval<It>()->element.second));
@@ -70,13 +71,14 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    dense_map_iterator() ENTT_NOEXCEPT = default;
+    dense_map_iterator() ENTT_NOEXCEPT
+        : it{} {}
 
     dense_map_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}
 
-    template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
-    dense_map_iterator(const dense_map_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other) ENTT_NOEXCEPT
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    dense_map_iterator(const dense_map_iterator<Other> &other) ENTT_NOEXCEPT
         : it{other.it} {}
 
     dense_map_iterator &operator++() ENTT_NOEXCEPT {
@@ -177,7 +179,8 @@ template<typename ILhs, typename IRhs>
 
 template<typename It>
 class dense_map_local_iterator final {
-    friend dense_map_local_iterator<const std::remove_pointer_t<It> *>;
+    template<typename>
+    friend class dense_map_local_iterator;
 
     using first_type = decltype(std::as_const(std::declval<It>()->element.first));
     using second_type = decltype((std::declval<It>()->element.second));
@@ -189,14 +192,16 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    dense_map_local_iterator() ENTT_NOEXCEPT = default;
+    dense_map_local_iterator() ENTT_NOEXCEPT
+        : it{},
+          offset{} {}
 
     dense_map_local_iterator(It iter, const std::size_t pos) ENTT_NOEXCEPT
         : it{iter},
           offset{pos} {}
 
-    template<bool Const = std::is_const_v<std::remove_pointer_t<It>>, typename = std::enable_if_t<Const>>
-    dense_map_local_iterator(const dense_map_local_iterator<std::remove_const_t<std::remove_pointer_t<It>> *> &other) ENTT_NOEXCEPT
+    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    dense_map_local_iterator(const dense_map_local_iterator<Other> &other) ENTT_NOEXCEPT
         : it{other.it},
           offset{other.offset} {}
 
@@ -302,8 +307,8 @@ class dense_map {
             return std::make_pair(it, false);
         }
 
-        const auto next = std::exchange(sparse.first()[index], packed.first().size());
-        packed.first().emplace_back(next, std::piecewise_construct, std::forward_as_tuple(std::forward<Other>(key)), std::forward_as_tuple(std::forward<Args>(args)...));
+        packed.first().emplace_back(sparse.first()[index], std::piecewise_construct, std::forward_as_tuple(std::forward<Other>(key)), std::forward_as_tuple(std::forward<Args>(args)...));
+        sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
         return std::make_pair(--end(), true);
@@ -318,8 +323,8 @@ class dense_map {
             return std::make_pair(it, false);
         }
 
-        const auto next = std::exchange(sparse.first()[index], packed.first().size());
-        packed.first().emplace_back(next, std::forward<Other>(key), std::forward<Arg>(value));
+        packed.first().emplace_back(sparse.first()[index], std::forward<Other>(key), std::forward<Arg>(value));
+        sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
         return std::make_pair(--end(), true);
@@ -357,14 +362,14 @@ public:
     using key_equal = KeyEqual;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
-    /*! @brief Random access iterator type. */
-    using iterator = internal::dense_map_iterator<typename packed_container_type::pointer>;
-    /*! @brief Constant random access iterator type. */
-    using const_iterator = internal::dense_map_iterator<typename packed_container_type::const_pointer>;
-    /*! @brief Forward iterator type. */
-    using local_iterator = internal::dense_map_local_iterator<typename packed_container_type::pointer>;
-    /*! @brief Constant forward iterator type. */
-    using const_local_iterator = internal::dense_map_local_iterator<typename packed_container_type::const_pointer>;
+    /*! @brief Input iterator type. */
+    using iterator = internal::dense_map_iterator<typename packed_container_type::iterator>;
+    /*! @brief Constant input iterator type. */
+    using const_iterator = internal::dense_map_iterator<typename packed_container_type::const_iterator>;
+    /*! @brief Input iterator type. */
+    using local_iterator = internal::dense_map_local_iterator<typename packed_container_type::iterator>;
+    /*! @brief Constant input iterator type. */
+    using const_local_iterator = internal::dense_map_local_iterator<typename packed_container_type::const_iterator>;
 
     /*! @brief Default constructor. */
     dense_map()
@@ -404,7 +409,7 @@ public:
      * @param equal Compare function to use.
      * @param allocator The allocator to use.
      */
-    explicit dense_map(const size_type bucket_count, const hasher &hash = hasher{}, const key_equal &equal = key_equal{}, const allocator_type &allocator = allocator_type())
+    explicit dense_map(const size_type bucket_count, const hasher &hash = hasher{}, const key_equal &equal = key_equal{}, const allocator_type &allocator = allocator_type{})
         : sparse{allocator, hash},
           packed{allocator, equal},
           threshold{default_threshold} {
@@ -466,7 +471,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
-        return packed.first().data();
+        return packed.first().begin();
     }
 
     /*! @copydoc cbegin */
@@ -476,7 +481,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
-        return packed.first().data();
+        return packed.first().begin();
     }
 
     /**
@@ -490,7 +495,7 @@ public:
      * internal array.
      */
     [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
-        return packed.first().data() + size();
+        return packed.first().end();
     }
 
     /*! @copydoc cend */
@@ -500,7 +505,7 @@ public:
 
     /*! @copydoc end */
     [[nodiscard]] iterator end() ENTT_NOEXCEPT {
-        return packed.first().data() + size();
+        return packed.first().end();
     }
 
     /**
@@ -662,11 +667,13 @@ public:
      * @return An iterator following the last removed element.
      */
     iterator erase(const_iterator first, const_iterator last) {
-        for(; last != first; --last) {
-            erase((last - 1u)->first);
+        const auto dist = first - cbegin();
+
+        for(auto from = last - cbegin(); from != dist; --from) {
+            erase(packed.first()[from - 1u].element.first);
         }
 
-        return (begin() + (last - cbegin()));
+        return (begin() + dist);
     }
 
     /**
@@ -703,14 +710,14 @@ public:
      * @param key A key of an element to find.
      * @return A reference to the mapped value of the requested element.
      */
-    [[nodiscard]] Type &at(const key_type &key) {
+    [[nodiscard]] mapped_type &at(const key_type &key) {
         auto it = find(key);
         ENTT_ASSERT(it != end(), "Invalid key");
         return it->second;
     }
 
     /*! @copydoc at */
-    [[nodiscard]] const Type &at(const key_type &key) const {
+    [[nodiscard]] const mapped_type &at(const key_type &key) const {
         auto it = find(key);
         ENTT_ASSERT(it != cend(), "Invalid key");
         return it->second;
@@ -721,7 +728,7 @@ public:
      * @param key A key of an element to find or insert.
      * @return A reference to the mapped value of the requested element.
      */
-    [[nodiscard]] Type &operator[](const key_type &key) {
+    [[nodiscard]] mapped_type &operator[](const key_type &key) {
         return insert_or_do_nothing(key).first->second;
     }
 
@@ -730,7 +737,7 @@ public:
      * @param key A key of an element to find or insert.
      * @return A reference to the mapped value of the requested element.
      */
-    [[nodiscard]] Type &operator[](key_type &&key) {
+    [[nodiscard]] mapped_type &operator[](key_type &&key) {
         return insert_or_do_nothing(std::move(key)).first->second;
     }
 
@@ -798,7 +805,7 @@ public:
      * @return An iterator to the beginning of the given bucket.
      */
     [[nodiscard]] const_local_iterator cbegin(const size_type index) const {
-        return {packed.first().data(), sparse.first()[index]};
+        return {packed.first().begin(), sparse.first()[index]};
     }
 
     /**
@@ -816,7 +823,7 @@ public:
      * @return An iterator to the beginning of the given bucket.
      */
     [[nodiscard]] local_iterator begin(const size_type index) {
-        return {packed.first().data(), sparse.first()[index]};
+        return {packed.first().begin(), sparse.first()[index]};
     }
 
     /**
@@ -825,7 +832,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] const_local_iterator cend([[maybe_unused]] const size_type index) const {
-        return {packed.first().data(), (std::numeric_limits<size_type>::max)()};
+        return {packed.first().begin(), (std::numeric_limits<size_type>::max)()};
     }
 
     /**
@@ -843,7 +850,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] local_iterator end([[maybe_unused]] const size_type index) {
-        return {packed.first().data(), (std::numeric_limits<size_type>::max)()};
+        return {packed.first().begin(), (std::numeric_limits<size_type>::max)()};
     }
 
     /**

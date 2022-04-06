@@ -103,7 +103,7 @@ TEST(DenseSet, Constructors) {
     entt::dense_set<int> temp{set, set.get_allocator()};
     entt::dense_set<int> other{std::move(temp), set.get_allocator()};
 
-    ASSERT_EQ(other.size(), 1u);
+    ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(set.bucket_count(), 4u * minimum_bucket_count);
     ASSERT_EQ(other.bucket_count(), 4u * minimum_bucket_count);
@@ -832,6 +832,21 @@ TEST(DenseSet, ThrowingAllocator) {
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
     ASSERT_THROW(set.reserve(2u * set.bucket_count()), packed_exception);
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(set.emplace(), packed_exception);
+    ASSERT_FALSE(set.contains(0u));
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(set.emplace(std::size_t{}), packed_exception);
+    ASSERT_FALSE(set.contains(0u));
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(set.insert(0u), packed_exception);
+    ASSERT_FALSE(set.contains(0u));
 }
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)

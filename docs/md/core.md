@@ -559,14 +559,23 @@ require to enable RTTI.<br/>
 Therefore, they can sometimes be even more reliable than those obtained
 otherwise.
 
-A type info object is an opaque class that is also copy and move constructible.
-Objects of this class are returned by the `type_id` function template:
+Its type defines a default constructible opaque class that is also copyable and
+movable.<br/>
+Objects of this class are generally returned by the `type_id` functions:
 
 ```cpp
+// by type
 auto info = entt::type_id<a_type>();
+
+// by value
+auto other = entt::type_id(42);
 ```
 
-These are the information made available by a `type_info` object:
+The objects thus received are nothing more than const references to instances of
+`type_info` with static storage duration.<br/>
+This is convenient for saving the entire object aside for the cost of a pointer.
+However, nothing prevents from constructing `type_info` objects directly.<br/>
+These are the information made available by this kind of objects:
 
 * The index associated with a given type:
 
@@ -577,7 +586,7 @@ These are the information made available by a `type_info` object:
   This is also an alias for the following:
 
   ```cpp
-  auto idx = entt::type_index<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  auto idx = entt::type_index<std::remove_cv_t<std::remove_reference_t<a_type>>>::value();
   ```
 
 * The hash value associated with a given type:
@@ -589,7 +598,7 @@ These are the information made available by a `type_info` object:
   This is also an alias for the following:
 
   ```cpp
-  auto hash = entt::type_hash<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  auto hash = entt::type_hash<std::remove_cv_t<std::remove_reference_t<a_type>>>::value();
   ```
 
 * The name associated with a given type:
@@ -601,7 +610,7 @@ These are the information made available by a `type_info` object:
   This is also an alias for the following:
 
   ```cpp
-  auto name = entt::type_name<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  auto name = entt::type_name<std::remove_cv_t<std::remove_reference_t<a_type>>>::value();
   ```
 
 Where all accessed features are available at compile-time, the `type_info` class

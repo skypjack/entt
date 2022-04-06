@@ -23,7 +23,8 @@ struct meta_range_iterator final {
     using iterator_category = std::input_iterator_tag;
     using node_type = Node;
 
-    meta_range_iterator() ENTT_NOEXCEPT = default;
+    meta_range_iterator() ENTT_NOEXCEPT
+        : it{} {}
 
     meta_range_iterator(node_type *head) ENTT_NOEXCEPT
         : it{head} {}
@@ -54,7 +55,7 @@ struct meta_range_iterator final {
     }
 
 private:
-    node_type *it{};
+    node_type *it;
 };
 
 } // namespace internal

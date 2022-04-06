@@ -42,10 +42,10 @@ class storage_iterator final {
         typename alloc_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::pointer>>;
 
 public:
-    using difference_type = typename iterator_traits::difference_type;
     using value_type = typename iterator_traits::value_type;
     using pointer = typename iterator_traits::pointer;
     using reference = typename iterator_traits::reference;
+    using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
     storage_iterator() ENTT_NOEXCEPT = default;
@@ -159,10 +159,10 @@ class extended_storage_iterator final {
     friend class extended_storage_iterator;
 
 public:
-    using difference_type = typename std::iterator_traits<It>::difference_type;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::forward_as_tuple(*std::declval<Other>()...)));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
+    using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
     extended_storage_iterator() = default;
@@ -715,7 +715,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of objects.
      */
-    template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<std::decay_t<typename std::iterator_traits<CIt>::value_type>, value_type>>>
+    template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
         for(; first != last; ++first, ++from) {
             emplace_element(*first, true, *from);

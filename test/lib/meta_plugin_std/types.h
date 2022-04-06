@@ -12,7 +12,7 @@ struct custom_type_hash;
 #define ASSIGN_TYPE_ID(clazz) \
     template<> \
     struct custom_type_hash<clazz> \
-        : std::integral_constant<entt::id_type, entt::basic_hashed_string<std::remove_cv_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}> {}
+        : std::integral_constant<entt::id_type, entt::basic_hashed_string<std::remove_const_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}> {}
 
 template<typename Type>
 struct entt::type_hash<Type> {

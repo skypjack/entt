@@ -192,7 +192,7 @@ public:
 
 template<typename... Args>
 [[nodiscard]] meta_type_node *meta_arg_node(type_list<Args...>, const std::size_t index) ENTT_NOEXCEPT {
-    meta_type_node *args[sizeof...(Args) + 1u]{nullptr, internal::meta_node<std::remove_const_t<std::remove_reference_t<Args>>>::resolve()...};
+    meta_type_node *args[sizeof...(Args) + 1u]{nullptr, internal::meta_node<std::remove_cv_t<std::remove_reference_t<Args>>>::resolve()...};
     return args[index + 1u];
 }
 

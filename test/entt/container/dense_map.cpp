@@ -104,7 +104,7 @@ TEST(DenseMap, Constructors) {
     entt::dense_map<int, int> temp{map, map.get_allocator()};
     entt::dense_map<int, int> other{std::move(temp), map.get_allocator()};
 
-    ASSERT_EQ(other.size(), 1u);
+    ASSERT_EQ(map.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(map.bucket_count(), 4u * minimum_bucket_count);
     ASSERT_EQ(other.bucket_count(), 4u * minimum_bucket_count);
@@ -1106,6 +1106,21 @@ TEST(DenseMap, ThrowingAllocator) {
     ASSERT_EQ(map.bucket_count(), minimum_bucket_count);
     ASSERT_THROW(map.reserve(2u * map.bucket_count()), packed_exception);
     ASSERT_EQ(map.bucket_count(), minimum_bucket_count);
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(map.emplace(0u, 0u), packed_exception);
+    ASSERT_FALSE(map.contains(0u));
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(map.emplace(std::piecewise_construct, std::make_tuple(0u), std::make_tuple(0u)), packed_exception);
+    ASSERT_FALSE(map.contains(0u));
+
+    packed_allocator::trigger_on_allocate = true;
+
+    ASSERT_THROW(map.insert_or_assign(0u, 0u), packed_exception);
+    ASSERT_FALSE(map.contains(0u));
 }
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)

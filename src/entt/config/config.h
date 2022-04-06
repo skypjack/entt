@@ -5,21 +5,16 @@
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_NOEXCEPT noexcept
+#    define ENTT_NOEXCEPT_IF(expr) noexcept(expr)
 #    define ENTT_THROW throw
 #    define ENTT_TRY try
 #    define ENTT_CATCH catch(...)
 #else
 #    define ENTT_NOEXCEPT
+#    define ENTT_NOEXCEPT_IF(...)
 #    define ENTT_THROW
 #    define ENTT_TRY if(true)
 #    define ENTT_CATCH if(false)
-#endif
-
-#if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606L
-#    include <new>
-#    define ENTT_LAUNDER(expr) std::launder(expr)
-#else
-#    define ENTT_LAUNDER(expr) expr
 #endif
 
 #ifdef ENTT_USE_ATOMIC

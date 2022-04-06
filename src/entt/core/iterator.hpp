@@ -61,7 +61,7 @@ private:
  */
 template<typename It, typename Sentinel = It>
 struct iterable_adaptor final {
-    /*! @brief Type of the objects returned during iteration. */
+    /*! @brief Value type. */
     using value_type = typename std::iterator_traits<It>::value_type;
     /*! @brief Iterator type. */
     using iterator = It;

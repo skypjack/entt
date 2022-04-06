@@ -192,7 +192,7 @@ class meta_factory<Type> {
             nullptr,
             nullptr,
             Setter::size,
-            internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
+            internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
             [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
             &meta_getter<Type, Getter, Policy>
@@ -271,7 +271,7 @@ public:
     auto conv() ENTT_NOEXCEPT {
         static internal::meta_conv_node node{
             nullptr,
-            internal::meta_node<std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>>::resolve(),
+            internal::meta_node<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>>::resolve(),
             [](const meta_any &instance) -> meta_any {
                 return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data())));
             }
@@ -295,7 +295,7 @@ public:
     auto conv() ENTT_NOEXCEPT {
         static internal::meta_conv_node node{
             nullptr,
-            internal::meta_node<std::remove_const_t<std::remove_reference_t<To>>>::resolve(),
+            internal::meta_node<std::remove_cv_t<std::remove_reference_t<To>>>::resolve(),
             [](const meta_any &instance) -> meta_any { return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance.data()))); }
             // tricks clang-format
         };
@@ -321,7 +321,7 @@ public:
     auto ctor() ENTT_NOEXCEPT {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
-        static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
+        static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
 
         static internal::meta_ctor_node node{
             nullptr,
@@ -474,7 +474,7 @@ public:
                 nullptr,
                 nullptr,
                 0u,
-                internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
+                internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>
@@ -493,7 +493,7 @@ public:
                 nullptr,
                 nullptr,
                 1u,
-                internal::meta_node<std::remove_const_t<std::remove_reference_t<data_type>>>::resolve(),
+                internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>
@@ -551,7 +551,7 @@ public:
             nullptr,
             nullptr,
             descriptor::args_type::size,
-            internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve(),
+            internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve(),
             &meta_arg<typename descriptor::args_type>,
             &meta_invoke<Type, Candidate, Policy>
             // tricks clang-format

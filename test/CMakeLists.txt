@@ -251,6 +251,8 @@ SETUP_BASIC_TEST(scheduler entt/process/scheduler.cpp)
 # Test resource
 
 SETUP_BASIC_TEST(resource entt/resource/resource.cpp)
+SETUP_BASIC_TEST(resource_cache entt/resource/resource_cache.cpp)
+SETUP_BASIC_TEST(resource_loader entt/resource/resource_loader.cpp)
 
 # Test signal
 

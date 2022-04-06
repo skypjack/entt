@@ -19,7 +19,7 @@ namespace entt {
  */
 template<typename Type>
 [[nodiscard]] constexpr auto to_address(Type &&ptr) ENTT_NOEXCEPT {
-    if constexpr(std::is_pointer_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
+    if constexpr(std::is_pointer_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
         return ptr;
     } else {
         return to_address(std::forward<Type>(ptr).operator->());

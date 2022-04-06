@@ -1,3 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="entt::resource&lt;*&gt;">
+		<DisplayString>{ value }</DisplayString>
+		<Expand>
+			<ExpandedItem>value</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="entt::resource_cache&lt;*&gt;">
+		<DisplayString>{ pool.first_base::value }</DisplayString>
+		<Expand>
+			<ExpandedItem>pool.first_base::value</ExpandedItem>
+		</Expand>
+	</Type>
 </AutoVisualizer>

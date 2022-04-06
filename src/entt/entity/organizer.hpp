@@ -65,29 +65,26 @@ struct unpack_type<const basic_view<Entity, get_t<Component...>, exclude_t<Exclu
     : unpack_type<basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>>, type_list<Override...>> {};
 
 template<typename, typename>
-struct resource;
+struct resource_traits;
 
 template<typename... Args, typename... Req>
-struct resource<type_list<Args...>, type_list<Req...>> {
+struct resource_traits<type_list<Args...>, type_list<Req...>> {
     using args = type_list<std::remove_const_t<Args>...>;
     using ro = type_list_cat_t<typename unpack_type<Args, type_list<Req...>>::ro..., typename unpack_type<Req, type_list<>>::ro...>;
     using rw = type_list_cat_t<typename unpack_type<Args, type_list<Req...>>::rw..., typename unpack_type<Req, type_list<>>::rw...>;
 };
 
 template<typename... Req, typename Ret, typename... Args>
-resource<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> free_function_to_resource(Ret (*)(Args...));
+resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> free_function_to_resource_traits(Ret (*)(Args...));
 
 template<typename... Req, typename Ret, typename Type, typename... Args>
-resource<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource(Ret (*)(Type &, Args...));
+resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (*)(Type &, Args...));
 
 template<typename... Req, typename Ret, typename Class, typename... Args>
-resource<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource(Ret (Class::*)(Args...));
+resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...));
 
 template<typename... Req, typename Ret, typename Class, typename... Args>
-resource<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource(Ret (Class::*)(Args...) const);
-
-template<typename... Req>
-resource<type_list<>, type_list<Req...>> to_resource();
+resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...) const);
 
 } // namespace internal
 
@@ -359,7 +356,7 @@ public:
      */
     template<auto Candidate, typename... Req>
     void emplace(const char *name = nullptr) {
-        using resource_type = decltype(internal::free_function_to_resource<Req...>(Candidate));
+        using resource_type = decltype(internal::free_function_to_resource_traits<Req...>(Candidate));
         constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, basic_registry<entity_type>>;
 
         callback_type *callback = +[](const void *, basic_registry<entity_type> &reg) {
@@ -391,7 +388,7 @@ public:
      */
     template<auto Candidate, typename... Req, typename Type>
     void emplace(Type &value_or_instance, const char *name = nullptr) {
-        using resource_type = decltype(internal::constrained_function_to_resource<Req...>(Candidate));
+        using resource_type = decltype(internal::constrained_function_to_resource_traits<Req...>(Candidate));
         constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, basic_registry<entity_type>>;
 
         callback_type *callback = +[](const void *payload, basic_registry<entity_type> &reg) {
@@ -423,7 +420,7 @@ public:
      */
     template<typename... Req>
     void emplace(function_type *func, const void *payload = nullptr, const char *name = nullptr) {
-        using resource_type = internal::resource<type_list<>, type_list<Req...>>;
+        using resource_type = internal::resource_traits<type_list<>, type_list<Req...>>;
         track_dependencies(vertices.size(), true, typename resource_type::ro{}, typename resource_type::rw{});
 
         vertex_data vdata{

@@ -24,8 +24,10 @@ namespace entt {
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
+    using basic_iterator = typename Type::basic_iterator;
+
     template<typename Func>
-    void notify_destruction(typename Type::basic_iterator first, typename Type::basic_iterator last, Func func) {
+    void notify_destruction(basic_iterator first, basic_iterator last, Func func) {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
 
         for(; first != last; ++first) {
@@ -36,15 +38,15 @@ class sigh_storage_mixin final: public Type {
         }
     }
 
-    void swap_and_pop(typename Type::basic_iterator first, typename Type::basic_iterator last) final {
+    void swap_and_pop(basic_iterator first, basic_iterator last) final {
         notify_destruction(std::move(first), std::move(last), [this](auto... args) { Type::swap_and_pop(args...); });
     }
 
-    void in_place_pop(typename Type::basic_iterator first, typename Type::basic_iterator last) final {
+    void in_place_pop(basic_iterator first, basic_iterator last) final {
         notify_destruction(std::move(first), std::move(last), [this](auto... args) { Type::in_place_pop(args...); });
     }
 
-    typename Type::basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
+    basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::try_emplace(entt, force_back, value);
         construction.publish(*owner, entt);
@@ -52,8 +54,6 @@ class sigh_storage_mixin final: public Type {
     }
 
 public:
-    /*! @brief Underlying value type. */
-    using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
 

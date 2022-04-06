@@ -32,7 +32,9 @@ struct sparse_set_iterator final {
     using difference_type = typename Container::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
-    sparse_set_iterator() ENTT_NOEXCEPT = default;
+    sparse_set_iterator() ENTT_NOEXCEPT
+        : packed{},
+          offset{} {}
 
     sparse_set_iterator(const Container &ref, const difference_type idx) ENTT_NOEXCEPT
         : packed{std::addressof(ref)},

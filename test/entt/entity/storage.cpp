@@ -61,16 +61,16 @@ private:
     entt::entity target{entt::null};
 };
 
-struct crete_from_constructor {
-    crete_from_constructor(entt::storage<crete_from_constructor> &ref, entt::entity other)
+struct create_from_constructor {
+    create_from_constructor(entt::storage<create_from_constructor> &ref, entt::entity other)
         : child{other} {
         if(child != entt::null) {
             ref.emplace(child, ref, entt::null);
         }
     }
 
-    crete_from_constructor(crete_from_constructor &&other) ENTT_NOEXCEPT = default;
-    crete_from_constructor &operator=(crete_from_constructor &&other) ENTT_NOEXCEPT = default;
+    create_from_constructor(create_from_constructor &&other) ENTT_NOEXCEPT = default;
+    create_from_constructor &operator=(create_from_constructor &&other) ENTT_NOEXCEPT = default;
 
     entt::entity child;
 };
@@ -1586,7 +1586,7 @@ TEST(Storage, UpdateFromDestructor) {
 }
 
 TEST(Storage, CreateFromConstructor) {
-    entt::storage<crete_from_constructor> pool;
+    entt::storage<create_from_constructor> pool;
     const entt::entity entity{0u};
     const entt::entity other{1u};
 

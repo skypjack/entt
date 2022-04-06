@@ -88,12 +88,12 @@ struct meta_function_descriptor<Type, Ret (*)(MaybeType, Args...)> {
     /*! @brief Meta function return type. */
     using return_type = Ret;
     /*! @brief Meta function arguments. */
-    using args_type = std::conditional_t<std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type>, type_list<Args...>, type_list<MaybeType, Args...>>;
+    using args_type = std::conditional_t<std::is_base_of_v<std::remove_cv_t<std::remove_reference_t<MaybeType>>, Type>, type_list<Args...>, type_list<MaybeType, Args...>>;
 
     /*! @brief True if the meta function is const, false otherwise. */
-    static constexpr auto is_const = std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type> && std::is_const_v<std::remove_reference_t<MaybeType>>;
+    static constexpr auto is_const = std::is_base_of_v<std::remove_cv_t<std::remove_reference_t<MaybeType>>, Type> && std::is_const_v<std::remove_reference_t<MaybeType>>;
     /*! @brief True if the meta function is static, false otherwise. */
-    static constexpr auto is_static = !std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type>;
+    static constexpr auto is_static = !std::is_base_of_v<std::remove_cv_t<std::remove_reference_t<MaybeType>>, Type>;
 };
 
 /**
