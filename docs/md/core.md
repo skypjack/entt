@@ -586,7 +586,7 @@ These are the information made available by this kind of objects:
   This is also an alias for the following:
 
   ```cpp
-  auto idx = entt::type_index<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  auto idx = entt::type_index<std::remove_cv_t<std::remove_reference_t<a_type>>>::value();
   ```
 
 * The hash value associated with a given type:
@@ -598,7 +598,7 @@ These are the information made available by this kind of objects:
   This is also an alias for the following:
 
   ```cpp
-  auto hash = entt::type_hash<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  auto hash = entt::type_hash<std::remove_cv_t<std::remove_reference_t<a_type>>>::value();
   ```
 
 * The name associated with a given type:
@@ -610,7 +610,7 @@ These are the information made available by this kind of objects:
   This is also an alias for the following:
 
   ```cpp
-  auto name = entt::type_name<std::remove_const_t<std::remove_reference_t<a_type>>>::value();
+  auto name = entt::type_name<std::remove_cv_t<std::remove_reference_t<a_type>>>::value();
   ```
 
 Where all accessed features are available at compile-time, the `type_info` class
