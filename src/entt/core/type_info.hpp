@@ -139,24 +139,24 @@ struct type_name final {
 };
 
 /*! @brief Implementation specific information about a type. */
-class type_info final {
-    template<typename Type>
-    friend const type_info &type_id() ENTT_NOEXCEPT;
-
-    template<typename Type>
-    constexpr type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
-        : seq{type_index<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
-          identifier{type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
-          alias{type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value()} {
-        ENTT_ASSERT(seq != 0u, "Invalid type index");
-    }
-
-public:
+struct type_info final {
     /*! @brief Default constructor. */
     constexpr type_info() ENTT_NOEXCEPT
         : seq{},
           identifier{},
           alias{} {}
+
+    /**
+     * @brief Constructs a type info object for a given type.
+     * @tparam Type Type for which to construct a type info object.
+     */
+    template<typename Type>
+    constexpr type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
+        : seq{type_index<std::remove_cv_t<std::remove_reference_t<Type>>>::value()},
+          identifier{type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value()},
+          alias{type_name<std::remove_cv_t<std::remove_reference_t<Type>>>::value()} {
+        ENTT_ASSERT(seq != 0u, "Invalid type index");
+    }
 
     /**
      * @brief Type index.

@@ -48,21 +48,12 @@ TEST(TypeInfo, Functionalities) {
     static_assert(std::is_copy_assignable_v<entt::type_info>);
     static_assert(std::is_move_assignable_v<entt::type_info>);
 
-    const int value = 42;
+    entt::type_info info{std::in_place_type<int>};
+    entt::type_info other{std::in_place_type<void>};
 
-    ASSERT_EQ(entt::type_id(value), entt::type_id<int>());
-    ASSERT_EQ(entt::type_id(42), entt::type_id<int>());
-
-    ASSERT_EQ(entt::type_id<int>(), entt::type_id<int>());
-    ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int &&>());
-    ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int>());
-    ASSERT_NE(entt::type_id<int>(), entt::type_id<char>());
-
-    ASSERT_EQ(&entt::type_id<int>(), &entt::type_id<int>());
-    ASSERT_NE(&entt::type_id<int>(), &entt::type_id<void>());
-
-    auto info = entt::type_id<const int &>();
-    auto other = entt::type_id<void>();
+    ASSERT_EQ(info, entt::type_info{std::in_place_type<int &>});
+    ASSERT_EQ(info, entt::type_info{std::in_place_type<int &&>});
+    ASSERT_EQ(info, entt::type_info{std::in_place_type<const int &>});
 
     ASSERT_NE(info, other);
     ASSERT_TRUE(info == info);
@@ -118,4 +109,19 @@ TEST(TypeInfo, Order) {
 
     ASSERT_GT(lhs, rhs);
     ASSERT_GE(lhs, rhs);
+}
+
+TEST(TypeId, Functionalities) {
+    const int value = 42;
+
+    ASSERT_EQ(entt::type_id(value), entt::type_id<int>());
+    ASSERT_EQ(entt::type_id(42), entt::type_id<int>());
+
+    ASSERT_EQ(entt::type_id<int>(), entt::type_id<int>());
+    ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int &&>());
+    ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int>());
+    ASSERT_NE(entt::type_id<int>(), entt::type_id<char>());
+
+    ASSERT_EQ(&entt::type_id<int>(), &entt::type_id<int>());
+    ASSERT_NE(&entt::type_id<int>(), &entt::type_id<void>());
 }
