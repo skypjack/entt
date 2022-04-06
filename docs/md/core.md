@@ -559,14 +559,23 @@ require to enable RTTI.<br/>
 Therefore, they can sometimes be even more reliable than those obtained
 otherwise.
 
-A type info object is an opaque class that is also copy and move constructible.
-Objects of this class are returned by the `type_id` function template:
+Its type defines a default constructible opaque class that is also copyable and
+movable.<br/>
+Objects of this class are generally returned by the `type_id` functions:
 
 ```cpp
+// by type
 auto info = entt::type_id<a_type>();
+
+// by value
+auto other = entt::type_id(42);
 ```
 
-These are the information made available by a `type_info` object:
+The objects thus received are nothing more than const references to instances of
+`type_info` with static storage duration.<br/>
+This is convenient for saving the entire object aside for the cost of a pointer.
+However, nothing prevents from constructing `type_info` objects directly.<br/>
+These are the information made available by this kind of objects:
 
 * The index associated with a given type:
 
