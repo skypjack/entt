@@ -21,7 +21,8 @@ namespace internal {
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
-        return value++;
+        // 0u is reserved for empty type_info objects
+        return ++value;
     }
 };
 
@@ -146,9 +147,17 @@ class type_info final {
     constexpr type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
         : seq{type_index<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
           identifier{type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value()},
-          alias{type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value()} {}
+          alias{type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value()} {
+        ENTT_ASSERT(seq != 0u, "Invalid type index");
+    }
 
 public:
+    /*! @brief Default constructor. */
+    constexpr type_info() ENTT_NOEXCEPT
+        : seq{},
+          identifier{},
+          alias{} {}
+
     /**
      * @brief Type index.
      * @return Type index.
@@ -171,6 +180,14 @@ public:
      */
     [[nodiscard]] constexpr std::string_view name() const ENTT_NOEXCEPT {
         return alias;
+    }
+
+    /**
+     * @brief Returns true if properly initialized, false otherwise.
+     * @return True if properly initialized, false otherwise.
+     */
+    [[nodiscard]] explicit constexpr operator bool() const ENTT_NOEXCEPT {
+        return (seq != 0u);
     }
 
 private:
@@ -245,12 +262,13 @@ private:
 /**
  * @brief Returns the type info object associated to a given type.
  *
+ * The returned element refers to an object with static storage duration.<br/>
  * The type doesn't need to be a complete type. If the type is a reference, the
  * result refers to the referenced type. In all cases, top-level cv-qualifiers
  * are ignored.
  *
  * @tparam Type Type for which to generate a type info object.
- * @return A properly initialized type info object.
+ * @return A reference to a properly initialized type info object.
  */
 template<typename Type>
 [[nodiscard]] const type_info &type_id() ENTT_NOEXCEPT {
