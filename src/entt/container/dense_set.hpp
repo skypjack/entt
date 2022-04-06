@@ -521,7 +521,7 @@ public:
      */
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
-        if constexpr(((sizeof...(Args) == 1u) && ... && std::is_same_v<std::remove_const_t<std::remove_reference_t<Args>>, value_type>)) {
+        if constexpr(((sizeof...(Args) == 1u) && ... && std::is_same_v<std::remove_cv_t<std::remove_reference_t<Args>>, value_type>)) {
             return insert_or_do_nothing(std::forward<Args>(args)...);
         } else {
             auto &node = packed.first().emplace_back(std::piecewise_construct, std::make_tuple(packed.first().size()), std::forward_as_tuple(std::forward<Args>(args)...));

@@ -214,7 +214,7 @@ public:
     template<typename Type, typename... Args>
     explicit basic_poly(std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept, Len, Align>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()} {}
+          vtable{poly_vtable<Concept, Len, Align>::template instance<std::remove_cv_t<std::remove_reference_t<Type>>>()} {}
 
     /**
      * @brief Constructs a poly from a given value.
@@ -255,7 +255,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.template emplace<Type>(std::forward<Args>(args)...);
-        vtable = poly_vtable<Concept, Len, Align>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>();
+        vtable = poly_vtable<Concept, Len, Align>::template instance<std::remove_cv_t<std::remove_reference_t<Type>>>();
     }
 
     /*! @brief Destroys contained object */

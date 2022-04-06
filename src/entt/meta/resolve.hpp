@@ -17,7 +17,7 @@ namespace entt {
  */
 template<typename Type>
 [[nodiscard]] meta_type resolve() ENTT_NOEXCEPT {
-    return internal::meta_node<std::remove_const_t<std::remove_reference_t<Type>>>::resolve();
+    return internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve();
 }
 
 /**
