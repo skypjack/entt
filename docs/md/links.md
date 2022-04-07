@@ -20,6 +20,9 @@ I hope this list can grow much more in the future:
   * [Minecraft Earth](https://www.minecraft.net/en-us/about-earth) by
     [Mojang](https://mojang.com/): an augmented reality game for mobile, that
     lets users bring Minecraft into the real world.
+  * [Ember Sword](https://embersword.com/): a modern Free-to-Play MMORPG with a
+    player-driven economy, a classless combat system, and scarce, tradable
+    cosmetic collectibles.
   * Apparently [Diablo II: Resurrected](https://diablo2.blizzard.com/) by
     [Blizzard](https://www.blizzard.com/): monsters, heroes, items, spells, all
     resurrected. Thanks unknown insider.
