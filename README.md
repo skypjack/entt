@@ -11,6 +11,9 @@
 [![Discord channel](https://img.shields.io/discord/707607951396962417?logo=discord)](https://discord.gg/5BjPWBd)
 [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/skypjack)
 
+> `EnTT` has been a dream so far, we haven't found a single bug to date and it's
+> super easy to work with
+
 `EnTT` is a header-only, tiny and easy to use library for game programming and
 much more written in **modern C++**.<br/>
 [Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's used
