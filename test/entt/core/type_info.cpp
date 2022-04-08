@@ -84,16 +84,6 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_EQ(other.name(), info.name());
 }
 
-TEST(TypeInfo, Validity) {
-    entt::type_info info{};
-    entt::type_info other = entt::type_id<int>();
-
-    ASSERT_FALSE(info);
-    ASSERT_TRUE(other);
-    ASSERT_EQ(info.index(), 0u);
-    ASSERT_NE(other.index(), 0u);
-}
-
 TEST(TypeInfo, Order) {
     entt::type_info rhs = entt::type_id<int>();
     entt::type_info lhs = entt::type_id<char>();

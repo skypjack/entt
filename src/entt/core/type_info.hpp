@@ -21,8 +21,7 @@ namespace internal {
 struct ENTT_API type_index final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
-        // 0u is reserved for empty type_info objects
-        return ++value;
+        return value++;
     }
 };
 
@@ -140,12 +139,6 @@ struct type_name final {
 
 /*! @brief Implementation specific information about a type. */
 struct type_info final {
-    /*! @brief Default constructor. */
-    constexpr type_info() ENTT_NOEXCEPT
-        : seq{},
-          identifier{},
-          alias{} {}
-
     /**
      * @brief Constructs a type info object for a given type.
      * @tparam Type Type for which to construct a type info object.
@@ -154,9 +147,7 @@ struct type_info final {
     constexpr type_info(std::in_place_type_t<Type>) ENTT_NOEXCEPT
         : seq{type_index<std::remove_cv_t<std::remove_reference_t<Type>>>::value()},
           identifier{type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value()},
-          alias{type_name<std::remove_cv_t<std::remove_reference_t<Type>>>::value()} {
-        ENTT_ASSERT(seq != 0u, "Invalid type index");
-    }
+          alias{type_name<std::remove_cv_t<std::remove_reference_t<Type>>>::value()} {}
 
     /**
      * @brief Type index.
@@ -180,14 +171,6 @@ struct type_info final {
      */
     [[nodiscard]] constexpr std::string_view name() const ENTT_NOEXCEPT {
         return alias;
-    }
-
-    /**
-     * @brief Returns true if properly initialized, false otherwise.
-     * @return True if properly initialized, false otherwise.
-     */
-    [[nodiscard]] explicit constexpr operator bool() const ENTT_NOEXCEPT {
-        return (seq != 0u);
     }
 
 private:

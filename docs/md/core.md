@@ -559,9 +559,8 @@ require to enable RTTI.<br/>
 Therefore, they can sometimes be even more reliable than those obtained
 otherwise.
 
-Its type defines a default constructible opaque class that is also copyable and
-movable.<br/>
-Objects of this class are generally returned by the `type_id` functions:
+Its type defines an opaque class that is also copyable and movable.<br/>
+Objects of this type are generally returned by the `type_id` functions:
 
 ```cpp
 // by type
@@ -571,11 +570,16 @@ auto info = entt::type_id<a_type>();
 auto other = entt::type_id(42);
 ```
 
-The objects thus received are nothing more than const references to instances of
-`type_info` with static storage duration.<br/>
+All elements thus received are nothing more than const references to instances
+of `type_info` with static storage duration.<br/>
 This is convenient for saving the entire object aside for the cost of a pointer.
-However, nothing prevents from constructing `type_info` objects directly.<br/>
-These are the information made available by this kind of objects:
+However, nothing prevents from constructing `type_info` objects directly:
+
+```cpp
+entt::type_info info{std::in_place_type<int>};
+```
+
+These are the information made available by `type_info`:
 
 * The index associated with a given type:
 
