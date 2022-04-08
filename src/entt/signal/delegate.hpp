@@ -120,25 +120,14 @@ public:
           fn{nullptr} {}
 
     /**
-     * @brief Constructs a delegate and connects a free function or an unbound
-     * member.
+     * @brief Constructs a delegate with a given object or payload, if any.
      * @tparam Candidate Function or member to connect to the delegate.
+     * @tparam Type Type of class or type of payload, if any.
+     * @param value_or_instance Optional valid object that fits the purpose.
      */
-    template<auto Candidate>
-    delegate(connect_arg_t<Candidate>) ENTT_NOEXCEPT {
-        connect<Candidate>();
-    }
-
-    /**
-     * @brief Constructs a delegate and connects a free function with payload or
-     * a bound member.
-     * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid object that fits the purpose.
-     */
-    template<auto Candidate, typename Type>
-    delegate(connect_arg_t<Candidate>, Type &&value_or_instance) ENTT_NOEXCEPT {
-        connect<Candidate>(std::forward<Type>(value_or_instance));
+    template<auto Candidate, typename... Type>
+    delegate(connect_arg_t<Candidate>, Type &&...value_or_instance) ENTT_NOEXCEPT {
+        connect<Candidate>(std::forward<Type>(value_or_instance)...);
     }
 
     /**
