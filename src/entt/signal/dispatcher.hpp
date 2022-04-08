@@ -129,6 +129,7 @@ class basic_dispatcher {
 
     template<typename Type>
     [[nodiscard]] handler_type<Type> &assure(const id_type id) {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
         auto &&ptr = pools.first()[id];
 
         if(!ptr) {
@@ -141,6 +142,7 @@ class basic_dispatcher {
 
     template<typename Type>
     [[nodiscard]] const handler_type<Type> *assure(const id_type id) const {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
         auto &container = pools.first();
 
         if(const auto it = container.find(id); it != container.end()) {
