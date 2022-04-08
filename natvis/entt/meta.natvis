@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	<Type Name="entt::meta_any">
-		<DisplayString Condition="node != nullptr">{{ type={ node->info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-		<Expand>
-			<ExpandedItem Condition="node != nullptr">*node</ExpandedItem>
-		</Expand>
-	</Type>
-	<Type Name="entt::meta_associative_container">
-		<DisplayString Condition="mapped_type_node != nullptr">{{ key_type={ key_type_node->info->alias,na }, mapped_type={ mapped_type_node->info->alias,na } }}</DisplayString>
-		<DisplayString Condition="key_type_node != nullptr">{{ key_type={ key_type_node->info->alias,na } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-	</Type>
 	<Type Name="entt::internal::meta_base_node">
 		<DisplayString Condition="type != nullptr">{{ type={ type->info->alias,na } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
@@ -46,13 +34,6 @@
 			</Synthetic>
 		</Expand>
 	</Type>
-	<Type Name="entt::meta_data">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
-		</Expand>
-	</Type>
 	<Type Name="entt::internal::meta_func_node"	>
 		<Intrinsic Name="has_property" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
@@ -74,16 +55,6 @@
 			</Synthetic>
 		</Expand>
 	</Type>
-	<Type Name="entt::meta_func">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
-		</Expand>
-	</Type>
-	<Type Name="entt::meta_handle">
-		<DisplayString>{ any }</DisplayString>
-	</Type>
 	<Type Name="entt::internal::meta_prop_node">
 		<DisplayString Condition="value.node != nullptr">{{ key_type={ id.node->info->alias,na }, mapped_type={ value.node->info->alias,na } }}</DisplayString>
 		<DisplayString Condition="id.node != nullptr">{{ key_type={ id.node->info->alias,na } }}</DisplayString>
@@ -92,17 +63,6 @@
 			<Item Name="[key]">id</Item>
 			<Item Name="[value]">value</Item>
 		</Expand>
-	</Type>
-	<Type Name="entt::meta_prop">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
-		</Expand>
-	</Type>
-	<Type Name="entt::meta_sequence_container">
-		<DisplayString Condition="value_type_node != nullptr">{{ value_type={ value_type_node->info->alias,na } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
 	</Type>
 	<Type Name="entt::internal::meta_template_node">
 		<DisplayString Condition="type != nullptr">{{ type={ type->info->alias,na } }}</DisplayString>
@@ -185,6 +145,45 @@
 					</LinkedListItems>
 				</Expand>
 			</Synthetic>
+		</Expand>
+	</Type>	<Type Name="entt::meta_any">
+		<DisplayString Condition="node != nullptr">{{ type={ node->info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="node != nullptr">*node</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="entt::meta_handle">
+		<DisplayString>{ any }</DisplayString>
+	</Type>
+	<Type Name="entt::meta_associative_container">
+		<DisplayString Condition="mapped_type_node != nullptr">{{ key_type={ key_type_node->info->alias,na }, mapped_type={ mapped_type_node->info->alias,na } }}</DisplayString>
+		<DisplayString Condition="key_type_node != nullptr">{{ key_type={ key_type_node->info->alias,na } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+	</Type>
+	<Type Name="entt::meta_sequence_container">
+		<DisplayString Condition="value_type_node != nullptr">{{ value_type={ value_type_node->info->alias,na } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+	</Type>
+	<Type Name="entt::meta_data">
+		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="entt::meta_func">
+		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="entt::meta_prop">
+		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_type">
