@@ -333,7 +333,25 @@ public:
     using context = internal::registry_context;
 
     /*! @brief Default constructor. */
-    basic_registry() = default;
+    basic_registry()
+        : pools{},
+          groups{},
+          entities{},
+          free_list{tombstone},
+          vars{} {}
+
+    /**
+     * @brief Allocates enough memory upon construction to store `count` pools.
+     * @param count The number of pools to allocate memory for.
+     */
+    basic_registry(const size_type count)
+        : pools{},
+          groups{},
+          entities{},
+          free_list{tombstone},
+          vars{} {
+        pools.reserve(count);
+    }
 
     /**
      * @brief Move constructor.
@@ -1465,10 +1483,10 @@ public:
     }
 
 private:
-    dense_map<id_type, std::unique_ptr<base_type>, identity> pools{};
-    std::vector<group_data> groups{};
-    std::vector<entity_type> entities{};
-    entity_type free_list{tombstone};
+    dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
+    std::vector<group_data> groups;
+    std::vector<entity_type> entities;
+    entity_type free_list;
     context vars;
 };
 

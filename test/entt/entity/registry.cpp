@@ -337,6 +337,18 @@ TEST(Registry, Functionalities) {
     ASSERT_TRUE(registry.storage<int>().empty());
 }
 
+TEST(Registry, Constructors) {
+    entt::registry registry;
+    entt::registry other{42};
+    const entt::entity entity = entt::tombstone;
+
+    ASSERT_TRUE(registry.empty());
+    ASSERT_TRUE(other.empty());
+
+    ASSERT_EQ(registry.released(), entity);
+    ASSERT_EQ(other.released(), entity);
+}
+
 TEST(Registry, Move) {
     entt::registry registry;
     const auto entity = registry.create();
