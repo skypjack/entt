@@ -1044,6 +1044,21 @@ public:
         auto all = poly_get_all<Component>(entity);
         return all.begin() != all.end() ? all.begin().operator->() : nullptr;
     }
+    /**
+     * @brief For given polymorphic component type remove all child instances of this type, attached to a given entity
+     * @tparam Component Polymorphic component type
+     * @param entity Entity, to remove components from
+     * @return count of removed components
+     */
+    template<typename Component>
+    int poly_remove([[maybe_unused]] const entity_type entity) {
+        ENTT_ASSERT(valid(entity), "Invalid entity");
+        int removed_count = 0;
+        for (auto& pool : polymorphic_data.template assure<Component>().pools()) {
+            removed_count += static_cast<int>(pool.remove(entity));
+        }
+        return removed_count;
+    }
 
     /**
      * @brief For a given component type applies given func to all child instances of this type in registry.

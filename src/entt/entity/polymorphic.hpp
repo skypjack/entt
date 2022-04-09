@@ -289,12 +289,15 @@ struct poly_any {
 template<typename Entity>
 class poly_pool_holder_base {
 public:
-    inline poly_pool_holder_base(basic_sparse_set<Entity>* pool, void* (*getter)(void*, Entity) ENTT_NOEXCEPT) :
-          pool_ptr(pool), getter_ptr(getter) {}
+    inline poly_pool_holder_base(basic_sparse_set<Entity>* pool,
+                                 void* (*getter)(void*, Entity) ENTT_NOEXCEPT,
+                                 bool (*remover)(void*, Entity)) :
+          pool_ptr(pool), getter_ptr(getter), remover_ptr(remover) {}
 
 protected:
     basic_sparse_set<Entity>* pool_ptr;
     void* (*getter_ptr)(void*, Entity) ENTT_NOEXCEPT;
+    bool (*remover_ptr)(void*, Entity);
 };
 
 /** @brief base class for entt::poly_type */
@@ -337,6 +340,15 @@ public:
     /** @copydoc try_get */
     inline const_pointer_type try_get(const Entity ent) const ENTT_NOEXCEPT {
         return const_cast<poly_pool_holder<Entity, Type>*>(this)->try_get(ent);
+    }
+
+    /**
+     * @brief removes component from pool by entity
+     * @param ent entity
+     * @return true, if component was removed, false, if it didnt exist
+     */
+    inline bool remove(const Entity ent) {
+        return this->remover_ptr(this->pool_ptr, ent);
     }
 
     /** @brief returns underlying pool */
@@ -423,7 +435,11 @@ public:
             return nullptr;
         };
 
-        return poly_pool_holder<Entity, Type>(pool_ptr, get);
+        bool (*remove)(void*, Entity entity) = +[](void* pool, const Entity entity) -> bool {
+            return static_cast<StorageType*>(pool)->remove(entity);
+        };
+
+        return poly_pool_holder<Entity, Type>(pool_ptr, get, remove);
     }
 
     /** @brief adds given storage pointer as a child type pool to this polymorphic type */

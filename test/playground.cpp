@@ -43,9 +43,9 @@ int main() {
     registry.emplace<dog*>(other, new dog);
 
     std::cout << "\nall shapes\n";
-    registry.each_poly<const shape>([](auto ent, auto& s) {
+    registry.each_poly<shape>([](auto ent, auto& s) {
         std::cout << entt::to_entity(ent) << " -> ";
-        // s.draw();
+        s.draw();
         std::cout << '\n';
     });
 
