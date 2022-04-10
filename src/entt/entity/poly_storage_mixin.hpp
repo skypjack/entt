@@ -2,6 +2,8 @@
 #define ENTT_ENTITY_POLY_STORAGE_MIXIN_HPP
 
 #include "storage.hpp"
+#include "poly_type_traits.hpp"
+
 
 namespace entt {
 
