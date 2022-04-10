@@ -30,10 +30,26 @@ struct entt::poly_parent_types<dog*> {
     using parent_types = type_list<animal*>;
 };
 
+void on_construct(entt::registry&, entt::entity e) {
+    std::cout << "constructed " << entt::to_entity(e) << "\n";
+}
+
+void on_update(entt::registry&, entt::entity e) {
+    std::cout << "updated " << entt::to_entity(e) << "\n";
+}
+
+void on_destroy(entt::registry&, entt::entity e) {
+    std::cout << "destroyed " << entt::to_entity(e) << "\n";
+}
+
 int main() {
     entt::registry registry;
     const auto entity = registry.create();
     const auto other = registry.create();
+
+    registry.on_construct<shape>().connect<on_construct>();
+    registry.on_update<shape>().connect<on_update>();
+    registry.on_destroy<shape>().connect<on_destroy>();
 
     registry.emplace<circle>(entity);
     registry.emplace<rectangle>(entity);
@@ -71,4 +87,7 @@ int main() {
         a->name();
         std::cout << '\n';
     }
+
+    registry.patch<circle>(entity);
+    registry.poly_remove<shape>(entity);
 }
