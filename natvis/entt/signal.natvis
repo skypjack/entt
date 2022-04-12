@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	<Type Name="entt::connection">
-		<DisplayString>{{ bound={ signal != nullptr } }}</DisplayString>
-	</Type>
 	<Type Name="entt::delegate&lt;*&gt;">
 		<DisplayString>{{ type={ "$T1" } }}</DisplayString>
 		<Expand>
@@ -10,15 +7,16 @@
 			<Item Name="[data]">instance</Item>
 		</Expand>
 	</Type>
-	<Type Name="entt::dispatcher">
-		<DisplayString>{{ size={ pools.size() } }}</DisplayString>
+	<Type Name="entt::basic_dispatcher&lt;*&gt;">
+		<Intrinsic Name="size" Expression="pools.first_base::value.packed.first_base::value.size()"/>
+		<DisplayString>{{ size={ size() } }}</DisplayString>
 		<Expand>
 			<Synthetic Name="[pools]">
-				<DisplayString>{ pools.size() }</DisplayString>
+				<DisplayString>{ size() }</DisplayString>
 				<Expand>
 					<IndexListItems>
-						<Size>pools.size()</Size>
-						<ValueNode>*pools.packed.first_base::value[$i].element.second</ValueNode>
+						<Size>size()</Size>
+						<ValueNode>*pools.first_base::value.packed.first_base::value[$i].element.second</ValueNode>
 					</IndexListItems>
 				</Expand>
 			</Synthetic>
@@ -29,6 +27,12 @@
 		<Expand>
 			<Item Name="[signal]">signal</Item>
 		</Expand>
+	</Type>
+	<Type Name="entt::emitter&lt;*&gt;">
+		<DisplayString>{{ size={ handlers.packed.first_base::value.size() } }}</DisplayString>
+	</Type>
+	<Type Name="entt::connection">
+		<DisplayString>{{ bound={ signal != nullptr } }}</DisplayString>
 	</Type>
 	<Type Name="entt::scoped_connection">
 		<DisplayString>{ conn }</DisplayString>
