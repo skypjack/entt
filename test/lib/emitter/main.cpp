@@ -11,7 +11,11 @@ TEST(Lib, Emitter) {
 
     ASSERT_EQ(value, 0);
 
-    emitter.once<message>([&](message msg, test_emitter &) { value = msg.payload; });
+    emitter.on<message>([&](message msg, test_emitter &emitter) {
+        value = msg.payload;
+        emitter.erase<message>();
+    });
+
     emit(emitter);
 
     ASSERT_EQ(value, 42);

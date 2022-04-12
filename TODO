@@ -7,9 +7,9 @@ EXAMPLES
 * support to polymorphic types (see #859)
 
 WIP:
+* emitter: runtime handlers, allocator support (ready for both already)
 * view/group: no storage_traits dependency -> use storage instead of components for the definition
 * resource<T>::operator</<=/>/>=
-* simplify emitter (see uvw), runtime events
 * basic_storage::bind for cross-registry setups
 * uses-allocator construction: any (with allocator support), poly, ...
 * process scheduler: reviews, use free lists internally

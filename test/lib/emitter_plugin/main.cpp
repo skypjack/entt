@@ -11,7 +11,10 @@ TEST(Lib, Emitter) {
 
     ASSERT_EQ(value, 0);
 
-    emitter.once<message>([&](message msg, test_emitter &) { value = msg.payload; });
+    emitter.on<message>([&](message msg, test_emitter &emitter) {
+        value = msg.payload;
+        emitter.erase<message>();
+    });
 
     cr_plugin ctx;
     cr_plugin_load(ctx, PLUGIN);
