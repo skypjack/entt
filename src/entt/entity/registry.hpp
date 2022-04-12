@@ -301,7 +301,7 @@ class basic_registry {
     }
 
     auto generate_identifier(const std::size_t pos) ENTT_NOEXCEPT {
-        ENTT_ASSERT(pos < entity_traits::to_integral(null), "No entities available");
+        ENTT_ASSERT(pos < entity_traits::to_entity(null), "No entities available");
         return entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), {});
     }
 
