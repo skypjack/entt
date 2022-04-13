@@ -326,12 +326,15 @@ private:
     }
 
 protected:
+    /*! @brief Random access iterator type. */
+    using basic_iterator = typename underlying_type::basic_iterator;
+
     /**
      * @brief Erases elements from a storage.
      * @param first An iterator to the first element to erase.
      * @param last An iterator past the last element to erase.
      */
-    void swap_and_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
+    void swap_and_pop(basic_iterator first, basic_iterator last) override {
         for(; first != last; ++first) {
             auto &elem = element_at(base_type::size() - 1u);
             // destroying on exit allows reentrant destructors
@@ -346,7 +349,7 @@ protected:
      * @param first An iterator to the first element to erase.
      * @param last An iterator past the last element to erase.
      */
-    void in_place_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
+    void in_place_pop(basic_iterator first, basic_iterator last) override {
         for(; first != last; ++first) {
             base_type::in_place_pop(first, first + 1u);
             std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
@@ -360,7 +363,7 @@ protected:
      * @param force_back Force back insertion.
      * @return Iterator pointing to the emplaced element.
      */
-    typename underlying_type::basic_iterator try_emplace([[maybe_unused]] const Entity entt, const bool force_back, const void *value) override {
+    basic_iterator try_emplace([[maybe_unused]] const Entity entt, const bool force_back, const void *value) override {
         if(value) {
             if constexpr(std::is_copy_constructible_v<value_type>) {
                 return emplace_element(entt, force_back, *static_cast<const value_type *>(value));
