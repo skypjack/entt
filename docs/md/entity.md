@@ -1732,7 +1732,7 @@ auto group = registry.group<position, velocity>();
 Filtering entities by components is also supported:
 
 ```cpp
-auto group = registry.group<position, velocity>(entt::exclude<renderable>);
+auto group = registry.group<position, velocity>({}, entt::exclude<renderable>);
 ```
 
 Once created, the group gets the ownership of all the components specified in
@@ -1841,7 +1841,7 @@ nested groups, an excluded component type `T` is treated as being an observed
 type `not_T`. Therefore, consider these two definitions:
 
 * `registry.group<sprite, transform>()`.
-* `registry.group<sprite, transform>(entt::exclude<rotation>)`.
+* `registry.group<sprite, transform>({}, entt::exclude<rotation>)`.
 
 They are treated as if users were defining the following groups:
 

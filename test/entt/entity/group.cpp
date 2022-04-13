@@ -1026,7 +1026,7 @@ TEST(OwningGroup, SortUnordered) {
 
 TEST(OwningGroup, SortWithExclusionList) {
     entt::registry registry;
-    auto group = registry.group<boxed_int>(entt::exclude<char>);
+    auto group = registry.group<boxed_int>({}, entt::exclude<char>);
 
     entt::entity entities[5]{};
     registry.create(std::begin(entities), std::end(entities));
@@ -1192,7 +1192,7 @@ TEST(OwningGroup, ExcludedComponents) {
     registry.emplace<int>(e1, 1);
     registry.emplace<char>(e1);
 
-    const auto group = registry.group<int>(entt::exclude<char, double>);
+    const auto group = registry.group<int>({}, entt::exclude<char, double>);
 
     const auto e2 = registry.create();
     registry.emplace<int>(e2, 2);
@@ -1263,8 +1263,8 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
 
 TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
     entt::registry registry;
-    const auto group = registry.group<int>(entt::exclude<char>);
-    const auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::exclude<char>);
+    const auto group = registry.group<int>({}, entt::exclude<char>);
+    const auto cgroup = std::as_const(registry).group_if_exists<const int>({}, entt::exclude<char>);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity);

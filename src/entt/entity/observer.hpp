@@ -13,7 +13,6 @@
 #include "fwd.hpp"
 #include "registry.hpp"
 #include "storage.hpp"
-#include "utility.hpp"
 
 namespace entt {
 

@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "../core/fwd.hpp"
-#include "utility.hpp"
+#include "../core/type_traits.hpp"
 
 namespace entt {
 
@@ -42,6 +42,48 @@ class basic_snapshot_loader;
 
 template<typename>
 class basic_continuous_loader;
+
+/**
+ * @brief Alias for exclusion lists.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+using exclude_t = type_list<Type...>;
+
+/**
+ * @brief Variable template for exclusion lists.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+inline constexpr exclude_t<Type...> exclude{};
+
+/**
+ * @brief Alias for lists of observed components.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+using get_t = type_list<Type...>;
+
+/**
+ * @brief Variable template for lists of observed components.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+inline constexpr get_t<Type...> get{};
+
+/**
+ * @brief Alias for lists of owned components.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+using owned_t = type_list<Type...>;
+
+/**
+ * @brief Variable template for lists of owned components.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+inline constexpr owned_t<Type...> owned{};
 
 /*! @brief Default entity identifier. */
 enum class entity : id_type {};
