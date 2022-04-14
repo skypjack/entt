@@ -81,7 +81,7 @@ public:
      */
     template<typename Type>
     void publish(Type &&value) {
-        if(auto &handler = assure<std::remove_const_t<std::remove_reference_t<Type>>>(); handler) {
+        if(auto &handler = assure<std::remove_cv_t<std::remove_reference_t<Type>>>(); handler) {
             handler(value, *static_cast<Derived *>(this));
         }
     }
@@ -102,7 +102,7 @@ public:
      */
     template<typename Type>
     void erase() {
-        handlers.erase(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
+        handlers.erase(type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value());
     }
 
     /*! @brief Disconnects all the listeners. */
@@ -117,7 +117,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool contains() const {
-        return handlers.contains(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
+        return handlers.contains(type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value());
     }
 
     /**
