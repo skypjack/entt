@@ -16,6 +16,82 @@
 namespace entt {
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+template<typename, typename, typename>
+class extended_group_iterator;
+
+template<typename It, typename... Owned, typename... Get>
+class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
+    template<typename Type>
+    auto index_to_element(Type &cpool) const {
+        if constexpr(ignore_as_empty_v<std::remove_const_t<typename Type::value_type>>) {
+            return std::make_tuple();
+        } else {
+            return std::forward_as_tuple(cpool.rbegin()[it.index()]);
+        }
+    }
+
+public:
+    using difference_type = std::ptrdiff_t;
+    using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Owned>().get_as_tuple({})..., std::declval<Get>().get_as_tuple({})...));
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using iterator_category = std::input_iterator_tag;
+
+    extended_group_iterator() = default;
+
+    extended_group_iterator(It from, const std::tuple<Owned *..., Get *...> &cpools)
+        : it{from},
+          pools{cpools} {}
+
+    extended_group_iterator &operator++() ENTT_NOEXCEPT {
+        return ++it, *this;
+    }
+
+    extended_group_iterator operator++(int) ENTT_NOEXCEPT {
+        extended_group_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+        return std::tuple_cat(std::make_tuple(*it), index_to_element(*std::get<Owned *>(pools))..., std::get<Get *>(pools)->get_as_tuple(*it)...);
+    }
+
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+        return operator*();
+    }
+
+    template<typename... Lhs, typename... Rhs>
+    friend bool operator==(const extended_group_iterator<Lhs...> &, const extended_group_iterator<Rhs...> &) ENTT_NOEXCEPT;
+
+private:
+    It it;
+    std::tuple<Owned *..., Get *...> pools;
+};
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] bool operator==(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+    return lhs.it == rhs.it;
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] bool operator!=(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
  * @brief Group.
  *
  * Primary template isn't defined on purpose. All the specializations give a
@@ -43,19 +119,6 @@ class basic_group;
  * In all other cases, modifying the pools iterated by the group in any way
  * invalidates all the iterators and using them results in undefined behavior.
  *
- * @note
- * Groups share references to the underlying data structures of the registry
- * that generated them. Therefore any change to the entities and to the
- * components made by means of the registry are immediately reflected by all the
- * groups.<br/>
- * Moreover, sorting a non-owning group affects all the instances of the same
- * group (it means that users don't have to call `sort` on each instance to sort
- * all of them because they _share_ entities and components).
- *
- * @warning
- * Lifetime of a group must not overcome that of the registry that generated it.
- * In any other case, attempting to use a group results in undefined behavior.
- *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Get Type of components observed by the group.
  * @tparam Exclude Types of components used to filter the group.
@@ -69,50 +132,6 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
     using basic_common_type = std::common_type_t<typename storage_type<Get>::base_type...>;
-
-    struct extended_group_iterator final {
-        using difference_type = std::ptrdiff_t;
-        using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_group>().get({})));
-        using pointer = input_iterator_pointer<value_type>;
-        using reference = value_type;
-        using iterator_category = std::input_iterator_tag;
-
-        extended_group_iterator() = default;
-
-        extended_group_iterator(typename basic_common_type::iterator from, const std::tuple<storage_type<Get> *...> &args)
-            : it{from},
-              pools{args} {}
-
-        extended_group_iterator &operator++() ENTT_NOEXCEPT {
-            return ++it, *this;
-        }
-
-        extended_group_iterator operator++(int) ENTT_NOEXCEPT {
-            extended_group_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            const auto entt = *it;
-            return std::tuple_cat(std::make_tuple(entt), std::get<storage_type<Get> *>(pools)->get_as_tuple(entt)...);
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            return operator*();
-        }
-
-        [[nodiscard]] bool operator==(const extended_group_iterator &other) const ENTT_NOEXCEPT {
-            return other.it == it;
-        }
-
-        [[nodiscard]] bool operator!=(const extended_group_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-    private:
-        typename basic_common_type::iterator it;
-        std::tuple<storage_type<Get> *...> pools;
-    };
 
     basic_group(basic_common_type &ref, storage_type<Get> &...gpool) ENTT_NOEXCEPT
         : handler{&ref},
@@ -130,7 +149,7 @@ public:
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
-    using iterable = iterable_adaptor<extended_group_iterator>;
+    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<storage_type<Get>...>>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() ENTT_NOEXCEPT
@@ -381,8 +400,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const ENTT_NOEXCEPT {
-        return handler ? iterable{extended_group_iterator{handler->begin(), pools}, extended_group_iterator{handler->end(), pools}}
-                       : iterable{extended_group_iterator{{}, pools}, extended_group_iterator{{}, pools}};
+        return iterable{{begin(), pools}, {end(), pools}};
     }
 
     /**
@@ -497,19 +515,6 @@ private:
  * In all other cases, modifying the pools iterated by the group in any way
  * invalidates all the iterators and using them results in undefined behavior.
  *
- * @note
- * Groups share references to the underlying data structures of the registry
- * that generated them. Therefore any change to the entities and to the
- * components made by means of the registry are immediately reflected by all the
- * groups.
- * Moreover, sorting an owning group affects all the instance of the same group
- * (it means that users don't have to call `sort` on each instance to sort all
- * of them because they share the underlying data structure).
- *
- * @warning
- * Lifetime of a group must not overcome that of the registry that generated it.
- * In any other case, attempting to use a group results in undefined behavior.
- *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Owned Types of components owned by the group.
  * @tparam Get Types of components observed by the group.
@@ -523,65 +528,6 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
     template<typename Comp>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
-    using basic_common_type = std::common_type_t<typename storage_type<Owned>::base_type..., typename storage_type<Get>::base_type...>;
-
-    class extended_group_iterator final {
-        template<typename Type>
-        auto index_to_element(storage_type<Type> &cpool) const {
-            if constexpr(ignore_as_empty_v<std::remove_const_t<Type>>) {
-                return std::make_tuple();
-            } else {
-                return std::forward_as_tuple(cpool.rbegin()[it.index()]);
-            }
-        }
-
-    public:
-        using difference_type = std::ptrdiff_t;
-        using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_group>().get({})));
-        using pointer = input_iterator_pointer<value_type>;
-        using reference = value_type;
-        using iterator_category = std::input_iterator_tag;
-
-        extended_group_iterator() = default;
-
-        template<typename... Other>
-        extended_group_iterator(typename basic_common_type::iterator from, const std::tuple<storage_type<Owned> *..., storage_type<Get> *...> &cpools)
-            : it{from},
-              pools{cpools} {}
-
-        extended_group_iterator &operator++() ENTT_NOEXCEPT {
-            return ++it, *this;
-        }
-
-        extended_group_iterator operator++(int) ENTT_NOEXCEPT {
-            extended_group_iterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-            return std::tuple_cat(
-                std::make_tuple(*it),
-                index_to_element<Owned>(*std::get<storage_type<Owned> *>(pools))...,
-                std::get<storage_type<Get> *>(pools)->get_as_tuple(*it)...);
-        }
-
-        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            return operator*();
-        }
-
-        [[nodiscard]] bool operator==(const extended_group_iterator &other) const ENTT_NOEXCEPT {
-            return other.it == it;
-        }
-
-        [[nodiscard]] bool operator!=(const extended_group_iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-    private:
-        typename basic_common_type::iterator it;
-        std::tuple<storage_type<Owned> *..., storage_type<Get> *...> pools;
-    };
-
     basic_group(const std::size_t &extent, storage_type<Owned> &...opool, storage_type<Get> &...gpool) ENTT_NOEXCEPT
         : pools{&opool..., &gpool...},
           length{&extent} {}
@@ -592,13 +538,13 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
+    using base_type = std::common_type_t<typename storage_type<Owned>::base_type..., typename storage_type<Get>::base_type...>;
     /*! @brief Random access iterator type. */
     using iterator = typename base_type::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
-    using iterable = iterable_adaptor<extended_group_iterator>;
+    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<storage_type<Owned>...>, get_t<storage_type<Get>...>>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() ENTT_NOEXCEPT
@@ -825,8 +771,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const ENTT_NOEXCEPT {
-        iterator last = length ? std::get<0>(pools)->basic_common_type::end() : iterator{};
-        return {extended_group_iterator{last - *length, pools}, extended_group_iterator{last, pools}};
+        return {{begin(), pools}, {end(), pools}};
     }
 
     /**
