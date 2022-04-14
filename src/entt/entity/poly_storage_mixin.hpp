@@ -7,6 +7,9 @@
 
 namespace entt {
 
+template<typename Entity, typename Type>
+class poly_type;
+
 /**
  * @brief used to add signal support for polymorphic storages
  * @tparam Entity storage entity type
@@ -210,7 +213,7 @@ public:
 
     template<typename ParentType>
     void add_self_for_type(basic_registry<entity_type>& reg) {
-        reg.poly_data().template assure<ParentType>().bind_child_storage(this);
+        reg.ctx().template emplace<poly_type<entity_type, ParentType>>().bind_child_storage(this);
     }
 
     template<typename... ParentTypes>

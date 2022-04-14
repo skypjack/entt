@@ -47,9 +47,9 @@ int main() {
     const auto entity = registry.create();
     const auto other = registry.create();
 
-    registry.on_construct<shape>().connect<on_construct>();
-    registry.on_update<shape>().connect<on_update>();
-    registry.on_destroy<shape>().connect<on_destroy>();
+//    registry.on_construct<shape>().connect<on_construct>();
+//    registry.on_update<shape>().connect<on_update>();
+//    registry.on_destroy<shape>().connect<on_destroy>();
 
     registry.emplace<circle>(entity);
     registry.emplace<rectangle>(entity);
@@ -59,35 +59,35 @@ int main() {
     registry.emplace<dog*>(other, new dog);
 
     std::cout << "\nall shapes\n";
-    registry.each_poly<shape>([](auto ent, auto& s) {
+    entt::algorithm::each_poly<shape>(registry, [](auto ent, auto& s) {
         std::cout << entt::to_entity(ent) << " -> ";
         s.draw();
         std::cout << '\n';
     });
 
     std::cout << "\nall shapes for entity " << entt::to_entity(entity) << "\n";
-    for ( shape& s : registry.poly_get_all< shape>(entity)) {
+    for ( shape& s : entt::algorithm::poly_get_all< shape>(registry, entity)) {
         s.draw();
         std::cout << '\n';
     }
 
     std::cout << "any shape for entity " << entt::to_entity(entity) << " ";
-    registry.poly_get_any<shape>(entity)->draw();
+    entt::algorithm::poly_get_any<shape>(registry, entity)->draw();
     std::cout << '\n';
 
     std::cout << "\nall animals\n";
-    registry.each_poly<const animal*>([](auto ent, const animal* a) {
+    entt::algorithm::each_poly<const animal*>(registry, [](auto ent, const animal* a) {
         std::cout << entt::to_entity(ent) << " -> ";
         a->name();
         std::cout << '\n';
     });
 
     std::cout << "\nall animals for entity " << entt::to_entity(entity) << "\n";
-    for (const animal* a : registry.poly_get_all<const animal*>(entity)) {
+    for (const animal* a : entt::algorithm::poly_get_all<const animal*>(registry, entity)) {
         a->name();
         std::cout << '\n';
     }
 
     registry.patch<circle>(entity);
-    registry.poly_remove<shape>(entity);
+    entt::algorithm::poly_remove<shape>(registry, entity);
 }

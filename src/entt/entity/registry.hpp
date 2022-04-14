@@ -1022,78 +1022,6 @@ public:
     }
 
     /**
-     * @brief For given polymorphic component type iterate over all child instances of it, attached to a given entity
-     * @tparam Component Polymorphic component type
-     * @param entity Entity, to get components from
-     * @return Iterable to iterate each component
-     */
-    template<typename Component>
-    [[nodiscard]] decltype(auto) poly_get_all([[maybe_unused]] const entity_type entity) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        return polymorphic_data.template assure<Component>().each(entity);
-    }
-
-    /**
-     * @brief For given polymorphic component type find and return any child instance of this type, attached to a given entity
-     * @tparam Component Polymorphic component type
-     * @param entity Entity, to get components from
-     * @return Pointer to attached component or nullptr, if none attached. NOTE: will return pointer type polymorphic components by value (as a single pointer)
-     */
-    template<typename Component>
-    [[nodiscard]] decltype(auto) poly_get_any([[maybe_unused]] const entity_type entity) {
-        auto all = poly_get_all<Component>(entity);
-        return all.begin() != all.end() ? all.begin().operator->() : nullptr;
-    }
-    /**
-     * @brief For given polymorphic component type remove all child instances of this type, attached to a given entity
-     * @tparam Component Polymorphic component type
-     * @param entity Entity, to remove components from
-     * @return count of removed components
-     */
-    template<typename Component>
-    int poly_remove([[maybe_unused]] const entity_type entity) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        int removed_count = 0;
-        for (auto& pool : polymorphic_data.template assure<Component>().pools()) {
-            removed_count += static_cast<int>(pool.remove(entity));
-        }
-        return removed_count;
-    }
-
-    /**
-     * @brief For a given component type applies given func to all child instances of this type in registry.
-     * @tparam Component polymorphic component type
-     * @tparam Func type of given function
-     * @param func function to call for each component, parameters are (entity, component&) or only one of them, or even none. Note: for pointer type components the component parameter is a value instead of value (single pointer)
-     */
-    template<typename Component, typename Func>
-    void each_poly(Func func) {
-        for (auto& pool : polymorphic_data.template assure<Component>().pools()) {
-            for (auto& ent : pool.pool()) {
-                if constexpr(std::is_invocable_v<Func, entity_type, Component&>) {
-                    auto ptr = pool.try_get(ent);
-                    if constexpr(std::is_pointer_v<Component>) {
-                        func(ent, ptr);
-                    } else {
-                        func(ent, *ptr);
-                    }
-                } else if constexpr(std::is_invocable_v<Func, Component&>) {
-                    auto ptr = pool.try_get(ent);
-                    if constexpr(std::is_pointer_v<Component>) {
-                        func(ptr);
-                    } else {
-                        func(*ptr);
-                    }
-                } else if constexpr(std::is_invocable_v<Func, entity_type>) {
-                    func(ent);
-                } else {
-                    func();
-                }
-            }
-        }
-    }
-
-    /**
      * @brief Returns a reference to the given component for an entity.
      *
      * In case the entity doesn't own the component, the parameters provided are
@@ -1539,26 +1467,12 @@ public:
         return vars;
     }
 
-    /**
-     * @brief Returns entt::poly_types_data object, that holds all information about polymorphic types in this registry
-     * @return object, that holds information about all polymorphic types in this registry
-     */
-    auto& poly_data() ENTT_NOEXCEPT {
-        return polymorphic_data;
-    }
-
-    /** @copydoc poly_data */
-    [[nodiscard]] const auto& poly_data() const ENTT_NOEXCEPT {
-        return polymorphic_data;
-    }
-
 private:
     dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
     std::vector<group_data> groups;
     std::vector<entity_type> epool;
     entity_type free_list;
     context vars;
-    poly_types_data<entity_type> polymorphic_data;
 };
 
 } // namespace entt

@@ -145,6 +145,7 @@ private:
  * @endcond
  */
 
+
 namespace entt {
 
 /** @brief base class for entt::poly_pool_holder */
@@ -160,15 +161,6 @@ protected:
     basic_sparse_set<Entity>* pool_ptr;
     void* (*getter_ptr)(void*, Entity) ENTT_NOEXCEPT;
     bool (*remover_ptr)(void*, Entity);
-};
-
-/** @brief base class for entt::poly_type */
-template<typename Entity>
-class poly_type_base {
-protected:
-    using child_pools_container = std::vector<poly_pool_holder_base<Entity>>;
-
-    child_pools_container child_pool_holders{};
 };
 
 /**
@@ -229,7 +221,7 @@ public:
  * @tparam Entity
  */
 template<typename Entity, typename Type>
-class poly_type : public poly_type_base<Entity> {
+class poly_type {
     /** @brief internally used to convert base_poly_pool_holder to a pool_poly_holder<Entity, Type> during the iteration */
     struct cast_pool_holder {
         auto& operator()(poly_pool_holder_base<Entity>& holder) {
@@ -247,7 +239,7 @@ public:
     /** @brief component type */
     using value_type = Type;
     /** @brief type of the underlying pool container */
-    using pools_container = typename poly_type_base<Entity>::child_pools_container;
+    using pools_container = std::vector<poly_pool_holder_base<Entity>>;
     /** @brief pool iterator type */
     using pools_iterator = internal::converting_iterator<cast_pool_holder, typename pools_container::iterator>;
     /** @brief const pool iterator type */
@@ -333,62 +325,149 @@ public:
         auto end = const_pools_iterator(this->child_pool_holders.cend());
         return { const_component_iterator(ent, begin, end), const_component_iterator(ent, end, end) };
     }
+
+private:
+    pools_container child_pool_holders{};
 };
 
+
 /**
- * @brief Holds all data of all poly types in this registry
+ * @brief Provides access of runtime polymorphic type data. Allows user to create specializations
+ * to store polymorphic type data separately from the registry
+ * Must specialize assure<Type>() method, where Type is poly_type<entity, component>
+ * @tparam PolyTypesData underlying polymorphic types data storage type
+ */
+template<typename PolyTypesData>
+struct poly_types_accessor;
+
+/**
+ * poly_types_accessor specialisation to access runtime polymorphic type data, stored in the registry context
  * @tparam Entity
  */
 template<typename Entity>
-class poly_types_data {
-    /**
-     * @brief converts const T* to T* const, used in assert,
-     * because first one looks much more intuitive, when the second is identical to const T for value types, but for pointers
-     */
-    template<typename T>
-    using sanitize_poly_type_t = std::conditional_t<std::is_pointer_v<T>,
-        constness_as_t<std::remove_const_t<std::remove_pointer_t<T>>*, std::remove_pointer_t<T>>, T>;
-
-public:
-    /**
-     * @param id type id of polymorphic type
-     * @return poly_type for given type id
-     */
-    inline auto& assure(const id_type id) {
-        return types[id];
-    }
-
-    /** @copydoc assure */
-    inline const auto& assure(const id_type id) const {
-        if(const auto it = types.find(id); it != types.cend()) {
-            return static_cast<const poly_type_base<Entity> &>(*it->second);
-        }
-        static poly_type_base<Entity> placeholder{};
-        return placeholder;
-    }
-
+struct poly_types_accessor<basic_registry<Entity>> {
     /**
      * @tparam T polymorphic type
      * @return poly_type for given type
      */
     template<typename T>
-    inline decltype(auto) assure() {
-        using type = sanitize_poly_type_t<T>;
-        using no_const_type = std::remove_const_t<type>;
-        static_assert(is_poly_type_v<no_const_type>);
-        return static_cast<constness_as_t<poly_type<Entity, no_const_type>, type>&>(assure(type_id<no_const_type>().hash()));
+    static inline decltype(auto) assure(basic_registry<Entity>& reg) {
+        return reg.ctx().template emplace<T>();
     }
-
-    /** @copydoc assure */
-    template<typename T>
-    inline const auto& assure() const {
-        using no_const_type = std::remove_const_t<sanitize_poly_type_t<T>>;
-        static_assert(is_poly_type_v<no_const_type>);
-        return static_cast<const poly_type<Entity, no_const_type>&>(assure(type_id<no_const_type>().hash()));
-    }
-private:
-    dense_map<id_type, poly_type_base<Entity>, identity> types{};
 };
+
+/**
+ * Converts const T* to T* const, used in assure_poly_type, because first one looks much more intuitive,
+ * when the second is identical to const T for value types, but for pointers
+ */
+template<typename T>
+using sanitize_poly_type_t = std::conditional_t<std::is_pointer_v<T> && !std::is_const_v<T>,
+                                                constness_as_t<std::remove_const_t<std::remove_pointer_t<T>>*, std::remove_pointer_t<T>>, T>;
+
+/**
+ * @brief Assures runtime polymorphic type data for a given entity and component types.
+ * @tparam Entity entity type
+ * @tparam Component polymorphic component type
+ * @tparam PolyTypesData underlying runtime polymorphic types data storage type
+ * @param data runtime polymorphic types data
+ * @return reference to poly_type<Entity, Component>, keeps const qualifiers both for Component and PolyData
+ */
+template<typename Entity, typename Component, typename PolyTypesData>
+[[nodiscard]] decltype(auto) assure_poly_type(PolyTypesData& data) {
+    using type = sanitize_poly_type_t<Component>;
+    using no_const_type = std::remove_const_t<type>;
+    static_assert(is_poly_type_v<no_const_type>, "must be a polymorphic type");
+
+    using result_type = poly_type<Entity, no_const_type>;
+    result_type& result = poly_types_accessor<PolyTypesData>::template assure<result_type>(const_cast<std::remove_const_t<PolyTypesData>&>(data));
+    if constexpr(std::is_const_v<type> || std::is_const_v<PolyTypesData>) {
+        return const_cast<const result_type&>(result);
+    } else {
+        return result;
+    }
+}
+
+} // namespace entt
+
+
+namespace entt::algorithm {
+
+/**
+ * @brief For given polymorphic component type iterate over all child instances of it, attached to a given entity
+ * @tparam Component Polymorphic component type
+ * @param entity Entity, to get components from
+ * @return Iterable to iterate each component
+ */
+template<typename Component, typename Entity>
+[[nodiscard]] decltype(auto) poly_get_all(basic_registry<Entity>& reg, [[maybe_unused]] const Entity entity) {
+    ENTT_ASSERT(reg.valid(entity), "Invalid entity");
+    return assure_poly_type<Entity, Component>(reg).each(entity);
+}
+
+/**
+ * @brief For given polymorphic component type find and return any child instance of this type, attached to a given entity
+ * @tparam Component Polymorphic component type
+ * @param entity Entity, to get components from
+ * @return Pointer to attached component or nullptr, if none attached. NOTE: will return pointer type polymorphic components by value (as a single pointer)
+ */
+template<typename Component, typename Entity>
+[[nodiscard]] decltype(auto) poly_get_any(basic_registry<Entity>& reg, [[maybe_unused]] const Entity entity) {
+    auto all = poly_get_all<Component>(reg, entity);
+    return all.begin() != all.end() ? all.begin().operator->() : nullptr;
+}
+
+/**
+ * @brief For given polymorphic component type remove all child instances of this type, attached to a given entity
+ * @tparam Component Polymorphic component type
+ * @param entity Entity, to remove components from
+ * @return count of removed components
+ */
+template<typename Component, typename Entity>
+int poly_remove(basic_registry<Entity>& reg, [[maybe_unused]] const Entity entity) {
+    ENTT_ASSERT(reg.valid(entity), "Invalid entity");
+    int removed_count = 0;
+    for (auto& pool : assure_poly_type<Entity, Component>(reg).pools()) {
+        removed_count += static_cast<int>(pool.remove(entity));
+    }
+    return removed_count;
+}
+
+/**
+ * @brief For a given component type applies given func to all child instances of this type in registry.
+ * @tparam Component polymorphic component type
+ * @tparam Entity entity type of underlying registry
+ * @tparam Func type of given function
+ * @param reg registry to operate on
+ * @param func function to call for each component, parameters are (entity, component&) or only one of them, or even none. Note: for pointer type components the component parameter is a value instead of value (single pointer)
+ */
+template<typename Component, typename Entity, typename Func>
+void each_poly(basic_registry<Entity>& reg, Func func) {
+    for (auto& pool : assure_poly_type<Entity, Component>(reg).pools()) {
+        for (auto& ent : pool.pool()) {
+            if constexpr(std::is_invocable_v<Func, Entity, Component&>) {
+                auto ptr = pool.try_get(ent);
+                if constexpr(std::is_pointer_v<Component>) {
+                    func(ent, ptr);
+                } else {
+                    func(ent, *ptr);
+                }
+            } else if constexpr(std::is_invocable_v<Func, Component&>) {
+                auto ptr = pool.try_get(ent);
+                if constexpr(std::is_pointer_v<Component>) {
+                    func(ptr);
+                } else {
+                    func(*ptr);
+                }
+            } else if constexpr(std::is_invocable_v<Func, Entity>) {
+                func(ent);
+            } else {
+                func();
+            }
+        }
+    }
+}
+
+} // namespace entt::algorithm
 
 
 /**
@@ -397,7 +476,7 @@ private:
  * @tparam Type polymorphic component type
  */
 template<typename Entity, typename Type>
-struct storage_traits<Entity, Type, std::enable_if_t<is_poly_type_v<Type>>> {
+struct entt::storage_traits<Entity, Type, std::enable_if_t<entt::is_poly_type_v<Type>>> {
     template<typename... T>
     struct parent_guard;
 
@@ -414,6 +493,5 @@ public:
     using storage_type = poly_storage_mixin<basic_storage<Entity, guarded_type>, Entity, guarded_type>;
 };
 
-} // namespace entt
 
 #endif // ENTT_ENTITY_POLYMORPHIC_HPP
