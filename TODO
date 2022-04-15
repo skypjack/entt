@@ -18,6 +18,7 @@ WIP:
 * entity-only and exclude-only views
 * custom allocators all over
 * use ENTT_NOEXCEPT_IF as appropriate (ie make compressed_pair conditionally noexcept)
+* add test for maximum number of entities reached
 
 WIP:
 * add user data to type_info
