@@ -47,9 +47,9 @@ int main() {
     const auto entity = registry.create();
     const auto other = registry.create();
 
-//    registry.on_construct<shape>().connect<on_construct>();
-//    registry.on_update<shape>().connect<on_update>();
-//    registry.on_destroy<shape>().connect<on_destroy>();
+    registry.on_construct<circle>().connect<on_construct>();
+    registry.on_update<circle>().connect<on_update>();
+    registry.on_destroy<circle>().connect<on_destroy>();
 
     registry.emplace<circle>(entity);
     registry.emplace<rectangle>(entity);

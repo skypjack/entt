@@ -7,6 +7,10 @@
 
 namespace entt {
 
+/** @brief Validates a polymorphic type and returns it unchanged */
+template<typename T, typename... Parents>
+struct poly_type_validate;
+
 /**
  * @brief declares direct parent types of polymorphic component type.
  * By default it uses the list from T::direct_parent_types, if it present, otherwise empty list is used.
@@ -110,6 +114,23 @@ struct is_poly_type<T, std::void_t<typename poly_direct_parent_types<T>::not_red
 template<typename T>
 static constexpr bool is_poly_type_v = is_poly_type<T>::value;
 
+/** @copydoc poly_type_validate */
+template<typename T, typename... Parents>
+struct poly_type_validate<T, type_list<Parents...>> {
+    static_assert(std::is_same_v<std::decay_t<T>, T>, "only decayed types allowed to be declared as polymorphic");
+    static_assert(is_poly_type_v<T>, "validating non-polymorphic type (probably some polymorphic type inherits type, that was not declared polymorphic)");
+    static_assert((is_poly_type_v<Parents> && ...), "all parent types of a polymorphic type must be also polymorphic");
+    static_assert((!std::is_pointer_v<std::remove_pointer_t<T>> && ... && !std::is_pointer_v<std::remove_pointer_t<Parents>>), "double pointers are not allowed as a polymorphic components");
+    static_assert(((std::is_pointer_v<T> == std::is_pointer_v<Parents>) && ...), "you cannot mix pointer-based and value-based polymorphic components inside one hierarchy");
+
+    /** @brief same input type, but validated */
+    using type = T;
+};
+
+/** @copydoc poly_type_validate */
+template<typename T>
+using poly_type_validate_t = typename poly_type_validate<T, poly_parent_types_t<T>>::type;
+
 /**
  * @brief used to inherit from all given parent types and declare inheriting type polymorphic with given direct parents.
  * All parent types are required to be polymorphic
@@ -121,29 +142,8 @@ static constexpr bool is_poly_type_v = is_poly_type<T>::value;
  * @tparam Parents list of parent types
  */
 template<typename... Parents>
-struct inherit : public Parents... {
-    static_assert((is_poly_type_v<Parents> && ...), "entt::inherit must be used only with polymorphic types");
+struct inherit : public poly_type_validate_t<Parents>... {
     using direct_parent_types = type_list<Parents...>;
-};
-
-/**
- * @brief TODO
- */
-template<typename T>
-struct poly_all {
-    static_assert(is_poly_type_v<T>, "entt::poly_all must be used only with polymorphic types");
-    using type = T;
-    using poly_all_tag = void;
-};
-
-/**
- * @brief TODO
- */
-template<typename T>
-struct poly_any {
-    static_assert(is_poly_type_v<T>, "entt::poly_any must be used only with polymorphic types");
-    using type = T;
-    using poly_any_tag = void;
 };
 
 } // entt

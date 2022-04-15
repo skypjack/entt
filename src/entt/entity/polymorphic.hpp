@@ -374,7 +374,7 @@ struct poly_types_accessor<basic_registry<Entity>> {
  * when the second is identical to const T for value types, but for pointers
  */
 template<typename T>
-using sanitize_poly_type_t = std::conditional_t<std::is_pointer_v<T> && !std::is_const_v<T>,
+using poly_type_sanitize_t = std::conditional_t<std::is_pointer_v<T> && !std::is_const_v<T>,
                                                 constness_as_t<std::remove_const_t<std::remove_pointer_t<T>>*, std::remove_pointer_t<T>>, T>;
 
 /**
@@ -386,8 +386,8 @@ using sanitize_poly_type_t = std::conditional_t<std::is_pointer_v<T> && !std::is
  */
 template<typename Component, typename PolyPoolsHolder>
 [[nodiscard]] decltype(auto) assure_poly_type(PolyPoolsHolder& holder) {
-    using type = sanitize_poly_type_t<Component>;
-    using no_const_type = std::remove_const_t<type>;
+    using type = poly_type_sanitize_t<Component>;
+    using no_const_type = poly_type_validate_t<std::remove_const_t<type>>;
     static_assert(is_poly_type_v<no_const_type>, "must be a polymorphic type");
 
     using result_type = poly_type<typename PolyPoolsHolder::entity_type, no_const_type>;
@@ -492,20 +492,7 @@ void each_poly(PolyPoolsHolder& reg, Func func) {
  */
 template<typename Entity, typename Type>
 struct entt::storage_traits<Entity, Type, std::enable_if_t<entt::is_poly_type_v<Type>>> {
-    template<typename... T>
-    struct parent_guard;
-
-    /** @brief used to assert, that all parent types of the component are polymorphic */
-    template<typename T, typename... Parents>
-    struct parent_guard<T, type_list<Parents...>> {
-        static_assert((is_poly_type_v<Parents> && ...), "all parents of polymorphic type must be also declared polymorphic");
-        using type = T;
-    };
-
-    using guarded_type = typename parent_guard<Type, poly_parent_types_t<Type>>::type;
-
-public:
-    using storage_type = poly_storage_mixin<basic_storage<Entity, guarded_type>, Entity, guarded_type>;
+    using storage_type = sigh_storage_mixin<poly_storage_mixin<basic_storage<Entity, poly_type_validate_t<Type>>>>;
 };
 
 
