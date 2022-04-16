@@ -9,7 +9,6 @@ EXAMPLES
 WIP:
 * emitter: runtime handlers, allocator support (ready for both already)
 * view/group: no storage_traits dependency -> use storage instead of components for the definition
-* resource<T>::operator</<=/>/>=
 * basic_storage::bind for cross-registry setups
 * uses-allocator construction: any (with allocator support), poly, ...
 * process scheduler: reviews, use free lists internally
@@ -17,6 +16,7 @@ WIP:
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
 * entity-only and exclude-only views
 * custom allocators all over
+* remove storage::patch
 * use ENTT_NOEXCEPT_IF as appropriate (ie make compressed_pair conditionally noexcept)
 
 WIP:

@@ -128,3 +128,17 @@ TEST(Resource, DynamicResourceHandleCast) {
     ASSERT_FALSE(cast);
     ASSERT_EQ(resource.use_count(), 1u);
 }
+
+TEST(Resource, Comparison) {
+    entt::resource<derived> resource{std::make_shared<derived>()};
+    entt::resource<const base> other = resource;
+
+    ASSERT_TRUE(resource == other);
+    ASSERT_FALSE(resource != other);
+
+    ASSERT_FALSE(resource < other);
+    ASSERT_FALSE(resource > other);
+
+    ASSERT_TRUE(resource <= other);
+    ASSERT_TRUE(resource >= other);
+}
