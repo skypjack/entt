@@ -374,8 +374,11 @@ struct poly_types_accessor<basic_registry<Entity>> {
  * when the second is identical to const T for value types, but for pointers
  */
 template<typename T>
-using poly_type_sanitize_t = std::conditional_t<std::is_pointer_v<T> && !std::is_const_v<T>,
-                                                constness_as_t<std::remove_const_t<std::remove_pointer_t<T>>*, std::remove_pointer_t<T>>, T>;
+using poly_type_sanitize_t = std::conditional_t<std::is_pointer_v<T>,
+    std::conditional_t<std::is_const_v<T>,
+        std::remove_const_t<std::remove_pointer_t<T>>* const, // (const?) T* const
+        constness_as_t<std::remove_const_t<std::remove_pointer_t<T>>*, std::remove_pointer_t<T>>> // (const?) T*
+                                                , T>; // (const?) T
 
 /**
  * @brief Assures runtime polymorphic type data for a given component types in the given polymorphic data holder
@@ -446,6 +449,37 @@ int poly_remove(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
 }
 
 /**
+* @brief For given polymorphic component type count all child instances of this type, attached to a given entity
+* @tparam Component Polymorphic component type
+* @param reg Registry, or any other polymorphic data holder to operate on
+* @param entity Entity, to count attached components
+* @return Count of components, attached to a given entity
+  */
+template<typename Component, typename Entity, typename PolyPoolsHolder>
+size_t poly_count(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
+    size_t count = 0;
+    for ([[maybe_unused]] auto& component : poly_get_all<Component>(reg, entity)) {
+        count++;
+    }
+    return count;
+}
+
+/**
+* @brief For given polymorphic component type count all child instances of this type
+* @tparam Component Polymorphic component type
+* @param reg Registry, or any other polymorphic data holder to operate on
+* @return Count of components
+ */
+template<typename Component, typename PolyPoolsHolder>
+size_t poly_count(PolyPoolsHolder& reg) {
+    size_t count = 0;
+    for (auto& pool : assure_poly_type<Component>(reg).pools()) {
+        count += pool.pool().size();
+    }
+    return count;
+}
+
+/**
  * @brief For a given component type applies given func to all child instances of this type in registry.
  * @tparam Component Polymorphic component type
  * @tparam PolyPoolsHolder Entity type of underlying registry
@@ -456,7 +490,7 @@ int poly_remove(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
  * Note: for pointer type components (T*) the component parameter is its value (T*) instead of pointer to value (T**)
  */
 template<typename Component, typename PolyPoolsHolder, typename Entity = typename PolyPoolsHolder::entity_type, typename Func>
-void each_poly(PolyPoolsHolder& reg, Func func) {
+void poly_each(PolyPoolsHolder& reg, Func func) {
     for (auto& pool : assure_poly_type<Component>(reg).pools()) {
         for (auto& ent : pool.pool()) {
             if constexpr(std::is_invocable_v<Func, Entity, Component&>) {
@@ -496,4 +530,4 @@ struct entt::storage_traits<Entity, Type, std::enable_if_t<entt::is_poly_type_v<
 };
 
 
-#endif // ENTT_ENTITY_POLYMORPHIC_HPP
+#endif

@@ -12,7 +12,7 @@ template<typename T, typename... Parents>
 struct poly_type_validate;
 
 /**
- * @brief declares direct parent types of polymorphic component type.
+ * @brief Declares direct parent types of polymorphic component type.
  * By default it uses the list from T::direct_parent_types, if it present, otherwise empty list is used.
  * All parent types must be declared polymorphic.
  * @code{.cpp}
@@ -44,7 +44,7 @@ struct poly_direct_parent_types<T, std::void_t<typename T::direct_parent_types>>
 };
 
 /**
- * @brief for given polymorphic component type returns entt::type_list of direct parent types,
+ * @brief For given polymorphic component type returns entt::type_list of direct parent types,
  * for non polymorphic type will return empty list
  * @tparam T type to get parents from
  */
@@ -52,7 +52,7 @@ template<typename T>
 using poly_direct_parent_types_t = typename poly_direct_parent_types<T>::parent_types;
 
 /**
- * @brief declares list of all parent types of polymorphic component type.
+ * @brief Declares list of all parent types of polymorphic component type.
  * By default will concatenates list of all direct parent types and all lists of all parents for each parent type. All parent
  * types must be declared polymorphic.
  * @tparam T
@@ -83,20 +83,18 @@ struct poly_parent_types<T, std::void_t<typename T::all_parent_types>> {
 };
 
 /**
- * @brief for given polymorphic component type returns entt::type_list of all parent types,
+ * @brief For given polymorphic component type returns entt::type_list of all parent types,
  * for non polymorphic type will return empty list
  * @tparam T type to get parents from
  */
 template<typename T>
 using poly_parent_types_t = typename poly_parent_types<T>::parent_types;
 
-
 /**
- * @brief for given type, detects, if it was declared polymorphic. Type considered polymorphic,
- * if it was either:
- *  - inherited from entt::inherit
- *  - declared types direct_parent_types or all_parent_types
- *  - for this type there is specialization of either entt::poly_direct_parent_types or entt::poly_parent_types
+ * @brief For a given type, detects, if it was declared polymorphic. Type considered polymorphic, if it was either:<br/>
+ *  - inherited from entt::inherit<br/>
+ *  - declared types direct_parent_types or all_parent_types<br/>
+ *  - for this type there is specialization of either entt::poly_direct_parent_types or entt::poly_parent_types<br/>
  * @tparam T type to check
  */
 template<typename T, typename = void>
@@ -132,7 +130,15 @@ template<typename T>
 using poly_type_validate_t = typename poly_type_validate<T, poly_parent_types_t<T>>::type;
 
 /**
- * @brief used to inherit from all given parent types and declare inheriting type polymorphic with given direct parents.
+ * @brief Returns if one polymorphic component type is same, or is declared as a parent of another polymorphic type
+ * @tparam Parent Parent type
+ * @tparam Type Child Type
+ */
+template<typename Parent, typename Type>
+constexpr bool is_poly_parent_of_v = is_poly_type_v<Type> && (type_list_contains_v<poly_parent_types_t<Type>, Parent> || std::is_same_v<Type, Parent>);
+
+/**
+ * @brief Used to inherit from all given parent types and declare inheriting type polymorphic with given direct parents.
  * All parent types are required to be polymorphic
  * @code{.cpp}
  * struct A : public entt::inherit<> {}; // base polymorphic type with no parents
@@ -148,4 +154,4 @@ struct inherit : public poly_type_validate_t<Parents>... {
 
 } // entt
 
-#endif // ENTT_ENTITY_POLY_TYPE_TRAITS_HPP
+#endif

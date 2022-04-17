@@ -54,4 +54,4 @@ private:
 
 } // entt
 
-#endif // ENTT_ENTITY_POLY_STORAGE_MIXIN_HPP
+#endif
