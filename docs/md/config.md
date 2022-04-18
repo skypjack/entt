@@ -7,7 +7,7 @@
 
 * [Introduction](#introduction)
 * [Definitions](#definitions)
-  * [ENTT_NOEXCEPTION](#entt_noexcept)
+  * [ENTT_NOEXCEPTION](#entt_noexception)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
   * [ENTT_ID_TYPE](#entt_id_type)
   * [ENTT_SPARSE_PAGE](#entt_sparse_page)
