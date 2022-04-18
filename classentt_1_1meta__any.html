@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -114,7 +114,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ae9298a9b894c870392da35f696fbb044"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value assignment operator.  <a href="classentt_1_1meta__any.html#ae9298a9b894c870392da35f696fbb044">More...</a><br /></td></tr>
 <tr class="separator:ae9298a9b894c870392da35f696fbb044"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bdf87354f140b2738e2f72d07af3350"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__type.html">meta_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__any.html#a8bdf87354f140b2738e2f72d07af3350">type</a> () const</td></tr>
-<tr class="memdesc:a8bdf87354f140b2738e2f72d07af3350"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the type of the underlying object.  <a href="classentt_1_1meta__any.html#a8bdf87354f140b2738e2f72d07af3350">More...</a><br /></td></tr>
+<tr class="memdesc:a8bdf87354f140b2738e2f72d07af3350"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the object type if any, <code>type_id&lt;void&gt;()</code> otherwise.  <a href="classentt_1_1meta__any.html#a8bdf87354f140b2738e2f72d07af3350">More...</a><br /></td></tr>
 <tr class="separator:a8bdf87354f140b2738e2f72d07af3350"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c16bceaf56eda12158f4b71ef879d5c"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__any.html#a3c16bceaf56eda12158f4b71ef879d5c">data</a> () const</td></tr>
 <tr class="memdesc:a3c16bceaf56eda12158f4b71ef879d5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an opaque pointer to the contained instance.  <a href="classentt_1_1meta__any.html#a3c16bceaf56eda12158f4b71ef879d5c">More...</a><br /></td></tr>
@@ -175,14 +175,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a3bb2e8e8a5eeb1cfaf1710b43382fef4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the contained object by creating a new instance directly.  <a href="classentt_1_1meta__any.html#a3bb2e8e8a5eeb1cfaf1710b43382fef4">More...</a><br /></td></tr>
 <tr class="separator:a3bb2e8e8a5eeb1cfaf1710b43382fef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a022362d5bb8ee42e3637e3d64a22027a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__any.html#a022362d5bb8ee42e3637e3d64a22027a">assign</a> (const <a class="el" href="classentt_1_1meta__any.html">meta_any</a> &amp;other)</td></tr>
-<tr class="memdesc:a022362d5bb8ee42e3637e3d64a22027a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assigns a value to the contained object without replacing it.  <a href="classentt_1_1meta__any.html#a022362d5bb8ee42e3637e3d64a22027a">More...</a><br /></td></tr>
+<tr class="memdesc:a022362d5bb8ee42e3637e3d64a22027a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a value to the contained object without replacing it.  <a href="classentt_1_1meta__any.html#a022362d5bb8ee42e3637e3d64a22027a">More...</a><br /></td></tr>
 <tr class="separator:a022362d5bb8ee42e3637e3d64a22027a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77e67e73023b213a5fe46f88820f571f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__any.html#a77e67e73023b213a5fe46f88820f571f">assign</a> (<a class="el" href="classentt_1_1meta__any.html">meta_any</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:a77e67e73023b213a5fe46f88820f571f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assigns a value to the contained object without replacing it.  <a href="classentt_1_1meta__any.html#a77e67e73023b213a5fe46f88820f571f">More...</a><br /></td></tr>
+<tr class="memdesc:a77e67e73023b213a5fe46f88820f571f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a value to the contained object without replacing it.  <a href="classentt_1_1meta__any.html#a77e67e73023b213a5fe46f88820f571f">More...</a><br /></td></tr>
 <tr class="separator:a77e67e73023b213a5fe46f88820f571f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92cb99988bdeb9453f2470b02c5249fb"><td class="memItemLeft" align="right" valign="top"><a id="a92cb99988bdeb9453f2470b02c5249fb"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__any.html#a92cb99988bdeb9453f2470b02c5249fb">reset</a> ()</td></tr>
-<tr class="memdesc:a92cb99988bdeb9453f2470b02c5249fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys contained object. <br /></td></tr>
+<tr class="memitem:a92cb99988bdeb9453f2470b02c5249fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__any.html#a92cb99988bdeb9453f2470b02c5249fb">reset</a> ()</td></tr>
+<tr class="memdesc:a92cb99988bdeb9453f2470b02c5249fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys contained object.  <a href="classentt_1_1meta__any.html#a92cb99988bdeb9453f2470b02c5249fb">More...</a><br /></td></tr>
 <tr class="separator:a92cb99988bdeb9453f2470b02c5249fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69ce5b726f86d8a5dc0a5a7ddf2f7c0e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__sequence__container.html">meta_sequence_container</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__any.html#a69ce5b726f86d8a5dc0a5a7ddf2f7c0e">as_sequence_container</a> ()</td></tr>
 <tr class="memdesc:a69ce5b726f86d8a5dc0a5a7ddf2f7c0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a sequence container proxy.  <a href="classentt_1_1meta__any.html#a69ce5b726f86d8a5dc0a5a7ddf2f7c0e">More...</a><br /></td></tr>
@@ -218,7 +217,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Opaque wrapper for values of any type. </p>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00148">148</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00141">141</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a327704bdb52c21b9ea8f221cdac11b20"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a327704bdb52c21b9ea8f221cdac11b20">&#9670;&nbsp;</a></span>meta_any() <span class="overload">[1/4]</span></h2>
@@ -424,7 +423,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there exists a viable conversion, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00458">458</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00452">452</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -462,7 +461,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid meta any object if there exists a viable conversion, an invalid one otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00442">442</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00436">436</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -499,7 +498,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there exists a viable conversion, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00423">423</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00417">417</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -536,7 +535,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid meta any object if there exists a viable conversion, an invalid one otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01408">1408</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01380">1380</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -566,7 +565,7 @@ template&lt;typename Type &gt; </div>
 <p>Returns an associative container proxy. </p>
 <dl class="section return"><dt>Returns</dt><dd>An associative container proxy for the underlying object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00530">530</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00511">511</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -596,7 +595,7 @@ template&lt;typename Type &gt; </div>
 <p>Returns an associative container proxy. </p>
 <dl class="section return"><dt>Returns</dt><dd>An associative container proxy for the underlying object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00538">538</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00519">519</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -626,7 +625,7 @@ template&lt;typename Type &gt; </div>
 <p>Aliasing constructor. </p>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper that shares a reference to an unmanaged object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00577">577</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00551">551</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -656,7 +655,7 @@ template&lt;typename Type &gt; </div>
 <p>Aliasing constructor. </p>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper that shares a reference to an unmanaged object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00582">582</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00556">556</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -686,7 +685,7 @@ template&lt;typename Type &gt; </div>
 <p>Returns a sequence container proxy. </p>
 <dl class="section return"><dt>Returns</dt><dd>A sequence container proxy for the underlying object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00511">511</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00492">492</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -716,7 +715,7 @@ template&lt;typename Type &gt; </div>
 <p>Returns a sequence container proxy. </p>
 <dl class="section return"><dt>Returns</dt><dd>A sequence container proxy for the underlying object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00519">519</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00500">500</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -744,7 +743,7 @@ template&lt;typename Type &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Copy assigns a value to the contained object without replacing it. </p>
+<p>Assigns a value to the contained object without replacing it. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">other</td><td>The value to assign to the contained object. </td></tr>
@@ -753,7 +752,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True in case of success, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01439">1439</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01411">1411</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -781,7 +780,7 @@ template&lt;typename Type &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Move assigns a value to the contained object without replacing it. </p>
+<p>Assigns a value to the contained object without replacing it. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">other</td><td>The value to assign to the contained object. </td></tr>
@@ -790,7 +789,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True in case of success, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01444">1444</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01416">1416</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -830,7 +829,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the contained instance. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00403">403</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00397">397</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -870,7 +869,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the contained instance. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00395">395</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00389">389</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -900,7 +899,7 @@ template&lt;typename Type &gt; </div>
 <p>Returns an opaque pointer to the contained instance. </p>
 <dl class="section return"><dt>Returns</dt><dd>An opaque pointer the contained instance, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00300">300</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00294">294</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -930,7 +929,7 @@ template&lt;typename Type &gt; </div>
 <p>Returns an opaque pointer to the contained instance. </p>
 <dl class="section return"><dt>Returns</dt><dd>An opaque pointer the contained instance, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00295">295</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00289">289</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -975,7 +974,7 @@ template&lt;typename Type , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00478">478</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00467">467</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1012,7 +1011,7 @@ template&lt;typename Type , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper containing the value of the underlying variable. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01404">1404</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01376">1376</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1049,7 +1048,7 @@ template&lt;typename Type , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper containing the value of the underlying variable. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01400">1400</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01372">1372</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1098,7 +1097,7 @@ template&lt;typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper containing the returned value, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01391">1391</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01363">1363</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1147,7 +1146,7 @@ template&lt;typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper containing the returned value, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01386">1386</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01358">1358</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1177,7 +1176,7 @@ template&lt;typename... Args&gt; </div>
 <p>Returns false if a wrapper is invalid, true otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>False if the wrapper is invalid, true otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00560">560</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00541">541</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1207,7 +1206,7 @@ template&lt;typename... Args&gt; </div>
 <p>Indirection operator for dereferencing opaque objects. </p>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper that shares a reference to an unmanaged object if the wrapped element is dereferenceable, an invalid meta any otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00550">550</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00531">531</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1363,7 +1362,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>False if the two objects differ in their content, true otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00569">569</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00546">546</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1393,7 +1392,36 @@ template&lt;typename Type &gt; </div>
 <p>Returns true if a wrapper owns its object, false otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the wrapper owns its object, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00590">590</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00561">561</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a92cb99988bdeb9453f2470b02c5249fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92cb99988bdeb9453f2470b02c5249fb">&#9670;&nbsp;</a></span>reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void entt::meta_any::reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Destroys contained object. </p>
+
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00481">481</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1442,7 +1470,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True in case of success, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01396">1396</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01368">1368</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1480,7 +1508,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (possibly null) pointer to the contained instance. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00369">369</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00363">363</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1518,7 +1546,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (possibly null) pointer to the contained instance. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00351">351</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00345">345</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -1545,10 +1573,10 @@ template&lt;typename Type &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the type of the underlying object. </p>
-<dl class="section return"><dt>Returns</dt><dd>The type of the underlying object, if any. </dd></dl>
+<p>Returns the object type if any, <code>type_id&lt;void&gt;()</code> otherwise. </p>
+<dl class="section return"><dt>Returns</dt><dd>The object type if any, <code>type_id&lt;void&gt;()</code> otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01381">1381</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01353">1353</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>

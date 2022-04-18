@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -109,7 +109,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a08417d17ad41c753ec292abdeafd1782"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether a data member is static or not.  <a href="structentt_1_1meta__data.html#a08417d17ad41c753ec292abdeafd1782">More...</a><br /></td></tr>
 <tr class="separator:a08417d17ad41c753ec292abdeafd1782"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad088d09cff4cea8b136d05a0d30049e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__type.html">meta_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#ad088d09cff4cea8b136d05a0d30049e6">type</a> () const</td></tr>
-<tr class="memdesc:ad088d09cff4cea8b136d05a0d30049e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the type of the underlying object.  <a href="structentt_1_1meta__data.html#ad088d09cff4cea8b136d05a0d30049e6">More...</a><br /></td></tr>
+<tr class="memdesc:ad088d09cff4cea8b136d05a0d30049e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the object type if any, <code>type_id&lt;void&gt;()</code> otherwise.  <a href="structentt_1_1meta__data.html#ad088d09cff4cea8b136d05a0d30049e6">More...</a><br /></td></tr>
 <tr class="separator:ad088d09cff4cea8b136d05a0d30049e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cec301b83378b11ad316663e8ece835"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
 <tr class="memitem:a9cec301b83378b11ad316663e8ece835"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__data.html#a9cec301b83378b11ad316663e8ece835">set</a> (<a class="el" href="structentt_1_1meta__handle.html">meta_handle</a> instance, Type &amp;&amp;value) const</td></tr>
@@ -134,7 +134,7 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Opaque wrapper for data members. </p>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00743">743</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00714">714</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a287652cfd950c698d124d12820ec9d10"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a287652cfd950c698d124d12820ec9d10">&#9670;&nbsp;</a></span>meta_data()</h2>
@@ -168,7 +168,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00750">750</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00721">721</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -206,7 +206,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The type accepted by the i-th setter. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01460">1460</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01432">1432</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -236,7 +236,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns the number of setters available. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of setters available. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00762">762</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00733">733</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -265,7 +265,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the value of a given variable. </p>
-<p>It must be possible to cast the instance to the parent type of the data member. Otherwise, invoking the getter results in an undefined behavior.</p>
+<p>It must be possible to cast the instance to the parent type of the data member.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">instance</td><td>An opaque instance of the underlying type. </td></tr>
@@ -274,7 +274,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A wrapper containing the value of the underlying variable. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00813">813</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00783">783</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -304,7 +304,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns the identifier assigned to a type. </p>
 <dl class="section return"><dt>Returns</dt><dd>The identifier assigned to the type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00754">754</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00725">725</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -334,7 +334,7 @@ Public Member Functions</h2></td></tr>
 <p>Indicates whether a data member is constant or not. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the data member is constant, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00770">770</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00741">741</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +364,7 @@ Public Member Functions</h2></td></tr>
 <p>Indicates whether a data member is static or not. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the data member is static, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00778">778</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00749">749</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -394,7 +394,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns true if an object is valid, false otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the object is valid, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00851">851</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00821">821</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -424,7 +424,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns a range to visit registered meta properties. </p>
 <dl class="section return"><dt>Returns</dt><dd>An iterable range to visit registered meta properties. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00828">828</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00798">798</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +461,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The registered meta property for the given key, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00837">837</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00807">807</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -502,7 +502,7 @@ template&lt;typename Type &gt; </div>
 </div><div class="memdoc">
 
 <p>Sets the value of a given variable. </p>
-<p>It must be possible to cast the instance to the parent type of the data member. Otherwise, invoking the setter results in an undefined behavior.<br  />
+<p>It must be possible to cast the instance to the parent type of the data member.<br  />
  The type of the value is such that a cast or conversion to the type of the variable is possible. Otherwise, invoking the setter does nothing.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -519,7 +519,7 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True in case of success, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00800">800</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00770">770</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -546,10 +546,10 @@ template&lt;typename Type &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the type of the underlying object. </p>
-<dl class="section return"><dt>Returns</dt><dd>The type of the underlying object, if any. </dd></dl>
+<p>Returns the object type if any, <code>type_id&lt;void&gt;()</code> otherwise. </p>
+<dl class="section return"><dt>Returns</dt><dd>The object type if any, <code>type_id&lt;void&gt;()</code> otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01452">1452</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01424">1424</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>

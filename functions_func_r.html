@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -75,15 +75,12 @@ $(function() {
 , <a class="el" href="classentt_1_1basic__storage.html#a294e9330b74e232a905b9f78a6524917">entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;</a>
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#a3469e9faa0e1c34beead1a483f1b0504">entt::basic_view&lt; Entity, get_t&lt; Component &gt;, exclude_t&lt;&gt;, std::void_t&lt; std::enable_if_t&lt;!component_traits&lt; std::remove_const_t&lt; Component &gt; &gt;::in_place_delete &gt; &gt; &gt;</a>
 </li>
-<li>ref()
-: <a class="el" href="structentt_1_1service__locator.html#a5379f8d798c2de5b1c41756ba3959e06">entt::service_locator&lt; Service &gt;</a>
-</li>
 <li>registry()
 : <a class="el" href="structentt_1_1basic__handle.html#a32db2781fd85be391ba5cb39a8fd3b57">entt::basic_handle&lt; Entity, Type &gt;</a>
 </li>
 <li>rehash()
-: <a class="el" href="classentt_1_1dense__hash__map.html#ab75c7e8afb0a3564f49844829a74a7bf">entt::dense_hash_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__set.html#aaec6797bcad6e06dc6f4c1b7f88088a8">entt::dense_hash_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
+: <a class="el" href="classentt_1_1dense__map.html#acfb4e8961af9f2be78836aa8ecba464d">entt::dense_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__set.html#a41d37c3108301ef8021e00f33daeeada">entt::dense_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
 </li>
 <li>rejected()
 : <a class="el" href="classentt_1_1process.html#a871cc9aa013c2aba9f7c0712a5fe3b98">entt::process&lt; Derived, Delta &gt;</a>
@@ -95,9 +92,6 @@ $(function() {
 </li>
 <li>released()
 : <a class="el" href="classentt_1_1basic__registry.html#a48630f103bc6448af1f2b2928df4f488">entt::basic_registry&lt; Entity &gt;</a>
-</li>
-<li>reload()
-: <a class="el" href="classentt_1_1resource__cache.html#a99bb176aa037d33218b4ea625a82300c">entt::resource_cache&lt; Resource &gt;</a>
 </li>
 <li>remove()
 : <a class="el" href="structentt_1_1basic__handle.html#ac47661c3d8845005ac3826c6c124a2d5">entt::basic_handle&lt; Entity, Type &gt;</a>
@@ -119,24 +113,24 @@ $(function() {
 : <a class="el" href="classentt_1_1basic__registry.html#a97677776c466a310547be1fdfdf84ff9">entt::basic_registry&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__sparse__set.html#a58d49df52ee3133a1347dc01131a4f1a">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
 , <a class="el" href="classentt_1_1basic__storage.html#a9006cd644effed8a5290283d05352ce7">entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__map.html#ac97a269ac4883ed9b269ca33a2728724">entt::dense_hash_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__set.html#a031f5e348d126c0c68c08dc49024a17c">entt::dense_hash_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__map.html#aefd32a0147886f0470267db5cabbb06d">entt::dense_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__set.html#ad2d49660bbbfe781919f2ea9bf0ff167">entt::dense_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
 </li>
 <li>reset()
 : <a class="el" href="classentt_1_1basic__any.html#a0f267d3bbc148e7e240b902b1819c9a6">entt::basic_any&lt; Len, Align &gt;</a>
 , <a class="el" href="classentt_1_1basic__poly.html#a43ab35169a0fdb31f7f5db5e5ad0e17d">entt::basic_poly&lt; Concept, Len, Align &gt;</a>
 , <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a20cfbc558d087ab1022a41f9453d2f3f">entt::delegate&lt; Ret(Args...)&gt;</a>
+, <a class="el" href="structentt_1_1locator.html#acf587655946b69f0c483c204a76ca84b">entt::locator&lt; Service &gt;</a>
 , <a class="el" href="classentt_1_1meta__any.html#a92cb99988bdeb9453f2470b02c5249fb">entt::meta_any</a>
-, <a class="el" href="structentt_1_1service__locator.html#a4d655acab54d87058ad41a266830d0e8">entt::service_locator&lt; Service &gt;</a>
 </li>
 <li>resize()
 : <a class="el" href="classentt_1_1meta__sequence__container.html#a7ef2656ac8dcdfb0b78313dab532f531">entt::meta_sequence_container</a>
 </li>
-<li>resource_cache()
-: <a class="el" href="classentt_1_1resource__cache.html#a919d10578aeda6ad9dd04e1b969b8a9c">entt::resource_cache&lt; Resource &gt;</a>
+<li>resource()
+: <a class="el" href="classentt_1_1resource.html#a5d2a41b70dfa8111f9c6dbab77f736ad">entt::resource&lt; Type &gt;</a>
 </li>
-<li>resource_handle()
-: <a class="el" href="classentt_1_1resource__handle.html#afb9bff321847029a473ffe4e7c486b42">entt::resource_handle&lt; Resource &gt;</a>
+<li>resource_cache()
+: <a class="el" href="classentt_1_1resource__cache.html#a06ba856c4484f52a91a8ee140a223bd5">entt::resource_cache&lt; Type, Loader, Allocator &gt;</a>
 </li>
 <li>respect()
 : <a class="el" href="classentt_1_1basic__sparse__set.html#ad6b9f10f5212846bfea6e4fd0ba7a1e4">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
@@ -149,9 +143,6 @@ $(function() {
 </li>
 <li>ro_dependency()
 : <a class="el" href="structentt_1_1basic__organizer_1_1vertex.html#a8b5be2b47c8609fcf3cb9df26c2b3c86">entt::basic_organizer&lt; Entity &gt;::vertex</a>
-</li>
-<li>runtime_view()
-: <a class="el" href="classentt_1_1basic__registry.html#af1d54beb5ae95d5f867c60c05319d1eb">entt::basic_registry&lt; Entity &gt;</a>
 </li>
 <li>rw_count()
 : <a class="el" href="structentt_1_1basic__organizer_1_1vertex.html#a0d1f98d28191735e9d22cce081f98b02">entt::basic_organizer&lt; Entity &gt;::vertex</a>

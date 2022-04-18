@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -85,8 +85,8 @@ $(function() {
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Types&gt;</div>
 <div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classentt_1_1identifier.html">   41</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1identifier.html">identifier</a> {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type, std::size_t... Index&gt;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    [[nodiscard]] <span class="keyword">static</span> constexpr <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> get(std::index_sequence&lt;Index...&gt;) {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        static_assert(std::disjunction_v&lt;std::is_same&lt;Type, Types&gt;...&gt;, <span class="stringliteral">&quot;Invalid type&quot;</span>);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    [[nodiscard]] <span class="keyword">static</span> constexpr <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> get(std::index_sequence&lt;Index...&gt;) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        static_assert((std::is_same_v&lt;Type, Types&gt; || ...), <span class="stringliteral">&quot;Invalid type&quot;</span>);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keywordflow">return</span> (0 + ... + (std::is_same_v&lt;Type, <a class="code" href="namespaceentt.html#ac839c1a03dba2436791d0056d6d0d1b6">type_list_element_t</a>&lt;Index, <a class="code" href="structentt_1_1type__list.html">type_list</a>&lt;std::decay_t&lt;Types&gt;...&gt;&gt;&gt; ? <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>{Index} : <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>{}));</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    }</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
@@ -103,8 +103,8 @@ $(function() {
 <div class="ttc" id="aclassentt_1_1identifier_html"><div class="ttname"><a href="classentt_1_1identifier.html">entt::identifier</a></div><div class="ttdoc">Types identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00041">ident.hpp:41</a></div></div>
 <div class="ttc" id="aclassentt_1_1identifier_html_a5ed0559dce16ea40707502274dba382b"><div class="ttname"><a href="classentt_1_1identifier.html#a5ed0559dce16ea40707502274dba382b">entt::identifier::identifier_type</a></div><div class="ttdeci">id_type identifier_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00050">ident.hpp:50</a></div></div>
 <div class="ttc" id="aclassentt_1_1identifier_html_adb3aad553b8d57ef94581af39fc53178"><div class="ttname"><a href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">entt::identifier::type</a></div><div class="ttdeci">static constexpr identifier_type type</div><div class="ttdoc">Statically generated unique identifier for the given type.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00054">ident.hpp:54</a></div></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="dense__hash__map_8hpp_source.html#l00021">dense_hash_map.hpp:21</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00013">fwd.hpp:13</a></div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="dense__map_8hpp_source.html#l00022">dense_map.hpp:22</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00014">fwd.hpp:14</a></div></div>
 <div class="ttc" id="anamespaceentt_html_ac839c1a03dba2436791d0056d6d0d1b6"><div class="ttname"><a href="namespaceentt.html#ac839c1a03dba2436791d0056d6d0d1b6">entt::type_list_element_t</a></div><div class="ttdeci">typename type_list_element&lt; Index, List &gt;::type type_list_element_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00148">type_traits.hpp:148</a></div></div>
 <div class="ttc" id="astructentt_1_1type__list_html"><div class="ttname"><a href="structentt_1_1type__list.html">entt::type_list</a></div><div class="ttdoc">A class to use to push around lists of types, nothing more.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00110">type_traits.hpp:110</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

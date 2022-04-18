@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -100,10 +100,10 @@ Collaboration diagram for entt::basic_storage&lt; Entity, Type, Allocator, std::
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:adc648d57a591eff7041e3891711ee1e3"><td class="memItemLeft" align="right" valign="top"><a id="adc648d57a591eff7041e3891711ee1e3"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#adc648d57a591eff7041e3891711ee1e3">base_type</a> = <a class="el" href="classentt_1_1basic__sparse__set.html">basic_sparse_set</a>&lt; Entity, typename allocator_traits::template rebind_alloc&lt; Entity &gt; &gt;</td></tr>
-<tr class="memdesc:adc648d57a591eff7041e3891711ee1e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base type. <br /></td></tr>
-<tr class="separator:adc648d57a591eff7041e3891711ee1e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94e9ea42f96a26560c82ec23c4dd03bf"><td class="memItemLeft" align="right" valign="top"><a id="a94e9ea42f96a26560c82ec23c4dd03bf"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a94e9ea42f96a26560c82ec23c4dd03bf">base_type</a> = <a class="el" href="classentt_1_1basic__sparse__set.html">underlying_type</a></td></tr>
+<tr class="memdesc:a94e9ea42f96a26560c82ec23c4dd03bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base type. <br /></td></tr>
+<tr class="separator:a94e9ea42f96a26560c82ec23c4dd03bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8f51651fb3f99ee794787e29dbaf870"><td class="memItemLeft" align="right" valign="top"><a id="ad8f51651fb3f99ee794787e29dbaf870"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#ad8f51651fb3f99ee794787e29dbaf870">allocator_type</a> = Allocator</td></tr>
 <tr class="memdesc:ad8f51651fb3f99ee794787e29dbaf870"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocator type. <br /></td></tr>
@@ -121,7 +121,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="memdesc:a67b50c6160f2ef1fc5ecbfaaad9c67f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
 <tr class="separator:a67b50c6160f2ef1fc5ecbfaaad9c67f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a371bf4723147609e9ba3a3ec5525f052"><td class="memItemLeft" align="right" valign="top"><a id="a371bf4723147609e9ba3a3ec5525f052"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a371bf4723147609e9ba3a3ec5525f052">iterable</a> = <a class="el" href="structentt_1_1iterable__adaptor.html">iterable_adaptor</a>&lt; internal::extended_storage_iterator&lt; typename <a class="el" href="classentt_1_1basic__sparse__set.html#a79c9252bb1121ae98e12c3308c150726">base_type::iterator</a> &gt; &gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a371bf4723147609e9ba3a3ec5525f052">iterable</a> = <a class="el" href="structentt_1_1iterable__adaptor.html">iterable_adaptor</a>&lt; internal::extended_storage_iterator&lt; typename <a class="el" href="classentt_1_1basic__sparse__set.html#a6cea231ae7386a12487164d918f632b0">base_type::iterator</a> &gt; &gt;</td></tr>
 <tr class="memdesc:a371bf4723147609e9ba3a3ec5525f052"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extended iterable storage proxy. <br /></td></tr>
 <tr class="separator:a371bf4723147609e9ba3a3ec5525f052"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c73c836c2ef40a29b3caafc714ae61e"><td class="memItemLeft" align="right" valign="top"><a id="a1c73c836c2ef40a29b3caafc714ae61e"></a>
@@ -149,16 +149,16 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a8b18963e68d4f003e19389fd342f90cc">pointer</a> = typename packed_container_type::const_pointer</td></tr>
 <tr class="memdesc:a8b18963e68d4f003e19389fd342f90cc inherit pub_types_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer type to contained entities. <br /></td></tr>
 <tr class="separator:a8b18963e68d4f003e19389fd342f90cc inherit pub_types_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79c9252bb1121ae98e12c3308c150726 inherit pub_types_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="a79c9252bb1121ae98e12c3308c150726"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a79c9252bb1121ae98e12c3308c150726">iterator</a> = internal::sparse_set_iterator&lt; packed_container_type &gt;</td></tr>
-<tr class="memdesc:a79c9252bb1121ae98e12c3308c150726 inherit pub_types_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Random access iterator type. <br /></td></tr>
-<tr class="separator:a79c9252bb1121ae98e12c3308c150726 inherit pub_types_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cea231ae7386a12487164d918f632b0 inherit pub_types_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="a6cea231ae7386a12487164d918f632b0"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a6cea231ae7386a12487164d918f632b0">iterator</a> = <a class="el" href="classentt_1_1basic__sparse__set.html#ac56bb654b47a648d64a754d85c70b40a">basic_iterator</a></td></tr>
+<tr class="memdesc:a6cea231ae7386a12487164d918f632b0 inherit pub_types_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Random access iterator type. <br /></td></tr>
+<tr class="separator:a6cea231ae7386a12487164d918f632b0 inherit pub_types_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3688979d568f2450725d69aa89571f4f inherit pub_types_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="a3688979d568f2450725d69aa89571f4f"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a3688979d568f2450725d69aa89571f4f">const_iterator</a> = <a class="el" href="classentt_1_1basic__sparse__set.html#a79c9252bb1121ae98e12c3308c150726">iterator</a></td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a3688979d568f2450725d69aa89571f4f">const_iterator</a> = <a class="el" href="classentt_1_1basic__sparse__set.html#a6cea231ae7386a12487164d918f632b0">iterator</a></td></tr>
 <tr class="memdesc:a3688979d568f2450725d69aa89571f4f inherit pub_types_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant random access iterator type. <br /></td></tr>
 <tr class="separator:a3688979d568f2450725d69aa89571f4f inherit pub_types_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe62c143e816cf5e12078a607966c003 inherit pub_types_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="afe62c143e816cf5e12078a607966c003"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#afe62c143e816cf5e12078a607966c003">reverse_iterator</a> = std::reverse_iterator&lt; <a class="el" href="classentt_1_1basic__sparse__set.html#a79c9252bb1121ae98e12c3308c150726">iterator</a> &gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#afe62c143e816cf5e12078a607966c003">reverse_iterator</a> = std::reverse_iterator&lt; <a class="el" href="classentt_1_1basic__sparse__set.html#a6cea231ae7386a12487164d918f632b0">iterator</a> &gt;</td></tr>
 <tr class="memdesc:afe62c143e816cf5e12078a607966c003 inherit pub_types_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reverse iterator type. <br /></td></tr>
 <tr class="separator:afe62c143e816cf5e12078a607966c003 inherit pub_types_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d0d07e67ebda136c33fe39ea193c69e inherit pub_types_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="a4d0d07e67ebda136c33fe39ea193c69e"></a>
@@ -193,10 +193,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7f4f6cd9032955d975bc7da5e5577231"><td class="memItemLeft" align="right" valign="top">std::tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a7f4f6cd9032955d975bc7da5e5577231">get_as_tuple</a> ([[maybe_unused]] const <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#aad06de6f2dce8a44864026f4584176f1">entity_type</a> entt) const</td></tr>
 <tr class="memdesc:a7f4f6cd9032955d975bc7da5e5577231"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an empty tuple.  <a href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a7f4f6cd9032955d975bc7da5e5577231">More...</a><br /></td></tr>
 <tr class="separator:a7f4f6cd9032955d975bc7da5e5577231"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a022a515247ef30e35163755e3faaffaa"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
-<tr class="memitem:a022a515247ef30e35163755e3faaffaa"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a022a515247ef30e35163755e3faaffaa">emplace</a> (const <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#aad06de6f2dce8a44864026f4584176f1">entity_type</a> entt, Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:a022a515247ef30e35163755e3faaffaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a storage and constructs its object.  <a href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a022a515247ef30e35163755e3faaffaa">More...</a><br /></td></tr>
-<tr class="separator:a022a515247ef30e35163755e3faaffaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3f1982eeb9d1dbcf61b55091df2e9a5"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:ae3f1982eeb9d1dbcf61b55091df2e9a5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#ae3f1982eeb9d1dbcf61b55091df2e9a5">emplace</a> (const <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#aad06de6f2dce8a44864026f4584176f1">entity_type</a> entt, Args &amp;&amp;...)</td></tr>
+<tr class="memdesc:ae3f1982eeb9d1dbcf61b55091df2e9a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a storage and constructs its object.  <a href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#ae3f1982eeb9d1dbcf61b55091df2e9a5">More...</a><br /></td></tr>
+<tr class="separator:ae3f1982eeb9d1dbcf61b55091df2e9a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9840b8e1334f079dec3a37d46fb9a1fe"><td class="memTemplParams" colspan="2">template&lt;typename... Func&gt; </td></tr>
 <tr class="memitem:a9840b8e1334f079dec3a37d46fb9a1fe"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a9840b8e1334f079dec3a37d46fb9a1fe">patch</a> ([[maybe_unused]] const <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#aad06de6f2dce8a44864026f4584176f1">entity_type</a> entt, Func &amp;&amp;...func)</td></tr>
 <tr class="memdesc:a9840b8e1334f079dec3a37d46fb9a1fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the instance assigned to a given entity in-place.  <a href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#a9840b8e1334f079dec3a37d46fb9a1fe">More...</a><br /></td></tr>
@@ -222,8 +222,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8e264ab5a7e2d97a204004d25b14238b inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a8e264ab5a7e2d97a204004d25b14238b">basic_sparse_set</a> (<a class="el" href="namespaceentt.html#abc4d0fa77fae26e7c01793990996c581">deletion_policy</a> pol, const <a class="el" href="classentt_1_1basic__sparse__set.html#af6faaccfb0c465afb6173b0fb8a37069">allocator_type</a> &amp;allocator={})</td></tr>
 <tr class="memdesc:a8e264ab5a7e2d97a204004d25b14238b inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty container with the given policy and allocator.  <a href="classentt_1_1basic__sparse__set.html#a8e264ab5a7e2d97a204004d25b14238b">More...</a><br /></td></tr>
 <tr class="separator:a8e264ab5a7e2d97a204004d25b14238b inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a437620052f5c5ff261715e607d6a0b35 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a437620052f5c5ff261715e607d6a0b35">basic_sparse_set</a> (const <a class="el" href="classentt_1_1type__info.html">type_info</a> &amp;value, <a class="el" href="namespaceentt.html#abc4d0fa77fae26e7c01793990996c581">deletion_policy</a> pol=deletion_policy::swap_and_pop, const <a class="el" href="classentt_1_1basic__sparse__set.html#af6faaccfb0c465afb6173b0fb8a37069">allocator_type</a> &amp;allocator={})</td></tr>
-<tr class="memdesc:a437620052f5c5ff261715e607d6a0b35 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty container with the given policy and allocator.  <a href="classentt_1_1basic__sparse__set.html#a437620052f5c5ff261715e607d6a0b35">More...</a><br /></td></tr>
+<tr class="memitem:a437620052f5c5ff261715e607d6a0b35 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a437620052f5c5ff261715e607d6a0b35">basic_sparse_set</a> (const <a class="el" href="structentt_1_1type__info.html">type_info</a> &amp;value, <a class="el" href="namespaceentt.html#abc4d0fa77fae26e7c01793990996c581">deletion_policy</a> pol=deletion_policy::swap_and_pop, const <a class="el" href="classentt_1_1basic__sparse__set.html#af6faaccfb0c465afb6173b0fb8a37069">allocator_type</a> &amp;allocator={})</td></tr>
+<tr class="memdesc:a437620052f5c5ff261715e607d6a0b35 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty container with the given value type, policy and allocator.  <a href="classentt_1_1basic__sparse__set.html#a437620052f5c5ff261715e607d6a0b35">More...</a><br /></td></tr>
 <tr class="separator:a437620052f5c5ff261715e607d6a0b35 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba22aad9557f355b657798a1e2fd9aad inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#aba22aad9557f355b657798a1e2fd9aad">basic_sparse_set</a> (<a class="el" href="classentt_1_1basic__sparse__set.html">basic_sparse_set</a> &amp;&amp;other)</td></tr>
 <tr class="memdesc:aba22aad9557f355b657798a1e2fd9aad inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor.  <a href="classentt_1_1basic__sparse__set.html#aba22aad9557f355b657798a1e2fd9aad">More...</a><br /></td></tr>
@@ -247,9 +247,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a02c273b23bb87b33e04dc598409eeede inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceentt.html#abc4d0fa77fae26e7c01793990996c581">deletion_policy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a02c273b23bb87b33e04dc598409eeede">policy</a> () const</td></tr>
 <tr class="memdesc:a02c273b23bb87b33e04dc598409eeede inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the deletion policy of a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a02c273b23bb87b33e04dc598409eeede">More...</a><br /></td></tr>
 <tr class="separator:a02c273b23bb87b33e04dc598409eeede inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cfe17211583fcac905a462dbe2d1c09 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a6f41f1b0b70a30ee160cf2734bec448f">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a3cfe17211583fcac905a462dbe2d1c09">slot</a> () const</td></tr>
-<tr class="memdesc:a3cfe17211583fcac905a462dbe2d1c09 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the next slot available for insertion.  <a href="classentt_1_1basic__sparse__set.html#a3cfe17211583fcac905a462dbe2d1c09">More...</a><br /></td></tr>
-<tr class="separator:a3cfe17211583fcac905a462dbe2d1c09 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58d49df52ee3133a1347dc01131a4f1a inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a58d49df52ee3133a1347dc01131a4f1a">reserve</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a6f41f1b0b70a30ee160cf2734bec448f">size_type</a> cap)</td></tr>
 <tr class="memdesc:a58d49df52ee3133a1347dc01131a4f1a inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the capacity of a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a58d49df52ee3133a1347dc01131a4f1a">More...</a><br /></td></tr>
 <tr class="separator:a58d49df52ee3133a1347dc01131a4f1a inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -278,7 +275,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:aaffd322c619ff4cb1545cd38eb01b04d inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a3688979d568f2450725d69aa89571f4f">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#aaffd322c619ff4cb1545cd38eb01b04d">cbegin</a> () const</td></tr>
 <tr class="memdesc:aaffd322c619ff4cb1545cd38eb01b04d inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="classentt_1_1basic__sparse__set.html#aaffd322c619ff4cb1545cd38eb01b04d">More...</a><br /></td></tr>
 <tr class="separator:aaffd322c619ff4cb1545cd38eb01b04d inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34c40a25499f47f87e13591aa378a0fb inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a79c9252bb1121ae98e12c3308c150726">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a34c40a25499f47f87e13591aa378a0fb">end</a> () const</td></tr>
+<tr class="memitem:a34c40a25499f47f87e13591aa378a0fb inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a6cea231ae7386a12487164d918f632b0">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a34c40a25499f47f87e13591aa378a0fb">end</a> () const</td></tr>
 <tr class="memdesc:a34c40a25499f47f87e13591aa378a0fb inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="classentt_1_1basic__sparse__set.html#a34c40a25499f47f87e13591aa378a0fb">More...</a><br /></td></tr>
 <tr class="separator:a34c40a25499f47f87e13591aa378a0fb inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedb8abe8289cd85a48b990d66cb7f90c inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a3688979d568f2450725d69aa89571f4f">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#aedb8abe8289cd85a48b990d66cb7f90c">cend</a> () const</td></tr>
@@ -296,7 +293,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a27796ccfcc21635bebede97f3d97a7af inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a4d0d07e67ebda136c33fe39ea193c69e">const_reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a27796ccfcc21635bebede97f3d97a7af">crend</a> () const</td></tr>
 <tr class="memdesc:a27796ccfcc21635bebede97f3d97a7af inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reverse iterator to the end.  <a href="classentt_1_1basic__sparse__set.html#a27796ccfcc21635bebede97f3d97a7af">More...</a><br /></td></tr>
 <tr class="separator:a27796ccfcc21635bebede97f3d97a7af inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82ea72545db86b1c25a790772d015c3d inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a79c9252bb1121ae98e12c3308c150726">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a82ea72545db86b1c25a790772d015c3d">find</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a91c6508fa13b0b3e27679c3c814e6148">entity_type</a> entt) const</td></tr>
+<tr class="memitem:a82ea72545db86b1c25a790772d015c3d inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a6cea231ae7386a12487164d918f632b0">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a82ea72545db86b1c25a790772d015c3d">find</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a91c6508fa13b0b3e27679c3c814e6148">entity_type</a> entt) const</td></tr>
 <tr class="memdesc:a82ea72545db86b1c25a790772d015c3d inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an entity.  <a href="classentt_1_1basic__sparse__set.html#a82ea72545db86b1c25a790772d015c3d">More...</a><br /></td></tr>
 <tr class="separator:a82ea72545db86b1c25a790772d015c3d inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2c7f1ac19e1040c2c2d2245f521f291 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#ad2c7f1ac19e1040c2c2d2245f521f291">contains</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a91c6508fa13b0b3e27679c3c814e6148">entity_type</a> entt) const</td></tr>
@@ -320,12 +317,15 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:af14c08f49b27ce6404d1603b0c28f472 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#af14c08f49b27ce6404d1603b0c28f472">get</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a91c6508fa13b0b3e27679c3c814e6148">entity_type</a> entt)</td></tr>
 <tr class="memdesc:af14c08f49b27ce6404d1603b0c28f472 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the element assigned to an entity, if any.  <a href="classentt_1_1basic__sparse__set.html#af14c08f49b27ce6404d1603b0c28f472">More...</a><br /></td></tr>
 <tr class="separator:af14c08f49b27ce6404d1603b0c28f472 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54e6ca3fb905b6341faae9547e0c4a56 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a54e6ca3fb905b6341faae9547e0c4a56">emplace</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a91c6508fa13b0b3e27679c3c814e6148">entity_type</a> entt, const void *value=nullptr)</td></tr>
-<tr class="memdesc:a54e6ca3fb905b6341faae9547e0c4a56 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a54e6ca3fb905b6341faae9547e0c4a56">More...</a><br /></td></tr>
-<tr class="separator:a54e6ca3fb905b6341faae9547e0c4a56 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a3903daddc7ec0a8260d8828b009402 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a1a3903daddc7ec0a8260d8828b009402">insert</a> (It first, It last)</td></tr>
-<tr class="memdesc:a1a3903daddc7ec0a8260d8828b009402 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns one or more entities to a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a1a3903daddc7ec0a8260d8828b009402">More...</a><br /></td></tr>
-<tr class="separator:a1a3903daddc7ec0a8260d8828b009402 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b8e9abf9cbe8e9955b4f6f12f4c19b2 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a6cea231ae7386a12487164d918f632b0">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a5b8e9abf9cbe8e9955b4f6f12f4c19b2">emplace</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a91c6508fa13b0b3e27679c3c814e6148">entity_type</a> entt, const void *value=nullptr)</td></tr>
+<tr class="memdesc:a5b8e9abf9cbe8e9955b4f6f12f4c19b2 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a5b8e9abf9cbe8e9955b4f6f12f4c19b2">More...</a><br /></td></tr>
+<tr class="separator:a5b8e9abf9cbe8e9955b4f6f12f4c19b2 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adde9ce48f5ac80b0e79927306ce62937 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#adde9ce48f5ac80b0e79927306ce62937">bump</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a91c6508fa13b0b3e27679c3c814e6148">entity_type</a> entt)</td></tr>
+<tr class="memdesc:adde9ce48f5ac80b0e79927306ce62937 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bump the version number of an entity.  <a href="classentt_1_1basic__sparse__set.html#adde9ce48f5ac80b0e79927306ce62937">More...</a><br /></td></tr>
+<tr class="separator:adde9ce48f5ac80b0e79927306ce62937 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9730e27e1155b725975120a8c494b3e2 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1basic__sparse__set.html#a6cea231ae7386a12487164d918f632b0">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a9730e27e1155b725975120a8c494b3e2">insert</a> (It first, It last)</td></tr>
+<tr class="memdesc:a9730e27e1155b725975120a8c494b3e2 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns one or more entities to a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a9730e27e1155b725975120a8c494b3e2">More...</a><br /></td></tr>
+<tr class="separator:a9730e27e1155b725975120a8c494b3e2 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a41589e81003ca86b8a6104842680cb inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a0a41589e81003ca86b8a6104842680cb">erase</a> (const <a class="el" href="classentt_1_1basic__sparse__set.html#a91c6508fa13b0b3e27679c3c814e6148">entity_type</a> entt)</td></tr>
 <tr class="memdesc:a0a41589e81003ca86b8a6104842680cb inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases an entity from a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a0a41589e81003ca86b8a6104842680cb">More...</a><br /></td></tr>
 <tr class="separator:a0a41589e81003ca86b8a6104842680cb inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -358,7 +358,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a6560773b887906122d50a413aea1faad">clear</a> ()</td></tr>
 <tr class="memdesc:a6560773b887906122d50a413aea1faad inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears a sparse set. <br /></td></tr>
 <tr class="separator:a6560773b887906122d50a413aea1faad inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac560b393e391e11d203455a0c1ffc027 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1type__info.html">type_info</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#ac560b393e391e11d203455a0c1ffc027">type</a> () const</td></tr>
+<tr class="memitem:ac560b393e391e11d203455a0c1ffc027 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structentt_1_1type__info.html">type_info</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#ac560b393e391e11d203455a0c1ffc027">type</a> () const</td></tr>
 <tr class="memdesc:ac560b393e391e11d203455a0c1ffc027 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returned value type, if any.  <a href="classentt_1_1basic__sparse__set.html#ac560b393e391e11d203455a0c1ffc027">More...</a><br /></td></tr>
 <tr class="separator:ac560b393e391e11d203455a0c1ffc027 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a407121400cf9f3a843caf131f169b4f1 inherit pub_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="a407121400cf9f3a843caf131f169b4f1"></a>
@@ -368,27 +368,21 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_types_classentt_1_1basic__sparse__set"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classentt_1_1basic__sparse__set')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classentt_1_1basic__sparse__set.html">entt::basic_sparse_set&lt; Entity, std::allocator_traits&lt; Allocator &gt;::template rebind_alloc&lt; Entity &gt; &gt;</a></td></tr>
+<tr class="memitem:ac56bb654b47a648d64a754d85c70b40a inherit pro_types_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="ac56bb654b47a648d64a754d85c70b40a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#ac56bb654b47a648d64a754d85c70b40a">basic_iterator</a> = internal::sparse_set_iterator&lt; packed_container_type &gt;</td></tr>
+<tr class="memdesc:ac56bb654b47a648d64a754d85c70b40a inherit pro_types_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Random access iterator type. <br /></td></tr>
+<tr class="separator:ac56bb654b47a648d64a754d85c70b40a inherit pro_types_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classentt_1_1basic__sparse__set"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classentt_1_1basic__sparse__set')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classentt_1_1basic__sparse__set.html">entt::basic_sparse_set&lt; Entity, std::allocator_traits&lt; Allocator &gt;::template rebind_alloc&lt; Entity &gt; &gt;</a></td></tr>
-<tr class="memitem:a47d951c4f97bfb7f871d1a2bcc475e7c inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">virtual const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a47d951c4f97bfb7f871d1a2bcc475e7c">get_at</a> (const std::size_t) const</td></tr>
-<tr class="memdesc:a47d951c4f97bfb7f871d1a2bcc475e7c inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the element assigned to an entity.  <a href="classentt_1_1basic__sparse__set.html#a47d951c4f97bfb7f871d1a2bcc475e7c">More...</a><br /></td></tr>
-<tr class="separator:a47d951c4f97bfb7f871d1a2bcc475e7c inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7839ecd024cf400c2d5e8d22c8cff05f inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="a7839ecd024cf400c2d5e8d22c8cff05f"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a7839ecd024cf400c2d5e8d22c8cff05f">swap_at</a> (const std::size_t, const std::size_t)</td></tr>
-<tr class="memdesc:a7839ecd024cf400c2d5e8d22c8cff05f inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swaps two entities in a sparse set. <br /></td></tr>
-<tr class="separator:a7839ecd024cf400c2d5e8d22c8cff05f inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe61ba2bc567ec90efd60b619ba76d57 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top"><a id="abe61ba2bc567ec90efd60b619ba76d57"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#abe61ba2bc567ec90efd60b619ba76d57">move_and_pop</a> (const std::size_t, const std::size_t)</td></tr>
-<tr class="memdesc:abe61ba2bc567ec90efd60b619ba76d57 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Moves an entity in a sparse set. <br /></td></tr>
-<tr class="separator:abe61ba2bc567ec90efd60b619ba76d57 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40f3640062e18305e4fc7742f4f4c284 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a40f3640062e18305e4fc7742f4f4c284">swap_and_pop</a> (const Entity entt)</td></tr>
-<tr class="memdesc:a40f3640062e18305e4fc7742f4f4c284 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase an entity from a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a40f3640062e18305e4fc7742f4f4c284">More...</a><br /></td></tr>
-<tr class="separator:a40f3640062e18305e4fc7742f4f4c284 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac307017fd20239e750c615986ba97bdf inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#ac307017fd20239e750c615986ba97bdf">in_place_pop</a> (const Entity entt)</td></tr>
-<tr class="memdesc:ac307017fd20239e750c615986ba97bdf inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase an entity from a sparse set.  <a href="classentt_1_1basic__sparse__set.html#ac307017fd20239e750c615986ba97bdf">More...</a><br /></td></tr>
-<tr class="separator:ac307017fd20239e750c615986ba97bdf inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2ffa27c249f22f503464d44df33271b inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#ad2ffa27c249f22f503464d44df33271b">try_emplace</a> (const Entity entt, const void *=nullptr)</td></tr>
-<tr class="memdesc:ad2ffa27c249f22f503464d44df33271b inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a sparse set.  <a href="classentt_1_1basic__sparse__set.html#ad2ffa27c249f22f503464d44df33271b">More...</a><br /></td></tr>
-<tr class="separator:ad2ffa27c249f22f503464d44df33271b inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80b3de1b97d44ff6e9b2d4557da138c6 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a80b3de1b97d44ff6e9b2d4557da138c6">swap_and_pop</a> (<a class="el" href="classentt_1_1basic__sparse__set.html#ac56bb654b47a648d64a754d85c70b40a">basic_iterator</a> first, <a class="el" href="classentt_1_1basic__sparse__set.html#ac56bb654b47a648d64a754d85c70b40a">basic_iterator</a> last)</td></tr>
+<tr class="memdesc:a80b3de1b97d44ff6e9b2d4557da138c6 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases entities from a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a80b3de1b97d44ff6e9b2d4557da138c6">More...</a><br /></td></tr>
+<tr class="separator:a80b3de1b97d44ff6e9b2d4557da138c6 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff8a2d818cbe74cc59687261627d3531 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#aff8a2d818cbe74cc59687261627d3531">in_place_pop</a> (<a class="el" href="classentt_1_1basic__sparse__set.html#ac56bb654b47a648d64a754d85c70b40a">basic_iterator</a> first, <a class="el" href="classentt_1_1basic__sparse__set.html#ac56bb654b47a648d64a754d85c70b40a">basic_iterator</a> last)</td></tr>
+<tr class="memdesc:aff8a2d818cbe74cc59687261627d3531 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases entities from a sparse set.  <a href="classentt_1_1basic__sparse__set.html#aff8a2d818cbe74cc59687261627d3531">More...</a><br /></td></tr>
+<tr class="separator:aff8a2d818cbe74cc59687261627d3531 inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c62d9615acde55f57fcca92e44c747c inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classentt_1_1basic__sparse__set.html#ac56bb654b47a648d64a754d85c70b40a">basic_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__sparse__set.html#a1c62d9615acde55f57fcca92e44c747c">try_emplace</a> (const Entity entt, const bool force_back, const void *=nullptr)</td></tr>
+<tr class="memdesc:a1c62d9615acde55f57fcca92e44c747c inherit pro_methods_classentt_1_1basic__sparse__set"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a sparse set.  <a href="classentt_1_1basic__sparse__set.html#a1c62d9615acde55f57fcca92e44c747c">More...</a><br /></td></tr>
+<tr class="separator:a1c62d9615acde55f57fcca92e44c747c inherit pro_methods_classentt_1_1basic__sparse__set"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity, typename Type, typename Allocator&gt;<br />
@@ -396,7 +390,7 @@ class entt::basic_storage&lt; Entity, Type, Allocator, std::enable_if_t&lt; igno
 
 <p>Default constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00780">780</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00748">748</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a001472f2d65c53dbd0291a45a072e3d7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a001472f2d65c53dbd0291a45a072e3d7">&#9670;&nbsp;</a></span>basic_storage() <span class="overload">[1/3]</span></h2>
@@ -432,7 +426,7 @@ template&lt;typename Entity , typename Type , typename Allocator &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00809">809</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00779">779</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -517,7 +511,7 @@ template&lt;typename Entity , typename Type , typename Allocator &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00823">823</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00793">793</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -551,7 +545,7 @@ template&lt;typename Entity , typename Type , typename Allocator &gt; </div>
 <p>The iterable object returns a tuple that contains the current entity.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterable object to use to <em>visit</em> the storage. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00925">925</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00887">887</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -584,12 +578,12 @@ template&lt;typename Entity , typename Type , typename Allocator &gt; </div>
 <p>The iterable object returns a tuple that contains the current entity.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterable object to use to <em>visit</em> the storage. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00930">930</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00892">892</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a022a515247ef30e35163755e3faaffaa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a022a515247ef30e35163755e3faaffaa">&#9670;&nbsp;</a></span>emplace()</h2>
+<a id="ae3f1982eeb9d1dbcf61b55091df2e9a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3f1982eeb9d1dbcf61b55091df2e9a5">&#9670;&nbsp;</a></span>emplace()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -610,8 +604,8 @@ template&lt;typename... Args&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Args &amp;&amp;...&#160;</td>
-          <td class="paramname"><em>args</em>&#160;</td>
+          <td class="paramtype">Args &amp;&amp;&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -637,12 +631,11 @@ template&lt;typename... Args&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">entt</td><td>A valid identifier. </td></tr>
-    <tr><td class="paramname">args</td><td>Parameters to use to construct an object for the entity. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00881">881</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00850">850</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -681,7 +674,7 @@ template&lt;typename Entity , typename Type , typename Allocator &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00850">850</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00820">820</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -713,7 +706,7 @@ template&lt;typename Entity , typename Type , typename Allocator &gt; </div>
 <p>Returns the associated allocator. </p>
 <dl class="section return"><dt>Returns</dt><dd>The associated allocator. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00837">837</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00807">807</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -753,7 +746,7 @@ template&lt;typename Entity , typename Type , typename Allocator &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns an empty tuple. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00864">864</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00834">834</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -817,7 +810,7 @@ template&lt;typename It , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00906">906</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00874">874</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>
@@ -911,7 +904,7 @@ template&lt;typename... Func&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00893">893</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00861">861</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>

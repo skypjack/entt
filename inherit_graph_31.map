@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_8_8_8_01_4_00_01exclude__t_3_01Exclude_8_8_8_01_4_01_4.html" title="Multi component view." alt="" coords="5,5,183,61"/>
+<area shape="rect" id="node1" href="$classentt_1_1basic__sparse__set.html" title=" " alt="" coords="5,42,196,113"/>
+<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title="Basic storage implementation." alt="" coords="248,5,415,61"/>
+<area shape="rect" id="node3" href="$classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html" title="Default constructor." alt="" coords="244,86,419,157"/>
 </map>

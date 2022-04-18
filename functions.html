@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -80,12 +80,21 @@ $(function() {
 : <a class="el" href="structentt_1_1basic__handle.html#a29185b95a343d6770517683daebb20c9">entt::basic_handle&lt; Entity, Type &gt;</a>
 , <a class="el" href="classentt_1_1basic__registry.html#a40072eca607846f43f47d0e3f11dd196">entt::basic_registry&lt; Entity &gt;</a>
 </li>
+<li>allocate_emplace()
+: <a class="el" href="structentt_1_1locator.html#a9670f20018968edcf7677aa44ae036bf">entt::locator&lt; Service &gt;</a>
+</li>
+<li>allocation_deleter()
+: <a class="el" href="structentt_1_1allocation__deleter.html#a1e40e8f850d327ed13dbb3eab6886b7d">entt::allocation_deleter&lt; Allocator &gt;</a>
+</li>
 <li>allocator_type
-: <a class="el" href="classentt_1_1basic__sparse__set.html#af6faaccfb0c465afb6173b0fb8a37069">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
+: <a class="el" href="structentt_1_1allocation__deleter.html#abce9d9de78a31b79e98745f4e029c863">entt::allocation_deleter&lt; Allocator &gt;</a>
+, <a class="el" href="classentt_1_1basic__dispatcher.html#a25129aec45c14bb934e9e9db3ed28015">entt::basic_dispatcher&lt; Allocator &gt;</a>
+, <a class="el" href="classentt_1_1basic__sparse__set.html#af6faaccfb0c465afb6173b0fb8a37069">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
 , <a class="el" href="classentt_1_1basic__storage.html#a2daf8e64dd510609d8063fe7f3c011f3">entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;</a>
 , <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01Allocator_00_01std_1_1enable__if__t_3_01igb49d3f82639348392c5a5f0f427d22ad.html#ad8f51651fb3f99ee794787e29dbaf870">entt::basic_storage&lt; Entity, Type, Allocator, std::enable_if_t&lt; ignore_as_empty_v&lt; Type &gt; &gt; &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__map.html#acab6c328584c0cb66e895b6220e022f9">entt::dense_hash_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__set.html#ae1eff330a53ec4691ff2bc0f0e6e2ae1">entt::dense_hash_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__map.html#adc7feba2153b3764cc7789f31b926d78">entt::dense_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__set.html#a8c83fbdb7d106f60f98d3ae3f395abc2">entt::dense_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">entt::resource_cache&lt; Type, Loader, Allocator &gt;</a>
 , <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Allocator_01_4.html#a21c7a7c56b0975495827e8b4c16103ba">entt::sigh&lt; Ret(Args...), Allocator &gt;</a>
 </li>
 <li>allow_cast()
@@ -102,7 +111,7 @@ $(function() {
 <li>args_type
 : <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_01Class_1_1_5_01_4.html#a8cc7260ed6098c519937116d1a276acb">entt::meta_function_descriptor&lt; Type, Ret Class::* &gt;</a>
 , <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07_08_4.html#a4c949efd3cbd6865f33054d0713f4f53">entt::meta_function_descriptor&lt; Type, Ret(*)()&gt;</a>
-, <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#a13814c123d03280c86bd85c5eeee25ab">entt::meta_function_descriptor&lt; Type, Ret(*)(MaybeType, Args...)&gt;</a>
+, <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#a1f9aff3c69a1576c2230a0511e94dd56">entt::meta_function_descriptor&lt; Type, Ret(*)(MaybeType, Args...)&gt;</a>
 , <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_01const_01_4.html#a883bd3dcad5433ed005974b56e08a476">entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...) const &gt;</a>
 , <a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html#a9ef80c632428bbd3d479149ba6687691">entt::meta_function_descriptor&lt; Type, Ret(Class::*)(Args...)&gt;</a>
 , <a class="el" href="structentt_1_1meta__template__traits_3_01Clazz_3_01Args_8_8_8_01_4_01_4.html#a9d0bdf951c08413401de8a4cb8f00541">entt::meta_template_traits&lt; Clazz&lt; Args... &gt; &gt;</a>
@@ -135,7 +144,7 @@ $(function() {
 </li>
 <li>at()
 : <a class="el" href="classentt_1_1basic__sparse__set.html#aa0d4efaf22f43c1a8573e50c7460299a">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__map.html#a1e168af85bd77d9bb6c1981c36c2592b">entt::dense_hash_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__map.html#a04ee0f865ad16834e845b786ac6d4aa6">entt::dense_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
 </li>
 <li>attach()
 : <a class="el" href="classentt_1_1scheduler.html#aced8ede0331494ea80e2b19ac203cccc">entt::scheduler&lt; Delta &gt;</a>

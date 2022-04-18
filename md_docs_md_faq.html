@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -66,13 +66,13 @@ $(function() {
 <div class="title">Frequently Asked Questions </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md98"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md101"></a>
 Introduction</h1>
 <p>This is a constantly updated section where I'll try to put the answers to the most frequently asked questions.<br  />
  If you don't find your answer here, there are two cases: nobody has done it yet or this section needs updating. In both cases, try to <a href="https://github.com/skypjack/entt/issues/new">open a new issue</a> or enter the <a href="https://gitter.im/skypjack/entt">gitter channel</a> and ask your question. Probably someone already has an answer for you and we can then integrate this part of the documentation.</p>
-<h1><a class="anchor" id="autotoc_md99"></a>
+<h1><a class="anchor" id="autotoc_md102"></a>
 FAQ</h1>
-<h2><a class="anchor" id="autotoc_md100"></a>
+<h2><a class="anchor" id="autotoc_md103"></a>
 Why is my debug build on Windows so slow?</h2>
 <p><code>EnTT</code> is an experimental project that I also use to keep me up-to-date with the latest revision of the language and the standard library. For this reason, it's likely that some classes you're working with are using standard containers under the hood.<br  />
  Unfortunately, it's known that the standard containers aren't particularly performing in debugging (the reasons for this go beyond this document) and are even less so on Windows apparently. Fortunately this can also be mitigated a lot, achieving good results in many cases.</p>
@@ -85,13 +85,13 @@ Why is my debug build on Windows so slow?</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#define ENTT_ASSERT(...) ((void)0)</span></div>
 </div><!-- fragment --><p>These asserts are introduced to help the users but they require to access to the underlying containers and therefore risk ruining the performance in some cases.</p>
 <p>With these changes, debug performance should increase enough for most cases. If you want something more, you can can also switch to an optimization level <code>O0</code> or preferably <code>O1</code>.</p>
-<h2><a class="anchor" id="autotoc_md101"></a>
+<h2><a class="anchor" id="autotoc_md104"></a>
 How can I represent hierarchies with my components?</h2>
 <p>This is one of the first questions that anyone makes when starting to work with the entity-component-system architectural pattern.<br  />
  There are several approaches to the problem and what’s the best one depends mainly on the real problem one is facing. In all cases, how to do it doesn't strictly depend on the library in use, but the latter can certainly allow or not different techniques depending on how the data are laid out.</p>
 <p>I tried to describe some of the techniques that fit well with the model of <code>EnTT</code>. <a href="https://skypjack.github.io/2019-06-25-ecs-baf-part-4/">Here</a> is the first post of a series that tries to explore the problem. More will probably come in future.<br  />
  In addition, <code>EnTT</code> also offers the possibility to create stable storage types and therefore have pointer stability for one, all or some components. This is by far the most convenient solution when it comes to creating hierarchies and whatnot. See the documentation for the ECS part of the library and in particular what concerns the <code>component_traits</code> class for further details.</p>
-<h2><a class="anchor" id="autotoc_md102"></a>
+<h2><a class="anchor" id="autotoc_md105"></a>
 Custom entity identifiers: yay or nay?</h2>
 <p>Custom entity identifiers are definitely a good idea in two cases at least:</p>
 <ul>
@@ -103,7 +103,7 @@ Custom entity identifiers: yay or nay?</h2>
 <div class="fragment"><div class="line"><span class="keyword">enum class</span> <a class="code" href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entity</a>: std::uint32_t {};</div>
 <div class="ttc" id="anamespaceentt_html_a0b54e231d069e8a231e14b223388808a"><div class="ttname"><a href="namespaceentt.html#a0b54e231d069e8a231e14b223388808a">entt::entity</a></div><div class="ttdeci">entity</div><div class="ttdoc">Default entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00047">fwd.hpp:47</a></div></div>
 </div><!-- fragment --><p>There is no limit to the number of identifiers that can be defined.</p>
-<h2><a class="anchor" id="autotoc_md103"></a>
+<h2><a class="anchor" id="autotoc_md106"></a>
 Warning C4307: integral constant overflow</h2>
 <p>According to <a href="https://github.com/skypjack/entt/issues/121">this</a> issue, using a hashed string under VS could generate a warning.<br  />
  First of all, I want to reassure you: it's expected and harmless. However, it can be annoying.</p>
@@ -116,31 +116,35 @@ Warning C4307: integral constant overflow</h2>
 </div><!-- fragment --><p>With an example of use included:</p>
 <div class="fragment"><div class="line">constexpr <span class="keyword">auto</span> identifier = HS(<span class="stringliteral">&quot;my/resource/identifier&quot;</span>);</div>
 </div><!-- fragment --><p>Thanks to <a href="https://github.com/huwpascoe">huwpascoe</a> for the courtesy.</p>
-<h2><a class="anchor" id="autotoc_md104"></a>
+<h2><a class="anchor" id="autotoc_md107"></a>
 Warning C4003: the min, the max and the macro</h2>
 <p>On Windows, a header file defines two macros <code>min</code> and <code>max</code> which may result in conflicts with their counterparts in the standard library and therefore in errors during compilation.</p>
 <p>It's a pretty big problem but fortunately it's not a problem of <code>EnTT</code> and there is a fairly simple solution to it.<br  />
  It consists in defining the <code>NOMINMAX</code> macro before to include any other header so as to get rid of the extra definitions:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define NOMINMAX</span></div>
 </div><!-- fragment --><p>Please refer to <a href="https://github.com/skypjack/entt/issues/96">this</a> issue for more details.</p>
-<h2><a class="anchor" id="autotoc_md105"></a>
+<h2><a class="anchor" id="autotoc_md108"></a>
 The standard and the non-copyable types</h2>
-<p><code>EnTT</code> uses internally the trait <code>std::is_copy_constructible_v</code> to check if a component is actually copyable. This trait doesn't check if an object can actually be copied but only verifies if there is a copy constructor available.<br  />
- This can lead to surprising results due to some idiosyncrasies of the standard mainly related to the need to guarantee backward compatibility.</p>
-<p>For example, <code>std::vector</code> defines a copy constructor no matter if its value type is copyable or not. As a result, <code>std::is_copy_constructible_v</code> is true for the following specialization:</p>
+<p><code>EnTT</code> uses internally the trait <code>std::is_copy_constructible_v</code> to check if a component is actually copyable. However, this trait doesn't really check whether a type is actually copyable. Instead, it just checks that a suitable copy constructor and copy operator exist.<br  />
+ This can lead to surprising results due to some idiosyncrasies of the standard.</p>
+<p>For example, <code>std::vector</code> defines a copy constructor that is conditionally enabled depending on whether the value type is copyable or not. As a result, <code>std::is_copy_constructible_v</code> returns true for the following specialization:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>type {</div>
 <div class="line">    std::vector&lt;std::unique_ptr&lt;action&gt;&gt; vec;</div>
 <div class="line">};</div>
-</div><!-- fragment --><p>When trying to assign an instance of this type to an entity in the ECS part, this may trigger a compilation error because we cannot really make a copy of it.<br  />
- As a workaround, users can mark the type explicitly as non-copyable:</p>
+</div><!-- fragment --><p>However, the copy constructor is effectively disabled upon specialization. Therefore, trying to assign an instance of this type to an entity may trigger a compilation error.<br  />
+ As a workaround, users can mark the type explicitly as non-copyable. This also suppresses the implicit generation of the move constructor and operator, which will therefore have to be defaulted accordingly:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>type {</div>
 <div class="line">    type(<span class="keyword">const</span> type &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line">    type(type &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"> </div>
 <div class="line">    type &amp; operator=(<span class="keyword">const</span> type &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line">    type &amp; operator=(type &amp;&amp;) = <span class="keywordflow">default</span>;</div>
 <div class="line"> </div>
 <div class="line">    std::vector&lt;std::unique_ptr&lt;action&gt;&gt; vec;</div>
 <div class="line">};</div>
-</div><!-- fragment --><p>Unfortunately, this will also disable aggregate initialization.</p>
-<h2><a class="anchor" id="autotoc_md106"></a>
+</div><!-- fragment --><p>Note that aggregate initialization is also disabled as a consequence.<br  />
+ Fortunately, this type of trick is quite rare. The bad news is that there is no way to deal with it at the library level, this being due to the design of the language. On the other hand, the fact that the language itself also offers a way to mitigate the problem makes it manageable.</p>
+<h2><a class="anchor" id="autotoc_md109"></a>
 Which functions trigger which signals</h2>
 <p>The <code>registry</code> class offers three signals that are emitted following specific operations. Maybe not everyone knows what these operations are, though.<br  />
  If this isn't clear, below you can find a <em>vademecum</em> for this purpose:</p>

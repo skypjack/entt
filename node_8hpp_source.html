@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -138,10 +138,10 @@ $(function() {
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keyword">struct </span>meta_data_node {</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keyword">using</span> size_type = std::size_t;</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    meta_data_node *next;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    meta_prop_node *prop;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">const</span> size_type arity;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">const</span> meta_traits traits;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keyword">const</span> meta_traits traits;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    meta_data_node *next;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    meta_prop_node *prop;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">const</span> size_type arity;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    meta_type_node *<span class="keyword">const</span> type;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    meta_type (*<span class="keyword">const</span> arg)(<span class="keyword">const</span> size_type) ENTT_NOEXCEPT;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    bool (*<span class="keyword">const</span> set)(meta_handle, meta_any);</div>
@@ -151,10 +151,10 @@ $(function() {
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">struct </span>meta_func_node {</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">using</span> size_type = std::size_t;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    meta_func_node *next;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    meta_prop_node *prop;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">const</span> size_type arity;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">const</span> meta_traits traits;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">const</span> meta_traits traits;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    meta_func_node *next;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    meta_prop_node *prop;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">const</span> size_type arity;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    meta_type_node *<span class="keyword">const</span> ret;</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    meta_type (*<span class="keyword">const</span> arg)(<span class="keyword">const</span> size_type) ENTT_NOEXCEPT;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    meta_any (*<span class="keyword">const</span> <a class="code" href="namespaceentt.html#aa512a354fe328df6be5a92eb43cd4d69">invoke</a>)(meta_handle, meta_any *<span class="keyword">const</span>);</div>
@@ -171,10 +171,10 @@ $(function() {
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keyword">using</span> size_type = std::size_t;</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keyword">const</span> type_info *info;</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    meta_type_node *next;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    meta_prop_node *prop;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keyword">const</span> size_type size_of;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keyword">const</span> meta_traits traits;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keyword">const</span> meta_traits traits;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    meta_type_node *next;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    meta_prop_node *prop;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keyword">const</span> size_type size_of;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    meta_any (*<span class="keyword">const</span> default_constructor)();</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    double (*<span class="keyword">const</span> conversion_helper)(<span class="keywordtype">void</span> *, <span class="keyword">const</span> <span class="keywordtype">void</span> *);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keyword">const</span> meta_template_node *<span class="keyword">const</span> templ;</div>
@@ -235,18 +235,18 @@ $(function() {
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <span class="keyword">static</span> meta_type_node node{</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;            &amp;type_id&lt;Type&gt;(),</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            {},</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            <span class="keyword">nullptr</span>,</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            <span class="keyword">nullptr</span>,</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;            size_of_v&lt;Type&gt;,</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;            internal::meta_traits::is_none</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                | (std::is_arithmetic_v&lt;Type&gt; ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                | (std::is_array_v&lt;Type&gt; ? internal::meta_traits::is_array : internal::meta_traits::is_none)</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;                | (std::is_enum_v&lt;Type&gt; ? internal::meta_traits::is_enum : internal::meta_traits::is_none)</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;                | (std::is_class_v&lt;Type&gt; ? internal::meta_traits::is_class : internal::meta_traits::is_none)</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;                | (std::is_pointer_v&lt;Type&gt; ? internal::meta_traits::is_pointer : internal::meta_traits::is_none)</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;                | (is_meta_pointer_like_v&lt;Type&gt; ? internal::meta_traits::is_meta_pointer_like : internal::meta_traits::is_none)</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;                | (is_complete_v&lt;meta_sequence_container_traits&lt;Type&gt;&gt; ? internal::meta_traits::is_meta_sequence_container : internal::meta_traits::is_none)</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;                | (<a class="code" href="namespaceentt.html#a8a96fcc4bc8da9a2aa1cdb0bc15b75c8">is_complete_v</a>&lt;meta_associative_container_traits&lt;Type&gt;&gt; ? internal::meta_traits::is_meta_associative_container : internal::meta_traits::is_none),</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            internal::meta_traits::is_none</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                | (std::is_arithmetic_v&lt;Type&gt; ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                | (std::is_array_v&lt;Type&gt; ? internal::meta_traits::is_array : internal::meta_traits::is_none)</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                | (std::is_enum_v&lt;Type&gt; ? internal::meta_traits::is_enum : internal::meta_traits::is_none)</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                | (std::is_class_v&lt;Type&gt; ? internal::meta_traits::is_class : internal::meta_traits::is_none)</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                | (std::is_pointer_v&lt;Type&gt; ? internal::meta_traits::is_pointer : internal::meta_traits::is_none)</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;                | (is_meta_pointer_like_v&lt;Type&gt; ? internal::meta_traits::is_meta_pointer_like : internal::meta_traits::is_none)</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;                | (is_complete_v&lt;meta_sequence_container_traits&lt;Type&gt;&gt; ? internal::meta_traits::is_meta_sequence_container : internal::meta_traits::is_none)</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;                | (<a class="code" href="namespaceentt.html#a8a96fcc4bc8da9a2aa1cdb0bc15b75c8">is_complete_v</a>&lt;meta_associative_container_traits&lt;Type&gt;&gt; ? internal::meta_traits::is_meta_associative_container : internal::meta_traits::is_none),</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;            <span class="keyword">nullptr</span>,</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;            <span class="keyword">nullptr</span>,</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            size_of_v&lt;Type&gt;,</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;            meta_default_constructor(),</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;            meta_conversion_helper(),</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            meta_template_info()</div>
@@ -259,12 +259,12 @@ $(function() {
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Args&gt;</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;[[nodiscard]] meta_type_node *meta_arg_node(type_list&lt;Args...&gt;, <span class="keyword">const</span> std::size_t index) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    meta_type_node *args[<span class="keyword">sizeof</span>...(Args) + 1u]{<span class="keyword">nullptr</span>, internal::meta_node&lt;std::remove_const_t&lt;std::remove_reference_t&lt;Args&gt;&gt;&gt;<a class="code" href="namespaceentt.html#a0b62be0d39676cb86f2aefefa890b198">::resolve</a>()...};</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    meta_type_node *args[<span class="keyword">sizeof</span>...(Args) + 1u]{<span class="keyword">nullptr</span>, internal::meta_node&lt;std::remove_cv_t&lt;std::remove_reference_t&lt;Args&gt;&gt;&gt;<a class="code" href="namespaceentt.html#a0b62be0d39676cb86f2aefefa890b198">::resolve</a>()...};</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">return</span> args[index + 1u];</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;}</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="keyword">template</span>&lt;auto Member, <span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;[[nodiscard]] <span class="keyword">static</span> std::decay_t&lt;decltype(std::declval&lt;internal::meta_type_node&gt;().*Member)&gt; find_by(<span class="keyword">const</span> Type &amp;info_or_id, <span class="keyword">const</span> internal::meta_type_node *node) {</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;[[nodiscard]] <span class="keyword">static</span> std::decay_t&lt;decltype(std::declval&lt;internal::meta_type_node&gt;().*Member)&gt; find_by(<span class="keyword">const</span> Type &amp;info_or_id, <span class="keyword">const</span> internal::meta_type_node *node) ENTT_NOEXCEPT {</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> *curr = node-&gt;*Member; curr; curr = curr-&gt;next) {</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keywordflow">if</span> constexpr(std::is_same_v&lt;Type, type_info&gt;) {</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;            <span class="keywordflow">if</span>(*curr-&gt;type-&gt;info == info_or_id) {</div>
@@ -295,9 +295,9 @@ $(function() {
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;} <span class="comment">// namespace entt</span></div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="dense__hash__map_8hpp_source.html#l00021">dense_hash_map.hpp:21</a></div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="dense__map_8hpp_source.html#l00022">dense_map.hpp:22</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a0b62be0d39676cb86f2aefefa890b198"><div class="ttname"><a href="namespaceentt.html#a0b62be0d39676cb86f2aefefa890b198">entt::resolve</a></div><div class="ttdeci">meta_type resolve()</div><div class="ttdoc">Returns the meta type associated with a given type.</div><div class="ttdef"><b>Definition:</b> <a href="resolve_8hpp_source.html#l00019">resolve.hpp:19</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00013">fwd.hpp:13</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00014">fwd.hpp:14</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a8a96fcc4bc8da9a2aa1cdb0bc15b75c8"><div class="ttname"><a href="namespaceentt.html#a8a96fcc4bc8da9a2aa1cdb0bc15b75c8">entt::is_complete_v</a></div><div class="ttdeci">constexpr bool is_complete_v</div><div class="ttdoc">Helper variable template.</div><div class="ttdef"><b>Definition:</b> <a href="core_2type__traits_8hpp_source.html#l00447">type_traits.hpp:447</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a8c24ecc5ab0055f9f2a4725c95afb29e"><div class="ttname"><a href="namespaceentt.html#a8c24ecc5ab0055f9f2a4725c95afb29e">entt::get</a></div><div class="ttdeci">constexpr get_t&lt; Type... &gt; get</div><div class="ttdoc">Variable template for lists of observed components.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2utility_8hpp_source.html#l00034">utility.hpp:34</a></div></div>
 <div class="ttc" id="anamespaceentt_html_aa512a354fe328df6be5a92eb43cd4d69"><div class="ttname"><a href="namespaceentt.html#aa512a354fe328df6be5a92eb43cd4d69">entt::invoke</a></div><div class="ttdeci">void invoke(basic_registry&lt; Entity &gt; &amp;reg, const Entity entt)</div><div class="ttdoc">Helper to create a listener that directly invokes a member function.</div><div class="ttdef"><b>Definition:</b> <a href="helper_8hpp_source.html#l00119">helper.hpp:119</a></div></div>

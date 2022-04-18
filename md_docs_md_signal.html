@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -66,20 +66,20 @@ $(function() {
 <div class="title">Crash Course: events, signals and everything in between </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md151"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md157"></a>
 Introduction</h1>
 <p>Signals are usually a core part of games and software architectures in general.<br  />
  Roughly speaking, they help to decouple the various parts of a system while allowing them to communicate with each other somehow.</p>
 <p>The so called <em>modern C++</em> comes with a tool that can be useful in these terms, the <code>std::function</code>. As an example, it can be used to create delegates.<br  />
  However, there is no guarantee that an <code>std::function</code> does not perform allocations under the hood and this could be problematic sometimes. Furthermore, it solves a problem but may not adapt well to other requirements that may arise from time to time.</p>
 <p>In case that the flexibility and power of an <code>std::function</code> isn't required or if the price to pay for them is too high,<code>EnTT</code> offers a complete set of lightweight classes to solve the same and many other problems.</p>
-<h1><a class="anchor" id="autotoc_md152"></a>
+<h1><a class="anchor" id="autotoc_md158"></a>
 Delegate</h1>
 <p>A delegate can be used as a general purpose invoker with no memory overhead for free functions and members provided along with an instance on which to invoke them.<br  />
  It doesn't claim to be a drop-in replacement for an <code>std::function</code>, so don't expect to use it whenever an <code>std::function</code> fits well. That said, it's most likely even a better fit than an <code>std::function</code> in a lot of cases, so expect to use it quite a lot anyway.</p>
 <p>The interface is trivial. It offers a default constructor to create empty delegates:</p>
 <div class="fragment"><div class="line"><a class="code" href="classentt_1_1delegate.html">entt::delegate</a>&lt;int(<span class="keywordtype">int</span>)&gt; <a class="code" href="namespaceentt.html#a7c8907a3a72cd2da043d81f6fd50487a">delegate</a>{};</div>
-<div class="ttc" id="aclassentt_1_1delegate_html"><div class="ttname"><a href="classentt_1_1delegate.html">entt::delegate</a></div><div class="ttdoc">Basic delegate implementation.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00066">delegate.hpp:66</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_html"><div class="ttname"><a href="classentt_1_1delegate.html">entt::delegate</a></div><div class="ttdoc">Basic delegate implementation.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00067">delegate.hpp:67</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a7c8907a3a72cd2da043d81f6fd50487a"><div class="ttname"><a href="namespaceentt.html#a7c8907a3a72cd2da043d81f6fd50487a">entt::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Candidate &gt;) -&gt; delegate&lt; std::remove_pointer_t&lt; internal::function_pointer_t&lt; decltype(Candidate)&gt;&gt;&gt;</div><div class="ttdoc">Deduction guide.</div></div>
 </div><!-- fragment --><p>All what is needed to create an instance is to specify the type of the function the delegate will <em>contain</em>, that is the signature of the free function or the member one wants to assign to it.</p>
 <p>Attempting to use an empty delegate by invoking its function call operator results in undefined behavior or most likely a crash. Before to use a delegate, it must be initialized.<br  />
@@ -129,7 +129,7 @@ Delegate</h1>
 <div class="line"><a class="code" href="namespaceentt.html#a7c8907a3a72cd2da043d81f6fd50487a">delegate</a>(instance, 42);</div>
 </div><!-- fragment --><p>In this case, it's not possible to deduce the function type since the first argument doesn't necessarily have to be a reference (for example, it can be a pointer, as well as a const reference).<br  />
  Therefore, the function type must be declared explicitly for unbound members.</p>
-<h2><a class="anchor" id="autotoc_md153"></a>
+<h2><a class="anchor" id="autotoc_md159"></a>
 Runtime arguments</h2>
 <p>The <code>delegate</code> class is meant to be used primarily with template arguments. However, as a consequence of its design, it can also offer minimal support for runtime arguments.<br  />
  When used in this modality, some feature aren't supported though. In particular:</p>
@@ -151,7 +151,7 @@ Runtime arguments</h2>
 <div class="line"><a class="code" href="namespaceentt.html#a7c8907a3a72cd2da043d81f6fd50487a">delegate</a>.connect(&amp;func, &amp;value);</div>
 </div><!-- fragment --><p>The type of the delegate is deduced from the function if possible. In this case, since the first argument is an implementation detail, the deduced function type is <code>int(int)</code>.<br  />
  Invoking a delegate built in this way follows the same rules as previously explained.</p>
-<h2><a class="anchor" id="autotoc_md154"></a>
+<h2><a class="anchor" id="autotoc_md160"></a>
 Lambda support</h2>
 <p>In general, the <code>delegate</code> class doesn't fully support lambda functions in all their nuances. The reason is pretty simple: a <code>delegate</code> isn't a drop-in replacement for an <code>std::function</code>. Instead, it tries to overcome the problems with the latter.<br  />
  That being said, non-capturing lambda functions are supported, even though some feature aren't available in this case.</p>
@@ -169,7 +169,7 @@ Lambda support</h2>
 <div class="line">    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>my_struct *<span class="keyword">&gt;</span>(ptr)-&gt;f(value);</div>
 <div class="line">}, &amp;instance);</div>
 </div><!-- fragment --><p>As above, the first parameter (<code>const void *</code>) isn't part of the function type of the delegate and is used to dispatch arbitrary user data back and forth. In other terms, the function type of the delegate above is <code>int(int)</code>.</p>
-<h1><a class="anchor" id="autotoc_md155"></a>
+<h1><a class="anchor" id="autotoc_md161"></a>
 Signals</h1>
 <p>Signal handlers work with references to classes, function pointers and pointers to members. Listeners can be any kind of objects and users are in charge of connecting and disconnecting them from a signal to avoid crashes due to different lifetimes. On the other side, performance shouldn't be affected that much by the presence of such a signal handler.<br  />
  Signals make use of delegates internally and therefore they undergo the same rules and offer similar functionalities. It may be a good idea to consult the documentation of the <code>delegate</code> class for further information.</p>
@@ -177,7 +177,7 @@ Signals</h1>
 <p>The API of a signal handler is straightforward. If a collector is supplied to the signal when something is published, all the values returned by the listeners can be literally <em>collected</em> and used later by the caller. Otherwise, the class works just like a plain signal that emits events from time to time.<br  />
  To create instances of signal handlers it is sufficient to provide the type of function to which they refer:</p>
 <div class="fragment"><div class="line"><a class="code" href="classentt_1_1sigh.html">entt::sigh</a>&lt;void(<span class="keywordtype">int</span>, <span class="keywordtype">char</span>)&gt; signal;</div>
-<div class="ttc" id="aclassentt_1_1sigh_html"><div class="ttname"><a href="classentt_1_1sigh.html">entt::sigh</a></div><div class="ttdoc">Unmanaged signal handler.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00024">fwd.hpp:24</a></div></div>
+<div class="ttc" id="aclassentt_1_1sigh_html"><div class="ttname"><a href="classentt_1_1sigh.html">entt::sigh</a></div><div class="ttdoc">Unmanaged signal handler.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00025">fwd.hpp:25</a></div></div>
 </div><!-- fragment --><p>Signals offer all the basic functionalities required to know how many listeners they contain (<code>size</code>) or if they contain at least a listener (<code>empty</code>), as well as a function to use to swap handlers (<code>swap</code>).</p>
 <p>Besides them, there are member functions to use both to connect and disconnect listeners in all their forms by means of a sink:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> foo(<span class="keywordtype">int</span>, <span class="keywordtype">char</span>) { <span class="comment">/* ... */</span> }</div>
@@ -207,7 +207,7 @@ Signals</h1>
 <div class="line"> </div>
 <div class="line"><span class="comment">// discards all listeners at once</span></div>
 <div class="line"><a class="code" href="namespaceentt.html#aba4dd70afb5ef2529d05bc474b234f53">sink</a>.disconnect();</div>
-<div class="ttc" id="aclassentt_1_1sink_html"><div class="ttname"><a href="classentt_1_1sink.html">entt::sink</a></div><div class="ttdoc">Sink class.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00021">fwd.hpp:21</a></div></div>
+<div class="ttc" id="aclassentt_1_1sink_html"><div class="ttname"><a href="classentt_1_1sink.html">entt::sink</a></div><div class="ttdoc">Sink class.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00022">fwd.hpp:22</a></div></div>
 <div class="ttc" id="anamespaceentt_html_aba4dd70afb5ef2529d05bc474b234f53"><div class="ttname"><a href="namespaceentt.html#aba4dd70afb5ef2529d05bc474b234f53">entt::sink</a></div><div class="ttdeci">sink(sigh&lt; Ret(Args...), Allocator &gt; &amp;) -&gt; sink&lt; sigh&lt; Ret(Args...), Allocator &gt;&gt;</div><div class="ttdoc">Deduction guide.</div></div>
 </div><!-- fragment --><p>As shown above, the listeners don't have to strictly follow the signature of the signal. As long as a listener can be invoked with the given arguments to yield a result that is convertible to the given return type, everything works just fine.<br  />
  It's also possible to connect a listener before other listeners already contained by the signal. The <code>before</code> function returns a <code>sink</code> object correctly initialized for the purpose that can be used to connect one or more listeners in order and in the desired position:</p>
@@ -237,7 +237,7 @@ Signals</h1>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>my_collector {</div>
 <div class="line">    std::vector&lt;int&gt; vec{};</div>
 <div class="line"> </div>
-<div class="line">    <span class="keywordtype">bool</span> operator()(<span class="keywordtype">int</span> v) noexcept {</div>
+<div class="line">    <span class="keywordtype">bool</span> operator()(<span class="keywordtype">int</span> v) {</div>
 <div class="line">        vec.push_back(v);</div>
 <div class="line">        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line">    }</div>
@@ -248,15 +248,16 @@ Signals</h1>
 <div class="line">my_collector <a class="code" href="namespaceentt.html#aea8b073b774362fe800d9cce3542927a">collector</a>;</div>
 <div class="line">signal.collect(std::ref(collector));</div>
 <div class="ttc" id="anamespaceentt_html_aea8b073b774362fe800d9cce3542927a"><div class="ttname"><a href="namespaceentt.html#aea8b073b774362fe800d9cce3542927a">entt::collector</a></div><div class="ttdeci">constexpr basic_collector collector</div><div class="ttdoc">Variable template used to ease the definition of collectors.</div><div class="ttdef"><b>Definition:</b> <a href="observer_8hpp_source.html#l00113">observer.hpp:113</a></div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md156"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md162"></a>
 Event dispatcher</h1>
-<p>The event dispatcher class is designed so as to be used in a loop. It allows users both to trigger immediate events or to queue events to be published all together once per tick.<br  />
- This class shares part of its API with the one of the signal handler, but it doesn't require that all the types of events are specified when declared:</p>
+<p>The event dispatcher class allows users to trigger immediate events or to queue and publish them all together later.<br  />
+ This class lazily instantiates its queues. Therefore, it's not necessary to <em>announce</em> the event types in advance:</p>
 <div class="fragment"><div class="line"><span class="comment">// define a general purpose dispatcher</span></div>
-<div class="line"><a class="code" href="classentt_1_1dispatcher.html">entt::dispatcher</a> dispatcher{};</div>
-<div class="ttc" id="aclassentt_1_1dispatcher_html"><div class="ttname"><a href="classentt_1_1dispatcher.html">entt::dispatcher</a></div><div class="ttdoc">Basic dispatcher implementation.</div><div class="ttdef"><b>Definition:</b> <a href="dispatcher_8hpp_source.html#l00030">dispatcher.hpp:30</a></div></div>
-</div><!-- fragment --><p>In order to register an instance of a class to a dispatcher, its type must expose one or more member functions the arguments of which are such that <code>E &amp;</code> can be converted to them for each type of event <code>E</code>, no matter what the return value is.<br  />
- The name of the member function aimed to receive the event must be provided to the <code>connect</code> member function of the sink in charge for the specific event:</p>
+<div class="line"><a class="code" href="classentt_1_1basic__dispatcher.html">entt::dispatcher</a> <a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>{};</div>
+<div class="ttc" id="aclassentt_1_1basic__dispatcher_html"><div class="ttname"><a href="classentt_1_1basic__dispatcher.html">entt::basic_dispatcher</a></div><div class="ttdoc">Basic dispatcher implementation.</div><div class="ttdef"><b>Definition:</b> <a href="dispatcher_8hpp_source.html#l00118">dispatcher.hpp:118</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a3b9e500ff0298787e120786c6247ba7c"><div class="ttname"><a href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">entt::dispatcher</a></div><div class="ttdeci">basic_dispatcher&lt;&gt; dispatcher</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00028">fwd.hpp:28</a></div></div>
+</div><!-- fragment --><p>A listener registered with a dispatcher is such that its type offers one or more member functions that take arguments of type <code>Event &amp;</code> for any type of event, regardless of the return value.<br  />
+ These functions are linked directly via <code>connect</code> to a <em>sink</em>:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>an_event { <span class="keywordtype">int</span> value; };</div>
 <div class="line"><span class="keyword">struct </span>another_event {};</div>
 <div class="line"> </div>
@@ -268,27 +269,35 @@ Event dispatcher</h1>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"> </div>
 <div class="line">listener listener;</div>
-<div class="line">dispatcher.sink&lt;an_event&gt;().connect&lt;&amp;listener::receive&gt;(listener);</div>
-<div class="line">dispatcher.sink&lt;another_event&gt;().connect&lt;&amp;listener::method&gt;(listener);</div>
-</div><!-- fragment --><p>The <code>disconnect</code> member function follows the same pattern and can be used to remove one listener at a time or all of them at once:</p>
-<div class="fragment"><div class="line">dispatcher.sink&lt;an_event&gt;().disconnect&lt;&amp;listener::receive&gt;(listener);</div>
-<div class="line">dispatcher.sink&lt;another_event&gt;().disconnect(listener);</div>
-</div><!-- fragment --><p>The <code>trigger</code> member function serves the purpose of sending an immediate event to all the listeners registered so far. It offers a convenient approach that relieves users from having to create the event itself. Instead, it's enough to specify the type of event and provide all the parameters required to construct it.<br  />
- As an example:</p>
-<div class="fragment"><div class="line">dispatcher.trigger&lt;an_event&gt;(42);</div>
-<div class="line">dispatcher.trigger&lt;another_event&gt;();</div>
+<div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.sink&lt;an_event&gt;().connect&lt;&amp;listener::receive&gt;(listener);</div>
+<div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.sink&lt;another_event&gt;().connect&lt;&amp;listener::method&gt;(listener);</div>
+</div><!-- fragment --><p>The <code>disconnect</code> member function is used to remove one listener at a time or all of them at once:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.sink&lt;an_event&gt;().disconnect&lt;&amp;listener::receive&gt;(listener);</div>
+<div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.sink&lt;another_event&gt;().disconnect(listener);</div>
+</div><!-- fragment --><p>The <code>trigger</code> member function serves the purpose of sending an immediate event to all the listeners registered so far:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.trigger(an_event{42});</div>
+<div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.trigger&lt;another_event&gt;();</div>
 </div><!-- fragment --><p>Listeners are invoked immediately, order of execution isn't guaranteed. This method can be used to push around urgent messages like an <em>is terminating</em> notification on a mobile app.</p>
-<p>On the other hand, the <code>enqueue</code> member function queues messages together and allows to maintain control over the moment they are sent to listeners. The signature of this method is more or less the same of <code>trigger</code>:</p>
-<div class="fragment"><div class="line">dispatcher.enqueue&lt;an_event&gt;(42);</div>
-<div class="line">dispatcher.enqueue&lt;another_event&gt;();</div>
-</div><!-- fragment --><p>Events are stored aside until the <code>update</code> member function is invoked, then all the messages that are still pending are sent to the listeners at once:</p>
+<p>On the other hand, the <code>enqueue</code> member function queues messages together and helps to maintain control over the moment they are sent to listeners:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.enqueue&lt;an_event&gt;(42);</div>
+<div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.enqueue(another_event{});</div>
+</div><!-- fragment --><p>Events are stored aside until the <code>update</code> member function is invoked:</p>
 <div class="fragment"><div class="line"><span class="comment">// emits all the events of the given type at once</span></div>
-<div class="line">dispatcher.update&lt;an_event&gt;();</div>
+<div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.update&lt;an_event&gt;();</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// emits all the events queued so far at once</span></div>
-<div class="line">dispatcher.update();</div>
+<div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.update();</div>
 </div><!-- fragment --><p>This way users can embed the dispatcher in a loop and literally dispatch events once per tick to their systems.</p>
-<h1><a class="anchor" id="autotoc_md157"></a>
+<h2><a class="anchor" id="autotoc_md163"></a>
+Named queues</h2>
+<p>All queues within a dispatcher are associated by default with an event type and then retrieved from it.<br  />
+ However, it's possible to create queues with different <em>names</em> (and therefore also multiple queues for a single type). In fact, more or less all functions also take an additional parameter. As an example:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.sink&lt;an_event&gt;(<span class="stringliteral">&quot;custom&quot;</span>_hs).connect&lt;&amp;listener::receive&gt;(listener);</div>
+</div><!-- fragment --><p>In this case, the term <em>name</em> is misused as these are actual numeric identifiers of type <code>id_type</code>.<br  />
+ An exception to this rule is the <code>enqueue</code> function. There is no additional parameter for it but rather a different function:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a3b9e500ff0298787e120786c6247ba7c">dispatcher</a>.enqueue_hint&lt;an_event&gt;(<span class="stringliteral">&quot;custom&quot;</span>_hs, 42);</div>
+</div><!-- fragment --><p>This is mainly due to the template argument deduction rules and unfortunately there is no real (elegant) way to avoid it.</p>
+<h1><a class="anchor" id="autotoc_md164"></a>
 Event emitter</h1>
 <p>A general purpose event emitter thought mainly for those cases where it comes to working with asynchronous stuff.<br  />
  Originally designed to fit the requirements of <a href="https://github.com/skypjack/uvw"><code>uvw</code></a> (a wrapper for <code>libuv</code> written in modern C++), it was adapted later to be included in this library.</p>

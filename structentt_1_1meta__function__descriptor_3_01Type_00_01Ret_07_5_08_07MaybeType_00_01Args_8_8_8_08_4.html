@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -86,19 +86,19 @@ Public Types</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#a1b3e630352b1d4518f9c9686d722a9ce">return_type</a> = Ret</td></tr>
 <tr class="memdesc:a1b3e630352b1d4518f9c9686d722a9ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Meta function return type. <br /></td></tr>
 <tr class="separator:a1b3e630352b1d4518f9c9686d722a9ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13814c123d03280c86bd85c5eeee25ab"><td class="memItemLeft" align="right" valign="top"><a id="a13814c123d03280c86bd85c5eeee25ab"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#a13814c123d03280c86bd85c5eeee25ab">args_type</a> = std::conditional_t&lt; std::is_base_of_v&lt; std::remove_const_t&lt; std::remove_reference_t&lt; MaybeType &gt; &gt;, Type &gt;, <a class="el" href="structentt_1_1type__list.html">type_list</a>&lt; Args... &gt;, <a class="el" href="structentt_1_1type__list.html">type_list</a>&lt; MaybeType, Args... &gt; &gt;</td></tr>
-<tr class="memdesc:a13814c123d03280c86bd85c5eeee25ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Meta function arguments. <br /></td></tr>
-<tr class="separator:a13814c123d03280c86bd85c5eeee25ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f9aff3c69a1576c2230a0511e94dd56"><td class="memItemLeft" align="right" valign="top"><a id="a1f9aff3c69a1576c2230a0511e94dd56"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#a1f9aff3c69a1576c2230a0511e94dd56">args_type</a> = std::conditional_t&lt; std::is_base_of_v&lt; std::remove_cv_t&lt; std::remove_reference_t&lt; MaybeType &gt; &gt;, Type &gt;, <a class="el" href="structentt_1_1type__list.html">type_list</a>&lt; Args... &gt;, <a class="el" href="structentt_1_1type__list.html">type_list</a>&lt; MaybeType, Args... &gt; &gt;</td></tr>
+<tr class="memdesc:a1f9aff3c69a1576c2230a0511e94dd56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Meta function arguments. <br /></td></tr>
+<tr class="separator:a1f9aff3c69a1576c2230a0511e94dd56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:a0b5490df3a06e36ae87f2757449bf297"><td class="memItemLeft" align="right" valign="top"><a id="a0b5490df3a06e36ae87f2757449bf297"></a>
-static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#a0b5490df3a06e36ae87f2757449bf297">is_const</a> = std::is_base_of_v&lt;std::remove_const_t&lt;std::remove_reference_t&lt;MaybeType&gt;&gt;, Type&gt; &amp;&amp; std::is_const_v&lt;std::remove_reference_t&lt;MaybeType&gt;&gt;</td></tr>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#a0b5490df3a06e36ae87f2757449bf297">is_const</a> = std::is_base_of_v&lt;std::remove_cv_t&lt;std::remove_reference_t&lt;MaybeType&gt;&gt;, Type&gt; &amp;&amp; std::is_const_v&lt;std::remove_reference_t&lt;MaybeType&gt;&gt;</td></tr>
 <tr class="memdesc:a0b5490df3a06e36ae87f2757449bf297"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the meta function is const, false otherwise. <br /></td></tr>
 <tr class="separator:a0b5490df3a06e36ae87f2757449bf297"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6eb8df95c6c2763db264ae94a844098"><td class="memItemLeft" align="right" valign="top"><a id="ad6eb8df95c6c2763db264ae94a844098"></a>
-static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#ad6eb8df95c6c2763db264ae94a844098">is_static</a> = !std::is_base_of_v&lt;std::remove_const_t&lt;std::remove_reference_t&lt;MaybeType&gt;&gt;, Type&gt;</td></tr>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07_5_08_07MaybeType_00_01Args_8_8_8_08_4.html#ad6eb8df95c6c2763db264ae94a844098">is_static</a> = !std::is_base_of_v&lt;std::remove_cv_t&lt;std::remove_reference_t&lt;MaybeType&gt;&gt;, Type&gt;</td></tr>
 <tr class="memdesc:ad6eb8df95c6c2763db264ae94a844098"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the meta function is static, false otherwise. <br /></td></tr>
 <tr class="separator:ad6eb8df95c6c2763db264ae94a844098"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnTT: entt::resource_cache&lt; Resource &gt; Class Template Reference</title>
+<title>EnTT: entt::resource_cache&lt; Type, Loader, Allocator &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -71,109 +71,350 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classentt_1_1resource__cache-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">entt::resource_cache&lt; Resource &gt; Class Template Reference</div>  </div>
+<div class="title">entt::resource_cache&lt; Type, Loader, Allocator &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Simple cache for resources of a given type.  
+<p>Basic cache for resources of any type.  
  <a href="classentt_1_1resource__cache.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="cache_8hpp_source.html">cache.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:aa9251f4bd388f39b18b6b416f58170e1"><td class="memItemLeft" align="right" valign="top"><a id="aa9251f4bd388f39b18b6b416f58170e1"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#aa9251f4bd388f39b18b6b416f58170e1">size_type</a> = std::size_t</td></tr>
-<tr class="memdesc:aa9251f4bd388f39b18b6b416f58170e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
-<tr class="separator:aa9251f4bd388f39b18b6b416f58170e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c660fb622942292cf7242e5361f80b7"><td class="memItemLeft" align="right" valign="top"><a id="a3c660fb622942292cf7242e5361f80b7"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a> = Resource</td></tr>
-<tr class="memdesc:a3c660fb622942292cf7242e5361f80b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of resources managed by a cache. <br /></td></tr>
-<tr class="separator:a3c660fb622942292cf7242e5361f80b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7405d91504b5793f260a93695f6cdee4"><td class="memItemLeft" align="right" valign="top"><a id="a7405d91504b5793f260a93695f6cdee4"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a7405d91504b5793f260a93695f6cdee4">value_type</a> = Type</td></tr>
+<tr class="memdesc:a7405d91504b5793f260a93695f6cdee4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resource type. <br /></td></tr>
+<tr class="separator:a7405d91504b5793f260a93695f6cdee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af96dd3b16bdd0f1151b75786bdc0a2cb"><td class="memItemLeft" align="right" valign="top"><a id="af96dd3b16bdd0f1151b75786bdc0a2cb"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#af96dd3b16bdd0f1151b75786bdc0a2cb">size_type</a> = std::size_t</td></tr>
+<tr class="memdesc:af96dd3b16bdd0f1151b75786bdc0a2cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
+<tr class="separator:af96dd3b16bdd0f1151b75786bdc0a2cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a834f161302d84ba1303358ce22f6e982"><td class="memItemLeft" align="right" valign="top"><a id="a834f161302d84ba1303358ce22f6e982"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a834f161302d84ba1303358ce22f6e982">loader_type</a> = Loader</td></tr>
+<tr class="memdesc:a834f161302d84ba1303358ce22f6e982"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loader type. <br /></td></tr>
+<tr class="separator:a834f161302d84ba1303358ce22f6e982"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1e2dc3aeffbbbce6d48e0c46d908cfd"><td class="memItemLeft" align="right" valign="top"><a id="ab1e2dc3aeffbbbce6d48e0c46d908cfd"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> = Allocator</td></tr>
+<tr class="memdesc:ab1e2dc3aeffbbbce6d48e0c46d908cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocator type. <br /></td></tr>
+<tr class="separator:ab1e2dc3aeffbbbce6d48e0c46d908cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad6a23cc2ea4a9367ebdb9b186308353"><td class="memItemLeft" align="right" valign="top"><a id="aad6a23cc2ea4a9367ebdb9b186308353"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a> = internal::resource_cache_iterator&lt; Type, typename <a class="el" href="classentt_1_1dense__map.html#acc07b299f15a57db885089cc1a31322d">container_type::iterator</a> &gt;</td></tr>
+<tr class="memdesc:aad6a23cc2ea4a9367ebdb9b186308353"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input iterator type. <br /></td></tr>
+<tr class="separator:aad6a23cc2ea4a9367ebdb9b186308353"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8eb72ec2d185a953cba0ac2f6e87d693"><td class="memItemLeft" align="right" valign="top"><a id="a8eb72ec2d185a953cba0ac2f6e87d693"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a> = internal::resource_cache_iterator&lt; const Type, typename <a class="el" href="classentt_1_1dense__map.html#a5c236223418b9ef327397424e2df24f8">container_type::const_iterator</a> &gt;</td></tr>
+<tr class="memdesc:a8eb72ec2d185a953cba0ac2f6e87d693"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant input iterator type. <br /></td></tr>
+<tr class="separator:a8eb72ec2d185a953cba0ac2f6e87d693"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a919d10578aeda6ad9dd04e1b969b8a9c"><td class="memItemLeft" align="right" valign="top"><a id="a919d10578aeda6ad9dd04e1b969b8a9c"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a919d10578aeda6ad9dd04e1b969b8a9c">resource_cache</a> ()=default</td></tr>
-<tr class="memdesc:a919d10578aeda6ad9dd04e1b969b8a9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
-<tr class="separator:a919d10578aeda6ad9dd04e1b969b8a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac785934919090b5755a87ab34804b163"><td class="memItemLeft" align="right" valign="top"><a id="ac785934919090b5755a87ab34804b163"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#ac785934919090b5755a87ab34804b163">resource_cache</a> (<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;&amp;)=default</td></tr>
-<tr class="memdesc:ac785934919090b5755a87ab34804b163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move constructor. <br /></td></tr>
-<tr class="separator:ac785934919090b5755a87ab34804b163"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1aecfbf6c4faaadb05ce5005c202223c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a1aecfbf6c4faaadb05ce5005c202223c">operator=</a> (<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;&amp;)=default</td></tr>
-<tr class="memdesc:a1aecfbf6c4faaadb05ce5005c202223c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move assignment operator.  <a href="classentt_1_1resource__cache.html#a1aecfbf6c4faaadb05ce5005c202223c">More...</a><br /></td></tr>
-<tr class="separator:a1aecfbf6c4faaadb05ce5005c202223c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90f4014d42bf22b536f720706a96d76d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#aa9251f4bd388f39b18b6b416f58170e1">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a90f4014d42bf22b536f720706a96d76d">size</a> () const</td></tr>
-<tr class="memdesc:a90f4014d42bf22b536f720706a96d76d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of resources managed by a cache.  <a href="classentt_1_1resource__cache.html#a90f4014d42bf22b536f720706a96d76d">More...</a><br /></td></tr>
-<tr class="separator:a90f4014d42bf22b536f720706a96d76d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68ac0bbd5731434c15bee4d7342c359f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a68ac0bbd5731434c15bee4d7342c359f">empty</a> () const</td></tr>
-<tr class="memdesc:a68ac0bbd5731434c15bee4d7342c359f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a cache contains no resources, false otherwise.  <a href="classentt_1_1resource__cache.html#a68ac0bbd5731434c15bee4d7342c359f">More...</a><br /></td></tr>
-<tr class="separator:a68ac0bbd5731434c15bee4d7342c359f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c6800c0d2ebb2c0a51f941af5fc9168"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a2c6800c0d2ebb2c0a51f941af5fc9168">clear</a> ()</td></tr>
-<tr class="memdesc:a2c6800c0d2ebb2c0a51f941af5fc9168"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears a cache and discards all its resources.  <a href="classentt_1_1resource__cache.html#a2c6800c0d2ebb2c0a51f941af5fc9168">More...</a><br /></td></tr>
-<tr class="separator:a2c6800c0d2ebb2c0a51f941af5fc9168"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d32fa751e6f6ca1a595ebb5642cff23"><td class="memTemplParams" colspan="2">template&lt;typename Loader , typename... Args&gt; </td></tr>
-<tr class="memitem:a5d32fa751e6f6ca1a595ebb5642cff23"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; <a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a5d32fa751e6f6ca1a595ebb5642cff23">load</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id, Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:a5d32fa751e6f6ca1a595ebb5642cff23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads the resource that corresponds to a given identifier.  <a href="classentt_1_1resource__cache.html#a5d32fa751e6f6ca1a595ebb5642cff23">More...</a><br /></td></tr>
-<tr class="separator:a5d32fa751e6f6ca1a595ebb5642cff23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99bb176aa037d33218b4ea625a82300c"><td class="memTemplParams" colspan="2">template&lt;typename Loader , typename... Args&gt; </td></tr>
-<tr class="memitem:a99bb176aa037d33218b4ea625a82300c"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; <a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a99bb176aa037d33218b4ea625a82300c">reload</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id, Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:a99bb176aa037d33218b4ea625a82300c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reloads a resource or loads it for the first time if not present.  <a href="classentt_1_1resource__cache.html#a99bb176aa037d33218b4ea625a82300c">More...</a><br /></td></tr>
-<tr class="separator:a99bb176aa037d33218b4ea625a82300c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad68eaab4f44691e76d128aaab4709d4f"><td class="memTemplParams" colspan="2">template&lt;typename Loader , typename... Args&gt; </td></tr>
-<tr class="memitem:ad68eaab4f44691e76d128aaab4709d4f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; <a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#ad68eaab4f44691e76d128aaab4709d4f">temp</a> (Args &amp;&amp;...args) const</td></tr>
-<tr class="memdesc:ad68eaab4f44691e76d128aaab4709d4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a temporary handle for a resource.  <a href="classentt_1_1resource__cache.html#ad68eaab4f44691e76d128aaab4709d4f">More...</a><br /></td></tr>
-<tr class="separator:ad68eaab4f44691e76d128aaab4709d4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b5cd3213a1f22aa6b8a5c4ce876a630"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; const <a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a4b5cd3213a1f22aa6b8a5c4ce876a630">handle</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id) const</td></tr>
-<tr class="memdesc:a4b5cd3213a1f22aa6b8a5c4ce876a630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a handle for a given resource identifier.  <a href="classentt_1_1resource__cache.html#a4b5cd3213a1f22aa6b8a5c4ce876a630">More...</a><br /></td></tr>
-<tr class="separator:a4b5cd3213a1f22aa6b8a5c4ce876a630"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a616c6f32c7bd4db18be22208a3e88e45"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt; <a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a616c6f32c7bd4db18be22208a3e88e45">handle</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id)</td></tr>
-<tr class="memdesc:a616c6f32c7bd4db18be22208a3e88e45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a handle for a given resource identifier.  <a href="classentt_1_1resource__cache.html#a616c6f32c7bd4db18be22208a3e88e45">More...</a><br /></td></tr>
-<tr class="separator:a616c6f32c7bd4db18be22208a3e88e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86bac75a12d6b8334c6438708f4b792f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a86bac75a12d6b8334c6438708f4b792f">contains</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id) const</td></tr>
-<tr class="memdesc:a86bac75a12d6b8334c6438708f4b792f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a cache contains a given identifier.  <a href="classentt_1_1resource__cache.html#a86bac75a12d6b8334c6438708f4b792f">More...</a><br /></td></tr>
-<tr class="separator:a86bac75a12d6b8334c6438708f4b792f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2620d6e8d97603ccd29f4e439e446480"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a2620d6e8d97603ccd29f4e439e446480">discard</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id)</td></tr>
-<tr class="memdesc:a2620d6e8d97603ccd29f4e439e446480"><td class="mdescLeft">&#160;</td><td class="mdescRight">Discards the resource that corresponds to a given identifier.  <a href="classentt_1_1resource__cache.html#a2620d6e8d97603ccd29f4e439e446480">More...</a><br /></td></tr>
-<tr class="separator:a2620d6e8d97603ccd29f4e439e446480"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0af1a225eb2a22f38380fbb6b90ebc5e"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
-<tr class="memitem:a0af1a225eb2a22f38380fbb6b90ebc5e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a0af1a225eb2a22f38380fbb6b90ebc5e">each</a> (Func func) const</td></tr>
-<tr class="memdesc:a0af1a225eb2a22f38380fbb6b90ebc5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates all resources.  <a href="classentt_1_1resource__cache.html#a0af1a225eb2a22f38380fbb6b90ebc5e">More...</a><br /></td></tr>
-<tr class="separator:a0af1a225eb2a22f38380fbb6b90ebc5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa91fbde235252dadf46ef1effe32bbe0"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
-<tr class="memitem:aa91fbde235252dadf46ef1effe32bbe0"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#aa91fbde235252dadf46ef1effe32bbe0">each</a> (Func func)</td></tr>
-<tr class="memdesc:aa91fbde235252dadf46ef1effe32bbe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates all resources.  <a href="classentt_1_1resource__cache.html#aa91fbde235252dadf46ef1effe32bbe0">More...</a><br /></td></tr>
-<tr class="separator:aa91fbde235252dadf46ef1effe32bbe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06ba856c4484f52a91a8ee140a223bd5"><td class="memItemLeft" align="right" valign="top"><a id="a06ba856c4484f52a91a8ee140a223bd5"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a06ba856c4484f52a91a8ee140a223bd5">resource_cache</a> ()</td></tr>
+<tr class="memdesc:a06ba856c4484f52a91a8ee140a223bd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a06ba856c4484f52a91a8ee140a223bd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85024663deca781eb063b03254a3f825"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a85024663deca781eb063b03254a3f825">resource_cache</a> (const <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> &amp;allocator)</td></tr>
+<tr class="memdesc:a85024663deca781eb063b03254a3f825"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty cache with a given allocator.  <a href="classentt_1_1resource__cache.html#a85024663deca781eb063b03254a3f825">More...</a><br /></td></tr>
+<tr class="separator:a85024663deca781eb063b03254a3f825"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87b5fdd8fd001e8444d1b51de6fd9189"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a87b5fdd8fd001e8444d1b51de6fd9189">resource_cache</a> (const <a class="el" href="classentt_1_1resource__cache.html#a834f161302d84ba1303358ce22f6e982">loader_type</a> &amp;callable, const <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> &amp;allocator=<a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a>{})</td></tr>
+<tr class="memdesc:a87b5fdd8fd001e8444d1b51de6fd9189"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty cache with a given allocator and loader.  <a href="classentt_1_1resource__cache.html#a87b5fdd8fd001e8444d1b51de6fd9189">More...</a><br /></td></tr>
+<tr class="separator:a87b5fdd8fd001e8444d1b51de6fd9189"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab35522f4f96e42e7ac246ce69abd2ee1"><td class="memItemLeft" align="right" valign="top"><a id="ab35522f4f96e42e7ac246ce69abd2ee1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#ab35522f4f96e42e7ac246ce69abd2ee1">resource_cache</a> (const <a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;)=default</td></tr>
+<tr class="memdesc:ab35522f4f96e42e7ac246ce69abd2ee1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default copy constructor. <br /></td></tr>
+<tr class="separator:ab35522f4f96e42e7ac246ce69abd2ee1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a91e3e3d19167b6c65e826e5419e273"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a1a91e3e3d19167b6c65e826e5419e273">resource_cache</a> (const <a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;other, const <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> &amp;allocator)</td></tr>
+<tr class="memdesc:a1a91e3e3d19167b6c65e826e5419e273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocator-extended copy constructor.  <a href="classentt_1_1resource__cache.html#a1a91e3e3d19167b6c65e826e5419e273">More...</a><br /></td></tr>
+<tr class="separator:a1a91e3e3d19167b6c65e826e5419e273"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa54d9a10a10019476cbb863ffb27c3f0"><td class="memItemLeft" align="right" valign="top"><a id="aa54d9a10a10019476cbb863ffb27c3f0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#aa54d9a10a10019476cbb863ffb27c3f0">resource_cache</a> (<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;&amp;)=default</td></tr>
+<tr class="memdesc:aa54d9a10a10019476cbb863ffb27c3f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move constructor. <br /></td></tr>
+<tr class="separator:aa54d9a10a10019476cbb863ffb27c3f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8419d3c2c6e142ca851e2a31d6813c63"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a8419d3c2c6e142ca851e2a31d6813c63">resource_cache</a> (<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;&amp;other, const <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> &amp;allocator)</td></tr>
+<tr class="memdesc:a8419d3c2c6e142ca851e2a31d6813c63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocator-extended move constructor.  <a href="classentt_1_1resource__cache.html#a8419d3c2c6e142ca851e2a31d6813c63">More...</a><br /></td></tr>
+<tr class="separator:a8419d3c2c6e142ca851e2a31d6813c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac62e77427a14f432ce48e73be6d0e99b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#ac62e77427a14f432ce48e73be6d0e99b">operator=</a> (const <a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;)=default</td></tr>
+<tr class="memdesc:ac62e77427a14f432ce48e73be6d0e99b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default copy assignment operator.  <a href="classentt_1_1resource__cache.html#ac62e77427a14f432ce48e73be6d0e99b">More...</a><br /></td></tr>
+<tr class="separator:ac62e77427a14f432ce48e73be6d0e99b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa45af1086197beca5820c03ecf2188f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#aa45af1086197beca5820c03ecf2188f4">operator=</a> (<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> &amp;&amp;)=default</td></tr>
+<tr class="memdesc:aa45af1086197beca5820c03ecf2188f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move assignment operator.  <a href="classentt_1_1resource__cache.html#aa45af1086197beca5820c03ecf2188f4">More...</a><br /></td></tr>
+<tr class="separator:aa45af1086197beca5820c03ecf2188f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fbba6086da8afe5a19edfb569ccfb21"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a7fbba6086da8afe5a19edfb569ccfb21">get_allocator</a> () const</td></tr>
+<tr class="memdesc:a7fbba6086da8afe5a19edfb569ccfb21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the associated allocator.  <a href="classentt_1_1resource__cache.html#a7fbba6086da8afe5a19edfb569ccfb21">More...</a><br /></td></tr>
+<tr class="separator:a7fbba6086da8afe5a19edfb569ccfb21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1e83d6e645e083b14afa3ad85c7cd5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#ae1e83d6e645e083b14afa3ad85c7cd5b">cbegin</a> () const</td></tr>
+<tr class="memdesc:ae1e83d6e645e083b14afa3ad85c7cd5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="classentt_1_1resource__cache.html#ae1e83d6e645e083b14afa3ad85c7cd5b">More...</a><br /></td></tr>
+<tr class="separator:ae1e83d6e645e083b14afa3ad85c7cd5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a09c477294cbe8e4ed7664404633e3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a4a09c477294cbe8e4ed7664404633e3b">begin</a> () const</td></tr>
+<tr class="memdesc:a4a09c477294cbe8e4ed7664404633e3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="classentt_1_1resource__cache.html#a4a09c477294cbe8e4ed7664404633e3b">More...</a><br /></td></tr>
+<tr class="separator:a4a09c477294cbe8e4ed7664404633e3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd993aefd78f8e80d413c3343bb61900"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#acd993aefd78f8e80d413c3343bb61900">begin</a> ()</td></tr>
+<tr class="memdesc:acd993aefd78f8e80d413c3343bb61900"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="classentt_1_1resource__cache.html#acd993aefd78f8e80d413c3343bb61900">More...</a><br /></td></tr>
+<tr class="separator:acd993aefd78f8e80d413c3343bb61900"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dbcbf4bacbe7036068ac25165c81fa5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a1dbcbf4bacbe7036068ac25165c81fa5">cend</a> () const</td></tr>
+<tr class="memdesc:a1dbcbf4bacbe7036068ac25165c81fa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="classentt_1_1resource__cache.html#a1dbcbf4bacbe7036068ac25165c81fa5">More...</a><br /></td></tr>
+<tr class="separator:a1dbcbf4bacbe7036068ac25165c81fa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1cc6e780dbb6f51e7148051c0b24202"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#af1cc6e780dbb6f51e7148051c0b24202">end</a> () const</td></tr>
+<tr class="memdesc:af1cc6e780dbb6f51e7148051c0b24202"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="classentt_1_1resource__cache.html#af1cc6e780dbb6f51e7148051c0b24202">More...</a><br /></td></tr>
+<tr class="separator:af1cc6e780dbb6f51e7148051c0b24202"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0701aef8b311f0f2801d889a926bce9c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a0701aef8b311f0f2801d889a926bce9c">end</a> ()</td></tr>
+<tr class="memdesc:a0701aef8b311f0f2801d889a926bce9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="classentt_1_1resource__cache.html#a0701aef8b311f0f2801d889a926bce9c">More...</a><br /></td></tr>
+<tr class="separator:a0701aef8b311f0f2801d889a926bce9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a764d7a559461002c10c4163bf31609dc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a764d7a559461002c10c4163bf31609dc">empty</a> () const</td></tr>
+<tr class="memdesc:a764d7a559461002c10c4163bf31609dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a cache contains no resources, false otherwise.  <a href="classentt_1_1resource__cache.html#a764d7a559461002c10c4163bf31609dc">More...</a><br /></td></tr>
+<tr class="separator:a764d7a559461002c10c4163bf31609dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63a0563cb6c49f1651f9d92832206ddf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#af96dd3b16bdd0f1151b75786bdc0a2cb">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a63a0563cb6c49f1651f9d92832206ddf">size</a> () const</td></tr>
+<tr class="memdesc:a63a0563cb6c49f1651f9d92832206ddf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of resources managed by a cache.  <a href="classentt_1_1resource__cache.html#a63a0563cb6c49f1651f9d92832206ddf">More...</a><br /></td></tr>
+<tr class="separator:a63a0563cb6c49f1651f9d92832206ddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45d256c8fe130284facc58071dcaa91f"><td class="memItemLeft" align="right" valign="top"><a id="a45d256c8fe130284facc58071dcaa91f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a45d256c8fe130284facc58071dcaa91f">clear</a> ()</td></tr>
+<tr class="memdesc:a45d256c8fe130284facc58071dcaa91f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears a cache. <br /></td></tr>
+<tr class="separator:a45d256c8fe130284facc58071dcaa91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a913f42ea03648c365c8cbbf8b405b6d4"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:a913f42ea03648c365c8cbbf8b405b6d4"><td class="memTemplItemLeft" align="right" valign="top">std::pair&lt; <a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a>, bool &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a913f42ea03648c365c8cbbf8b405b6d4">load</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id, Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:a913f42ea03648c365c8cbbf8b405b6d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads a resource, if its identifier does not exist.  <a href="classentt_1_1resource__cache.html#a913f42ea03648c365c8cbbf8b405b6d4">More...</a><br /></td></tr>
+<tr class="separator:a913f42ea03648c365c8cbbf8b405b6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a29a1bce27e98fd4f8407fb9eb5b58e"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:a3a29a1bce27e98fd4f8407fb9eb5b58e"><td class="memTemplItemLeft" align="right" valign="top">std::pair&lt; <a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a>, bool &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a3a29a1bce27e98fd4f8407fb9eb5b58e">force_load</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id, Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:a3a29a1bce27e98fd4f8407fb9eb5b58e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Force loads a resource, if its identifier does not exist.  <a href="classentt_1_1resource__cache.html#a3a29a1bce27e98fd4f8407fb9eb5b58e">More...</a><br /></td></tr>
+<tr class="separator:a3a29a1bce27e98fd4f8407fb9eb5b58e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5d5a3100bb36367700d12a808286fbb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource.html">resource</a>&lt; const <a class="el" href="classentt_1_1resource__cache.html#a7405d91504b5793f260a93695f6cdee4">value_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#ac5d5a3100bb36367700d12a808286fbb">operator[]</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id) const</td></tr>
+<tr class="memdesc:ac5d5a3100bb36367700d12a808286fbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a handle for a given resource identifier.  <a href="classentt_1_1resource__cache.html#ac5d5a3100bb36367700d12a808286fbb">More...</a><br /></td></tr>
+<tr class="separator:ac5d5a3100bb36367700d12a808286fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af571e731540287786242dbb28ef0fe1f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource.html">resource</a>&lt; <a class="el" href="classentt_1_1resource__cache.html#a7405d91504b5793f260a93695f6cdee4">value_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#af571e731540287786242dbb28ef0fe1f">operator[]</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id)</td></tr>
+<tr class="memdesc:af571e731540287786242dbb28ef0fe1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a handle for a given resource identifier.  <a href="classentt_1_1resource__cache.html#af571e731540287786242dbb28ef0fe1f">More...</a><br /></td></tr>
+<tr class="separator:af571e731540287786242dbb28ef0fe1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff744458b981ee509a7381ffdf544522"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#aff744458b981ee509a7381ffdf544522">contains</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id) const</td></tr>
+<tr class="memdesc:aff744458b981ee509a7381ffdf544522"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a cache contains a given identifier.  <a href="classentt_1_1resource__cache.html#aff744458b981ee509a7381ffdf544522">More...</a><br /></td></tr>
+<tr class="separator:aff744458b981ee509a7381ffdf544522"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59fd1af63515fbb9e9ed26cb13dbe041"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a59fd1af63515fbb9e9ed26cb13dbe041">erase</a> (<a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a> pos)</td></tr>
+<tr class="memdesc:a59fd1af63515fbb9e9ed26cb13dbe041"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes an element from a given position.  <a href="classentt_1_1resource__cache.html#a59fd1af63515fbb9e9ed26cb13dbe041">More...</a><br /></td></tr>
+<tr class="separator:a59fd1af63515fbb9e9ed26cb13dbe041"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9938c0c0228fd59b67470e7a904cf3a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#af9938c0c0228fd59b67470e7a904cf3a">erase</a> (<a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a> first, <a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a> last)</td></tr>
+<tr class="memdesc:af9938c0c0228fd59b67470e7a904cf3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the given elements from a cache.  <a href="classentt_1_1resource__cache.html#af9938c0c0228fd59b67470e7a904cf3a">More...</a><br /></td></tr>
+<tr class="separator:af9938c0c0228fd59b67470e7a904cf3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0166a373140e75be2c5b41ccd39d8375"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#af96dd3b16bdd0f1151b75786bdc0a2cb">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a0166a373140e75be2c5b41ccd39d8375">erase</a> (const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a> id)</td></tr>
+<tr class="memdesc:a0166a373140e75be2c5b41ccd39d8375"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the given elements from a cache.  <a href="classentt_1_1resource__cache.html#a0166a373140e75be2c5b41ccd39d8375">More...</a><br /></td></tr>
+<tr class="separator:a0166a373140e75be2c5b41ccd39d8375"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29225250d340dfc89818ab6662efe774"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1resource__cache.html#a834f161302d84ba1303358ce22f6e982">loader_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1resource__cache.html#a29225250d340dfc89818ab6662efe774">loader</a> () const</td></tr>
+<tr class="memdesc:a29225250d340dfc89818ab6662efe774"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the loader used to create resources.  <a href="classentt_1_1resource__cache.html#a29225250d340dfc89818ab6662efe774">More...</a><br /></td></tr>
+<tr class="separator:a29225250d340dfc89818ab6662efe774"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Resource&gt;<br />
-class entt::resource_cache&lt; Resource &gt;</h3>
+<div class="textblock"><h3>template&lt;typename Type, typename Loader, typename Allocator&gt;<br />
+class entt::resource_cache&lt; Type, Loader, Allocator &gt;</h3>
 
-<p>Simple cache for resources of a given type. </p>
-<p>Minimal implementation of a cache for resources of a given type. It doesn't offer much functionalities but it's suitable for small or medium sized applications and can be freely inherited to add targeted functionalities for large sized applications.</p>
+<p>Basic cache for resources of any type. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Resource</td><td>Type of resources managed by a cache. </td></tr>
+    <tr><td class="paramname">Type</td><td>Type of resources managed by a cache. </td></tr>
+    <tr><td class="paramname">Loader</td><td>Type of loader used to create the resources. </td></tr>
+    <tr><td class="paramname">Allocator</td><td>Type of allocator used to manage memory and elements. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00027">27</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a2c6800c0d2ebb2c0a51f941af5fc9168"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c6800c0d2ebb2c0a51f941af5fc9168">&#9670;&nbsp;</a></span>clear()</h2>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00161">161</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a85024663deca781eb063b03254a3f825"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85024663deca781eb063b03254a3f825">&#9670;&nbsp;</a></span>resource_cache() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::clear </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs an empty cache with a given allocator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">allocator</td><td>The allocator to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00189">189</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a87b5fdd8fd001e8444d1b51de6fd9189"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87b5fdd8fd001e8444d1b51de6fd9189">&#9670;&nbsp;</a></span>resource_cache() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__cache.html#a834f161302d84ba1303358ce22f6e982">loader_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>callable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em> = <code><a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs an empty cache with a given allocator and loader. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callable</td><td>The loader to use. </td></tr>
+    <tr><td class="paramname">allocator</td><td>The allocator to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00197">197</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a1a91e3e3d19167b6c65e826e5419e273"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a91e3e3d19167b6c65e826e5419e273">&#9670;&nbsp;</a></span>resource_cache() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__cache.html">resource_cache</a>&lt; Type, Loader, Allocator &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Allocator-extended copy constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The instance to copy from. </td></tr>
+    <tr><td class="paramname">allocator</td><td>The allocator to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00208">208</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a8419d3c2c6e142ca851e2a31d6813c63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8419d3c2c6e142ca851e2a31d6813c63">&#9670;&nbsp;</a></span>resource_cache() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::<a class="el" href="classentt_1_1resource__cache.html">resource_cache</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a>&lt; Type, Loader, Allocator &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Allocator-extended move constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The instance to move from. </td></tr>
+    <tr><td class="paramname">allocator</td><td>The allocator to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00219">219</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="acd993aefd78f8e80d413c3343bb61900"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd993aefd78f8e80d413c3343bb61900">&#9670;&nbsp;</a></span>begin() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -186,26 +427,126 @@ template&lt;typename Resource &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Clears a cache and discards all its resources. </p>
-<p>Handles are not invalidated and the memory used by a resource isn't freed as long as at least a handle keeps the resource itself alive. </p>
+<p>Returns an iterator to the beginning. </p>
+<p>The returned iterator points to the first instance of the cache. If the cache is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1resource__cache.html#a0701aef8b311f0f2801d889a926bce9c" title="Returns an iterator to the end.">end()</a></code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the internal cache. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00067">67</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00260">260</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a86bac75a12d6b8334c6438708f4b792f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86bac75a12d6b8334c6438708f4b792f">&#9670;&nbsp;</a></span>contains()</h2>
+<a id="a4a09c477294cbe8e4ed7664404633e3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a09c477294cbe8e4ed7664404633e3b">&#9670;&nbsp;</a></span>begin() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::contains </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator to the beginning. </p>
+<p>The returned iterator points to the first instance of the cache. If the cache is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1resource__cache.html#a0701aef8b311f0f2801d889a926bce9c" title="Returns an iterator to the end.">end()</a></code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the internal cache. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00255">255</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae1e83d6e645e083b14afa3ad85c7cd5b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1e83d6e645e083b14afa3ad85c7cd5b">&#9670;&nbsp;</a></span>cbegin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::cbegin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator to the beginning. </p>
+<p>The returned iterator points to the first instance of the cache. If the cache is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1resource__cache.html#a0701aef8b311f0f2801d889a926bce9c" title="Returns an iterator to the end.">end()</a></code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the internal cache. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00250">250</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a1dbcbf4bacbe7036068ac25165c81fa5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dbcbf4bacbe7036068ac25165c81fa5">&#9670;&nbsp;</a></span>cend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::cend </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator to the end. </p>
+<p>The returned iterator points to the element following the last instance of the cache. Attempting to dereference the returned iterator results in undefined behavior.</p>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the internal cache. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00274">274</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aff744458b981ee509a7381ffdf544522"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff744458b981ee509a7381ffdf544522">&#9670;&nbsp;</a></span>contains()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::contains </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
@@ -228,166 +569,23 @@ template&lt;typename Resource &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the cache contains the resource, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00186">186</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00376">376</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a2620d6e8d97603ccd29f4e439e446480"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2620d6e8d97603ccd29f4e439e446480">&#9670;&nbsp;</a></span>discard()</h2>
+<a id="a764d7a559461002c10c4163bf31609dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a764d7a559461002c10c4163bf31609dc">&#9670;&nbsp;</a></span>empty()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::discard </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td>
-          <td class="paramname"><em>id</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Discards the resource that corresponds to a given identifier. </p>
-<p>Handles are not invalidated and the memory used by the resource isn't freed as long as at least a handle keeps the resource itself alive.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">id</td><td>Unique resource identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00198">198</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
-
-</div>
-</div>
-<a id="aa91fbde235252dadf46ef1effe32bbe0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa91fbde235252dadf46ef1effe32bbe0">&#9670;&nbsp;</a></span>each() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<div class="memtemplate">
-template&lt;typename Func &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::each </td>
-          <td>(</td>
-          <td class="paramtype">Func&#160;</td>
-          <td class="paramname"><em>func</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Iterates all resources. </p>
-<p>The function object is invoked for each element. It is provided with either the resource identifier, the resource handle or both of them.<br  />
- The signature of the function must be equivalent to one of the following forms:</p>
-<div class="fragment"><div class="line">void(<span class="keyword">const</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a>);</div>
-<div class="line">void(<a class="code" href="classentt_1_1resource__handle.html">entt::resource_handle&lt;resource_type&gt;</a>);</div>
-<div class="line">void(<span class="keyword">const</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a>, <a class="code" href="classentt_1_1resource__handle.html">entt::resource_handle&lt;resource_type&gt;</a>);</div>
-<div class="ttc" id="aclassentt_1_1resource__handle_html"><div class="ttname"><a href="classentt_1_1resource__handle.html">entt::resource_handle</a></div><div class="ttdoc">Shared resource handle.</div><div class="ttdef"><b>Definition:</b> <a href="resource_2handle_8hpp_source.html#l00025">handle.hpp:25</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00013">fwd.hpp:13</a></div></div>
-</div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">func</td><td>A valid function object. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00257">257</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a0af1a225eb2a22f38380fbb6b90ebc5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0af1a225eb2a22f38380fbb6b90ebc5e">&#9670;&nbsp;</a></span>each() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<div class="memtemplate">
-template&lt;typename Func &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::each </td>
-          <td>(</td>
-          <td class="paramtype">Func&#160;</td>
-          <td class="paramname"><em>func</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Iterates all resources. </p>
-<p>The function object is invoked for each element. It is provided with either the resource identifier, the resource handle or both of them.<br  />
- The signature of the function must be equivalent to one of the following forms:</p>
-<div class="fragment"><div class="line">void(<span class="keyword">const</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a>);</div>
-<div class="line">void(<a class="code" href="classentt_1_1resource__handle.html">entt::resource_handle&lt;const resource_type&gt;</a>);</div>
-<div class="line">void(<span class="keyword">const</span> <a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a>, <a class="code" href="classentt_1_1resource__handle.html">entt::resource_handle&lt;const resource_type&gt;</a>);</div>
-</div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">func</td><td>A valid function object. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00222">222</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a68ac0bbd5731434c15bee4d7342c359f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a68ac0bbd5731434c15bee4d7342c359f">&#9670;&nbsp;</a></span>empty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::empty </td>
+          <td class="memname">bool <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::empty </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -403,23 +601,89 @@ template&lt;typename Resource &gt; </div>
 <p>Returns true if a cache contains no resources, false otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the cache contains no resources, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00057">57</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00292">292</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a616c6f32c7bd4db18be22208a3e88e45"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a616c6f32c7bd4db18be22208a3e88e45">&#9670;&nbsp;</a></span>handle() <span class="overload">[1/2]</span></h2>
+<a id="a0701aef8b311f0f2801d889a926bce9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0701aef8b311f0f2801d889a926bce9c">&#9670;&nbsp;</a></span>end() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt;<a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a>&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::<a class="el" href="namespaceentt.html#a5a0027b922894421f703102c374c234c">handle</a> </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator to the end. </p>
+<p>The returned iterator points to the element following the last instance of the cache. Attempting to dereference the returned iterator results in undefined behavior.</p>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the internal cache. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00284">284</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="af1cc6e780dbb6f51e7148051c0b24202"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1cc6e780dbb6f51e7148051c0b24202">&#9670;&nbsp;</a></span>end() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator to the end. </p>
+<p>The returned iterator points to the element following the last instance of the cache. Attempting to dereference the returned iterator results in undefined behavior.</p>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the internal cache. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00279">279</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a0166a373140e75be2c5b41ccd39d8375"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0166a373140e75be2c5b41ccd39d8375">&#9670;&nbsp;</a></span>erase() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#af96dd3b16bdd0f1151b75786bdc0a2cb">size_type</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::erase </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
@@ -433,38 +697,46 @@ template&lt;typename Resource &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Creates a handle for a given resource identifier. </p>
-<p>A resource handle can be in a either valid or invalid state. In other terms, a resource handle is properly initialized with a resource if the cache contains the resource itself. Otherwise the returned handle is uninitialized and accessing it results in undefined behavior.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1resource__handle.html" title="Shared resource handle.">resource_handle</a></dd></dl>
+<p>Removes the given elements from a cache. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">id</td><td>Unique resource identifier. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A handle for the given resource. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Number of resources erased (either 0 or 1). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00173">173</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00406">406</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a4b5cd3213a1f22aa6b8a5c4ce876a630"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b5cd3213a1f22aa6b8a5c4ce876a630">&#9670;&nbsp;</a></span>handle() <span class="overload">[2/2]</span></h2>
+<a id="af9938c0c0228fd59b67470e7a904cf3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9938c0c0228fd59b67470e7a904cf3a">&#9670;&nbsp;</a></span>erase() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt;const <a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a>&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::<a class="el" href="namespaceentt.html#a5a0027b922894421f703102c374c234c">handle</a> </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::erase </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td>
-          <td class="paramname"><em>id</em></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a>&#160;</td>
+          <td class="paramname"><em>first</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a>&#160;</td>
+          <td class="paramname"><em>last</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -474,36 +746,74 @@ template&lt;typename Resource &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Creates a handle for a given resource identifier. </p>
-<p>A resource handle can be in a either valid or invalid state. In other terms, a resource handle is properly initialized with a resource if the cache contains the resource itself. Otherwise the returned handle is uninitialized and accessing it results in undefined behavior.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1resource__handle.html" title="Shared resource handle.">resource_handle</a></dd></dl>
+<p>Removes the given elements from a cache. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">id</td><td>Unique resource identifier. </td></tr>
+    <tr><td class="paramname">first</td><td>An iterator to the first element of the range of elements. </td></tr>
+    <tr><td class="paramname">last</td><td>An iterator past the last element of the range of elements. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A handle for the given resource. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An iterator following the last removed element. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00164">164</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00396">396</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a5d32fa751e6f6ca1a595ebb5642cff23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5d32fa751e6f6ca1a595ebb5642cff23">&#9670;&nbsp;</a></span>load()</h2>
+<a id="a59fd1af63515fbb9e9ed26cb13dbe041"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59fd1af63515fbb9e9ed26cb13dbe041">&#9670;&nbsp;</a></span>erase() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<div class="memtemplate">
-template&lt;typename Loader , typename... Args&gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt;<a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a>&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::load </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::erase </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1resource__cache.html#a8eb72ec2d185a953cba0ac2f6e87d693">const_iterator</a>&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Removes an element from a given position. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>An iterator to the element to remove. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An iterator following the removed element. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00385">385</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3a29a1bce27e98fd4f8407fb9eb5b58e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a29a1bce27e98fd4f8407fb9eb5b58e">&#9670;&nbsp;</a></span>force_load()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<div class="memtemplate">
+template&lt;typename... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::pair&lt;<a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a>, bool&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::force_load </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td>
           <td class="paramname"><em>id</em>, </td>
@@ -527,13 +837,11 @@ template&lt;typename Loader , typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Loads the resource that corresponds to a given identifier. </p>
-<p>In case an identifier isn't already present in the cache, it loads its resource and stores it aside for future uses. Arguments are forwarded directly to the loader in order to construct properly the requested resource.</p>
-<dl class="section note"><dt>Note</dt><dd>If the identifier is already present in the cache, this function does nothing and the arguments are simply discarded.</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>If the resource cannot be loaded correctly, the returned handle will be invalid and any use of it will result in undefined behavior.</dd></dl>
+<p>Force loads a resource, if its identifier does not exist. </p>
+<p>Arguments are forwarded directly to the loader and <em>consumed</em> only if the resource doesn't already exist.</p>
+<dl class="section warning"><dt>Warning</dt><dd>If the resource isn't loaded correctly, the returned handle could be invalid and any use of it will result in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Loader</td><td>Type of loader to use to load the resource if required. </td></tr>
     <tr><td class="paramname">Args</td><td>Types of arguments to use to load the resource if required. </td></tr>
   </table>
   </dd>
@@ -545,27 +853,182 @@ template&lt;typename Loader , typename... Args&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A handle for the given resource. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pair consisting of an iterator to the inserted element (or to the element that prevented the insertion) and a bool denoting whether the insertion took place. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00094">94</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00340">340</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a1aecfbf6c4faaadb05ce5005c202223c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1aecfbf6c4faaadb05ce5005c202223c">&#9670;&nbsp;</a></span>operator=()</h2>
+<a id="a7fbba6086da8afe5a19edfb569ccfb21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fbba6086da8afe5a19edfb569ccfb21">&#9670;&nbsp;</a></span>get_allocator()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a>&amp; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::operator= </td>
+          <td class="memname">constexpr <a class="el" href="classentt_1_1resource__cache.html#ab1e2dc3aeffbbbce6d48e0c46d908cfd">allocator_type</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::get_allocator </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a>&lt; Resource &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the associated allocator. </p>
+<dl class="section return"><dt>Returns</dt><dd>The associated allocator. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00238">238</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a913f42ea03648c365c8cbbf8b405b6d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a913f42ea03648c365c8cbbf8b405b6d4">&#9670;&nbsp;</a></span>load()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<div class="memtemplate">
+template&lt;typename... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::pair&lt;<a class="el" href="classentt_1_1resource__cache.html#aad6a23cc2ea4a9367ebdb9b186308353">iterator</a>, bool&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::load </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Args &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>args</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Loads a resource, if its identifier does not exist. </p>
+<p>Arguments are forwarded directly to the loader and <em>consumed</em> only if the resource doesn't already exist.</p>
+<dl class="section warning"><dt>Warning</dt><dd>If the resource isn't loaded correctly, the returned handle could be invalid and any use of it will result in undefined behavior.</dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Args</td><td>Types of arguments to use to load the resource if required. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Unique resource identifier. </td></tr>
+    <tr><td class="paramname">args</td><td>Arguments to use to load the resource if required. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pair consisting of an iterator to the inserted element (or to the element that prevented the insertion) and a bool denoting whether the insertion took place. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00327">327</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a29225250d340dfc89818ab6662efe774"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29225250d340dfc89818ab6662efe774">&#9670;&nbsp;</a></span>loader()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#a834f161302d84ba1303358ce22f6e982">loader_type</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::loader </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the loader used to create resources. </p>
+<dl class="section return"><dt>Returns</dt><dd>The loader used to create resources. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00414">414</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac62e77427a14f432ce48e73be6d0e99b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac62e77427a14f432ce48e73be6d0e99b">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a>&amp; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1resource__cache.html">resource_cache</a>&lt; Type, Loader, Allocator &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default copy assignment operator. </p>
+<dl class="section return"><dt>Returns</dt><dd>This cache. </dd></dl>
+
+</div>
+</div>
+<a id="aa45af1086197beca5820c03ecf2188f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa45af1086197beca5820c03ecf2188f4">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a>&amp; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1resource__cache.html">resource_cache</a>&lt; Type, Loader, Allocator &gt; &amp;&amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -582,35 +1045,23 @@ template&lt;typename Resource &gt; </div>
 
 </div>
 </div>
-<a id="a99bb176aa037d33218b4ea625a82300c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a99bb176aa037d33218b4ea625a82300c">&#9670;&nbsp;</a></span>reload()</h2>
+<a id="af571e731540287786242dbb28ef0fe1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af571e731540287786242dbb28ef0fe1f">&#9670;&nbsp;</a></span>operator[]() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<div class="memtemplate">
-template&lt;typename Loader , typename... Args&gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt;<a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a>&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::reload </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource.html">resource</a>&lt;<a class="el" href="classentt_1_1resource__cache.html#a7405d91504b5793f260a93695f6cdee4">value_type</a>&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::operator[] </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td>
-          <td class="paramname"><em>id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>id</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">Args &amp;&amp;...&#160;</td>
-          <td class="paramname"><em>args</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -620,45 +1071,75 @@ template&lt;typename Loader , typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Reloads a resource or loads it for the first time if not present. </p>
-<p>Equivalent to the following snippet (pseudocode):</p>
-<div class="fragment"><div class="line">cache.discard(<span class="keywordtype">id</span>);</div>
-<div class="line">cache.load(<span class="keywordtype">id</span>, args...);</div>
-</div><!-- fragment --><p>Arguments are forwarded directly to the loader in order to construct properly the requested resource.</p>
-<dl class="section warning"><dt>Warning</dt><dd>If the resource cannot be loaded correctly, the returned handle will be invalid and any use of it will result in undefined behavior.</dd></dl>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Loader</td><td>Type of loader to use to load the resource. </td></tr>
-    <tr><td class="paramname">Args</td><td>Types of arguments to use to load the resource. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Returns a handle for a given resource identifier. </p>
+<dl class="section warning"><dt>Warning</dt><dd>There is no guarantee that the returned handle is valid.<br  />
+ If it is not, any use will result in indefinite behavior.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">id</td><td>Unique resource identifier. </td></tr>
-    <tr><td class="paramname">args</td><td>Arguments to use to load the resource. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A handle for the given resource. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00130">130</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00363">363</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a90f4014d42bf22b536f720706a96d76d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90f4014d42bf22b536f720706a96d76d">&#9670;&nbsp;</a></span>size()</h2>
+<a id="ac5d5a3100bb36367700d12a808286fbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5d5a3100bb36367700d12a808286fbb">&#9670;&nbsp;</a></span>operator[]() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Resource &gt; </div>
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#aa9251f4bd388f39b18b6b416f58170e1">size_type</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::size </td>
+          <td class="memname"><a class="el" href="classentt_1_1resource.html">resource</a>&lt;const <a class="el" href="classentt_1_1resource__cache.html#a7405d91504b5793f260a93695f6cdee4">value_type</a>&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">id_type</a>&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a handle for a given resource identifier. </p>
+<dl class="section warning"><dt>Warning</dt><dd>There is no guarantee that the returned handle is valid.<br  />
+ If it is not, any use will result in indefinite behavior.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Unique resource identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A handle for the given resource. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00354">354</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a63a0563cb6c49f1651f9d92832206ddf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63a0563cb6c49f1651f9d92832206ddf">&#9670;&nbsp;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type , typename Loader , typename Allocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1resource__cache.html#af96dd3b16bdd0f1151b75786bdc0a2cb">size_type</a> <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Type, Loader, Allocator &gt;::size </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -674,56 +1155,7 @@ template&lt;typename Resource &gt; </div>
 <p>Number of resources managed by a cache. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of resources currently stored. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00049">49</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
-
-</div>
-</div>
-<a id="ad68eaab4f44691e76d128aaab4709d4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad68eaab4f44691e76d128aaab4709d4f">&#9670;&nbsp;</a></span>temp()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Resource &gt; </div>
-<div class="memtemplate">
-template&lt;typename Loader , typename... Args&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classentt_1_1resource__handle.html">resource_handle</a>&lt;<a class="el" href="classentt_1_1resource__cache.html#a3c660fb622942292cf7242e5361f80b7">resource_type</a>&gt; <a class="el" href="classentt_1_1resource__cache.html">entt::resource_cache</a>&lt; Resource &gt;::temp </td>
-          <td>(</td>
-          <td class="paramtype">Args &amp;&amp;...&#160;</td>
-          <td class="paramname"><em>args</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Creates a temporary handle for a resource. </p>
-<p>Arguments are forwarded directly to the loader in order to construct properly the requested resource. The handle isn't stored aside and the cache isn't in charge of the lifetime of the resource itself.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Loader</td><td>Type of loader to use to load the resource. </td></tr>
-    <tr><td class="paramname">Args</td><td>Types of arguments to use to load the resource. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">args</td><td>Arguments to use to load the resource. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A handle for the given resource. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00147">147</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cache_8hpp_source.html#l00300">300</a> of file <a class="el" href="cache_8hpp_source.html">cache.hpp</a>.</p>
 
 </div>
 </div>

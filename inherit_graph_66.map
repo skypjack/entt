@@ -1,4 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,27,145,69"/>
-<area shape="rect" id="node2" href="$structentt_1_1is__iterator_3_01Type_00_01std_1_1enable__if__t_3_9std_1_1is__same__v_3_01std_1_1rd42721e751eff098894616f5c9eb2c37.html" title="Provides the member constant value to true if a given type is an iterator, false otherwise." alt="" coords="193,5,403,91"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,27,135,54"/>
+<area shape="rect" id="node2" href="$structentt_1_1is__equality__comparable_3_01Type_00_01std_1_1void__t_3_01decltype_07std_1_1declva46aebf4c20f38cbd0108d1e297595736.html" title="Provides the member constant value to true if a given type is equality comparable,..." alt="" coords="183,5,373,76"/>
 </map>

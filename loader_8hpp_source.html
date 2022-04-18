@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -70,32 +70,32 @@ $(function() {
 <div class="title">loader.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef ENTT_RESOURCE_LOADER_HPP</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define ENTT_RESOURCE_LOADER_HPP</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef ENTT_RESOURCE_LOADEr_HPP</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define ENTT_RESOURCE_LOADEr_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fwd.hpp&quot;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;handle.hpp&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Loader, <span class="keyword">typename</span> Resource&gt;</div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classentt_1_1resource__loader.html">   42</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1resource__loader.html">resource_loader</a> {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Other&gt;</div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classentt_1_1resource__loader.html#a4112be35c9b6819c3b0d429a94f77728">   45</a></span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classentt_1_1resource__cache.html">resource_cache</a>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    [[nodiscard]] <a class="code" href="classentt_1_1resource__handle.html">resource_handle&lt;Resource&gt;</a> get(Args &amp;&amp;...args)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>Loader *<span class="keyword">&gt;</span>(<span class="keyword">this</span>)-&gt;load(std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;};</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;} <span class="comment">// namespace entt</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclassentt_1_1resource__cache_html"><div class="ttname"><a href="classentt_1_1resource__cache.html">entt::resource_cache</a></div><div class="ttdoc">Simple cache for resources of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="cache_8hpp_source.html#l00027">cache.hpp:27</a></div></div>
-<div class="ttc" id="aclassentt_1_1resource__handle_html"><div class="ttname"><a href="classentt_1_1resource__handle.html">entt::resource_handle</a></div><div class="ttdoc">Shared resource handle.</div><div class="ttdef"><b>Definition:</b> <a href="resource_2handle_8hpp_source.html#l00025">handle.hpp:25</a></div></div>
-<div class="ttc" id="aclassentt_1_1resource__loader_html"><div class="ttname"><a href="classentt_1_1resource__loader.html">entt::resource_loader</a></div><div class="ttdoc">Base class for resource loaders.</div><div class="ttdef"><b>Definition:</b> <a href="loader_8hpp_source.html#l00042">loader.hpp:42</a></div></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="dense__hash__map_8hpp_source.html#l00021">dense_hash_map.hpp:21</a></div></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;utility&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;fwd.hpp&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="structentt_1_1resource__loader.html">   15</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1resource__loader.html">resource_loader</a> {</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="structentt_1_1resource__loader.html#add7a5c71b563bbc139c0983837764dc1">   17</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1resource__loader.html#add7a5c71b563bbc139c0983837764dc1">result_type</a> = std::shared_ptr&lt;Type&gt;;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="structentt_1_1resource__loader.html#a675f609c3081613b042167bd44050e70">   26</a></span>&#160;    <a class="code" href="structentt_1_1resource__loader.html#add7a5c71b563bbc139c0983837764dc1">result_type</a> <a class="code" href="structentt_1_1resource__loader.html#a675f609c3081613b042167bd44050e70">operator()</a>(Args &amp;&amp;...args)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordflow">return</span> std::make_shared&lt;Type&gt;(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    }</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;};</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;} <span class="comment">// namespace entt</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="dense__map_8hpp_source.html#l00022">dense_map.hpp:22</a></div></div>
+<div class="ttc" id="astructentt_1_1resource__loader_html"><div class="ttname"><a href="structentt_1_1resource__loader.html">entt::resource_loader</a></div><div class="ttdoc">Transparent loader for shared resources.</div><div class="ttdef"><b>Definition:</b> <a href="loader_8hpp_source.html#l00015">loader.hpp:15</a></div></div>
+<div class="ttc" id="astructentt_1_1resource__loader_html_a675f609c3081613b042167bd44050e70"><div class="ttname"><a href="structentt_1_1resource__loader.html#a675f609c3081613b042167bd44050e70">entt::resource_loader::operator()</a></div><div class="ttdeci">result_type operator()(Args &amp;&amp;...args) const</div><div class="ttdoc">Constructs a shared pointer to a resource from its arguments.</div><div class="ttdef"><b>Definition:</b> <a href="loader_8hpp_source.html#l00026">loader.hpp:26</a></div></div>
+<div class="ttc" id="astructentt_1_1resource__loader_html_add7a5c71b563bbc139c0983837764dc1"><div class="ttname"><a href="structentt_1_1resource__loader.html#add7a5c71b563bbc139c0983837764dc1">entt::resource_loader::result_type</a></div><div class="ttdeci">std::shared_ptr&lt; Type &gt; result_type</div><div class="ttdoc">Result type.</div><div class="ttdef"><b>Definition:</b> <a href="loader_8hpp_source.html#l00017">loader.hpp:17</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

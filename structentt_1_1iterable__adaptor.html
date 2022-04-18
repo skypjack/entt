@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnTT: entt::iterable_adaptor&lt; It &gt; Struct Template Reference</title>
+<title>EnTT: entt::iterable_adaptor&lt; It, Sentinel &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="structentt_1_1iterable__adaptor-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">entt::iterable_adaptor&lt; It &gt; Struct Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
+<div class="title">entt::iterable_adaptor&lt; It, Sentinel &gt; Struct Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -82,76 +82,77 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a5f2efe4d02ffa42b11ecd1bdf8bee6b0"><td class="memItemLeft" align="right" valign="top"><a id="a5f2efe4d02ffa42b11ecd1bdf8bee6b0"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a5f2efe4d02ffa42b11ecd1bdf8bee6b0">value_type</a> = typename std::iterator_traits&lt; It &gt;::<a class="el" href="structentt_1_1iterable__adaptor.html#a5f2efe4d02ffa42b11ecd1bdf8bee6b0">value_type</a></td></tr>
-<tr class="memdesc:a5f2efe4d02ffa42b11ecd1bdf8bee6b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the objects returned during iteration. <br /></td></tr>
-<tr class="separator:a5f2efe4d02ffa42b11ecd1bdf8bee6b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d3d37eb178ab61415cec31e23012478"><td class="memItemLeft" align="right" valign="top"><a id="a7d3d37eb178ab61415cec31e23012478"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a7d3d37eb178ab61415cec31e23012478">iterator</a> = It</td></tr>
-<tr class="memdesc:a7d3d37eb178ab61415cec31e23012478"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterator type. <br /></td></tr>
-<tr class="separator:a7d3d37eb178ab61415cec31e23012478"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6ac835d7a8d53b23951fbdba6db850d"><td class="memItemLeft" align="right" valign="top"><a id="aa6ac835d7a8d53b23951fbdba6db850d"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a> = <a class="el" href="structentt_1_1iterable__adaptor.html#a7d3d37eb178ab61415cec31e23012478">iterator</a></td></tr>
-<tr class="memdesc:aa6ac835d7a8d53b23951fbdba6db850d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Const iterator type. <br /></td></tr>
-<tr class="separator:aa6ac835d7a8d53b23951fbdba6db850d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbde706b5ce0286d8e3fd6e71be12720"><td class="memItemLeft" align="right" valign="top"><a id="adbde706b5ce0286d8e3fd6e71be12720"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#adbde706b5ce0286d8e3fd6e71be12720">value_type</a> = typename std::iterator_traits&lt; It &gt;::<a class="el" href="structentt_1_1iterable__adaptor.html#adbde706b5ce0286d8e3fd6e71be12720">value_type</a></td></tr>
+<tr class="memdesc:adbde706b5ce0286d8e3fd6e71be12720"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value type. <br /></td></tr>
+<tr class="separator:adbde706b5ce0286d8e3fd6e71be12720"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f7920bf5cba9b4aa765affe21490a2d"><td class="memItemLeft" align="right" valign="top"><a id="a5f7920bf5cba9b4aa765affe21490a2d"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a5f7920bf5cba9b4aa765affe21490a2d">iterator</a> = It</td></tr>
+<tr class="memdesc:a5f7920bf5cba9b4aa765affe21490a2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterator type. <br /></td></tr>
+<tr class="separator:a5f7920bf5cba9b4aa765affe21490a2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86150bc99361dabcbb7f574d84691e42"><td class="memItemLeft" align="right" valign="top"><a id="a86150bc99361dabcbb7f574d84691e42"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a86150bc99361dabcbb7f574d84691e42">sentinel</a> = Sentinel</td></tr>
+<tr class="memdesc:a86150bc99361dabcbb7f574d84691e42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sentinel type. <br /></td></tr>
+<tr class="separator:a86150bc99361dabcbb7f574d84691e42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a047f9b4bd49dd52067defbfb50ad1e92"><td class="memItemLeft" align="right" valign="top"><a id="a047f9b4bd49dd52067defbfb50ad1e92"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a047f9b4bd49dd52067defbfb50ad1e92">iterable_adaptor</a> ()=default</td></tr>
-<tr class="memdesc:a047f9b4bd49dd52067defbfb50ad1e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
-<tr class="separator:a047f9b4bd49dd52067defbfb50ad1e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc0ab97bc15ec48970b44911ad7d0661"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#adc0ab97bc15ec48970b44911ad7d0661">iterable_adaptor</a> (It from, It to)</td></tr>
-<tr class="memdesc:adc0ab97bc15ec48970b44911ad7d0661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an iterable object from a pair of iterators.  <a href="structentt_1_1iterable__adaptor.html#adc0ab97bc15ec48970b44911ad7d0661">More...</a><br /></td></tr>
-<tr class="separator:adc0ab97bc15ec48970b44911ad7d0661"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a017dd4bccfd6777df24cf5beb4e2cc06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a017dd4bccfd6777df24cf5beb4e2cc06">begin</a> () const</td></tr>
-<tr class="memdesc:a017dd4bccfd6777df24cf5beb4e2cc06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="structentt_1_1iterable__adaptor.html#a017dd4bccfd6777df24cf5beb4e2cc06">More...</a><br /></td></tr>
-<tr class="separator:a017dd4bccfd6777df24cf5beb4e2cc06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22e90b6cc6b986e07c3688de97f4a67b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a22e90b6cc6b986e07c3688de97f4a67b">end</a> () const</td></tr>
-<tr class="memdesc:a22e90b6cc6b986e07c3688de97f4a67b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="structentt_1_1iterable__adaptor.html#a22e90b6cc6b986e07c3688de97f4a67b">More...</a><br /></td></tr>
-<tr class="separator:a22e90b6cc6b986e07c3688de97f4a67b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33c94d2a866e0c93f3dbaabdf91e80fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a33c94d2a866e0c93f3dbaabdf91e80fa">cbegin</a> () const</td></tr>
-<tr class="memdesc:a33c94d2a866e0c93f3dbaabdf91e80fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="structentt_1_1iterable__adaptor.html#a33c94d2a866e0c93f3dbaabdf91e80fa">More...</a><br /></td></tr>
-<tr class="separator:a33c94d2a866e0c93f3dbaabdf91e80fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a647cd837df15e583db221c24af02abb6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a647cd837df15e583db221c24af02abb6">cend</a> () const</td></tr>
-<tr class="memdesc:a647cd837df15e583db221c24af02abb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="structentt_1_1iterable__adaptor.html#a647cd837df15e583db221c24af02abb6">More...</a><br /></td></tr>
-<tr class="separator:a647cd837df15e583db221c24af02abb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a633a07efaa72436004db4c0923481921"><td class="memItemLeft" align="right" valign="top"><a id="a633a07efaa72436004db4c0923481921"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a633a07efaa72436004db4c0923481921">iterable_adaptor</a> ()=default</td></tr>
+<tr class="memdesc:a633a07efaa72436004db4c0923481921"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a633a07efaa72436004db4c0923481921"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb0c73a7ef046ad97eb836b6692f7010"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#adb0c73a7ef046ad97eb836b6692f7010">iterable_adaptor</a> (<a class="el" href="structentt_1_1iterable__adaptor.html#a5f7920bf5cba9b4aa765affe21490a2d">iterator</a> from, <a class="el" href="structentt_1_1iterable__adaptor.html#a86150bc99361dabcbb7f574d84691e42">sentinel</a> to)</td></tr>
+<tr class="memdesc:adb0c73a7ef046ad97eb836b6692f7010"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an iterable object from a pair of iterators.  <a href="structentt_1_1iterable__adaptor.html#adb0c73a7ef046ad97eb836b6692f7010">More...</a><br /></td></tr>
+<tr class="separator:adb0c73a7ef046ad97eb836b6692f7010"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24f0c0139b40ae81a191b8330b221004"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1iterable__adaptor.html#a5f7920bf5cba9b4aa765affe21490a2d">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a24f0c0139b40ae81a191b8330b221004">begin</a> () const</td></tr>
+<tr class="memdesc:a24f0c0139b40ae81a191b8330b221004"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="structentt_1_1iterable__adaptor.html#a24f0c0139b40ae81a191b8330b221004">More...</a><br /></td></tr>
+<tr class="separator:a24f0c0139b40ae81a191b8330b221004"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91d5e906cec2aeae1289ac8f06774295"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1iterable__adaptor.html#a86150bc99361dabcbb7f574d84691e42">sentinel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#a91d5e906cec2aeae1289ac8f06774295">end</a> () const</td></tr>
+<tr class="memdesc:a91d5e906cec2aeae1289ac8f06774295"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="structentt_1_1iterable__adaptor.html#a91d5e906cec2aeae1289ac8f06774295">More...</a><br /></td></tr>
+<tr class="separator:a91d5e906cec2aeae1289ac8f06774295"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf869d640cc961dba11d6e0b04a0f588"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1iterable__adaptor.html#a5f7920bf5cba9b4aa765affe21490a2d">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#abf869d640cc961dba11d6e0b04a0f588">cbegin</a> () const</td></tr>
+<tr class="memdesc:abf869d640cc961dba11d6e0b04a0f588"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning.  <a href="structentt_1_1iterable__adaptor.html#abf869d640cc961dba11d6e0b04a0f588">More...</a><br /></td></tr>
+<tr class="separator:abf869d640cc961dba11d6e0b04a0f588"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7e87b44217f4c784b3efc9f074cabcf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1iterable__adaptor.html#a86150bc99361dabcbb7f574d84691e42">sentinel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1iterable__adaptor.html#ac7e87b44217f4c784b3efc9f074cabcf">cend</a> () const</td></tr>
+<tr class="memdesc:ac7e87b44217f4c784b3efc9f074cabcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="structentt_1_1iterable__adaptor.html#ac7e87b44217f4c784b3efc9f074cabcf">More...</a><br /></td></tr>
+<tr class="separator:ac7e87b44217f4c784b3efc9f074cabcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename It&gt;<br />
-struct entt::iterable_adaptor&lt; It &gt;</h3>
+<div class="textblock"><h3>template&lt;typename It, typename Sentinel = It&gt;<br />
+struct entt::iterable_adaptor&lt; It, Sentinel &gt;</h3>
 
 <p>Utility class to create an iterable object from a pair of iterators. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">It</td><td>Type of iterators. </td></tr>
+    <tr><td class="paramname">It</td><td>Type of iterator. </td></tr>
+    <tr><td class="paramname">Sentinel</td><td>Type of sentinel. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00062">62</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00063">63</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="adc0ab97bc15ec48970b44911ad7d0661"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc0ab97bc15ec48970b44911ad7d0661">&#9670;&nbsp;</a></span>iterable_adaptor()</h2>
+<a id="adb0c73a7ef046ad97eb836b6692f7010"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb0c73a7ef046ad97eb836b6692f7010">&#9670;&nbsp;</a></span>iterable_adaptor()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename It &gt; </div>
+template&lt;typename It , typename Sentinel  = It&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It &gt;::<a class="el" href="structentt_1_1iterable__adaptor.html">iterable_adaptor</a> </td>
+          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It, Sentinel &gt;::<a class="el" href="structentt_1_1iterable__adaptor.html">iterable_adaptor</a> </td>
           <td>(</td>
-          <td class="paramtype">It&#160;</td>
+          <td class="paramtype"><a class="el" href="structentt_1_1iterable__adaptor.html#a5f7920bf5cba9b4aa765affe21490a2d">iterator</a>&#160;</td>
           <td class="paramname"><em>from</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">It&#160;</td>
+          <td class="paramtype"><a class="el" href="structentt_1_1iterable__adaptor.html#a86150bc99361dabcbb7f574d84691e42">sentinel</a>&#160;</td>
           <td class="paramname"><em>to</em>&#160;</td>
         </tr>
         <tr>
@@ -176,24 +177,24 @@ template&lt;typename It &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00078">78</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00079">79</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a017dd4bccfd6777df24cf5beb4e2cc06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a017dd4bccfd6777df24cf5beb4e2cc06">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="a24f0c0139b40ae81a191b8330b221004"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24f0c0139b40ae81a191b8330b221004">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename It &gt; </div>
+template&lt;typename It , typename Sentinel  = It&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a> <a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It &gt;::begin </td>
+          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html#a5f7920bf5cba9b4aa765affe21490a2d">iterator</a> <a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It, Sentinel &gt;::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -209,23 +210,23 @@ template&lt;typename It &gt; </div>
 <p>Returns an iterator to the beginning. </p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first element of the range. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00086">86</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00087">87</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a33c94d2a866e0c93f3dbaabdf91e80fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33c94d2a866e0c93f3dbaabdf91e80fa">&#9670;&nbsp;</a></span>cbegin()</h2>
+<a id="abf869d640cc961dba11d6e0b04a0f588"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf869d640cc961dba11d6e0b04a0f588">&#9670;&nbsp;</a></span>cbegin()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename It &gt; </div>
+template&lt;typename It , typename Sentinel  = It&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a> <a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It &gt;::cbegin </td>
+          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html#a5f7920bf5cba9b4aa765affe21490a2d">iterator</a> <a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It, Sentinel &gt;::cbegin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -241,23 +242,23 @@ template&lt;typename It &gt; </div>
 <p>Returns an iterator to the beginning. </p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first element of the range. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00100">100</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00101">101</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a647cd837df15e583db221c24af02abb6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a647cd837df15e583db221c24af02abb6">&#9670;&nbsp;</a></span>cend()</h2>
+<a id="ac7e87b44217f4c784b3efc9f074cabcf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7e87b44217f4c784b3efc9f074cabcf">&#9670;&nbsp;</a></span>cend()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename It &gt; </div>
+template&lt;typename It , typename Sentinel  = It&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a> <a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It &gt;::cend </td>
+          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html#a86150bc99361dabcbb7f574d84691e42">sentinel</a> <a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It, Sentinel &gt;::cend </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -273,23 +274,23 @@ template&lt;typename It &gt; </div>
 <p>Returns an iterator to the end. </p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last element of the range. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00105">105</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00106">106</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a22e90b6cc6b986e07c3688de97f4a67b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22e90b6cc6b986e07c3688de97f4a67b">&#9670;&nbsp;</a></span>end()</h2>
+<a id="a91d5e906cec2aeae1289ac8f06774295"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91d5e906cec2aeae1289ac8f06774295">&#9670;&nbsp;</a></span>end()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename It &gt; </div>
+template&lt;typename It , typename Sentinel  = It&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html#aa6ac835d7a8d53b23951fbdba6db850d">const_iterator</a> <a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It &gt;::end </td>
+          <td class="memname"><a class="el" href="structentt_1_1iterable__adaptor.html#a86150bc99361dabcbb7f574d84691e42">sentinel</a> <a class="el" href="structentt_1_1iterable__adaptor.html">entt::iterable_adaptor</a>&lt; It, Sentinel &gt;::end </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -305,7 +306,7 @@ template&lt;typename It &gt; </div>
 <p>Returns an iterator to the end. </p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last element of the range. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00095">95</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterator_8hpp_source.html#l00096">96</a> of file <a class="el" href="iterator_8hpp_source.html">iterator.hpp</a>.</p>
 
 </div>
 </div>

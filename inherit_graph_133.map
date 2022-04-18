@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1type__list__cat_3_4.html" title="Concatenates multiple type lists." alt="" coords="5,5,148,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,20,116,47"/>
+<area shape="rect" id="node2" href="$structentt_1_1type__list__contains_3_01type__list_3_01Type_8_8_8_01_4_00_01Other_01_4.html" title="Provides the member constant value to true if a type list contains a given type, false otherwise." alt="" coords="164,5,321,61"/>
 </map>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -76,14 +76,20 @@ Introduction</h1>
 <h1><a class="anchor" id="autotoc_md14"></a>
 Containers</h1>
 <h2><a class="anchor" id="autotoc_md15"></a>
-Dense hash map</h2>
-<p>The dense hash map made available in <code>EnTT</code> is a map that aims to return a packed array of elements, so as to reduce the number of jumps in memory during the iteration.<br  />
+Dense map</h2>
+<p>The dense map made available in <code>EnTT</code> is a hash map that aims to return a packed array of elements, so as to reduce the number of jumps in memory during iterations.<br  />
  The implementation is based on <em>sparse sets</em> and each bucket is identified by an implicit list within the packed array itself.</p>
-<p>The interface is in all respects similar to its counterpart in the standard library, that is, <code>std::unordered_map</code>.<br  />
- Therefore, there is no need to go into the API description.</p>
+<p>The interface is very close to its counterpart in the standard library, that is, <code>std::unordered_map</code>.<br  />
+ However, both local and non-local iterators returned by a dense map belong to the input iterator category although they respectively model the concepts of a <em>forward iterator</em> type and a <em>random access iterator</em> type.<br  />
+ This is because they return a pair of references rather than a reference to a pair. In other words, dense maps return a so called <em>proxy iterator</em> the value type of which is:</p>
+<ul>
+<li><code>std::pair&lt;const Key &amp;, Type &amp;&gt;</code> for non-const iterator types.</li>
+<li><code>std::pair&lt;const Key &amp;, const Type &amp;&gt;</code> for const iterator types.</li>
+</ul>
+<p>This is quite different from what any standard library map returns and should be taken into account when looking for a drop-in replacement.</p>
 <h2><a class="anchor" id="autotoc_md16"></a>
-Dense hash set</h2>
-<p>The dense hash set made available in <code>EnTT</code> is a set that aims to return a packed array of elements, so as to reduce the number of jumps in memory during the iteration.<br  />
+Dense set</h2>
+<p>The dense set made available in <code>EnTT</code> is a hash set that aims to return a packed array of elements, so as to reduce the number of jumps in memory during iterations.<br  />
  The implementation is based on <em>sparse sets</em> and each bucket is identified by an implicit list within the packed array itself.</p>
 <p>The interface is in all respects similar to its counterpart in the standard library, that is, <code>std::unordered_set</code>.<br  />
  Therefore, there is no need to go into the API description. </p>

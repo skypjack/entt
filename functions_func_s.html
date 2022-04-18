@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -74,15 +74,10 @@ $(function() {
 <li>second()
 : <a class="el" href="classentt_1_1compressed__pair.html#a73cc7edd96358313d81fe92736467d3f">entt::compressed_pair&lt; First, Second &gt;</a>
 </li>
-<li>service_locator()
-: <a class="el" href="structentt_1_1service__locator.html#a120cdb3eb1d820e5649f3d8bac8098d0">entt::service_locator&lt; Service &gt;</a>
-</li>
 <li>set()
-: <a class="el" href="classentt_1_1basic__registry.html#a9f04ea21a04ad05937274de518da705f">entt::basic_registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1meta__any.html#aa82e0c3e29683d99cc611618d101488b">entt::meta_any</a>
+: <a class="el" href="classentt_1_1meta__any.html#aa82e0c3e29683d99cc611618d101488b">entt::meta_any</a>
 , <a class="el" href="structentt_1_1meta__data.html#a9cec301b83378b11ad316663e8ece835">entt::meta_data</a>
 , <a class="el" href="classentt_1_1meta__type.html#a708bdf89918c3fdf2b3539454201f1e9">entt::meta_type</a>
-, <a class="el" href="structentt_1_1service__locator.html#a1cab7cf8cff562d6ec95b7aaeaf12366">entt::service_locator&lt; Service &gt;</a>
 </li>
 <li>shrink()
 : <a class="el" href="classentt_1_1basic__continuous__loader.html#a01b949f4a5829bd5bf3738a7e0f776d2">entt::basic_continuous_loader&lt; Entity &gt;</a>
@@ -96,33 +91,32 @@ $(function() {
 : <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Allocator_01_4.html#a0118cc119e2d90dc667fe44916c560a7">entt::sigh&lt; Ret(Args...), Allocator &gt;</a>
 </li>
 <li>sink()
-: <a class="el" href="classentt_1_1dispatcher.html#a0fd52abaeed110ec526918c255f6fcfa">entt::dispatcher</a>
+: <a class="el" href="classentt_1_1basic__dispatcher.html#a5612937de61684689e71ba7039913820">entt::basic_dispatcher&lt; Allocator &gt;</a>
 , <a class="el" href="classentt_1_1sink_3_01sigh_3_01Ret_07Args_8_8_8_08_00_01Allocator_01_4_01_4.html#a118455f8748e70c2e3a6e78ffd1f7175">entt::sink&lt; sigh&lt; Ret(Args...), Allocator &gt; &gt;</a>
 </li>
 <li>size()
-: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01owned__t_3_01Owned_8_8_8_01_4_00_01get__t_3_01Get_8_8_7e553a767a43a044ebe212daf245cf6c.html#a5946d6c8e4129956d3a7ec77ab26a427">entt::basic_group&lt; Entity, owned_t&lt; Owned... &gt;, get_t&lt; Get... &gt;, exclude_t&lt; Exclude... &gt; &gt;</a>
+: <a class="el" href="classentt_1_1basic__dispatcher.html#a11d69f559e877f65beb4dd23ea975fb0">entt::basic_dispatcher&lt; Allocator &gt;</a>
+, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01owned__t_3_01Owned_8_8_8_01_4_00_01get__t_3_01Get_8_8_7e553a767a43a044ebe212daf245cf6c.html#a5946d6c8e4129956d3a7ec77ab26a427">entt::basic_group&lt; Entity, owned_t&lt; Owned... &gt;, get_t&lt; Get... &gt;, exclude_t&lt; Exclude... &gt; &gt;</a>
 , <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01owned__t_3_4_00_01get__t_3_01Get_8_8_8_01_4_00_01exclu1dcd462b241f859eda99da588b99288a.html#a4b4a17bece15f2cf4507610d92cb0d15">entt::basic_group&lt; Entity, owned_t&lt;&gt;, get_t&lt; Get... &gt;, exclude_t&lt; Exclude... &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__hashed__string.html#a78d52d39edf529df2225bd0b695e42d5">entt::basic_hashed_string&lt; Char &gt;</a>
 , <a class="el" href="classentt_1_1basic__observer.html#aae9024a8c5b14adfe90690a56fa09935">entt::basic_observer&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__registry.html#a5b056608b1723b73a001e20d2f2592bc">entt::basic_registry&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__sparse__set.html#a781b6cee81c02b5dd601d0c808cf97a8">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#a799bc0f08f63bbeac5154f22431db1e9">entt::basic_view&lt; Entity, get_t&lt; Component &gt;, exclude_t&lt;&gt;, std::void_t&lt; std::enable_if_t&lt;!component_traits&lt; std::remove_const_t&lt; Component &gt; &gt;::in_place_delete &gt; &gt; &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__map.html#a6d119cf64191efa39b949e37905e2d02">entt::dense_hash_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__set.html#a7fb84bd3b74213d0a9c6ce1329c92327">entt::dense_hash_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__map.html#afeca346dc4e81401d0beb3e3387d8596">entt::dense_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__set.html#a03fcb636493dcf1d4e417eba8e8976e9">entt::dense_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
 , <a class="el" href="classentt_1_1meta__associative__container.html#ae7bf0859ac226d818a58cd6181915032">entt::meta_associative_container</a>
 , <a class="el" href="classentt_1_1meta__sequence__container.html#ab8e77ced086e11a170953992af5fbebf">entt::meta_sequence_container</a>
-, <a class="el" href="classentt_1_1resource__cache.html#a90f4014d42bf22b536f720706a96d76d">entt::resource_cache&lt; Resource &gt;</a>
+, <a class="el" href="classentt_1_1resource__cache.html#a63a0563cb6c49f1651f9d92832206ddf">entt::resource_cache&lt; Type, Loader, Allocator &gt;</a>
 , <a class="el" href="classentt_1_1scheduler.html#a137d1d00e30f8840051adb5002a69bc5">entt::scheduler&lt; Delta &gt;</a>
 , <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Allocator_01_4.html#a6d3b17d4e20d0c478cee768dfa4d57b6">entt::sigh&lt; Ret(Args...), Allocator &gt;</a>
 </li>
 <li>size_hint()
-: <a class="el" href="classentt_1_1basic__runtime__view.html#afc03b5d755f01f2417beadca306a30f7">entt::basic_runtime_view&lt; Entity &gt;</a>
+: <a class="el" href="structentt_1_1basic__runtime__view_3_01basic__sparse__set_3_01Entity_00_01Allocator_01_4_01_4.html#a89fa897d13f068d50907936ff66d9a52">entt::basic_runtime_view&lt; basic_sparse_set&lt; Entity, Allocator &gt; &gt;</a>
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_8_8_8_01_4_00_01exclude__t_3_01Exclude_8_8_8_01_4_01_4.html#ae8c282c644bd62bbd3838688b816b807">entt::basic_view&lt; Entity, get_t&lt; Component... &gt;, exclude_t&lt; Exclude... &gt; &gt;</a>
 </li>
 <li>size_of()
 : <a class="el" href="classentt_1_1meta__type.html#a611f49dda24012f0a1c3eda4c2022501">entt::meta_type</a>
-</li>
-<li>slot()
-: <a class="el" href="classentt_1_1basic__sparse__set.html#a3cfe17211583fcac905a462dbe2d1c09">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
 </li>
 <li>sort()
 : <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01owned__t_3_01Owned_8_8_8_01_4_00_01get__t_3_01Get_8_8_7e553a767a43a044ebe212daf245cf6c.html#ad3428f8d0a65d65365fa26ead2bb727d">entt::basic_group&lt; Entity, owned_t&lt; Owned... &gt;, get_t&lt; Get... &gt;, exclude_t&lt; Exclude... &gt; &gt;</a>
@@ -134,7 +128,7 @@ $(function() {
 : <a class="el" href="classentt_1_1basic__sparse__set.html#a43c1c0aa0fa525e12cee0791cd945915">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
 </li>
 <li>sortable()
-: <a class="el" href="classentt_1_1basic__registry.html#a5f7af56d6b9fca94a6ebd6ab13896b27">entt::basic_registry&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1basic__registry.html#a0fcde0f4f2fd0d1cd6fef0c0078acdbc">entt::basic_registry&lt; Entity &gt;</a>
 </li>
 <li>storage()
 : <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01owned__t_3_01Owned_8_8_8_01_4_00_01get__t_3_01Get_8_8_7e553a767a43a044ebe212daf245cf6c.html#a2c7a70f488590b07ac39508977936d8e">entt::basic_group&lt; Entity, owned_t&lt; Owned... &gt;, get_t&lt; Get... &gt;, exclude_t&lt; Exclude... &gt; &gt;</a>
@@ -147,20 +141,17 @@ $(function() {
 : <a class="el" href="classentt_1_1process.html#a3b71fd166a1e6b42ea76f2e92bfa5edc">entt::process&lt; Derived, Delta &gt;</a>
 </li>
 <li>swap()
-: <a class="el" href="classentt_1_1basic__sparse__set.html#a0ba4866849ffb525cce7b4eee58b83a8">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
+: <a class="el" href="classentt_1_1basic__dispatcher.html#a0588bf4eef21b89fc716ab7c0ad8ce01">entt::basic_dispatcher&lt; Allocator &gt;</a>
+, <a class="el" href="classentt_1_1basic__sparse__set.html#a0ba4866849ffb525cce7b4eee58b83a8">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
 , <a class="el" href="classentt_1_1basic__storage.html#ac4b412a6f425771044b2c903afe97235">entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;</a>
 , <a class="el" href="classentt_1_1compressed__pair.html#a1f153123bcde4947f020ea2459d76e45">entt::compressed_pair&lt; First, Second &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__map.html#a7ef165b4b927086e73f200d288a11923">entt::dense_hash_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
-, <a class="el" href="classentt_1_1dense__hash__set.html#a04d35e41cb0d2ff7254d644bc81a2011">entt::dense_hash_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__map.html#ab88e2ffe045acc9aef1de4f77a23449b">entt::dense_map&lt; Key, Type, Hash, KeyEqual, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1dense__set.html#a3eec96c16a044c4e687639177121e899">entt::dense_set&lt; Type, Hash, KeyEqual, Allocator &gt;</a>
 , <a class="el" href="classentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Allocator_01_4.html#aa9fba3d3d4e6be85493982011d9f6d46">entt::sigh&lt; Ret(Args...), Allocator &gt;</a>
 </li>
 <li>swap_and_pop()
-: <a class="el" href="classentt_1_1basic__sparse__set.html#a40f3640062e18305e4fc7742f4f4c284">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage.html#a66082b2fd40d10d749e99bc1b8144db8">entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;</a>
-</li>
-<li>swap_at()
-: <a class="el" href="classentt_1_1basic__sparse__set.html#a7839ecd024cf400c2d5e8d22c8cff05f">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage.html#a4d761b7d0e922003761366ff46f01cec">entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;</a>
+: <a class="el" href="classentt_1_1basic__sparse__set.html#a80b3de1b97d44ff6e9b2d4557da138c6">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage.html#ae2f157f3fd68a192db771d06aee12bd5">entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;</a>
 </li>
 <li>swap_elements()
 : <a class="el" href="classentt_1_1basic__sparse__set.html#a2b82af720eca37261f3230c654d7fe1f">entt::basic_sparse_set&lt; Entity, Allocator &gt;</a>

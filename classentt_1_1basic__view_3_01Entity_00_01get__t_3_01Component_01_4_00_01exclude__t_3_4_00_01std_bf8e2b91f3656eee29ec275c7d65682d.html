@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.9.0</span>
+   &#160;<span id="projectnumber">3.10.0</span>
    </div>
   </td>
  </tr>
@@ -119,7 +119,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac41277543f1ce2cb02306a5203a6fc8c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#afa44a297867b649fc67f17b0431d7ee9">base_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#ac41277543f1ce2cb02306a5203a6fc8c">handle</a> () const</td></tr>
 <tr class="memdesc:ac41277543f1ce2cb02306a5203a6fc8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the leading storage of a view.  <a href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#ac41277543f1ce2cb02306a5203a6fc8c">More...</a><br /></td></tr>
 <tr class="separator:ac41277543f1ce2cb02306a5203a6fc8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe0214f2ff037157e39711c5abc7616f"><td class="memTemplParams" colspan="2">template&lt;typename... Comp&gt; </td></tr>
+<tr class="memitem:abe0214f2ff037157e39711c5abc7616f"><td class="memTemplParams" colspan="2">template&lt;typename Comp  = Component&gt; </td></tr>
 <tr class="memitem:abe0214f2ff037157e39711c5abc7616f"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#abe0214f2ff037157e39711c5abc7616f">storage</a> () const</td></tr>
 <tr class="memdesc:abe0214f2ff037157e39711c5abc7616f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the storage for a given component type.  <a href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#abe0214f2ff037157e39711c5abc7616f">More...</a><br /></td></tr>
 <tr class="separator:abe0214f2ff037157e39711c5abc7616f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -208,7 +208,7 @@ class entt::basic_view&lt; Entity, get_t&lt; Component &gt;, exclude_t&lt;&gt;, 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00535">535</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00532">532</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a56bd7a61d27ef592459bcfdf5e5a8c57"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a56bd7a61d27ef592459bcfdf5e5a8c57">&#9670;&nbsp;</a></span>basic_view()</h2>
@@ -244,7 +244,7 @@ template&lt;typename Entity , typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00565">565</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00562">562</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -277,7 +277,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>Returns the last entity of the view, if any. </p>
 <dl class="section return"><dt>Returns</dt><dd>The last entity of the view if one exists, the null entity otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00681">681</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00678">678</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -310,7 +310,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>The returned iterator points to the first entity of the view. If the view is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#a0dbbf2ac4441e4f943c463b6b4d100d3" title="Returns an iterator that is past the last entity of the view.">end()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity of the view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00623">623</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00620">620</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -349,7 +349,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the view contains the given entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00726">726</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00723">723</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +382,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>The iterable object returns a tuple that contains the current entity and a reference to its component if it's a non-empty one. The <em>constness</em> of the component is as requested.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterable object to use to <em>visit</em> the view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00812">812</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00805">805</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -419,7 +419,7 @@ template&lt;typename Func &gt; </div>
  The signature of the function must be equivalent to one of the following forms:</p>
 <div class="fragment"><div class="line">void(<span class="keyword">const</span> <a class="code" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#ab39810cc33432d0ad315dae49ca0dbfe">entity_type</a>, Component &amp;);</div>
 <div class="line">void(Component &amp;);</div>
-<div class="ttc" id="aclassentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d_html_ab39810cc33432d0ad315dae49ca0dbfe"><div class="ttname"><a href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#ab39810cc33432d0ad315dae49ca0dbfe">entt::basic_view&lt; Entity, get_t&lt; Component &gt;, exclude_t&lt;&gt;, std::void_t&lt; std::enable_if_t&lt;!component_traits&lt; std::remove_const_t&lt; Component &gt; &gt;::in_place_delete &gt; &gt; &gt;::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="view_8hpp_source.html#l00543">view.hpp:543</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d_html_ab39810cc33432d0ad315dae49ca0dbfe"><div class="ttname"><a href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#ab39810cc33432d0ad315dae49ca0dbfe">entt::basic_view&lt; Entity, get_t&lt; Component &gt;, exclude_t&lt;&gt;, std::void_t&lt; std::enable_if_t&lt;!component_traits&lt; std::remove_const_t&lt; Component &gt; &gt;::in_place_delete &gt; &gt; &gt;::entity_type</a></div><div class="ttdeci">Entity entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="view_8hpp_source.html#l00540">view.hpp:540</a></div></div>
 </div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
@@ -433,7 +433,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00779">779</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00776">776</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -465,7 +465,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>Checks whether a view is empty. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the view is empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00611">611</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00608">608</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -498,7 +498,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>The returned iterator points to the entity following the last entity of the view. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity of the view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00636">636</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00633">633</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -537,7 +537,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the given entity if it's found, past the end iterator otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00691">691</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00688">688</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -569,7 +569,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>Returns the first entity of the view, if any. </p>
 <dl class="section return"><dt>Returns</dt><dd>The first entity of the view if one exists, the null entity otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00672">672</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00669">669</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -617,7 +617,7 @@ template&lt;typename... Comp&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00742">742</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00739">739</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -665,7 +665,7 @@ template&lt;std::size_t Comp&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00755">755</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00752">752</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -697,7 +697,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>Returns the leading storage of a view. </p>
 <dl class="section return"><dt>Returns</dt><dd>The leading storage of the view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00574">574</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00571">571</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -729,7 +729,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>Checks if a view is properly initialized. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the view is properly initialized, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00717">717</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00714">714</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -768,7 +768,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the given entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00709">709</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00706">706</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -807,7 +807,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The identifier that occupies the given position. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00700">700</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00697">697</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -855,7 +855,7 @@ template&lt;typename... Get, typename... Excl&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A more specific view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00824">824</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00817">817</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -888,7 +888,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>The returned iterator points to the first entity of the reversed view. If the view is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1basic__view_3_01Entity_00_01get__t_3_01Component_01_4_00_01exclude__t_3_4_00_01std_bf8e2b91f3656eee29ec275c7d65682d.html#a4bc3a043ad6ff8f74082764f5cd3a22c" title="Returns an iterator that is past the last entity of the reversed view.">rend()</a></code>.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity of the reversed view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00648">648</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00645">645</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -921,7 +921,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>The returned iterator points to the entity following the last entity of the reversed view. Attempting to dereference the returned iterator results in undefined behavior.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity of the reversed view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00663">663</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00660">660</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -953,7 +953,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>Returns the number of entities that have the given component. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of entities that have the given component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00603">603</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00600">600</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -965,7 +965,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <div class="memtemplate">
 template&lt;typename Entity , typename Component &gt; </div>
 <div class="memtemplate">
-template&lt;typename... Comp&gt; </div>
+template&lt;typename Comp  = Component&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -993,7 +993,7 @@ template&lt;typename... Comp&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The storage for the given component type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00584">584</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00581">581</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -1033,7 +1033,7 @@ template&lt;std::size_t Comp&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The storage for the given component type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00595">595</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00592">592</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>

@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1as__cref__t.html" title="Empty class type used to request the as cref policy." alt="" coords="5,5,111,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,13,79,39"/>
+<area shape="rect" id="node2" href="$structentt_1_1allocation__deleter.html" title="Deleter for allocator&#45;aware unique pointers (waiting for C++20)." alt="" coords="127,5,280,47"/>
 </map>
