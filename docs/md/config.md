@@ -8,6 +8,7 @@
 * [Introduction](#introduction)
 * [Definitions](#definitions)
   * [ENTT_NOEXCEPTION](#entt_noexception)
+  * [ENTT_NOEXCEPT](#entt_noexcept)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
   * [ENTT_ID_TYPE](#entt_id_type)
   * [ENTT_SPARSE_PAGE](#entt_sparse_page)
@@ -40,18 +41,24 @@ will remain stable over time unlike the options below.
 
 ## ENTT_NOEXCEPTION
 
-This parameter can be used to switch off exception handling in `EnTT`.<br/>
-To do this, simply define the variable without assigning any value to it. This
-is roughly equivalent to setting the compiler flag `-ff-noexceptions`.
+Define this variable without assigning any value to it to turn off exception
+handling in `EnTT`.<br/>
+This is roughly equivalent to setting the compiler flag `-fno-exceptions` but is
+also limited to this library only.
+
+## ENTT_NOEXCEPT
+
+The purpose of this parameter is to suppress the use of `noexcept` by this
+library.<br/>
+To do this, simply define the variable without assigning any value to it.
 
 ## ENTT_USE_ATOMIC
 
 In general, `EnTT` doesn't offer primitives to support multi-threading. Many of
-the features can be split over multiple threads without any explicit control and
-the user is the only one who knows if and when a synchronization point is
-required.<br/>
-However, some features aren't easily accessible to users and can be made
-thread-safe by means of this definition.
+the feature can be split over multiple threads without any explicit control and
+the user is the one who knows if a synchronization point is required.<br/>
+However, some feature aren't easily accessible to users and are made thread-safe
+by means of this definition.
 
 ## ENTT_ID_TYPE
 
@@ -70,9 +77,9 @@ power of 2.
 
 ## ENTT_PACKED_PAGE
 
-Similar to sparse arrays, packed arrays of components are paginated as well. In
-However, int this case the aim isn't to reduce memory usage but to have pointer
-stability upon component creation.<br/>
+As it happens with sparse arrays, packed arrays are also paginated. However, in
+this case the aim isn't to reduce memory usage but to have pointer stability
+upon component creation.<br/>
 Default size of pages (that is, the number of elements they contain) is 1024 but
 users can adjust it if appropriate. In all case, the chosen value **must** be a
 power of 2.
@@ -83,8 +90,8 @@ For performance reasons, `EnTT` doesn't use exceptions or any other control
 structures. In fact, it offers many features that result in undefined behavior
 if not used correctly.<br/>
 To get around this, the library relies on a lot of asserts for the purpose of
-detecting errors in debug builds. By default, it uses `assert` internally, but
-users are allowed to overwrite its behavior by setting this variable.
+detecting errors in debug builds. By default, it uses `assert` internally. Users
+are allowed to overwrite its behavior by setting this variable.
 
 ### ENTT_DISABLE_ASSERT
 
@@ -105,7 +112,7 @@ dedicated storage for them.
 
 `EnTT` mixes non-standard language features with others that are perfectly
 compliant to offer some of its functionalities.<br/>
-This definition will prevent the library from using non-standard techniques,
-that is, functionalities that aren't fully compliant with the standard C++.<br/>
+This definition prevents the library from using non-standard techniques, that
+is, functionalities that aren't fully compliant with the standard C++.<br/>
 While there are no known portability issues at the time of this writing, this
 should make the library fully portable anyway if needed.
