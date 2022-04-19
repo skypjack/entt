@@ -18,6 +18,7 @@ WIP:
 * custom allocators all over
 * remove storage::patch
 * consider removing ENTT_NOEXCEPT, use ENTT_NOEXCEPT_IF (or noexcept(...)) as appropriate in any case (ie make compressed_pair conditionally noexcept)
+* add test for maximum number of entities reached
 
 WIP:
 * add user data to type_info
