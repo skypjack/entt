@@ -17,7 +17,7 @@ WIP:
 * entity-only and exclude-only views
 * custom allocators all over
 * remove storage::patch
-* use ENTT_NOEXCEPT_IF as appropriate (ie make compressed_pair conditionally noexcept)
+* consider removing ENTT_NOEXCEPT, use ENTT_NOEXCEPT_IF (or noexcept(...)) as appropriate in any case (ie make compressed_pair conditionally noexcept)
 
 WIP:
 * add user data to type_info
