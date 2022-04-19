@@ -458,8 +458,8 @@ int poly_remove(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
 template<typename Component, typename Entity, typename PolyPoolsHolder>
 size_t poly_count(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
     size_t count = 0;
-    for ([[maybe_unused]] auto& component : poly_get_all<Component>(reg, entity)) {
-        count++;
+    for (auto& pool : assure_poly_type<Component>(reg).pools()) {
+        count += static_cast<int>(pool.pool().contains(entity));
     }
     return count;
 }
