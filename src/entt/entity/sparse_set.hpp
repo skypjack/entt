@@ -636,12 +636,12 @@ public:
      * @param entt A valid identifier.
      * @return An opaque pointer to the element assigned to the entity, if any.
      */
-    const void *get(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] const void *get(const entity_type entt) const ENTT_NOEXCEPT {
         return get_at(index(entt));
     }
 
     /*! @copydoc get */
-    void *get(const entity_type entt) ENTT_NOEXCEPT {
+    [[nodiscard]] void *get(const entity_type entt) ENTT_NOEXCEPT {
         return const_cast<void *>(std::as_const(*this).get(entt));
     }
 
