@@ -110,16 +110,16 @@ struct is_poly_type<T, std::void_t<typename poly_direct_parent_types<T>::not_red
 
 /** @copydoc is_poly_type */
 template<typename T>
-static constexpr bool is_poly_type_v = is_poly_type<T>::value;
+inline constexpr bool is_poly_type_v = is_poly_type<T>::value;
 
 /** @copydoc poly_type_validate */
 template<typename T, typename... Parents>
 struct poly_type_validate<T, type_list<Parents...>> {
     static_assert(std::is_same_v<std::decay_t<T>, T>, "only decayed types allowed to be declared as polymorphic");
     static_assert(is_poly_type_v<T>, "validating non-polymorphic type (probably some polymorphic type inherits type, that was not declared polymorphic)");
-    static_assert((is_poly_type_v<Parents> && ...), "all parent types of a polymorphic type must be also polymorphic");
-    static_assert((!std::is_pointer_v<std::remove_pointer_t<T>> && ... && !std::is_pointer_v<std::remove_pointer_t<Parents>>), "double pointers are not allowed as a polymorphic components");
-    static_assert(((std::is_pointer_v<T> == std::is_pointer_v<Parents>) && ...), "you cannot mix pointer-based and value-based polymorphic components inside one hierarchy");
+    static_assert(std::bool_constant<(is_poly_type_v<Parents> && ...)>::value, "all parent types of a polymorphic type must be also polymorphic");
+    static_assert(std::bool_constant<(!std::is_pointer_v<std::remove_pointer_t<T>> && ... && !std::is_pointer_v<std::remove_pointer_t<Parents>>)>::value, "double pointers are not allowed as a polymorphic components");
+    static_assert(std::bool_constant<((std::is_pointer_v<T> == std::is_pointer_v<Parents>) && ...)>::value, "you cannot mix pointer-based and value-based polymorphic components inside one hierarchy");
 
     /** @brief same input type, but validated */
     using type = T;
@@ -135,7 +135,7 @@ using poly_type_validate_t = typename poly_type_validate<T, poly_parent_types_t<
  * @tparam Type Child Type
  */
 template<typename Parent, typename Type>
-constexpr bool is_poly_parent_of_v = is_poly_type_v<Type> && (type_list_contains_v<poly_parent_types_t<Type>, Parent> || std::is_same_v<Type, Parent>);
+inline constexpr bool is_poly_parent_of_v = is_poly_type_v<Type> && (type_list_contains_v<poly_parent_types_t<Type>, Parent> || std::is_same_v<Type, Parent>);
 
 /**
  * @brief Used to inherit from all given parent types and declare inheriting type polymorphic with given direct parents.

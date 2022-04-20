@@ -233,6 +233,38 @@ class poly_type {
         }
     };
 
+    /** @brief derived value to base pointer conversion, workaround for if constexpr bug on some compilers */
+    template<typename Base, typename Derived, typename = void>
+    struct derived_to_base_ptr {
+        inline static Base* convert(Derived& ref) ENTT_NOEXCEPT {
+            return static_cast<Base*>(std::addressof(ref));
+        }
+    };
+
+    /** @copydoc derived_to_base_ptr */
+    template<typename Base, typename Derived>
+    struct derived_to_base_ptr<Base, Derived, std::enable_if_t<std::is_pointer_v<Derived>>> {
+        inline static Base convert(Derived ptr) ENTT_NOEXCEPT {
+            return static_cast<Base>(ptr);
+        }
+    };
+
+    /** @brief value to pointer conversion, workaround for if constexpr bug on some compilers */
+    template<typename T, typename = void>
+    struct value_to_ptr {
+        inline static T* convert(T& ref) ENTT_NOEXCEPT {
+            return std::addressof(ref);
+        }
+    };
+
+    /** @copydoc value_to_ptr */
+    template<typename T>
+    struct value_to_ptr<T, std::enable_if_t<std::is_pointer_v<T>>> {
+        inline static T convert(T ptr) ENTT_NOEXCEPT {
+            return ptr;
+        }
+    };
+
 public:
     /** @brief entity type of the component pools */
     using entity_type = Entity;
@@ -257,32 +289,21 @@ public:
      */
     template<typename StorageType>
     inline static poly_pool_holder<Entity, Type> make_pool_holder(StorageType* pool_ptr) ENTT_NOEXCEPT {
-        using ChildType = typename StorageType::value_type;
-        static_assert(is_poly_type_v<ChildType>);
-        static_assert(type_list_contains_v<poly_parent_types_t<ChildType>, Type> || std::is_same_v<ChildType, Type>);
-        static_assert(std::is_pointer_v<ChildType> == std::is_pointer_v<Type>);
+        using BaseType = Type;
+        using DerivedType = typename StorageType::value_type;
+        static_assert(is_poly_type_v<DerivedType>);
+        static_assert(type_list_contains_v<poly_parent_types_t<DerivedType>, BaseType> || std::is_same_v<DerivedType, BaseType>);
+        static_assert(std::is_pointer_v<DerivedType> == std::is_pointer_v<BaseType>);
 
         void* (*get)(void*, Entity entity) ENTT_NOEXCEPT = +[](void* pool, const Entity entity) ENTT_NOEXCEPT -> void* {
             if (static_cast<StorageType*>(pool)->contains(entity)) {
                 // if entity is contained within the set
-                if constexpr(std::is_base_of_v<std::remove_pointer_t<Type>, std::remove_pointer_t<ChildType>>) {
-                    if constexpr(std::is_pointer_v<ChildType>) {
-                        // Type and ChildType are pointers, dereference source pointer and do conversion
-                        ChildType ptr = static_cast<StorageType*>(pool)->get(entity);
-                        return static_cast<Type>(ptr);
-                    } else {
-                        // Type is base of ChildType, do pointer conversion
-                        return static_cast<Type*>(std::addressof(static_cast<StorageType*>(pool)->get(entity)));
-                    }
+                if constexpr(std::is_base_of_v<std::remove_pointer_t<BaseType>, std::remove_pointer_t<DerivedType>>) {
+                    // if base type is inherited from derived type, do pointer conversion
+                    return derived_to_base_ptr<BaseType, DerivedType>::convert(static_cast<StorageType*>(pool)->get(entity));
                 } else {
-                    // no inheritance - no conversion required
-                    if constexpr(std::is_pointer_v<ChildType>) {
-                        // in case of pointer type return it as it is
-                        return static_cast<StorageType*>(pool)->get(entity);
-                    } else {
-                        // otherwise, get the address
-                        return std::addressof(static_cast<StorageType*>(pool)->get(entity));
-                    }
+                    // no inheritance - no conversion required, just get the pointer
+                    return value_to_ptr<DerivedType>::convert(static_cast<StorageType*>(pool)->get(entity));
                 }
             }
             // otherwise, return null

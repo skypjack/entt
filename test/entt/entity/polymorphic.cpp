@@ -95,11 +95,9 @@ TEST(PolyGetAll, Functionalities) {
     }
 
     {
-        int count = 0;
-        for ([[maybe_unused]] shape& s: entt::algorithm::poly_get_all<shape>(reg, entity1)) {
-            count++;
+        for (shape& s: entt::algorithm::poly_get_all<shape>(reg, entity1)) {
+            ASSERT_TRUE(false && std::addressof(s));
         }
-        ASSERT_EQ(count, 0);
     }
 
     {
@@ -172,11 +170,9 @@ TEST(PolyGetAllPointers, Functionalities) {
     }
 
     {
-        int count = 0;
-        for ([[maybe_unused]] shape* s: entt::algorithm::poly_get_all<shape*>(reg, entity1)) {
-            count++;
+        for (shape* s: entt::algorithm::poly_get_all<shape*>(reg, entity1)) {
+            ASSERT_TRUE(false && s);
         }
-        ASSERT_EQ(count, 0);
     }
 
     {
@@ -300,11 +296,9 @@ TEST(PolyEach, Functionalities) {
     }
 
     {
-        int count = 0;
         entt::algorithm::poly_each<animal*>(reg, [&] (entt::entity e, [[maybe_unused]] animal* a) -> void {
-            count++;
+            ASSERT_TRUE(false);
         });
-        ASSERT_EQ(count, 0);
     }
 }
 
@@ -375,11 +369,9 @@ TEST(PolyEachPointer, Functionalities) {
     }
 
     {
-        int count = 0;
         entt::algorithm::poly_each<animal>(reg, [&] (entt::entity e, [[maybe_unused]] animal& a) -> void {
-            count++;
+            ASSERT_TRUE(false);
         });
-        ASSERT_EQ(count, 0);
     }
 }
 
