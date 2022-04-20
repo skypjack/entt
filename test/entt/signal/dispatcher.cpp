@@ -187,7 +187,7 @@ TEST(Dispatcher, NamedQueue) {
 }
 
 TEST(Dispatcher, CustomAllocator) {
-    std::allocator<char> allocator;
+    std::allocator<void> allocator;
     entt::dispatcher dispatcher{allocator};
 
     ASSERT_EQ(dispatcher.get_allocator(), allocator);

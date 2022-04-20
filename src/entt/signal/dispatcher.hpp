@@ -38,7 +38,7 @@ class dispatcher_handler final: public basic_dispatcher_handler {
     static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Invalid type");
 
     using alloc_traits = std::allocator_traits<Allocator>;
-    using signal_type = sigh<void(Type &), typename alloc_traits::template rebind_alloc<void (*)(Type &)>>;
+    using signal_type = sigh<void(Type &), Allocator>;
     using container_type = std::vector<Type, typename alloc_traits::template rebind_alloc<Type>>;
 
 public:
@@ -67,8 +67,7 @@ public:
     }
 
     [[nodiscard]] auto bucket() ENTT_NOEXCEPT {
-        using sink_type = typename sigh<void(Type &)>::sink_type;
-        return sink_type{signal};
+        return typename signal_type::sink_type{signal};
     }
 
     void trigger(Type event) {
