@@ -308,13 +308,13 @@ class basic_registry {
     auto recycle_identifier() ENTT_NOEXCEPT {
         ENTT_ASSERT(free_list != null, "No entities available");
         const auto curr = entity_traits::to_entity(free_list);
-        free_list = entity_traits::combine(entity_traits::to_integral(entities[curr]), tombstone);
-        return (entities[curr] = entity_traits::combine(curr, entity_traits::to_integral(entities[curr])));
+        free_list = entity_traits::combine(entity_traits::to_integral(epool[curr]), tombstone);
+        return (epool[curr] = entity_traits::combine(curr, entity_traits::to_integral(epool[curr])));
     }
 
     auto release_entity(const Entity entity, const typename entity_traits::version_type version) {
         const typename entity_traits::version_type vers = version + (version == entity_traits::to_version(tombstone));
-        entities[entity_traits::to_entity(entity)] = entity_traits::construct(entity_traits::to_integral(free_list), vers);
+        epool[entity_traits::to_entity(entity)] = entity_traits::construct(entity_traits::to_integral(free_list), vers);
         free_list = entity_traits::combine(entity_traits::to_integral(entity), tombstone);
         return vers;
     }
@@ -335,7 +335,7 @@ public:
     basic_registry()
         : pools{},
           groups{},
-          entities{},
+          epool{},
           free_list{tombstone},
           vars{} {}
 
@@ -355,7 +355,7 @@ public:
     basic_registry(basic_registry &&other)
         : pools{std::move(other.pools)},
           groups{std::move(other.groups)},
-          entities{std::move(other.entities)},
+          epool{std::move(other.epool)},
           free_list{other.free_list},
           vars{std::move(other.vars)} {
         for(auto &&curr: pools) {
@@ -371,7 +371,7 @@ public:
     basic_registry &operator=(basic_registry &&other) {
         pools = std::move(other.pools);
         groups = std::move(other.groups);
-        entities = std::move(other.entities);
+        epool = std::move(other.epool);
         free_list = other.free_list;
         vars = std::move(other.vars);
 
@@ -455,7 +455,7 @@ public:
      * @return Number of entities created so far.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return entities.size();
+        return epool.size();
     }
 
     /**
@@ -463,10 +463,10 @@ public:
      * @return Number of entities still in use.
      */
     [[nodiscard]] size_type alive() const {
-        auto sz = entities.size();
+        auto sz = epool.size();
 
         for(auto curr = free_list; curr != null; --sz) {
-            curr = entities[entity_traits::to_entity(curr)];
+            curr = epool[entity_traits::to_entity(curr)];
         }
 
         return sz;
@@ -477,7 +477,7 @@ public:
      * @param cap Desired capacity.
      */
     void reserve(const size_type cap) {
-        entities.reserve(cap);
+        epool.reserve(cap);
     }
 
     /**
@@ -486,7 +486,7 @@ public:
      * @return Capacity of the registry.
      */
     [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
-        return entities.capacity();
+        return epool.capacity();
     }
 
     /**
@@ -510,7 +510,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type *data() const ENTT_NOEXCEPT {
-        return entities.data();
+        return epool.data();
     }
 
     /**
@@ -532,7 +532,7 @@ public:
      */
     [[nodiscard]] bool valid(const entity_type entity) const {
         const auto pos = size_type(entity_traits::to_entity(entity));
-        return (pos < entities.size() && entities[pos] == entity);
+        return (pos < epool.size() && epool[pos] == entity);
     }
 
     /**
@@ -543,7 +543,7 @@ public:
      */
     [[nodiscard]] version_type current(const entity_type entity) const {
         const auto pos = size_type(entity_traits::to_entity(entity));
-        return entity_traits::to_version(pos < entities.size() ? entities[pos] : tombstone);
+        return entity_traits::to_version(pos < epool.size() ? epool[pos] : tombstone);
     }
 
     /**
@@ -551,7 +551,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
-        return (free_list == null) ? entities.emplace_back(generate_identifier(entities.size())) : recycle_identifier();
+        return (free_list == null) ? epool.emplace_back(generate_identifier(epool.size())) : recycle_identifier();
     }
 
     /**
@@ -564,25 +564,25 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
-        const auto length = entities.size();
+        const auto length = epool.size();
 
         if(hint == null || hint == tombstone) {
             return create();
         } else if(const auto req = entity_traits::to_entity(hint); !(req < length)) {
-            entities.resize(size_type(req) + 1u, null);
+            epool.resize(size_type(req) + 1u, null);
 
             for(auto pos = length; pos < req; ++pos) {
                 release_entity(generate_identifier(pos), {});
             }
 
-            return (entities[req] = hint);
-        } else if(const auto curr = entity_traits::to_entity(entities[req]); req == curr) {
+            return (epool[req] = hint);
+        } else if(const auto curr = entity_traits::to_entity(epool[req]); req == curr) {
             return create();
         } else {
             auto *it = &free_list;
-            for(; entity_traits::to_entity(*it) != req; it = &entities[entity_traits::to_entity(*it)]) {}
+            for(; entity_traits::to_entity(*it) != req; it = &epool[entity_traits::to_entity(*it)]) {}
             *it = entity_traits::combine(curr, entity_traits::to_integral(*it));
-            return (entities[req] = hint);
+            return (epool[req] = hint);
         }
     }
 
@@ -601,11 +601,11 @@ public:
             *first = recycle_identifier();
         }
 
-        const auto length = entities.size();
-        entities.resize(length + std::distance(first, last), null);
+        const auto length = epool.size();
+        epool.resize(length + std::distance(first, last), null);
 
         for(auto pos = length; first != last; ++first, ++pos) {
-            *first = entities[pos] = generate_identifier(pos);
+            *first = epool[pos] = generate_identifier(pos);
         }
     }
 
@@ -629,7 +629,7 @@ public:
     template<typename It>
     void assign(It first, It last, const entity_type destroyed) {
         ENTT_ASSERT(!alive(), "Entities still alive");
-        entities.assign(first, last);
+        epool.assign(first, last);
         free_list = destroyed;
     }
 
@@ -1115,12 +1115,12 @@ public:
     template<typename Func>
     void each(Func func) const {
         if(free_list == null) {
-            for(auto pos = entities.size(); pos; --pos) {
-                func(entities[pos - 1]);
+            for(auto pos = epool.size(); pos; --pos) {
+                func(epool[pos - 1]);
             }
         } else {
-            for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entity = entities[pos - 1]; entity_traits::to_entity(entity) == (pos - 1)) {
+            for(auto pos = epool.size(); pos; --pos) {
+                if(const auto entity = epool[pos - 1]; entity_traits::to_entity(entity) == (pos - 1)) {
                     func(entity);
                 }
             }
@@ -1467,7 +1467,7 @@ public:
 private:
     dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
     std::vector<group_data> groups;
-    std::vector<entity_type> entities;
+    std::vector<entity_type> epool;
     entity_type free_list;
     context vars;
 };

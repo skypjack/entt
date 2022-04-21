@@ -11,6 +11,7 @@ DOC:
 * examples (and credits) from @alanjfs :)
 
 WIP:
+* make non-const registry::get use const assure or the like
 * emitter: runtime handlers, allocator support (ready for both already)
 * view/group: no storage_traits dependency -> use storage instead of components for the definition
 * basic_storage::bind for cross-registry setups
