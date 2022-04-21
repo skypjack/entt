@@ -244,6 +244,24 @@ TEST(Storage, StableSwap) {
     ASSERT_EQ(other.get(entt::entity{42}).value, 41);
 }
 
+TEST(Storage, VoidType) {
+    entt::storage<void> pool;
+    pool.emplace(entt::entity{99});
+
+    ASSERT_EQ(pool.type(), entt::type_id<void>());
+    ASSERT_TRUE(pool.contains(entt::entity{99}));
+
+    entt::storage<void> other{std::move(pool)};
+
+    ASSERT_FALSE(pool.contains(entt::entity{99}));
+    ASSERT_TRUE(other.contains(entt::entity{99}));
+
+    pool = std::move(other);
+
+    ASSERT_TRUE(pool.contains(entt::entity{99}));
+    ASSERT_FALSE(other.contains(entt::entity{99}));
+}
+
 TEST(Storage, EmptyType) {
     entt::storage<empty_stable_type> pool;
     pool.emplace(entt::entity{99});

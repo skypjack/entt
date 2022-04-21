@@ -16,7 +16,7 @@
 #ifndef ENTT_NOEXCEPT
 #    define ENTT_NOEXCEPT noexcept
 #    define ENTT_NOEXCEPT_IF(expr) noexcept(expr)
-# else
+#else
 #    define ENTT_NOEXCEPT_IF(...)
 #endif
 
@@ -48,10 +48,8 @@
 #    define ENTT_ASSERT(condition, ...) assert(condition)
 #endif
 
-#ifdef ENTT_NO_ETO
-#    define ENTT_IGNORE_IF_EMPTY false
-#else
-#    define ENTT_IGNORE_IF_EMPTY true
+#ifndef ENTT_NO_ETO
+#    define ENTT_IGNORE_IF_EMPTY
 #endif
 
 #ifdef ENTT_STANDARD_CPP

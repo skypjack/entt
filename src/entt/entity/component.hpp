@@ -21,8 +21,13 @@ template<typename Type>
 struct in_place_delete<Type, std::enable_if_t<Type::in_place_delete>>
     : std::true_type {};
 
+#if defined ENTT_IGNORE_IF_EMPTY
 template<typename Type, typename = void>
-struct page_size: std::integral_constant<std::size_t, (ENTT_IGNORE_IF_EMPTY && std::is_empty_v<Type>) ? 0u : ENTT_PACKED_PAGE> {};
+struct page_size: std::integral_constant<std::size_t, !std::is_empty_v<Type> * ENTT_PACKED_PAGE> {};
+#else
+template<typename Type, typename = void>
+struct page_size: std::integral_constant<std::size_t, ENTT_PACKED_PAGE> {};
+#endif
 
 template<typename Type>
 struct page_size<Type, std::enable_if_t<std::is_convertible_v<decltype(Type::page_size), std::size_t>>>
@@ -41,7 +46,10 @@ struct page_size<Type, std::enable_if_t<std::is_convertible_v<decltype(Type::pag
  */
 template<typename Type, typename = void>
 struct component_traits {
-    static_assert(std::is_same_v<std::decay_t<Type>, Type>, "Unsupported type");
+    static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Unsupported type");
+
+    /*! @brief Component type. */
+    using type = Type;
 
     /*! @brief Pointer stability, default is `false`. */
     static constexpr bool in_place_delete = internal::in_place_delete<Type>::value;
@@ -54,7 +62,7 @@ struct component_traits {
  * @tparam Type Type of component.
  */
 template<class Type>
-inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 0u);
+inline constexpr bool ignore_as_empty_v = (std::is_void_v<Type> || component_traits<Type>::page_size == 0u);
 
 } // namespace entt
 
