@@ -156,6 +156,8 @@ I hope this list can grow much more in the future:
     of the Alan Wake Engine.
   * [Nazara Engine](https://github.com/DigitalPulseSoftware/NazaraEngine): fast,
     cross-platform, object-oriented API to help in daily developer life.
+  * [Billy Engine](https://github.com/billy4479/BillyEngine): some kind of a 2D
+    engine based on `SDL2` and `EnTT`.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
