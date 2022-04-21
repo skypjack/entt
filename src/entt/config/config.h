@@ -48,8 +48,10 @@
 #    define ENTT_ASSERT(condition, ...) assert(condition)
 #endif
 
-#ifndef ENTT_NO_ETO
-#    define ENTT_IGNORE_IF_EMPTY
+#ifdef ENTT_NO_ETO
+#    define ENTT_ETO_TYPE(Type) void
+#else
+#    define ENTT_ETO_TYPE(Type) Type
 #endif
 
 #ifdef ENTT_STANDARD_CPP

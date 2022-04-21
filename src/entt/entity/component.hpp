@@ -21,13 +21,8 @@ template<typename Type>
 struct in_place_delete<Type, std::enable_if_t<Type::in_place_delete>>
     : std::true_type {};
 
-#if defined ENTT_IGNORE_IF_EMPTY
 template<typename Type, typename = void>
-struct page_size: std::integral_constant<std::size_t, !std::is_empty_v<Type> * ENTT_PACKED_PAGE> {};
-#else
-template<typename Type, typename = void>
-struct page_size: std::integral_constant<std::size_t, ENTT_PACKED_PAGE> {};
-#endif
+struct page_size: std::integral_constant<std::size_t, !std::is_empty_v<ENTT_ETO_TYPE(Type)> * ENTT_PACKED_PAGE> {};
 
 template<typename Type>
 struct page_size<Type, std::enable_if_t<std::is_convertible_v<decltype(Type::page_size), std::size_t>>>
