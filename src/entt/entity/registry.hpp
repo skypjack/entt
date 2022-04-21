@@ -344,11 +344,7 @@ public:
      * @param count The number of pools to allocate memory for.
      */
     basic_registry(const size_type count)
-        : pools{},
-          groups{},
-          entities{},
-          free_list{tombstone},
-          vars{} {
+        : basic_registry{} {
         pools.reserve(count);
     }
 
