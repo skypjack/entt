@@ -14,27 +14,44 @@
 namespace entt {
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+enum class any_operation : std::uint8_t {
+    copy,
+    move,
+    transfer,
+    assign,
+    destroy,
+    compare,
+    get
+};
+
+enum class any_policy : std::uint8_t {
+    owner,
+    ref,
+    cref
+};
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
  * @brief A SBO friendly, type-safe container for single values of any type.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  */
 template<std::size_t Len, std::size_t Align>
 class basic_any {
-    enum class operation : std::uint8_t {
-        copy,
-        move,
-        transfer,
-        assign,
-        destroy,
-        compare,
-        get
-    };
-
-    enum class policy : std::uint8_t {
-        owner,
-        ref,
-        cref
-    };
+    using operation = internal::any_operation;
+    using policy = internal::any_policy;
 
     using storage_type = std::aligned_storage_t<Len + !Len, Align>;
     using vtable_type = const void *(const operation, const basic_any &, const void *);
