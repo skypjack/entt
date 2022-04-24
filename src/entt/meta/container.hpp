@@ -55,14 +55,12 @@ struct basic_meta_sequence_container_traits {
     }
 
     [[nodiscard]] static iterator iter(any &container, const bool as_end) {
-        using std::begin;
-
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{begin(*cont), static_cast<typename iterator::difference_type>(as_end * cont->size())};
+            return iterator{*cont, static_cast<typename iterator::difference_type>(as_end * cont->size())};
         }
 
         const Type &as_const = any_cast<const Type &>(container);
-        return iterator{begin(as_const), static_cast<typename iterator::difference_type>(as_end * as_const.size())};
+        return iterator{as_const, static_cast<typename iterator::difference_type>(as_end * as_const.size())};
     }
 
     [[nodiscard]] static iterator insert([[maybe_unused]] any &container, [[maybe_unused]] const std::ptrdiff_t offset, [[maybe_unused]] meta_any &value) {
@@ -70,10 +68,9 @@ struct basic_meta_sequence_container_traits {
             if(auto *const cont = any_cast<Type>(&container); cont) {
                 // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
                 if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
-                    using std::begin;
                     const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                    const auto curr = cont->insert(begin(*cont) + offset, element ? *element : value.cast<typename Type::value_type>());
-                    return iterator{curr, curr - begin(*cont)};
+                    const auto curr = cont->insert(cont->begin() + offset, element ? *element : value.cast<typename Type::value_type>());
+                    return iterator{*cont, curr - cont->begin()};
                 }
             }
         }
@@ -84,9 +81,8 @@ struct basic_meta_sequence_container_traits {
     [[nodiscard]] static iterator erase([[maybe_unused]] any &container, [[maybe_unused]] const std::ptrdiff_t offset) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
-                using std::begin;
-                const auto curr = cont->erase(begin(*cont) + offset);
-                return iterator{curr, curr - begin(*cont)};
+                const auto curr = cont->erase(cont->begin() + offset);
+                return iterator{*cont, curr - cont->begin()};
             }
         }
 
@@ -115,15 +111,12 @@ struct basic_meta_associative_container_traits {
     }
 
     [[nodiscard]] static iterator iter(any &container, const bool as_end) {
-        using std::begin;
-        using std::end;
-
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::integral_constant<bool, key_only>{}, as_end ? end(*cont) : begin(*cont)};
+            return iterator{std::integral_constant<bool, key_only>{}, as_end ? cont->end() : cont->begin()};
         }
 
         const auto &as_const = any_cast<const Type &>(container);
-        return iterator{std::integral_constant<bool, key_only>{}, as_end ? end(as_const) : begin(as_const)};
+        return iterator{std::integral_constant<bool, key_only>{}, as_end ? as_const.end() : as_const.begin()};
     }
 
     [[nodiscard]] static bool insert(any &container, meta_any &key, [[maybe_unused]] meta_any &value) {
