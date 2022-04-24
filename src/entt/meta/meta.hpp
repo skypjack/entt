@@ -1464,11 +1464,11 @@ public:
           offset{},
           handle{} {}
 
-    template<typename It>
-    explicit meta_iterator(It iter, const difference_type init) ENTT_NOEXCEPT
-        : deref{&deref_fn<It>},
+    template<typename Type>
+    explicit meta_iterator(Type &cont, const difference_type init) ENTT_NOEXCEPT
+        : deref{&deref_fn<decltype(cont.begin())>},
           offset{init},
-          handle{std::move(iter)} {}
+          handle{cont.begin()} {}
 
     meta_iterator &operator++() ENTT_NOEXCEPT {
         return ++offset, *this;

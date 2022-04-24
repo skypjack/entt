@@ -147,11 +147,16 @@ TEST_F(MetaContainer, StdVector) {
     ASSERT_EQ(view.begin()->cast<int>(), 0);
     ASSERT_EQ((++view.begin())->cast<int>(), 1);
 
+    ret = view.insert(view.end(), 42);
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(*ret, 42);
+
     it = view.begin();
     ret = view.erase(it);
 
     ASSERT_TRUE(ret);
-    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ(ret->cast<int>(), 1);
 
     ASSERT_TRUE(view.clear());
