@@ -23,3 +23,13 @@ TEST(Tuple, UnwrapTuple) {
     ASSERT_EQ(entt::unwrap_tuple(multi), multi);
     ASSERT_EQ(entt::unwrap_tuple(std::move(ref)), 42);
 }
+
+TEST(Tuple, apply_fn) {
+    auto empty = std::make_tuple();
+    auto single = std::make_tuple(42);
+    auto multi = std::make_tuple(42, 'c');
+
+    ASSERT_EQ(entt::apply_fn{ [](auto&&... args) { return sizeof...(args); } }(empty), 0);
+    ASSERT_TRUE(entt::apply_fn{ [](int i) { return i == 42; } }(single));
+    ASSERT_TRUE(entt::apply_fn{ [](int i, char c) { return i == 42 && c == 'c'; } }(multi));
+}

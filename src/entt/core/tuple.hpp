@@ -24,6 +24,24 @@ constexpr decltype(auto) unwrap_tuple(Type &&value) ENTT_NOEXCEPT {
     }
 }
 
+/**
+ * \brief Functional type, which forwards the given tuple and the stored function to ``std::apply`` on invocation.
+ * \tparam Func Type of the stored functional object.
+ */
+template <typename Func>
+struct apply_fn
+{
+	Func func{};
+
+	template <class Tuple>
+	constexpr decltype(auto) operator ()(Tuple&& tuple)
+	{
+		return std::apply(std::ref(func), std::forward<Tuple>(tuple));
+	}
+};
+
+template <typename Func>
+	apply_fn(Func) -> apply_fn<Func>;
 } // namespace entt
 
 #endif
