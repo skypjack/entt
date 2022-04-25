@@ -15,71 +15,15 @@
 
 namespace entt::internal {
 
-template<typename Convert, typename It>
-struct converting_iterator {
-    using value_type = std::remove_reference_t<decltype(std::declval<Convert>()(*std::declval<It>()))>;
-    using reference = value_type&;
-    using pointer = value_type*;
-    using difference_type = typename It::difference_type;
-    using iterator_category = std::bidirectional_iterator_tag;
-
-    converting_iterator() ENTT_NOEXCEPT = default;
-
-    converting_iterator(It it) ENTT_NOEXCEPT :
-        wrapped(it) {}
-
-    converting_iterator &operator++() ENTT_NOEXCEPT {
-        wrapped++;
-        return *this;
-    }
-
-    converting_iterator operator++(int) ENTT_NOEXCEPT {
-        converting_iterator orig = *this;
-        return ++(*this), orig;
-    }
-
-    converting_iterator &operator--() ENTT_NOEXCEPT {
-        wrapped--;
-        return *this;
-    }
-
-    converting_iterator operator--(int) ENTT_NOEXCEPT {
-        converting_iterator orig = *this;
-        return --(*this), orig;
-    }
-
-    bool operator==(const converting_iterator& other) const ENTT_NOEXCEPT {
-        return wrapped == other.wrapped;
-    }
-
-    bool operator!=(const converting_iterator& other) const ENTT_NOEXCEPT {
-        return wrapped != other.wrapped;
-    }
-
-    reference operator*() ENTT_NOEXCEPT {
-        Convert convert{};
-        return convert(*wrapped);
-    }
-
-    pointer operator->() ENTT_NOEXCEPT {
-        return std::addressof(operator*());
-    }
-
-private:
-    It wrapped;
-};
-
-
-template<typename PoolsIterator>
+template<typename PoolsIterator, typename PoolHolderType>
 class poly_components_iterator {
     using iterator_traits = typename std::iterator_traits<PoolsIterator>;
-    using pool_holder_type = typename iterator_traits::value_type;
 
 public:
-    using entity_type = typename pool_holder_type::entity_type;
-    using pointer = std::conditional_t<std::is_const_v<pool_holder_type>, typename pool_holder_type::const_pointer_type, typename pool_holder_type::pointer_type>;
-    using value_type = std::conditional_t<std::is_pointer_v<typename pool_holder_type::value_type>, pointer, constness_as_t<typename pool_holder_type::value_type, pool_holder_type>>;
-    using reference = std::conditional_t<std::is_pointer_v<typename pool_holder_type::value_type>, pointer, value_type&>;
+    using entity_type = typename PoolHolderType::entity_type;
+    using pointer = std::conditional_t<std::is_const_v<PoolHolderType>, typename PoolHolderType::const_pointer_type, typename PoolHolderType::pointer_type>;
+    using value_type = std::conditional_t<std::is_pointer_v<typename PoolHolderType::value_type>, pointer, constness_as_t<typename PoolHolderType::value_type, PoolHolderType>>;
+    using reference = std::conditional_t<std::is_pointer_v<typename PoolHolderType::value_type>, pointer, value_type&>;
     using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::forward_iterator_tag;
 
@@ -88,7 +32,7 @@ public:
     poly_components_iterator(entity_type e, PoolsIterator pos, PoolsIterator last) ENTT_NOEXCEPT :
         ent(e), it(pos), end(last) {
         if (it != end) {
-            current = it->try_get(ent);
+            current = static_cast<PoolHolderType&>(*it).try_get(ent);
             if(current == nullptr) {
                 ++(*this);
             }
@@ -98,7 +42,7 @@ public:
     poly_components_iterator &operator++() ENTT_NOEXCEPT {
         ++it;
         while (it != end) {
-            current = it->try_get(ent);
+            current = static_cast<PoolHolderType&>(*it).try_get(ent);
             if (current != nullptr)
                 break;
             ++it;
@@ -153,14 +97,12 @@ template<typename Entity>
 class poly_pool_holder_base {
 public:
     inline poly_pool_holder_base(basic_sparse_set<Entity>* pool,
-                                 void* (*getter)(void*, Entity) ENTT_NOEXCEPT,
-                                 bool (*remover)(void*, Entity)) :
-          pool_ptr(pool), getter_ptr(getter), remover_ptr(remover) {}
+                                 void* (*getter)(void*, Entity) ENTT_NOEXCEPT) :
+          pool_ptr(pool), getter_ptr(getter) {}
 
 protected:
     basic_sparse_set<Entity>* pool_ptr;
     void* (*getter_ptr)(void*, Entity) ENTT_NOEXCEPT;
-    bool (*remover_ptr)(void*, Entity);
 };
 
 /**
@@ -202,7 +144,7 @@ public:
      * @return true, if component was removed, false, if it didnt exist
      */
     inline bool remove(const Entity ent) {
-        return this->remover_ptr(this->pool_ptr, ent);
+        return this->pool_ptr->remove(ent);
     }
 
     /** @brief returns underlying pool */
@@ -222,17 +164,6 @@ public:
  */
 template<typename Entity, typename Type>
 class poly_type {
-    /** @brief internally used to convert base_poly_pool_holder to a pool_poly_holder<Entity, Type> during the iteration */
-    struct cast_pool_holder {
-        auto& operator()(poly_pool_holder_base<Entity>& holder) {
-            return static_cast<poly_pool_holder<Entity, Type>&>(holder);
-        }
-
-        const auto& operator()(const poly_pool_holder_base<Entity>& holder) const {
-            return static_cast<const poly_pool_holder<Entity, Type>&>(holder);
-        }
-    };
-
     /** @brief derived value to base pointer conversion, workaround for if constexpr bug on some compilers */
     template<typename Base, typename Derived, typename = void>
     struct derived_to_base_ptr {
@@ -272,14 +203,12 @@ public:
     using value_type = Type;
     /** @brief type of the underlying pool container */
     using pools_container = std::vector<poly_pool_holder_base<Entity>>;
-    /** @brief pool iterator type */
-    using pools_iterator = internal::converting_iterator<cast_pool_holder, typename pools_container::iterator>;
-    /** @brief const pool iterator type */
-    using const_pools_iterator = internal::converting_iterator<const cast_pool_holder, typename pools_container::const_iterator>;
+    /** @brief type of the pool holder */
+    using pool_holder = poly_pool_holder<Entity, Type>;
     /** @brief single entity component iterator type */
-    using component_iterator = internal::poly_components_iterator<pools_iterator>;
+    using component_iterator = internal::poly_components_iterator<typename pools_container::iterator, pool_holder>;
     /** @brief const single entity component iterator type */
-    using const_component_iterator = internal::poly_components_iterator<const_pools_iterator>;
+    using const_component_iterator = internal::poly_components_iterator<typename pools_container::const_iterator, const pool_holder>;
 
     /**
      * @brief From a given set, makes a poly_storage_holder to hold child type and convert to parent type.
@@ -288,7 +217,7 @@ public:
      * @return poly_storage_holder to hold ChildType set and access it as Type
      */
     template<typename StorageType>
-    inline static poly_pool_holder<Entity, Type> make_pool_holder(StorageType* pool_ptr) ENTT_NOEXCEPT {
+    inline static pool_holder make_pool_holder(StorageType* pool_ptr) ENTT_NOEXCEPT {
         using BaseType = Type;
         using DerivedType = typename StorageType::value_type;
         static_assert(is_poly_type_v<DerivedType>);
@@ -310,11 +239,7 @@ public:
             return nullptr;
         };
 
-        bool (*remove)(void*, Entity entity) = +[](void* pool, const Entity entity) -> bool {
-            return static_cast<StorageType*>(pool)->remove(entity);
-        };
-
-        return poly_pool_holder<Entity, Type>(pool_ptr, get, remove);
+        return pool_holder(pool_ptr, get);
     }
 
     /** @brief adds given storage pointer as a child type pool to this polymorphic type */
@@ -323,27 +248,33 @@ public:
         this->child_pool_holders.emplace_back(make_pool_holder(storage_ptr));
     }
 
-    /** @brief returns an iterable to iterate through all pool holders */
-    [[nodiscard]] iterable_adaptor<pools_iterator> pools() {
-        return { pools_iterator(this->child_pool_holders.begin()), pools_iterator(this->child_pool_holders.end()) };
+    /** @brief calls given function for all child pool holders */
+    template<typename Func>
+    void each_pool(Func func) {
+        for (auto& pool : child_pool_holders) {
+            func(static_cast<pool_holder&>(pool));
+        }
     }
 
-    /** @copydoc pools */
-    [[nodiscard]] iterable_adaptor<const_pools_iterator> pools() const {
-        return { const_pools_iterator(this->child_pool_holders.cbegin()), const_pools_iterator(this->child_pool_holders.cend()) };
+    /** @copydoc each_pool */
+    template<typename Func>
+    void each_pool(Func func) const {
+        for (auto& pool : child_pool_holders) {
+            func(static_cast<const pool_holder&>(pool));
+        }
     }
 
     /** @brief returns an iterable to iterate through all polymorphic components, derived from this type, attached to a given entities */
     [[nodiscard]] iterable_adaptor<component_iterator> each(const entity_type ent) {
-        auto begin = pools_iterator(this->child_pool_holders.begin());
-        auto end = pools_iterator(this->child_pool_holders.end());
+        auto begin = this->child_pool_holders.begin();
+        auto end = this->child_pool_holders.end();
         return { component_iterator(ent, begin, end), component_iterator(ent, end, end) };
     }
 
     /** @copydoc each */
     [[nodiscard]] iterable_adaptor<const_component_iterator> each(const entity_type ent) const {
-        auto begin = const_pools_iterator(this->child_pool_holders.cbegin());
-        auto end = const_pools_iterator(this->child_pool_holders.cend());
+        auto begin = this->child_pool_holders.cbegin();
+        auto end = this->child_pool_holders.cend();
         return { const_component_iterator(ent, begin, end), const_component_iterator(ent, end, end) };
     }
 
@@ -463,9 +394,9 @@ template<typename Component, typename Entity, typename PolyPoolsHolder>
 template<typename Component, typename Entity, typename PolyPoolsHolder>
 int poly_remove(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
     int removed_count = 0;
-    for (auto& pool : assure_poly_type<Component>(reg).pools()) {
+    assure_poly_type<Component>(reg).each_pool([&](auto& pool){
         removed_count += static_cast<int>(pool.remove(entity));
-    }
+    });
     return removed_count;
 }
 
@@ -479,9 +410,9 @@ int poly_remove(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
 template<typename Component, typename Entity, typename PolyPoolsHolder>
 size_t poly_count(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
     size_t count = 0;
-    for (auto& pool : assure_poly_type<Component>(reg).pools()) {
+    assure_poly_type<Component>(reg).each_pool([&](auto& pool){
         count += static_cast<int>(pool.pool().contains(entity));
-    }
+    });
     return count;
 }
 
@@ -494,9 +425,9 @@ size_t poly_count(PolyPoolsHolder& reg, [[maybe_unused]] const Entity entity) {
 template<typename Component, typename PolyPoolsHolder>
 size_t poly_count(PolyPoolsHolder& reg) {
     size_t count = 0;
-    for (auto& pool : assure_poly_type<Component>(reg).pools()) {
+    assure_poly_type<Component>(reg).each_pool([&](auto& pool){
         count += pool.pool().size();
-    }
+    });
     return count;
 }
 
@@ -512,7 +443,7 @@ size_t poly_count(PolyPoolsHolder& reg) {
  */
 template<typename Component, typename PolyPoolsHolder, typename Entity = typename PolyPoolsHolder::entity_type, typename Func>
 void poly_each(PolyPoolsHolder& reg, Func func) {
-    for (auto& pool : assure_poly_type<Component>(reg).pools()) {
+    assure_poly_type<Component>(reg).each_pool([&](auto& pool){
         for (auto& ent : pool.pool()) {
             if constexpr(std::is_invocable_v<Func, Entity, Component&>) {
                 auto ptr = pool.try_get(ent);
@@ -534,7 +465,7 @@ void poly_each(PolyPoolsHolder& reg, Func func) {
                 func();
             }
         }
-    }
+    });
 }
 
 } // namespace entt::algorithm

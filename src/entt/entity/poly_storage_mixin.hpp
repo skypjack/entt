@@ -18,8 +18,7 @@ class poly_type;
  * @tparam Type value type
  */
 template<typename Storage, typename = void>
-class poly_storage_mixin : public Storage {
-public:
+struct poly_storage_mixin : Storage {
     /*! @brief Underlying value type. */
     using value_type = typename Storage::value_type;
     /*! @brief Underlying entity identifier. */
@@ -34,7 +33,6 @@ public:
      */
     void bind(any value) ENTT_NOEXCEPT override {
         if(auto *reg = any_cast<basic_registry<entity_type>>(&value); reg) {
-            owner = reg;
             bind_all_parent_types(*reg, poly_parent_types_t<value_type>{});
         }
         Storage::bind(std::move(value));
@@ -46,9 +44,6 @@ private:
         (reg.ctx().template emplace<poly_type<entity_type, ParentTypes>>().bind_child_storage(this), ...);
         reg.ctx().template emplace<poly_type<entity_type, value_type>>().bind_child_storage(this);
     }
-
-private:
-    basic_registry<entity_type> *owner{};
 };
 
 
