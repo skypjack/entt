@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "type_traits.hpp"
 
 namespace entt {
 
@@ -25,23 +26,33 @@ constexpr decltype(auto) unwrap_tuple(Type &&value) ENTT_NOEXCEPT {
 }
 
 /**
- * \brief Functional type, which forwards the given tuple and the stored function to ``std::apply`` on invocation.
+ * \brief Functional type, which forwards the given tuple and the internal functional object to ``std::apply`` on invocation.
  * \tparam Func Type of the stored functional object.
  */
 template <typename Func>
-struct apply_fn
+class apply_fn : Func
 {
-	Func func{};
+public:
+	template <class... Args>
+    constexpr apply_fn(Args&&... args) ENTT_NOEXCEPT_IF((std::is_nothrow_constructible_v<Func, Args...>))
+        : Func{ std::forward<Args>(args)... }
+	{}
 
 	template <class Tuple>
-	constexpr decltype(auto) operator ()(Tuple&& tuple)
+	constexpr decltype(auto) operator ()(Tuple&& tuple) ENTT_NOEXCEPT_IF(noexcept(std::apply(std::declval<Func&>(), std::declval<Tuple>())))
 	{
-		return std::apply(std::ref(func), std::forward<Tuple>(tuple));
+		return std::apply(static_cast<Func&>(*this), std::forward<Tuple>(tuple));
+	}
+
+    template <class Tuple>
+	constexpr decltype(auto) operator ()(Tuple&& tuple) const ENTT_NOEXCEPT_IF(noexcept(std::apply(std::declval<const Func&>(), std::declval<Tuple>())))
+	{
+		return std::apply(static_cast<const Func&>(*this), std::forward<Tuple>(tuple));
 	}
 };
 
 template <typename Func>
-	apply_fn(Func) -> apply_fn<Func>;
+apply_fn(Func) -> apply_fn<std::remove_reference_t<std::remove_cv_t<Func>>>;
 } // namespace entt
 
 #endif
