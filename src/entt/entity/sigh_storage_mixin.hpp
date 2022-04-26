@@ -24,6 +24,7 @@ namespace entt {
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
+    using sigh_type = sigh<void(basic_registry<typename Type::entity_type> &, const typename Type::entity_type), typename Type::allocator_type>;
     using basic_iterator = typename Type::basic_iterator;
 
     template<typename Func>
@@ -54,11 +55,75 @@ class sigh_storage_mixin final: public Type {
     }
 
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = typename Type::allocator_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
 
-    /*! @brief Inherited constructors. */
-    using Type::Type;
+    /*! @brief Default constructor. */
+    sigh_storage_mixin()
+        : sigh_storage_mixin{allocator_type{}} {}
+
+    /**
+     * @brief Constructs an empty storage with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit sigh_storage_mixin(const allocator_type &allocator)
+        : Type{allocator},
+          owner{},
+          construction{},
+          destruction{},
+          update{} {}
+
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    sigh_storage_mixin(sigh_storage_mixin &&other) ENTT_NOEXCEPT
+        : Type{std::move(other)},
+          owner{other.owner},
+          construction{std::move(other.construction)},
+          destruction{std::move(other.destruction)},
+          update{std::move(other.update)} {}
+
+    /**
+     * @brief Allocator-extended move constructor.
+     * @param other The instance to move from.
+     * @param allocator The allocator to use.
+     */
+    sigh_storage_mixin(sigh_storage_mixin &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+        : Type{std::move(other), allocator},
+          owner{other.owner},
+          construction{std::move(other.construction), allocator},
+          destruction{std::move(other.destruction), allocator},
+          update{std::move(other.update), allocator} {}
+
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to move from.
+     * @return This storage.
+     */
+    sigh_storage_mixin &operator=(sigh_storage_mixin &&other) ENTT_NOEXCEPT {
+        Type::operator=(std::move(other));
+        owner = other.owner;
+        construction = std::move(other.construction);
+        destruction = std::move(other.destruction);
+        update = std::move(other.update);
+        return *this;
+    }
+
+    /**
+     * @brief Exchanges the contents with those of a given storage.
+     * @param other Storage to exchange the content with.
+     */
+    void swap(sigh_storage_mixin &other) {
+        using std::swap;
+        Type::swap(other);
+        swap(owner, other.owner);
+        swap(construction, other.construction);
+        swap(destruction, other.destruction);
+        swap(update, other.update);
+    }
 
     /**
      * @brief Returns a sink object.
@@ -166,10 +231,10 @@ public:
     }
 
 private:
-    sigh<void(basic_registry<entity_type> &, const entity_type)> construction{};
-    sigh<void(basic_registry<entity_type> &, const entity_type)> destruction{};
-    sigh<void(basic_registry<entity_type> &, const entity_type)> update{};
-    basic_registry<entity_type> *owner{};
+    basic_registry<entity_type> *owner;
+    sigh_type construction;
+    sigh_type destruction;
+    sigh_type update;
 };
 
 } // namespace entt
