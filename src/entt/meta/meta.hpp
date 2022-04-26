@@ -185,7 +185,7 @@ class meta_any {
     }
 
     void release() {
-        if(node && node->dtor && storage.owner()) {
+        if(node && node->dtor && owner()) {
             node->dtor(storage.data());
         }
     }
@@ -343,35 +343,26 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
-        if(const auto &info = type_id<Type>(); node && *node->info == info) {
-            return any_cast<Type>(&storage);
-        } else if(node) {
-            for(auto *it = node->base; it; it = it->next) {
-                const auto as_const = it->cast(as_ref());
+        auto *self = any_cast<Type>(&storage);
 
-                if(const Type *base = as_const.template try_cast<Type>(); base) {
-                    return base;
-                }
-            }
+        for(auto *it = node ? node->base : nullptr; it && !self; it = it->next) {
+            const auto &as_const = it->cast(as_ref());
+            self = as_const.template try_cast<Type>();
         }
 
-        return nullptr;
+        return self;
     }
 
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        if(const auto &info = type_id<Type>(); node && *node->info == info) {
-            return any_cast<Type>(&storage);
-        } else if(node) {
-            for(auto *it = node->base; it; it = it->next) {
-                if(Type *base = it->cast(as_ref()).template try_cast<Type>(); base) {
-                    return base;
-                }
-            }
+        auto *self = any_cast<Type>(&storage);
+
+        for(auto *it = node ? node->base : nullptr; it && !self; it = it->next) {
+            self = it->cast(as_ref()).template try_cast<Type>();
         }
 
-        return nullptr;
+        return self;
     }
 
     /**
@@ -416,7 +407,7 @@ public:
      */
     [[nodiscard]] bool allow_cast(const meta_type &type) {
         if(auto other = std::as_const(*this).allow_cast(type); other) {
-            if(other.storage.owner()) {
+            if(other.owner()) {
                 std::swap(*this, other);
             }
 
@@ -435,12 +426,7 @@ public:
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         const auto other = allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve());
-
-        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return other.storage.owner() ? other : meta_any{};
-        } else {
-            return other;
-        }
+        return (!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>> || other.owner()) ? other : meta_any{};
     }
 
     /**
@@ -451,7 +437,7 @@ public:
     template<typename Type>
     bool allow_cast() {
         if(auto other = std::as_const(*this).allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve()); other) {
-            if(other.storage.owner()) {
+            if(other.owner()) {
                 std::swap(*this, other);
                 return true;
             }
@@ -1397,7 +1383,7 @@ bool meta_any::set(const id_type id, Type &&value) {
         }
 
         for(auto *it = node->base; it; it = it->next) {
-            const auto as_const = it->cast(as_ref());
+            const auto &as_const = it->cast(as_ref());
 
             if(auto other = as_const.allow_cast(type); other) {
                 return other;
