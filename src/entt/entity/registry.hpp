@@ -613,7 +613,7 @@ public:
      * @brief Assigns identifiers to an empty registry.
      *
      * This function is intended for use in conjunction with `data`, `size` and
-     * `destroyed`.<br/>
+     * `released`.<br/>
      * Don't try to inject ranges of randomly generated entities nor the _wrong_
      * head for the list of destroyed entities. There is no guarantee that a
      * registry will continue to work properly in this case.
