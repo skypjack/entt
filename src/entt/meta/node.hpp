@@ -108,6 +108,7 @@ struct meta_type_node {
     meta_type_node *next;
     meta_prop_node *prop;
     const size_type size_of;
+    meta_type_node *(*const remove_pointer)() ENTT_NOEXCEPT;
     meta_any (*const default_constructor)();
     double (*const conversion_helper)(void *, const void *);
     const meta_template_node *const templ;
@@ -180,6 +181,7 @@ public:
             nullptr,
             nullptr,
             size_of_v<Type>,
+            &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<Type>>>>::resolve,
             meta_default_constructor(),
             meta_conversion_helper(),
             meta_template_info()

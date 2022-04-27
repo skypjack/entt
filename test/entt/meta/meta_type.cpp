@@ -261,6 +261,13 @@ TEST_F(MetaType, Traits) {
     ASSERT_FALSE(entt::resolve<std::vector<int>>().is_associative_container());
 }
 
+TEST_F(MetaType, RemovePointer) {
+    ASSERT_EQ(entt::resolve<void *>().remove_pointer(), entt::resolve<void>());
+    ASSERT_EQ(entt::resolve<char **>().remove_pointer(), entt::resolve<char *>());
+    ASSERT_EQ(entt::resolve<int (*)(char, double)>().remove_pointer(), entt::resolve<int(char, double)>());
+    ASSERT_EQ(entt::resolve<derived_t>().remove_pointer(), entt::resolve<derived_t>());
+}
+
 TEST_F(MetaType, TemplateInfo) {
     ASSERT_FALSE(entt::resolve<int>().is_template_specialization());
     ASSERT_EQ(entt::resolve<int>().template_arity(), 0u);

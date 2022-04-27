@@ -1057,6 +1057,15 @@ public:
     }
 
     /**
+     * @brief Provides the type for which the pointer is defined.
+     * @return The type for which the pointer is defined or this type if it
+     * doesn't refer to a pointer type.
+     */
+    [[nodiscard]] meta_type remove_pointer() const ENTT_NOEXCEPT {
+        return node->remove_pointer();
+    }
+
+    /**
      * @brief Checks whether a type is a pointer-like type or not.
      * @return True if the underlying type is a pointer-like one, false
      * otherwise.
