@@ -181,7 +181,7 @@ public:
             nullptr,
             nullptr,
             size_of_v<Type>,
-            &meta_node<std::remove_cv_t<std::remove_reference_t<std::remove_pointer_t<Type>>>>::resolve,
+            &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
             meta_default_constructor(),
             meta_conversion_helper(),
             meta_template_info()
