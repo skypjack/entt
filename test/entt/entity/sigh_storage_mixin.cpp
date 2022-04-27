@@ -418,8 +418,8 @@ TEST(SighStorageMixin, CustomAllocator) {
         counter on_destroy{};
 
         pool.bind(entt::forward_as_any(registry));
-        pool.on_construct().connect<&listener>(on_construct);
-        pool.on_destroy().connect<&listener>(on_destroy);
+        pool.on_construct().template connect<&listener>(on_construct);
+        pool.on_destroy().template connect<&listener>(on_destroy);
 
         pool.reserve(1u);
 
@@ -481,8 +481,8 @@ TEST(SighStorageMixin, ThrowingAllocator) {
         counter on_destroy{};
 
         pool.bind(entt::forward_as_any(registry));
-        pool.on_construct().connect<&listener>(on_construct);
-        pool.on_destroy().connect<&listener>(on_destroy);
+        pool.on_construct().template connect<&listener>(on_construct);
+        pool.on_destroy().template connect<&listener>(on_destroy);
 
         pool_allocator_type::trigger_on_allocate = true;
 
