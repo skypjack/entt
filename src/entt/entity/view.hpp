@@ -92,17 +92,17 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
     return !(lhs == rhs);
 }
 
-template<typename It, typename... Storage>
+template<typename It, typename... Type>
 struct extended_view_iterator final {
     using difference_type = std::ptrdiff_t;
-    using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Storage>().get_as_tuple({})...));
+    using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Type>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
     extended_view_iterator() = default;
 
-    extended_view_iterator(It from, std::tuple<Storage *...> storage)
+    extended_view_iterator(It from, std::tuple<Type *...> storage)
         : it{from},
           pools{storage} {}
 
@@ -128,7 +128,7 @@ struct extended_view_iterator final {
 
 private:
     It it;
-    std::tuple<Storage *...> pools;
+    std::tuple<Type *...> pools;
 };
 
 template<typename... Lhs, typename... Rhs>
@@ -829,11 +829,11 @@ private:
 
 /**
  * @brief Deduction guide.
- * @tparam Storage Type of storage classes used to create the view.
+ * @tparam Type Type of storage classes used to create the view.
  * @param storage The storage for the types to iterate.
  */
-template<typename... Storage>
-basic_view(Storage &...storage) -> basic_view<std::common_type_t<typename Storage::entity_type...>, get_t<constness_as_t<typename Storage::value_type, Storage>...>, exclude_t<>>;
+template<typename... Type>
+basic_view(Type &...storage) -> basic_view<std::common_type_t<typename Type::entity_type...>, get_t<constness_as_t<typename Type::value_type, Type>...>, exclude_t<>>;
 
 } // namespace entt
 
