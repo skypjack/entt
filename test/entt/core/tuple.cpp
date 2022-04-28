@@ -23,3 +23,9 @@ TEST(Tuple, UnwrapTuple) {
     ASSERT_EQ(entt::unwrap_tuple(multi), multi);
     ASSERT_EQ(entt::unwrap_tuple(std::move(ref)), 42);
 }
+
+TEST(Tuple, ForwardApply) {
+    ASSERT_EQ(entt::forward_apply{[](auto &&...args) { return sizeof...(args); }}(std::make_tuple()), 0u);
+    ASSERT_EQ(entt::forward_apply{[](int i) { return i; }}(std::make_tuple(42)), 42);
+    ASSERT_EQ(entt::forward_apply{[](auto... args) { return (args + ...); }}(std::make_tuple('a', 1u)), 'b');
+}

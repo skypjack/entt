@@ -24,6 +24,46 @@ constexpr decltype(auto) unwrap_tuple(Type &&value) ENTT_NOEXCEPT {
     }
 }
 
+/**
+ * @brief Utility class to forward-and-apply tuple objects.
+ * @tparam Func Type of underlying invocable object.
+ */
+template<typename Func>
+struct forward_apply: private Func {
+    /**
+     * @brief Constructs a forward-and-apply object.
+     * @tparam Args Types of arguments to use to construct the new instance.
+     * @param args Parameters to use to construct the instance.
+     */
+    template<class... Args>
+    constexpr forward_apply(Args &&...args) ENTT_NOEXCEPT_IF((std::is_nothrow_constructible_v<Func, Args...>))
+        : Func{std::forward<Args>(args)...} {}
+
+    /**
+     * @brief Forwards and applies the arguments with the underlying function.
+     * @tparam Type Tuple-like type to forward to the underlying function.
+     * @param args Parameters to forward to the underlying function.
+     * @return Return value of the underlying function, if any.
+     */
+    template<class Type>
+    constexpr decltype(auto) operator()(Type &&args) ENTT_NOEXCEPT_IF(noexcept(std::apply(std::declval<Func &>(), args))) {
+        return std::apply(static_cast<Func &>(*this), std::forward<Type>(args));
+    }
+
+    /*! @copydoc operator()() */
+    template<class Type>
+    constexpr decltype(auto) operator()(Type &&args) const ENTT_NOEXCEPT_IF(noexcept(std::apply(std::declval<const Func &>(), args))) {
+        return std::apply(static_cast<const Func &>(*this), std::forward<Type>(args));
+    }
+};
+
+/**
+ * @brief Deduction guide.
+ * @tparam Func Type of underlying invocable object.
+ */
+template<typename Func>
+forward_apply(Func) -> forward_apply<std::remove_reference_t<std::remove_cv_t<Func>>>;
+
 } // namespace entt
 
 #endif
