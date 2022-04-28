@@ -46,6 +46,16 @@ TEST(Example, DifferentRegistryTypes) {
     entt::basic_registry<entt::entity> registry{};
     entt::basic_registry<my_entity> other{};
 
+    /*
+        TODO These are currently needed to ensure that the source and
+             target registries have the proper storage initialized
+             prior to copying, as this isn't done automatically
+             when emplacing storages (as is done below).
+
+             There is an open issue about this, and these two
+             lines should be removed when a fix is properly landed.
+             https://github.com/skypjack/entt/issues/827
+    */
     static_cast<void>(registry.storage<double>());
     static_cast<void>(other.storage<int>());
 
