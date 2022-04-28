@@ -6,19 +6,19 @@
 		<Intrinsic Name="to_entity" Expression="*((entity_traits::entity_type *)&amp;entity) &amp; entity_traits::entity_mask">
 			<Parameter Name="entity" Type="entity_traits::value_type &amp;"/>
 		</Intrinsic>
-		<DisplayString>{{ size={ entities.size() } }}</DisplayString>
+		<DisplayString>{{ size={ epool.size() } }}</DisplayString>
 		<Expand>
-			<Item IncludeView="simple" Name="[entities]">entities,view(simple)nr</Item>
-			<Synthetic Name="[entities]" ExcludeView="simple">
-				<DisplayString>{ entities.size() }</DisplayString>
+			<Item IncludeView="simple" Name="[epool]">epool,view(simple)nr</Item>
+			<Synthetic Name="[epool]" ExcludeView="simple">
+				<DisplayString>{ epool.size() }</DisplayString>
 				<Expand>
 					<CustomListItems>
 						<Variable Name="pos" InitialValue="0" />
-						<Variable Name="last" InitialValue="entities.size()"/>
+						<Variable Name="last" InitialValue="epool.size()"/>
 						<Loop>
 							<Break Condition="pos == last"/>
-							<If Condition="to_entity(entities[pos]) == pos">
-								<Item Name="[{ pos }]">entities[pos]</Item>
+							<If Condition="to_entity(epool[pos]) == pos">
+								<Item Name="[{ pos }]">epool[pos]</Item>
 							</If>
 							<Exec>++pos</Exec>
 						</Loop>
@@ -32,8 +32,8 @@
 						<Variable Name="it" InitialValue="to_entity(free_list)" />
 						<Loop>
 							<Break Condition="it == entity_traits::entity_mask"/>
-							<Item Name="[{ it }]">entities[it]</Item>
-							<Exec>it = to_entity(entities[it])</Exec>
+							<Item Name="[{ it }]">epool[it]</Item>
+							<Exec>it = to_entity(epool[it])</Exec>
 						</Loop>
 					</CustomListItems>
 				</Expand>
