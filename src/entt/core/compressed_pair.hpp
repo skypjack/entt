@@ -50,18 +50,19 @@ template<typename Type, std::size_t Tag>
 struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Type>>>: Type {
     using reference = Type &;
     using const_reference = const Type &;
+    using base_type = Type;
 
-    template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<Type>>>
+    template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<base_type>>>
     compressed_pair_element()
-        : Type{} {}
+        : base_type{} {}
 
     template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
     compressed_pair_element(Args &&args)
-        : Type{std::forward<Args>(args)} {}
+        : base_type{std::forward<Args>(args)} {}
 
     template<typename... Args, std::size_t... Index>
     compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
-        : Type{std::forward<Args>(std::get<Index>(args))...} {}
+        : base_type{std::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] reference get() ENTT_NOEXCEPT {
         return *this;
