@@ -288,16 +288,15 @@ class basic_registry {
     }
 
     template<typename Component>
-    [[nodiscard]] const auto &assure(const id_type id = type_hash<Component>::value()) const {
+    [[nodiscard]] const auto assure(const id_type id = type_hash<Component>::value()) const {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
 
         if(const auto it = pools.find(id); it != pools.cend()) {
             ENTT_ASSERT(it->second->type() == type_id<Component>(), "Unexpected type");
-            return static_cast<const storage_type<Component> &>(*it->second);
+            return &(static_cast<const storage_type<Component> &>(*it->second));
         }
 
-        static storage_type<Component> placeholder{};
-        return placeholder;
+		return (const storage_type<Component>*)nullptr;
     }
 
     auto generate_identifier(const std::size_t pos) ENTT_NOEXCEPT {
@@ -447,7 +446,7 @@ public:
      */
     template<typename Component>
     decltype(auto) storage(const id_type id = type_hash<std::remove_const_t<Component>>::value()) const {
-        return assure<std::remove_const_t<Component>>(id);
+        return *assure<std::remove_const_t<Component>>(id);
     }
 
     /**
@@ -980,7 +979,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool all_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<std::remove_const_t<Component>>().contains(entity) && ...);
+        return (assure<std::remove_const_t<Component>>()->contains(entity) && ...);
     }
 
     /**
@@ -997,7 +996,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool any_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<std::remove_const_t<Component>>().contains(entity) || ...);
+        return (assure<std::remove_const_t<Component>>()->contains(entity) || ...);
     }
 
     /**
@@ -1064,8 +1063,8 @@ public:
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
         if constexpr(sizeof...(Component) == 1) {
-            const auto &cpool = assure<std::remove_const_t<Component>...>();
-            return cpool.contains(entity) ? std::addressof(cpool.get(entity)) : nullptr;
+            const auto cpool = assure<std::remove_const_t<Component>...>();
+            return cpool != nullptr && cpool->contains(entity) ? std::addressof(cpool->get(entity)) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
         }
