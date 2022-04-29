@@ -109,7 +109,8 @@ public:
     using size_type = std::size_t;
 
     /*! @brief Default constructor. */
-    scheduler() = default;
+    scheduler()
+        : handlers{} {}
 
     /*! @brief Default move constructor. */
     scheduler(scheduler &&) = default;

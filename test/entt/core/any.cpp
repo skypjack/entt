@@ -59,7 +59,7 @@ struct not_movable {
     not_movable &operator=(const not_movable &) = default;
     not_movable &operator=(not_movable &&) = delete;
 
-    double payload;
+    double payload{};
 };
 
 struct alignas(64u) over_aligned {};

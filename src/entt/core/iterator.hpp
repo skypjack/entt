@@ -69,7 +69,9 @@ struct iterable_adaptor final {
     using sentinel = Sentinel;
 
     /*! @brief Default constructor. */
-    iterable_adaptor() = default;
+    iterable_adaptor()
+        : first{},
+          last{} {}
 
     /**
      * @brief Creates an iterable object from a pair of iterators.

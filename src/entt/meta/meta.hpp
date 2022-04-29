@@ -596,7 +596,8 @@ meta_any forward_as_meta(Type &&value) {
  */
 struct meta_handle {
     /*! @brief Default constructor. */
-    meta_handle() = default;
+    meta_handle()
+        : any{} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     meta_handle(const meta_handle &) = delete;

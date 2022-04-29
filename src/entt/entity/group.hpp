@@ -43,7 +43,9 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    extended_group_iterator() = default;
+    extended_group_iterator()
+        : it{},
+          pools{} {}
 
     extended_group_iterator(It from, const std::tuple<Owned *..., Get *...> &cpools)
         : it{from},

@@ -66,7 +66,7 @@ struct clazz_t {
         return value;
     }
 
-    int value;
+    int value{};
 };
 
 struct overloaded_func_t {

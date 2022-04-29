@@ -17,7 +17,7 @@ struct clazz_t {
         return (value != 0);
     }
 
-    int value;
+    int value{};
 };
 
 double conv_to_double(const clazz_t &instance) {

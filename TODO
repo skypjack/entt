@@ -12,7 +12,6 @@ DOC:
 
 WIP:
 * add storage getter for filters to views and groups
-* no () = default ctor for iterators with uninitialized members
 * remove storage::base_type, make views extract the sparse set directly
 * make non-const registry::get use const assure or the like
 * emitter: runtime handlers, allocator support (ready for both already)

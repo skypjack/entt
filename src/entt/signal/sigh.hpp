@@ -237,7 +237,9 @@ class connection {
 
 public:
     /*! @brief Default constructor. */
-    connection() = default;
+    connection()
+        : disconnect{},
+          signal{} {}
 
     /**
      * @brief Checks whether a connection is properly initialized.
@@ -257,7 +259,7 @@ public:
 
 private:
     delegate<void(void *)> disconnect;
-    void *signal{};
+    void *signal;
 };
 
 /**

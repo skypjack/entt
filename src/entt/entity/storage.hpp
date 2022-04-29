@@ -165,7 +165,8 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    extended_storage_iterator() = default;
+    extended_storage_iterator()
+        : it{} {}
 
     extended_storage_iterator(It base, Other... other)
         : it{base, other...} {}
