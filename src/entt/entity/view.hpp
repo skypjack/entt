@@ -25,14 +25,16 @@ namespace entt {
 
 namespace internal {
 
-template<typename Type, std::size_t Component, std::size_t Exclude>
-class view_iterator final {
+template<typename, typename, typename>
+class view_iterator;
+
+template<typename Type, std::size_t... AllOf, std::size_t... AnyOf>
+class view_iterator<Type, std::index_sequence<AllOf...>, std::index_sequence<AnyOf...>> final {
+    static constexpr std::size_t pool_count = sizeof...(AllOf) + sizeof...(AnyOf);
     using iterator_type = typename Type::const_iterator;
 
     [[nodiscard]] bool valid() const ENTT_NOEXCEPT {
-        return ((Component != 0u) || (*it != tombstone))
-               && std::apply([entt = *it](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
-               && std::apply([entt = *it](const auto *...curr) { return (!curr->contains(entt) && ...); }, filter);
+        return ((sizeof...(AllOf) != 0u) || (*it != tombstone)) && (std::get<AllOf>(pools)->contains(*it) && ...) && (!std::get<AnyOf>(pools)->contains(*it) && ...);
     }
 
 public:
@@ -44,11 +46,10 @@ public:
 
     view_iterator() ENTT_NOEXCEPT = default;
 
-    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) ENTT_NOEXCEPT
+    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, pool_count> ref) ENTT_NOEXCEPT
         : it{curr},
           last{to},
-          pools{all_of},
-          filter{none_of} {
+          pools{ref} {
         if(it != last && !valid()) {
             ++(*this);
         }
@@ -72,22 +73,21 @@ public:
         return *operator->();
     }
 
-    template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
+    template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
     friend bool operator==(const view_iterator<LhsType, LhsArgs...> &, const view_iterator<RhsType, RhsArgs...> &) ENTT_NOEXCEPT;
 
 private:
     iterator_type it;
     iterator_type last;
-    std::array<const Type *, Component> pools;
-    std::array<const Type *, Exclude> filter;
+    std::array<const Type *, pool_count> pools;
 };
 
-template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
+template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
 [[nodiscard]] bool operator==(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
     return lhs.it == rhs.it;
 }
 
-template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
+template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
 [[nodiscard]] bool operator!=(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
@@ -190,11 +190,12 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
     template<std::size_t... Index>
-    [[nodiscard]] auto pools_to_array(std::index_sequence<Index...>) const ENTT_NOEXCEPT {
+    [[nodiscard]] auto opaque_set(std::index_sequence<Index...>) const ENTT_NOEXCEPT {
         std::size_t pos{};
-        std::array<const base_type *, sizeof...(Component) - 1u> other{};
-        (static_cast<void>(std::get<Index>(pools) == view ? void() : void(other[pos++] = std::get<Index>(pools))), ...);
-        return other;
+        std::array<const base_type *, sizeof...(Component) + sizeof...(Exclude) - 1u> arr{};
+        (static_cast<void>(std::get<Index>(pools) == view ? void() : void(arr[pos++] = std::get<Index>(pools))), ...);
+        std::apply([&arr, &pos](auto *...curr) mutable { ((arr[pos++] = curr), ...); }, filter);
+        return arr;
     }
 
     template<std::size_t Comp, std::size_t Other, typename... Args>
@@ -213,7 +214,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
 
             if(((sizeof...(Component) != 1u) || (entt != tombstone))
                && ((Comp == Index || std::get<Index>(pools)->contains(entt)) && ...)
-               && std::apply([entt](const auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
+               && std::apply([entt](const auto *...epool) { return (!epool->contains(entt) && ...); }, filter)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Comp, Index>(curr)...));
                 } else {
@@ -236,7 +237,7 @@ public:
     /*! @brief Common type among all storage types. */
     using base_type = std::common_type_t<typename storage_type<Component>::base_type...>;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<base_type, sizeof...(Component) - 1u, sizeof...(Exclude)>;
+    using iterator = internal::view_iterator<base_type, std::make_index_sequence<sizeof...(Component) - 1u>, std::index_sequence_for<Exclude...>>;
     /*! @brief Iterable view type. */
     using iterable = iterable_adaptor<internal::extended_view_iterator<iterator, storage_type<Component>...>>;
 
@@ -251,7 +252,7 @@ public:
      * @param component The storage for the types to iterate.
      * @param epool The storage for the types used to filter the view.
      */
-    basic_view(storage_type<Component> &...component, const storage_type<Exclude> &...epool) ENTT_NOEXCEPT
+    basic_view(storage_type<Component> &...component, storage_type<Exclude> &...epool) ENTT_NOEXCEPT
         : pools{&component...},
           filter{&epool...},
           view{(std::min)({&static_cast<const base_type &>(component)...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); })} {}
@@ -325,7 +326,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return iterator{view->begin(), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
+        return iterator{view->begin(), view->end(), opaque_set(std::index_sequence_for<Component...>{})};
     }
 
     /**
@@ -338,7 +339,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return iterator{view->end(), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter};
+        return iterator{view->end(), view->end(), opaque_set(std::index_sequence_for<Component...>{})};
     }
 
     /**
@@ -369,7 +370,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const ENTT_NOEXCEPT {
-        return contains(entt) ? iterator{view->find(entt), view->end(), pools_to_array(std::index_sequence_for<Component...>{}), filter} : end();
+        return contains(entt) ? iterator{view->find(entt), view->end(), opaque_set(std::index_sequence_for<Component...>{})} : end();
     }
 
     /**
@@ -492,16 +493,12 @@ public:
     template<typename... Get, typename... Excl>
     [[nodiscard]] auto operator|(const basic_view<Entity, get_t<Get...>, exclude_t<Excl...>> &other) const ENTT_NOEXCEPT {
         using view_type = basic_view<Entity, get_t<Component..., Get...>, exclude_t<Exclude..., Excl...>>;
-        return std::make_from_tuple<view_type>(std::tuple_cat(
-            std::apply([](auto *...curr) { return std::forward_as_tuple(*curr...); }, pools),
-            std::apply([](auto *...curr) { return std::forward_as_tuple(*curr...); }, other.pools),
-            std::apply([](const auto *...curr) { return std::forward_as_tuple(static_cast<const storage_type<Exclude> &>(*curr)...); }, filter),
-            std::apply([](const auto *...curr) { return std::forward_as_tuple(static_cast<const storage_type<Excl> &>(*curr)...); }, other.filter)));
+        return std::make_from_tuple<view_type>(std::apply([](auto *...curr) { return std::forward_as_tuple(*curr...); }, std::tuple_cat(pools, other.pools, filter, other.filter)));
     }
 
 private:
     std::tuple<storage_type<Component> *...> pools;
-    std::array<const base_type *, sizeof...(Exclude)> filter;
+    std::tuple<storage_type<Exclude> *...> filter;
     const base_type *view;
 };
 
@@ -815,15 +812,12 @@ public:
     template<typename... Get, typename... Excl>
     [[nodiscard]] auto operator|(const basic_view<Entity, get_t<Get...>, exclude_t<Excl...>> &other) const ENTT_NOEXCEPT {
         using view_type = basic_view<Entity, get_t<Component, Get...>, exclude_t<Excl...>>;
-        return std::make_from_tuple<view_type>(std::tuple_cat(
-            std::forward_as_tuple(*std::get<0>(pools)),
-            std::apply([](auto *...curr) { return std::forward_as_tuple(*curr...); }, other.pools),
-            std::apply([](const auto *...curr) { return std::forward_as_tuple(static_cast<const typename view_type::template storage_type<Excl> &>(*curr)...); }, other.filter)));
+        return std::make_from_tuple<view_type>(std::apply([this](auto *...curr) { return std::forward_as_tuple(*std::get<0>(pools), *curr...); }, std::tuple_cat(other.pools, other.filter)));
     }
 
 private:
     std::tuple<storage_type *> pools;
-    std::array<const base_type *, 0u> filter;
+    std::tuple<> filter;
     const base_type *view;
 };
 
