@@ -1269,7 +1269,7 @@ public:
             return gdata.size == size
                    && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
                    && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
-                   && (gdata.exclude(type_hash<Exclude>::value()) && ...);
+                   && (gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()) && ...);
         });
 
         if(it != groups.cend()) {
@@ -1280,7 +1280,7 @@ public:
                 {new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); }},
                 []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<Exclude>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
             };
 
             handler = static_cast<handler_type *>(candidate.group.get());
@@ -1293,7 +1293,7 @@ public:
             } else {
                 [[maybe_unused]] auto has_conflict = [size](const auto &gdata) {
                     const auto overlapping = (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
-                    const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<Exclude>::value()));
+                    const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()));
                     return !overlapping || ((sz == size) || (sz == gdata.size));
                 };
 
@@ -1314,11 +1314,11 @@ public:
 
             (on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Owned>>>(*handler), ...);
             (on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler), ...);
-            (on_destroy<Exclude>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Exclude>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
 
             (on_destroy<std::remove_const_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
             (on_destroy<std::remove_const_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
-            (on_construct<Exclude>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
 
             if constexpr(sizeof...(Owned) == 0) {
                 for(const auto entity: view<Owned..., Get...>(exclude<Exclude...>)) {
@@ -1337,12 +1337,12 @@ public:
 
     /*! @copydoc group */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<entity_type, owned_t<std::add_const_t<Owned>...>, get_t<std::add_const_t<Get>...>, exclude_t<Exclude...>> group_if_exists(get_t<Get...> = {}, exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_group<entity_type, owned_t<const Owned...>, get_t<const Get...>, exclude_t<const Exclude...>> group_if_exists(get_t<Get...> = {}, exclude_t<Exclude...> = {}) const {
         auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
             return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))
                    && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
                    && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
-                   && (gdata.exclude(type_hash<Exclude>::value()) && ...);
+                   && (gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()) && ...);
         });
 
         if(it == groups.cend()) {

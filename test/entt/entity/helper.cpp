@@ -31,7 +31,7 @@ TEST(Helper, AsGroup) {
     const entt::registry cregistry;
 
     ([](entt::group<entt::owned_t<double>, entt::get_t<char>, entt::exclude_t<int>>) {})(entt::as_group{registry});
-    ([](entt::group<entt::owned_t<double>, entt::get_t<const char>, entt::exclude_t<int>>) {})(entt::as_group{registry});
+    ([](entt::group<entt::owned_t<double>, entt::get_t<const char>, entt::exclude_t<const int>>) {})(entt::as_group{registry});
     ([](entt::group<entt::owned_t<const double>, entt::get_t<const char>, entt::exclude_t<const int>>) {})(entt::as_group{cregistry});
 }
 
