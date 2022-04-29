@@ -34,12 +34,12 @@ inline constexpr bool is_view_v = is_view<Type>::value;
 template<typename Type, typename Override>
 struct unpack_type {
     using ro = std::conditional_t<
-        type_list_contains_v<Override, std::add_const_t<Type>> || (std::is_const_v<Type> && !type_list_contains_v<Override, std::remove_const_t<Type>>),
+        type_list_contains_v<Override, const Type> || (std::is_const_v<Type> && !type_list_contains_v<Override, std::remove_const_t<Type>>),
         type_list<std::remove_const_t<Type>>,
         type_list<>>;
 
     using rw = std::conditional_t<
-        type_list_contains_v<Override, std::remove_const_t<Type>> || (!std::is_const_v<Type> && !type_list_contains_v<Override, std::add_const_t<Type>>),
+        type_list_contains_v<Override, std::remove_const_t<Type>> || (!std::is_const_v<Type> && !type_list_contains_v<Override, const Type>),
         type_list<Type>,
         type_list<>>;
 };

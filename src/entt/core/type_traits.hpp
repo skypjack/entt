@@ -606,7 +606,7 @@ struct constness_as {
 template<typename To, typename From>
 struct constness_as<To, const From> {
     /*! @brief The type resulting from the transcription of the constness. */
-    using type = std::add_const_t<To>;
+    using type = const To;
 };
 
 /**

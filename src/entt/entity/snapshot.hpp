@@ -34,7 +34,7 @@ class basic_snapshot {
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
-        const auto view = reg->template view<std::add_const_t<Component>>();
+        const auto view = reg->template view<const Component>();
         archive(typename entity_traits::entity_type(sz));
 
         while(first != last) {
