@@ -255,9 +255,17 @@ public:
      * @param epool The storage for the types used to filter the view.
      */
     basic_view(storage_type<Component> &...component, storage_type<Exclude> &...epool) ENTT_NOEXCEPT
-        : pools{&component...},
-          filter{&epool...},
-          view{(std::min)({&static_cast<const base_type &>(component)...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); })} {}
+        : basic_view{std::forward_as_tuple(component...), std::forward_as_tuple(epool...)} {}
+
+    /**
+     * @brief Constructs a multi-type view from a set of storage classes.
+     * @param component The storage for the types to iterate.
+     * @param epool The storage for the types used to filter the view.
+     */
+    basic_view(std::tuple<storage_type<Component> &...> component, std::tuple<storage_type<Exclude> &...> epool = {}) ENTT_NOEXCEPT
+        : pools{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, component)},
+          filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, epool)},
+          view{std::apply([](const auto &...curr) { return (std::min)({&static_cast<const base_type &>(curr)...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); }); }, component)} {}
 
     /**
      * @brief Creates a new view driven by a given component in its iterations.
@@ -558,9 +566,16 @@ public:
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : pools{&ref},
+        : basic_view{std::forward_as_tuple(ref)} {}
+
+    /**
+     * @brief Constructs a single-type view from a storage class.
+     * @param ref The storage for the type to iterate.
+     */
+    basic_view(std::tuple<storage_type &> ref, std::tuple<> = {}) ENTT_NOEXCEPT
+        : pools{&std::get<0>(ref)},
           filter{},
-          view{&ref} {}
+          view{&std::get<0>(ref)} {}
 
     /**
      * @brief Returns the leading storage of a view.
@@ -830,6 +845,14 @@ private:
  */
 template<typename... Type>
 basic_view(Type &...storage) -> basic_view<std::common_type_t<typename Type::entity_type...>, get_t<constness_as_t<typename Type::value_type, Type>...>, exclude_t<>>;
+
+/**
+ * @brief Deduction guide.
+ * @tparam Component Types of components iterated by the view.
+ * @tparam Exclude Types of components used to filter the view.
+ */
+template<typename... Component, typename... Exclude>
+basic_view(std::tuple<Component &...>, std::tuple<Exclude &...> = {}) -> basic_view<std::common_type_t<typename Component::entity_type..., typename Exclude::entity_type...>, get_t<constness_as_t<typename Component::value_type, Component>...>, exclude_t<constness_as_t<typename Exclude::value_type, Exclude>...>>;
 
 } // namespace entt
 

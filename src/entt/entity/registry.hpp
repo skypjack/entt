@@ -221,8 +221,8 @@ class basic_registry {
     using entity_traits = entt_traits<Entity>;
     using basic_common_type = basic_sparse_set<Entity>;
 
-    template<typename Component>
-    using storage_type = typename storage_traits<Entity, Component>::storage_type;
+    template<typename Comp>
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
     template<typename...>
     struct group_handler;
@@ -1220,14 +1220,20 @@ public:
      * @return A newly created view.
      */
     template<typename Component, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_view<entity_type, get_t<const Component, const Other...>, exclude_t<const Exclude...>> view(exclude_t<Exclude...> = {}) const {
-        return {assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
+    [[nodiscard]] auto view(exclude_t<Exclude...> = {}) const {
+        return basic_view{std::forward_as_tuple(
+                              assure<std::remove_const_t<Component>>(),
+                              assure<std::remove_const_t<Other>>()...),
+                          std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...)};
     }
 
     /*! @copydoc view */
     template<typename Component, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_view<entity_type, get_t<Component, Other...>, exclude_t<Exclude...>> view(exclude_t<Exclude...> = {}) {
-        return {assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
+    [[nodiscard]] auto view(exclude_t<Exclude...> = {}) {
+        return basic_view{std::forward_as_tuple(
+                              static_cast<storage_type<Component> &>(assure<std::remove_const_t<Component>>()),
+                              static_cast<storage_type<Other> &>(assure<std::remove_const_t<Other>>())...),
+                          std::forward_as_tuple(static_cast<storage_type<Exclude> &>(assure<std::remove_const_t<Exclude>>())...)};
     }
 
     /**
