@@ -91,6 +91,20 @@ template<typename T>
 using poly_parent_types_t = typename poly_parent_types<T>::parent_types;
 
 /**
+ * Used to declare allocator type for polymorphic component type
+ * @tparam Type
+ */
+template<typename Type, typename = void>
+struct poly_type_allocator {
+    /** @brief allocator type */
+    using type = std::allocator<Type>;
+};
+
+/** @copydoc poly_type_allocator */
+template<typename Type>
+using poly_type_allocator_t = typename poly_type_allocator<Type>::type;
+
+/**
  * @brief For a given type, detects, if it was declared polymorphic. Type considered polymorphic, if it was either:<br/>
  *  - inherited from entt::inherit<br/>
  *  - declared types direct_parent_types or all_parent_types<br/>

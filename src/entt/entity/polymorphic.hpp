@@ -96,21 +96,22 @@ namespace entt {
 template<typename Entity>
 class poly_pool_holder_base {
 public:
-    inline poly_pool_holder_base(basic_sparse_set<Entity>* pool,
+    inline poly_pool_holder_base(void* pool,
                                  void* (*getter)(void*, Entity) ENTT_NOEXCEPT) :
           pool_ptr(pool), getter_ptr(getter) {}
 
 protected:
-    basic_sparse_set<Entity>* pool_ptr;
+    void* pool_ptr;
     void* (*getter_ptr)(void*, Entity) ENTT_NOEXCEPT;
 };
 
 /**
  * @brief Holds pointer to child type storage and a function to convert it into parent type
  * @tparam Entity underlying entity type
- * @tparam Type polymorphic component type to be converted into
+ * @tparam Type polymorphic component type to convert into
+ * @tparam Allocator allocator type of the pool
  */
-template<typename Entity, typename Type>
+template<typename Entity, typename Type, typename Allocator>
 class poly_pool_holder : public poly_pool_holder_base<Entity> {
 public:
     using poly_pool_holder_base<Entity>::poly_pool_holder_base;
@@ -123,6 +124,8 @@ public:
     using pointer_type = std::remove_pointer_t<Type>*;
     /** @copydoc pointer_type */
     using const_pointer_type = const std::remove_pointer_t<Type>*;
+    /** @brief type of hold sparse set */
+    using sparse_set_type = basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>>;
 
     /**
      * @brief gets child from a child pool as parent type reference by given entity
@@ -135,7 +138,17 @@ public:
 
     /** @copydoc try_get */
     inline const_pointer_type try_get(const Entity ent) const ENTT_NOEXCEPT {
-        return const_cast<poly_pool_holder<Entity, Type>*>(this)->try_get(ent);
+        return const_cast<poly_pool_holder<Entity, Type, Allocator>*>(this)->try_get(ent);
+    }
+
+    /** @brief returns underlying pool */
+    inline auto& pool() ENTT_NOEXCEPT {
+        return *static_cast<sparse_set_type*>(this->pool_ptr);
+    }
+
+    /** @copydoc pool */
+    inline const auto& pool() const ENTT_NOEXCEPT {
+        return *static_cast<sparse_set_type*>(this->pool_ptr);
     }
 
     /**
@@ -144,25 +157,17 @@ public:
      * @return true, if component was removed, false, if it didnt exist
      */
     inline bool remove(const Entity ent) {
-        return this->pool_ptr->remove(ent);
-    }
-
-    /** @brief returns underlying pool */
-    inline auto& pool() ENTT_NOEXCEPT {
-        return *this->pool_ptr;
-    }
-
-    /** @copydoc pool */
-    inline const auto& pool() const ENTT_NOEXCEPT {
-        return *this->pool_ptr;
+        return pool().remove(ent);
     }
 };
 
 /**
  * @brief Holds runtime information about one polymorphic component type.
- * @tparam Entity
+ * @tparam Entity underlying entity type
+ * @tparam Type polymorphic component type
+*  @tparam Allocator allocator type for all bound contained pool holders
  */
-template<typename Entity, typename Type>
+template<typename Entity, typename Type, typename Allocator>
 class poly_type {
     /** @brief derived value to base pointer conversion, workaround for if constexpr bug on some compilers */
     template<typename Base, typename Derived, typename = void>
@@ -201,10 +206,12 @@ public:
     using entity_type = Entity;
     /** @brief component type */
     using value_type = Type;
+    /** @brief allocator type */
+    using allocator_type = Allocator;
     /** @brief type of the underlying pool container */
     using pools_container = std::vector<poly_pool_holder_base<Entity>>;
     /** @brief type of the pool holder */
-    using pool_holder = poly_pool_holder<Entity, Type>;
+    using pool_holder = poly_pool_holder<Entity, Type, allocator_type>;
     /** @brief single entity component iterator type */
     using component_iterator = internal::poly_components_iterator<typename pools_container::iterator, pool_holder>;
     /** @brief const single entity component iterator type */
@@ -223,6 +230,8 @@ public:
         static_assert(is_poly_type_v<DerivedType>);
         static_assert(type_list_contains_v<poly_parent_types_t<DerivedType>, BaseType> || std::is_same_v<DerivedType, BaseType>);
         static_assert(std::is_pointer_v<DerivedType> == std::is_pointer_v<BaseType>);
+        static_assert(std::is_same_v<typename std::allocator_traits<allocator_type>::template rebind_alloc<Entity>::pointer, typename StorageType::base_type::allocator_type::pointer>,
+                      "Allocator pointer types dont match for polymorphic types in one hierarchy. Use std::poly_type_allocator to explicitly provide allocator type for each polymorphic component type.");
 
         void* (*get)(void*, Entity entity) ENTT_NOEXCEPT = +[](void* pool, const Entity entity) ENTT_NOEXCEPT -> void* {
             if (static_cast<StorageType*>(pool)->contains(entity)) {
@@ -291,6 +300,7 @@ private:
  * - Type& assure<Type>(PolyPoolsHolder&) method, it must assure and return instance of @b Type stored given @b PolyPoolsHolder<br/>
  * - holder_type - same as PolyPoolsHolder<br/>
  * - entity_type - underlying entity type<br/>
+ * - allocator_type<Type> - allocator type getter for given component type Type<br/>
  *
  * @tparam PolyPoolsHolder Underlying polymorphic types data holder
  */
@@ -308,6 +318,10 @@ struct poly_types_accessor<basic_registry<Entity>> {
 
     /** @brief Underlying entity type  */
     using entity_type = Entity;
+
+    /** @brief Returns allocator type for Type */
+    template<typename Type>
+    using allocator_type = poly_type_allocator_t<Type>;
 
     /**
      * @brief Assures and returns instance of some type stored given polymorphic types data holder
@@ -345,8 +359,9 @@ template<typename Component, typename PolyPoolsHolder>
     using no_const_type = poly_type_validate_t<std::remove_const_t<type>>;
     static_assert(is_poly_type_v<no_const_type>, "must be a polymorphic type");
 
-    using result_type = poly_type<typename PolyPoolsHolder::entity_type, no_const_type>;
-    result_type& result = poly_types_accessor<PolyPoolsHolder>::template assure<result_type>(const_cast<std::remove_const_t<PolyPoolsHolder>&>(holder));
+    using accessor_type = poly_types_accessor<PolyPoolsHolder>;
+    using result_type = poly_type<typename accessor_type::entity_type, no_const_type, typename accessor_type::template allocator_type<no_const_type>>;
+    result_type& result = accessor_type::template assure<result_type>(const_cast<std::remove_const_t<PolyPoolsHolder>&>(holder));
     if constexpr(std::is_const_v<type> || std::is_const_v<PolyPoolsHolder>) {
         return const_cast<const result_type&>(result);
     } else {
@@ -478,7 +493,7 @@ void poly_each(PolyPoolsHolder& reg, Func func) {
  */
 template<typename Entity, typename Type>
 struct entt::storage_traits<Entity, Type, std::enable_if_t<entt::is_poly_type_v<Type>>> {
-    using storage_type = sigh_storage_mixin<poly_storage_mixin<basic_storage<Entity, poly_type_validate_t<Type>>>>;
+    using storage_type = sigh_storage_mixin<poly_storage_mixin<basic_storage<Entity, poly_type_validate_t<Type>, poly_type_allocator_t<Type>>>>;
 };
 
 
