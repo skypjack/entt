@@ -1,6 +1,8 @@
 #ifndef ENTT_ENTITY_POLYMORPHIC_HPP
 #define ENTT_ENTITY_POLYMORPHIC_HPP
 
+#include <variant>
+#include <vector>
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
@@ -80,6 +82,69 @@ private:
     PoolsIterator it;
     PoolsIterator end;
     pointer current = nullptr;
+};
+
+
+template<typename T>
+struct basic_inlined_vector {
+    using value_type = T;
+    using iterator = T*;
+    using const_iterator = const T*;
+
+    iterator begin() {
+        return std::visit([&] (auto& payload) -> iterator {
+            using type = std::decay_t<decltype(payload)>;
+            if constexpr(std::is_same_v<type, std::monostate>) {
+                return nullptr;
+            } else if constexpr(std::is_same_v<type, T>) {
+                return std::addressof(payload);
+            } else if constexpr(std::is_same_v<type, std::vector<T>>) {
+                return std::addressof(*payload.begin());
+            }
+        }, storage);
+    }
+
+    const_iterator begin() const {
+        return const_cast<basic_inlined_vector<T>*>(this)->begin();
+    }
+
+    iterator end() {
+        return std::visit([&] (auto& payload) -> iterator {
+            using type = std::decay_t<decltype(payload)>;
+            if constexpr(std::is_same_v<type, std::monostate>) {
+                return nullptr;
+            } else if constexpr(std::is_same_v<type, T>) {
+                return std::addressof(payload) + 1;
+            } else if constexpr(std::is_same_v<type, std::vector<T>>) {
+                return std::addressof(*payload.end());
+            }
+        }, storage);
+    }
+
+    const_iterator end() const {
+        return const_cast<basic_inlined_vector<T>*>(this)->end();
+    }
+
+    template<typename... Args>
+    void emplace_back(Args&& ...args) {
+        std::visit([&] (auto& payload) -> void {
+            using type = std::decay_t<decltype(payload)>;
+            if constexpr(std::is_same_v<type, std::monostate>) {
+                storage.template emplace<T>(std::forward<Args>(args)...);
+            } else if constexpr(std::is_same_v<type, T>) {
+                T tmp = std::move(payload);
+                auto& v = storage.template emplace<std::vector<T>>();
+                v.reserve(2);
+                v.emplace_back(std::move(tmp));
+                v.emplace_back(std::forward<Args>(args)...);
+            } else if constexpr(std::is_same_v<type, std::vector<T>>) {
+                payload.emplace_back(std::forward<Args>(args)...);
+            }
+        }, storage);
+    }
+
+private:
+    std::variant<std::monostate, T, std::vector<T>> storage;
 };
 
 } // namespace entt::internal
@@ -208,8 +273,8 @@ public:
     using value_type = Type;
     /** @brief allocator type */
     using allocator_type = Allocator;
-    /** @brief type of the underlying pool container */
-    using pools_container = std::vector<poly_pool_holder_base<Entity>>;
+    /** @brief type of underlying container for bound pools */
+    using pools_container = internal::basic_inlined_vector<poly_pool_holder_base<Entity>>;
     /** @brief type of the pool holder */
     using pool_holder = poly_pool_holder<Entity, Type, allocator_type>;
     /** @brief single entity component iterator type */
@@ -251,16 +316,26 @@ public:
         return pool_holder(pool_ptr, get);
     }
 
-    /** @brief adds given storage pointer as a child type pool to this polymorphic type */
+    /** @brief binds given storage pointer as a child type pool to this polymorphic type */
     template<typename Storage>
-    void bind_child_storage(Storage* storage_ptr) {
-        this->child_pool_holders.emplace_back(make_pool_holder(storage_ptr));
+    void bind_storage(Storage* storage_ptr) {
+        bound_pools.emplace_back(make_pool_holder(storage_ptr));
+    }
+
+    /** @brief returns all pools bound for this type */
+    [[nodiscard]] auto& get_bound_pools() ENTT_NOEXCEPT {
+        return bound_pools;
+    }
+
+    /** @copydoc get_bound_pools */
+    [[nodiscard]] const auto& get_bound_pools() const ENTT_NOEXCEPT {
+        return bound_pools;
     }
 
     /** @brief calls given function for all child pool holders */
     template<typename Func>
     void each_pool(Func func) {
-        for (auto& pool : child_pool_holders) {
+        for (auto& pool : bound_pools) {
             func(static_cast<pool_holder&>(pool));
         }
     }
@@ -268,27 +343,27 @@ public:
     /** @copydoc each_pool */
     template<typename Func>
     void each_pool(Func func) const {
-        for (auto& pool : child_pool_holders) {
+        for (auto& pool : bound_pools) {
             func(static_cast<const pool_holder&>(pool));
         }
     }
 
     /** @brief returns an iterable to iterate through all polymorphic components, derived from this type, attached to a given entities */
     [[nodiscard]] iterable_adaptor<component_iterator> each(const entity_type ent) {
-        auto begin = this->child_pool_holders.begin();
-        auto end = this->child_pool_holders.end();
+        auto begin = bound_pools.begin();
+        auto end = bound_pools.end();
         return { component_iterator(ent, begin, end), component_iterator(ent, end, end) };
     }
 
     /** @copydoc each */
     [[nodiscard]] iterable_adaptor<const_component_iterator> each(const entity_type ent) const {
-        auto begin = this->child_pool_holders.cbegin();
-        auto end = this->child_pool_holders.cend();
+        auto begin = bound_pools.begin();
+        auto end = bound_pools.end();
         return { const_component_iterator(ent, begin, end), const_component_iterator(ent, end, end) };
     }
 
 private:
-    pools_container child_pool_holders{};
+    pools_container bound_pools{};
 };
 
 

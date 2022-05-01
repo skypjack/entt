@@ -41,8 +41,8 @@ struct poly_storage_mixin : Storage {
 private:
     template<typename... ParentTypes>
     void bind_all_parent_types(basic_registry<entity_type>& reg, [[maybe_unused]] type_list<ParentTypes...>) {
-        (reg.ctx().template emplace<poly_type<entity_type, ParentTypes, poly_type_allocator_t<ParentTypes>>>().bind_child_storage(this), ...);
-        reg.ctx().template emplace<poly_type<entity_type, value_type, poly_type_allocator_t<value_type>>>().bind_child_storage(this);
+        (reg.ctx().template emplace<poly_type<entity_type, ParentTypes, poly_type_allocator_t<ParentTypes>>>().bind_storage(this), ...);
+        reg.ctx().template emplace<poly_type<entity_type, value_type, poly_type_allocator_t<value_type>>>().bind_storage(this);
     }
 };
 
