@@ -295,7 +295,7 @@ public:
         static_assert(is_poly_type_v<DerivedType>);
         static_assert(type_list_contains_v<poly_parent_types_t<DerivedType>, BaseType> || std::is_same_v<DerivedType, BaseType>);
         static_assert(std::is_pointer_v<DerivedType> == std::is_pointer_v<BaseType>);
-        static_assert(std::is_same_v<typename std::allocator_traits<allocator_type>::template rebind_alloc<Entity>::pointer, typename StorageType::base_type::allocator_type::pointer>,
+        static_assert(std::is_same_v<typename std::allocator_traits<allocator_type>::template rebind_traits<Entity>::pointer, typename std::allocator_traits<typename StorageType::base_type::allocator_type>::pointer>,
                       "Allocator pointer types dont match for polymorphic types in one hierarchy. Use std::poly_type_allocator to explicitly provide allocator type for each polymorphic component type.");
 
         void* (*get)(void*, Entity entity) ENTT_NOEXCEPT = +[](void* pool, const Entity entity) ENTT_NOEXCEPT -> void* {
