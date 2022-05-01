@@ -4,11 +4,11 @@
 #include <entt/entity/polymorphic.hpp>
 
 
-struct animal : public entt::inherit<> { virtual std::string name() = 0; int animal_payload{}; };
+struct animal : public entt::inherit<> { virtual std::string name() = 0; int animal_payload{}; virtual ~animal() = default; };
 struct dog : public entt::inherit<animal> { std::string name() override { return "dog"; }; };
 struct cat : public entt::inherit<animal> { std::string name() override { return "cat"; }; };
 
-struct shape { virtual std::string draw() = 0; int shape_payload{}; };
+struct shape { virtual std::string draw() = 0; int shape_payload{}; virtual ~shape() = default; };
 struct sphere : public shape { std::string draw() override { return "sphere"; } };
 struct cube : public shape { std::string draw() override { return "cube"; } };
 
