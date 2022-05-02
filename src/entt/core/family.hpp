@@ -19,12 +19,12 @@ class family {
 
 public:
     /*! @brief Unsigned integer type. */
-    using family_type = id_type;
+    using value_type = id_type;
 
     /*! @brief Statically generated unique identifier for the given type. */
     template<typename... Type>
     // at the time I'm writing, clang crashes during compilation if auto is used instead of family_type
-    inline static const family_type type = identifier++;
+    inline static const value_type value = identifier++;
 };
 
 } // namespace entt

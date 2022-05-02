@@ -784,19 +784,19 @@ that fully embraces what the modern C++ has to offer.
 ## Compile-time generator
 
 To generate sequential numeric identifiers at compile-time, `EnTT` offers the
-`identifier` class template:
+`ident` class template:
 
 ```cpp
 // defines the identifiers for the given types
-using id = entt::identifier<a_type, another_type>;
+using id = entt::ident<a_type, another_type>;
 
 // ...
 
 switch(a_type_identifier) {
-case id::type<a_type>:
+case id::value<a_type>:
     // ...
     break;
-case id::type<another_type>:
+case id::value<another_type>:
     // ...
     break;
 default:
@@ -804,7 +804,7 @@ default:
 }
 ```
 
-This is all what this class template has to offer: a `type` inline variable that
+This is what this class template has to offer: a `value` inline variable that
 contains a numeric identifier for the given type. It can be used in any context
 where constant expressions are required.
 
@@ -816,9 +816,9 @@ the other identifiers unchanged:
 ```cpp
 template<typename> struct ignore_type {};
 
-using id = entt::identifier<
+using id = entt::ident<
     a_type_still_valid,
-    ignore_type<a_type_no_longer_valid>,
+    ignore_type<no_longer_valid_type>,
     another_type_still_valid
 >;
 ```
@@ -836,12 +836,12 @@ using id = entt::family<struct my_tag>;
 
 // ...
 
-const auto a_type_id = id::type<a_type>;
-const auto another_type_id = id::type<another_type>;
+const auto a_type_id = id::value<a_type>;
+const auto another_type_id = id::value<another_type>;
 ```
 
-This is all what a _family_ has to offer: a `type` inline variable that contains
-a numeric identifier for the given type.<br/>
+This is what a _family_ has to offer: a `value` inline variable that contains a
+numeric identifier for the given type.<br/>
 The generator is customizable, so as to get different _sequences_ for different
 purposes if needed.
 
