@@ -78,6 +78,10 @@ TEST(TypeList, Functionalities) {
     static_assert(std::is_same_v<entt::type_list_element_t<1u, type>, char>);
     static_assert(std::is_same_v<entt::type_list_element_t<0u, other>, double>);
 
+    static_assert(entt::type_list_index_v<int, type> == 0u);
+    static_assert(entt::type_list_index_v<char, type> == 1u);
+    static_assert(entt::type_list_index_v<double, other> == 0u);
+
     static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<float, bool>>, entt::type_list<int, char, double>>);
     static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<int, char, double>>, entt::type_list<>>);
     static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<int, char>>, entt::type_list<double>>);

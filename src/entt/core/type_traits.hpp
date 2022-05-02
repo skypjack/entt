@@ -121,22 +121,22 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam First First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
-template<std::size_t Index, typename Type, typename... Other>
-struct type_list_element<Index, type_list<Type, Other...>>
+template<std::size_t Index, typename First, typename... Other>
+struct type_list_element<Index, type_list<First, Other...>>
     : type_list_element<Index - 1u, type_list<Other...>> {};
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam First First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
-template<typename Type, typename... Other>
-struct type_list_element<0u, type_list<Type, Other...>> {
+template<typename First, typename... Other>
+struct type_list_element<0u, type_list<First, Other...>> {
     /*! @brief Searched type. */
-    using type = Type;
+    using type = First;
 };
 
 /**
@@ -146,6 +146,58 @@ struct type_list_element<0u, type_list<Type, Other...>> {
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
+
+/*! @brief Primary template isn't defined on purpose. */
+template<typename, typename>
+struct type_list_index;
+
+/**
+ * @brief Provides compile-time type access to the types of a type list.
+ * @tparam Type Type to look for and for which to return the index.
+ * @tparam First First type provided by the type list.
+ * @tparam Other Other types provided by the type list.
+ */
+template<typename Type, typename First, typename... Other>
+struct type_list_index<Type, type_list<First, Other...>> {
+    /*! @brief Unsigned integer type. */
+    using value_type = std::size_t;
+    /*! @brief Compile-time position of the given type in the sublist. */
+    static constexpr value_type value = 1u + type_list_index<Type, type_list<Other...>>::value;
+};
+
+/**
+ * @brief Provides compile-time type access to the types of a type list.
+ * @tparam Type Type to look for and for which to return the index.
+ * @tparam Other Other types provided by the type list.
+ */
+template<typename Type, typename... Other>
+struct type_list_index<Type, type_list<Type, Other...>> {
+    static_assert(type_list_index<Type, type_list<Other...>>::value == sizeof...(Other), "Non-unique type");
+    /*! @brief Unsigned integer type. */
+    using value_type = std::size_t;
+    /*! @brief Compile-time position of the given type in the sublist. */
+    static constexpr value_type value = 0u;
+};
+
+/**
+ * @brief Provides compile-time type access to the types of a type list.
+ * @tparam Type Type to look for and for which to return the index.
+ */
+template<typename Type>
+struct type_list_index<Type, type_list<>> {
+    /*! @brief Unsigned integer type. */
+    using value_type = std::size_t;
+    /*! @brief Compile-time position of the given type in the sublist. */
+    static constexpr value_type value = 0u;
+};
+
+/**
+ * @brief Helper variable template.
+ * @tparam List Type list.
+ * @tparam Type Type to look for and for which to return the index.
+ */
+template<typename Type, typename List>
+inline constexpr std::size_t type_list_index_v = type_list_index<Type, List>::value;
 
 /**
  * @brief Concatenates multiple type lists.
