@@ -116,7 +116,7 @@ struct basic_inlined_vector {
             } else if constexpr(std::is_same_v<type, T>) {
                 return std::addressof(payload) + 1;
             } else if constexpr(std::is_same_v<type, std::vector<T>>) {
-                return std::addressof(*payload.end());
+                return std::addressof(*payload.begin()) + payload.size();
             }
         }, storage);
     }
@@ -127,16 +127,17 @@ struct basic_inlined_vector {
 
     template<typename... Args>
     void emplace_back(Args&& ...args) {
+        auto& s = storage;
         std::visit([&] (auto& payload) -> void {
             using type = std::decay_t<decltype(payload)>;
             if constexpr(std::is_same_v<type, std::monostate>) {
-                storage.template emplace<T>(std::forward<Args>(args)...);
+                s.template emplace<T>(std::forward<Args>(args)...);
             } else if constexpr(std::is_same_v<type, T>) {
-                T tmp = std::move(payload);
-                auto& v = storage.template emplace<std::vector<T>>();
+                std::vector<T> v;
                 v.reserve(2);
-                v.emplace_back(std::move(tmp));
+                v.emplace_back(std::move(payload));
                 v.emplace_back(std::forward<Args>(args)...);
+                s.template emplace<std::vector<T>>(std::move(v));
             } else if constexpr(std::is_same_v<type, std::vector<T>>) {
                 payload.emplace_back(std::forward<Args>(args)...);
             }
