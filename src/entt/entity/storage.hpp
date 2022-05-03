@@ -901,7 +901,7 @@ public:
 /**
  * @brief Provides a common way to access certain properties of storage types.
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects managed by the storage class.
+ * @tparam Type Storage value type.
  */
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
