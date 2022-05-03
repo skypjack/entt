@@ -4,10 +4,12 @@
 #include "version.h"
 
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
+#    define ENTT_CONSTEXPR
 #    define ENTT_THROW throw
 #    define ENTT_TRY try
 #    define ENTT_CATCH catch(...)
 #else
+#    define ENTT_CONSTEXPR constexpr // use only with throwing functions (waiting for C++20)
 #    define ENTT_THROW
 #    define ENTT_TRY if(true)
 #    define ENTT_CATCH if(false)
