@@ -21,13 +21,13 @@ struct input_iterator_pointer final {
     input_iterator_pointer(const input_iterator_pointer &) = delete;
 
     /*! @brief Default move constructor. */
-    input_iterator_pointer(input_iterator_pointer &&) = default;
+    constexpr input_iterator_pointer(input_iterator_pointer &&) = default;
 
     /**
      * @brief Constructs a proxy object by move.
      * @param val Value to use to initialize the proxy object.
      */
-    input_iterator_pointer(Type &&val)
+    constexpr input_iterator_pointer(Type &&val)
         : value{std::move(val)} {}
 
     /**
@@ -40,13 +40,13 @@ struct input_iterator_pointer final {
      * @brief Default move assignment operator.
      * @return This proxy object.
      */
-    input_iterator_pointer &operator=(input_iterator_pointer &&) = default;
+    constexpr input_iterator_pointer &operator=(input_iterator_pointer &&) = default;
 
     /**
      * @brief Access operator for accessing wrapped values.
      * @return A pointer to the wrapped value.
      */
-    [[nodiscard]] pointer operator->() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() ENTT_NOEXCEPT {
         return std::addressof(value);
     }
 
@@ -69,7 +69,7 @@ struct iterable_adaptor final {
     using sentinel = Sentinel;
 
     /*! @brief Default constructor. */
-    iterable_adaptor()
+    constexpr iterable_adaptor()
         : first{},
           last{} {}
 
@@ -78,7 +78,7 @@ struct iterable_adaptor final {
      * @param from Begin iterator.
      * @param to End iterator.
      */
-    iterable_adaptor(iterator from, sentinel to)
+    constexpr iterable_adaptor(iterator from, sentinel to)
         : first{from},
           last{to} {}
 
@@ -86,7 +86,7 @@ struct iterable_adaptor final {
      * @brief Returns an iterator to the beginning.
      * @return An iterator to the first element of the range.
      */
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr iterator begin() const ENTT_NOEXCEPT {
         return first;
     }
 
@@ -95,17 +95,17 @@ struct iterable_adaptor final {
      * @return An iterator to the element following the last element of the
      * range.
      */
-    [[nodiscard]] sentinel end() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr sentinel end() const ENTT_NOEXCEPT {
         return last;
     }
 
     /*! @copydoc begin */
-    [[nodiscard]] iterator cbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr iterator cbegin() const ENTT_NOEXCEPT {
         return begin();
     }
 
     /*! @copydoc end */
-    [[nodiscard]] sentinel cend() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr sentinel cend() const ENTT_NOEXCEPT {
         return end();
     }
 
