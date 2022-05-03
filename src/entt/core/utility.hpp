@@ -72,7 +72,7 @@ struct y_combinator {
      * @brief Constructs a y-combinator from a given function.
      * @param recursive A potentially recursive function.
      */
-    y_combinator(Func recursive)
+    constexpr y_combinator(Func recursive)
         : func{std::move(recursive)} {}
 
     /**
@@ -82,13 +82,13 @@ struct y_combinator {
      * @return Return value of the underlying function, if any.
      */
     template<class... Args>
-    decltype(auto) operator()(Args &&...args) const {
+    constexpr decltype(auto) operator()(Args &&...args) const {
         return func(*this, std::forward<Args>(args)...);
     }
 
     /*! @copydoc operator()() */
     template<class... Args>
-    decltype(auto) operator()(Args &&...args) {
+    constexpr decltype(auto) operator()(Args &&...args) {
         return func(*this, std::forward<Args>(args)...);
     }
 
