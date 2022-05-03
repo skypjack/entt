@@ -23,22 +23,22 @@ struct compressed_pair_element {
     using const_reference = const Type &;
 
     template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<Type>>>
-    compressed_pair_element()
+    constexpr compressed_pair_element()
         : value{} {}
 
     template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
-    compressed_pair_element(Args &&args)
+    constexpr compressed_pair_element(Args &&args)
         : value{std::forward<Args>(args)} {}
 
     template<typename... Args, std::size_t... Index>
-    compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
+    constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
         : value{std::forward<Args>(std::get<Index>(args))...} {}
 
-    [[nodiscard]] reference get() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference get() ENTT_NOEXCEPT {
         return value;
     }
 
-    [[nodiscard]] const_reference get() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const_reference get() const ENTT_NOEXCEPT {
         return value;
     }
 
@@ -53,22 +53,22 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
     using base_type = Type;
 
     template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<base_type>>>
-    compressed_pair_element()
+    constexpr compressed_pair_element()
         : base_type{} {}
 
     template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
-    compressed_pair_element(Args &&args)
+    constexpr compressed_pair_element(Args &&args)
         : base_type{std::forward<Args>(args)} {}
 
     template<typename... Args, std::size_t... Index>
-    compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
+    constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
         : base_type{std::forward<Args>(std::get<Index>(args))...} {}
 
-    [[nodiscard]] reference get() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference get() ENTT_NOEXCEPT {
         return *this;
     }
 
-    [[nodiscard]] const_reference get() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const_reference get() const ENTT_NOEXCEPT {
         return *this;
     }
 };
@@ -169,12 +169,12 @@ public:
      * @brief Returns the first element that a pair stores.
      * @return The first element that a pair stores.
      */
-    [[nodiscard]] first_type &first() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr first_type &first() ENTT_NOEXCEPT {
         return static_cast<first_base &>(*this).get();
     }
 
     /*! @copydoc first */
-    [[nodiscard]] const first_type &first() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const first_type &first() const ENTT_NOEXCEPT {
         return static_cast<const first_base &>(*this).get();
     }
 
@@ -182,12 +182,12 @@ public:
      * @brief Returns the second element that a pair stores.
      * @return The second element that a pair stores.
      */
-    [[nodiscard]] second_type &second() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr second_type &second() ENTT_NOEXCEPT {
         return static_cast<second_base &>(*this).get();
     }
 
     /*! @copydoc second */
-    [[nodiscard]] const second_type &second() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const second_type &second() const ENTT_NOEXCEPT {
         return static_cast<const second_base &>(*this).get();
     }
 
@@ -195,7 +195,7 @@ public:
      * @brief Swaps two compressed pair objects.
      * @param other The compressed pair to swap with.
      */
-    void swap(compressed_pair &other) {
+    constexpr void swap(compressed_pair &other) {
         using std::swap;
         swap(first(), other.first());
         swap(second(), other.second());
@@ -208,7 +208,7 @@ public:
      * reference to the second element if `Index` is 1.
      */
     template<std::size_t Index>
-    decltype(auto) get() ENTT_NOEXCEPT {
+    constexpr decltype(auto) get() ENTT_NOEXCEPT {
         if constexpr(Index == 0u) {
             return first();
         } else {
@@ -219,7 +219,7 @@ public:
 
     /*! @copydoc get */
     template<std::size_t Index>
-    decltype(auto) get() const ENTT_NOEXCEPT {
+    constexpr decltype(auto) get() const ENTT_NOEXCEPT {
         if constexpr(Index == 0u) {
             return first();
         } else {
@@ -245,7 +245,7 @@ compressed_pair(Type &&, Other &&) -> compressed_pair<std::decay_t<Type>, std::d
  * @param rhs A valid compressed pair object.
  */
 template<typename First, typename Second>
-inline void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
+inline constexpr void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
 
