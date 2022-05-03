@@ -119,14 +119,14 @@ struct allocation_deleter: private Allocator {
      * @brief Inherited constructors.
      * @param alloc The allocator to use.
      */
-    allocation_deleter(const allocator_type &alloc)
+    constexpr allocation_deleter(const allocator_type &alloc)
         : Allocator{alloc} {}
 
     /**
      * @brief Destroys the pointed object and deallocates its memory.
      * @param ptr A valid pointer to an object of the given type.
      */
-    void operator()(pointer ptr) {
+    constexpr void operator()(pointer ptr) {
         using alloc_traits = typename std::allocator_traits<Allocator>;
         alloc_traits::destroy(*this, to_address(ptr));
         alloc_traits::deallocate(*this, ptr, 1u);
@@ -143,7 +143,7 @@ struct allocation_deleter: private Allocator {
  * @return A properly initialized unique pointer with a custom deleter.
  */
 template<typename Type, typename Allocator, typename... Args>
-auto allocate_unique(Allocator &allocator, Args &&...args) {
+ENTT_CONSTEXPR auto allocate_unique(Allocator &allocator, Args &&...args) {
     static_assert(!std::is_array_v<Type>, "Array types are not supported");
 
     using alloc_traits = typename std::allocator_traits<Allocator>::template rebind_traits<Type>;
