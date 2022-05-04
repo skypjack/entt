@@ -1,5 +1,5 @@
-#ifndef ENTT_RESOURCE_LOADEr_HPP
-#define ENTT_RESOURCE_LOADEr_HPP
+#ifndef ENTT_RESOURCE_LOADER_HPP
+#define ENTT_RESOURCE_LOADER_HPP
 
 #include <memory>
 #include <utility>
