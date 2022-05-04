@@ -37,7 +37,7 @@ public:
     using reference = typename iterator_type::reference;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    runtime_view_iterator() ENTT_NOEXCEPT
+    constexpr runtime_view_iterator() ENTT_NOEXCEPT
         : pools{},
           filter{},
           it{},
@@ -81,11 +81,11 @@ public:
         return *operator->();
     }
 
-    [[nodiscard]] bool operator==(const runtime_view_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(const runtime_view_iterator &other) const ENTT_NOEXCEPT {
         return it == other.it;
     }
 
-    [[nodiscard]] bool operator!=(const runtime_view_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(const runtime_view_iterator &other) const ENTT_NOEXCEPT {
         return !(*this == other);
     }
 

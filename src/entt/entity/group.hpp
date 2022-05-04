@@ -43,7 +43,7 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    extended_group_iterator()
+    constexpr extended_group_iterator()
         : it{},
           pools{} {}
 
@@ -69,7 +69,7 @@ public:
     }
 
     template<typename... Lhs, typename... Rhs>
-    friend bool operator==(const extended_group_iterator<Lhs...> &, const extended_group_iterator<Rhs...> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const extended_group_iterator<Lhs...> &, const extended_group_iterator<Rhs...> &) ENTT_NOEXCEPT;
 
 private:
     It it;
@@ -77,12 +77,12 @@ private:
 };
 
 template<typename... Lhs, typename... Rhs>
-[[nodiscard]] bool operator==(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
     return lhs.it == rhs.it;
 }
 
 template<typename... Lhs, typename... Rhs>
-[[nodiscard]] bool operator!=(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

@@ -32,63 +32,63 @@ struct sparse_set_iterator final {
     using difference_type = typename Container::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
-    sparse_set_iterator() ENTT_NOEXCEPT
+    constexpr sparse_set_iterator() ENTT_NOEXCEPT
         : packed{},
           offset{} {}
 
-    sparse_set_iterator(const Container &ref, const difference_type idx) ENTT_NOEXCEPT
+    constexpr sparse_set_iterator(const Container &ref, const difference_type idx) ENTT_NOEXCEPT
         : packed{std::addressof(ref)},
           offset{idx} {}
 
-    sparse_set_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator &operator++() ENTT_NOEXCEPT {
         return --offset, *this;
     }
 
-    sparse_set_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator operator++(int) ENTT_NOEXCEPT {
         sparse_set_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    sparse_set_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator &operator--() ENTT_NOEXCEPT {
         return ++offset, *this;
     }
 
-    sparse_set_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator operator--(int) ENTT_NOEXCEPT {
         sparse_set_iterator orig = *this;
         return operator--(), orig;
     }
 
-    sparse_set_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
         offset -= value;
         return *this;
     }
 
-    sparse_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
         sparse_set_iterator copy = *this;
         return (copy += value);
     }
 
-    sparse_set_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
         return (*this += -value);
     }
 
-    sparse_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
         return (*this + -value);
     }
 
-    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         return packed->data()[index() - value];
     }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
         return packed->data() + index();
     }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 
-    [[nodiscard]] difference_type index() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr difference_type index() const ENTT_NOEXCEPT {
         return offset - 1;
     }
 
@@ -98,37 +98,37 @@ private:
 };
 
 template<typename Type, typename Other>
-[[nodiscard]] std::ptrdiff_t operator-(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return rhs.index() - lhs.index();
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] bool operator==(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return lhs.index() == rhs.index();
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] bool operator!=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] bool operator<(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return lhs.index() > rhs.index();
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] bool operator>(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return lhs.index() < rhs.index();
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] bool operator<=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return !(lhs > rhs);
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] bool operator>=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
     return !(lhs < rhs);
 }
 

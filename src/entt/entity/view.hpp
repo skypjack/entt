@@ -44,7 +44,7 @@ public:
     using difference_type = typename iterator_type::difference_type;
     using iterator_category = std::forward_iterator_tag;
 
-    view_iterator() ENTT_NOEXCEPT = default;
+    constexpr view_iterator() ENTT_NOEXCEPT = default;
 
     view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, pool_count> ref) ENTT_NOEXCEPT
         : it{curr},
@@ -74,7 +74,7 @@ public:
     }
 
     template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
-    friend bool operator==(const view_iterator<LhsType, LhsArgs...> &, const view_iterator<RhsType, RhsArgs...> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const view_iterator<LhsType, LhsArgs...> &, const view_iterator<RhsType, RhsArgs...> &) ENTT_NOEXCEPT;
 
 private:
     iterator_type it;
@@ -83,12 +83,12 @@ private:
 };
 
 template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
-[[nodiscard]] bool operator==(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
     return lhs.it == rhs.it;
 }
 
 template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
-[[nodiscard]] bool operator!=(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -100,7 +100,7 @@ struct extended_view_iterator final {
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    extended_view_iterator()
+    constexpr extended_view_iterator()
         : it{},
           pools{} {}
 
@@ -126,7 +126,7 @@ struct extended_view_iterator final {
     }
 
     template<typename... Lhs, typename... Rhs>
-    friend bool operator==(const extended_view_iterator<Lhs...> &, const extended_view_iterator<Rhs...> &) ENTT_NOEXCEPT;
+    friend bool constexpr operator==(const extended_view_iterator<Lhs...> &, const extended_view_iterator<Rhs...> &) ENTT_NOEXCEPT;
 
 private:
     It it;
@@ -134,12 +134,12 @@ private:
 };
 
 template<typename... Lhs, typename... Rhs>
-[[nodiscard]] bool operator==(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
     return lhs.it == rhs.it;
 }
 
 template<typename... Lhs, typename... Rhs>
-[[nodiscard]] bool operator!=(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

@@ -48,68 +48,68 @@ public:
     using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
-    storage_iterator() ENTT_NOEXCEPT = default;
+    constexpr storage_iterator() ENTT_NOEXCEPT = default;
 
-    storage_iterator(Container *ref, difference_type idx) ENTT_NOEXCEPT
+    constexpr storage_iterator(Container *ref, difference_type idx) ENTT_NOEXCEPT
         : packed{ref},
           offset{idx} {}
 
     template<bool Const = std::is_const_v<Container>, typename = std::enable_if_t<Const>>
-    storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) ENTT_NOEXCEPT
+    constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) ENTT_NOEXCEPT
         : packed{other.packed},
           offset{other.offset} {}
 
-    storage_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr storage_iterator &operator++() ENTT_NOEXCEPT {
         return --offset, *this;
     }
 
-    storage_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr storage_iterator operator++(int) ENTT_NOEXCEPT {
         storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    storage_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr storage_iterator &operator--() ENTT_NOEXCEPT {
         return ++offset, *this;
     }
 
-    storage_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr storage_iterator operator--(int) ENTT_NOEXCEPT {
         storage_iterator orig = *this;
         return operator--(), orig;
     }
 
-    storage_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr storage_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
         offset -= value;
         return *this;
     }
 
-    storage_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr storage_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
         storage_iterator copy = *this;
         return (copy += value);
     }
 
-    storage_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr storage_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
         return (*this += -value);
     }
 
-    storage_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr storage_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
         return (*this + -value);
     }
 
-    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         const auto pos = index() - value;
         return (*packed)[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
         const auto pos = index();
         return (*packed)[pos / comp_traits::page_size] + fast_mod(pos, comp_traits::page_size);
     }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 
-    [[nodiscard]] difference_type index() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr difference_type index() const ENTT_NOEXCEPT {
         return offset - 1;
     }
 
@@ -119,37 +119,37 @@ private:
 };
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] std::ptrdiff_t operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
     return rhs.index() - lhs.index();
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] bool operator==(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.index() == rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] bool operator!=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] bool operator<(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.index() > rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] bool operator>(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.index() < rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] bool operator<=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs > rhs);
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] bool operator>=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs < rhs);
 }
 
@@ -165,47 +165,47 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    extended_storage_iterator()
+    constexpr extended_storage_iterator()
         : it{} {}
 
-    extended_storage_iterator(It base, Other... other)
+    constexpr extended_storage_iterator(It base, Other... other)
         : it{base, other...} {}
 
     template<typename... Args, typename = std::enable_if_t<(!std::is_same_v<Other, Args> && ...) && (std::is_constructible_v<Other, Args> && ...)>>
-    extended_storage_iterator(const extended_storage_iterator<It, Args...> &other)
+    constexpr extended_storage_iterator(const extended_storage_iterator<It, Args...> &other)
         : it{other.it} {}
 
-    extended_storage_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr extended_storage_iterator &operator++() ENTT_NOEXCEPT {
         return ++std::get<It>(it), (++std::get<Other>(it), ...), *this;
     }
 
-    extended_storage_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr extended_storage_iterator operator++(int) ENTT_NOEXCEPT {
         extended_storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
         return operator*();
     }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
         return {*std::get<It>(it), *std::get<Other>(it)...};
     }
 
     template<typename... CLhs, typename... CRhs>
-    friend bool operator==(const extended_storage_iterator<CLhs...> &, const extended_storage_iterator<CRhs...> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const extended_storage_iterator<CLhs...> &, const extended_storage_iterator<CRhs...> &) ENTT_NOEXCEPT;
 
 private:
     std::tuple<It, Other...> it;
 };
 
 template<typename... CLhs, typename... CRhs>
-[[nodiscard]] bool operator==(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
     return std::get<0>(lhs.it) == std::get<0>(rhs.it);
 }
 
 template<typename... CLhs, typename... CRhs>
-[[nodiscard]] bool operator!=(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

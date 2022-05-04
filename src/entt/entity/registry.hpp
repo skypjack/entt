@@ -50,109 +50,109 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    storage_proxy_iterator() ENTT_NOEXCEPT
+    constexpr storage_proxy_iterator() ENTT_NOEXCEPT
         : it{} {}
 
-    storage_proxy_iterator(const It iter) ENTT_NOEXCEPT
+    constexpr storage_proxy_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    storage_proxy_iterator(const storage_proxy_iterator<Other> &other) ENTT_NOEXCEPT
+    constexpr storage_proxy_iterator(const storage_proxy_iterator<Other> &other) ENTT_NOEXCEPT
         : it{other.it} {}
 
-    storage_proxy_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator &operator++() ENTT_NOEXCEPT {
         return ++it, *this;
     }
 
-    storage_proxy_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator operator++(int) ENTT_NOEXCEPT {
         storage_proxy_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    storage_proxy_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator &operator--() ENTT_NOEXCEPT {
         return --it, *this;
     }
 
-    storage_proxy_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator operator--(int) ENTT_NOEXCEPT {
         storage_proxy_iterator orig = *this;
         return operator--(), orig;
     }
 
-    storage_proxy_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
         it += value;
         return *this;
     }
 
-    storage_proxy_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
         storage_proxy_iterator copy = *this;
         return (copy += value);
     }
 
-    storage_proxy_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
         return (*this += -value);
     }
 
-    storage_proxy_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
         return (*this + -value);
     }
 
-    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         return {it[value].first, *it[value].second};
     }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
         return {it->first, *it->second};
     }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
         return operator*();
     }
 
     template<typename ILhs, typename IRhs>
-    friend std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
 
     template<typename ILhs, typename IRhs>
-    friend bool operator==(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
 
     template<typename ILhs, typename IRhs>
-    friend bool operator<(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator<(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
 
 private:
     It it;
 };
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.it - rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator==(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.it == rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator!=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator<(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.it < rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator>(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return rhs < lhs;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator<=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs > rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator>=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs < rhs);
 }
 
