@@ -39,109 +39,109 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::random_access_iterator_tag;
 
-    dense_set_iterator() ENTT_NOEXCEPT
+    constexpr dense_set_iterator() ENTT_NOEXCEPT
         : it{} {}
 
-    dense_set_iterator(const It iter) ENTT_NOEXCEPT
+    constexpr dense_set_iterator(const It iter) ENTT_NOEXCEPT
         : it{iter} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    dense_set_iterator(const dense_set_iterator<Other> &other) ENTT_NOEXCEPT
+    constexpr dense_set_iterator(const dense_set_iterator<Other> &other) ENTT_NOEXCEPT
         : it{other.it} {}
 
-    dense_set_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr dense_set_iterator &operator++() ENTT_NOEXCEPT {
         return ++it, *this;
     }
 
-    dense_set_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr dense_set_iterator operator++(int) ENTT_NOEXCEPT {
         dense_set_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    dense_set_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr dense_set_iterator &operator--() ENTT_NOEXCEPT {
         return --it, *this;
     }
 
-    dense_set_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr dense_set_iterator operator--(int) ENTT_NOEXCEPT {
         dense_set_iterator orig = *this;
         return operator--(), orig;
     }
 
-    dense_set_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr dense_set_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
         it += value;
         return *this;
     }
 
-    dense_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr dense_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
         dense_set_iterator copy = *this;
         return (copy += value);
     }
 
-    dense_set_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr dense_set_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
         return (*this += -value);
     }
 
-    dense_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr dense_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
         return (*this + -value);
     }
 
-    [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
         return it[value].second;
     }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
         return std::addressof(it->second);
     }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 
     template<typename ILhs, typename IRhs>
-    friend std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
 
     template<typename ILhs, typename IRhs>
-    friend bool operator==(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
 
     template<typename ILhs, typename IRhs>
-    friend bool operator<(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator<(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
 
 private:
     It it;
 };
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.it - rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator==(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.it == rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator!=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator<(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.it < rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator>(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return rhs < lhs;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator<=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs > rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator>=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs < rhs);
 }
 
@@ -157,37 +157,37 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::forward_iterator_tag;
 
-    dense_set_local_iterator() ENTT_NOEXCEPT
+    constexpr dense_set_local_iterator() ENTT_NOEXCEPT
         : it{},
           offset{} {}
 
-    dense_set_local_iterator(It iter, const std::size_t pos) ENTT_NOEXCEPT
+    constexpr dense_set_local_iterator(It iter, const std::size_t pos) ENTT_NOEXCEPT
         : it{iter},
           offset{pos} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    dense_set_local_iterator(const dense_set_local_iterator<Other> &other) ENTT_NOEXCEPT
+    constexpr dense_set_local_iterator(const dense_set_local_iterator<Other> &other) ENTT_NOEXCEPT
         : it{other.it},
           offset{other.offset} {}
 
-    dense_set_local_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr dense_set_local_iterator &operator++() ENTT_NOEXCEPT {
         return offset = it[offset].first, *this;
     }
 
-    dense_set_local_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr dense_set_local_iterator operator++(int) ENTT_NOEXCEPT {
         dense_set_local_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
         return std::addressof(it[offset].second);
     }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
         return *operator->();
     }
 
-    [[nodiscard]] std::size_t index() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr std::size_t index() const ENTT_NOEXCEPT {
         return offset;
     }
 
@@ -197,12 +197,12 @@ private:
 };
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator==(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return lhs.index() == rhs.index();
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] bool operator!=(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
