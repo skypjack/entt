@@ -1455,7 +1455,7 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    meta_iterator() ENTT_NOEXCEPT
+    constexpr meta_iterator() ENTT_NOEXCEPT
         : deref{},
           offset{},
           handle{} {}
@@ -1545,7 +1545,7 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    meta_iterator() ENTT_NOEXCEPT
+    constexpr meta_iterator() ENTT_NOEXCEPT
         : vtable{},
           handle{} {}
 

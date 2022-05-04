@@ -11,6 +11,7 @@ DOC:
 * examples (and credits) from @alanjfs :)
 
 WIP:
+* fix meta iterators, they copy handles in some cases O.o
 * add storage getter for filters to views and groups
 * remove storage::base_type, make views extract the sparse set directly
 * make non-const registry::get use const assure or the like
