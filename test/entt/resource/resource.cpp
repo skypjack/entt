@@ -5,13 +5,13 @@
 struct base {
     virtual ~base() = default;
 
-    virtual const entt::type_info &type() const ENTT_NOEXCEPT {
+    virtual const entt::type_info &type() const noexcept {
         return entt::type_id<base>();
     }
 };
 
 struct derived: base {
-    const entt::type_info &type() const ENTT_NOEXCEPT override {
+    const entt::type_info &type() const noexcept override {
         return entt::type_id<derived>();
     }
 };

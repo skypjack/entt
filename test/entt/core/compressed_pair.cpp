@@ -23,10 +23,10 @@ struct move_only_type {
     move_only_type(const move_only_type &) = delete;
     move_only_type &operator=(const move_only_type &) = delete;
 
-    move_only_type(move_only_type &&other) ENTT_NOEXCEPT
+    move_only_type(move_only_type &&other) noexcept
         : value{std::exchange(other.value, nullptr)} {}
 
-    move_only_type &operator=(move_only_type &&other) ENTT_NOEXCEPT {
+    move_only_type &operator=(move_only_type &&other) noexcept {
         delete value;
         value = std::exchange(other.value, nullptr);
         return *this;

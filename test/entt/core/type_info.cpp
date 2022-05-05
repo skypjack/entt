@@ -8,7 +8,7 @@
 
 template<>
 struct entt::type_name<float> final {
-    [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr std::string_view value() noexcept {
         return std::string_view{""};
     }
 };

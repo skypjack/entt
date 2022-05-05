@@ -25,7 +25,7 @@ class tracked_memory_resource: public std::pmr::memory_resource {
         std::pmr::get_default_resource()->deallocate(value, bytes, alignment);
     }
 
-    bool do_is_equal(const std::pmr::memory_resource &other) const ENTT_NOEXCEPT override {
+    bool do_is_equal(const std::pmr::memory_resource &other) const noexcept override {
         return (this == &other);
     }
 
@@ -39,15 +39,15 @@ public:
         : alloc_counter{},
           dealloc_counter{} {}
 
-    size_type do_allocate_counter() const ENTT_NOEXCEPT {
+    size_type do_allocate_counter() const noexcept {
         return alloc_counter;
     }
 
-    size_type do_deallocate_counter() const ENTT_NOEXCEPT {
+    size_type do_deallocate_counter() const noexcept {
         return dealloc_counter;
     }
 
-    void reset() ENTT_NOEXCEPT {
+    void reset() noexcept {
         alloc_counter = 0u;
         dealloc_counter = 0u;
     }

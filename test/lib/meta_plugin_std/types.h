@@ -16,7 +16,7 @@ struct custom_type_hash;
 
 template<typename Type>
 struct entt::type_hash<Type> {
-    static constexpr entt::id_type value() ENTT_NOEXCEPT {
+    static constexpr entt::id_type value() noexcept {
         return custom_type_hash<Type>::value;
     }
 };

@@ -40,11 +40,11 @@ struct update_from_destructor {
         : storage{&ref},
           target{other} {}
 
-    update_from_destructor(update_from_destructor &&other) ENTT_NOEXCEPT
+    update_from_destructor(update_from_destructor &&other) noexcept
         : storage{std::exchange(other.storage, nullptr)},
           target{std::exchange(other.target, entt::null)} {}
 
-    update_from_destructor &operator=(update_from_destructor &&other) ENTT_NOEXCEPT {
+    update_from_destructor &operator=(update_from_destructor &&other) noexcept {
         storage = std::exchange(other.storage, nullptr);
         target = std::exchange(other.target, entt::null);
         return *this;
@@ -69,8 +69,8 @@ struct create_from_constructor {
         }
     }
 
-    create_from_constructor(create_from_constructor &&other) ENTT_NOEXCEPT = default;
-    create_from_constructor &operator=(create_from_constructor &&other) ENTT_NOEXCEPT = default;
+    create_from_constructor(create_from_constructor &&other) noexcept = default;
+    create_from_constructor &operator=(create_from_constructor &&other) noexcept = default;
 
     entt::entity child;
 };

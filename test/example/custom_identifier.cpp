@@ -8,13 +8,13 @@ struct entity_id {
     using entity_type = std::uint32_t;
     static constexpr auto null = entt::null;
 
-    constexpr entity_id(entity_type value = null) ENTT_NOEXCEPT
+    constexpr entity_id(entity_type value = null) noexcept
         : entt{value} {}
 
-    constexpr entity_id(const entity_id &other) ENTT_NOEXCEPT
+    constexpr entity_id(const entity_id &other) noexcept
         : entt{other.entt} {}
 
-    constexpr operator entity_type() const ENTT_NOEXCEPT {
+    constexpr operator entity_type() const noexcept {
         return entt;
     }
 
