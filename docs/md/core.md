@@ -483,7 +483,7 @@ Basically, the whole system relies on a handful of classes. In particular:
   ```cpp
   template<typename Type>
   struct entt::type_index<Type, std::void_d<decltype(Type::index())>> {
-      static entt::id_type value() ENTT_NOEXCEPT {
+      static entt::id_type value() noexcept {
           return Type::index();
       }
   };
