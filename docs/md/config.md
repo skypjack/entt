@@ -8,7 +8,6 @@
 * [Introduction](#introduction)
 * [Definitions](#definitions)
   * [ENTT_NOEXCEPTION](#entt_noexception)
-  * [ENTT_NOEXCEPT](#entt_noexcept)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
   * [ENTT_ID_TYPE](#entt_id_type)
   * [ENTT_SPARSE_PAGE](#entt_sparse_page)
@@ -45,12 +44,6 @@ Define this variable without assigning any value to it to turn off exception
 handling in `EnTT`.<br/>
 This is roughly equivalent to setting the compiler flag `-fno-exceptions` but is
 also limited to this library only.
-
-## ENTT_NOEXCEPT
-
-The purpose of this parameter is to suppress the use of `noexcept` by this
-library.<br/>
-To do this, simply define the variable without assigning any value to it.
 
 ## ENTT_USE_ATOMIC
 
