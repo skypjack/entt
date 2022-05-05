@@ -10,7 +10,6 @@
 #        include <cstddef>
 #        include <memory_resource>
 #        include <string>
-#        include <entt/config/config.h>
 
 namespace test {
 

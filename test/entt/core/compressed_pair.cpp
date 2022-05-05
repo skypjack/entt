@@ -4,7 +4,6 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <entt/config/config.h>
 #include <entt/core/compressed_pair.hpp>
 
 struct empty_type {};

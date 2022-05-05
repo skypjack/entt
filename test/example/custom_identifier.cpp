@@ -1,6 +1,5 @@
 #include <cstdint>
 #include <gtest/gtest.h>
-#include <entt/config/config.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 
