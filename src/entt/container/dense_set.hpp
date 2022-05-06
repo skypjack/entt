@@ -39,109 +39,109 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::random_access_iterator_tag;
 
-    constexpr dense_set_iterator() ENTT_NOEXCEPT
+    constexpr dense_set_iterator() noexcept
         : it{} {}
 
-    constexpr dense_set_iterator(const It iter) ENTT_NOEXCEPT
+    constexpr dense_set_iterator(const It iter) noexcept
         : it{iter} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    constexpr dense_set_iterator(const dense_set_iterator<Other> &other) ENTT_NOEXCEPT
+    constexpr dense_set_iterator(const dense_set_iterator<Other> &other) noexcept
         : it{other.it} {}
 
-    constexpr dense_set_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr dense_set_iterator &operator++() noexcept {
         return ++it, *this;
     }
 
-    constexpr dense_set_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr dense_set_iterator operator++(int) noexcept {
         dense_set_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    constexpr dense_set_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr dense_set_iterator &operator--() noexcept {
         return --it, *this;
     }
 
-    constexpr dense_set_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr dense_set_iterator operator--(int) noexcept {
         dense_set_iterator orig = *this;
         return operator--(), orig;
     }
 
-    constexpr dense_set_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr dense_set_iterator &operator+=(const difference_type value) noexcept {
         it += value;
         return *this;
     }
 
-    constexpr dense_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr dense_set_iterator operator+(const difference_type value) const noexcept {
         dense_set_iterator copy = *this;
         return (copy += value);
     }
 
-    constexpr dense_set_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr dense_set_iterator &operator-=(const difference_type value) noexcept {
         return (*this += -value);
     }
 
-    constexpr dense_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr dense_set_iterator operator-(const difference_type value) const noexcept {
         return (*this + -value);
     }
 
-    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         return it[value].second;
     }
 
-    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
         return std::addressof(it->second);
     }
 
-    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const noexcept {
         return *operator->();
     }
 
     template<typename ILhs, typename IRhs>
-    friend constexpr std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) noexcept;
 
     template<typename ILhs, typename IRhs>
-    friend constexpr bool operator==(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) noexcept;
 
     template<typename ILhs, typename IRhs>
-    friend constexpr bool operator<(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator<(const dense_set_iterator<ILhs> &, const dense_set_iterator<IRhs> &) noexcept;
 
 private:
     It it;
 };
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) noexcept {
     return lhs.it - rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator==(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) noexcept {
     return lhs.it == rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator!=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator<(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) noexcept {
     return lhs.it < rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator>(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) noexcept {
     return rhs < lhs;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator<=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator>=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const dense_set_iterator<ILhs> &lhs, const dense_set_iterator<IRhs> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -157,37 +157,37 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::forward_iterator_tag;
 
-    constexpr dense_set_local_iterator() ENTT_NOEXCEPT
+    constexpr dense_set_local_iterator() noexcept
         : it{},
           offset{} {}
 
-    constexpr dense_set_local_iterator(It iter, const std::size_t pos) ENTT_NOEXCEPT
+    constexpr dense_set_local_iterator(It iter, const std::size_t pos) noexcept
         : it{iter},
           offset{pos} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    constexpr dense_set_local_iterator(const dense_set_local_iterator<Other> &other) ENTT_NOEXCEPT
+    constexpr dense_set_local_iterator(const dense_set_local_iterator<Other> &other) noexcept
         : it{other.it},
           offset{other.offset} {}
 
-    constexpr dense_set_local_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr dense_set_local_iterator &operator++() noexcept {
         return offset = it[offset].first, *this;
     }
 
-    constexpr dense_set_local_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr dense_set_local_iterator operator++(int) noexcept {
         dense_set_local_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
         return std::addressof(it[offset].second);
     }
 
-    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const noexcept {
         return *operator->();
     }
 
-    [[nodiscard]] constexpr std::size_t index() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr std::size_t index() const noexcept {
         return offset;
     }
 
@@ -197,12 +197,12 @@ private:
 };
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator==(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) noexcept {
     return lhs.index() == rhs.index();
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator!=(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const dense_set_local_iterator<ILhs> &lhs, const dense_set_local_iterator<IRhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
@@ -237,7 +237,7 @@ class dense_set {
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
     template<typename Other>
-    [[nodiscard]] std::size_t value_to_bucket(const Other &value) const ENTT_NOEXCEPT {
+    [[nodiscard]] std::size_t value_to_bucket(const Other &value) const noexcept {
         return fast_mod(sparse.second()(value), bucket_count());
     }
 
@@ -404,7 +404,7 @@ public:
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
-    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
         return sparse.first().get_allocator();
     }
 
@@ -416,17 +416,17 @@ public:
      *
      * @return An iterator to the first instance of the internal array.
      */
-    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cbegin() const noexcept {
         return packed.first().begin();
     }
 
     /*! @copydoc cbegin */
-    [[nodiscard]] const_iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator begin() const noexcept {
         return cbegin();
     }
 
     /*! @copydoc begin */
-    [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() noexcept {
         return packed.first().begin();
     }
 
@@ -440,17 +440,17 @@ public:
      * @return An iterator to the element following the last instance of the
      * internal array.
      */
-    [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cend() const noexcept {
         return packed.first().end();
     }
 
     /*! @copydoc cend */
-    [[nodiscard]] const_iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator end() const noexcept {
         return cend();
     }
 
     /*! @copydoc end */
-    [[nodiscard]] iterator end() ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() noexcept {
         return packed.first().end();
     }
 
@@ -458,7 +458,7 @@ public:
      * @brief Checks whether a container is empty.
      * @return True if the container is empty, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return packed.first().empty();
     }
 
@@ -466,12 +466,12 @@ public:
      * @brief Returns the number of elements in a container.
      * @return Number of elements in a container.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return packed.first().size();
     }
 
     /*! @brief Clears the container. */
-    void clear() ENTT_NOEXCEPT {
+    void clear() noexcept {
         sparse.first().clear();
         packed.first().clear();
         rehash(0u);
