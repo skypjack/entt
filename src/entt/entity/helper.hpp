@@ -2,10 +2,10 @@
 #define ENTT_ENTITY_HELPER_HPP
 
 #include <type_traits>
-#include "../config/config.h"
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
+#include "component.hpp"
 #include "fwd.hpp"
 #include "registry.hpp"
 
@@ -144,8 +144,8 @@ Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
     const typename basic_registry<Entity>::base_type &base = storage;
     const auto *addr = std::addressof(instance);
 
-    for(auto it = base.rbegin(), last = base.rend(); it < last; it += ENTT_PACKED_PAGE) {
-        if(const auto dist = (addr - std::addressof(storage.get(*it))); dist >= 0 && dist < ENTT_PACKED_PAGE) {
+    for(auto it = base.rbegin(), last = base.rend(); it < last; it += component_traits<Component>::page_size) {
+        if(const auto dist = (addr - std::addressof(storage.get(*it))); dist >= 0 && dist < component_traits<Component>::page_size) {
             return *(it + dist);
         }
     }
