@@ -15,13 +15,6 @@
 #    define ENTT_CATCH if(false)
 #endif
 
-#ifndef ENTT_NOEXCEPT
-#    define ENTT_NOEXCEPT noexcept
-#    define ENTT_NOEXCEPT_IF(expr) noexcept(expr)
-#else
-#    define ENTT_NOEXCEPT_IF(...)
-#endif
-
 #ifdef ENTT_USE_ATOMIC
 #    include <atomic>
 #    define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
