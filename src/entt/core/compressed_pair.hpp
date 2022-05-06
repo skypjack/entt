@@ -22,15 +22,15 @@ struct compressed_pair_element {
     using const_reference = const Type &;
 
     template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<Type>>>
-    constexpr compressed_pair_element()
+    constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<Type>)
         : value{} {}
 
     template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
-    constexpr compressed_pair_element(Args &&args)
+    constexpr compressed_pair_element(Args &&args) noexcept(std::is_nothrow_constructible_v<Type, Args>)
         : value{std::forward<Args>(args)} {}
 
     template<typename... Args, std::size_t... Index>
-    constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
+    constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>) noexcept(std::is_nothrow_constructible_v<Type, Args...>)
         : value{std::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] constexpr reference get() noexcept {
@@ -52,15 +52,15 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
     using base_type = Type;
 
     template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<base_type>>>
-    constexpr compressed_pair_element()
+    constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<base_type>)
         : base_type{} {}
 
     template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
-    constexpr compressed_pair_element(Args &&args)
+    constexpr compressed_pair_element(Args &&args) noexcept(std::is_nothrow_constructible_v<base_type, Args>)
         : base_type{std::forward<Args>(args)} {}
 
     template<typename... Args, std::size_t... Index>
-    constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
+    constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>) noexcept(std::is_nothrow_constructible_v<base_type, Args...>)
         : base_type{std::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] constexpr reference get() noexcept {
