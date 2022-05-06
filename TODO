@@ -11,6 +11,8 @@ DOC:
 * examples (and credits) from @alanjfs :)
 
 WIP:
+* use conditional noexcept properly
+* don't use entt_packed/sparse_page directly
 * add storage getter for filters to views and groups
 * emitter: runtime handlers, allocator support (ready for both already)
 * view: no storage_traits dependency -> use storage instead of components for the definition
@@ -21,7 +23,6 @@ WIP:
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
 * entity-only and exclude-only views (both solved with entity storage and storage<void>)
 * custom allocators all over (registry, ...)
-* consider removing ENTT_NOEXCEPT, use ENTT_NOEXCEPT_IF (or noexcept(...)) as appropriate in any case (ie make compressed_pair conditionally noexcept)
 * add test for maximum number of entities reached
 * add user data to type_info
 * make runtime views use opaque storage and therefore return also elements.
