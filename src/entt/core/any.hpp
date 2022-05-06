@@ -144,7 +144,7 @@ class basic_any {
         }
     }
 
-    basic_any(const basic_any &other, const policy pol) ENTT_NOEXCEPT
+    basic_any(const basic_any &other, const policy pol) noexcept
         : instance{other.data()},
           info{other.info},
           vtable{other.vtable},
@@ -157,7 +157,7 @@ public:
     static constexpr auto alignment = Align;
 
     /*! @brief Default constructor. */
-    constexpr basic_any() ENTT_NOEXCEPT
+    constexpr basic_any() noexcept
         : instance{},
           info{&type_id<void>()},
           vtable{},
@@ -201,7 +201,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_any(basic_any &&other) ENTT_NOEXCEPT
+    basic_any(basic_any &&other) noexcept
         : instance{},
           info{other.info},
           vtable{other.vtable},
@@ -238,7 +238,7 @@ public:
      * @param other The instance to move from.
      * @return This any object.
      */
-    basic_any &operator=(basic_any &&other) ENTT_NOEXCEPT {
+    basic_any &operator=(basic_any &&other) noexcept {
         reset();
 
         if(other.vtable) {
@@ -268,7 +268,7 @@ public:
      * @brief Returns the object type if any, `type_id<void>()` otherwise.
      * @return The object type if any, `type_id<void>()` otherwise.
      */
-    [[nodiscard]] const type_info &type() const ENTT_NOEXCEPT {
+    [[nodiscard]] const type_info &type() const noexcept {
         return *info;
     }
 
@@ -276,7 +276,7 @@ public:
      * @brief Returns an opaque pointer to the contained instance.
      * @return An opaque pointer the contained instance, if any.
      */
-    [[nodiscard]] const void *data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const void *data() const noexcept {
         return vtable ? vtable(operation::get, *this, nullptr) : nullptr;
     }
 
@@ -285,7 +285,7 @@ public:
      * @param req Expected type.
      * @return An opaque pointer the contained instance, if any.
      */
-    [[nodiscard]] const void *data(const type_info &req) const ENTT_NOEXCEPT {
+    [[nodiscard]] const void *data(const type_info &req) const noexcept {
         return *info == req ? data() : nullptr;
     }
 
@@ -293,7 +293,7 @@ public:
      * @brief Returns an opaque pointer to the contained instance.
      * @return An opaque pointer the contained instance, if any.
      */
-    [[nodiscard]] void *data() ENTT_NOEXCEPT {
+    [[nodiscard]] void *data() noexcept {
         return (!vtable || mode == policy::cref) ? nullptr : const_cast<void *>(vtable(operation::get, *this, nullptr));
     }
 
@@ -302,7 +302,7 @@ public:
      * @param req Expected type.
      * @return An opaque pointer the contained instance, if any.
      */
-    [[nodiscard]] void *data(const type_info &req) ENTT_NOEXCEPT {
+    [[nodiscard]] void *data(const type_info &req) noexcept {
         return *info == req ? data() : nullptr;
     }
 
@@ -359,7 +359,7 @@ public:
      * @brief Returns false if a wrapper is empty, true otherwise.
      * @return False if the wrapper is empty, true otherwise.
      */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const noexcept {
         return vtable != nullptr;
     }
 
@@ -368,7 +368,7 @@ public:
      * @param other Wrapper with which to compare.
      * @return False if the two objects differ in their content, true otherwise.
      */
-    bool operator==(const basic_any &other) const ENTT_NOEXCEPT {
+    bool operator==(const basic_any &other) const noexcept {
         if(vtable && *info == *other.info) {
             return (vtable(operation::compare, *this, other.data()) != nullptr);
         }
@@ -380,12 +380,12 @@ public:
      * @brief Aliasing constructor.
      * @return A wrapper that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] basic_any as_ref() ENTT_NOEXCEPT {
+    [[nodiscard]] basic_any as_ref() noexcept {
         return basic_any{*this, (mode == policy::cref ? policy::cref : policy::ref)};
     }
 
     /*! @copydoc as_ref */
-    [[nodiscard]] basic_any as_ref() const ENTT_NOEXCEPT {
+    [[nodiscard]] basic_any as_ref() const noexcept {
         return basic_any{*this, policy::cref};
     }
 
@@ -393,7 +393,7 @@ public:
      * @brief Returns true if a wrapper owns its object, false otherwise.
      * @return True if the wrapper owns its object, false otherwise.
      */
-    [[nodiscard]] bool owner() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool owner() const noexcept {
         return (mode == policy::owner);
     }
 
@@ -416,7 +416,7 @@ private:
  * @return True if the two wrappers differ in their content, false otherwise.
  */
 template<std::size_t Len, std::size_t Align>
-[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
@@ -429,7 +429,7 @@ template<std::size_t Len, std::size_t Align>
  * @return The element converted to the requested type.
  */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
+Type any_cast(const basic_any<Len, Align> &data) noexcept {
     const auto *const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
     return static_cast<Type>(*instance);
@@ -437,7 +437,7 @@ Type any_cast(const basic_any<Len, Align> &data) ENTT_NOEXCEPT {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
+Type any_cast(basic_any<Len, Align> &data) noexcept {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto *const instance = any_cast<std::remove_reference_t<const Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
@@ -446,7 +446,7 @@ Type any_cast(basic_any<Len, Align> &data) ENTT_NOEXCEPT {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
+Type any_cast(basic_any<Len, Align> &&data) noexcept {
     if constexpr(std::is_copy_constructible_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
         if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(std::move(*instance));
@@ -462,14 +462,14 @@ Type any_cast(basic_any<Len, Align> &&data) ENTT_NOEXCEPT {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-const Type *any_cast(const basic_any<Len, Align> *data) ENTT_NOEXCEPT {
+const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
     const auto &info = type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
     return static_cast<const Type *>(data->data(info));
 }
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type *any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
+Type *any_cast(basic_any<Len, Align> *data) noexcept {
     const auto &info = type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
     // last attempt to make wrappers for const references return their values
     return static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data(info));

@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include "../config/config.h"
 #include "fwd.hpp"
 #include "type_traits.hpp"
 
@@ -17,7 +16,7 @@ namespace entt {
 template<typename... Type>
 class ident {
     template<typename Curr, std::size_t... Index>
-    [[nodiscard]] static constexpr id_type get(std::index_sequence<Index...>) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr id_type get(std::index_sequence<Index...>) noexcept {
         static_assert((std::is_same_v<Curr, Type> || ...), "Invalid type");
         return (0 + ... + (std::is_same_v<Curr, type_list_element_t<Index, type_list<std::decay_t<Type>...>>> ? id_type{Index} : id_type{}));
     }

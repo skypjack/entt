@@ -4,7 +4,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "../config/config.h"
 
 namespace entt {
 
@@ -16,7 +15,7 @@ namespace entt {
  * element otherwise.
  */
 template<typename Type>
-constexpr decltype(auto) unwrap_tuple(Type &&value) ENTT_NOEXCEPT {
+constexpr decltype(auto) unwrap_tuple(Type &&value) noexcept {
     if constexpr(std::tuple_size_v<std::remove_reference_t<Type>> == 1u) {
         return std::get<0>(std::forward<Type>(value));
     } else {
@@ -36,7 +35,7 @@ struct forward_apply: private Func {
      * @param args Parameters to use to construct the instance.
      */
     template<class... Args>
-    constexpr forward_apply(Args &&...args) ENTT_NOEXCEPT_IF((std::is_nothrow_constructible_v<Func, Args...>))
+    constexpr forward_apply(Args &&...args) noexcept(std::is_nothrow_constructible_v<Func, Args...>)
         : Func{std::forward<Args>(args)...} {}
 
     /**
@@ -46,13 +45,13 @@ struct forward_apply: private Func {
      * @return Return value of the underlying function, if any.
      */
     template<class Type>
-    constexpr decltype(auto) operator()(Type &&args) ENTT_NOEXCEPT_IF(noexcept(std::apply(std::declval<Func &>(), args))) {
+    constexpr decltype(auto) operator()(Type &&args) noexcept(noexcept(std::apply(std::declval<Func &>(), args))) {
         return std::apply(static_cast<Func &>(*this), std::forward<Type>(args));
     }
 
     /*! @copydoc operator()() */
     template<class Type>
-    constexpr decltype(auto) operator()(Type &&args) const ENTT_NOEXCEPT_IF(noexcept(std::apply(std::declval<const Func &>(), args))) {
+    constexpr decltype(auto) operator()(Type &&args) const noexcept(noexcept(std::apply(std::declval<const Func &>(), args))) {
         return std::apply(static_cast<const Func &>(*this), std::forward<Type>(args));
     }
 };

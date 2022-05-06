@@ -2,7 +2,6 @@
 #define ENTT_CORE_UTILITY_HPP
 
 #include <utility>
-#include "../config/config.h"
 
 namespace entt {
 
@@ -18,7 +17,7 @@ struct identity {
      * @return The submitted value as-is.
      */
     template<class Type>
-    [[nodiscard]] constexpr Type &&operator()(Type &&value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr Type &&operator()(Type &&value) const noexcept {
         return std::forward<Type>(value);
     }
 };
@@ -31,7 +30,7 @@ struct identity {
  * @return Pointer to the member.
  */
 template<typename Type, typename Class>
-[[nodiscard]] constexpr auto overload(Type Class::*member) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr auto overload(Type Class::*member) noexcept {
     return member;
 }
 
@@ -42,7 +41,7 @@ template<typename Type, typename Class>
  * @return Pointer to the function.
  */
 template<typename Func>
-[[nodiscard]] constexpr auto overload(Func *func) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr auto overload(Func *func) noexcept {
     return func;
 }
 

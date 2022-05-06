@@ -25,7 +25,7 @@ struct monostate {
      * @param val User data to assign to the given key.
      */
     template<typename Type>
-    void operator=(Type val) const ENTT_NOEXCEPT {
+    void operator=(Type val) const noexcept {
         value<Type> = val;
     }
 
@@ -35,7 +35,7 @@ struct monostate {
      * @return Stored value, if any.
      */
     template<typename Type>
-    operator Type() const ENTT_NOEXCEPT {
+    operator Type() const noexcept {
         return value<Type>;
     }
 

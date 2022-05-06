@@ -4,7 +4,6 @@
 #include <iterator>
 #include <memory>
 #include <utility>
-#include "../config/config.h"
 
 namespace entt {
 
@@ -46,7 +45,7 @@ struct input_iterator_pointer final {
      * @brief Access operator for accessing wrapped values.
      * @return A pointer to the wrapped value.
      */
-    [[nodiscard]] constexpr pointer operator->() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() noexcept {
         return std::addressof(value);
     }
 
@@ -86,7 +85,7 @@ struct iterable_adaptor final {
      * @brief Returns an iterator to the beginning.
      * @return An iterator to the first element of the range.
      */
-    [[nodiscard]] constexpr iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr iterator begin() const noexcept {
         return first;
     }
 
@@ -95,17 +94,17 @@ struct iterable_adaptor final {
      * @return An iterator to the element following the last element of the
      * range.
      */
-    [[nodiscard]] constexpr sentinel end() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr sentinel end() const noexcept {
         return last;
     }
 
     /*! @copydoc begin */
-    [[nodiscard]] constexpr iterator cbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr iterator cbegin() const noexcept {
         return begin();
     }
 
     /*! @copydoc end */
-    [[nodiscard]] constexpr sentinel cend() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr sentinel cend() const noexcept {
         return end();
     }
 

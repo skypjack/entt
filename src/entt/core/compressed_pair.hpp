@@ -5,7 +5,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "../config/config.h"
 #include "type_traits.hpp"
 
 namespace entt {
@@ -34,11 +33,11 @@ struct compressed_pair_element {
     constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
         : value{std::forward<Args>(std::get<Index>(args))...} {}
 
-    [[nodiscard]] constexpr reference get() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference get() noexcept {
         return value;
     }
 
-    [[nodiscard]] constexpr const_reference get() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const_reference get() const noexcept {
         return value;
     }
 
@@ -64,11 +63,11 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
     constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>)
         : base_type{std::forward<Args>(std::get<Index>(args))...} {}
 
-    [[nodiscard]] constexpr reference get() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference get() noexcept {
         return *this;
     }
 
-    [[nodiscard]] constexpr const_reference get() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const_reference get() const noexcept {
         return *this;
     }
 };
@@ -169,12 +168,12 @@ public:
      * @brief Returns the first element that a pair stores.
      * @return The first element that a pair stores.
      */
-    [[nodiscard]] constexpr first_type &first() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr first_type &first() noexcept {
         return static_cast<first_base &>(*this).get();
     }
 
     /*! @copydoc first */
-    [[nodiscard]] constexpr const first_type &first() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const first_type &first() const noexcept {
         return static_cast<const first_base &>(*this).get();
     }
 
@@ -182,12 +181,12 @@ public:
      * @brief Returns the second element that a pair stores.
      * @return The second element that a pair stores.
      */
-    [[nodiscard]] constexpr second_type &second() ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr second_type &second() noexcept {
         return static_cast<second_base &>(*this).get();
     }
 
     /*! @copydoc second */
-    [[nodiscard]] constexpr const second_type &second() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const second_type &second() const noexcept {
         return static_cast<const second_base &>(*this).get();
     }
 
@@ -208,7 +207,7 @@ public:
      * reference to the second element if `Index` is 1.
      */
     template<std::size_t Index>
-    constexpr decltype(auto) get() ENTT_NOEXCEPT {
+    constexpr decltype(auto) get() noexcept {
         if constexpr(Index == 0u) {
             return first();
         } else {
@@ -219,7 +218,7 @@ public:
 
     /*! @copydoc get */
     template<std::size_t Index>
-    constexpr decltype(auto) get() const ENTT_NOEXCEPT {
+    constexpr decltype(auto) get() const noexcept {
         if constexpr(Index == 0u) {
             return first();
         } else {
