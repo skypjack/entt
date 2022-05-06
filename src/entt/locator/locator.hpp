@@ -37,7 +37,7 @@ struct locator final {
      * @brief Checks whether a service locator contains a value.
      * @return True if the service locator contains a value, false otherwise.
      */
-    [[nodiscard]] static bool has_value() ENTT_NOEXCEPT {
+    [[nodiscard]] static bool has_value() noexcept {
         return (service != nullptr);
     }
 
@@ -50,7 +50,7 @@ struct locator final {
      *
      * @return A reference to the service currently set, if any.
      */
-    [[nodiscard]] static Service &value() ENTT_NOEXCEPT {
+    [[nodiscard]] static Service &value() noexcept {
         ENTT_ASSERT(has_value(), "Service not available");
         return *service;
     }
@@ -100,7 +100,7 @@ struct locator final {
     }
 
     /*! @brief Resets a service. */
-    static void reset() ENTT_NOEXCEPT {
+    static void reset() noexcept {
         service.reset();
     }
 
