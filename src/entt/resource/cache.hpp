@@ -8,7 +8,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
@@ -39,108 +38,108 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    constexpr resource_cache_iterator() ENTT_NOEXCEPT = default;
+    constexpr resource_cache_iterator() noexcept = default;
 
-    constexpr resource_cache_iterator(const It iter) ENTT_NOEXCEPT
+    constexpr resource_cache_iterator(const It iter) noexcept
         : it{iter} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    constexpr resource_cache_iterator(const resource_cache_iterator<std::remove_const_t<Type>, Other> &other) ENTT_NOEXCEPT
+    constexpr resource_cache_iterator(const resource_cache_iterator<std::remove_const_t<Type>, Other> &other) noexcept
         : it{other.it} {}
 
-    constexpr resource_cache_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr resource_cache_iterator &operator++() noexcept {
         return ++it, *this;
     }
 
-    constexpr resource_cache_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr resource_cache_iterator operator++(int) noexcept {
         resource_cache_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    constexpr resource_cache_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr resource_cache_iterator &operator--() noexcept {
         return --it, *this;
     }
 
-    constexpr resource_cache_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr resource_cache_iterator operator--(int) noexcept {
         resource_cache_iterator orig = *this;
         return operator--(), orig;
     }
 
-    constexpr resource_cache_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr resource_cache_iterator &operator+=(const difference_type value) noexcept {
         it += value;
         return *this;
     }
 
-    constexpr resource_cache_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr resource_cache_iterator operator+(const difference_type value) const noexcept {
         resource_cache_iterator copy = *this;
         return (copy += value);
     }
 
-    constexpr resource_cache_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr resource_cache_iterator &operator-=(const difference_type value) noexcept {
         return (*this += -value);
     }
 
-    constexpr resource_cache_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr resource_cache_iterator operator-(const difference_type value) const noexcept {
         return (*this + -value);
     }
 
-    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         return {it[value].first, resource<Type>{it[value].second}};
     }
 
-    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const noexcept {
         return (*this)[0];
     }
 
-    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
         return operator*();
     }
 
     template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-    friend constexpr std::ptrdiff_t operator-(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr std::ptrdiff_t operator-(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) noexcept;
 
     template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-    friend constexpr bool operator==(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) noexcept;
 
     template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-    friend constexpr bool operator<(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator<(const resource_cache_iterator<TLhs, ILhs> &, const resource_cache_iterator<TRhs, IRhs> &) noexcept;
 
 private:
     It it;
 };
 
 template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) noexcept {
     return lhs.it - rhs.it;
 }
 
 template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-[[nodiscard]] constexpr bool operator==(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) noexcept {
     return lhs.it == rhs.it;
 }
 
 template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-[[nodiscard]] constexpr bool operator!=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-[[nodiscard]] constexpr bool operator<(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) noexcept {
     return lhs.it < rhs.it;
 }
 
 template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-[[nodiscard]] constexpr bool operator>(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) noexcept {
     return rhs < lhs;
 }
 
 template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-[[nodiscard]] constexpr bool operator<=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
 template<typename TLhs, typename ILhs, typename TRhs, typename IRhs>
-[[nodiscard]] constexpr bool operator>=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const resource_cache_iterator<TLhs, ILhs> &lhs, const resource_cache_iterator<TRhs, IRhs> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -235,7 +234,7 @@ public:
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
-    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
         return pool.first().get_allocator();
     }
 
@@ -247,17 +246,17 @@ public:
      *
      * @return An iterator to the first instance of the internal cache.
      */
-    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cbegin() const noexcept {
         return pool.first().begin();
     }
 
     /*! @copydoc cbegin */
-    [[nodiscard]] const_iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator begin() const noexcept {
         return cbegin();
     }
 
     /*! @copydoc begin */
-    [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() noexcept {
         return pool.first().begin();
     }
 
@@ -271,17 +270,17 @@ public:
      * @return An iterator to the element following the last instance of the
      * internal cache.
      */
-    [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cend() const noexcept {
         return pool.first().end();
     }
 
     /*! @copydoc cend */
-    [[nodiscard]] const_iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator end() const noexcept {
         return cend();
     }
 
     /*! @copydoc end */
-    [[nodiscard]] iterator end() ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() noexcept {
         return pool.first().end();
     }
 
@@ -289,7 +288,7 @@ public:
      * @brief Returns true if a cache contains no resources, false otherwise.
      * @return True if the cache contains no resources, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return pool.first().empty();
     }
 
@@ -297,12 +296,12 @@ public:
      * @brief Number of resources managed by a cache.
      * @return Number of resources currently stored.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return pool.first().size();
     }
 
     /*! @brief Clears a cache. */
-    void clear() ENTT_NOEXCEPT {
+    void clear() noexcept {
         pool.first().clear();
     }
 
