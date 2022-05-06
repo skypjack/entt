@@ -7,7 +7,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "../config/config.h"
 #include "process.hpp"
 
 namespace entt {
@@ -53,7 +52,7 @@ class scheduler {
     };
 
     struct continuation {
-        continuation(process_handler *ref) ENTT_NOEXCEPT
+        continuation(process_handler *ref) noexcept
             : handler{ref} {}
 
         template<typename Proc, typename... Args>
@@ -122,7 +121,7 @@ public:
      * @brief Number of processes currently scheduled.
      * @return Number of processes currently scheduled.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return handlers.size();
     }
 
@@ -130,7 +129,7 @@ public:
      * @brief Returns true if at least a process is currently scheduled.
      * @return True if there are scheduled processes, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return handlers.empty();
     }
 
