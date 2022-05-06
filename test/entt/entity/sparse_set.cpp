@@ -139,7 +139,7 @@ TEST(SparseSet, Current) {
     ASSERT_NE(set.current(traits_type::construct(3, 3)), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(traits_type::construct(3, 0)), traits_type::to_version(traits_type::construct(3, 3)));
     ASSERT_EQ(set.current(traits_type::construct(42, 1)), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.current(traits_type::construct(ENTT_SPARSE_PAGE, 1)), traits_type::to_version(entt::tombstone));
+    ASSERT_EQ(set.current(traits_type::construct(traits_type::page_size, 1)), traits_type::to_version(entt::tombstone));
 
     set.remove(entt::entity{0});
 
@@ -226,38 +226,40 @@ TEST(SparseSet, Swap) {
 }
 
 TEST(SparseSet, Pagination) {
-    entt::sparse_set set;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::sparse_set set{};
 
     ASSERT_EQ(set.extent(), 0u);
 
-    set.emplace(entt::entity{ENTT_SPARSE_PAGE - 1u});
+    set.emplace(entt::entity{traits_type::page_size - 1u});
 
-    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
-    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE - 1u}));
+    ASSERT_EQ(set.extent(), traits_type::page_size);
+    ASSERT_TRUE(set.contains(entt::entity{traits_type::page_size - 1u}));
 
-    set.emplace(entt::entity{ENTT_SPARSE_PAGE});
+    set.emplace(entt::entity{traits_type::page_size});
 
-    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
-    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE - 1u}));
-    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
-    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE + 1u}));
+    ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+    ASSERT_TRUE(set.contains(entt::entity{traits_type::page_size - 1u}));
+    ASSERT_TRUE(set.contains(entt::entity{traits_type::page_size}));
+    ASSERT_FALSE(set.contains(entt::entity{traits_type::page_size + 1u}));
 
-    set.erase(entt::entity{ENTT_SPARSE_PAGE - 1u});
+    set.erase(entt::entity{traits_type::page_size - 1u});
 
-    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
-    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE - 1u}));
-    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
-
-    set.shrink_to_fit();
-    set.erase(entt::entity{ENTT_SPARSE_PAGE});
-
-    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
-    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE - 1u}));
-    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
+    ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+    ASSERT_FALSE(set.contains(entt::entity{traits_type::page_size - 1u}));
+    ASSERT_TRUE(set.contains(entt::entity{traits_type::page_size}));
 
     set.shrink_to_fit();
+    set.erase(entt::entity{traits_type::page_size});
 
-    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+    ASSERT_FALSE(set.contains(entt::entity{traits_type::page_size - 1u}));
+    ASSERT_FALSE(set.contains(entt::entity{traits_type::page_size}));
+
+    set.shrink_to_fit();
+
+    ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
 }
 
 TEST(SparseSet, Emplace) {
@@ -296,17 +298,19 @@ TEST(SparseSetDeathTest, Emplace) {
 }
 
 TEST(SparseSet, EmplaceOutOfBounds) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::sparse_set set{entt::deletion_policy::in_place};
-    entt::entity entities[2u]{entt::entity{0}, entt::entity{ENTT_SPARSE_PAGE}};
+    entt::entity entities[2u]{entt::entity{0}, entt::entity{traits_type::page_size}};
 
     ASSERT_NE(set.emplace(entities[0u]), set.end());
-    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.extent(), traits_type::page_size);
     ASSERT_EQ(set.index(entities[0u]), 0u);
 
     set.erase(entities[0u]);
 
     ASSERT_NE(set.emplace(entities[1u]), set.end());
-    ASSERT_EQ(set.extent(), 2u * ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.extent(), 2u * traits_type::page_size);
     ASSERT_EQ(set.index(entities[1u]), 0u);
 }
 
@@ -1312,6 +1316,8 @@ TEST(SparseSet, CustomAllocator) {
 }
 
 TEST(SparseSet, ThrowingAllocator) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::basic_sparse_set<entt::entity, test::throwing_allocator<entt::entity>> set{};
 
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
@@ -1323,37 +1329,37 @@ TEST(SparseSet, ThrowingAllocator) {
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
     ASSERT_THROW(set.emplace(entt::entity{0}), test::throwing_allocator<entt::entity>::exception_type);
-    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.extent(), traits_type::page_size);
     ASSERT_EQ(set.capacity(), 0u);
 
     set.emplace(entt::entity{0});
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
     ASSERT_THROW(set.reserve(2u), test::throwing_allocator<entt::entity>::exception_type);
-    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.extent(), traits_type::page_size);
     ASSERT_TRUE(set.contains(entt::entity{0}));
     ASSERT_EQ(set.capacity(), 1u);
 
     test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
     ASSERT_THROW(set.emplace(entt::entity{1}), test::throwing_allocator<entt::entity>::exception_type);
-    ASSERT_EQ(set.extent(), ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.extent(), traits_type::page_size);
     ASSERT_TRUE(set.contains(entt::entity{0}));
     ASSERT_FALSE(set.contains(entt::entity{1}));
     ASSERT_EQ(set.capacity(), 1u);
 
-    entt::entity entities[2u]{entt::entity{1}, entt::entity{ENTT_SPARSE_PAGE}};
+    entt::entity entities[2u]{entt::entity{1}, entt::entity{traits_type::page_size}};
     test::throwing_allocator<entt::entity>::trigger_after_allocate = true;
 
     ASSERT_THROW(set.insert(std::begin(entities), std::end(entities)), test::throwing_allocator<entt::entity>::exception_type);
-    ASSERT_EQ(set.extent(), 2 * ENTT_SPARSE_PAGE);
+    ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
     ASSERT_TRUE(set.contains(entt::entity{0}));
     ASSERT_TRUE(set.contains(entt::entity{1}));
-    ASSERT_FALSE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
+    ASSERT_FALSE(set.contains(entt::entity{traits_type::page_size}));
     ASSERT_EQ(set.capacity(), 2u);
     ASSERT_EQ(set.size(), 2u);
 
     set.emplace(entities[1u]);
 
-    ASSERT_TRUE(set.contains(entt::entity{ENTT_SPARSE_PAGE}));
+    ASSERT_TRUE(set.contains(entt::entity{traits_type::page_size}));
 }

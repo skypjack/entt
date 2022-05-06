@@ -7,7 +7,6 @@
 #include <unordered_set>
 #include <utility>
 #include <gtest/gtest.h>
-#include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
@@ -16,7 +15,7 @@
 struct empty_type {};
 
 struct no_eto_type {
-    static constexpr std::size_t page_size = ENTT_PACKED_PAGE;
+    static constexpr std::size_t page_size = 1024u;
 };
 
 bool operator==(const no_eto_type &lhs, const no_eto_type &rhs) {

@@ -12,7 +12,6 @@ DOC:
 
 WIP:
 * use conditional noexcept properly
-* don't use entt_packed/sparse_page directly
 * add storage getter for filters to views and groups
 * emitter: runtime handlers, allocator support (ready for both already)
 * view: no storage_traits dependency -> use storage instead of components for the definition
