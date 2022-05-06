@@ -6,7 +6,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "../config/config.h"
 #include "delegate.hpp"
 #include "fwd.hpp"
 
@@ -97,7 +96,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    sigh(sigh &&other) ENTT_NOEXCEPT
+    sigh(sigh &&other) noexcept
         : calls{std::move(other.calls)} {}
 
     /**
@@ -105,7 +104,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    sigh(sigh &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+    sigh(sigh &&other, const allocator_type &allocator) noexcept
         : calls{std::move(other.calls), allocator} {}
 
     /**
@@ -123,7 +122,7 @@ public:
      * @param other The instance to move from.
      * @return This signal handler.
      */
-    sigh &operator=(sigh &&other) ENTT_NOEXCEPT {
+    sigh &operator=(sigh &&other) noexcept {
         calls = std::move(other.calls);
         return *this;
     }
@@ -141,7 +140,7 @@ public:
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
-    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
         return calls.get_allocator();
     }
 
@@ -156,7 +155,7 @@ public:
      * @brief Number of listeners connected to the signal.
      * @return Number of listeners currently connected.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return calls.size();
     }
 
@@ -164,7 +163,7 @@ public:
      * @brief Returns false if at least a listener is connected to the signal.
      * @return True if the signal has no listeners connected, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return calls.empty();
     }
 
@@ -245,7 +244,7 @@ public:
      * @brief Checks whether a connection is properly initialized.
      * @return True if the connection is properly initialized, false otherwise.
      */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const noexcept {
         return static_cast<bool>(disconnect);
     }
 
@@ -289,7 +288,7 @@ struct scoped_connection {
      * @brief Move constructor.
      * @param other The scoped connection to move from.
      */
-    scoped_connection(scoped_connection &&other) ENTT_NOEXCEPT
+    scoped_connection(scoped_connection &&other) noexcept
         : conn{std::exchange(other.conn, {})} {}
 
     /*! @brief Automatically breaks the link on destruction. */
@@ -308,7 +307,7 @@ struct scoped_connection {
      * @param other The scoped connection to move from.
      * @return This scoped connection.
      */
-    scoped_connection &operator=(scoped_connection &&other) ENTT_NOEXCEPT {
+    scoped_connection &operator=(scoped_connection &&other) noexcept {
         conn = std::exchange(other.conn, {});
         return *this;
     }
@@ -327,7 +326,7 @@ struct scoped_connection {
      * @brief Checks whether a scoped connection is properly initialized.
      * @return True if the connection is properly initialized, false otherwise.
      */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const noexcept {
         return static_cast<bool>(conn);
     }
 
@@ -379,7 +378,7 @@ public:
      * @brief Constructs a sink that is allowed to modify a given signal.
      * @param ref A valid reference to a signal object.
      */
-    sink(sigh<Ret(Args...), Allocator> &ref) ENTT_NOEXCEPT
+    sink(sigh<Ret(Args...), Allocator> &ref) noexcept
         : offset{},
           signal{&ref} {}
 
@@ -387,7 +386,7 @@ public:
      * @brief Returns false if at least a listener is connected to the sink.
      * @return True if the sink has no listeners connected, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return signal->calls.empty();
     }
 

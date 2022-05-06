@@ -5,7 +5,6 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
@@ -61,7 +60,7 @@ public:
         : handlers{} {}
 
     /*! @brief Default destructor. */
-    virtual ~emitter() ENTT_NOEXCEPT {
+    virtual ~emitter() noexcept {
         static_assert(std::is_base_of_v<emitter<Derived>, Derived>, "Invalid emitter type");
     }
 
@@ -106,7 +105,7 @@ public:
     }
 
     /*! @brief Disconnects all the listeners. */
-    void clear() ENTT_NOEXCEPT {
+    void clear() noexcept {
         handlers.clear();
     }
 
@@ -124,7 +123,7 @@ public:
      * @brief Checks if there are listeners registered with the event emitter.
      * @return True if there are no listeners registered, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return handlers.empty();
     }
 
