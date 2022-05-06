@@ -5,7 +5,6 @@
 #include <functional>
 #include <type_traits>
 #include <utility>
-#include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "meta.hpp"
 #include "node.hpp"
@@ -181,7 +180,7 @@ meta_any meta_dispatch([[maybe_unused]] Type &&value) {
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
-[[nodiscard]] static meta_type meta_arg(const std::size_t index) ENTT_NOEXCEPT {
+[[nodiscard]] static meta_type meta_arg(const std::size_t index) noexcept {
     return internal::meta_arg_node(Type{}, index);
 }
 

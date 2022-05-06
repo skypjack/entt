@@ -39,7 +39,7 @@ struct basic_meta_sequence_container_traits {
     using iterator = meta_sequence_container::iterator;
     using size_type = std::size_t;
 
-    [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
+    [[nodiscard]] static size_type size(const any &container) noexcept {
         return any_cast<const Type &>(container).size();
     }
 
@@ -97,7 +97,7 @@ struct basic_meta_associative_container_traits {
 
     static constexpr auto key_only = is_key_only_meta_associative_container<Type>::value;
 
-    [[nodiscard]] static size_type size(const any &container) ENTT_NOEXCEPT {
+    [[nodiscard]] static size_type size(const any &container) noexcept {
         return any_cast<const Type &>(container).size();
     }
 

@@ -26,7 +26,7 @@ namespace entt {
 
 namespace internal {
 
-inline void link_prop_if_required(internal::meta_prop_node **ref, internal::meta_prop_node &node) ENTT_NOEXCEPT {
+inline void link_prop_if_required(internal::meta_prop_node **ref, internal::meta_prop_node &node) noexcept {
     if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*ref}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&node](const auto *curr) { return curr->id == node.id; }) == range.cend(), "Duplicate identifier");
         node.next = *ref;
@@ -34,7 +34,7 @@ inline void link_prop_if_required(internal::meta_prop_node **ref, internal::meta
     }
 }
 
-inline void link_type_if_required(meta_type_node *owner, const id_type id) ENTT_NOEXCEPT {
+inline void link_type_if_required(meta_type_node *owner, const id_type id) noexcept {
     meta_range<meta_type_node *, meta_type_node> range{*meta_context::global()};
     ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&](const auto *curr) { return curr != owner && curr->id == id; }) == range.cend(), "Duplicate identifier");
     owner->id = id;
@@ -45,28 +45,28 @@ inline void link_type_if_required(meta_type_node *owner, const id_type id) ENTT_
     }
 }
 
-inline void link_base_if_required(meta_type_node *owner, meta_base_node &node) ENTT_NOEXCEPT {
+inline void link_base_if_required(meta_type_node *owner, meta_base_node &node) noexcept {
     if(meta_range<meta_base_node *, meta_base_node> range{owner->base}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         node.next = owner->base;
         owner->base = &node;
     }
 }
 
-inline void link_conv_if_required(meta_type_node *owner, meta_conv_node &node) ENTT_NOEXCEPT {
+inline void link_conv_if_required(meta_type_node *owner, meta_conv_node &node) noexcept {
     if(meta_range<meta_conv_node *, meta_conv_node> range{owner->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         node.next = owner->conv;
         owner->conv = &node;
     }
 }
 
-inline void link_ctor_if_required(meta_type_node *owner, meta_ctor_node &node) ENTT_NOEXCEPT {
+inline void link_ctor_if_required(meta_type_node *owner, meta_ctor_node &node) noexcept {
     if(meta_range<meta_ctor_node *, meta_ctor_node> range{owner->ctor}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         node.next = owner->ctor;
         owner->ctor = &node;
     }
 }
 
-inline void link_data_if_required(meta_type_node *owner, const id_type id, meta_data_node &node) ENTT_NOEXCEPT {
+inline void link_data_if_required(meta_type_node *owner, const id_type id, meta_data_node &node) noexcept {
     meta_range<meta_data_node *, meta_data_node> range{owner->data};
     ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id, &node](const auto *curr) { return curr != &node && curr->id == id; }) == range.cend(), "Duplicate identifier");
     node.id = id;
@@ -77,7 +77,7 @@ inline void link_data_if_required(meta_type_node *owner, const id_type id, meta_
     }
 }
 
-inline void link_func_if_required(meta_type_node *owner, const id_type id, meta_func_node &node) ENTT_NOEXCEPT {
+inline void link_func_if_required(meta_type_node *owner, const id_type id, meta_func_node &node) noexcept {
     node.id = id;
 
     if(meta_range<meta_func_node *, meta_func_node> range{owner->func}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
@@ -112,25 +112,25 @@ class meta_factory;
 template<typename Type, typename... Spec>
 class meta_factory<Type, Spec...>: public meta_factory<Type> {
     template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<2>, std::tuple<Property...> property, Other &&...other) ENTT_NOEXCEPT {
+    void unroll(choice_t<2>, std::tuple<Property...> property, Other &&...other) noexcept {
         std::apply([this](auto &&...curr) { (this->unroll<Step>(choice<2>, std::forward<Property>(curr)...)); }, property);
         unroll<Step + sizeof...(Property)>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<1>, std::pair<Property...> property, Other &&...other) ENTT_NOEXCEPT {
+    void unroll(choice_t<1>, std::pair<Property...> property, Other &&...other) noexcept {
         assign<Step>(std::move(property.first), std::move(property.second));
         unroll<Step + 1>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t Step = 0, typename Property, typename... Other>
-    void unroll(choice_t<0>, Property &&property, Other &&...other) ENTT_NOEXCEPT {
+    void unroll(choice_t<0>, Property &&property, Other &&...other) noexcept {
         assign<Step>(std::forward<Property>(property));
         unroll<Step + 1>(choice<2>, std::forward<Other>(other)...);
     }
 
     template<std::size_t>
-    void unroll(choice_t<0>) ENTT_NOEXCEPT {}
+    void unroll(choice_t<0>) noexcept {}
 
     template<std::size_t = 0>
     void assign(meta_any key, meta_any value = {}) {
@@ -154,7 +154,7 @@ public:
      * @brief Constructs an extended factory from a given node.
      * @param target The underlying node to which to assign the properties.
      */
-    meta_factory(internal::meta_prop_node **target) ENTT_NOEXCEPT
+    meta_factory(internal::meta_prop_node **target) noexcept
         : ref{target} {}
 
     /**
@@ -205,7 +205,7 @@ private:
 template<typename Type>
 class meta_factory<Type> {
     template<typename Setter, auto Getter, typename Policy, std::size_t... Index>
-    auto data(const id_type id, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+    auto data(const id_type id, std::index_sequence<Index...>) noexcept {
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
         using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
@@ -230,7 +230,7 @@ class meta_factory<Type> {
 
 public:
     /*! @brief Default constructor. */
-    meta_factory() ENTT_NOEXCEPT
+    meta_factory() noexcept
         : owner{internal::meta_node<Type>::resolve()} {}
 
     /**
@@ -238,7 +238,7 @@ public:
      * @param id Optional unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto type(const id_type id = type_hash<Type>::value()) ENTT_NOEXCEPT {
+    auto type(const id_type id = type_hash<Type>::value()) noexcept {
         internal::link_type_if_required(owner, id);
         return meta_factory<Type, Type>{&owner->prop};
     }
@@ -252,13 +252,13 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Base>
-    auto base() ENTT_NOEXCEPT {
+    auto base() noexcept {
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
 
         static internal::meta_base_node node{
             nullptr,
             internal::meta_node<Base>::resolve(),
-            [](meta_any other) ENTT_NOEXCEPT -> meta_any {
+            [](meta_any other) noexcept -> meta_any {
                 if(auto *ptr = other.data(); ptr) {
                     return forward_as_meta(*static_cast<Base *>(static_cast<Type *>(ptr)));
                 }
@@ -285,7 +285,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate>
-    auto conv() ENTT_NOEXCEPT {
+    auto conv() noexcept {
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>>::resolve(),
@@ -309,7 +309,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename To>
-    auto conv() ENTT_NOEXCEPT {
+    auto conv() noexcept {
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<std::remove_cv_t<std::remove_reference_t<To>>>::resolve(),
@@ -335,7 +335,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto ctor() ENTT_NOEXCEPT {
+    auto ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
@@ -363,7 +363,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<typename... Args>
-    auto ctor() ENTT_NOEXCEPT {
+    auto ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
 
         static internal::meta_ctor_node node{
@@ -397,7 +397,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Func>
-    auto dtor() ENTT_NOEXCEPT {
+    auto dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         owner->dtor = [](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
         return meta_factory<Type>{};
@@ -417,7 +417,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    auto data(const id_type id) ENTT_NOEXCEPT {
+    auto data(const id_type id) noexcept {
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
 
@@ -479,7 +479,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const id_type id) ENTT_NOEXCEPT {
+    auto data(const id_type id) noexcept {
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
@@ -540,7 +540,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<typename Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const id_type id) ENTT_NOEXCEPT {
+    auto data(const id_type id) noexcept {
         return data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
     }
 
@@ -558,7 +558,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto func(const id_type id) ENTT_NOEXCEPT {
+    auto func(const id_type id) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
@@ -594,7 +594,7 @@ private:
  * @return A meta factory for the given type.
  */
 template<typename Type>
-[[nodiscard]] auto meta() ENTT_NOEXCEPT {
+[[nodiscard]] auto meta() noexcept {
     auto *const node = internal::meta_node<Type>::resolve();
     // extended meta factory to allow assigning properties to opaque meta types
     return meta_factory<Type, Type>{&node->prop};
@@ -611,7 +611,7 @@ template<typename Type>
  *
  * @param id Unique identifier.
  */
-inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
+inline void meta_reset(const id_type id) noexcept {
     auto clear_chain = [](auto **curr, auto... member) {
         for(; *curr; *curr = std::exchange((*curr)->next, nullptr)) {
             if constexpr(sizeof...(member) != 0u) {
@@ -647,7 +647,7 @@ inline void meta_reset(const id_type id) ENTT_NOEXCEPT {
  * @tparam Type Type to reset.
  */
 template<typename Type>
-void meta_reset() ENTT_NOEXCEPT {
+void meta_reset() noexcept {
     meta_reset(internal::meta_node<Type>::resolve()->id);
 }
 
@@ -656,7 +656,7 @@ void meta_reset() ENTT_NOEXCEPT {
  *
  * @sa meta_reset
  */
-inline void meta_reset() ENTT_NOEXCEPT {
+inline void meta_reset() noexcept {
     while(*internal::meta_context::global()) {
         meta_reset((*internal::meta_context::global())->id);
     }

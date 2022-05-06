@@ -1,7 +1,6 @@
 #ifndef ENTT_META_CTX_HPP
 #define ENTT_META_CTX_HPP
 
-#include "../config/config.h"
 #include "../core/attribute.h"
 
 namespace entt {
@@ -20,12 +19,12 @@ struct ENTT_API meta_context {
     //     inline static meta_type_node *local = nullptr;
     //     inline static meta_type_node **global = &local;
 
-    [[nodiscard]] static meta_type_node *&local() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_type_node *&local() noexcept {
         static meta_type_node *chain = nullptr;
         return chain;
     }
 
-    [[nodiscard]] static meta_type_node **&global() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_type_node **&global() noexcept {
         static meta_type_node **chain = &local();
         return chain;
     }
@@ -44,7 +43,7 @@ struct meta_ctx {
      * @brief Binds the meta system to a given context.
      * @param other A valid context to which to bind.
      */
-    static void bind(meta_ctx other) ENTT_NOEXCEPT {
+    static void bind(meta_ctx other) noexcept {
         internal::meta_context::global() = other.ctx;
     }
 

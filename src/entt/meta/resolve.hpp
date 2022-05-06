@@ -16,7 +16,7 @@ namespace entt {
  * @return The meta type associated with the given type, if any.
  */
 template<typename Type>
-[[nodiscard]] meta_type resolve() ENTT_NOEXCEPT {
+[[nodiscard]] meta_type resolve() noexcept {
     return internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve();
 }
 
@@ -24,7 +24,7 @@ template<typename Type>
  * @brief Returns a range to use to visit all meta types.
  * @return An iterable range to use to visit all meta types.
  */
-[[nodiscard]] inline meta_range<meta_type> resolve() ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_range<meta_type> resolve() noexcept {
     return *internal::meta_context::global();
 }
 
@@ -33,7 +33,7 @@ template<typename Type>
  * @param id Unique identifier.
  * @return The meta type associated with the given identifier, if any.
  */
-[[nodiscard]] inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type resolve(const id_type id) noexcept {
     for(auto &&curr: resolve()) {
         if(curr.id() == id) {
             return curr;
@@ -48,7 +48,7 @@ template<typename Type>
  * @param info The type info object of the requested type.
  * @return The meta type associated with the given type info object, if any.
  */
-[[nodiscard]] inline meta_type resolve(const type_info &info) ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type resolve(const type_info &info) noexcept {
     for(auto &&curr: resolve()) {
         if(curr.info() == info) {
             return curr;
