@@ -169,7 +169,7 @@ TEST(SingleComponentView, Each) {
     entt::registry registry;
     entt::entity entity[2]{registry.create(), registry.create()};
 
-    auto view = registry.view<int>();
+    auto view = registry.view<int>(entt::exclude<double>);
     auto cview = std::as_const(registry).view<const int>();
 
     registry.emplace<int>(entity[0u], 0);
@@ -673,7 +673,7 @@ TEST(MultiComponentView, Each) {
     entt::registry registry;
     entt::entity entity[2]{registry.create(), registry.create()};
 
-    auto view = registry.view<int, char>();
+    auto view = registry.view<int, char>(entt::exclude<double>);
     auto cview = std::as_const(registry).view<const int, const char>();
 
     registry.emplace<int>(entity[0u], 0);

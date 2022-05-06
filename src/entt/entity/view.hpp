@@ -25,16 +25,14 @@ namespace entt {
 
 namespace internal {
 
-template<typename, typename, typename>
-class view_iterator;
-
-template<typename Type, std::size_t... AllOf, std::size_t... AnyOf>
-class view_iterator<Type, std::index_sequence<AllOf...>, std::index_sequence<AnyOf...>> final {
-    static constexpr std::size_t pool_count = sizeof...(AllOf) + sizeof...(AnyOf);
+template<typename Type, std::size_t Component, std::size_t Exclude>
+class view_iterator final {
     using iterator_type = typename Type::const_iterator;
 
     [[nodiscard]] bool valid() const noexcept {
-        return ((sizeof...(AllOf) != 0u) || (*it != tombstone)) && (std::get<AllOf>(pools)->contains(*it) && ...) && (!std::get<AnyOf>(pools)->contains(*it) && ...);
+        return ((Component != 0u) || (*it != tombstone))
+               && std::apply([entt = *it](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
+               && std::apply([entt = *it](const auto *...curr) { return (!curr->contains(entt) && ...); }, filter);
     }
 
 public:
@@ -46,10 +44,11 @@ public:
 
     constexpr view_iterator() noexcept = default;
 
-    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, pool_count> ref) noexcept
+    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) noexcept
         : it{curr},
           last{to},
-          pools{ref} {
+          pools{all_of},
+          filter{none_of} {
         if(it != last && !valid()) {
             ++(*this);
         }
@@ -73,21 +72,22 @@ public:
         return *operator->();
     }
 
-    template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
+    template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
     friend constexpr bool operator==(const view_iterator<LhsType, LhsArgs...> &, const view_iterator<RhsType, RhsArgs...> &) noexcept;
 
 private:
     iterator_type it;
     iterator_type last;
-    std::array<const Type *, pool_count> pools;
+    std::array<const Type *, Component> pools;
+    std::array<const Type *, Exclude> filter;
 };
 
-template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
+template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 [[nodiscard]] constexpr bool operator==(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) noexcept {
     return lhs.it == rhs.it;
 }
 
-template<typename LhsType, typename... LhsArgs, typename RhsType, typename... RhsArgs>
+template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 [[nodiscard]] constexpr bool operator!=(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) noexcept {
     return !(lhs == rhs);
 }
@@ -191,13 +191,14 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     template<typename Comp>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
-    template<std::size_t... Index>
-    [[nodiscard]] auto opaque_set(std::index_sequence<Index...>) const noexcept {
-        std::size_t pos{};
-        std::array<const base_type *, sizeof...(Component) + sizeof...(Exclude) - 1u> arr{};
-        (static_cast<void>(std::get<Index>(pools) == view ? void() : void(arr[pos++] = std::get<Index>(pools))), ...);
-        std::apply([&arr, &pos](auto *...curr) mutable { ((arr[pos++] = curr), ...); }, filter);
-        return arr;
+    [[nodiscard]] auto opaque_check() const noexcept {
+        std::array<const base_type *, sizeof...(Component) - 1u> other{};
+        std::apply([&other, pos = 0u, view = view](const auto *...curr) mutable { ((curr == view ? void() : void(other[pos++] = curr)), ...); }, pools);
+        return other;
+    }
+
+    [[nodiscard]] auto opaque_filter() const noexcept {
+        return std::apply([](const auto *...curr) { return std::array<const base_type *, sizeof...(Exclude)>{curr...}; }, filter);
     }
 
     template<std::size_t Comp, std::size_t Other, typename... Args>
@@ -239,7 +240,7 @@ public:
     /*! @brief Common type among all storage types. */
     using base_type = std::common_type_t<typename storage_type<Component>::base_type...>;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<base_type, std::make_index_sequence<sizeof...(Component) - 1u>, std::index_sequence_for<Exclude...>>;
+    using iterator = internal::view_iterator<base_type, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable = iterable_adaptor<internal::extended_view_iterator<iterator, storage_type<Component>...>>;
 
@@ -336,7 +337,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return iterator{view->begin(), view->end(), opaque_set(std::index_sequence_for<Component...>{})};
+        return iterator{view->begin(), view->end(), opaque_check(), opaque_filter()};
     }
 
     /**
@@ -349,7 +350,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return iterator{view->end(), view->end(), opaque_set(std::index_sequence_for<Component...>{})};
+        return iterator{view->end(), view->end(), opaque_check(), opaque_filter()};
     }
 
     /**
@@ -380,7 +381,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{view->find(entt), view->end(), opaque_set(std::index_sequence_for<Component...>{})} : end();
+        return contains(entt) ? iterator{view->find(entt), view->end(), opaque_check(), opaque_filter()} : end();
     }
 
     /**
