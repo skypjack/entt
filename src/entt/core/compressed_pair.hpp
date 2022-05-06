@@ -25,9 +25,9 @@ struct compressed_pair_element {
     constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<Type>)
         : value{} {}
 
-    template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
-    constexpr compressed_pair_element(Args &&args) noexcept(std::is_nothrow_constructible_v<Type, Args>)
-        : value{std::forward<Args>(args)} {}
+    template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Arg>>, compressed_pair_element>>>
+    constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<Type, Arg>)
+        : value{std::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
     constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>) noexcept(std::is_nothrow_constructible_v<Type, Args...>)
@@ -55,9 +55,9 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
     constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<base_type>)
         : base_type{} {}
 
-    template<typename Args, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Args>>, compressed_pair_element>>>
-    constexpr compressed_pair_element(Args &&args) noexcept(std::is_nothrow_constructible_v<base_type, Args>)
-        : base_type{std::forward<Args>(args)} {}
+    template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Arg>>, compressed_pair_element>>>
+    constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<base_type, Arg>)
+        : base_type{std::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
     constexpr compressed_pair_element(std::tuple<Args...> args, std::index_sequence<Index...>) noexcept(std::is_nothrow_constructible_v<base_type, Args...>)
@@ -110,7 +110,7 @@ public:
      * @tparam Dummy Dummy template parameter used for internal purposes.
      */
     template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<first_type> && std::is_default_constructible_v<second_type>>>
-    constexpr compressed_pair()
+    constexpr compressed_pair() noexcept(std::is_nothrow_default_constructible_v<first_base> &&std::is_nothrow_default_constructible_v<second_base>)
         : first_base{},
           second_base{} {}
 
@@ -118,13 +118,13 @@ public:
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    constexpr compressed_pair(const compressed_pair &other) = default;
+    constexpr compressed_pair(const compressed_pair &other) noexcept(std::is_nothrow_copy_constructible_v<first_base> &&std::is_nothrow_copy_constructible_v<second_base>) = default;
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    constexpr compressed_pair(compressed_pair &&other) = default;
+    constexpr compressed_pair(compressed_pair &&other) noexcept(std::is_nothrow_move_constructible_v<first_base> &&std::is_nothrow_move_constructible_v<second_base>) = default;
 
     /**
      * @brief Constructs a pair from its values.
@@ -134,7 +134,7 @@ public:
      * @param other Value to use to initialize the second element.
      */
     template<typename Arg, typename Other>
-    constexpr compressed_pair(Arg &&arg, Other &&other)
+    constexpr compressed_pair(Arg &&arg, Other &&other) noexcept(std::is_nothrow_constructible_v<first_base, Arg> &&std::is_nothrow_constructible_v<second_base, Other>)
         : first_base{std::forward<Arg>(arg)},
           second_base{std::forward<Other>(other)} {}
 
@@ -146,7 +146,7 @@ public:
      * @param other Arguments to use to initialize the second element.
      */
     template<typename... Args, typename... Other>
-    constexpr compressed_pair(std::piecewise_construct_t, std::tuple<Args...> args, std::tuple<Other...> other)
+    constexpr compressed_pair(std::piecewise_construct_t, std::tuple<Args...> args, std::tuple<Other...> other) noexcept(std::is_nothrow_constructible_v<first_base, Args...> &&std::is_nothrow_constructible_v<second_base, Other...>)
         : first_base{std::move(args), std::index_sequence_for<Args...>{}},
           second_base{std::move(other), std::index_sequence_for<Other...>{}} {}
 
@@ -155,14 +155,14 @@ public:
      * @param other The instance to copy from.
      * @return This compressed pair object.
      */
-    constexpr compressed_pair &operator=(const compressed_pair &other) = default;
+    constexpr compressed_pair &operator=(const compressed_pair &other) noexcept(std::is_nothrow_copy_assignable_v<first_base> &&std::is_nothrow_copy_assignable_v<second_base>) = default;
 
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
      * @return This compressed pair object.
      */
-    constexpr compressed_pair &operator=(compressed_pair &&other) = default;
+    constexpr compressed_pair &operator=(compressed_pair &&other) noexcept(std::is_nothrow_move_assignable_v<first_base> &&std::is_nothrow_move_assignable_v<second_base>) = default;
 
     /**
      * @brief Returns the first element that a pair stores.
@@ -194,7 +194,7 @@ public:
      * @brief Swaps two compressed pair objects.
      * @param other The compressed pair to swap with.
      */
-    constexpr void swap(compressed_pair &other) {
+    constexpr void swap(compressed_pair &other) noexcept(std::is_nothrow_swappable_v<first_type> &&std::is_nothrow_swappable_v<second_type>) {
         using std::swap;
         swap(first(), other.first());
         swap(second(), other.second());
