@@ -26,7 +26,8 @@ struct as_view {
      * @brief Constructs a converter for a given registry.
      * @param source A valid reference to a registry.
      */
-    as_view(registry_type &source) ENTT_NOEXCEPT: reg{source} {}
+    as_view(registry_type &source) noexcept
+        : reg{source} {}
 
     /**
      * @brief Conversion function from a registry to a view.
@@ -72,7 +73,8 @@ struct as_group {
      * @brief Constructs a converter for a given registry.
      * @param source A valid reference to a registry.
      */
-    as_group(registry_type &source) ENTT_NOEXCEPT: reg{source} {}
+    as_group(registry_type &source) noexcept
+        : reg{source} {}
 
     /**
      * @brief Conversion function from a registry to a group.

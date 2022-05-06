@@ -32,63 +32,63 @@ struct sparse_set_iterator final {
     using difference_type = typename Container::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
-    constexpr sparse_set_iterator() ENTT_NOEXCEPT
+    constexpr sparse_set_iterator() noexcept
         : packed{},
           offset{} {}
 
-    constexpr sparse_set_iterator(const Container &ref, const difference_type idx) ENTT_NOEXCEPT
+    constexpr sparse_set_iterator(const Container &ref, const difference_type idx) noexcept
         : packed{std::addressof(ref)},
           offset{idx} {}
 
-    constexpr sparse_set_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator &operator++() noexcept {
         return --offset, *this;
     }
 
-    constexpr sparse_set_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator operator++(int) noexcept {
         sparse_set_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    constexpr sparse_set_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator &operator--() noexcept {
         return ++offset, *this;
     }
 
-    constexpr sparse_set_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator operator--(int) noexcept {
         sparse_set_iterator orig = *this;
         return operator--(), orig;
     }
 
-    constexpr sparse_set_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator &operator+=(const difference_type value) noexcept {
         offset -= value;
         return *this;
     }
 
-    constexpr sparse_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator operator+(const difference_type value) const noexcept {
         sparse_set_iterator copy = *this;
         return (copy += value);
     }
 
-    constexpr sparse_set_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator &operator-=(const difference_type value) noexcept {
         return (*this += -value);
     }
 
-    constexpr sparse_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr sparse_set_iterator operator-(const difference_type value) const noexcept {
         return (*this + -value);
     }
 
-    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         return packed->data()[index() - value];
     }
 
-    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
         return packed->data() + index();
     }
 
-    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const noexcept {
         return *operator->();
     }
 
-    [[nodiscard]] constexpr difference_type index() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr difference_type index() const noexcept {
         return offset - 1;
     }
 
@@ -98,37 +98,37 @@ private:
 };
 
 template<typename Type, typename Other>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) noexcept {
     return rhs.index() - lhs.index();
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] constexpr bool operator==(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) noexcept {
     return lhs.index() == rhs.index();
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] constexpr bool operator!=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] constexpr bool operator<(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) noexcept {
     return lhs.index() > rhs.index();
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] constexpr bool operator>(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) noexcept {
     return lhs.index() < rhs.index();
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] constexpr bool operator<=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
 template<typename Type, typename Other>
-[[nodiscard]] constexpr bool operator>=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const sparse_set_iterator<Type> &lhs, const sparse_set_iterator<Other> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -340,7 +340,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_sparse_set(basic_sparse_set &&other) ENTT_NOEXCEPT
+    basic_sparse_set(basic_sparse_set &&other) noexcept
         : sparse{std::move(other.sparse)},
           packed{std::move(other.packed)},
           info{other.info},
@@ -352,7 +352,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+    basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) v
         : sparse{std::move(other.sparse), allocator},
           packed{std::move(other.packed), allocator},
           info{other.info},
@@ -371,7 +371,7 @@ public:
      * @param other The instance to move from.
      * @return This sparse set.
      */
-    basic_sparse_set &operator=(basic_sparse_set &&other) ENTT_NOEXCEPT {
+    basic_sparse_set &operator=(basic_sparse_set &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
 
         release_sparse_pages();
@@ -400,7 +400,7 @@ public:
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
-    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
         return packed.get_allocator();
     }
 
@@ -408,7 +408,7 @@ public:
      * @brief Returns the deletion policy of a sparse set.
      * @return The deletion policy of the sparse set.
      */
-    [[nodiscard]] deletion_policy policy() const ENTT_NOEXCEPT {
+    [[nodiscard]] deletion_policy policy() const noexcept {
         return mode;
     }
 
@@ -429,7 +429,7 @@ public:
      * allocated space for.
      * @return Capacity of the sparse set.
      */
-    [[nodiscard]] virtual size_type capacity() const ENTT_NOEXCEPT {
+    [[nodiscard]] virtual size_type capacity() const noexcept {
         return packed.capacity();
     }
 
@@ -448,7 +448,7 @@ public:
      *
      * @return Extent of the sparse set.
      */
-    [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type extent() const noexcept {
         return sparse.size() * entity_traits::page_size;
     }
 
@@ -462,7 +462,7 @@ public:
      *
      * @return Number of elements.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return packed.size();
     }
 
@@ -470,7 +470,7 @@ public:
      * @brief Checks whether a sparse set is empty.
      * @return True if the sparse set is empty, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return packed.empty();
     }
 
@@ -478,7 +478,7 @@ public:
      * @brief Direct access to the internal packed array.
      * @return A pointer to the internal packed array.
      */
-    [[nodiscard]] pointer data() const ENTT_NOEXCEPT {
+    [[nodiscard]] pointer data() const noexcept {
         return packed.data();
     }
 
@@ -491,13 +491,13 @@ public:
      *
      * @return An iterator to the first entity of the sparse set.
      */
-    [[nodiscard]] const_iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator begin() const noexcept {
         const auto pos = static_cast<typename iterator::difference_type>(packed.size());
         return iterator{packed, pos};
     }
 
     /*! @copydoc begin */
-    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cbegin() const noexcept {
         return begin();
     }
 
@@ -511,12 +511,12 @@ public:
      * @return An iterator to the element following the last entity of a sparse
      * set.
      */
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const noexcept {
         return iterator{packed, {}};
     }
 
     /*! @copydoc end */
-    [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cend() const noexcept {
         return end();
     }
 
@@ -530,12 +530,12 @@ public:
      * @return An iterator to the first entity of the reversed internal packed
      * array.
      */
-    [[nodiscard]] const_reverse_iterator rbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reverse_iterator rbegin() const noexcept {
         return std::make_reverse_iterator(end());
     }
 
     /*! @copydoc rbegin */
-    [[nodiscard]] const_reverse_iterator crbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reverse_iterator crbegin() const noexcept {
         return rbegin();
     }
 
@@ -549,12 +549,12 @@ public:
      * @return An iterator to the element following the last entity of the
      * reversed sparse set.
      */
-    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+    [[nodiscard]] reverse_iterator rend() const noexcept {
         return std::make_reverse_iterator(begin());
     }
 
     /*! @copydoc rend */
-    [[nodiscard]] const_reverse_iterator crend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reverse_iterator crend() const noexcept {
         return rend();
     }
 
@@ -564,7 +564,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    [[nodiscard]] iterator find(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator find(const entity_type entt) const noexcept {
         return contains(entt) ? --(end() - index(entt)) : end();
     }
 
@@ -573,7 +573,7 @@ public:
      * @param entt A valid identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         const auto elem = sparse_ptr(entt);
         constexpr auto cap = entity_traits::to_entity(null);
         // testing versions permits to avoid accessing the packed array
@@ -586,7 +586,7 @@ public:
      * @return The version for the given identifier if present, the tombstone
      * version otherwise.
      */
-    [[nodiscard]] version_type current(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] version_type current(const entity_type entt) const noexcept {
         const auto elem = sparse_ptr(entt);
         constexpr auto fallback = entity_traits::to_version(tombstone);
         return elem ? entity_traits::to_version(*elem) : fallback;
@@ -602,7 +602,7 @@ public:
      * @param entt A valid identifier.
      * @return The position of the entity in the sparse set.
      */
-    [[nodiscard]] size_type index(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type index(const entity_type entt) const noexcept {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
         return static_cast<size_type>(entity_traits::to_entity(sparse_ref(entt)));
     }
@@ -612,7 +612,7 @@ public:
      * @param pos The position for which to return the entity.
      * @return The entity at specified location if any, a null entity otherwise.
      */
-    [[nodiscard]] entity_type at(const size_type pos) const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type at(const size_type pos) const noexcept {
         return pos < packed.size() ? packed[pos] : null;
     }
 
@@ -621,7 +621,7 @@ public:
      * @param pos The position for which to return the entity.
      * @return The entity at specified location.
      */
-    [[nodiscard]] entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type operator[](const size_type pos) const noexcept {
         ENTT_ASSERT(pos < packed.size(), "Position is out of bounds");
         return packed[pos];
     }
@@ -636,12 +636,12 @@ public:
      * @param entt A valid identifier.
      * @return An opaque pointer to the element assigned to the entity, if any.
      */
-    [[nodiscard]] const void *get(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] const void *get(const entity_type entt) const noexcept {
         return get_at(index(entt));
     }
 
     /*! @copydoc get */
-    [[nodiscard]] void *get(const entity_type entt) ENTT_NOEXCEPT {
+    [[nodiscard]] void *get(const entity_type entt) noexcept {
         return const_cast<void *>(std::as_const(*this).get(entt));
     }
 
@@ -939,12 +939,12 @@ public:
      * @brief Returned value type, if any.
      * @return Returned value type, if any.
      */
-    const type_info &type() const ENTT_NOEXCEPT {
+    const type_info &type() const noexcept {
         return *info;
     }
 
     /*! @brief Forwards variables to mixins, if any. */
-    virtual void bind(any) ENTT_NOEXCEPT {}
+    virtual void bind(any) noexcept {}
 
 private:
     sparse_container_type sparse;

@@ -51,25 +51,25 @@ public:
         : it{from},
           pools{cpools} {}
 
-    extended_group_iterator &operator++() ENTT_NOEXCEPT {
+    extended_group_iterator &operator++() noexcept {
         return ++it, *this;
     }
 
-    extended_group_iterator operator++(int) ENTT_NOEXCEPT {
+    extended_group_iterator operator++(int) noexcept {
         extended_group_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] reference operator*() const noexcept {
         return std::tuple_cat(std::make_tuple(*it), index_to_element(*std::get<Owned *>(pools))..., std::get<Get *>(pools)->get_as_tuple(*it)...);
     }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] pointer operator->() const noexcept {
         return operator*();
     }
 
     template<typename... Lhs, typename... Rhs>
-    friend constexpr bool operator==(const extended_group_iterator<Lhs...> &, const extended_group_iterator<Rhs...> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const extended_group_iterator<Lhs...> &, const extended_group_iterator<Rhs...> &) noexcept;
 
 private:
     It it;
@@ -77,12 +77,12 @@ private:
 };
 
 template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator==(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) noexcept {
     return lhs.it == rhs.it;
 }
 
 template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator!=(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
@@ -138,7 +138,7 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
 
     using basic_common_type = std::common_type_t<typename storage_type<Get>::base_type...>;
 
-    basic_group(basic_common_type &ref, storage_type<Get> &...gpool) ENTT_NOEXCEPT
+    basic_group(basic_common_type &ref, storage_type<Get> &...gpool) noexcept
         : handler{&ref},
           pools{&gpool...} {}
 
@@ -157,14 +157,14 @@ public:
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<storage_type<Get>...>>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
-    basic_group() ENTT_NOEXCEPT
+    basic_group() noexcept
         : handler{} {}
 
     /**
      * @brief Returns a const reference to the underlying handler.
      * @return A const reference to the underlying handler.
      */
-    const base_type &handle() const ENTT_NOEXCEPT {
+    const base_type &handle() const noexcept {
         return *handler;
     }
 
@@ -174,7 +174,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Comp>
-    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] decltype(auto) storage() const noexcept {
         return *std::get<index_of<Comp>>(pools);
     }
 
@@ -184,7 +184,7 @@ public:
      * @return The storage for the given component type.
      */
     template<std::size_t Comp>
-    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] decltype(auto) storage() const noexcept {
         return *std::get<Comp>(pools);
     }
 
@@ -192,7 +192,7 @@ public:
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return *this ? handler->size() : size_type{};
     }
 
@@ -201,7 +201,7 @@ public:
      * allocated space for.
      * @return Capacity of the group.
      */
-    [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type capacity() const noexcept {
         return *this ? handler->capacity() : size_type{};
     }
 
@@ -216,7 +216,7 @@ public:
      * @brief Checks whether a group is empty.
      * @return True if the group is empty, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return !*this || handler->empty();
     }
 
@@ -228,7 +228,7 @@ public:
      *
      * @return An iterator to the first entity of the group.
      */
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const noexcept {
         return *this ? handler->begin() : iterator{};
     }
 
@@ -242,7 +242,7 @@ public:
      * @return An iterator to the entity following the last entity of the
      * group.
      */
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const noexcept {
         return *this ? handler->end() : iterator{};
     }
 
@@ -254,7 +254,7 @@ public:
      *
      * @return An iterator to the first entity of the reversed group.
      */
-    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] reverse_iterator rbegin() const noexcept {
         return *this ? handler->rbegin() : reverse_iterator{};
     }
 
@@ -269,7 +269,7 @@ public:
      * @return An iterator to the entity following the last entity of the
      * reversed group.
      */
-    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+    [[nodiscard]] reverse_iterator rend() const noexcept {
         return *this ? handler->rend() : reverse_iterator{};
     }
 
@@ -278,7 +278,7 @@ public:
      * @return The first entity of the group if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type front() const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type front() const noexcept {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -288,7 +288,7 @@ public:
      * @return The last entity of the group if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type back() const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type back() const noexcept {
         const auto it = rbegin();
         return it != rend() ? *it : null;
     }
@@ -299,7 +299,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    [[nodiscard]] iterator find(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator find(const entity_type entt) const noexcept {
         const auto it = *this ? handler->find(entt) : iterator{};
         return it != end() && *it == entt ? it : end();
     }
@@ -317,7 +317,7 @@ public:
      * @brief Checks if a group is properly initialized.
      * @return True if the group is properly initialized, false otherwise.
      */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const noexcept {
         return handler != nullptr;
     }
 
@@ -326,7 +326,7 @@ public:
      * @param entt A valid identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         return *this && handler->contains(entt);
     }
 
@@ -404,7 +404,7 @@ public:
      *
      * @return An iterable object to use to _visit_ the group.
      */
-    [[nodiscard]] iterable each() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterable each() const noexcept {
         return iterable{{begin(), pools}, {end(), pools}};
     }
 
@@ -536,7 +536,7 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
     template<typename Comp>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
-    basic_group(const std::size_t &extent, storage_type<Owned> &...opool, storage_type<Get> &...gpool) ENTT_NOEXCEPT
+    basic_group(const std::size_t &extent, storage_type<Owned> &...opool, storage_type<Get> &...gpool) noexcept
         : pools{&opool..., &gpool...},
           length{&extent} {}
 
@@ -555,7 +555,7 @@ public:
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<storage_type<Owned>...>, get_t<storage_type<Get>...>>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
-    basic_group() ENTT_NOEXCEPT
+    basic_group() noexcept
         : length{} {}
 
     /**
@@ -564,7 +564,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Comp>
-    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] decltype(auto) storage() const noexcept {
         return *std::get<index_of<Comp>>(pools);
     }
 
@@ -574,7 +574,7 @@ public:
      * @return The storage for the given component type.
      */
     template<std::size_t Comp>
-    [[nodiscard]] decltype(auto) storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] decltype(auto) storage() const noexcept {
         return *std::get<Comp>(pools);
     }
 
@@ -582,7 +582,7 @@ public:
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return *this ? *length : size_type{};
     }
 
@@ -590,7 +590,7 @@ public:
      * @brief Checks whether a group is empty.
      * @return True if the group is empty, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return !*this || !*length;
     }
 
@@ -602,7 +602,7 @@ public:
      *
      * @return An iterator to the first entity of the group.
      */
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const noexcept {
         return *this ? (std::get<0>(pools)->base_type::end() - *length) : iterator{};
     }
 
@@ -616,7 +616,7 @@ public:
      * @return An iterator to the entity following the last entity of the
      * group.
      */
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const noexcept {
         return *this ? std::get<0>(pools)->base_type::end() : iterator{};
     }
 
@@ -628,7 +628,7 @@ public:
      *
      * @return An iterator to the first entity of the reversed group.
      */
-    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] reverse_iterator rbegin() const noexcept {
         return *this ? std::get<0>(pools)->base_type::rbegin() : reverse_iterator{};
     }
 
@@ -643,7 +643,7 @@ public:
      * @return An iterator to the entity following the last entity of the
      * reversed group.
      */
-    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+    [[nodiscard]] reverse_iterator rend() const noexcept {
         return *this ? (std::get<0>(pools)->base_type::rbegin() + *length) : reverse_iterator{};
     }
 
@@ -652,7 +652,7 @@ public:
      * @return The first entity of the group if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type front() const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type front() const noexcept {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -662,7 +662,7 @@ public:
      * @return The last entity of the group if one exists, the null entity
      * otherwise.
      */
-    [[nodiscard]] entity_type back() const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type back() const noexcept {
         const auto it = rbegin();
         return it != rend() ? *it : null;
     }
@@ -673,7 +673,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    [[nodiscard]] iterator find(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator find(const entity_type entt) const noexcept {
         const auto it = *this ? std::get<0>(pools)->find(entt) : iterator{};
         return it != end() && it >= begin() && *it == entt ? it : end();
     }
@@ -691,7 +691,7 @@ public:
      * @brief Checks if a group is properly initialized.
      * @return True if the group is properly initialized, false otherwise.
      */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const noexcept {
         return length != nullptr;
     }
 
@@ -700,7 +700,7 @@ public:
      * @param entt A valid identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    [[nodiscard]] bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         return *this && std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < (*length));
     }
 
@@ -778,7 +778,7 @@ public:
      *
      * @return An iterable object to use to _visit_ the group.
      */
-    [[nodiscard]] iterable each() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterable each() const noexcept {
         return {{begin(), pools}, {end(), pools}};
     }
 

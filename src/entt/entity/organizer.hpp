@@ -254,7 +254,7 @@ public:
          * @param length The length of the user-supplied buffer.
          * @return The number of type info objects written to the buffer.
          */
-        size_type ro_dependency(const type_info **buffer, const std::size_t length) const ENTT_NOEXCEPT {
+        size_type ro_dependency(const type_info **buffer, const std::size_t length) const noexcept {
             return node.dependency(false, buffer, length);
         }
 
@@ -265,7 +265,7 @@ public:
          * @param length The length of the user-supplied buffer.
          * @return The number of type info objects written to the buffer.
          */
-        size_type rw_dependency(const type_info **buffer, const std::size_t length) const ENTT_NOEXCEPT {
+        size_type rw_dependency(const type_info **buffer, const std::size_t length) const noexcept {
             return node.dependency(true, buffer, length);
         }
 
@@ -273,7 +273,7 @@ public:
          * @brief Returns the number of read-only resources of a vertex.
          * @return The number of read-only resources of the vertex.
          */
-        size_type ro_count() const ENTT_NOEXCEPT {
+        size_type ro_count() const noexcept {
             return node.ro_count;
         }
 
@@ -281,7 +281,7 @@ public:
          * @brief Returns the number of writable resources of a vertex.
          * @return The number of writable resources of the vertex.
          */
-        size_type rw_count() const ENTT_NOEXCEPT {
+        size_type rw_count() const noexcept {
             return node.rw_count;
         }
 
@@ -289,7 +289,7 @@ public:
          * @brief Checks if a vertex is also a top-level one.
          * @return True if the vertex is a top-level one, false otherwise.
          */
-        bool top_level() const ENTT_NOEXCEPT {
+        bool top_level() const noexcept {
             return is_top_level;
         }
 
@@ -297,7 +297,7 @@ public:
          * @brief Returns a type info object associated with a vertex.
          * @return A properly initialized type info object.
          */
-        const type_info &info() const ENTT_NOEXCEPT {
+        const type_info &info() const noexcept {
             return *node.info;
         }
 
@@ -305,7 +305,7 @@ public:
          * @brief Returns a user defined name associated with a vertex, if any.
          * @return The user defined name associated with the vertex, if any.
          */
-        const char *name() const ENTT_NOEXCEPT {
+        const char *name() const noexcept {
             return node.name;
         }
 
@@ -313,7 +313,7 @@ public:
          * @brief Returns the function associated with a vertex.
          * @return The function associated with the vertex.
          */
-        function_type *callback() const ENTT_NOEXCEPT {
+        function_type *callback() const noexcept {
             return node.callback;
         }
 
@@ -321,7 +321,7 @@ public:
          * @brief Returns the payload associated with a vertex, if any.
          * @return The payload associated with the vertex, if any.
          */
-        const void *data() const ENTT_NOEXCEPT {
+        const void *data() const noexcept {
             return node.payload;
         }
 
@@ -329,7 +329,7 @@ public:
          * @brief Returns the list of nodes reachable from a given vertex.
          * @return The list of nodes reachable from the vertex.
          */
-        const std::vector<std::size_t> &children() const ENTT_NOEXCEPT {
+        const std::vector<std::size_t> &children() const noexcept {
             return reachable;
         }
 

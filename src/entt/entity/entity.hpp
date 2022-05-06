@@ -79,7 +79,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the given value.
      */
-    [[nodiscard]] static constexpr entity_type to_integral(const value_type value) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr entity_type to_integral(const value_type value) noexcept {
         return static_cast<entity_type>(value);
     }
 
@@ -88,7 +88,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the entity part.
      */
-    [[nodiscard]] static constexpr entity_type to_entity(const value_type value) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr entity_type to_entity(const value_type value) noexcept {
         return (to_integral(value) & base_type::entity_mask);
     }
 
@@ -97,7 +97,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the version part.
      */
-    [[nodiscard]] static constexpr version_type to_version(const value_type value) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr version_type to_version(const value_type value) noexcept {
         return (to_integral(value) >> base_type::entity_shift);
     }
 
@@ -111,7 +111,7 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type construct(const entity_type entity, const version_type version) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr value_type construct(const entity_type entity, const version_type version) noexcept {
         return value_type{(entity & base_type::entity_mask) | (static_cast<entity_type>(version) << base_type::entity_shift)};
     }
 
@@ -125,7 +125,7 @@ public:
      * @param rhs The identifier from which to take the version part.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type combine(const entity_type lhs, const entity_type rhs) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr value_type combine(const entity_type lhs, const entity_type rhs) noexcept {
         constexpr auto mask = (base_type::version_mask << base_type::entity_shift);
         return value_type{(lhs & base_type::entity_mask) | (rhs & mask)};
     }
@@ -136,7 +136,7 @@ public:
  * @tparam Entity The value type.
  */
 template<typename Entity>
-[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_integral(const Entity value) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_integral(const Entity value) noexcept {
     return entt_traits<Entity>::to_integral(value);
 }
 
@@ -145,7 +145,7 @@ template<typename Entity>
  * @tparam Entity The value type.
  */
 template<typename Entity>
-[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_entity(const Entity value) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_entity(const Entity value) noexcept {
     return entt_traits<Entity>::to_entity(value);
 }
 
@@ -154,7 +154,7 @@ template<typename Entity>
  * @tparam Entity The value type.
  */
 template<typename Entity>
-[[nodiscard]] constexpr typename entt_traits<Entity>::version_type to_version(const Entity value) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr typename entt_traits<Entity>::version_type to_version(const Entity value) noexcept {
     return entt_traits<Entity>::to_version(value);
 }
 
@@ -166,7 +166,7 @@ struct null_t {
      * @return The null representation for the given type.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr operator Entity() const noexcept {
         using entity_traits = entt_traits<Entity>;
         return entity_traits::combine(entity_traits::reserved, entity_traits::reserved);
     }
@@ -176,7 +176,7 @@ struct null_t {
      * @param other A null object.
      * @return True in all cases.
      */
-    [[nodiscard]] constexpr bool operator==([[maybe_unused]] const null_t other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==([[maybe_unused]] const null_t other) const noexcept {
         return true;
     }
 
@@ -185,7 +185,7 @@ struct null_t {
      * @param other A null object.
      * @return False in all cases.
      */
-    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const null_t other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const null_t other) const noexcept {
         return false;
     }
 
@@ -196,7 +196,7 @@ struct null_t {
      * @return False if the two elements differ, true otherwise.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using entity_traits = entt_traits<Entity>;
         return entity_traits::to_entity(entity) == entity_traits::to_entity(*this);
     }
@@ -208,7 +208,7 @@ struct null_t {
      * @return True if the two elements differ, false otherwise.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(const Entity entity) const noexcept {
         return !(entity == *this);
     }
 };
@@ -221,7 +221,7 @@ struct null_t {
  * @return False if the two elements differ, true otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator==(const Entity entity, const null_t other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const Entity entity, const null_t other) noexcept {
     return other.operator==(entity);
 }
 
@@ -233,7 +233,7 @@ template<typename Entity>
  * @return True if the two elements differ, false otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity entity, const null_t other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const Entity entity, const null_t other) noexcept {
     return !(other == entity);
 }
 
@@ -245,7 +245,7 @@ struct tombstone_t {
      * @return The tombstone representation for the given type.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr operator Entity() const noexcept {
         using entity_traits = entt_traits<Entity>;
         return entity_traits::combine(entity_traits::reserved, entity_traits::reserved);
     }
@@ -255,7 +255,7 @@ struct tombstone_t {
      * @param other A tombstone object.
      * @return True in all cases.
      */
-    [[nodiscard]] constexpr bool operator==([[maybe_unused]] const tombstone_t other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==([[maybe_unused]] const tombstone_t other) const noexcept {
         return true;
     }
 
@@ -264,7 +264,7 @@ struct tombstone_t {
      * @param other A tombstone object.
      * @return False in all cases.
      */
-    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const tombstone_t other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const tombstone_t other) const noexcept {
         return false;
     }
 
@@ -275,7 +275,7 @@ struct tombstone_t {
      * @return False if the two elements differ, true otherwise.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using entity_traits = entt_traits<Entity>;
         return entity_traits::to_version(entity) == entity_traits::to_version(*this);
     }
@@ -287,7 +287,7 @@ struct tombstone_t {
      * @return True if the two elements differ, false otherwise.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(const Entity entity) const noexcept {
         return !(entity == *this);
     }
 };
@@ -300,7 +300,7 @@ struct tombstone_t {
  * @return False if the two elements differ, true otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator==(const Entity entity, const tombstone_t other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const Entity entity, const tombstone_t other) noexcept {
     return other.operator==(entity);
 }
 
@@ -312,7 +312,7 @@ template<typename Entity>
  * @return True if the two elements differ, false otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity entity, const tombstone_t other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const Entity entity, const tombstone_t other) noexcept {
     return !(other == entity);
 }
 

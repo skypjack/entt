@@ -4,7 +4,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
 #include "registry.hpp"
@@ -31,7 +30,7 @@ struct basic_handle {
     using size_type = typename registry_type::size_type;
 
     /*! @brief Constructs an invalid handle. */
-    basic_handle() ENTT_NOEXCEPT
+    basic_handle() noexcept
         : reg{},
           entt{null} {}
 
@@ -40,7 +39,7 @@ struct basic_handle {
      * @param ref An instance of the registry class.
      * @param value A valid identifier.
      */
-    basic_handle(registry_type &ref, entity_type value) ENTT_NOEXCEPT
+    basic_handle(registry_type &ref, entity_type value) noexcept
         : reg{&ref},
           entt{value} {}
 
@@ -52,7 +51,7 @@ struct basic_handle {
      * entity.
      */
     template<typename Other, typename... Args>
-    operator basic_handle<Other, Args...>() const ENTT_NOEXCEPT {
+    operator basic_handle<Other, Args...>() const noexcept {
         static_assert(std::is_same_v<Other, Entity> || std::is_same_v<std::remove_const_t<Other>, Entity>, "Invalid conversion between different handles");
         static_assert((sizeof...(Type) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Type)) && ... && (type_list_contains_v<type_list<Type...>, Args>))), "Invalid conversion between different handles");
 
@@ -63,7 +62,7 @@ struct basic_handle {
      * @brief Converts a handle to its underlying entity.
      * @return The contained identifier.
      */
-    [[nodiscard]] operator entity_type() const ENTT_NOEXCEPT {
+    [[nodiscard]] operator entity_type() const noexcept {
         return entity();
     }
 
@@ -71,7 +70,7 @@ struct basic_handle {
      * @brief Checks if a handle refers to non-null registry pointer and entity.
      * @return True if the handle refers to non-null registry and entity, false otherwise.
      */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const noexcept {
         return reg && reg->valid(entt);
     }
 
@@ -87,7 +86,7 @@ struct basic_handle {
      * @brief Returns a pointer to the underlying registry, if any.
      * @return A pointer to the underlying registry, if any.
      */
-    [[nodiscard]] registry_type *registry() const ENTT_NOEXCEPT {
+    [[nodiscard]] registry_type *registry() const noexcept {
         return reg;
     }
 
@@ -95,7 +94,7 @@ struct basic_handle {
      * @brief Returns the entity associated with a handle.
      * @return The entity associated with the handle.
      */
-    [[nodiscard]] entity_type entity() const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type entity() const noexcept {
         return entt;
     }
 
@@ -303,7 +302,7 @@ private:
  * entity, false otherwise.
  */
 template<typename... Args, typename... Other>
-[[nodiscard]] bool operator==(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] bool operator==(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) noexcept {
     return lhs.registry() == rhs.registry() && lhs.entity() == rhs.entity();
 }
 
@@ -317,7 +316,7 @@ template<typename... Args, typename... Other>
  * entity, true otherwise.
  */
 template<typename... Args, typename... Other>
-[[nodiscard]] bool operator!=(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] bool operator!=(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) noexcept {
     return !(lhs == rhs);
 }
 

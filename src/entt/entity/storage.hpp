@@ -48,68 +48,68 @@ public:
     using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
-    constexpr storage_iterator() ENTT_NOEXCEPT = default;
+    constexpr storage_iterator() noexcept = default;
 
-    constexpr storage_iterator(Container *ref, difference_type idx) ENTT_NOEXCEPT
+    constexpr storage_iterator(Container *ref, difference_type idx) noexcept
         : packed{ref},
           offset{idx} {}
 
     template<bool Const = std::is_const_v<Container>, typename = std::enable_if_t<Const>>
-    constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) ENTT_NOEXCEPT
+    constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) noexcept
         : packed{other.packed},
           offset{other.offset} {}
 
-    constexpr storage_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr storage_iterator &operator++() noexcept {
         return --offset, *this;
     }
 
-    constexpr storage_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr storage_iterator operator++(int) noexcept {
         storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    constexpr storage_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr storage_iterator &operator--() noexcept {
         return ++offset, *this;
     }
 
-    constexpr storage_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr storage_iterator operator--(int) noexcept {
         storage_iterator orig = *this;
         return operator--(), orig;
     }
 
-    constexpr storage_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr storage_iterator &operator+=(const difference_type value) noexcept {
         offset -= value;
         return *this;
     }
 
-    constexpr storage_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr storage_iterator operator+(const difference_type value) const noexcept {
         storage_iterator copy = *this;
         return (copy += value);
     }
 
-    constexpr storage_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr storage_iterator &operator-=(const difference_type value) noexcept {
         return (*this += -value);
     }
 
-    constexpr storage_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr storage_iterator operator-(const difference_type value) const noexcept {
         return (*this + -value);
     }
 
-    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         const auto pos = index() - value;
         return (*packed)[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
-    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
         const auto pos = index();
         return (*packed)[pos / comp_traits::page_size] + fast_mod(pos, comp_traits::page_size);
     }
 
-    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const noexcept {
         return *operator->();
     }
 
-    [[nodiscard]] constexpr difference_type index() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr difference_type index() const noexcept {
         return offset - 1;
     }
 
@@ -119,37 +119,37 @@ private:
 };
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
     return rhs.index() - lhs.index();
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator==(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
     return lhs.index() == rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator!=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator<(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
     return lhs.index() > rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator>(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
     return lhs.index() < rhs.index();
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator<=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
 template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator>=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -175,37 +175,37 @@ public:
     constexpr extended_storage_iterator(const extended_storage_iterator<It, Args...> &other)
         : it{other.it} {}
 
-    constexpr extended_storage_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr extended_storage_iterator &operator++() noexcept {
         return ++std::get<It>(it), (++std::get<Other>(it), ...), *this;
     }
 
-    constexpr extended_storage_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr extended_storage_iterator operator++(int) noexcept {
         extended_storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
         return operator*();
     }
 
-    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const noexcept {
         return {*std::get<It>(it), *std::get<Other>(it)...};
     }
 
     template<typename... CLhs, typename... CRhs>
-    friend constexpr bool operator==(const extended_storage_iterator<CLhs...> &, const extended_storage_iterator<CRhs...> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const extended_storage_iterator<CLhs...> &, const extended_storage_iterator<CRhs...> &) noexcept;
 
 private:
     std::tuple<It, Other...> it;
 };
 
 template<typename... CLhs, typename... CRhs>
-[[nodiscard]] constexpr bool operator==(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) noexcept {
     return std::get<0>(lhs.it) == std::get<0>(rhs.it);
 }
 
 template<typename... CLhs, typename... CRhs>
-[[nodiscard]] constexpr bool operator!=(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
@@ -424,7 +424,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_storage(basic_storage &&other) ENTT_NOEXCEPT
+    basic_storage(basic_storage &&other) noexcept
         : base_type{std::move(other)},
           packed{std::move(other.packed)} {}
 
@@ -433,7 +433,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_storage(basic_storage &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+    basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
         : base_type{std::move(other), allocator},
           packed{container_type{std::move(other.packed.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.second() == other.packed.second(), "Copying a storage is not allowed");
@@ -449,7 +449,7 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    basic_storage &operator=(basic_storage &&other) ENTT_NOEXCEPT {
+    basic_storage &operator=(basic_storage &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.second() == other.packed.second(), "Copying a storage is not allowed");
 
         shrink_to_size(0u);
@@ -474,7 +474,7 @@ public:
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
-    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
         return allocator_type{packed.second()};
     }
 
@@ -498,7 +498,7 @@ public:
      * allocated space for.
      * @return Capacity of the storage.
      */
-    [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT override {
+    [[nodiscard]] size_type capacity() const noexcept override {
         return packed.first().size() * comp_traits::page_size;
     }
 
@@ -512,12 +512,12 @@ public:
      * @brief Direct access to the array of objects.
      * @return A pointer to the array of objects.
      */
-    [[nodiscard]] const_pointer raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_pointer raw() const noexcept {
         return packed.first().data();
     }
 
     /*! @copydoc raw */
-    [[nodiscard]] pointer raw() ENTT_NOEXCEPT {
+    [[nodiscard]] pointer raw() noexcept {
         return packed.first().data();
     }
 
@@ -529,18 +529,18 @@ public:
      *
      * @return An iterator to the first instance of the internal array.
      */
-    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cbegin() const noexcept {
         const auto pos = static_cast<typename iterator::difference_type>(base_type::size());
         return const_iterator{&packed.first(), pos};
     }
 
     /*! @copydoc cbegin */
-    [[nodiscard]] const_iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator begin() const noexcept {
         return cbegin();
     }
 
     /*! @copydoc begin */
-    [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() noexcept {
         const auto pos = static_cast<typename iterator::difference_type>(base_type::size());
         return iterator{&packed.first(), pos};
     }
@@ -555,17 +555,17 @@ public:
      * @return An iterator to the element following the last instance of the
      * internal array.
      */
-    [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cend() const noexcept {
         return const_iterator{&packed.first(), {}};
     }
 
     /*! @copydoc cend */
-    [[nodiscard]] const_iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator end() const noexcept {
         return cend();
     }
 
     /*! @copydoc end */
-    [[nodiscard]] iterator end() ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() noexcept {
         return iterator{&packed.first(), {}};
     }
 
@@ -578,17 +578,17 @@ public:
      *
      * @return An iterator to the first instance of the reversed internal array.
      */
-    [[nodiscard]] const_reverse_iterator crbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reverse_iterator crbegin() const noexcept {
         return std::make_reverse_iterator(cend());
     }
 
     /*! @copydoc crbegin */
-    [[nodiscard]] const_reverse_iterator rbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reverse_iterator rbegin() const noexcept {
         return crbegin();
     }
 
     /*! @copydoc rbegin */
-    [[nodiscard]] reverse_iterator rbegin() ENTT_NOEXCEPT {
+    [[nodiscard]] reverse_iterator rbegin() noexcept {
         return std::make_reverse_iterator(end());
     }
 
@@ -602,17 +602,17 @@ public:
      * @return An iterator to the element following the last instance of the
      * reversed internal array.
      */
-    [[nodiscard]] const_reverse_iterator crend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reverse_iterator crend() const noexcept {
         return std::make_reverse_iterator(cbegin());
     }
 
     /*! @copydoc crend */
-    [[nodiscard]] const_reverse_iterator rend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_reverse_iterator rend() const noexcept {
         return crend();
     }
 
     /*! @copydoc rend */
-    [[nodiscard]] reverse_iterator rend() ENTT_NOEXCEPT {
+    [[nodiscard]] reverse_iterator rend() noexcept {
         return std::make_reverse_iterator(begin());
     }
 
@@ -626,12 +626,12 @@ public:
      * @param entt A valid identifier.
      * @return The object assigned to the entity.
      */
-    [[nodiscard]] const value_type &get(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] const value_type &get(const entity_type entt) const noexcept {
         return element_at(base_type::index(entt));
     }
 
     /*! @copydoc get */
-    [[nodiscard]] value_type &get(const entity_type entt) ENTT_NOEXCEPT {
+    [[nodiscard]] value_type &get(const entity_type entt) noexcept {
         return const_cast<value_type &>(std::as_const(*this).get(entt));
     }
 
@@ -640,12 +640,12 @@ public:
      * @param entt A valid identifier.
      * @return The object assigned to the entity as a tuple.
      */
-    [[nodiscard]] std::tuple<const value_type &> get_as_tuple(const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] std::tuple<const value_type &> get_as_tuple(const entity_type entt) const noexcept {
         return std::forward_as_tuple(get(entt));
     }
 
     /*! @copydoc get_as_tuple */
-    [[nodiscard]] std::tuple<value_type &> get_as_tuple(const entity_type entt) ENTT_NOEXCEPT {
+    [[nodiscard]] std::tuple<value_type &> get_as_tuple(const entity_type entt) noexcept {
         return std::forward_as_tuple(get(entt));
     }
 
@@ -734,12 +734,12 @@ public:
      *
      * @return An iterable object to use to _visit_ the storage.
      */
-    [[nodiscard]] iterable each() ENTT_NOEXCEPT {
+    [[nodiscard]] iterable each() noexcept {
         return {internal::extended_storage_iterator{base_type::begin(), begin()}, internal::extended_storage_iterator{base_type::end(), end()}};
     }
 
     /*! @copydoc each */
-    [[nodiscard]] const_iterable each() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterable each() const noexcept {
         return {internal::extended_storage_iterator{base_type::cbegin(), cbegin()}, internal::extended_storage_iterator{base_type::cend(), cend()}};
     }
 
@@ -787,14 +787,14 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_storage(basic_storage &&other) ENTT_NOEXCEPT = default;
+    basic_storage(basic_storage &&other) noexcept = default;
 
     /**
      * @brief Allocator-extended move constructor.
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_storage(basic_storage &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+    basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
         : base_type{std::move(other), allocator} {}
 
     /**
@@ -802,13 +802,13 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    basic_storage &operator=(basic_storage &&other) ENTT_NOEXCEPT = default;
+    basic_storage &operator=(basic_storage &&other) noexcept = default;
 
     /**
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
-    [[nodiscard]] constexpr allocator_type get_allocator() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
         return allocator_type{base_type::get_allocator()};
     }
 
@@ -821,7 +821,7 @@ public:
      *
      * @param entt A valid identifier.
      */
-    void get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    void get([[maybe_unused]] const entity_type entt) const noexcept {
         ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
     }
 
@@ -835,7 +835,7 @@ public:
      * @param entt A valid identifier.
      * @return Returns an empty tuple.
      */
-    [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const noexcept {
         ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
         return std::tuple{};
     }
@@ -888,12 +888,12 @@ public:
      *
      * @return An iterable object to use to _visit_ the storage.
      */
-    [[nodiscard]] iterable each() ENTT_NOEXCEPT {
+    [[nodiscard]] iterable each() noexcept {
         return {internal::extended_storage_iterator{base_type::begin()}, internal::extended_storage_iterator{base_type::end()}};
     }
 
     /*! @copydoc each */
-    [[nodiscard]] const_iterable each() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterable each() const noexcept {
         return {internal::extended_storage_iterator{base_type::cbegin()}, internal::extended_storage_iterator{base_type::cend()}};
     }
 };

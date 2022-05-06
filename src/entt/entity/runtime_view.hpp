@@ -6,7 +6,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "../config/config.h"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "sparse_set.hpp"
@@ -37,13 +36,13 @@ public:
     using reference = typename iterator_type::reference;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    constexpr runtime_view_iterator() ENTT_NOEXCEPT
+    constexpr runtime_view_iterator() noexcept
         : pools{},
           filter{},
           it{},
           tombstone_check{} {}
 
-    runtime_view_iterator(const std::vector<const Set *> &cpools, const std::vector<const Set *> &ignore, iterator_type curr) ENTT_NOEXCEPT
+    runtime_view_iterator(const std::vector<const Set *> &cpools, const std::vector<const Set *> &ignore, iterator_type curr) noexcept
         : pools{&cpools},
           filter{&ignore},
           it{curr},
@@ -73,19 +72,19 @@ public:
         return operator--(), orig;
     }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] pointer operator->() const noexcept {
         return it.operator->();
     }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] reference operator*() const noexcept {
         return *operator->();
     }
 
-    [[nodiscard]] constexpr bool operator==(const runtime_view_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(const runtime_view_iterator &other) const noexcept {
         return it == other.it;
     }
 
-    [[nodiscard]] constexpr bool operator!=(const runtime_view_iterator &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(const runtime_view_iterator &other) const noexcept {
         return !(*this == other);
     }
 
@@ -163,7 +162,7 @@ struct basic_runtime_view<basic_sparse_set<Entity, Allocator>> {
     using iterator = internal::runtime_view_iterator<base_type>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
-    basic_runtime_view() ENTT_NOEXCEPT
+    basic_runtime_view() noexcept
         : pools{},
           filter{} {}
 

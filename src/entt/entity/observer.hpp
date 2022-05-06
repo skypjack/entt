@@ -6,7 +6,6 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
-#include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
 #include "entity.hpp"
@@ -46,7 +45,7 @@ struct basic_collector<> {
      * @return The updated collector.
      */
     template<typename... AllOf, typename... NoneOf>
-    static constexpr auto group(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
+    static constexpr auto group(exclude_t<NoneOf...> = {}) noexcept {
         return basic_collector<matcher<type_list<>, type_list<>, type_list<NoneOf...>, AllOf...>>{};
     }
 
@@ -56,7 +55,7 @@ struct basic_collector<> {
      * @return The updated collector.
      */
     template<typename AnyOf>
-    static constexpr auto update() ENTT_NOEXCEPT {
+    static constexpr auto update() noexcept {
         return basic_collector<matcher<type_list<>, type_list<>, AnyOf>>{};
     }
 };
@@ -81,7 +80,7 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
      * @return The updated collector.
      */
     template<typename... AllOf, typename... NoneOf>
-    static constexpr auto group(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
+    static constexpr auto group(exclude_t<NoneOf...> = {}) noexcept {
         return basic_collector<matcher<type_list<>, type_list<>, type_list<NoneOf...>, AllOf...>, current_type, Other...>{};
     }
 
@@ -91,7 +90,7 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
      * @return The updated collector.
      */
     template<typename AnyOf>
-    static constexpr auto update() ENTT_NOEXCEPT {
+    static constexpr auto update() noexcept {
         return basic_collector<matcher<type_list<>, type_list<>, AnyOf>, current_type, Other...>{};
     }
 
@@ -102,7 +101,7 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
      * @return The updated collector.
      */
     template<typename... AllOf, typename... NoneOf>
-    static constexpr auto where(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
+    static constexpr auto where(exclude_t<NoneOf...> = {}) noexcept {
         using extended_type = matcher<type_list<Reject..., NoneOf...>, type_list<Require..., AllOf...>, Rule...>;
         return basic_collector<extended_type, Other...>{};
     }
@@ -331,7 +330,7 @@ public:
      * @brief Returns the number of elements in an observer.
      * @return Number of elements.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return storage.size();
     }
 
@@ -339,7 +338,7 @@ public:
      * @brief Checks whether an observer is empty.
      * @return True if the observer is empty, false otherwise.
      */
-    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const noexcept {
         return storage.empty();
     }
 
@@ -355,7 +354,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    [[nodiscard]] const entity_type *data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type *data() const noexcept {
         return storage.data();
     }
 
@@ -367,7 +366,7 @@ public:
      *
      * @return An iterator to the first entity of the observer.
      */
-    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const noexcept {
         return storage.basic_sparse_set<entity_type>::begin();
     }
 
@@ -381,12 +380,12 @@ public:
      * @return An iterator to the entity following the last entity of the
      * observer.
      */
-    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const noexcept {
         return storage.basic_sparse_set<entity_type>::end();
     }
 
     /*! @brief Clears the underlying container. */
-    void clear() ENTT_NOEXCEPT {
+    void clear() noexcept {
         storage.clear();
     }
 

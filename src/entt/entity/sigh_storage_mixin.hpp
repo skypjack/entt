@@ -79,7 +79,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    sigh_storage_mixin(sigh_storage_mixin &&other) ENTT_NOEXCEPT
+    sigh_storage_mixin(sigh_storage_mixin &&other) noexcept
         : Type{std::move(other)},
           owner{other.owner},
           construction{std::move(other.construction)},
@@ -91,7 +91,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    sigh_storage_mixin(sigh_storage_mixin &&other, const allocator_type &allocator) ENTT_NOEXCEPT
+    sigh_storage_mixin(sigh_storage_mixin &&other, const allocator_type &allocator) noexcept
         : Type{std::move(other), allocator},
           owner{other.owner},
           construction{std::move(other.construction), allocator},
@@ -103,7 +103,7 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    sigh_storage_mixin &operator=(sigh_storage_mixin &&other) ENTT_NOEXCEPT {
+    sigh_storage_mixin &operator=(sigh_storage_mixin &&other) noexcept {
         Type::operator=(std::move(other));
         owner = other.owner;
         construction = std::move(other.construction);
@@ -136,7 +136,7 @@ public:
      *
      * @return A temporary sink object.
      */
-    [[nodiscard]] auto on_construct() ENTT_NOEXCEPT {
+    [[nodiscard]] auto on_construct() noexcept {
         return sink{construction};
     }
 
@@ -151,7 +151,7 @@ public:
      *
      * @return A temporary sink object.
      */
-    [[nodiscard]] auto on_update() ENTT_NOEXCEPT {
+    [[nodiscard]] auto on_update() noexcept {
         return sink{update};
     }
 
@@ -166,7 +166,7 @@ public:
      *
      * @return A temporary sink object.
      */
-    [[nodiscard]] auto on_destroy() ENTT_NOEXCEPT {
+    [[nodiscard]] auto on_destroy() noexcept {
         return sink{destruction};
     }
 
@@ -224,7 +224,7 @@ public:
      * @brief Forwards variables to mixins, if any.
      * @param value A variable wrapped in an opaque container.
      */
-    void bind(any value) ENTT_NOEXCEPT final {
+    void bind(any value) noexcept final {
         auto *reg = any_cast<basic_registry<entity_type>>(&value);
         owner = reg ? reg : owner;
         Type::bind(std::move(value));

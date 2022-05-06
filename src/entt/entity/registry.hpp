@@ -50,109 +50,109 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    constexpr storage_proxy_iterator() ENTT_NOEXCEPT
+    constexpr storage_proxy_iterator() noexcept
         : it{} {}
 
-    constexpr storage_proxy_iterator(const It iter) ENTT_NOEXCEPT
+    constexpr storage_proxy_iterator(const It iter) noexcept
         : it{iter} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    constexpr storage_proxy_iterator(const storage_proxy_iterator<Other> &other) ENTT_NOEXCEPT
+    constexpr storage_proxy_iterator(const storage_proxy_iterator<Other> &other) noexcept
         : it{other.it} {}
 
-    constexpr storage_proxy_iterator &operator++() ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator &operator++() noexcept {
         return ++it, *this;
     }
 
-    constexpr storage_proxy_iterator operator++(int) ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator operator++(int) noexcept {
         storage_proxy_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    constexpr storage_proxy_iterator &operator--() ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator &operator--() noexcept {
         return --it, *this;
     }
 
-    constexpr storage_proxy_iterator operator--(int) ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator operator--(int) noexcept {
         storage_proxy_iterator orig = *this;
         return operator--(), orig;
     }
 
-    constexpr storage_proxy_iterator &operator+=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator &operator+=(const difference_type value) noexcept {
         it += value;
         return *this;
     }
 
-    constexpr storage_proxy_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator operator+(const difference_type value) const noexcept {
         storage_proxy_iterator copy = *this;
         return (copy += value);
     }
 
-    constexpr storage_proxy_iterator &operator-=(const difference_type value) ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator &operator-=(const difference_type value) noexcept {
         return (*this += -value);
     }
 
-    constexpr storage_proxy_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+    constexpr storage_proxy_iterator operator-(const difference_type value) const noexcept {
         return (*this + -value);
     }
 
-    [[nodiscard]] constexpr reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         return {it[value].first, *it[value].second};
     }
 
-    [[nodiscard]] constexpr reference operator*() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr reference operator*() const noexcept {
         return {it->first, *it->second};
     }
 
-    [[nodiscard]] constexpr pointer operator->() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
         return operator*();
     }
 
     template<typename ILhs, typename IRhs>
-    friend constexpr std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) noexcept;
 
     template<typename ILhs, typename IRhs>
-    friend constexpr bool operator==(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator==(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) noexcept;
 
     template<typename ILhs, typename IRhs>
-    friend constexpr bool operator<(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) ENTT_NOEXCEPT;
+    friend constexpr bool operator<(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) noexcept;
 
 private:
     It it;
 };
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
     return lhs.it - rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator==(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
     return lhs.it == rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator!=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator<(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
     return lhs.it < rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator>(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
     return rhs < lhs;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator<=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator<=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator>=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator>=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -268,9 +268,9 @@ class basic_registry {
     struct group_data {
         std::size_t size;
         std::unique_ptr<void, void (*)(void *)> group;
-        bool (*owned)(const id_type) ENTT_NOEXCEPT;
-        bool (*get)(const id_type) ENTT_NOEXCEPT;
-        bool (*exclude)(const id_type) ENTT_NOEXCEPT;
+        bool (*owned)(const id_type) noexcept;
+        bool (*get)(const id_type) noexcept;
+        bool (*exclude)(const id_type) noexcept;
     };
 
     template<typename Component>
@@ -300,12 +300,12 @@ class basic_registry {
         return placeholder;
     }
 
-    auto generate_identifier(const std::size_t pos) ENTT_NOEXCEPT {
+    auto generate_identifier(const std::size_t pos) noexcept {
         ENTT_ASSERT(pos < entity_traits::to_entity(null), "No entities available");
         return entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), {});
     }
 
-    auto recycle_identifier() ENTT_NOEXCEPT {
+    auto recycle_identifier() noexcept {
         ENTT_ASSERT(free_list != null, "No entities available");
         const auto curr = entity_traits::to_entity(free_list);
         free_list = entity_traits::combine(entity_traits::to_integral(epool[curr]), tombstone);
@@ -390,12 +390,12 @@ public:
      *
      * @return An iterable object to use to _visit_ the registry.
      */
-    [[nodiscard]] auto storage() ENTT_NOEXCEPT {
+    [[nodiscard]] auto storage() noexcept {
         return iterable_adaptor{internal::storage_proxy_iterator{pools.begin()}, internal::storage_proxy_iterator{pools.end()}};
     }
 
     /*! @copydoc storage */
-    [[nodiscard]] auto storage() const ENTT_NOEXCEPT {
+    [[nodiscard]] auto storage() const noexcept {
         return iterable_adaptor{internal::storage_proxy_iterator{pools.cbegin()}, internal::storage_proxy_iterator{pools.cend()}};
     }
 
@@ -454,7 +454,7 @@ public:
      * @brief Returns the number of entities created so far.
      * @return Number of entities created so far.
      */
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const noexcept {
         return epool.size();
     }
 
@@ -485,7 +485,7 @@ public:
      * allocated space for.
      * @return Capacity of the registry.
      */
-    [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type capacity() const noexcept {
         return epool.capacity();
     }
 
@@ -509,7 +509,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    [[nodiscard]] const entity_type *data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type *data() const noexcept {
         return epool.data();
     }
 
@@ -521,7 +521,7 @@ public:
      *
      * @return The head of the list of released entities.
      */
-    [[nodiscard]] entity_type released() const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type released() const noexcept {
         return free_list;
     }
 
@@ -1284,9 +1284,9 @@ public:
             group_data candidate = {
                 size,
                 {new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); }},
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ...); },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
             };
 
             handler = static_cast<handler_type *>(candidate.group.get());
@@ -1378,7 +1378,7 @@ public:
      * @return True if the group can be sorted, false otherwise.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] bool sortable(const basic_group<entity_type, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) ENTT_NOEXCEPT {
+    [[nodiscard]] bool sortable(const basic_group<entity_type, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) noexcept {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         auto pred = [size](const auto &gdata) { return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) && (size < gdata.size); };
         return std::find_if(groups.cbegin(), groups.cend(), std::move(pred)) == groups.cend();
@@ -1461,12 +1461,12 @@ public:
      * @brief Returns the context object, that is, a general purpose container.
      * @return The context object, that is, a general purpose container.
      */
-    context &ctx() ENTT_NOEXCEPT {
+    context &ctx() noexcept {
         return vars;
     }
 
     /*! @copydoc ctx */
-    const context &ctx() const ENTT_NOEXCEPT {
+    const context &ctx() const noexcept {
         return vars;
     }
 

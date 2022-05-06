@@ -67,14 +67,14 @@ public:
      * @brief Constructs an instance that is bound to a given registry.
      * @param source A valid reference to a registry.
      */
-    basic_snapshot(const basic_registry<entity_type> &source) ENTT_NOEXCEPT
+    basic_snapshot(const basic_registry<entity_type> &source) noexcept
         : reg{&source} {}
 
     /*! @brief Default move constructor. */
-    basic_snapshot(basic_snapshot &&) ENTT_NOEXCEPT = default;
+    basic_snapshot(basic_snapshot &&) noexcept = default;
 
     /*! @brief Default move assignment operator. @return This snapshot. */
-    basic_snapshot &operator=(basic_snapshot &&) ENTT_NOEXCEPT = default;
+    basic_snapshot &operator=(basic_snapshot &&) noexcept = default;
 
     /**
      * @brief Puts aside all the entities from the underlying registry.
@@ -195,17 +195,17 @@ public:
      * @brief Constructs an instance that is bound to a given registry.
      * @param source A valid reference to a registry.
      */
-    basic_snapshot_loader(basic_registry<entity_type> &source) ENTT_NOEXCEPT
+    basic_snapshot_loader(basic_registry<entity_type> &source) noexcept
         : reg{&source} {
         // restoring a snapshot as a whole requires a clean registry
         ENTT_ASSERT(reg->empty(), "Registry must be empty");
     }
 
     /*! @brief Default move constructor. */
-    basic_snapshot_loader(basic_snapshot_loader &&) ENTT_NOEXCEPT = default;
+    basic_snapshot_loader(basic_snapshot_loader &&) noexcept = default;
 
     /*! @brief Default move assignment operator. @return This loader. */
-    basic_snapshot_loader &operator=(basic_snapshot_loader &&) ENTT_NOEXCEPT = default;
+    basic_snapshot_loader &operator=(basic_snapshot_loader &&) noexcept = default;
 
     /**
      * @brief Restores entities that were in use during serialization.
@@ -409,7 +409,7 @@ public:
      * @brief Constructs an instance that is bound to a given registry.
      * @param source A valid reference to a registry.
      */
-    basic_continuous_loader(basic_registry<entity_type> &source) ENTT_NOEXCEPT
+    basic_continuous_loader(basic_registry<entity_type> &source) noexcept
         : reg{&source} {}
 
     /*! @brief Default move constructor. */
@@ -531,7 +531,7 @@ public:
      * @param entt A valid identifier.
      * @return True if `entity` is managed by the loader, false otherwise.
      */
-    [[nodiscard]] bool contains(entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool contains(entity_type entt) const noexcept {
         return (remloc.find(entt) != remloc.cend());
     }
 
@@ -540,7 +540,7 @@ public:
      * @param entt A valid identifier.
      * @return The local identifier if any, the null entity otherwise.
      */
-    [[nodiscard]] entity_type map(entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type map(entity_type entt) const noexcept {
         const auto it = remloc.find(entt);
         entity_type other = null;
 
