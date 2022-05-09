@@ -1,6 +1,7 @@
 #ifndef ENTT_CORE_UTILITY_HPP
 #define ENTT_CORE_UTILITY_HPP
 
+#include <type_traits>
 #include <utility>
 
 namespace entt {
@@ -71,7 +72,7 @@ struct y_combinator {
      * @brief Constructs a y-combinator from a given function.
      * @param recursive A potentially recursive function.
      */
-    constexpr y_combinator(Func recursive)
+    constexpr y_combinator(Func recursive) noexcept(std::is_nothrow_move_constructible_v<Func>)
         : func{std::move(recursive)} {}
 
     /**
@@ -81,13 +82,13 @@ struct y_combinator {
      * @return Return value of the underlying function, if any.
      */
     template<class... Args>
-    constexpr decltype(auto) operator()(Args &&...args) const {
+    constexpr decltype(auto) operator()(Args &&...args) const noexcept(std::is_nothrow_invocable_v<Func, const y_combinator &, Args...>) {
         return func(*this, std::forward<Args>(args)...);
     }
 
     /*! @copydoc operator()() */
     template<class... Args>
-    constexpr decltype(auto) operator()(Args &&...args) {
+    constexpr decltype(auto) operator()(Args &&...args) noexcept(std::is_nothrow_invocable_v<Func, y_combinator &, Args...>) {
         return func(*this, std::forward<Args>(args)...);
     }
 
