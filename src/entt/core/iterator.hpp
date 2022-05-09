@@ -78,8 +78,8 @@ struct iterable_adaptor final {
      * @param to End iterator.
      */
     constexpr iterable_adaptor(iterator from, sentinel to)
-        : first{from},
-          last{to} {}
+        : first{std::move(from)},
+          last{std::move(to)} {}
 
     /**
      * @brief Returns an iterator to the beginning.
