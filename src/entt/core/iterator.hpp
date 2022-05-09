@@ -68,7 +68,7 @@ struct iterable_adaptor final {
     using sentinel = Sentinel;
 
     /*! @brief Default constructor. */
-    constexpr iterable_adaptor()
+    constexpr iterable_adaptor() noexcept(std::is_nothrow_default_constructible_v<It> &&std::is_nothrow_default_constructible_v<Sentinel>)
         : first{},
           last{} {}
 
@@ -77,7 +77,7 @@ struct iterable_adaptor final {
      * @param from Begin iterator.
      * @param to End iterator.
      */
-    constexpr iterable_adaptor(iterator from, sentinel to)
+    constexpr iterable_adaptor(iterator from, sentinel to) noexcept(std::is_nothrow_move_constructible_v<It> &&std::is_nothrow_move_constructible_v<Sentinel>)
         : first{std::move(from)},
           last{std::move(to)} {}
 
