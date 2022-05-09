@@ -119,14 +119,14 @@ struct allocation_deleter: private Allocator {
      * @brief Inherited constructors.
      * @param alloc The allocator to use.
      */
-    constexpr allocation_deleter(const allocator_type &alloc)
+    constexpr allocation_deleter(const allocator_type &alloc) noexcept(std::is_nothrow_copy_constructible_v<allocator_type>)
         : Allocator{alloc} {}
 
     /**
      * @brief Destroys the pointed object and deallocates its memory.
      * @param ptr A valid pointer to an object of the given type.
      */
-    constexpr void operator()(pointer ptr) {
+    constexpr void operator()(pointer ptr) noexcept(std::is_nothrow_destructible_v<typename allocator_type::value_type>) {
         using alloc_traits = typename std::allocator_traits<Allocator>;
         alloc_traits::destroy(*this, to_address(ptr));
         alloc_traits::deallocate(*this, ptr, 1u);
