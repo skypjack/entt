@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 namespace entt {
@@ -13,33 +14,35 @@ namespace entt {
  */
 template<typename Type>
 struct input_iterator_pointer final {
+    /*! @brief Value type. */
+    using value_type = Type;
     /*! @brief Pointer type. */
     using pointer = Type *;
 
     /*! @brief Default copy constructor, deleted on purpose. */
-    input_iterator_pointer(const input_iterator_pointer &) = delete;
+    input_iterator_pointer(const input_iterator_pointer &) noexcept(std::is_nothrow_copy_constructible_v<value_type>) = delete;
 
     /*! @brief Default move constructor. */
-    constexpr input_iterator_pointer(input_iterator_pointer &&) = default;
+    constexpr input_iterator_pointer(input_iterator_pointer &&) noexcept(std::is_nothrow_move_constructible_v<value_type>) = default;
 
     /**
      * @brief Constructs a proxy object by move.
      * @param val Value to use to initialize the proxy object.
      */
-    constexpr input_iterator_pointer(Type &&val)
+    constexpr input_iterator_pointer(value_type &&val) noexcept(std::is_nothrow_move_constructible_v<value_type>)
         : value{std::move(val)} {}
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
      * @return This proxy object.
      */
-    input_iterator_pointer &operator=(const input_iterator_pointer &) = delete;
+    input_iterator_pointer &operator=(const input_iterator_pointer &) noexcept(std::is_nothrow_copy_assignable_v<value_type>) = delete;
 
     /**
      * @brief Default move assignment operator.
      * @return This proxy object.
      */
-    constexpr input_iterator_pointer &operator=(input_iterator_pointer &&) = default;
+    constexpr input_iterator_pointer &operator=(input_iterator_pointer &&) noexcept(std::is_nothrow_move_assignable_v<value_type>) = default;
 
     /**
      * @brief Access operator for accessing wrapped values.
@@ -68,7 +71,7 @@ struct iterable_adaptor final {
     using sentinel = Sentinel;
 
     /*! @brief Default constructor. */
-    constexpr iterable_adaptor() noexcept(std::is_nothrow_default_constructible_v<It> &&std::is_nothrow_default_constructible_v<Sentinel>)
+    constexpr iterable_adaptor() noexcept(std::is_nothrow_default_constructible_v<iterator> &&std::is_nothrow_default_constructible_v<sentinel>)
         : first{},
           last{} {}
 
@@ -77,7 +80,7 @@ struct iterable_adaptor final {
      * @param from Begin iterator.
      * @param to End iterator.
      */
-    constexpr iterable_adaptor(iterator from, sentinel to) noexcept(std::is_nothrow_move_constructible_v<It> &&std::is_nothrow_move_constructible_v<Sentinel>)
+    constexpr iterable_adaptor(iterator from, sentinel to) noexcept(std::is_nothrow_move_constructible_v<iterator> &&std::is_nothrow_move_constructible_v<sentinel>)
         : first{std::move(from)},
           last{std::move(to)} {}
 
