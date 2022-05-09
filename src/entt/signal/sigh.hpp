@@ -67,7 +67,7 @@ public:
     using sink_type = sink<sigh<Ret(Args...), Allocator>>;
 
     /*! @brief Default constructor. */
-    sigh() noexcept(std::is_nothrow_constructible_v<sigh, const allocator_type &>)
+    sigh() noexcept(std::is_nothrow_default_constructible_v<allocator_type> &&std::is_nothrow_constructible_v<container_type, const allocator_type &>)
         : sigh{allocator_type{}} {}
 
     /**
