@@ -1026,6 +1026,22 @@ public:
     }
 
     /**
+     * @brief Checks whether a type refers to an integral type or not.
+     * @return True if the underlying type is an integral type, false otherwise.
+     */
+    [[nodiscard]] bool is_integral() const noexcept {
+        return !!(node->traits & internal::meta_traits::is_integral);
+    }
+
+    /**
+     * @brief Checks whether a type refers to a signed type or not.
+     * @return True if the underlying type is a signed type, false otherwise.
+     */
+    [[nodiscard]] bool is_signed() const noexcept {
+        return !!(node->traits & internal::meta_traits::is_signed);
+    }
+
+    /**
      * @brief Checks whether a type refers to an array type or not.
      * @return True if the underlying type is an array type, false otherwise.
      */

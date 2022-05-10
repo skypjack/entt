@@ -235,6 +235,14 @@ TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<double>().is_arithmetic());
     ASSERT_FALSE(entt::resolve<clazz_t>().is_arithmetic());
 
+    ASSERT_TRUE(entt::resolve<int>().is_integral());
+    ASSERT_FALSE(entt::resolve<double>().is_integral());
+    ASSERT_FALSE(entt::resolve<clazz_t>().is_integral());
+
+    ASSERT_TRUE(entt::resolve<long>().is_signed());
+    ASSERT_FALSE(entt::resolve<unsigned int>().is_signed());
+    ASSERT_FALSE(entt::resolve<clazz_t>().is_signed());
+
     ASSERT_TRUE(entt::resolve<int[5]>().is_array());
     ASSERT_TRUE(entt::resolve<int[5][3]>().is_array());
     ASSERT_FALSE(entt::resolve<int>().is_array());
