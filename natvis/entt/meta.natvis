@@ -81,6 +81,8 @@
 			<Item Name="[id]">id</Item>
 			<Item Name="[sizeof]">size_of</Item>
 			<Item Name="[is_arithmetic]">has_property(entt::internal::meta_traits::is_arithmetic)</Item>
+			<Item Name="[is_integral]">has_property(entt::internal::meta_traits::is_integral)</Item>
+			<Item Name="[is_signed]">has_property(entt::internal::meta_traits::is_signed)</Item>
 			<Item Name="[is_array]">has_property(entt::internal::meta_traits::is_array)</Item>
 			<Item Name="[is_enum]">has_property(entt::internal::meta_traits::is_enum)</Item>
 			<Item Name="[is_class]">has_property(entt::internal::meta_traits::is_class)</Item>
