@@ -198,7 +198,7 @@ struct registry_context {
     template<typename Type>
     [[nodiscard]] bool contains(const id_type id = type_id<Type>().hash()) const {
         const auto it = data.find(id);
-        return it != data.end() && it->second.type() == type_id<Type>();
+        return it != data.cend() && it->second.type() == type_id<Type>();
     }
 
 private:
