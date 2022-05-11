@@ -13,6 +13,9 @@ class basic_sparse_set;
 template<typename, typename Type, typename = std::allocator<Type>, typename = void>
 class basic_storage;
 
+template<typename Type>
+class sigh_storage_mixin;
+
 template<typename>
 class basic_registry;
 
