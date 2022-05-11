@@ -31,22 +31,22 @@ TEST(PolyGetAny, Functionalities) {
 TEST(PolyGetAnyPointer, Functionalities) {
     entt::registry reg;
 
-    cat cat1;
-    dog dog1;
-    dog dog2;
-    cube cube2;
-    sphere sphere2;
-    fat_cat fat_cat3;
+    auto cat1 = std::make_unique<cat>();
+    auto dog1 = std::make_unique<dog>();
+    auto dog2 = std::make_unique<dog>();
+    auto cube2 = std::make_unique<cube>();
+    auto sphere2 = std::make_unique<sphere>();
+    auto fat_cat3 = std::make_unique<fat_cat>();
 
     entt::entity entity1 = reg.create();  // components: cat, dog
     entt::entity entity2 = reg.create();  // components: dog, sphere, cube
     entt::entity entity3 = reg.create();  // components: fat_cat
-    reg.emplace<cat*>(entity1, &cat1);
-    reg.emplace<dog*>(entity1, &dog1);
-    reg.emplace<dog*>(entity2, &dog2);
-    reg.emplace<cube*>(entity2, &cube2);
-    reg.emplace<sphere*>(entity2, &sphere2);
-    reg.emplace<fat_cat*>(entity3, &fat_cat3);
+    reg.emplace<cat*>(entity1, cat1.get());
+    reg.emplace<dog*>(entity1, dog1.get());
+    reg.emplace<dog*>(entity2, dog2.get());
+    reg.emplace<cube*>(entity2, cube2.get());
+    reg.emplace<sphere*>(entity2, sphere2.get());
+    reg.emplace<fat_cat*>(entity3, fat_cat3.get());
 
     ASSERT_EQ(entt::algorithm::poly_get_any<shape*>(reg, entity1), nullptr);
     ASSERT_EQ(entt::algorithm::poly_get_any<cat*>(reg, entity1), reg.get<cat*>(entity1));
@@ -129,22 +129,22 @@ TEST(PolyGetAll, Functionalities) {
 TEST(PolyGetAllPointers, Functionalities) {
     entt::registry reg;
 
-    cat cat1;
-    dog dog1;
-    dog dog2;
-    cube cube2;
-    sphere sphere2;
-    fat_cat fat_cat3;
+    auto cat1 = std::make_unique<cat>();
+    auto dog1 = std::make_unique<dog>();
+    auto dog2 = std::make_unique<dog>();
+    auto cube2 = std::make_unique<cube>();
+    auto sphere2 = std::make_unique<sphere>();
+    auto fat_cat3 = std::make_unique<fat_cat>();
 
     entt::entity entity1 = reg.create();  // components: cat(payload=1), dog(payload=2)
     entt::entity entity2 = reg.create();  // components: dog(payload=2), cube(payload=3), sphere(payload=4)
     entt::entity entity3 = reg.create();  // components: fat_cat(both payloads = 5)
-    reg.emplace<cat*>(entity1, &cat1)->animal_payload = 1;
-    reg.emplace<dog*>(entity1, &dog1)->animal_payload = 2;
-    reg.emplace<dog*>(entity2, &dog2)->animal_payload = 2;
-    reg.emplace<cube*>(entity2, &cube2)->shape_payload = 3;
-    reg.emplace<sphere*>(entity2, &sphere2)->shape_payload = 4;
-    auto* c = reg.emplace<fat_cat*>(entity3, &fat_cat3);
+    reg.emplace<cat*>(entity1, cat1.get())->animal_payload = 1;
+    reg.emplace<dog*>(entity1, dog1.get())->animal_payload = 2;
+    reg.emplace<dog*>(entity2, dog2.get())->animal_payload = 2;
+    reg.emplace<cube*>(entity2, cube2.get())->shape_payload = 3;
+    reg.emplace<sphere*>(entity2, sphere2.get())->shape_payload = 4;
+    auto* c = reg.emplace<fat_cat*>(entity3, fat_cat3.get());
     c->animal_payload = c->shape_payload = 5;
 
     {
@@ -300,22 +300,22 @@ TEST(PolyEach, Functionalities) {
 TEST(PolyEachPointer, Functionalities) {
     entt::registry reg;
 
-    cat cat1;
-    dog dog1;
-    dog dog2;
-    cube cube2;
-    sphere sphere2;
-    fat_cat fat_cat3;
+    auto cat1 = std::make_unique<cat>();
+    auto dog1 = std::make_unique<dog>();
+    auto dog2 = std::make_unique<dog>();
+    auto cube2 = std::make_unique<cube>();
+    auto sphere2 = std::make_unique<sphere>();
+    auto fat_cat3 = std::make_unique<fat_cat>();
 
     entt::entity entity1 = reg.create();  // components: cat(payload=1), dog(payload=2)
     entt::entity entity2 = reg.create();  // components: dog(payload=2), cube(payload=3), sphere(payload=4)
     entt::entity entity3 = reg.create();  // components: fat_cat(both payloads = 5)
-    reg.emplace<cat*>(entity1, &cat1)->animal_payload = 1;
-    reg.emplace<dog*>(entity1, &dog1)->animal_payload = 2;
-    reg.emplace<dog*>(entity2, &dog2)->animal_payload = 2;
-    reg.emplace<cube*>(entity2, &cube2)->shape_payload = 3;
-    reg.emplace<sphere*>(entity2, &sphere2)->shape_payload = 4;
-    auto* c = reg.emplace<fat_cat*>(entity3, &fat_cat3);
+    reg.emplace<cat*>(entity1, cat1.get())->animal_payload = 1;
+    reg.emplace<dog*>(entity1, dog1.get())->animal_payload = 2;
+    reg.emplace<dog*>(entity2, dog2.get())->animal_payload = 2;
+    reg.emplace<cube*>(entity2, cube2.get())->shape_payload = 3;
+    reg.emplace<sphere*>(entity2, sphere2.get())->shape_payload = 4;
+    auto* c = reg.emplace<fat_cat*>(entity3, fat_cat3.get());
     c->animal_payload = c->shape_payload = 5;
 
     {
