@@ -42,7 +42,11 @@ public:
     using difference_type = typename iterator_type::difference_type;
     using iterator_category = std::forward_iterator_tag;
 
-    constexpr view_iterator() noexcept = default;
+    constexpr view_iterator() noexcept
+        : it{},
+          last{},
+          pools{},
+          filter{} {}
 
     view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Component> all_of, std::array<const Type *, Exclude> none_of) noexcept
         : it{curr},
