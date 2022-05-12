@@ -343,7 +343,7 @@ TEST(SparseSetDeathTest, Bump) {
     ASSERT_DEATH(set.bump(entt::null), "");
     ASSERT_DEATH(set.bump(entt::tombstone), "");
     ASSERT_DEATH(set.bump(entt::entity{42}), "");
-    ASSERT_DEATH(set.bump(traits_type::construct(traits_type::to_entity(entt::entity{3}), traits_type::to_entity(entt::tombstone))), "");
+    ASSERT_DEATH(set.bump(traits_type::construct(traits_type::to_entity(entt::entity{3}), traits_type::to_version(entt::tombstone))), "");
 }
 
 TEST(SparseSet, Insert) {
