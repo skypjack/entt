@@ -671,6 +671,7 @@ public:
      * @param entt A valid identifier.
      */
     void bump(const entity_type entt) {
+        ENTT_ASSERT(entity_traits::to_version(entt) != entity_traits::to_version(tombstone), "Cannot set the tombstone version");
         auto &entity = sparse_ref(entt);
         entity = entity_traits::combine(entity_traits::to_integral(entity), entity_traits::to_integral(entt));
         packed[static_cast<size_type>(entity_traits::to_entity(entity))] = entt;

@@ -12,6 +12,7 @@ DOC:
 
 WIP:
 * add storage getter for filters to views and groups
+* exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
 * emitter: runtime handlers, allocator support (ready for both already)
 * view: no storage_traits dependency -> use storage instead of components for the definition
 * basic_storage::bind for cross-registry setups (see and remove todo from entity_copy.cpp)

@@ -335,11 +335,15 @@ TEST(SparseSet, Bump) {
 }
 
 TEST(SparseSetDeathTest, Bump) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::sparse_set set{entt::deletion_policy::in_place};
+    set.emplace(entt::entity{3});
 
     ASSERT_DEATH(set.bump(entt::null), "");
     ASSERT_DEATH(set.bump(entt::tombstone), "");
     ASSERT_DEATH(set.bump(entt::entity{42}), "");
+    ASSERT_DEATH(set.bump(traits_type::construct(traits_type::to_entity(entt::entity{3}), traits_type::to_entity(entt::tombstone))), "");
 }
 
 TEST(SparseSet, Insert) {
