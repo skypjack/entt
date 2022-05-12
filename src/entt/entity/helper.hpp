@@ -145,7 +145,7 @@ Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
     const auto *addr = std::addressof(instance);
 
     for(auto it = base.rbegin(), last = base.rend(); it < last; it += component_traits<Component>::page_size) {
-        if(const auto dist = (addr - std::addressof(storage.get(*it))); dist >= 0 && dist < component_traits<Component>::page_size) {
+        if(const auto dist = (addr - std::addressof(storage.get(*it))); dist >= 0 && dist < static_cast<decltype(dist)>(component_traits<Component>::page_size)) {
             return *(it + dist);
         }
     }
