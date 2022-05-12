@@ -205,7 +205,7 @@ class basic_sparse_set {
         }
 
         auto &elem = sparse[page][fast_mod(pos, entity_traits::page_size)];
-        ENTT_ASSERT(entity_traits::to_version(elem) == entity_traits::to_version(tombstone), "Slot not available");
+        ENTT_ASSERT(elem == tombstone, "Slot not available");
         return elem;
     }
 
@@ -671,8 +671,8 @@ public:
      * @param entt A valid identifier.
      */
     void bump(const entity_type entt) {
-        ENTT_ASSERT(entity_traits::to_version(entt) != entity_traits::to_version(tombstone), "Cannot set the tombstone version");
         auto &entity = sparse_ref(entt);
+        ENTT_ASSERT(entt != tombstone && entity != null, "Cannot set the required version");
         entity = entity_traits::combine(entity_traits::to_integral(entity), entity_traits::to_integral(entt));
         packed[static_cast<size_type>(entity_traits::to_entity(entity))] = entt;
     }
