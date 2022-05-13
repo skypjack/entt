@@ -193,7 +193,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     friend class basic_view;
 
     template<typename Comp>
-    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::type, Comp>;
 
     [[nodiscard]] auto opaque_check() const noexcept {
         std::array<const base_type *, sizeof...(Component) - 1u> other{};
@@ -544,7 +544,7 @@ class basic_view<Entity, get_t<Component>, exclude_t<>, std::void_t<std::enable_
     template<typename, typename, typename, typename>
     friend class basic_view;
 
-    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::type, Component>;
 
 public:
     /*! @brief Underlying entity identifier. */

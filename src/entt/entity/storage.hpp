@@ -906,7 +906,7 @@ public:
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
     /*! @brief Resulting type after component-to-storage conversion. */
-    using storage_type = sigh_storage_mixin<basic_storage<Entity, Type>>;
+    using type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
 
 } // namespace entt
