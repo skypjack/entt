@@ -205,7 +205,7 @@ class basic_sparse_set {
         }
 
         auto &elem = sparse[page][fast_mod(pos, entity_traits::page_size)];
-        ENTT_ASSERT(elem == tombstone, "Slot not available");
+        ENTT_ASSERT(elem == null, "Slot not available");
         return elem;
     }
 
