@@ -243,7 +243,7 @@ protected:
             sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(first.index()), entity_traits::to_integral(packed.back()));
             const auto entt = std::exchange(packed[first.index()], packed.back());
             // unnecessary but it helps to detect nasty bugs
-            ENTT_ASSERT((packed.back() = tombstone, true), "");
+            ENTT_ASSERT((packed.back() = null, true), "");
             // lazy self-assignment guard
             sparse_ref(entt) = null;
             packed.pop_back();
