@@ -407,6 +407,8 @@ dispatcher.sink<an_event>().connect<&listener::receive>(listener);
 dispatcher.sink<another_event>().connect<&listener::method>(listener);
 ```
 
+You should not connect listeners inside event handlers: this produces undefined behaviour.
+
 The `disconnect` member function is used to remove one listener at a time or all
 of them at once:
 
