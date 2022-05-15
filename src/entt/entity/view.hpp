@@ -193,7 +193,7 @@ class basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>> {
     friend class basic_view;
 
     template<typename Comp>
-    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::type, Comp>;
+    using storage_for = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::type, Comp>;
 
     [[nodiscard]] auto opaque_check() const noexcept {
         std::array<const base_type *, sizeof...(Component) - 1u> other{};
@@ -242,11 +242,11 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = std::common_type_t<typename storage_type<Component>::base_type...>;
+    using base_type = std::common_type_t<typename storage_for<Component>::base_type...>;
     /*! @brief Bidirectional iterator type. */
     using iterator = internal::view_iterator<base_type, sizeof...(Component) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
-    using iterable = iterable_adaptor<internal::extended_view_iterator<iterator, storage_type<Component>...>>;
+    using iterable = iterable_adaptor<internal::extended_view_iterator<iterator, storage_for<Component>...>>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() noexcept
@@ -259,7 +259,7 @@ public:
      * @param component The storage for the types to iterate.
      * @param epool The storage for the types used to filter the view.
      */
-    basic_view(storage_type<Component> &...component, storage_type<Exclude> &...epool) noexcept
+    basic_view(storage_for<Component> &...component, storage_for<Exclude> &...epool) noexcept
         : basic_view{std::forward_as_tuple(component...), std::forward_as_tuple(epool...)} {}
 
     /**
@@ -267,7 +267,7 @@ public:
      * @param component The storage for the types to iterate.
      * @param epool The storage for the types used to filter the view.
      */
-    basic_view(std::tuple<storage_type<Component> &...> component, std::tuple<storage_type<Exclude> &...> epool = {}) noexcept
+    basic_view(std::tuple<storage_for<Component> &...> component, std::tuple<storage_for<Exclude> &...> epool = {}) noexcept
         : pools{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, component)},
           filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, epool)},
           view{std::apply([](const auto &...curr) { return (std::min)({&static_cast<const base_type &>(curr)...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); }); }, component)} {}
@@ -280,7 +280,7 @@ public:
     template<typename Comp>
     [[nodiscard]] basic_view use() const noexcept {
         basic_view other{*this};
-        other.view = std::get<storage_type<Comp> *>(pools);
+        other.view = std::get<storage_for<Comp> *>(pools);
         return other;
     }
 
@@ -311,7 +311,7 @@ public:
      */
     template<typename Comp>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<storage_type<Comp> *>(pools);
+        return *std::get<storage_for<Comp> *>(pools);
     }
 
     /**
@@ -433,9 +433,9 @@ public:
         if constexpr(sizeof...(Comp) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools);
         } else if constexpr(sizeof...(Comp) == 1) {
-            return (std::get<storage_type<Comp> *>(pools)->get(entt), ...);
+            return (std::get<storage_for<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<storage_type<Comp> *>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<storage_for<Comp> *>(pools)->get_as_tuple(entt)...);
         }
     }
 
@@ -512,8 +512,8 @@ public:
     }
 
 private:
-    std::tuple<storage_type<Component> *...> pools;
-    std::tuple<storage_type<Exclude> *...> filter;
+    std::tuple<storage_for<Component> *...> pools;
+    std::tuple<storage_for<Exclude> *...> filter;
     const base_type *view;
 };
 
@@ -544,7 +544,7 @@ class basic_view<Entity, get_t<Component>, exclude_t<>, std::void_t<std::enable_
     template<typename, typename, typename, typename>
     friend class basic_view;
 
-    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::type, Component>;
+    using storage_for = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::type, Component>;
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -552,13 +552,13 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = typename storage_type::base_type;
+    using base_type = typename storage_for::base_type;
     /*! @brief Random access iterator type. */
     using iterator = typename base_type::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable view type. */
-    using iterable = decltype(std::declval<storage_type>().each());
+    using iterable = decltype(std::declval<storage_for>().each());
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() noexcept
@@ -570,14 +570,14 @@ public:
      * @brief Constructs a single-type view from a storage class.
      * @param ref The storage for the type to iterate.
      */
-    basic_view(storage_type &ref) noexcept
+    basic_view(storage_for &ref) noexcept
         : basic_view{std::forward_as_tuple(ref)} {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
      * @param ref The storage for the type to iterate.
      */
-    basic_view(std::tuple<storage_type &> ref, std::tuple<> = {}) noexcept
+    basic_view(std::tuple<storage_for &> ref, std::tuple<> = {}) noexcept
         : pools{&std::get<0>(ref)},
           filter{},
           view{&std::get<0>(ref)} {}
@@ -838,7 +838,7 @@ public:
     }
 
 private:
-    std::tuple<storage_type *> pools;
+    std::tuple<storage_for *> pools;
     std::tuple<> filter;
     const base_type *view;
 };
