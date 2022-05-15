@@ -379,8 +379,7 @@ public:
     /*! @brief Delivers all the pending events. */
     void update() const {
         for(auto &&cpool: pools.first()) {
-            if(cpool.second)
-                cpool.second->publish();
+            cpool.second->publish();
         }
     }
 
