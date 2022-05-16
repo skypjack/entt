@@ -904,7 +904,7 @@ public:
  * @tparam Type Storage value type.
  */
 template<typename Entity, typename Type, typename = void>
-struct storage_traits {
+struct storage_type {
     /*! @brief Resulting type after component-to-storage conversion. */
     using type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };

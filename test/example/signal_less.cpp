@@ -5,13 +5,13 @@
 #include <entt/entity/registry.hpp>
 
 template<typename Entity, typename Type>
-struct entt::storage_traits<Entity, Type> {
+struct entt::storage_type<Entity, Type> {
     // no signal regardless of component type ...
     using type = basic_storage<Entity, Type>;
 };
 
 template<typename Entity>
-struct entt::storage_traits<Entity, char> {
+struct entt::storage_type<Entity, char> {
     // ... unless it's char, because yes.
     using type = sigh_storage_mixin<basic_storage<Entity, char>>;
 };
@@ -20,7 +20,7 @@ template<typename, typename, typename = void>
 struct has_on_construct: std::false_type {};
 
 template<typename Entity, typename Type>
-struct has_on_construct<Entity, Type, std::void_t<decltype(&entt::storage_traits<Entity, Type>::type::on_construct)>>: std::true_type {};
+struct has_on_construct<Entity, Type, std::void_t<decltype(&entt::storage_type<Entity, Type>::type::on_construct)>>: std::true_type {};
 
 template<typename Entity, typename Type>
 inline constexpr auto has_on_construct_v = has_on_construct<Entity, Type>::value;

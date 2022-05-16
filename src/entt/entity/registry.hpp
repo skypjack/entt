@@ -222,7 +222,7 @@ class basic_registry {
     using basic_common_type = basic_sparse_set<Entity>;
 
     template<typename Comp>
-    using storage_for = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::type, Comp>;
+    using storage_for = constness_as_t<typename storage_type<Entity, std::remove_const_t<Comp>>::type, Comp>;
 
     template<typename...>
     struct group_handler;
