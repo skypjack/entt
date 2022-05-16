@@ -909,6 +909,14 @@ struct storage_type {
     using type = sigh_storage_mixin<basic_storage<Entity, Type>>;
 };
 
+/**
+ * @brief Helper type.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Storage value type.
+ */
+template<typename Entity, typename Type>
+using storage_type_t = typename storage_type<Entity, Type>::type;
+
 } // namespace entt
 
 #endif
