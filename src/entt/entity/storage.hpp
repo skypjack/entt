@@ -899,7 +899,7 @@ public:
 };
 
 /**
- * @brief Provides a common way to access certain properties of storage types.
+ * @brief Provides a common way to define storage types.
  * @tparam Type Storage value type.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -911,11 +911,10 @@ struct storage_type {
 
 /**
  * @brief Helper type.
- * @tparam Type Storage value type.
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Args Arguments to forward.
  */
-template<typename Type, typename Entity>
-using storage_type_t = typename storage_type<Type, Entity>::type;
+template<typename... Args>
+using storage_type_t = typename storage_type<Args...>::type;
 
 } // namespace entt
 
