@@ -7,13 +7,13 @@
 template<typename Entity, typename Type>
 struct entt::storage_type<Entity, Type> {
     // no signal regardless of component type ...
-    using type = basic_storage<Entity, Type>;
+    using type = basic_storage<Type, Entity>;
 };
 
 template<typename Entity>
 struct entt::storage_type<Entity, char> {
     // ... unless it's char, because yes.
-    using type = sigh_storage_mixin<basic_storage<Entity, char>>;
+    using type = sigh_storage_mixin<basic_storage<char, Entity>>;
 };
 
 template<typename, typename, typename = void>

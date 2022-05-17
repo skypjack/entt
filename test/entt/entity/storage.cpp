@@ -1659,9 +1659,9 @@ TEST(Storage, CustomAllocator) {
 
     test::throwing_allocator<entt::entity> allocator{};
 
-    test(entt::basic_storage<entt::entity, int, test::throwing_allocator<int>>{allocator}, allocator);
-    test(entt::basic_storage<entt::entity, std::true_type, test::throwing_allocator<std::true_type>>{allocator}, allocator);
-    test(entt::basic_storage<entt::entity, stable_type, test::throwing_allocator<stable_type>>{allocator}, allocator);
+    test(entt::basic_storage<int, entt::entity, test::throwing_allocator<int>>{allocator}, allocator);
+    test(entt::basic_storage<std::true_type, entt::entity, test::throwing_allocator<std::true_type>>{allocator}, allocator);
+    test(entt::basic_storage<stable_type, entt::entity, test::throwing_allocator<stable_type>>{allocator}, allocator);
 }
 
 TEST(Storage, ThrowingAllocator) {
@@ -1724,8 +1724,8 @@ TEST(Storage, ThrowingAllocator) {
         ASSERT_FALSE(pool.contains(entt::entity{sparse_page_size}));
     };
 
-    test(entt::basic_storage<entt::entity, int, test::throwing_allocator<int>>{});
-    test(entt::basic_storage<entt::entity, stable_type, test::throwing_allocator<stable_type>>{});
+    test(entt::basic_storage<int, entt::entity, test::throwing_allocator<int>>{});
+    test(entt::basic_storage<stable_type, entt::entity, test::throwing_allocator<stable_type>>{});
 }
 
 TEST(Storage, ThrowingComponent) {
@@ -1784,7 +1784,7 @@ TEST(Storage, ThrowingComponent) {
 
 TEST(Storage, NoUsesAllocatorConstruction) {
     test::tracked_memory_resource memory_resource{};
-    entt::basic_storage<entt::entity, int, std::pmr::polymorphic_allocator<int>> pool{&memory_resource};
+    entt::basic_storage<int, entt::entity, std::pmr::polymorphic_allocator<int>> pool{&memory_resource};
     const entt::entity entity{};
 
     pool.emplace(entity);
@@ -1801,7 +1801,7 @@ TEST(Storage, UsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
 
     test::tracked_memory_resource memory_resource{};
-    entt::basic_storage<entt::entity, string_type, std::pmr::polymorphic_allocator<string_type>> pool{&memory_resource};
+    entt::basic_storage<string_type, entt::entity, std::pmr::polymorphic_allocator<string_type>> pool{&memory_resource};
     const entt::entity entity{};
 
     pool.emplace(entity);

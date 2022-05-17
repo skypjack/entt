@@ -10,7 +10,7 @@ namespace entt {
 template<typename Entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 
-template<typename, typename Type, typename = std::allocator<Type>, typename = void>
+template<typename Type, typename, typename = std::allocator<Type>, typename = void>
 class basic_storage;
 
 template<typename Type>
@@ -96,10 +96,10 @@ using sparse_set = basic_sparse_set<entity>;
 
 /**
  * @brief Alias declaration for the most common use case.
- * @tparam Args Other template parameters.
+ * @tparam Type Type of objects assigned to the entities.
  */
-template<typename... Args>
-using storage = basic_storage<entity, Args...>;
+template<typename Type>
+using storage = basic_storage<Type, entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;

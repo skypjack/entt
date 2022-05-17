@@ -426,7 +426,7 @@ public:
 
 private:
     delegate<void(basic_observer &)> release;
-    basic_storage<entity_type, payload_type> storage;
+    basic_storage<payload_type, entity_type> storage;
 };
 
 } // namespace entt

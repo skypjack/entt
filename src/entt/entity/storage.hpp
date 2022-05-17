@@ -227,11 +227,11 @@ template<typename... CLhs, typename... CRhs>
  * Empty types aren't explicitly instantiated. Therefore, many of the functions
  * normally available for non-empty types will not be available for empty ones.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Type Type of objects assigned to the entities.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Entity, typename Type, typename Allocator, typename>
+template<typename Type, typename Entity, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The type must be at least move constructible/assignable");
 
@@ -748,8 +748,8 @@ private:
 };
 
 /*! @copydoc basic_storage */
-template<typename Entity, typename Type, typename Allocator>
-class basic_storage<Entity, Type, Allocator, std::enable_if_t<ignore_as_empty_v<Type>>>
+template<typename Type, typename Entity, typename Allocator>
+class basic_storage<Type, Entity, Allocator, std::enable_if_t<ignore_as_empty_v<Type>>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
@@ -906,7 +906,7 @@ public:
 template<typename Entity, typename Type, typename = void>
 struct storage_type {
     /*! @brief Resulting type after component-to-storage conversion. */
-    using type = sigh_storage_mixin<basic_storage<Entity, Type>>;
+    using type = sigh_storage_mixin<basic_storage<Type, Entity>>;
 };
 
 /**

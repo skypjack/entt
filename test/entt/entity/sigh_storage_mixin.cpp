@@ -464,9 +464,9 @@ TEST(SighStorageMixin, CustomAllocator) {
 
     test::throwing_allocator<entt::entity> allocator{};
 
-    test(entt::sigh_storage_mixin<entt::storage<int, test::throwing_allocator<int>>>{allocator}, allocator);
-    test(entt::sigh_storage_mixin<entt::storage<std::true_type, test::throwing_allocator<std::true_type>>>{allocator}, allocator);
-    test(entt::sigh_storage_mixin<entt::storage<stable_type, test::throwing_allocator<stable_type>>>{allocator}, allocator);
+    test(entt::sigh_storage_mixin<entt::basic_storage<int, entt::entity, test::throwing_allocator<int>>>{allocator}, allocator);
+    test(entt::sigh_storage_mixin<entt::basic_storage<std::true_type, entt::entity, test::throwing_allocator<std::true_type>>>{allocator}, allocator);
+    test(entt::sigh_storage_mixin<entt::basic_storage<stable_type, entt::entity, test::throwing_allocator<stable_type>>>{allocator}, allocator);
 }
 
 TEST(SighStorageMixin, ThrowingAllocator) {
@@ -540,8 +540,8 @@ TEST(SighStorageMixin, ThrowingAllocator) {
         ASSERT_EQ(on_destroy.value, 1);
     };
 
-    test(entt::sigh_storage_mixin<entt::basic_storage<entt::entity, int, test::throwing_allocator<int>>>{});
-    test(entt::sigh_storage_mixin<entt::basic_storage<entt::entity, stable_type, test::throwing_allocator<stable_type>>>{});
+    test(entt::sigh_storage_mixin<entt::basic_storage<int, entt::entity, test::throwing_allocator<int>>>{});
+    test(entt::sigh_storage_mixin<entt::basic_storage<stable_type, entt::entity, test::throwing_allocator<stable_type>>>{});
 }
 
 TEST(SighStorageMixin, ThrowingComponent) {
