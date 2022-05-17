@@ -134,7 +134,7 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<std::remove_const_t<Get>...>>;
 
     template<typename Comp>
-    using storage_for = constness_as_t<storage_type_t<Entity, std::remove_const_t<Comp>>, Comp>;
+    using storage_for = constness_as_t<storage_type_t<std::remove_const_t<Comp>, Entity>, Comp>;
 
     using basic_common_type = std::common_type_t<typename storage_for<Get>::base_type...>;
 
@@ -534,7 +534,7 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<std::remove_const_t<Owned>..., std::remove_const_t<Get>...>>;
 
     template<typename Comp>
-    using storage_for = constness_as_t<storage_type_t<Entity, std::remove_const_t<Comp>>, Comp>;
+    using storage_for = constness_as_t<storage_type_t<std::remove_const_t<Comp>, Entity>, Comp>;
 
     basic_group(const std::size_t &extent, storage_for<Owned> &...opool, storage_for<Get> &...gpool) noexcept
         : pools{&opool..., &gpool...},

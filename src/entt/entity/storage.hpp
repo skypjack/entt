@@ -900,10 +900,10 @@ public:
 
 /**
  * @brief Provides a common way to access certain properties of storage types.
- * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Type Storage value type.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
  */
-template<typename Entity, typename Type, typename = void>
+template<typename Type, typename Entity, typename = void>
 struct storage_type {
     /*! @brief Resulting type after component-to-storage conversion. */
     using type = sigh_storage_mixin<basic_storage<Type, Entity>>;
@@ -911,11 +911,11 @@ struct storage_type {
 
 /**
  * @brief Helper type.
- * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Type Storage value type.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
  */
-template<typename Entity, typename Type>
-using storage_type_t = typename storage_type<Entity, Type>::type;
+template<typename Type, typename Entity>
+using storage_type_t = typename storage_type<Type, Entity>::type;
 
 } // namespace entt
 

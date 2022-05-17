@@ -1943,11 +1943,11 @@ TEST(Registry, RuntimePools) {
     auto &storage = registry.storage<empty_type>("other"_hs);
     const auto entity = registry.create();
 
-    static_assert(std::is_same_v<decltype(registry.storage<empty_type>()), entt::storage_type_t<entt::entity, empty_type> &>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const entt::storage_type_t<entt::entity, empty_type> &>);
+    static_assert(std::is_same_v<decltype(registry.storage<empty_type>()), entt::storage_type_t<empty_type, entt::entity> &>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const entt::storage_type_t<empty_type, entt::entity> &>);
 
-    static_assert(std::is_same_v<decltype(registry.storage("other"_hs)->second), entt::storage_type_t<entt::entity, empty_type>::base_type &>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)->second), const entt::storage_type_t<entt::entity, empty_type>::base_type &>);
+    static_assert(std::is_same_v<decltype(registry.storage("other"_hs)->second), entt::storage_type_t<empty_type, entt::entity>::base_type &>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)->second), const entt::storage_type_t<empty_type, entt::entity>::base_type &>);
 
     ASSERT_NE(registry.storage("other"_hs), registry.storage().end());
     ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), registry.storage().end());
