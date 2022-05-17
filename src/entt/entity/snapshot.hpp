@@ -26,11 +26,11 @@ namespace entt {
  * This type can be used in both cases if provided with a correctly configured
  * output archive.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Basic registry type.
  */
-template<typename Entity>
+template<typename Type>
 class basic_snapshot {
-    using entity_traits = entt_traits<Entity>;
+    using entity_traits = entt_traits<typename Type::entity_type>;
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
@@ -60,14 +60,16 @@ class basic_snapshot {
     }
 
 public:
+    /*! Basic registry type. */
+    using registry_type = Type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = typename Type::entity_type;
 
     /**
      * @brief Constructs an instance that is bound to a given registry.
      * @param source A valid reference to a registry.
      */
-    basic_snapshot(const basic_registry<entity_type> &source) noexcept
+    basic_snapshot(const registry_type &source) noexcept
         : reg{&source} {}
 
     /*! @brief Default move constructor. */
@@ -144,7 +146,7 @@ public:
     }
 
 private:
-    const basic_registry<entity_type> *reg;
+    const registry_type *reg;
 };
 
 /**
@@ -155,11 +157,11 @@ private:
  * originally had.<br/>
  * An example of use is the implementation of a save/restore utility.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Basic registry type.
  */
-template<typename Entity>
+template<typename Type>
 class basic_snapshot_loader {
-    using entity_traits = entt_traits<Entity>;
+    using entity_traits = entt_traits<typename Type::entity_type>;
 
     template<typename Type, typename Archive>
     void assign(Archive &archive) const {
@@ -188,14 +190,16 @@ class basic_snapshot_loader {
     }
 
 public:
+    /*! Basic registry type. */
+    using registry_type = Type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = typename Type::entity_type;
 
     /**
      * @brief Constructs an instance that is bound to a given registry.
      * @param source A valid reference to a registry.
      */
-    basic_snapshot_loader(basic_registry<entity_type> &source) noexcept
+    basic_snapshot_loader(registry_type &source) noexcept
         : reg{&source} {
         // restoring a snapshot as a whole requires a clean registry
         ENTT_ASSERT(reg->empty(), "Registry must be empty");
@@ -273,7 +277,7 @@ public:
     }
 
 private:
-    basic_registry<entity_type> *reg;
+    registry_type *reg;
 };
 
 /**
@@ -290,13 +294,13 @@ private:
  * the requirement of transferring somehow parts of the representation side to
  * side.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Basic registry type.
  */
-template<typename Entity>
+template<typename Type>
 class basic_continuous_loader {
-    using entity_traits = entt_traits<Entity>;
+    using entity_traits = entt_traits<typename Type::entity_type>;
 
-    void destroy(Entity entt) {
+    void destroy(typename Type::entity_type entt) {
         if(const auto it = remloc.find(entt); it == remloc.cend()) {
             const auto local = reg->create();
             remloc.emplace(entt, std::make_pair(local, true));
@@ -304,7 +308,7 @@ class basic_continuous_loader {
         }
     }
 
-    void restore(Entity entt) {
+    void restore(typename Type::entity_type entt) {
         const auto it = remloc.find(entt);
 
         if(it == remloc.cend()) {
@@ -402,14 +406,16 @@ class basic_continuous_loader {
     }
 
 public:
+    /*! Basic registry type. */
+    using registry_type = Type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = typename Type::entity_type;
 
     /**
      * @brief Constructs an instance that is bound to a given registry.
      * @param source A valid reference to a registry.
      */
-    basic_continuous_loader(basic_registry<entity_type> &source) noexcept
+    basic_continuous_loader(registry_type &source) noexcept
         : reg{&source} {}
 
     /*! @brief Default move constructor. */
@@ -553,7 +559,7 @@ public:
 
 private:
     dense_map<entity_type, std::pair<entity_type, bool>> remloc;
-    basic_registry<entity_type> *reg;
+    registry_type *reg;
 };
 
 } // namespace entt

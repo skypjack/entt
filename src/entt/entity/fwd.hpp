@@ -131,13 +131,13 @@ template<typename... Args>
 using const_handle_view = basic_handle<const entity, Args...>;
 
 /*! @brief Alias declaration for the most common use case. */
-using snapshot = basic_snapshot<entity>;
+using snapshot = basic_snapshot<registry>;
 
 /*! @brief Alias declaration for the most common use case. */
-using snapshot_loader = basic_snapshot_loader<entity>;
+using snapshot_loader = basic_snapshot_loader<registry>;
 
 /*! @brief Alias declaration for the most common use case. */
-using continuous_loader = basic_continuous_loader<entity>;
+using continuous_loader = basic_continuous_loader<registry>;
 
 /**
  * @brief Alias declaration for the most common use case.
