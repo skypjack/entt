@@ -105,7 +105,7 @@ using storage = basic_storage<Type, entity>;
 using registry = basic_registry<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
-using observer = basic_observer<entity>;
+using observer = basic_observer<registry>;
 
 /*! @brief Alias declaration for the most common use case. */
 using organizer = basic_organizer<entity>;
