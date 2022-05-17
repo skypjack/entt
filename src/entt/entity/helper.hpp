@@ -13,14 +13,14 @@ namespace entt {
 
 /**
  * @brief Converts a registry to a view.
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Basic registry type.
  */
-template<typename Entity>
+template<typename Type>
 struct as_view {
-    /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<Entity>;
     /*! @brief Type of registry to convert. */
-    using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
+    using registry_type = Type;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = std::remove_const_t<typename Type::entity_type>;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -45,29 +45,15 @@ private:
 };
 
 /**
- * @brief Deduction guide.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-as_view(basic_registry<Entity> &) -> as_view<Entity>;
-
-/**
- * @brief Deduction guide.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-as_view(const basic_registry<Entity> &) -> as_view<const Entity>;
-
-/**
  * @brief Converts a registry to a group.
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Basic registry type.
  */
-template<typename Entity>
+template<typename Type>
 struct as_group {
-    /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<Entity>;
     /*! @brief Type of registry to convert. */
-    using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
+    using registry_type = Type;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = std::remove_const_t<typename Type::entity_type>;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -95,20 +81,6 @@ struct as_group {
 private:
     registry_type &reg;
 };
-
-/**
- * @brief Deduction guide.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-as_group(basic_registry<Entity> &) -> as_group<Entity>;
-
-/**
- * @brief Deduction guide.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-as_group(const basic_registry<Entity> &) -> as_group<const Entity>;
 
 /**
  * @brief Helper to create a listener that directly invokes a member function.
