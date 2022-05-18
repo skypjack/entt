@@ -163,28 +163,28 @@ template<typename Type>
 class basic_snapshot_loader {
     using entity_traits = entt_traits<typename Type::entity_type>;
 
-    template<typename Type, typename Archive>
+    template<typename Component, typename Archive>
     void assign(Archive &archive) const {
         typename entity_traits::entity_type length{};
         entity_type entt;
 
         archive(length);
 
-        if constexpr(ignore_as_empty_v<Type>) {
+        if constexpr(ignore_as_empty_v<Component>) {
             while(length--) {
                 archive(entt);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
                 ENTT_ASSERT(entity == entt, "Entity not available for use");
-                reg->template emplace<Type>(entt);
+                reg->template emplace<Component>(entt);
             }
         } else {
-            Type instance;
+            Component instance;
 
             while(length--) {
                 archive(entt, instance);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
                 ENTT_ASSERT(entity == entt, "Entity not available for use");
-                reg->template emplace<Type>(entt, std::move(instance));
+                reg->template emplace<Component>(entt, std::move(instance));
             }
         }
     }
@@ -357,9 +357,9 @@ class basic_continuous_loader {
         }
     }
 
-    template<typename Other, typename Type, typename Member>
-    void update([[maybe_unused]] Other &instance, [[maybe_unused]] Member Type::*member) {
-        if constexpr(!std::is_same_v<Other, Type>) {
+    template<typename Component, typename Other, typename Member>
+    void update([[maybe_unused]] Component &instance, [[maybe_unused]] Member Other::*member) {
+        if constexpr(!std::is_same_v<Component, Other>) {
             return;
         } else if constexpr(std::is_same_v<Member, entity_type>) {
             instance.*member = map(instance.*member);
@@ -380,27 +380,27 @@ class basic_continuous_loader {
         }
     }
 
-    template<typename Other, typename Archive, typename... Type, typename... Member>
-    void assign(Archive &archive, [[maybe_unused]] Member Type::*...member) {
+    template<typename Component, typename Archive, typename... Other, typename... Member>
+    void assign(Archive &archive, [[maybe_unused]] Member Other::*...member) {
         typename entity_traits::entity_type length{};
         entity_type entt;
 
         archive(length);
 
-        if constexpr(ignore_as_empty_v<Other>) {
+        if constexpr(ignore_as_empty_v<Component>) {
             while(length--) {
                 archive(entt);
                 restore(entt);
-                reg->template emplace_or_replace<Other>(map(entt));
+                reg->template emplace_or_replace<Component>(map(entt));
             }
         } else {
-            Other instance;
+            Component instance;
 
             while(length--) {
                 archive(entt, instance);
                 (update(instance, member), ...);
                 restore(entt);
-                reg->template emplace_or_replace<Other>(map(entt), std::move(instance));
+                reg->template emplace_or_replace<Component>(map(entt), std::move(instance));
             }
         }
     }
@@ -469,14 +469,14 @@ public:
      *
      * @tparam Component Type of component to restore.
      * @tparam Archive Type of input archive.
-     * @tparam Type Types of components to update with local counterparts.
+     * @tparam Other Types of components to update with local counterparts.
      * @tparam Member Types of members to update with their local counterparts.
      * @param archive A valid reference to an input archive.
      * @param member Members to update with their local counterparts.
      * @return A non-const reference to this loader.
      */
-    template<typename... Component, typename Archive, typename... Type, typename... Member>
-    basic_continuous_loader &component(Archive &archive, Member Type::*...member) {
+    template<typename... Component, typename Archive, typename... Other, typename... Member>
+    basic_continuous_loader &component(Archive &archive, Member Other::*...member) {
         (remove_if_exists<Component>(), ...);
         (assign<Component>(archive, member...), ...);
         return *this;
