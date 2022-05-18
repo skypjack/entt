@@ -15,13 +15,13 @@ namespace entt {
  *
  * Tiny wrapper around a registry and an entity.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Basic registry type.
  * @tparam Scope Types to which to restrict the scope of a handle.
  */
-template<typename Entity, typename... Scope>
+template<typename Type, typename... Scope>
 struct basic_handle {
     /*! @brief Type of registry accepted by the handle. */
-    using registry_type = constness_as_t<basic_registry<std::remove_const_t<Entity>>, Entity>;
+    using registry_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename registry_type::entity_type;
     /*! @brief Underlying version type. */
@@ -52,7 +52,7 @@ struct basic_handle {
      */
     template<typename Other, typename... Args>
     operator basic_handle<Other, Args...>() const noexcept {
-        static_assert(std::is_same_v<Other, Entity> || std::is_same_v<std::remove_const_t<Other>, Entity>, "Invalid conversion between different handles");
+        static_assert(std::is_same_v<Other, Type> || std::is_same_v<std::remove_const_t<Other>, Type>, "Invalid conversion between different handles");
         static_assert((sizeof...(Scope) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Scope)) && ... && (type_list_contains_v<type_list<Scope...>, Args>))), "Invalid conversion between different handles");
 
         return reg ? basic_handle<Other, Args...>{*reg, entt} : basic_handle<Other, Args...>{};
@@ -319,20 +319,6 @@ template<typename... Args, typename... Other>
 [[nodiscard]] bool operator!=(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) noexcept {
     return !(lhs == rhs);
 }
-
-/**
- * @brief Deduction guide.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-basic_handle(basic_registry<Entity> &, Entity) -> basic_handle<Entity>;
-
-/**
- * @brief Deduction guide.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-basic_handle(const basic_registry<Entity> &, Entity) -> basic_handle<const Entity>;
 
 } // namespace entt
 

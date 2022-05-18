@@ -111,24 +111,24 @@ using observer = basic_observer<registry>;
 using organizer = basic_organizer<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
-using handle = basic_handle<entity>;
+using handle = basic_handle<registry>;
 
 /*! @brief Alias declaration for the most common use case. */
-using const_handle = basic_handle<const entity>;
+using const_handle = basic_handle<const registry>;
 
 /**
  * @brief Alias declaration for the most common use case.
  * @tparam Args Other template parameters.
  */
 template<typename... Args>
-using handle_view = basic_handle<entity, Args...>;
+using handle_view = basic_handle<registry, Args...>;
 
 /**
  * @brief Alias declaration for the most common use case.
  * @tparam Args Other template parameters.
  */
 template<typename... Args>
-using const_handle_view = basic_handle<const entity, Args...>;
+using const_handle_view = basic_handle<const registry, Args...>;
 
 /*! @brief Alias declaration for the most common use case. */
 using snapshot = basic_snapshot<registry>;
