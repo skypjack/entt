@@ -13,14 +13,14 @@ namespace entt {
 
 /**
  * @brief Converts a registry to a view.
- * @tparam Type Basic registry type.
+ * @tparam Registry Basic registry type.
  */
-template<typename Type>
+template<typename Registry>
 struct as_view {
     /*! @brief Type of registry to convert. */
-    using registry_type = Type;
+    using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<typename Type::entity_type>;
+    using entity_type = std::remove_const_t<typename registry_type::entity_type>;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -46,14 +46,14 @@ private:
 
 /**
  * @brief Converts a registry to a group.
- * @tparam Type Basic registry type.
+ * @tparam Registry Basic registry type.
  */
-template<typename Type>
+template<typename Registry>
 struct as_group {
     /*! @brief Type of registry to convert. */
-    using registry_type = Type;
+    using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<typename Type::entity_type>;
+    using entity_type = std::remove_const_t<typename registry_type::entity_type>;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -85,14 +85,14 @@ private:
 /**
  * @brief Helper to create a listener that directly invokes a member function.
  * @tparam Member Member function to invoke on a component of the given type.
- * @tparam Type Basic registry type.
+ * @tparam Registry Basic registry type.
  * @param reg A registry that contains the given entity and its components.
  * @param entt Entity from which to get the component.
  */
-template<auto Member, typename Type = registry>
-void invoke(Type &reg, const typename Type::entity_type entt) {
+template<auto Member, typename Registry = registry>
+void invoke(Registry &reg, const typename Registry::entity_type entt) {
     static_assert(std::is_member_function_pointer_v<decltype(Member)>, "Invalid pointer to non-static member function");
-    delegate<void(Type &, const typename Type::entity_type)> func;
+    delegate<void(Registry &, const typename Registry::entity_type)> func;
     func.template connect<Member>(reg.template get<member_class_t<decltype(Member)>>(entt));
     func(reg, entt);
 }
@@ -104,16 +104,16 @@ void invoke(Type &reg, const typename Type::entity_type entt) {
  * Currently, this function only works correctly with the default pool as it
  * makes assumptions about how the components are laid out.
  *
- * @tparam Type Basic registry type.
+ * @tparam Registry Basic registry type.
  * @tparam Component Type of component.
  * @param reg A registry that contains the given entity and its components.
  * @param instance A valid component instance.
  * @return The entity associated with the given component.
  */
-template<typename Type, typename Component>
-typename Type::entity_type to_entity(const Type &reg, const Component &instance) {
+template<typename Registry, typename Component>
+typename Registry::entity_type to_entity(const Registry &reg, const Component &instance) {
     const auto &storage = reg.template storage<Component>();
-    const typename Type::base_type &base = storage;
+    const typename Registry::base_type &base = storage;
     const auto *addr = std::addressof(instance);
 
     for(auto it = base.rbegin(), last = base.rend(); it < last; it += component_traits<Component>::page_size) {
