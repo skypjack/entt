@@ -85,14 +85,14 @@ private:
 /**
  * @brief Helper to create a listener that directly invokes a member function.
  * @tparam Member Member function to invoke on a component of the given type.
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Basic registry type.
  * @param reg A registry that contains the given entity and its components.
  * @param entt Entity from which to get the component.
  */
-template<auto Member, typename Entity = entity>
-void invoke(basic_registry<Entity> &reg, const Entity entt) {
+template<auto Member, typename Type = registry>
+void invoke(Type &reg, const typename Type::entity_type entt) {
     static_assert(std::is_member_function_pointer_v<decltype(Member)>, "Invalid pointer to non-static member function");
-    delegate<void(basic_registry<Entity> &, const Entity)> func;
+    delegate<void(Type &, const typename Type::entity_type)> func;
     func.template connect<Member>(reg.template get<member_class_t<decltype(Member)>>(entt));
     func(reg, entt);
 }
@@ -104,16 +104,16 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
  * Currently, this function only works correctly with the default pool as it
  * makes assumptions about how the components are laid out.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type Basic registry type.
  * @tparam Component Type of component.
  * @param reg A registry that contains the given entity and its components.
  * @param instance A valid component instance.
  * @return The entity associated with the given component.
  */
-template<typename Entity, typename Component>
-Entity to_entity(const basic_registry<Entity> &reg, const Component &instance) {
+template<typename Type, typename Component>
+typename Type::entity_type to_entity(const Type &reg, const Component &instance) {
     const auto &storage = reg.template storage<Component>();
-    const typename basic_registry<Entity>::base_type &base = storage;
+    const typename Type::base_type &base = storage;
     const auto *addr = std::addressof(instance);
 
     for(auto it = base.rbegin(), last = base.rend(); it < last; it += component_traits<Component>::page_size) {
