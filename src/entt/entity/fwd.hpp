@@ -108,7 +108,7 @@ using registry = basic_registry<entity>;
 using observer = basic_observer<registry>;
 
 /*! @brief Alias declaration for the most common use case. */
-using organizer = basic_organizer<entity>;
+using organizer = basic_organizer<registry>;
 
 /*! @brief Alias declaration for the most common use case. */
 using handle = basic_handle<registry>;

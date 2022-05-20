@@ -44,15 +44,15 @@ struct unpack_type {
         type_list<>>;
 };
 
-template<typename Entity, typename... Override>
-struct unpack_type<basic_registry<Entity>, type_list<Override...>> {
+template<typename... Args, typename... Override>
+struct unpack_type<basic_registry<Args...>, type_list<Override...>> {
     using ro = type_list<>;
     using rw = type_list<>;
 };
 
-template<typename Entity, typename... Override>
-struct unpack_type<const basic_registry<Entity>, type_list<Override...>>
-    : unpack_type<basic_registry<Entity>, type_list<Override...>> {};
+template<typename... Args, typename... Override>
+struct unpack_type<const basic_registry<Args...>, type_list<Override...>>
+    : unpack_type<basic_registry<Args...>, type_list<Override...>> {};
 
 template<typename Entity, typename... Component, typename... Exclude, typename... Override>
 struct unpack_type<basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>>, type_list<Override...>> {
@@ -102,12 +102,12 @@ resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> 
  * goal of the tool. Instead, they are returned to the user in the form of a
  * graph that allows for safe execution.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Registry Basic registry type.
  */
-template<typename Entity>
+template<typename Registry>
 class basic_organizer final {
-    using callback_type = void(const void *, basic_registry<Entity> &);
-    using prepare_type = void(basic_registry<Entity> &);
+    using callback_type = void(const void *, Registry &);
+    using prepare_type = void(Registry &);
     using dependency_type = std::size_t(const bool, const type_info **, const std::size_t);
 
     struct vertex_data final {
@@ -122,8 +122,8 @@ class basic_organizer final {
     };
 
     template<typename Type>
-    [[nodiscard]] static decltype(auto) extract(basic_registry<Entity> &reg) {
-        if constexpr(std::is_same_v<Type, basic_registry<Entity>>) {
+    [[nodiscard]] static decltype(auto) extract(Registry &reg) {
+        if constexpr(std::is_same_v<Type, Registry>) {
             return reg;
         } else if constexpr(internal::is_view_v<Type>) {
             return as_view{reg};
@@ -133,7 +133,7 @@ class basic_organizer final {
     }
 
     template<typename... Args>
-    [[nodiscard]] static auto to_args(basic_registry<Entity> &reg, type_list<Args...>) {
+    [[nodiscard]] static auto to_args(Registry &reg, type_list<Args...>) {
         return std::tuple<decltype(extract<Args>(reg))...>(extract<Args>(reg)...);
     }
 
@@ -151,7 +151,7 @@ class basic_organizer final {
 
     template<typename... RO, typename... RW>
     void track_dependencies(std::size_t index, const bool requires_registry, type_list<RO...>, type_list<RW...>) {
-        dependencies[type_hash<basic_registry<Entity>>::value()].emplace_back(index, requires_registry || (sizeof...(RO) + sizeof...(RW) == 0u));
+        dependencies[type_hash<Registry>::value()].emplace_back(index, requires_registry || (sizeof...(RO) + sizeof...(RW) == 0u));
         (dependencies[type_hash<RO>::value()].emplace_back(index, false), ...);
         (dependencies[type_hash<RW>::value()].emplace_back(index, true), ...);
     }
@@ -227,8 +227,10 @@ class basic_organizer final {
     }
 
 public:
+    /*! Basic registry type. */
+    using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = typename registry_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Raw task function type. */
@@ -338,7 +340,7 @@ public:
          * are properly instantiated before using them.
          * @param reg A valid registry.
          */
-        void prepare(basic_registry<entity_type> &reg) const {
+        void prepare(registry_type &reg) const {
             node.prepare ? node.prepare(reg) : void();
         }
 
@@ -357,9 +359,9 @@ public:
     template<auto Candidate, typename... Req>
     void emplace(const char *name = nullptr) {
         using resource_type = decltype(internal::free_function_to_resource_traits<Req...>(Candidate));
-        constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, basic_registry<entity_type>>;
+        constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, registry_type>;
 
-        callback_type *callback = +[](const void *, basic_registry<entity_type> &reg) {
+        callback_type *callback = +[](const void *, registry_type &reg) {
             std::apply(Candidate, to_args(reg, typename resource_type::args{}));
         };
 
@@ -370,7 +372,7 @@ public:
             nullptr,
             callback,
             +[](const bool rw, const type_info **buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
-            +[](basic_registry<entity_type> &reg) { void(to_args(reg, typename resource_type::args{})); },
+            +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
         track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
@@ -389,9 +391,9 @@ public:
     template<auto Candidate, typename... Req, typename Type>
     void emplace(Type &value_or_instance, const char *name = nullptr) {
         using resource_type = decltype(internal::constrained_function_to_resource_traits<Req...>(Candidate));
-        constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, basic_registry<entity_type>>;
+        constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, registry_type>;
 
-        callback_type *callback = +[](const void *payload, basic_registry<entity_type> &reg) {
+        callback_type *callback = +[](const void *payload, registry_type &reg) {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
             std::apply(Candidate, std::tuple_cat(std::forward_as_tuple(*curr), to_args(reg, typename resource_type::args{})));
         };
@@ -403,7 +405,7 @@ public:
             &value_or_instance,
             callback,
             +[](const bool rw, const type_info **buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
-            +[](basic_registry<entity_type> &reg) { void(to_args(reg, typename resource_type::args{})); },
+            +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
         track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
