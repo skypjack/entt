@@ -28,6 +28,9 @@ class resource {
     static constexpr bool is_acceptable_v = !std::is_same_v<Type, Other> && std::is_constructible_v<Type &, Other &>;
 
 public:
+    /*! @brief Resource type. */
+    using element_type = Type;
+
     /*! @brief Default constructor. */
     resource() noexcept
         : value{} {}
@@ -36,7 +39,7 @@ public:
      * @brief Creates a handle from a weak pointer, namely a resource.
      * @param res A weak pointer to a resource.
      */
-    explicit resource(std::shared_ptr<Type> res) noexcept
+    explicit resource(std::shared_ptr<element_type> res) noexcept
         : value{std::move(res)} {}
 
     /*! @brief Default copy constructor. */
@@ -52,7 +55,7 @@ public:
      * @param res Unrelated and unmanaged resources.
      */
     template<typename Other>
-    resource(const resource<Other> &other, Type &res) noexcept
+    resource(const resource<Other> &other, element_type &res) noexcept
         : value{other.value, std::addressof(res)} {}
 
     /**
@@ -119,12 +122,12 @@ public:
      *
      * @return A reference to the managed resource.
      */
-    [[nodiscard]] Type &operator*() const noexcept {
+    [[nodiscard]] element_type &operator*() const noexcept {
         return *value;
     }
 
     /*! @copydoc operator* */
-    [[nodiscard]] operator Type &() const noexcept {
+    [[nodiscard]] operator element_type &() const noexcept {
         return *value;
     }
 
@@ -132,7 +135,7 @@ public:
      * @brief Returns a pointer to the managed resource.
      * @return A pointer to the managed resource.
      */
-    [[nodiscard]] Type *operator->() const noexcept {
+    [[nodiscard]] element_type *operator->() const noexcept {
         return value.get();
     }
 
@@ -153,7 +156,7 @@ public:
     }
 
 private:
-    std::shared_ptr<Type> value;
+    std::shared_ptr<element_type> value;
 };
 
 /**
