@@ -157,6 +157,14 @@ public:
         return value.use_count();
     }
 
+    /**
+     * @brief Returns the underlying resource handle.
+     * @return The underlying resource handle.
+     */
+    [[nodiscard]] handle_type handle() const noexcept {
+        return value;
+    }
+
 private:
     handle_type value;
 };

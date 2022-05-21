@@ -30,7 +30,7 @@ TEST(Resource, Functionalities) {
 
     ASSERT_FALSE(resource);
     ASSERT_EQ(resource.operator->(), nullptr);
-    ASSERT_EQ(resource.use_count(), 0l);
+    ASSERT_EQ(resource.handle().use_count(), 0l);
 
     const auto value = std::make_shared<derived>();
     entt::resource<derived> other{value};
