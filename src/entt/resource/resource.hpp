@@ -30,6 +30,8 @@ class resource {
 public:
     /*! @brief Resource type. */
     using element_type = Type;
+    /*! @brief Handle type. */
+    using handle_type = std::shared_ptr<element_type>;
 
     /*! @brief Default constructor. */
     resource() noexcept
@@ -39,7 +41,7 @@ public:
      * @brief Creates a handle from a weak pointer, namely a resource.
      * @param res A weak pointer to a resource.
      */
-    explicit resource(std::shared_ptr<element_type> res) noexcept
+    explicit resource(handle_type res) noexcept
         : value{std::move(res)} {}
 
     /*! @brief Default copy constructor. */
@@ -156,7 +158,7 @@ public:
     }
 
 private:
-    std::shared_ptr<element_type> value;
+    handle_type value;
 };
 
 /**
