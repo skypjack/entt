@@ -150,18 +150,10 @@ public:
     }
 
     /**
-     * @brief Returns the number of handles pointing the same resource.
-     * @return The number of handles pointing the same resource.
-     */
-    [[nodiscard]] long use_count() const noexcept {
-        return value.use_count();
-    }
-
-    /**
      * @brief Returns the underlying resource handle.
      * @return The underlying resource handle.
      */
-    [[nodiscard]] handle_type handle() const noexcept {
+    [[nodiscard]] const handle_type &handle() const noexcept {
         return value;
     }
 
