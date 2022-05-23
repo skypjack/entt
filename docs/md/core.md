@@ -27,6 +27,7 @@
     * [Is applicable](#is-applicable)
     * [Constness as](#constness-as)
     * [Member class type](#member-class-type)
+    * [N-th argument](#n-th-argument)
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
     * [Type list and value list](#type-list-and-value-list)
@@ -714,6 +715,18 @@ The purpose of this utility is to extract the class type in a few lines of code:
 template<typename Member>
 using clazz = entt::member_class_t<Member>;
 ```
+
+### N-th argument
+
+An utility to quickly find the n-th argument of a function, member function or
+data member (for blind operations on opaque types):
+
+```cpp
+using type = entt::nt_argument_t<1u, &clazz::member>;
+```
+
+Disambiguation of overloaded functions is the responsibility of the user, should
+it be needed.
 
 ### Integral constant
 
