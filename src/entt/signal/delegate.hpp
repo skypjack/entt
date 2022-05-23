@@ -20,19 +20,19 @@ namespace entt {
 namespace internal {
 
 template<typename Ret, typename... Args>
-auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
+constexpr auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
 
 template<typename Ret, typename Type, typename... Args, typename Other>
-auto function_pointer(Ret (*)(Type, Args...), Other &&) -> Ret (*)(Args...);
+constexpr auto function_pointer(Ret (*)(Type, Args...), Other &&) -> Ret (*)(Args...);
 
 template<typename Class, typename Ret, typename... Args, typename... Other>
-auto function_pointer(Ret (Class::*)(Args...), Other &&...) -> Ret (*)(Args...);
+constexpr auto function_pointer(Ret (Class::*)(Args...), Other &&...) -> Ret (*)(Args...);
 
 template<typename Class, typename Ret, typename... Args, typename... Other>
-auto function_pointer(Ret (Class::*)(Args...) const, Other &&...) -> Ret (*)(Args...);
+constexpr auto function_pointer(Ret (Class::*)(Args...) const, Other &&...) -> Ret (*)(Args...);
 
 template<typename Class, typename Type, typename... Other>
-auto function_pointer(Type Class::*, Other &&...) -> Type (*)();
+constexpr auto function_pointer(Type Class::*, Other &&...) -> Type (*)();
 
 template<typename... Type>
 using function_pointer_t = decltype(internal::function_pointer(std::declval<Type>()...));
