@@ -698,6 +698,38 @@ public:
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
 
+/**
+ * @brief Extracts the n-th argument of a given function or member function.
+ * @tparam Index The index of the argument to extract.
+ * @tparam Candidate A valid function, member function or data member.
+ */
+template<std::size_t Index, auto Candidate>
+class nth_argument {
+    template<typename Ret, typename... Args>
+    static constexpr type_list<Args...> pick_up(Ret (*)(Args...));
+
+    template<typename Ret, typename Class, typename... Args>
+    static constexpr type_list<Args...> pick_up(Ret (Class ::*)(Args...));
+
+    template<typename Ret, typename Class, typename... Args>
+    static constexpr type_list<Args...> pick_up(Ret (Class ::*)(Args...) const);
+
+    template<typename Type, typename Class>
+    static constexpr type_list<Type> pick_up(Type Class ::*);
+
+public:
+    /*! @brief N-th argument of the given function or member function. */
+    using type = type_list_element_t<Index, decltype(pick_up(Candidate))>;
+};
+
+/**
+ * @brief Helper type.
+ * @tparam Index The index of the argument to extract.
+ * @tparam Candidate A valid function, member function or data member.
+ */
+template<std::size_t Index, auto Candidate>
+using nth_argument_t = typename nth_argument<Index, Candidate>::type;
+
 } // namespace entt
 
 #endif

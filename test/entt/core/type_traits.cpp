@@ -20,6 +20,20 @@ struct nlohmann_json_like final {
     }
 };
 
+struct clazz {
+    char foo(int) {
+        return {};
+    }
+
+    int bar(double, float) const {
+        return {};
+    }
+
+    bool quux;
+};
+
+void free_function(int, const double &) {}
+
 TEST(SizeOf, Functionalities) {
     static_assert(entt::size_of_v<void> == 0u);
     static_assert(entt::size_of_v<char> == sizeof(char));
@@ -177,21 +191,17 @@ TEST(ConstnessAs, Functionalities) {
 }
 
 TEST(MemberClass, Functionalities) {
-    struct clazz {
-        char foo(int) {
-            return {};
-        }
-
-        int bar(double, float) const {
-            return {};
-        }
-
-        bool quux;
-    };
-
     static_assert(std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::foo)>>);
     static_assert(std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::bar)>>);
     static_assert(std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::quux)>>);
+}
+
+TEST(NthArgument, Functionalities) {
+    static_assert(std::is_same_v<entt::nth_argument_t<0u, free_function>, int>);
+    static_assert(std::is_same_v<entt::nth_argument_t<1u, free_function>, const double &>);
+    static_assert(std::is_same_v<entt::nth_argument_t<0u, &clazz::bar>, double>);
+    static_assert(std::is_same_v<entt::nth_argument_t<1u, &clazz::bar>, float>);
+    static_assert(std::is_same_v<entt::nth_argument_t<0u, &clazz::quux>, bool>);
 }
 
 TEST(Tag, Functionalities) {
