@@ -31,7 +31,7 @@ struct poly_storage_mixin : Storage {
      * @brief Forwards variables to mixins, if any.
      * @param value A variable wrapped in an opaque container.
      */
-    void bind(any value) ENTT_NOEXCEPT override {
+    void bind(any value) noexcept override {
         if(auto *reg = any_cast<basic_registry<entity_type>>(&value); reg) {
             bind_all_parent_types(*reg, poly_parent_types_t<value_type>{});
         }
