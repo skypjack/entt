@@ -329,6 +329,28 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename, template<typename...> class>
+struct type_list_transform;
+
+/**
+ * @brief Computes the difference between two type lists.
+ * @tparam Type Types provided by the type list.
+ * @tparam Op Unary operation as template class with a type member named `type`.
+ */
+template<typename... Type, template<typename...> class Op>
+struct type_list_transform<type_list<Type...>, Op> {
+    using type = type_list<typename Op<Type>::type...>;
+};
+
+/**
+ * @brief Helper type.
+ * @tparam List Type list.
+ * @tparam Op Unary operation as template class with a type member named `type`.
+ */
+template<typename List, template<typename...> class Op>
+using type_list_transform_t = typename type_list_transform<List, Op>::type;
+
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
  * @tparam Value Values provided by the value list.

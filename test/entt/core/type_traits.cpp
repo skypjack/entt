@@ -34,6 +34,11 @@ struct clazz {
 
 void free_function(int, const double &) {}
 
+template<typename, typename Type = void>
+struct multi_argument_operation {
+    using type = Type;
+};
+
 TEST(SizeOf, Functionalities) {
     static_assert(entt::size_of_v<void> == 0u);
     static_assert(entt::size_of_v<char> == sizeof(char));
@@ -101,6 +106,10 @@ TEST(TypeList, Functionalities) {
     static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<int, char>>, entt::type_list<double>>);
     static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<char, double>>, entt::type_list<int>>);
     static_assert(std::is_same_v<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<char>>, entt::type_list<int, double>>);
+
+    static_assert(std::is_same_v<entt::type_list_transform_t<entt::type_list<int, char>, entt::type_identity>, entt::type_list<int, char>>);
+    static_assert(std::is_same_v<entt::type_list_transform_t<entt::type_list<int, char>, std::add_const>, entt::type_list<const int, const char>>);
+    static_assert(std::is_same_v<entt::type_list_transform_t<entt::type_list<int, char>, multi_argument_operation>, entt::type_list<void, void>>);
 }
 
 TEST(ValueList, Functionalities) {
