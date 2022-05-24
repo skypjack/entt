@@ -780,6 +780,7 @@ type list:
 * `type_list_unique[_t]` to remove duplicate types from a type list.
 * `type_list_contains[_v]` to know if a type list contains a given type.
 * `type_list_diff[_t]` to remove types from type lists.
+* `type_list_transform[_t]` to _transform_ a range and create another type list.
 
 I'm also pretty sure that more and more utilities will be added over time as
 needs become apparent.<br/>
