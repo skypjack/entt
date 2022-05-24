@@ -300,14 +300,16 @@ public:
                       "Allocator pointer types dont match for polymorphic types in one hierarchy. Use std::poly_type_allocator to explicitly provide allocator type for each polymorphic component type.");
 
         void* (*get)(void*, Entity entity) noexcept = +[](void* pool, const Entity entity) noexcept -> void* {
-            if (static_cast<StorageType*>(pool)->contains(entity)) {
-                // if entity is contained within the set
-                if constexpr(std::is_base_of_v<std::remove_pointer_t<BaseType>, std::remove_pointer_t<DerivedType>>) {
-                    // if base type is inherited from derived type, do pointer conversion
-                    return derived_to_base_ptr<BaseType, DerivedType>::convert(static_cast<StorageType*>(pool)->get(entity));
-                } else {
-                    // no inheritance - no conversion required, just get the pointer
-                    return value_to_ptr<DerivedType>::convert(static_cast<StorageType*>(pool)->get(entity));
+            if constexpr(!ignore_as_empty_v<DerivedType>) {
+                if(static_cast<StorageType *>(pool)->contains(entity)) {
+                    // if entity is contained within the set
+                    if constexpr(std::is_base_of_v<std::remove_pointer_t<BaseType>, std::remove_pointer_t<DerivedType>>) {
+                        // if base type is inherited from derived type, do pointer conversion
+                        return derived_to_base_ptr<BaseType, DerivedType>::convert(static_cast<StorageType *>(pool)->get(entity));
+                    } else {
+                        // no inheritance - no conversion required, just get the pointer
+                        return value_to_ptr<DerivedType>::convert(static_cast<StorageType *>(pool)->get(entity));
+                    }
                 }
             }
             // otherwise, return null
