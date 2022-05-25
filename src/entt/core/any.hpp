@@ -323,7 +323,7 @@ public:
      * @param other The value to assign to the contained object.
      * @return True in case of success, false otherwise.
      */
-    bool assign(const any &other) {
+    bool assign(const basic_any &other) {
         if(vtable && mode != policy::cref && *info == *other.info) {
             return (vtable(operation::assign, *this, other.data()) != nullptr);
         }
@@ -332,7 +332,7 @@ public:
     }
 
     /*! @copydoc assign */
-    bool assign(any &&other) {
+    bool assign(basic_any &&other) {
         if(vtable && mode != policy::cref && *info == *other.info) {
             if(auto *val = other.data(); val) {
                 return (vtable(operation::transfer, *this, val) != nullptr);
