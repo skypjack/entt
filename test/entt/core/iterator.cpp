@@ -9,12 +9,6 @@ struct clazz {
 };
 
 TEST(InputIteratorPointer, Functionalities) {
-    static_assert(!std::is_default_constructible_v<entt::input_iterator_pointer<clazz>>);
-    static_assert(!std::is_copy_constructible_v<entt::input_iterator_pointer<clazz>>);
-    static_assert(std::is_move_constructible_v<entt::input_iterator_pointer<clazz>>);
-    static_assert(!std::is_copy_assignable_v<entt::input_iterator_pointer<clazz>>);
-    static_assert(std::is_move_assignable_v<entt::input_iterator_pointer<clazz>>);
-
     clazz instance{};
     entt::input_iterator_pointer ptr{std::move(instance)};
     ptr->value = 42;
