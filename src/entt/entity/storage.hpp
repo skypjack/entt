@@ -905,7 +905,7 @@ public:
  */
 template<typename Type, typename Entity, typename>
 struct storage_type {
-    /*! @brief Resulting type after component-to-storage conversion. */
+    /*! @brief Type-to-storage conversion result. */
     using type = sigh_storage_mixin<basic_storage<Type, Entity>>;
 };
 
