@@ -903,7 +903,7 @@ public:
  * @tparam Type Storage value type.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
-template<typename Type, typename Entity, typename = void>
+template<typename Type, typename Entity, typename>
 struct storage_type {
     /*! @brief Resulting type after component-to-storage conversion. */
     using type = sigh_storage_mixin<basic_storage<Type, Entity>>;

@@ -20,7 +20,7 @@ template<typename, typename, typename = void>
 struct has_on_construct: std::false_type {};
 
 template<typename Entity, typename Type>
-struct has_on_construct<Entity, Type, std::void_t<decltype(&entt::storage_type_t<Type, Entity>::on_construct)>>: std::true_type {};
+struct has_on_construct<Entity, Type, std::void_t<decltype(&entt::storage_type_t<Type>::on_construct)>>: std::true_type {};
 
 template<typename Entity, typename Type>
 inline constexpr auto has_on_construct_v = has_on_construct<Entity, Type>::value;

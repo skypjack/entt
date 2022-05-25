@@ -7,16 +7,22 @@
 
 namespace entt {
 
-template<typename Entity, typename = std::allocator<Entity>>
+/*! @brief Default entity identifier. */
+enum class entity : id_type {};
+
+template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 
-template<typename Type, typename, typename = std::allocator<Type>, typename = void>
+template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
 class basic_storage;
+
+template<typename, typename = entity, typename = void>
+struct storage_type;
 
 template<typename Type>
 class sigh_storage_mixin;
 
-template<typename>
+template<typename = entity>
 class basic_registry;
 
 template<typename, typename, typename, typename = void>
@@ -88,21 +94,18 @@ using owned_t = type_list<Type...>;
 template<typename... Type>
 inline constexpr owned_t<Type...> owned{};
 
-/*! @brief Default entity identifier. */
-enum class entity : id_type {};
-
 /*! @brief Alias declaration for the most common use case. */
-using sparse_set = basic_sparse_set<entity>;
+using sparse_set = basic_sparse_set<>;
 
 /**
  * @brief Alias declaration for the most common use case.
  * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Type>
-using storage = basic_storage<Type, entity>;
+using storage = basic_storage<Type>;
 
 /*! @brief Alias declaration for the most common use case. */
-using registry = basic_registry<entity>;
+using registry = basic_registry<>;
 
 /*! @brief Alias declaration for the most common use case. */
 using observer = basic_observer<registry>;

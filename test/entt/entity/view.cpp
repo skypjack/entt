@@ -376,8 +376,8 @@ TEST(SingleComponentView, FrontBack) {
 
 TEST(SingleComponentView, DeductionGuide) {
     entt::registry registry;
-    entt::storage_type_t<int, entt::entity> istorage;
-    entt::storage_type_t<stable_type, entt::entity> sstorage;
+    entt::storage_type_t<int> istorage;
+    entt::storage_type_t<stable_type> sstorage;
 
     static_assert(std::is_same_v<entt::basic_view<entt::entity, entt::get_t<int>, entt::exclude_t<>>, decltype(entt::basic_view{istorage})>);
     static_assert(std::is_same_v<entt::basic_view<entt::entity, entt::get_t<const int>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage)})>);
@@ -448,12 +448,12 @@ TEST(SingleComponentView, Storage) {
     const auto view = registry.view<int>();
     const auto cview = registry.view<const char>();
 
-    static_assert(std::is_same_v<decltype(view.storage()), entt::storage_type_t<int, entt::entity> &>);
-    static_assert(std::is_same_v<decltype(view.storage<0u>()), entt::storage_type_t<int, entt::entity> &>);
-    static_assert(std::is_same_v<decltype(view.storage<int>()), entt::storage_type_t<int, entt::entity> &>);
-    static_assert(std::is_same_v<decltype(cview.storage()), const entt::storage_type_t<char, entt::entity> &>);
-    static_assert(std::is_same_v<decltype(cview.storage<0u>()), const entt::storage_type_t<char, entt::entity> &>);
-    static_assert(std::is_same_v<decltype(cview.storage<const char>()), const entt::storage_type_t<char, entt::entity> &>);
+    static_assert(std::is_same_v<decltype(view.storage()), entt::storage_type_t<int> &>);
+    static_assert(std::is_same_v<decltype(view.storage<0u>()), entt::storage_type_t<int> &>);
+    static_assert(std::is_same_v<decltype(view.storage<int>()), entt::storage_type_t<int> &>);
+    static_assert(std::is_same_v<decltype(cview.storage()), const entt::storage_type_t<char> &>);
+    static_assert(std::is_same_v<decltype(cview.storage<0u>()), const entt::storage_type_t<char> &>);
+    static_assert(std::is_same_v<decltype(cview.storage<const char>()), const entt::storage_type_t<char> &>);
 
     ASSERT_EQ(view.size(), 0u);
     ASSERT_EQ(cview.size(), 0u);
@@ -1031,9 +1031,9 @@ TEST(MultiComponentView, ExtendedGet) {
 
 TEST(MultiComponentView, DeductionGuide) {
     entt::registry registry;
-    entt::storage_type_t<int, entt::entity> istorage;
-    entt::storage_type_t<double, entt::entity> dstorage;
-    entt::storage_type_t<stable_type, entt::entity> sstorage;
+    entt::storage_type_t<int> istorage;
+    entt::storage_type_t<double> dstorage;
+    entt::storage_type_t<stable_type> sstorage;
 
     static_assert(std::is_same_v<entt::basic_view<entt::entity, entt::get_t<int, double>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, dstorage})>);
     static_assert(std::is_same_v<entt::basic_view<entt::entity, entt::get_t<const int, double>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage), dstorage})>);
@@ -1159,8 +1159,8 @@ TEST(MultiComponentView, StableTypeWithExcludedComponent) {
 
 TEST(MultiComponentView, SameComponentTypes) {
     entt::registry registry;
-    entt::storage_type_t<int, entt::entity> storage;
-    entt::storage_type_t<int, entt::entity> other;
+    entt::storage_type_t<int> storage;
+    entt::storage_type_t<int> other;
     entt::basic_view view{storage, other};
 
     storage.bind(entt::forward_as_any(registry));
@@ -1240,10 +1240,10 @@ TEST(MultiComponentView, Storage) {
     const auto entity = registry.create();
     const auto view = registry.view<int, const char>();
 
-    static_assert(std::is_same_v<decltype(view.storage<0u>()), entt::storage_type_t<int, entt::entity> &>);
-    static_assert(std::is_same_v<decltype(view.storage<int>()), entt::storage_type_t<int, entt::entity> &>);
-    static_assert(std::is_same_v<decltype(view.storage<1u>()), const entt::storage_type_t<char, entt::entity> &>);
-    static_assert(std::is_same_v<decltype(view.storage<const char>()), const entt::storage_type_t<char, entt::entity> &>);
+    static_assert(std::is_same_v<decltype(view.storage<0u>()), entt::storage_type_t<int> &>);
+    static_assert(std::is_same_v<decltype(view.storage<int>()), entt::storage_type_t<int> &>);
+    static_assert(std::is_same_v<decltype(view.storage<1u>()), const entt::storage_type_t<char> &>);
+    static_assert(std::is_same_v<decltype(view.storage<const char>()), const entt::storage_type_t<char> &>);
 
     ASSERT_EQ(view.size_hint(), 0u);
 
