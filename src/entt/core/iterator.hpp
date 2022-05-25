@@ -20,7 +20,7 @@ struct input_iterator_pointer final {
     using pointer = Type *;
 
     /*! @brief Default copy constructor, deleted on purpose. */
-    input_iterator_pointer(const input_iterator_pointer &) noexcept(std::is_nothrow_copy_constructible_v<value_type>) = delete;
+    constexpr input_iterator_pointer(const input_iterator_pointer &) noexcept(std::is_nothrow_copy_constructible_v<value_type>) = delete;
 
     /*! @brief Default move constructor. */
     constexpr input_iterator_pointer(input_iterator_pointer &&) noexcept(std::is_nothrow_move_constructible_v<value_type>) = default;
@@ -36,7 +36,7 @@ struct input_iterator_pointer final {
      * @brief Default copy assignment operator, deleted on purpose.
      * @return This proxy object.
      */
-    input_iterator_pointer &operator=(const input_iterator_pointer &) noexcept(std::is_nothrow_copy_assignable_v<value_type>) = delete;
+    constexpr input_iterator_pointer &operator=(const input_iterator_pointer &) noexcept(std::is_nothrow_copy_assignable_v<value_type>) = delete;
 
     /**
      * @brief Default move assignment operator.
