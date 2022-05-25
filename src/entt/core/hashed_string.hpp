@@ -73,6 +73,7 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
         // non-explicit constructor on purpose
         constexpr const_wrapper(const Char *str) noexcept
             : repr{str} {}
+
         const Char *repr;
     };
 
