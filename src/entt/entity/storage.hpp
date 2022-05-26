@@ -916,6 +916,24 @@ struct storage_type {
 template<typename... Args>
 using storage_type_t = typename storage_type<Args...>::type;
 
+/**
+ * Type-to-storage conversion utility that preserves constness.
+ * @tparam Type Storage value type, eventually const.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
+template<typename Type, typename Entity>
+struct storage_for {
+    /*! @brief Type-to-storage conversion result. */
+    using type = constness_as_t<typename storage_type<std::remove_const_t<Type>, Entity>::type, Type>;
+};
+
+/**
+ * @brief Helper type.
+ * @tparam Args Arguments to forward.
+ */
+template<typename... Args>
+using storage_for_t = typename storage_for<Args...>::type;
+
 } // namespace entt
 
 #endif

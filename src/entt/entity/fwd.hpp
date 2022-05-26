@@ -19,6 +19,9 @@ class basic_storage;
 template<typename, typename = entity, typename = void>
 struct storage_type;
 
+template<typename, typename = entity>
+struct storage_for;
+
 template<typename Type>
 class sigh_storage_mixin;
 
