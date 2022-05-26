@@ -133,12 +133,9 @@ class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     template<typename Comp>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<std::remove_const_t<Get>...>>;
 
-    template<typename Comp>
-    using storage_for = constness_as_t<storage_type_t<std::remove_const_t<Comp>, Entity>, Comp>;
+    using basic_common_type = std::common_type_t<typename storage_for_t<Get, Entity>::base_type...>;
 
-    using basic_common_type = std::common_type_t<typename storage_for<Get>::base_type...>;
-
-    basic_group(basic_common_type &ref, storage_for<Get> &...gpool) noexcept
+    basic_group(basic_common_type &ref, storage_for_t<Get, Entity> &...gpool) noexcept
         : handler{&ref},
           pools{&gpool...} {}
 
@@ -154,7 +151,7 @@ public:
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
-    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<storage_for<Get>...>>>;
+    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<storage_for_t<Get, entity_type>...>>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
@@ -489,7 +486,7 @@ public:
 
 private:
     base_type *const handler;
-    const std::tuple<storage_for<Get> *...> pools;
+    const std::tuple<storage_for_t<Get, entity_type> *...> pools;
 };
 
 /**
@@ -533,10 +530,7 @@ class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...
     template<typename Comp>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<std::remove_const_t<Owned>..., std::remove_const_t<Get>...>>;
 
-    template<typename Comp>
-    using storage_for = constness_as_t<storage_type_t<std::remove_const_t<Comp>, Entity>, Comp>;
-
-    basic_group(const std::size_t &extent, storage_for<Owned> &...opool, storage_for<Get> &...gpool) noexcept
+    basic_group(const std::size_t &extent, storage_for_t<Owned, Entity> &...opool, storage_for_t<Get, Entity> &...gpool) noexcept
         : pools{&opool..., &gpool...},
           length{&extent} {}
 
@@ -546,13 +540,13 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = std::common_type_t<typename storage_for<Owned>::base_type..., typename storage_for<Get>::base_type...>;
+    using base_type = std::common_type_t<typename storage_for_t<Owned, entity_type>::base_type..., typename storage_for_t<Get, entity_type>::base_type...>;
     /*! @brief Random access iterator type. */
     using iterator = typename base_type::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
-    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<storage_for<Owned>...>, get_t<storage_for<Get>...>>>;
+    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<storage_for_t<Owned, entity_type>...>, get_t<storage_for_t<Get, entity_type>...>>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
@@ -846,7 +840,7 @@ public:
     }
 
 private:
-    const std::tuple<storage_for<Owned> *..., storage_for<Get> *...> pools;
+    const std::tuple<storage_for_t<Owned, entity_type> *..., storage_for_t<Get, entity_type> *...> pools;
     const size_type *const length;
 };
 
