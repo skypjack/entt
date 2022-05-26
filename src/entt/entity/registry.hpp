@@ -221,9 +221,6 @@ class basic_registry {
     using entity_traits = entt_traits<Entity>;
     using basic_common_type = basic_sparse_set<Entity>;
 
-    template<typename Comp>
-    using storage_for = constness_as_t<storage_type_t<std::remove_const_t<Comp>, Entity>, Comp>;
-
     template<typename...>
     struct group_handler;
 
@@ -237,7 +234,7 @@ class basic_registry {
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
             [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
 
-            const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<storage_for<Owned> &>(cpools).contains(entt)) && ...)
+            const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<storage_for_t<Owned, entity_type> &>(cpools).contains(entt)) && ...)
                                   && ((std::is_same_v<Component, Get> || owner.assure<Get>().contains(entt)) && ...)
                                   && ((std::is_same_v<Component, Exclude> || !owner.assure<Exclude>().contains(entt)) && ...);
 
@@ -248,7 +245,7 @@ class basic_registry {
             } else {
                 if(is_valid && !(std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = current++;
-                    (std::get<storage_for<Owned> &>(cpools).swap_elements(std::get<storage_for<Owned> &>(cpools).data()[pos], entt), ...);
+                    (std::get<storage_for_t<Owned, entity_type> &>(cpools).swap_elements(std::get<storage_for_t<Owned, entity_type> &>(cpools).data()[pos], entt), ...);
                 }
             }
         }
@@ -259,7 +256,7 @@ class basic_registry {
             } else {
                 if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = --current;
-                    (std::get<storage_for<Owned> &>(cpools).swap_elements(std::get<storage_for<Owned> &>(cpools).data()[pos], entt), ...);
+                    (std::get<storage_for_t<Owned, entity_type> &>(cpools).swap_elements(std::get<storage_for_t<Owned, entity_type> &>(cpools).data()[pos], entt), ...);
                 }
             }
         }
@@ -279,12 +276,12 @@ class basic_registry {
         auto &&cpool = pools[id];
 
         if(!cpool) {
-            cpool.reset(new storage_for<Component>{});
+            cpool.reset(new storage_type_t<Component, entity_type>{});
             cpool->bind(forward_as_any(*this));
         }
 
         ENTT_ASSERT(cpool->type() == type_id<Component>(), "Unexpected type");
-        return static_cast<storage_for<Component> &>(*cpool);
+        return static_cast<storage_type_t<Component, entity_type> &>(*cpool);
     }
 
     template<typename Component>
@@ -293,10 +290,10 @@ class basic_registry {
 
         if(const auto it = pools.find(id); it != pools.cend()) {
             ENTT_ASSERT(it->second->type() == type_id<Component>(), "Unexpected type");
-            return static_cast<const storage_for<Component> &>(*it->second);
+            return static_cast<const storage_type_t<Component, entity_type> &>(*it->second);
         }
 
-        static storage_for<Component> placeholder{};
+        static storage_type_t<Component, entity_type> placeholder{};
         return placeholder;
     }
 
@@ -1227,9 +1224,9 @@ public:
     template<typename Component, typename... Other, typename... Exclude>
     [[nodiscard]] auto view(exclude_t<Exclude...> = {}) {
         return basic_view{std::forward_as_tuple(
-                              static_cast<storage_for<Component> &>(assure<std::remove_const_t<Component>>()),
-                              static_cast<storage_for<Other> &>(assure<std::remove_const_t<Other>>())...),
-                          std::forward_as_tuple(static_cast<storage_for<Exclude> &>(assure<std::remove_const_t<Exclude>>())...)};
+                              static_cast<storage_for_t<Component, entity_type> &>(assure<std::remove_const_t<Component>>()),
+                              static_cast<storage_for_t<Other, entity_type> &>(assure<std::remove_const_t<Other>>())...),
+                          std::forward_as_tuple(static_cast<storage_for_t<Exclude, entity_type> &>(assure<std::remove_const_t<Exclude>>())...)};
     }
 
     /**
@@ -1334,7 +1331,7 @@ public:
             }
         }
 
-        return {handler->current, std::get<storage_for<std::remove_const_t<Owned>> &>(cpools)..., std::get<storage_for<std::remove_const_t<Get>> &>(cpools)...};
+        return {handler->current, std::get<storage_for_t<std::remove_const_t<Owned>, entity_type> &>(cpools)..., std::get<storage_for_t<std::remove_const_t<Get>, entity_type> &>(cpools)...};
     }
 
     /*! @copydoc group */
