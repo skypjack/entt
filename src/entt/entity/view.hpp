@@ -257,7 +257,9 @@ public:
      * @param epool The storage for the types used to filter the view.
      */
     basic_view(storage_for_t<Component, entity_type> &...component, storage_for_t<Exclude, entity_type> &...epool) noexcept
-        : basic_view{std::forward_as_tuple(component...), std::forward_as_tuple(epool...)} {}
+        : pools{&component...},
+          filter{&epool...},
+          view{(std::min)({&static_cast<const base_type &>(component)...}, [](auto *lhs, auto *rhs) { return lhs->size() < rhs->size(); })} {}
 
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
@@ -566,16 +568,16 @@ public:
      * @param ref The storage for the type to iterate.
      */
     basic_view(storage_for_t<Component, entity_type> &ref) noexcept
-        : basic_view{std::forward_as_tuple(ref)} {}
+        : pools{&ref},
+          filter{},
+          view{&ref} {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
      * @param ref The storage for the type to iterate.
      */
     basic_view(std::tuple<storage_for_t<Component, entity_type> &> ref, std::tuple<> = {}) noexcept
-        : pools{&std::get<0>(ref)},
-          filter{},
-          view{&std::get<0>(ref)} {}
+        : basic_view{std::get<0>(ref)} {}
 
     /**
      * @brief Returns the leading storage of a view.

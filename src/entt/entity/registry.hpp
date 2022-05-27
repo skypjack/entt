@@ -1214,19 +1214,15 @@ public:
      */
     template<typename Component, typename... Other, typename... Exclude>
     [[nodiscard]] auto view(exclude_t<Exclude...> = {}) const {
-        return basic_view{std::forward_as_tuple(
-                              assure<std::remove_const_t<Component>>(),
-                              assure<std::remove_const_t<Other>>()...),
-                          std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...)};
+        using view_type = basic_view<Entity, get_t<const Component, const Other...>, exclude_t<const Exclude...>>;
+        return view_type{assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
 
     /*! @copydoc view */
     template<typename Component, typename... Other, typename... Exclude>
     [[nodiscard]] auto view(exclude_t<Exclude...> = {}) {
-        return basic_view{std::forward_as_tuple(
-                              static_cast<storage_for_t<Component, entity_type> &>(assure<std::remove_const_t<Component>>()),
-                              static_cast<storage_for_t<Other, entity_type> &>(assure<std::remove_const_t<Other>>())...),
-                          std::forward_as_tuple(static_cast<storage_for_t<Exclude, entity_type> &>(assure<std::remove_const_t<Exclude>>())...)};
+        using view_type = basic_view<Entity, get_t<Component, Other...>, exclude_t<Exclude...>>;
+        return view_type{assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
 
     /**
