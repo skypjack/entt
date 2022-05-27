@@ -15,7 +15,7 @@ struct boxed_int {
     int value;
 };
 
-bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
+inline bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
     return lhs.value == rhs.value;
 }
 

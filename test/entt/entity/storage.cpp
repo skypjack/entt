@@ -81,7 +81,7 @@ struct entt::component_traits<std::unordered_set<char>> {
     static constexpr auto page_size = 128u;
 };
 
-bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
+inline bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
     return lhs.value == rhs.value;
 }
 
