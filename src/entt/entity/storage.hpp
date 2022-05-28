@@ -924,7 +924,7 @@ using storage_type_t = typename storage_type<Args...>::type;
 template<typename Type, typename Entity>
 struct storage_for {
     /*! @brief Type-to-storage conversion result. */
-    using type = constness_as_t<typename storage_type<std::remove_const_t<Type>, Entity>::type, Type>;
+    using type = constness_as_t<storage_type_t<std::remove_const_t<Type>, Entity>, Type>;
 };
 
 /**
