@@ -470,9 +470,13 @@ const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 Type *any_cast(basic_any<Len, Align> *data) noexcept {
-    const auto &info = type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
-    // last attempt to make wrappers for const references return their values
-    return static_cast<Type *>(static_cast<constness_as_t<basic_any<Len, Align>, Type> *>(data)->data(info));
+    if constexpr(std::is_const_v<Type>) {
+        // last attempt to make wrappers for const references return their values
+        return any_cast<Type>(&std::as_const(*data));
+    } else {
+        const auto &info = type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
+        return static_cast<Type *>(data->data(info));
+    }
 }
 
 /**
