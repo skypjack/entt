@@ -107,7 +107,7 @@ class basic_any {
             break;
         case operation::compare:
             if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
-                return *static_cast<const Type *>(element) == *static_cast<const Type *>(other) ? other : nullptr;
+                return *element == *static_cast<const Type *>(other) ? other : nullptr;
             } else {
                 return (element == other) ? other : nullptr;
             }
