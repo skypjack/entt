@@ -169,8 +169,7 @@ public:
         static meta_type_node node{
             &type_id<Type>(),
             {},
-            internal::meta_traits::is_none
-                | (std::is_arithmetic_v<Type> ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)
+            (std::is_arithmetic_v<Type> ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)
                 | (std::is_integral_v<Type> ? internal::meta_traits::is_integral : internal::meta_traits::is_none)
                 | (std::is_signed_v<Type> ? internal::meta_traits::is_signed : internal::meta_traits::is_none)
                 | (std::is_array_v<Type> ? internal::meta_traits::is_array : internal::meta_traits::is_none)
