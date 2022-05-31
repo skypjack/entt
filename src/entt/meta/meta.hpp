@@ -726,7 +726,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_const);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -734,7 +734,7 @@ struct meta_data {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_static);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_static);
     }
 
     /*! @copydoc meta_any::type */
@@ -842,7 +842,7 @@ struct meta_func {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_const);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -850,7 +850,7 @@ struct meta_func {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_static);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_static);
     }
 
     /**
@@ -1022,7 +1022,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_arithmetic() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_arithmetic);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_arithmetic);
     }
 
     /**
@@ -1030,7 +1030,7 @@ public:
      * @return True if the underlying type is an integral type, false otherwise.
      */
     [[nodiscard]] bool is_integral() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_integral);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_integral);
     }
 
     /**
@@ -1038,7 +1038,7 @@ public:
      * @return True if the underlying type is a signed type, false otherwise.
      */
     [[nodiscard]] bool is_signed() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_signed);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_signed);
     }
 
     /**
@@ -1046,7 +1046,7 @@ public:
      * @return True if the underlying type is an array type, false otherwise.
      */
     [[nodiscard]] bool is_array() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_array);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_array);
     }
 
     /**
@@ -1054,7 +1054,7 @@ public:
      * @return True if the underlying type is an enum, false otherwise.
      */
     [[nodiscard]] bool is_enum() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_enum);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_enum);
     }
 
     /**
@@ -1062,7 +1062,7 @@ public:
      * @return True if the underlying type is a class, false otherwise.
      */
     [[nodiscard]] bool is_class() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_class);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_class);
     }
 
     /**
@@ -1088,7 +1088,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_pointer_like() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_meta_pointer_like);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_meta_pointer_like);
     }
 
     /**
@@ -1096,7 +1096,7 @@ public:
      * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_meta_sequence_container);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_meta_sequence_container);
     }
 
     /**
@@ -1104,7 +1104,7 @@ public:
      * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_meta_associative_container);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_meta_associative_container);
     }
 
     /**
