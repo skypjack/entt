@@ -1070,7 +1070,7 @@ public:
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_pointer);
+        return node != node->remove_pointer();
     }
 
     /**
