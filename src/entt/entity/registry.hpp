@@ -53,12 +53,12 @@ public:
     constexpr storage_proxy_iterator() noexcept
         : it{} {}
 
-    constexpr storage_proxy_iterator(const It iter) noexcept
+    constexpr storage_proxy_iterator(It iter) noexcept
         : it{iter} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
     constexpr storage_proxy_iterator(const storage_proxy_iterator<Other> &other) noexcept
-        : it{other.it} {}
+        : storage_proxy_iterator{other.it} {}
 
     constexpr storage_proxy_iterator &operator++() noexcept {
         return ++it, *this;

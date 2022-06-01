@@ -56,8 +56,7 @@ public:
 
     template<bool Const = std::is_const_v<Container>, typename = std::enable_if_t<Const>>
     constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) noexcept
-        : packed{other.packed},
-          offset{other.offset} {}
+        : storage_iterator{other.packed, other.offset} {}
 
     constexpr storage_iterator &operator++() noexcept {
         return --offset, *this;
