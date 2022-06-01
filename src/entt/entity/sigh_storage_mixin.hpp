@@ -221,7 +221,7 @@ public:
     }
 
     /**
-     * @brief Forwards variables to mixins, if any.
+     * @brief Forwards variables to derived classes, if any.
      * @param value A variable wrapped in an opaque container.
      */
     void bind(any value) noexcept final {

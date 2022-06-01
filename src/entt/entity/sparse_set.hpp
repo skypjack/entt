@@ -944,7 +944,7 @@ public:
         return *info;
     }
 
-    /*! @brief Forwards variables to mixins, if any. */
+    /*! @brief Forwards variables to derived classes, if any. */
     virtual void bind(any) noexcept {}
 
 private:
