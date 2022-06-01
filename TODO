@@ -11,6 +11,7 @@ DOC:
 * examples (and credits) from @alanjfs :)
 
 WIP:
+* handle: replace visit with an iterable object
 * add storage getter for filters to views and groups
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
 * emitter: runtime handlers, allocator support (ready for both already)
