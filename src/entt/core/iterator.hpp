@@ -39,6 +39,90 @@ private:
 };
 
 /**
+ * @brief Plain iota iterator (waiting for C++20).
+ * @tparam Type Value type.
+ */
+template<typename Type>
+class iota_iterator final {
+    static_assert(std::is_integral_v<Type>, "Not an integral type");
+
+public:
+    /*! @brief Value type, likely an integral one. */
+    using value_type = Type;
+    /*! @brief Invalid pointer type. */
+    using pointer = void;
+    /*! @brief Non-reference type, same as value type. */
+    using reference = value_type;
+    /*! @brief Difference type. */
+    using difference_type = std::ptrdiff_t;
+    /*! @brief Iterator category. */
+    using iterator_category = std::input_iterator_tag;
+
+    /*! @brief Default constructor. */
+    constexpr iota_iterator() noexcept
+        : current{} {}
+
+    /**
+     * @brief Constructs an iota iterator from a given value.
+     * @param init The initial value assigned to the iota iterator.
+     */
+    constexpr iota_iterator(const value_type init) noexcept
+        : current{init} {}
+
+    /**
+     * @brief Pre-increment operator.
+     * @return This iota iterator.
+     */
+    constexpr iota_iterator &operator++() noexcept {
+        return ++current, *this;
+    }
+
+    /**
+     * @brief Post-increment operator.
+     * @return This iota iterator.
+     */
+    constexpr iota_iterator operator++(int) noexcept {
+        iota_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    /**
+     * @brief Dereference operator.
+     * @return The underlying value.
+     */
+    [[nodiscard]] constexpr reference operator*() const noexcept {
+        return current;
+    }
+
+private:
+    value_type current;
+};
+
+/**
+ * @brief Comparison operator.
+ * @tparam Type Value type of the iota iterator.
+ * @param lhs A properly initialized iota iterator.
+ * @param rhs A properly initialized iota iterator.
+ * @return True if the two iterators are identical, false otherwise.
+ */
+template<typename Type>
+[[nodiscard]] constexpr bool operator==(const iota_iterator<Type> &lhs, const iota_iterator<Type> &rhs) noexcept {
+    return *lhs == *rhs;
+}
+
+/**
+ * @brief Comparison operator.
+ * @tparam Type Value type of the iota iterator.
+ * @param lhs A properly initialized iota iterator.
+ * @param rhs A properly initialized iota iterator.
+ * @return True if the two iterators differ, false otherwise.
+ */
+template<typename Type>
+[[nodiscard]] constexpr bool operator!=(const iota_iterator<Type> &lhs, const iota_iterator<Type> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+/**
  * @brief Utility class to create an iterable object from a pair of iterators.
  * @tparam It Type of iterator.
  * @tparam Sentinel Type of sentinel.

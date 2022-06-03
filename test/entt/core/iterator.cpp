@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -15,6 +16,20 @@ TEST(InputIteratorPointer, Functionalities) {
 
     ASSERT_EQ(instance.value, 0);
     ASSERT_EQ(ptr->value, 42);
+}
+
+TEST(IotaIterator, Functionalities) {
+    entt::iota_iterator<std::size_t> first{};
+    const entt::iota_iterator<std::size_t> last{2u};
+
+    ASSERT_NE(first, last);
+    ASSERT_FALSE(first == last);
+    ASSERT_TRUE(first != last);
+
+    ASSERT_EQ(*first++, 0u);
+    ASSERT_EQ(*first, 1u);
+    ASSERT_EQ(*++first, *last);
+    ASSERT_EQ(*first, 2u);
 }
 
 TEST(IterableAdaptor, Functionalities) {

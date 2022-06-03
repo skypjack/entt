@@ -9,6 +9,7 @@ DOC:
 * storage<void>
 * custom storage/view
 * examples (and credits) from @alanjfs :)
+* document iterator.hpp (see core.md)
 
 WIP:
 * handle: replace visit with an iterable object
