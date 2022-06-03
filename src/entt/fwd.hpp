@@ -3,5 +3,6 @@
 #include "entity/fwd.hpp"
 #include "meta/fwd.hpp"
 #include "poly/fwd.hpp"
+#include "process/fwd.hpp"
 #include "resource/fwd.hpp"
 #include "signal/fwd.hpp"

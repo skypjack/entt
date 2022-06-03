@@ -165,6 +165,7 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/platform/android-ndk-r17.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/poly.hpp>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/process.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/scheduler.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/cache.hpp>
