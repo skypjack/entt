@@ -171,16 +171,14 @@ class basic_organizer final {
                     if(auto curr = it++; it != last) {
                         if(it->second) {
                             edges[curr->first * length + it->first] = true;
+                        } else if(const auto next = std::find_if(it, last, [](const auto &elem) { return elem.second; }); next != last) {
+                            for(; it != next; ++it) {
+                                edges[curr->first * length + it->first] = true;
+                                edges[it->first * length + next->first] = true;
+                            }
                         } else {
-                            if(const auto next = std::find_if(it, last, [](const auto &elem) { return elem.second; }); next != last) {
-                                for(; it != next; ++it) {
-                                    edges[curr->first * length + it->first] = true;
-                                    edges[it->first * length + next->first] = true;
-                                }
-                            } else {
-                                for(; it != next; ++it) {
-                                    edges[curr->first * length + it->first] = true;
-                                }
+                            for(; it != next; ++it) {
+                                edges[curr->first * length + it->first] = true;
                             }
                         }
                     }
