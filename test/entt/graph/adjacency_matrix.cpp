@@ -252,7 +252,7 @@ TEST(AdjacencyMatrix, Edges) {
     ASSERT_EQ(++it, iterable.end());
 }
 
-TEST(AdjacencyMatrix, EdgesByVertex) {
+TEST(AdjacencyMatrix, OutEdges) {
     entt::adjacency_matrix adjacency_matrix{3u};
     auto iterable = adjacency_matrix.edges();
 
@@ -260,7 +260,7 @@ TEST(AdjacencyMatrix, EdgesByVertex) {
 
     adjacency_matrix.insert(0u, 1u);
     adjacency_matrix.insert(1u, 2u);
-    iterable = adjacency_matrix.edges(0u);
+    iterable = adjacency_matrix.out_edges(0u);
 
     ASSERT_NE(iterable.begin(), iterable.end());
 

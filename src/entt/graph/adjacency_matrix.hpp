@@ -234,11 +234,11 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to visit all edges of a vertex.
-     * @param vertex The vertex of which to return all edges.
-     * @return An iterable object to visit all edges of a vertex.
+     * @brief Returns an iterable object to visit all out edges of a vertex.
+     * @param vertex The vertex of which to return all out edges.
+     * @return An iterable object to visit all out edges of a vertex.
      */
-    [[nodiscard]] iterable_adaptor<edge_iterator> edges(const vertex_type vertex) const noexcept {
+    [[nodiscard]] iterable_adaptor<edge_iterator> out_edges(const vertex_type vertex) const noexcept {
         const auto first = vertex * vert;
         const auto last = vertex * vert + vert;
         return {{matrix.data(), vert, first, last}, {matrix.data(), vert, last, last}};
