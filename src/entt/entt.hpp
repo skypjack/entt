@@ -32,6 +32,7 @@
 #include "entity/sparse_set.hpp"
 #include "entity/storage.hpp"
 #include "entity/view.hpp"
+#include "graph/adjacency_matrix.hpp"
 #include "locator/locator.hpp"
 #include "meta/adl_pointer.hpp"
 #include "meta/container.hpp"

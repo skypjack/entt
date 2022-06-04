@@ -12,6 +12,7 @@ DOC:
 * document iterator.hpp (see core.md)
 
 WIP:
+* add directed/undirected support to adjacency matrix (see brief)
 * handle: replace visit with an iterable object
 * add storage getter for filters to views and groups
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
