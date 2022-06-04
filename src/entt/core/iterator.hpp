@@ -18,6 +18,8 @@ struct input_iterator_pointer final {
     using value_type = Type;
     /*! @brief Pointer type. */
     using pointer = Type *;
+    /*! @brief Reference type. */
+    using reference = Type &;
 
     /**
      * @brief Constructs a proxy object by move.
@@ -32,6 +34,14 @@ struct input_iterator_pointer final {
      */
     [[nodiscard]] constexpr pointer operator->() noexcept {
         return std::addressof(value);
+    }
+
+    /**
+     * @brief Dereference operator for accessing wrapped values.
+     * @return A reference to the wrapped value.
+     */
+    [[nodiscard]] constexpr reference operator*() noexcept {
+        return value;
     }
 
 private:

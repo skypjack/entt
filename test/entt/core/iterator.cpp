@@ -16,6 +16,8 @@ TEST(InputIteratorPointer, Functionalities) {
 
     ASSERT_EQ(instance.value, 0);
     ASSERT_EQ(ptr->value, 42);
+    ASSERT_EQ(ptr->value, (*ptr).value);
+    ASSERT_EQ(ptr.operator->(), &ptr.operator*());
 }
 
 TEST(IotaIterator, Functionalities) {
