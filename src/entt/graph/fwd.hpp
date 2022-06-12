@@ -7,7 +7,7 @@
 namespace entt {
 
 template<typename = std::allocator<std::size_t>>
-struct basic_adjacency_matrix;
+class basic_adjacency_matrix;
 
 /*! @brief Alias declaration for the most common use case. */
 using adjacency_matrix = basic_adjacency_matrix<>;
