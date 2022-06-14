@@ -34,7 +34,7 @@ class basic_view;
 template<typename>
 struct basic_runtime_view;
 
-template<typename, typename, typename, typename>
+template<typename, typename, typename>
 class basic_group;
 
 template<typename>
@@ -160,8 +160,8 @@ using runtime_view = basic_runtime_view<sparse_set>;
  * @brief Alias declaration for the most common use case.
  * @tparam Args Other template parameters.
  */
-template<typename... Args>
-using group = basic_group<entity, Args...>;
+template<typename Owned, typename Get, typename Exclude>
+using group = basic_group<type_list_transform_t<Owned, storage_for>, type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
 
 } // namespace entt
 

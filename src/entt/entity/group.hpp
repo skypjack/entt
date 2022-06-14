@@ -99,7 +99,7 @@ template<typename... Lhs, typename... Rhs>
  * Primary template isn't defined on purpose. All the specializations give a
  * compile-time error, but for a few reasonable cases.
  */
-template<typename, typename, typename, typename>
+template<typename, typename, typename>
 class basic_group;
 
 /**
@@ -121,27 +121,27 @@ class basic_group;
  * In all other cases, modifying the pools iterated by the group in any way
  * invalidates all the iterators and using them results in undefined behavior.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Get Type of components observed by the group.
- * @tparam Exclude Types of components used to filter the group.
+ * @tparam Get Type of storage _observed_ by the group.
+ * @tparam Exclude Types of storage used to filter the group.
  */
-template<typename Entity, typename... Get, typename... Exclude>
-class basic_group<Entity, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
-    /*! @brief A registry is allowed to create groups. */
-    friend class basic_registry<Entity>;
+template<typename... Get, typename... Exclude>
+class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
+    using underlying_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
+    using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
 
     template<typename Comp>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<std::remove_const_t<Get>...>>;
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<typename Get::value_type...>>;
 
-    using basic_common_type = std::common_type_t<typename storage_for_t<Get, Entity>::base_type...>;
+    /*! @brief A registry is allowed to create groups. */
+    friend class basic_registry<underlying_type>;
 
-    basic_group(basic_common_type &ref, storage_for_t<Get, Entity> &...gpool) noexcept
+    basic_group(basic_common_type &ref, Get &...gpool) noexcept
         : handler{&ref},
           pools{&gpool...} {}
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
@@ -151,7 +151,7 @@ public:
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
-    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<storage_for_t<Get, entity_type>...>>>;
+    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<Get...>>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
@@ -186,8 +186,8 @@ public:
     }
 
     /**
-     * @brief Returns the number of entities that have the given components.
-     * @return Number of entities that have the given components.
+     * @brief Returns the number of entities that are part of the group.
+     * @return Number of entities that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
         return *this ? handler->size() : size_type{};
@@ -486,7 +486,7 @@ public:
 
 private:
     base_type *const handler;
-    const std::tuple<storage_for_t<Get, entity_type> *...> pools;
+    const std::tuple<Get *...> pools;
 };
 
 /**
@@ -517,36 +517,38 @@ private:
  * In all other cases, modifying the pools iterated by the group in any way
  * invalidates all the iterators and using them results in undefined behavior.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Owned Types of components owned by the group.
- * @tparam Get Types of components observed by the group.
- * @tparam Exclude Types of components used to filter the group.
+ * @tparam Owned Types of storage _owned_ by the group.
+ * @tparam Get Types of storage _observed_ by the group.
+ * @tparam Exclude Types of storage used to filter the group.
  */
-template<typename Entity, typename... Owned, typename... Get, typename... Exclude>
-class basic_group<Entity, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
+template<typename... Owned, typename... Get, typename... Exclude>
+class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
+    using underlying_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
+    using basic_common_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
+
     /*! @brief A registry is allowed to create groups. */
-    friend class basic_registry<Entity>;
+    friend class basic_registry<underlying_type>;
 
     template<typename Comp>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<std::remove_const_t<Owned>..., std::remove_const_t<Get>...>>;
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<typename Owned::value_type..., typename Get::value_type...>>;
 
-    basic_group(const std::size_t &extent, storage_for_t<Owned, Entity> &...opool, storage_for_t<Get, Entity> &...gpool) noexcept
+    basic_group(const std::size_t &extent, Owned &...opool, Get &...gpool) noexcept
         : pools{&opool..., &gpool...},
           length{&extent} {}
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = std::common_type_t<typename storage_for_t<Owned, entity_type>::base_type..., typename storage_for_t<Get, entity_type>::base_type...>;
+    using base_type = basic_common_type;
     /*! @brief Random access iterator type. */
     using iterator = typename base_type::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
-    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<storage_for_t<Owned, entity_type>...>, get_t<storage_for_t<Get, entity_type>...>>>;
+    using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<Owned...>, get_t<Get...>>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
@@ -573,8 +575,8 @@ public:
     }
 
     /**
-     * @brief Returns the number of entities that have the given components.
-     * @return Number of entities that have the given components.
+     * @brief Returns the number of entities that that are part of the group.
+     * @return Number of entities that that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
         return *this ? *length : size_type{};
@@ -830,17 +832,17 @@ public:
             std::get<0>(pools)->sort_n(*length, std::move(comp), std::move(algo), std::forward<Args>(args)...);
         }
 
-        [this](auto &head, auto &...other) {
+        std::apply([this](auto *head, auto *...other) {
             for(auto next = *length; next; --next) {
                 const auto pos = next - 1;
-                [[maybe_unused]] const auto entt = head.data()[pos];
-                (other.swap_elements(other.data()[pos], entt), ...);
+                [[maybe_unused]] const auto entt = head->data()[pos];
+                (other->swap_elements(other->data()[pos], entt), ...);
             }
-        }(*std::get<index_of<Owned>>(pools)...);
+        }, pools);
     }
 
 private:
-    const std::tuple<storage_for_t<Owned, entity_type> *..., storage_for_t<Get, entity_type> *...> pools;
+    const std::tuple<Owned *..., Get *...> pools;
     const size_type *const length;
 };
 
