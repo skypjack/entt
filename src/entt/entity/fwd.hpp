@@ -158,7 +158,9 @@ using runtime_view = basic_runtime_view<sparse_set>;
 
 /**
  * @brief Alias declaration for the most common use case.
- * @tparam Args Other template parameters.
+ * @tparam Owned Types of storage _owned_ by the group.
+ * @tparam Get Types of storage _observed_ by the group.
+ * @tparam Exclude Types of storage used to filter the group.
  */
 template<typename Owned, typename Get, typename Exclude>
 using group = basic_group<type_list_transform_t<Owned, storage_for>, type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
