@@ -1634,8 +1634,8 @@ useful in this regard.
 Groups are meant to iterate multiple components at once and to offer a faster
 alternative to multi type views.<br/>
 Groups overcome the performance of the other tools available but require to get
-the ownership of components and this sets some constraints on pools. On the
-other side, groups aren't an automatism that increases memory consumption,
+the ownership of components. This sets some constraints on the pools. On the
+other hand, groups aren't an automatism that increases memory consumption,
 affects functionalities and tries to optimize iterations for all the possible
 combinations of components. Users can decide when to pay for groups and to what
 extent.<br/>

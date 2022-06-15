@@ -105,17 +105,17 @@ class basic_group;
 /**
  * @brief Non-owning group.
  *
- * A non-owning group returns all entities and only the entities that have at
- * least the given components. Moreover, it's guaranteed that the entity list
- * is tightly packed in memory for fast iterations.
+ * A non-owning group returns all entities and only the entities that are at
+ * least in the given storage. Moreover, it's guaranteed that the entity list is
+ * tightly packed in memory for fast iterations.
  *
  * @b Important
  *
  * Iterators aren't invalidated if:
  *
- * * New instances of the given components are created and assigned to entities.
- * * The entity currently pointed is modified (as an example, if one of the
- *   given components is removed from the entity to which the iterator points).
+ * * New elements are added to the storage.
+ * * The entity currently pointed is modified (for example, components are added
+ *   or removed from it).
  * * The entity currently pointed is destroyed.
  *
  * In all other cases, modifying the pools iterated by the group in any way
@@ -417,12 +417,12 @@ public:
      * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
-     * bool(std::tuple<Component &...>, std::tuple<Component &...>);
-     * bool(const Component &..., const Component &...);
+     * bool(std::tuple<Type &...>, std::tuple<Type &...>);
+     * bool(const Type &..., const Type &...);
      * bool(const Entity, const Entity);
      * @endcode
      *
-     * Where `Component` are such that they are iterated by the group.<br/>
+     * Where `Type` are such that they are iterated by the group.<br/>
      * Moreover, the comparison function object shall induce a
      * _strict weak ordering_ on the values.
      *
@@ -492,26 +492,25 @@ private:
 /**
  * @brief Owning group.
  *
- * Owning groups return all entities and only the entities that have at least
- * the given components. Moreover:
+ * Owning groups returns all entities and only the entities that are at
+ * least in the given storage. Moreover:
  *
  * * It's guaranteed that the entity list is tightly packed in memory for fast
  *   iterations.
- * * It's guaranteed that the lists of owned components are tightly packed in
- *   memory for even faster iterations and to allow direct access.
- * * They stay true to the order of the owned components and all instances have
- *   the same order in memory.
+ * * It's guaranteed that all components in the owned storage are tightly packed
+ *   in memory for even faster iterations and to allow direct access.
+ * * They stay true to the order of the owned storage and all instances have the
+ *   same order in memory.
  *
- * The more types of components are owned by a group, the faster it is to
- * iterate them.
+ * The more types of storage are owned, the faster it is to iterate a group.
  *
  * @b Important
  *
  * Iterators aren't invalidated if:
  *
- * * New instances of the given components are created and assigned to entities.
- * * The entity currently pointed is modified (as an example, if one of the
- *   given components is removed from the entity to which the iterator points).
+ * * New elements are added to the storage.
+ * * The entity currently pointed is modified (for example, components are added
+ *   or removed from it).
  * * The entity currently pointed is destroyed.
  *
  * In all other cases, modifying the pools iterated by the group in any way
@@ -790,13 +789,13 @@ public:
      * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
-     * bool(std::tuple<Component &...>, std::tuple<Component &...>);
-     * bool(const Component &, const Component &);
+     * bool(std::tuple<Type &...>, std::tuple<Type &...>);
+     * bool(const Type &, const Type &);
      * bool(const Entity, const Entity);
      * @endcode
      *
-     * Where `Component` are either owned types or not but still such that they
-     * are iterated by the group.<br/>
+     * Where `Type` are either owned types or not but still such that they are
+     * iterated by the group.<br/>
      * Moreover, the comparison function object shall induce a
      * _strict weak ordering_ on the values.
      *
