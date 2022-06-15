@@ -121,7 +121,7 @@ class basic_group;
  * In all other cases, modifying the pools iterated by the group in any way
  * invalidates all the iterators and using them results in undefined behavior.
  *
- * @tparam Get Type of storage _observed_ by the group.
+ * @tparam Get Types of storage _observed_ by the group.
  * @tparam Exclude Types of storage used to filter the group.
  */
 template<typename... Get, typename... Exclude>
