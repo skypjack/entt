@@ -129,8 +129,8 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
     using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
 
-    template<typename Comp>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<typename Get::value_type...>>;
+    template<typename Type>
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type...>>;
 
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<underlying_type>;
@@ -167,22 +167,22 @@ public:
 
     /**
      * @brief Returns the storage for a given component type.
-     * @tparam Comp Type of component of which to return the storage.
+     * @tparam Type Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
-    template<typename Comp>
+    template<typename Type>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<index_of<Comp>>(pools);
+        return *std::get<index_of<Type>>(pools);
     }
 
     /**
-     * @brief Returns the storage for a given component type.
-     * @tparam Comp Index of component of which to return the storage.
-     * @return The storage for the given component type.
+     * @brief Returns the storage for a given index.
+     * @tparam Index Index of the storage to return.
+     * @return The storage for the given index.
      */
-    template<std::size_t Comp>
+    template<std::size_t Index>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<Comp>(pools);
+        return *std::get<Index>(pools);
     }
 
     /**
@@ -338,20 +338,20 @@ public:
      * error. Attempting to use an entity that doesn't belong to the group
      * results in undefined behavior.
      *
-     * @tparam Comp Types of components to get.
+     * @tparam Type Types of components to get.
      * @param entt A valid identifier.
      * @return The components assigned to the entity.
      */
-    template<typename... Comp>
+    template<typename... Type>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         ENTT_ASSERT(contains(entt), "Group does not contain entity");
 
-        if constexpr(sizeof...(Comp) == 0) {
+        if constexpr(sizeof...(Type) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools);
-        } else if constexpr(sizeof...(Comp) == 1) {
-            return (std::get<index_of<Comp>>(pools)->get(entt), ...);
+        } else if constexpr(sizeof...(Type) == 1) {
+            return (std::get<index_of<Type>>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<index_of<Comp>>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<index_of<Type>>(pools)->get_as_tuple(entt)...);
         }
     }
 
@@ -433,7 +433,7 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * @tparam Comp Optional types of components to compare.
+     * @tparam Type Optional types of components to compare.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -441,18 +441,18 @@ public:
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
-    template<typename... Comp, typename Compare, typename Sort = std_sort, typename... Args>
+    template<typename... Type, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
         if(*this) {
-            if constexpr(sizeof...(Comp) == 0) {
+            if constexpr(sizeof...(Type) == 0) {
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
                 handler->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
                 auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
-                    if constexpr(sizeof...(Comp) == 1) {
-                        return compare((std::get<index_of<Comp>>(pools)->get(lhs), ...), (std::get<index_of<Comp>>(pools)->get(rhs), ...));
+                    if constexpr(sizeof...(Type) == 1) {
+                        return compare((std::get<index_of<Type>>(pools)->get(lhs), ...), (std::get<index_of<Type>>(pools)->get(rhs), ...));
                     } else {
-                        return compare(std::forward_as_tuple(std::get<index_of<Comp>>(pools)->get(lhs)...), std::forward_as_tuple(std::get<index_of<Comp>>(pools)->get(rhs)...));
+                        return compare(std::forward_as_tuple(std::get<index_of<Type>>(pools)->get(lhs)...), std::forward_as_tuple(std::get<index_of<Type>>(pools)->get(rhs)...));
                     }
                 };
 
@@ -475,12 +475,12 @@ public:
      * can quickly ruin the order imposed to the pool of entities shared between
      * the non-owning groups.
      *
-     * @tparam Comp Type of component to use to impose the order.
+     * @tparam Type Type of component to use to impose the order.
      */
-    template<typename Comp>
+    template<typename Type>
     void sort() const {
         if(*this) {
-            handler->respect(*std::get<index_of<Comp>>(pools));
+            handler->respect(*std::get<index_of<Type>>(pools));
         }
     }
 
@@ -529,8 +529,8 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<underlying_type>;
 
-    template<typename Comp>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Comp>, type_list<typename Owned::value_type..., typename Get::value_type...>>;
+    template<typename Type>
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type...>>;
 
     basic_group(const std::size_t &extent, Owned &...opool, Get &...gpool) noexcept
         : pools{&opool..., &gpool...},
@@ -556,22 +556,22 @@ public:
 
     /**
      * @brief Returns the storage for a given component type.
-     * @tparam Comp Type of component of which to return the storage.
+     * @tparam Type Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
-    template<typename Comp>
+    template<typename Type>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<index_of<Comp>>(pools);
+        return *std::get<index_of<Type>>(pools);
     }
 
     /**
-     * @brief Returns the storage for a given component type.
-     * @tparam Comp Index of component of which to return the storage.
-     * @return The storage for the given component type.
+     * @brief Returns the storage for a given index.
+     * @tparam Index Index of the storage to return.
+     * @return The storage for the given index.
      */
-    template<std::size_t Comp>
+    template<std::size_t Index>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<Comp>(pools);
+        return *std::get<Index>(pools);
     }
 
     /**
@@ -711,20 +711,20 @@ public:
      * error. Attempting to use an entity that doesn't belong to the group
      * results in undefined behavior.
      *
-     * @tparam Comp Types of components to get.
+     * @tparam Type Types of components to get.
      * @param entt A valid identifier.
      * @return The components assigned to the entity.
      */
-    template<typename... Comp>
+    template<typename... Type>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         ENTT_ASSERT(contains(entt), "Group does not contain entity");
 
-        if constexpr(sizeof...(Comp) == 0) {
+        if constexpr(sizeof...(Type) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools);
-        } else if constexpr(sizeof...(Comp) == 1) {
-            return (std::get<index_of<Comp>>(pools)->get(entt), ...);
+        } else if constexpr(sizeof...(Type) == 1) {
+            return (std::get<index_of<Type>>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<index_of<Comp>>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<index_of<Type>>(pools)->get_as_tuple(entt)...);
         }
     }
 
@@ -807,7 +807,7 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * @tparam Comp Optional types of components to compare.
+     * @tparam Type Optional types of components to compare.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -815,17 +815,17 @@ public:
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
-    template<typename... Comp, typename Compare, typename Sort = std_sort, typename... Args>
+    template<typename... Type, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
-        if constexpr(sizeof...(Comp) == 0) {
+        if constexpr(sizeof...(Type) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
             std::get<0>(pools)->sort_n(*length, std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
             auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
-                if constexpr(sizeof...(Comp) == 1) {
-                    return compare((std::get<index_of<Comp>>(pools)->get(lhs), ...), (std::get<index_of<Comp>>(pools)->get(rhs), ...));
+                if constexpr(sizeof...(Type) == 1) {
+                    return compare((std::get<index_of<Type>>(pools)->get(lhs), ...), (std::get<index_of<Type>>(pools)->get(rhs), ...));
                 } else {
-                    return compare(std::forward_as_tuple(std::get<index_of<Comp>>(pools)->get(lhs)...), std::forward_as_tuple(std::get<index_of<Comp>>(pools)->get(rhs)...));
+                    return compare(std::forward_as_tuple(std::get<index_of<Type>>(pools)->get(lhs)...), std::forward_as_tuple(std::get<index_of<Type>>(pools)->get(rhs)...));
                 }
             };
 
@@ -838,7 +838,8 @@ public:
                 [[maybe_unused]] const auto entt = head->data()[pos];
                 (other->swap_elements(other->data()[pos], entt), ...);
             }
-        }, pools);
+        },
+                   pools);
     }
 
 private:
