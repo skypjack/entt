@@ -224,7 +224,7 @@ public:
                     if(auto curr = it++; it != last) {
                         if(it->second) {
                             matrix.insert(curr->first, it->first);
-                        } else if(const auto next = std::find_if(it, last, [](const auto &elem) { return elem.second; }); next != last) {
+                        } else if(const auto next = std::find_if(it, last, [](const auto &value) { return value.second; }); next != last) {
                             for(; it != next; ++it) {
                                 matrix.insert(curr->first, it->first);
                                 matrix.insert(it->first, next->first);
@@ -237,7 +237,7 @@ public:
                     }
                 } else {
                     // ro item (first iteration only)
-                    if(const auto next = std::find_if(it, last, [](const auto &elem) { return elem.second; }); next != last) {
+                    if(const auto next = std::find_if(it, last, [](const auto &value) { return value.second; }); next != last) {
                         for(; it != next; ++it) {
                             matrix.insert(it->first, next->first);
                         }
