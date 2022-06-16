@@ -192,6 +192,7 @@ if(ENTT_HAS_NATVIS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/container.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/core.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/entity.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/graph.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/locator.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/meta.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/platform.natvis>

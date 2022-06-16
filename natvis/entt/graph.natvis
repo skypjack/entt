@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="entt::basic_adjacency_matrix&lt;*&gt;">
+		<DisplayString>{{ size={ vert } }}</DisplayString>
+        <Expand>
+			<CustomListItems>
+				<Variable Name="pos" InitialValue="0" />
+				<Variable Name="last" InitialValue="vert * vert"/>
+				<Loop>
+					<Break Condition="pos == last"/>
+					<If Condition="matrix[pos] != 0u">
+						<Item Name="[{pos / vert}, {pos % vert}]">true</Item>
+					</If>
+					<Exec>++pos</Exec>
+				</Loop>
+			</CustomListItems>
+        </Expand>
+    </Type>
+</AutoVisualizer>
