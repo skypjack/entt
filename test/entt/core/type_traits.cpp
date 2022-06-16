@@ -32,7 +32,9 @@ struct clazz {
     bool quux;
 };
 
-void free_function(int, const double &) {}
+int free_function(int, const double &) {
+    return 42;
+}
 
 template<typename, typename Type = void>
 struct multi_argument_operation {
@@ -206,11 +208,13 @@ TEST(MemberClass, Functionalities) {
 }
 
 TEST(NthArgument, Functionalities) {
-    static_assert(std::is_same_v<entt::nth_argument_t<0u, free_function>, int>);
-    static_assert(std::is_same_v<entt::nth_argument_t<1u, free_function>, const double &>);
+    static_assert(std::is_same_v<entt::nth_argument_t<0u, &free_function>, int>);
+    static_assert(std::is_same_v<entt::nth_argument_t<1u, &free_function>, const double &>);
     static_assert(std::is_same_v<entt::nth_argument_t<0u, &clazz::bar>, double>);
     static_assert(std::is_same_v<entt::nth_argument_t<1u, &clazz::bar>, float>);
     static_assert(std::is_same_v<entt::nth_argument_t<0u, &clazz::quux>, bool>);
+
+    ASSERT_EQ(free_function(entt::nth_argument_t<0u, &free_function>{}, entt::nth_argument_t<1u, &free_function>{}), 42);
 }
 
 TEST(Tag, Functionalities) {
