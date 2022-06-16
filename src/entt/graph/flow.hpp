@@ -99,6 +99,15 @@ public:
         return allocator_type{index.second()};
     }
 
+    /**
+     * @brief Returns the identifier at specified location.
+     * @param pos Position of the identifier to return.
+     * @return The requested identifier.
+     */
+    id_type operator[](const size_type pos) const {
+        return vertices.cbegin()[pos];
+    }
+
     /*! @brief Clears the flow builder. */
     void clear() noexcept {
         index.first() = 0u;
@@ -130,18 +139,10 @@ public:
      * @param value Task identifier.
      * @return This flow builder.
      */
-    basic_flow &bind(id_type value) {
+    basic_flow &bind(const id_type value) {
         const auto it = vertices.emplace(value).first;
         index.first() = size_type(it - vertices.begin());
         return *this;
-    }
-
-    /**
-     * @brief Returns an iterable object to use to _visit_ the tasks.
-     * @return An iterable object to use to _visit_ the tasks.
-     */
-    iterable tasks() const noexcept {
-        return {vertices.cbegin(), vertices.cend()};
     }
 
     /**
@@ -149,7 +150,7 @@ public:
      * @param res Resource identifier.
      * @return This flow builder.
      */
-    basic_flow &ro(id_type res) {
+    basic_flow &ro(const id_type res) {
         ENTT_ASSERT(index.first() < vertices.size(), "Invalid task");
         deps[res].emplace_back(index.first(), false);
         return *this;
@@ -177,7 +178,7 @@ public:
      * @param res Resource identifier.
      * @return This flow builder.
      */
-    basic_flow &rw(id_type res) {
+    basic_flow &rw(const id_type res) {
         ENTT_ASSERT(index.first() < vertices.size(), "Invalid task");
         deps[res].emplace_back(index.first(), true);
         return *this;

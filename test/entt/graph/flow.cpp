@@ -25,8 +25,9 @@ TEST(Flow, Constructors) {
     ASSERT_EQ(flow.size(), 0u);
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(flow.tasks().cbegin(), flow.tasks().cend());
-    ASSERT_EQ(*++other.tasks().cbegin(), 3);
+    ASSERT_EQ(other[0u], 0);
+    ASSERT_EQ(other[1u], 3);
+    ASSERT_EQ(other[2u], 99);
 }
 
 TEST(Flow, Copy) {
@@ -41,8 +42,9 @@ TEST(Flow, Copy) {
     ASSERT_EQ(flow.size(), 3u);
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(*flow.tasks().cbegin(), 0);
-    ASSERT_EQ(*++other.tasks().cbegin(), 3);
+    ASSERT_EQ(other[0u], 0);
+    ASSERT_EQ(other[1u], 3);
+    ASSERT_EQ(other[2u], 99);
 
     flow.bind(1);
     other.bind(2);
@@ -52,8 +54,10 @@ TEST(Flow, Copy) {
     ASSERT_EQ(other.size(), 4u);
     ASSERT_EQ(flow.size(), 4u);
 
-    ASSERT_EQ(*--flow.tasks().cend(), 1);
-    ASSERT_EQ(*--other.tasks().cend(), 1);
+    ASSERT_EQ(other[0u], 0);
+    ASSERT_EQ(other[1u], 3);
+    ASSERT_EQ(other[2u], 99);
+    ASSERT_EQ(other[3u], 1);
 }
 
 TEST(Flow, Move) {
@@ -68,8 +72,9 @@ TEST(Flow, Move) {
     ASSERT_EQ(flow.size(), 0u);
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(flow.tasks().cbegin(), flow.tasks().cend());
-    ASSERT_EQ(*++other.tasks().cbegin(), 3);
+    ASSERT_EQ(other[0u], 0);
+    ASSERT_EQ(other[1u], 3);
+    ASSERT_EQ(other[2u], 99);
 
     flow = {};
     flow.bind(1);
@@ -80,8 +85,7 @@ TEST(Flow, Move) {
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(flow.size(), 0u);
 
-    ASSERT_EQ(flow.tasks().cbegin(), flow.tasks().cend());
-    ASSERT_EQ(*other.tasks().cbegin(), 1);
+    ASSERT_EQ(other[0u], 1);
 }
 
 TEST(Flow, Swap) {
@@ -92,15 +96,13 @@ TEST(Flow, Swap) {
 
     ASSERT_EQ(other.size(), 0u);
     ASSERT_EQ(flow.size(), 1u);
-    ASSERT_EQ(*flow.tasks().cbegin(), 7);
-    ASSERT_EQ(other.tasks().cbegin(), other.tasks().cend());
+    ASSERT_EQ(flow[0u], 7);
 
     flow.swap(other);
 
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(flow.size(), 0u);
-    ASSERT_EQ(flow.tasks().cbegin(), flow.tasks().cend());
-    ASSERT_EQ(*other.tasks().cbegin(), 7);
+    ASSERT_EQ(other[0u], 7);
 }
 
 TEST(Flow, Clear) {
@@ -110,14 +112,12 @@ TEST(Flow, Clear) {
     flow.bind(99);
 
     ASSERT_EQ(flow.size(), 2u);
-    ASSERT_EQ(*flow.tasks().cbegin(), 0);
-    ASSERT_EQ(*--flow.tasks().cend(), 99);
-    ASSERT_EQ(++flow.tasks().cbegin(), --flow.tasks().cend());
+    ASSERT_EQ(flow[0u], 0);
+    ASSERT_EQ(flow[1u], 99);
 
     flow.clear();
 
     ASSERT_EQ(flow.size(), 0u);
-    ASSERT_EQ(flow.tasks().cbegin(), flow.tasks().cend());
 }
 
 TEST(Flow, RO) {
@@ -197,27 +197,22 @@ TEST(Flow, Graph) {
     ASSERT_EQ(flow.size(), 5u);
     ASSERT_EQ(flow.size(), graph.size());
 
-    auto from = flow.tasks().cbegin();
-    const auto to = flow.tasks().cend();
+    ASSERT_EQ(flow[0u], "task_0"_hs);
+    ASSERT_EQ(flow[1u], "task_1"_hs);
+    ASSERT_EQ(flow[2u], "task_2"_hs);
+    ASSERT_EQ(flow[3u], "task_3"_hs);
+    ASSERT_EQ(flow[4u], "task_4"_hs);
 
-    ASSERT_NE(from, to);
-    ASSERT_EQ(from[0u], "task_0"_hs);
-    ASSERT_EQ(from[1u], "task_1"_hs);
-    ASSERT_EQ(from[2u], "task_2"_hs);
-    ASSERT_EQ(from[3u], "task_3"_hs);
-    ASSERT_EQ(from[4u], "task_4"_hs);
-    ASSERT_EQ(from + 5u, to);
-
-    auto first = graph.edges().cbegin();
+    auto it = graph.edges().cbegin();
     const auto last = graph.edges().cend();
 
-    ASSERT_NE(first, last);
-    ASSERT_EQ(*first++, std::make_pair(std::size_t{0u}, std::size_t{2u}));
-    ASSERT_EQ(*first++, std::make_pair(std::size_t{0u}, std::size_t{4u}));
-    ASSERT_EQ(*first++, std::make_pair(std::size_t{1u}, std::size_t{3u}));
-    ASSERT_EQ(*first++, std::make_pair(std::size_t{1u}, std::size_t{4u}));
-    ASSERT_EQ(*first++, std::make_pair(std::size_t{2u}, std::size_t{3u}));
-    ASSERT_EQ(first, last);
+    ASSERT_NE(it, last);
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{2u}));
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{4u}));
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{1u}, std::size_t{3u}));
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{1u}, std::size_t{4u}));
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{2u}, std::size_t{3u}));
+    ASSERT_EQ(it, last);
 }
 
 TEST(Flow, ThrowingAllocator) {
