@@ -148,6 +148,7 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/storage.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/view.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/adjacency_matrix.hpp>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/flow.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/locator/locator.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/adl_pointer.hpp>
