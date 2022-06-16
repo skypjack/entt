@@ -126,11 +126,11 @@ public:
     }
 
     /**
-     * @brief Sets the current task.
+     * @brief Binds a task to a flow builder.
      * @param value Task identifier.
      * @return This flow builder.
      */
-    basic_flow &task(id_type value) {
+    basic_flow &bind(id_type value) {
         const auto it = vertices.emplace(value).first;
         index.first() = size_type(it - vertices.begin());
         return *this;

@@ -13,9 +13,9 @@ TEST(Flow, Constructors) {
 
     ASSERT_EQ(flow.size(), 0u);
 
-    flow.task(0);
-    flow.task(3);
-    flow.task(99);
+    flow.bind(0);
+    flow.bind(3);
+    flow.bind(99);
 
     ASSERT_EQ(flow.size(), 3u);
 
@@ -32,9 +32,9 @@ TEST(Flow, Constructors) {
 TEST(Flow, Copy) {
     entt::flow flow{};
 
-    flow.task(0);
-    flow.task(3);
-    flow.task(99);
+    flow.bind(0);
+    flow.bind(3);
+    flow.bind(99);
 
     entt::flow other{flow};
 
@@ -44,8 +44,8 @@ TEST(Flow, Copy) {
     ASSERT_EQ(*flow.tasks().cbegin(), 0);
     ASSERT_EQ(*++other.tasks().cbegin(), 3);
 
-    flow.task(1);
-    other.task(2);
+    flow.bind(1);
+    other.bind(2);
 
     other = flow;
 
@@ -59,9 +59,9 @@ TEST(Flow, Copy) {
 TEST(Flow, Move) {
     entt::flow flow{};
 
-    flow.task(0);
-    flow.task(3);
-    flow.task(99);
+    flow.bind(0);
+    flow.bind(3);
+    flow.bind(99);
 
     entt::flow other{std::move(flow)};
 
@@ -72,8 +72,8 @@ TEST(Flow, Move) {
     ASSERT_EQ(*++other.tasks().cbegin(), 3);
 
     flow = {};
-    flow.task(1);
-    other.task(2);
+    flow.bind(1);
+    other.bind(2);
 
     other = std::move(flow);
 
@@ -88,7 +88,7 @@ TEST(Flow, Swap) {
     entt::flow flow{};
     entt::flow other{};
 
-    flow.task(7);
+    flow.bind(7);
 
     ASSERT_EQ(other.size(), 0u);
     ASSERT_EQ(flow.size(), 1u);
@@ -106,8 +106,8 @@ TEST(Flow, Swap) {
 TEST(Flow, Clear) {
     entt::flow flow{};
 
-    flow.task(0);
-    flow.task(99);
+    flow.bind(0);
+    flow.bind(99);
 
     ASSERT_EQ(flow.size(), 2u);
     ASSERT_EQ(*flow.tasks().cbegin(), 0);
@@ -122,7 +122,7 @@ TEST(Flow, Clear) {
 
 TEST(Flow, RO) {
     entt::flow flow{};
-    flow.task(0).ro(10).task(1).ro(10).ro(11);
+    flow.bind(0).ro(10).bind(1).ro(10).ro(11);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -133,7 +133,7 @@ TEST(Flow, RO) {
 TEST(Flow, RangeRO) {
     entt::flow flow{};
     const entt::id_type res[2u]{10, 11};
-    flow.task(0).ro(res, res + 1).task(1).ro(res, res + 2);
+    flow.bind(0).ro(res, res + 1).bind(1).ro(res, res + 2);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -143,7 +143,7 @@ TEST(Flow, RangeRO) {
 
 TEST(Flow, RW) {
     entt::flow flow{};
-    flow.task(0).rw(10).task(1).rw(10).rw(11);
+    flow.bind(0).rw(10).bind(1).rw(10).rw(11);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -157,7 +157,7 @@ TEST(Flow, RW) {
 TEST(Flow, RangeRW) {
     entt::flow flow{};
     const entt::id_type res[2u]{10, 11};
-    flow.task(0).rw(res, res + 1).task(1).rw(res, res + 2);
+    flow.bind(0).rw(res, res + 1).bind(1).rw(res, res + 2);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -173,23 +173,23 @@ TEST(Flow, Graph) {
 
     entt::flow flow{};
 
-    flow.task("task_0"_hs)
+    flow.bind("task_0"_hs)
         .ro("resource_0"_hs)
         .rw("resource_1"_hs);
 
-    flow.task("task_1"_hs)
+    flow.bind("task_1"_hs)
         .ro("resource_0"_hs)
         .rw("resource_2"_hs);
 
-    flow.task("task_2"_hs)
+    flow.bind("task_2"_hs)
         .ro("resource_1"_hs)
         .rw("resource_3"_hs);
 
-    flow.task("task_3"_hs)
+    flow.bind("task_3"_hs)
         .rw("resource_1"_hs)
         .ro("resource_2"_hs);
 
-    flow.task("task_4"_hs)
+    flow.bind("task_4"_hs)
         .rw("resource_0"_hs);
 
     auto graph = flow.graph();
@@ -230,10 +230,10 @@ TEST(Flow, ThrowingAllocator) {
     task_allocator::trigger_on_allocate = true;
 
     ASSERT_EQ(flow.size(), 0u);
-    ASSERT_THROW(flow.task(1), task_exception);
+    ASSERT_THROW(flow.bind(1), task_exception);
     ASSERT_EQ(flow.size(), 0u);
 
-    flow.task(1);
+    flow.bind(1);
 
     ASSERT_EQ(flow.size(), 1u);
 }
