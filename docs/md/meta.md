@@ -257,8 +257,8 @@ auto by_id = entt::resolve("reflected_type"_hs);
 auto by_type_id = entt::resolve(entt::type_id<my_type>());
 ```
 
-There exits also an overload of the `resolve` function to use to iterate all the
-reflected types at once. It returns an iterable object that can be used in a
+There exists also an overload of the `resolve` function to use to iterate all
+the reflected types at once. It returns an iterable object that can be used in a
 range-for loop:
 
 ```cpp
