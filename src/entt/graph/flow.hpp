@@ -131,13 +131,8 @@ public:
      * @return This flow builder.
      */
     basic_flow &task(id_type value) {
-        if(const auto it = vertices.find(value); it == vertices.cend()) {
-            index.first() = vertices.size();
-            vertices.emplace(value);
-        } else {
-            index.first() = static_cast<size_type>(it - vertices.cbegin());
-        }
-
+        const auto it = vertices.emplace(value).first;
+        index.first() = size_type(it - vertices.begin());
         return *this;
     }
 
