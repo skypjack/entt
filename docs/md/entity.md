@@ -921,13 +921,13 @@ lvalue is necessarily provided as an argument:
 
 ```cpp
 time clock;
-registry.ctx().emplace<my_type &>(clock);
+registry.ctx().emplace<time &>(clock);
 ```
 
 Read-only aliased properties are created using const types instead:
 
 ```cpp
-registry.ctx().emplace<const my_type &>(clock);
+registry.ctx().emplace<const time &>(clock);
 ```
 
 From the point of view of the user, there are no differences between a variable
