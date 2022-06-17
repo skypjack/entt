@@ -51,8 +51,8 @@ if(adjacency_matrix.contains(0u, 1u)) {
 }
 ```
 
-To be fair, both `insert` and` erase` are idempotent functions which have no
-effect if the element already exists or has already been deleted.<br/>
+Both `insert` and` erase` are idempotent functions which have no effect if the
+element already exists or has already been deleted.<br/>
 The first one returns an `std::pair` containing the iterator to the element and
 a boolean value indicating whether the element has been inserted or was already
 present. The second one instead returns the number of deleted elements (0 or 1).
@@ -112,8 +112,7 @@ or 'get_allocator` and so on.
 
 A flow builder is used to create execution graphs from tasks and resources.<br/>
 The implementation is as generic as possible and doesn't bind to any other part
-of the library, so it can be used independently of everything else to create an
-execution graph for own own purposes.
+of the library.
 
 This class is designed as a sort of _state machine_ to which a specific task is
 attached for which the resources accessed in read-only or read-write mode are
