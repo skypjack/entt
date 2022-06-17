@@ -254,13 +254,31 @@ TEST(AdjacencyMatrix, Edges) {
 
 TEST(AdjacencyMatrix, OutEdges) {
     entt::adjacency_matrix adjacency_matrix{3u};
-    auto iterable = adjacency_matrix.edges();
+    auto iterable = adjacency_matrix.out_edges(0u);
 
     ASSERT_EQ(iterable.begin(), iterable.end());
 
     adjacency_matrix.insert(0u, 1u);
     adjacency_matrix.insert(1u, 2u);
     iterable = adjacency_matrix.out_edges(0u);
+
+    ASSERT_NE(iterable.begin(), iterable.end());
+
+    auto it = iterable.begin();
+
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{1u}));
+    ASSERT_EQ(it, iterable.end());
+}
+
+TEST(AdjacencyMatrix, InEdges) {
+    entt::adjacency_matrix adjacency_matrix{3u};
+    auto iterable = adjacency_matrix.in_edges(1u);
+
+    ASSERT_EQ(iterable.begin(), iterable.end());
+
+    adjacency_matrix.insert(0u, 1u);
+    adjacency_matrix.insert(1u, 2u);
+    iterable = adjacency_matrix.in_edges(1u);
 
     ASSERT_NE(iterable.begin(), iterable.end());
 

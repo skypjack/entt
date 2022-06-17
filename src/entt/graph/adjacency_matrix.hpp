@@ -20,37 +20,38 @@ namespace entt {
 
 namespace internal {
 
-struct edge_iterator {
-    using value_type = std::pair<std::size_t, std::size_t>;
+template<typename It>
+class row_edge_iterator {
+    using size_type = std::size_t;
+
+public:
+    using value_type = std::pair<size_type, size_type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    constexpr edge_iterator() noexcept
-        : matrix{},
+    constexpr row_edge_iterator() noexcept
+        : it{},
           vert{},
-          it{},
+          pos{},
           last{} {}
 
-    constexpr edge_iterator(const std::size_t *ref, const std::size_t vertices, const std::size_t from) noexcept
-        : edge_iterator{ref, vertices, from, vertices * vertices} {}
-
-    constexpr edge_iterator(const std::size_t *ref, const std::size_t vertices, const std::size_t from, const std::size_t to) noexcept
-        : matrix{ref},
+    constexpr row_edge_iterator(It base, const size_type vertices, const size_type from, const size_type to) noexcept
+        : it{std::move(base)},
           vert{vertices},
-          it{from},
+          pos{from},
           last{to} {
-        for(; it != last && !matrix[it]; ++it) {}
+        for(; pos != last && !it[pos]; ++pos) {}
     }
 
-    constexpr edge_iterator &operator++() noexcept {
-        for(++it; it != last && !matrix[it]; ++it) {}
+    constexpr row_edge_iterator &operator++() noexcept {
+        for(++pos; pos != last && !it[pos]; ++pos) {}
         return *this;
     }
 
-    constexpr edge_iterator operator++(int) noexcept {
-        edge_iterator orig = *this;
+    constexpr row_edge_iterator operator++(int) noexcept {
+        row_edge_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -59,23 +60,89 @@ struct edge_iterator {
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::make_pair<std::size_t>(it / vert, it % vert);
+        return std::make_pair<size_type>(pos / vert, pos % vert);
     }
 
-    friend constexpr bool operator==(const edge_iterator &, const edge_iterator &) noexcept;
+    template<typename Type>
+    friend constexpr bool operator==(const row_edge_iterator<Type> &, const row_edge_iterator<Type> &) noexcept;
 
 private:
-    const std::size_t *matrix;
-    std::size_t vert;
-    std::size_t it;
-    std::size_t last;
+    It it;
+    size_type vert;
+    size_type pos;
+    size_type last;
 };
 
-[[nodiscard]] inline constexpr bool operator==(const edge_iterator &lhs, const edge_iterator &rhs) noexcept {
-    return lhs.it == rhs.it;
+template<typename Container>
+[[nodiscard]] inline constexpr bool operator==(const row_edge_iterator<Container> &lhs, const row_edge_iterator<Container> &rhs) noexcept {
+    return lhs.pos == rhs.pos;
 }
 
-[[nodiscard]] inline constexpr bool operator!=(const edge_iterator &lhs, const edge_iterator &rhs) noexcept {
+template<typename Container>
+[[nodiscard]] inline constexpr bool operator!=(const row_edge_iterator<Container> &lhs, const row_edge_iterator<Container> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template<typename It>
+class col_edge_iterator {
+    using size_type = std::size_t;
+
+public:
+    using value_type = std::pair<size_type, size_type>;
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::input_iterator_tag;
+
+    constexpr col_edge_iterator() noexcept
+        : it{},
+          vert{},
+          pos{},
+          last{} {}
+
+    constexpr col_edge_iterator(It base, const size_type vertices, const size_type from, const size_type to) noexcept
+        : it{std::move(base)},
+          vert{vertices},
+          pos{from},
+          last{to} {
+        for(; pos != last && !it[pos]; pos += vert) {}
+    }
+
+    constexpr col_edge_iterator &operator++() noexcept {
+        for(pos += vert; pos != last && !it[pos]; pos += vert) {}
+        return *this;
+    }
+
+    constexpr col_edge_iterator operator++(int) noexcept {
+        col_edge_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    [[nodiscard]] constexpr reference operator*() const noexcept {
+        return *operator->();
+    }
+
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
+        return std::make_pair<size_type>(pos / vert, pos % vert);
+    }
+
+    template<typename Type>
+    friend constexpr bool operator==(const col_edge_iterator<Type> &, const col_edge_iterator<Type> &) noexcept;
+
+private:
+    It it;
+    size_type vert;
+    size_type pos;
+    size_type last;
+};
+
+template<typename Container>
+[[nodiscard]] inline constexpr bool operator==(const col_edge_iterator<Container> &lhs, const col_edge_iterator<Container> &rhs) noexcept {
+    return lhs.pos == rhs.pos;
+}
+
+template<typename Container>
+[[nodiscard]] inline constexpr bool operator!=(const col_edge_iterator<Container> &lhs, const col_edge_iterator<Container> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
@@ -108,7 +175,11 @@ public:
     /*! @brief Vertex iterator type. */
     using vertex_iterator = iota_iterator<vertex_type>;
     /*! @brief Edge iterator type. */
-    using edge_iterator = internal::edge_iterator;
+    using edge_iterator = internal::row_edge_iterator<typename container_type::const_iterator>;
+    /*! @brief Out edge iterator type. */
+    using out_edge_iterator = internal::row_edge_iterator<typename container_type::const_iterator>;
+    /*! @brief In edge iterator type. */
+    using in_edge_iterator = internal::col_edge_iterator<typename container_type::const_iterator>;
 
     /*! @brief Default constructor. */
     basic_adjacency_matrix() noexcept(noexcept(allocator_type{}))
@@ -230,7 +301,9 @@ public:
      * @return An iterable object to visit all edges of a matrix.
      */
     [[nodiscard]] iterable_adaptor<edge_iterator> edges() const noexcept {
-        return {{matrix.data(), vert, 0u}, {matrix.data(), vert, matrix.size()}};
+        const auto it = matrix.cbegin();
+        const auto sz = matrix.size();
+        return {{it, vert, 0u, sz}, {it, vert, sz, sz}};
     }
 
     /**
@@ -238,10 +311,23 @@ public:
      * @param vertex The vertex of which to return all out edges.
      * @return An iterable object to visit all out edges of a vertex.
      */
-    [[nodiscard]] iterable_adaptor<edge_iterator> out_edges(const vertex_type vertex) const noexcept {
-        const auto first = vertex * vert;
-        const auto last = vertex * vert + vert;
-        return {{matrix.data(), vert, first, last}, {matrix.data(), vert, last, last}};
+    [[nodiscard]] iterable_adaptor<out_edge_iterator> out_edges(const vertex_type vertex) const noexcept {
+        const auto it = matrix.cbegin();
+        const auto from = vertex * vert;
+        const auto to = vertex * vert + vert;
+        return {{it, vert, from, to}, {it, vert, to, to}};
+    }
+
+    /**
+     * @brief Returns an iterable object to visit all in edges of a vertex.
+     * @param vertex The vertex of which to return all in edges.
+     * @return An iterable object to visit all in edges of a vertex.
+     */
+    [[nodiscard]] iterable_adaptor<in_edge_iterator> in_edges(const vertex_type vertex) const noexcept {
+        const auto it = matrix.cbegin();
+        const auto from = vertex;
+        const auto to = vertex * vert + vertex;
+        return {{it, vert, from, to}, {it, vert, to, to}};
     }
 
     /**
@@ -264,7 +350,7 @@ public:
     std::pair<edge_iterator, bool> insert(const vertex_type lhs, const vertex_type rhs) {
         const auto pos = lhs * vert + rhs;
         const auto inserted = !std::exchange(matrix[pos], 1u);
-        return {edge_iterator{matrix.data(), vert, pos}, inserted};
+        return {edge_iterator{matrix.cbegin(), vert, pos, matrix.size()}, inserted};
     }
 
     /**
