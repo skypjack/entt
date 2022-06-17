@@ -32,6 +32,16 @@ class basic_flow {
     using ro_rw_container_type = std::vector<std::pair<std::size_t, bool>, typename alloc_traits::template rebind_alloc<std::pair<std::size_t, bool>>>;
     using deps_container_type = dense_map<id_type, ro_rw_container_type, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, ro_rw_container_type>>>;
 
+    void emplace(const id_type res, const bool is_rw) {
+        ENTT_ASSERT(index.first() < vertices.size(), "Invalid node");
+
+        if(!deps.contains(res) && sync_on != vertices.size()) {
+            deps[res].emplace_back(sync_on, true);
+        }
+
+        deps[res].emplace_back(index.first(), is_rw);
+    }
+
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
@@ -51,7 +61,8 @@ public:
     explicit basic_flow(const allocator_type &allocator)
         : index{0u, allocator},
           vertices{},
-          deps{} {}
+          deps{},
+          sync_on{} {}
 
     /*! @brief Default copy constructor. */
     basic_flow(const basic_flow &) = default;
@@ -64,7 +75,8 @@ public:
     basic_flow(const basic_flow &other, const allocator_type &allocator)
         : index{other.index.first(), allocator},
           vertices{other.vertices, allocator},
-          deps{other.deps, allocator} {}
+          deps{other.deps, allocator},
+          sync_on{other.sync_on} {}
 
     /*! @brief Default move constructor. */
     basic_flow(basic_flow &&) noexcept = default;
@@ -77,7 +89,8 @@ public:
     basic_flow(basic_flow &&other, const allocator_type &allocator)
         : index{other.index.first(), allocator},
           vertices{std::move(other.vertices), allocator},
-          deps{std::move(other.deps), allocator} {}
+          deps{std::move(other.deps), allocator},
+          sync_on{other.sync_on} {}
 
     /**
      * @brief Default copy assignment operator.
@@ -110,7 +123,7 @@ public:
 
     /*! @brief Clears the flow builder. */
     void clear() noexcept {
-        index.first() = 0u;
+        index.first() = sync_on = {};
         vertices.clear();
         deps.clear();
     }
@@ -124,6 +137,7 @@ public:
         std::swap(index, other.index);
         std::swap(vertices, other.vertices);
         std::swap(deps, other.deps);
+        std::swap(sync_on, other.sync_on);
     }
 
     /**
@@ -140,8 +154,24 @@ public:
      * @return This flow builder.
      */
     basic_flow &bind(const id_type value) {
+        sync_on += (sync_on == vertices.size());
         const auto it = vertices.emplace(value).first;
         index.first() = size_type(it - vertices.begin());
+        return *this;
+    }
+
+    /**
+     * @brief Turns the current task into a sync point.
+     * @return This flow builder.
+     */
+    basic_flow& sync() {
+        ENTT_ASSERT(index.first() < vertices.size(), "Invalid node");
+        sync_on = index.first();
+
+        for(const auto &elem: deps) {
+            elem.second.emplace_back(sync_on, true);
+        }
+
         return *this;
     }
 
@@ -151,8 +181,7 @@ public:
      * @return This flow builder.
      */
     basic_flow &ro(const id_type res) {
-        ENTT_ASSERT(index.first() < vertices.size(), "Invalid task");
-        deps[res].emplace_back(index.first(), false);
+        emplace(res, false);
         return *this;
     }
 
@@ -167,7 +196,7 @@ public:
     std::enable_if_t<std::is_same_v<std::remove_const_t<typename std::iterator_traits<It>::value_type>, id_type>, basic_flow &>
     ro(It first, It last) {
         for(; first != last; ++first) {
-            ro(*first);
+            emplace(*first, false);
         }
 
         return *this;
@@ -179,8 +208,7 @@ public:
      * @return This flow builder.
      */
     basic_flow &rw(const id_type res) {
-        ENTT_ASSERT(index.first() < vertices.size(), "Invalid task");
-        deps[res].emplace_back(index.first(), true);
+        emplace(res, true);
         return *this;
     }
 
@@ -195,7 +223,7 @@ public:
     std::enable_if_t<std::is_same_v<std::remove_const_t<typename std::iterator_traits<It>::value_type>, id_type>, basic_flow &>
     rw(It first, It last) {
         for(; first != last; ++first) {
-            rw(*first);
+            emplace(*first, true);
         }
 
         return *this;
@@ -279,6 +307,7 @@ private:
     compressed_pair<size_type, allocator_type> index;
     task_container_type vertices;
     deps_container_type deps;
+    size_type sync_on;
 };
 
 } // namespace entt

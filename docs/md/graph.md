@@ -225,7 +225,19 @@ others tasks.
 
 ## Sync points
 
-To be done. Coming soon.
+Sometimes it's useful to assign the role of _sync point_ to a node.<br/>
+Whether it accesses new resources or is simply a watershed, the procedure for
+assigning this role to a vertex is always the same: first it's tied to the flow
+builder, then the `sync` function is invoked:
+
+```cpp
+builder.bind("sync_point").sync();
+```
+
+The choice to assign an _identity_ to this type of nodes lies in the fact that,
+more often than not, they also perform operations on resources.<br/>
+If this isn't the case, it will still be possible to create no-op vertices to
+which empty tasks are assigned.
 
 ## Execution graph
 

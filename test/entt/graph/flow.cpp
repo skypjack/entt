@@ -215,6 +215,49 @@ TEST(Flow, Graph) {
     ASSERT_EQ(it, last);
 }
 
+TEST(Flow, Sync) {
+    using namespace entt::literals;
+
+    entt::flow flow{};
+
+    flow.bind("task_0"_hs)
+        .ro("resource_0"_hs);
+
+    flow.bind("task_1"_hs)
+        .rw("resource_1"_hs);
+
+    flow.bind("task_2"_hs)
+        .sync();
+
+    flow.bind("task_3"_hs)
+        .ro("resource_0"_hs)
+        .rw("resource_2"_hs);
+
+    flow.bind("task_4"_hs)
+        .ro("resource_2"_hs);
+
+    auto graph = flow.graph();
+
+    ASSERT_EQ(flow.size(), 5u);
+    ASSERT_EQ(flow.size(), graph.size());
+
+    ASSERT_EQ(flow[0u], "task_0"_hs);
+    ASSERT_EQ(flow[1u], "task_1"_hs);
+    ASSERT_EQ(flow[2u], "task_2"_hs);
+    ASSERT_EQ(flow[3u], "task_3"_hs);
+    ASSERT_EQ(flow[4u], "task_4"_hs);
+
+    auto it = graph.edges().cbegin();
+    const auto last = graph.edges().cend();
+
+    ASSERT_NE(it, last);
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{2u}));
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{1u}, std::size_t{2u}));
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{2u}, std::size_t{3u}));
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{3u}, std::size_t{4u}));
+    ASSERT_EQ(it, last);
+}
+
 TEST(Flow, ThrowingAllocator) {
     using allocator = test::throwing_allocator<entt::id_type>;
     using task_allocator = test::throwing_allocator<std::pair<std::size_t, entt::id_type>>;
