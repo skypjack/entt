@@ -53,9 +53,7 @@ public:
           last{to},
           pools{all_of},
           filter{none_of} {
-        if(it != last && !valid()) {
-            ++(*this);
-        }
+        while(it != last && !valid()) { ++it; }
     }
 
     view_iterator &operator++() noexcept {
