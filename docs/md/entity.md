@@ -738,8 +738,8 @@ using my_const_handle = entt::basic_handle<const my_identifier>;
 Handles are also implicitly convertible to const handles out of the box but not
 the other way around.<br/>
 A handle stores a non-const pointer to a registry and therefore it can do all
-the things that can be done with a non-const registry. On the other hand, a
-const handles store const pointers to registries and offer a restricted set of
+the things that can be done with a non-const registry. On the other hand, const
+handles store const pointers to registries and offer a restricted set of
 functionalities.
 
 This class is intended to simplify function signatures. In case of functions
