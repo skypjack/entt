@@ -37,9 +37,9 @@ namespace entt {
 namespace internal {
 
 template<typename It>
-class storage_proxy_iterator final {
+class registry_storage_iterator final {
     template<typename Other>
-    friend class storage_proxy_iterator;
+    friend class registry_storage_iterator;
 
     using mapped_type = std::remove_reference_t<decltype(std::declval<It>()->second)>;
 
@@ -50,49 +50,49 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    constexpr storage_proxy_iterator() noexcept
+    constexpr registry_storage_iterator() noexcept
         : it{} {}
 
-    constexpr storage_proxy_iterator(It iter) noexcept
+    constexpr registry_storage_iterator(It iter) noexcept
         : it{iter} {}
 
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    constexpr storage_proxy_iterator(const storage_proxy_iterator<Other> &other) noexcept
-        : storage_proxy_iterator{other.it} {}
+    constexpr registry_storage_iterator(const registry_storage_iterator<Other> &other) noexcept
+        : registry_storage_iterator{other.it} {}
 
-    constexpr storage_proxy_iterator &operator++() noexcept {
+    constexpr registry_storage_iterator &operator++() noexcept {
         return ++it, *this;
     }
 
-    constexpr storage_proxy_iterator operator++(int) noexcept {
-        storage_proxy_iterator orig = *this;
+    constexpr registry_storage_iterator operator++(int) noexcept {
+        registry_storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
-    constexpr storage_proxy_iterator &operator--() noexcept {
+    constexpr registry_storage_iterator &operator--() noexcept {
         return --it, *this;
     }
 
-    constexpr storage_proxy_iterator operator--(int) noexcept {
-        storage_proxy_iterator orig = *this;
+    constexpr registry_storage_iterator operator--(int) noexcept {
+        registry_storage_iterator orig = *this;
         return operator--(), orig;
     }
 
-    constexpr storage_proxy_iterator &operator+=(const difference_type value) noexcept {
+    constexpr registry_storage_iterator &operator+=(const difference_type value) noexcept {
         it += value;
         return *this;
     }
 
-    constexpr storage_proxy_iterator operator+(const difference_type value) const noexcept {
-        storage_proxy_iterator copy = *this;
+    constexpr registry_storage_iterator operator+(const difference_type value) const noexcept {
+        registry_storage_iterator copy = *this;
         return (copy += value);
     }
 
-    constexpr storage_proxy_iterator &operator-=(const difference_type value) noexcept {
+    constexpr registry_storage_iterator &operator-=(const difference_type value) noexcept {
         return (*this += -value);
     }
 
-    constexpr storage_proxy_iterator operator-(const difference_type value) const noexcept {
+    constexpr registry_storage_iterator operator-(const difference_type value) const noexcept {
         return (*this + -value);
     }
 
@@ -109,50 +109,50 @@ public:
     }
 
     template<typename ILhs, typename IRhs>
-    friend constexpr std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) noexcept;
+    friend constexpr std::ptrdiff_t operator-(const registry_storage_iterator<ILhs> &, const registry_storage_iterator<IRhs> &) noexcept;
 
     template<typename ILhs, typename IRhs>
-    friend constexpr bool operator==(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) noexcept;
+    friend constexpr bool operator==(const registry_storage_iterator<ILhs> &, const registry_storage_iterator<IRhs> &) noexcept;
 
     template<typename ILhs, typename IRhs>
-    friend constexpr bool operator<(const storage_proxy_iterator<ILhs> &, const storage_proxy_iterator<IRhs> &) noexcept;
+    friend constexpr bool operator<(const registry_storage_iterator<ILhs> &, const registry_storage_iterator<IRhs> &) noexcept;
 
 private:
     It it;
 };
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const registry_storage_iterator<ILhs> &lhs, const registry_storage_iterator<IRhs> &rhs) noexcept {
     return lhs.it - rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator==(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
+[[nodiscard]] constexpr bool operator==(const registry_storage_iterator<ILhs> &lhs, const registry_storage_iterator<IRhs> &rhs) noexcept {
     return lhs.it == rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator!=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
+[[nodiscard]] constexpr bool operator!=(const registry_storage_iterator<ILhs> &lhs, const registry_storage_iterator<IRhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator<(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
+[[nodiscard]] constexpr bool operator<(const registry_storage_iterator<ILhs> &lhs, const registry_storage_iterator<IRhs> &rhs) noexcept {
     return lhs.it < rhs.it;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator>(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
+[[nodiscard]] constexpr bool operator>(const registry_storage_iterator<ILhs> &lhs, const registry_storage_iterator<IRhs> &rhs) noexcept {
     return rhs < lhs;
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator<=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
+[[nodiscard]] constexpr bool operator<=(const registry_storage_iterator<ILhs> &lhs, const registry_storage_iterator<IRhs> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
 template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator>=(const storage_proxy_iterator<ILhs> &lhs, const storage_proxy_iterator<IRhs> &rhs) noexcept {
+[[nodiscard]] constexpr bool operator>=(const registry_storage_iterator<ILhs> &lhs, const registry_storage_iterator<IRhs> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -391,12 +391,12 @@ public:
      * @return An iterable object to use to _visit_ the registry.
      */
     [[nodiscard]] auto storage() noexcept {
-        return iterable_adaptor{internal::storage_proxy_iterator{pools.begin()}, internal::storage_proxy_iterator{pools.end()}};
+        return iterable_adaptor{internal::registry_storage_iterator{pools.begin()}, internal::registry_storage_iterator{pools.end()}};
     }
 
     /*! @copydoc storage */
     [[nodiscard]] auto storage() const noexcept {
-        return iterable_adaptor{internal::storage_proxy_iterator{pools.cbegin()}, internal::storage_proxy_iterator{pools.cend()}};
+        return iterable_adaptor{internal::registry_storage_iterator{pools.cbegin()}, internal::registry_storage_iterator{pools.cend()}};
     }
 
     /**
@@ -406,7 +406,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] auto storage(const id_type id) {
-        return internal::storage_proxy_iterator{pools.find(id)};
+        return internal::registry_storage_iterator{pools.find(id)};
     }
 
     /**
@@ -416,7 +416,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] auto storage(const id_type id) const {
-        return internal::storage_proxy_iterator{pools.find(id)};
+        return internal::registry_storage_iterator{pools.find(id)};
     }
 
     /**
