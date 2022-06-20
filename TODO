@@ -13,9 +13,9 @@ DOC:
 * update entity doc when the storage based model is in place
 
 WIP:
+* dense_map/set and registry: move ctor/op should be noexcept (op is conditionally noexcept though)
 * "replace" organizer with flow
 * add directed/undirected support to adjacency matrix (see brief) and refine iterators a little
-* handle: replace visit with an iterable object
 * add storage getter for filters to views and groups
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
 * emitter: runtime handlers, allocator support (ready for both already)
