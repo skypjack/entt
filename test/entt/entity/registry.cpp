@@ -1988,7 +1988,7 @@ TEST(RegistryDeathTest, RuntimePools) {
     ASSERT_DEATH(std::as_const(registry).storage<int>("other"_hs), "");
 }
 
-TEST(Registry, StorageProxy) {
+TEST(Registry, Storage) {
     using namespace entt::literals;
 
     entt::registry registry;
@@ -2015,7 +2015,7 @@ TEST(Registry, StorageProxy) {
     }
 }
 
-TEST(Registry, StorageProxyIterator) {
+TEST(Registry, RegistryStorageIterator) {
     entt::registry registry;
     const auto entity = registry.create();
     registry.emplace<int>(entity);
@@ -2070,7 +2070,7 @@ TEST(Registry, StorageProxyIterator) {
     ASSERT_NE(cit, std::as_const(registry).storage().end());
 }
 
-TEST(Registry, StorageProxyIteratorConversion) {
+TEST(Registry, RegistryStorageIteratorConversion) {
     entt::registry registry;
     const auto entity = registry.create();
     registry.emplace<int>(entity);
