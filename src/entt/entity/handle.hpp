@@ -45,10 +45,6 @@ public:
         while(it != last && !it->second.contains(entt)) { ++it; }
     }
 
-    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
-    constexpr handle_storage_iterator(const handle_storage_iterator<Other> &other) noexcept
-        : handle_storage_iterator{other.entt, other it, other.last} {}
-
     constexpr handle_storage_iterator &operator++() noexcept {
         while(++it != last && !it->second.contains(entt)) {}
         return *this;
@@ -136,17 +132,10 @@ struct basic_handle {
      *
      * @return An iterable object to use to _visit_ the handle.
      */
-    [[nodiscard]] auto storage() noexcept {
+    [[nodiscard]] auto storage() const noexcept {
         auto iterable = reg->storage();
         using iterator_type = internal::handle_storage_iterator<typename decltype(iterable)::iterator>;
         return iterable_adaptor{iterator_type{entt, iterable.begin(), iterable.end()}, iterator_type{entt, iterable.end(), iterable.end()}};
-    }
-
-    /*! @copydoc storage */
-    [[nodiscard]] auto storage() const noexcept {
-        auto iterable = reg->storage();
-        using iterator_type = internal::handle_storage_iterator<typename decltype(iterable)::const_iterator>;
-        return iterable_adaptor{iterator_type{entt, iterable.cbegin(), iterable.cend()}, iterator_type{entt, iterable.cend(), iterable.cend()}};
     }
 
     /**
