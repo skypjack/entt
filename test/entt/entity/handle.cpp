@@ -276,7 +276,7 @@ TEST(BasicHandle, HandleStorageIterator) {
     registry.emplace<int>(entity);
     registry.emplace<double>(entity);
 
-    auto test = [entity](auto iterable) {
+    auto test = [](auto iterable) {
         auto end{iterable.begin()};
         decltype(end) begin{};
         begin = iterable.end();
