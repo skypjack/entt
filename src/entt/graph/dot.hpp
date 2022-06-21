@@ -15,7 +15,7 @@ namespace entt {
  * @param writer Vertex decorator object.
  */
 template<typename Graph, typename Writer>
-auto dot(std::ostream &out, const Graph &graph, Writer writer) -> decltype(*graph.vertices().begin(), void()) {
+void dot(std::ostream &out, const Graph &graph, Writer writer) {
     out << "digraph{";
 
     for(auto &&vertex: graph.vertices()) {
@@ -38,7 +38,7 @@ auto dot(std::ostream &out, const Graph &graph, Writer writer) -> decltype(*grap
  * @param graph The graph to output.
  */
 template<typename Graph>
-auto dot(std::ostream &out, const Graph &graph) -> decltype(*graph.vertices().begin(), void()) {
+void dot(std::ostream &out, const Graph &graph) {
     return dot(out, graph, [](auto &&...) {});
 }
 
