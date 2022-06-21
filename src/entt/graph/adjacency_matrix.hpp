@@ -361,7 +361,7 @@ public:
 
         if constexpr(std::is_same_v<graph_category, undirected_tag>) {
             const auto rev = rhs * vert + lhs;
-            ENTT_ASSERT(matrix[pos] == matrix[rev]);
+            ENTT_ASSERT(matrix[pos] == matrix[rev], "Something went really wrong");
             matrix[rev] = 1u;
         }
 
@@ -380,7 +380,7 @@ public:
 
         if constexpr(std::is_same_v<graph_category, undirected_tag>) {
             const auto rev = rhs * vert + lhs;
-            ENTT_ASSERT(matrix[pos] == matrix[rev]);
+            ENTT_ASSERT(matrix[pos] == matrix[rev], "Something went really wrong");
             matrix[rev] = 0u;
         }
 
