@@ -155,11 +155,13 @@ template<typename Container>
 
 /**
  * @brief Basic implementation of a directed adjacency matrix.
+ * @tparam Category Either a directed or undirected category tag.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Allocator>
-class basic_adjacency_matrix {
+template<typename Category, typename Allocator>
+class adjacency_matrix {
     using alloc_traits = std::allocator_traits<Allocator>;
+    static_assert(std::is_base_of_v<undirected_tag, Category>, "Invalid graph category");
     static_assert(std::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");
     using container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
 
@@ -180,17 +182,19 @@ public:
     using out_edge_iterator = internal::row_edge_iterator<typename container_type::const_iterator>;
     /*! @brief In edge iterator type. */
     using in_edge_iterator = internal::col_edge_iterator<typename container_type::const_iterator>;
+    /*! @brieg Graph category tag. */
+    using graph_category = Category;
 
     /*! @brief Default constructor. */
-    basic_adjacency_matrix() noexcept(noexcept(allocator_type{}))
-        : basic_adjacency_matrix{0u} {}
+    adjacency_matrix() noexcept(noexcept(allocator_type{}))
+        : adjacency_matrix{0u} {}
 
     /**
      * @brief Constructs an empty container with a given allocator.
      * @param allocator The allocator to use.
      */
-    explicit basic_adjacency_matrix(const allocator_type &allocator) noexcept
-        : basic_adjacency_matrix{0u, allocator} {}
+    explicit adjacency_matrix(const allocator_type &allocator) noexcept
+        : adjacency_matrix{0u, allocator} {}
 
     /**
      * @brief Constructs an empty container with a given allocator and user
@@ -198,7 +202,7 @@ public:
      * @param vertices Number of vertices.
      * @param allocator The allocator to use.
      */
-    basic_adjacency_matrix(const size_type vertices, const allocator_type &allocator = allocator_type{})
+    adjacency_matrix(const size_type vertices, const allocator_type &allocator = allocator_type{})
         : matrix(vertices * vertices),
           vert{vertices} {}
 
@@ -206,15 +210,15 @@ public:
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    basic_adjacency_matrix(const basic_adjacency_matrix &other)
-        : basic_adjacency_matrix{other, other.get_allocator()} {}
+    adjacency_matrix(const adjacency_matrix &other)
+        : adjacency_matrix{other, other.get_allocator()} {}
 
     /**
      * @brief Allocator-extended copy constructor.
      * @param other The instance to copy from.
      * @param allocator The allocator to use.
      */
-    basic_adjacency_matrix(const basic_adjacency_matrix &other, const allocator_type &allocator)
+    adjacency_matrix(const adjacency_matrix &other, const allocator_type &allocator)
         : matrix{other.matrix, allocator},
           vert{other.vert} {}
 
@@ -222,15 +226,15 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_adjacency_matrix(basic_adjacency_matrix &&other) noexcept
-        : basic_adjacency_matrix{std::move(other), other.get_allocator()} {}
+    adjacency_matrix(adjacency_matrix &&other) noexcept
+        : adjacency_matrix{std::move(other), other.get_allocator()} {}
 
     /**
      * @brief Allocator-extended move constructor.
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_adjacency_matrix(basic_adjacency_matrix &&other, const allocator_type &allocator)
+    adjacency_matrix(adjacency_matrix &&other, const allocator_type &allocator)
         : matrix{std::move(other.matrix), allocator},
           vert{std::exchange(other.vert, 0u)} {}
 
@@ -239,7 +243,7 @@ public:
      * @param other The instance to copy from.
      * @return This container.
      */
-    basic_adjacency_matrix &operator=(const basic_adjacency_matrix &other) {
+    adjacency_matrix &operator=(const adjacency_matrix &other) {
         matrix = other.matrix;
         vert = other.vert;
         return *this;
@@ -250,7 +254,7 @@ public:
      * @param other The instance to move from.
      * @return This container.
      */
-    basic_adjacency_matrix &operator=(basic_adjacency_matrix &&other) noexcept {
+    adjacency_matrix &operator=(adjacency_matrix &&other) noexcept {
         matrix = std::move(other.matrix);
         vert = std::exchange(other.vert, 0u);
         return *this;
@@ -274,7 +278,7 @@ public:
      * @brief Exchanges the contents with those of a given adjacency matrix.
      * @param other Adjacency matrix to exchange the content with.
      */
-    void swap(basic_adjacency_matrix &other) {
+    void swap(adjacency_matrix &other) {
         using std::swap;
         swap(matrix, other.matrix);
         swap(vert, other.vert);
@@ -326,7 +330,7 @@ public:
     [[nodiscard]] iterable_adaptor<in_edge_iterator> in_edges(const vertex_type vertex) const noexcept {
         const auto it = matrix.cbegin();
         const auto from = vertex;
-        const auto to = vertex * vert + vertex;
+        const auto to = vert * (vert - 1u) + vertex;
         return {{it, vert, from, to}, {it, vert, to, to}};
     }
 
@@ -335,7 +339,7 @@ public:
      * @param vertices The new number of vertices.
      */
     void resize(const size_type vertices) {
-        basic_adjacency_matrix other{vertices, get_allocator()};
+        adjacency_matrix other{vertices, get_allocator()};
 
         for(auto [lhs, rhs]: edges()) {
             other.insert(lhs, rhs);
@@ -354,6 +358,13 @@ public:
      */
     std::pair<edge_iterator, bool> insert(const vertex_type lhs, const vertex_type rhs) {
         const auto pos = lhs * vert + rhs;
+
+        if constexpr(std::is_same_v<graph_category, undirected_tag>) {
+            const auto rev = rhs * vert + lhs;
+            ENTT_ASSERT(matrix[pos] == matrix[rev]);
+            matrix[rev] = 1u;
+        }
+
         const auto inserted = !std::exchange(matrix[pos], 1u);
         return {edge_iterator{matrix.cbegin(), vert, pos, matrix.size()}, inserted};
     }
@@ -365,7 +376,15 @@ public:
      * @return Number of elements removed (either 0 or 1).
      */
     size_type erase(const vertex_type lhs, const vertex_type rhs) {
-        return std::exchange(matrix[lhs * vert + rhs], 0u);
+        const auto pos = lhs * vert + rhs;
+
+        if constexpr(std::is_same_v<graph_category, undirected_tag>) {
+            const auto rev = rhs * vert + lhs;
+            ENTT_ASSERT(matrix[pos] == matrix[rev]);
+            matrix[rev] = 0u;
+        }
+
+        return std::exchange(matrix[pos], 0u);
     }
 
     /**

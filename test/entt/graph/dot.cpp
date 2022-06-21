@@ -6,7 +6,7 @@
 
 TEST(Dot, DefaultWriter) {
     std::ostringstream output{};
-    entt::adjacency_matrix adjacency_matrix{3u};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
 
     adjacency_matrix.insert(0u, 1u);
     adjacency_matrix.insert(1u, 2u);
@@ -23,7 +23,7 @@ TEST(Dot, DefaultWriter) {
 
 TEST(Dot, CustomWriter) {
     std::ostringstream output{};
-    entt::adjacency_matrix adjacency_matrix{3u};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
 
     adjacency_matrix.insert(0u, 1u);
     adjacency_matrix.insert(1u, 2u);

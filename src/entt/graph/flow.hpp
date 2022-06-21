@@ -233,9 +233,9 @@ public:
      * @brief Generates a task graph for the current content.
      * @return The adjacency matrix of the task graph.
      */
-    adjacency_matrix graph() const {
+    adjacency_matrix<directed_tag> graph() const {
         const auto length = vertices.size();
-        adjacency_matrix matrix{length};
+        adjacency_matrix<directed_tag> matrix{length};
 
         // creates the adjacency matrix
         for(const auto &elem: deps) {

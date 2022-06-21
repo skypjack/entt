@@ -7,14 +7,17 @@
 
 namespace entt {
 
-template<typename = std::allocator<std::size_t>>
-class basic_adjacency_matrix;
+/*! @brief Undirected graph category tag. */
+struct undirected_tag {};
+
+/*! @brief Directed graph category tag. */
+struct directed_tag: undirected_tag {};
+
+template<typename, typename = std::allocator<std::size_t>>
+class adjacency_matrix;
 
 template<typename = std::allocator<id_type>>
 class basic_flow;
-
-/*! @brief Alias declaration for the most common use case. */
-using adjacency_matrix = basic_adjacency_matrix<>;
 
 /*! @brief Alias declaration for the most common use case. */
 using flow = basic_flow<>;

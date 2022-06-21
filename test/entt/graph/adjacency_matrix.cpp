@@ -5,7 +5,7 @@
 #include "../common/throwing_allocator.hpp"
 
 TEST(AdjacencyMatrix, Resize) {
-    entt::adjacency_matrix adjacency_matrix{2};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{2};
     adjacency_matrix.insert(1u, 0u);
 
     ASSERT_EQ(adjacency_matrix.size(), 2u);
@@ -18,19 +18,19 @@ TEST(AdjacencyMatrix, Resize) {
 }
 
 TEST(AdjacencyMatrix, Constructors) {
-    entt::adjacency_matrix adjacency_matrix{};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{};
 
     ASSERT_EQ(adjacency_matrix.size(), 0u);
 
-    adjacency_matrix = entt::adjacency_matrix{std::allocator<bool>{}};
-    adjacency_matrix = entt::adjacency_matrix{3u, std::allocator<bool>{}};
+    adjacency_matrix = entt::adjacency_matrix<entt::directed_tag>{std::allocator<bool>{}};
+    adjacency_matrix = entt::adjacency_matrix<entt::directed_tag>{3u, std::allocator<bool>{}};
 
     ASSERT_EQ(adjacency_matrix.size(), 3u);
 
     adjacency_matrix.insert(0u, 1u);
 
-    entt::adjacency_matrix temp{adjacency_matrix, adjacency_matrix.get_allocator()};
-    entt::adjacency_matrix other{std::move(adjacency_matrix), adjacency_matrix.get_allocator()};
+    entt::adjacency_matrix<entt::directed_tag> temp{adjacency_matrix, adjacency_matrix.get_allocator()};
+    entt::adjacency_matrix<entt::directed_tag> other{std::move(adjacency_matrix), adjacency_matrix.get_allocator()};
 
     ASSERT_EQ(adjacency_matrix.size(), 0u);
     ASSERT_EQ(other.size(), 3u);
@@ -40,10 +40,10 @@ TEST(AdjacencyMatrix, Constructors) {
 }
 
 TEST(AdjacencyMatrix, Copy) {
-    entt::adjacency_matrix adjacency_matrix{3u};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
     adjacency_matrix.insert(0u, 1u);
 
-    entt::adjacency_matrix other{adjacency_matrix};
+    entt::adjacency_matrix<entt::directed_tag> other{adjacency_matrix};
 
     ASSERT_EQ(adjacency_matrix.size(), 3u);
     ASSERT_EQ(other.size(), 3u);
@@ -66,10 +66,10 @@ TEST(AdjacencyMatrix, Copy) {
 }
 
 TEST(AdjacencyMatrix, Move) {
-    entt::adjacency_matrix adjacency_matrix{3u};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
     adjacency_matrix.insert(0u, 1u);
 
-    entt::adjacency_matrix other{std::move(adjacency_matrix)};
+    entt::adjacency_matrix<entt::directed_tag> other{std::move(adjacency_matrix)};
 
     ASSERT_EQ(adjacency_matrix.size(), 0u);
     ASSERT_EQ(other.size(), 3u);
@@ -93,8 +93,8 @@ TEST(AdjacencyMatrix, Move) {
 }
 
 TEST(AdjacencyMatrix, Swap) {
-    entt::adjacency_matrix adjacency_matrix{3u};
-    entt::adjacency_matrix other{};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
+    entt::adjacency_matrix<entt::directed_tag> other{};
 
     adjacency_matrix.insert(0u, 1u);
 
@@ -111,8 +111,8 @@ TEST(AdjacencyMatrix, Swap) {
     ASSERT_TRUE(other.contains(0u, 1u));
 }
 
-TEST(AdjacencyMatrix, Insert) {
-    entt::adjacency_matrix adjacency_matrix{3u};
+TEST(AdjacencyMatrix, InsertDirected) {
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
 
     auto first = adjacency_matrix.insert(0u, 1u);
     auto second = adjacency_matrix.insert(0u, 2u);
@@ -127,21 +127,64 @@ TEST(AdjacencyMatrix, Insert) {
 
     ASSERT_EQ(*first.first, std::make_pair(std::size_t{0u}, std::size_t{1u}));
     ASSERT_EQ(*second.first, std::make_pair(std::size_t{0u}, std::size_t{2u}));
+
+    ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_FALSE(adjacency_matrix.contains(2u, 0u));
 }
 
-TEST(AdjacencyMatrix, Erase) {
-    entt::adjacency_matrix adjacency_matrix{3u};
+TEST(AdjacencyMatrix, InsertUndirected) {
+    entt::adjacency_matrix<entt::undirected_tag> adjacency_matrix{3u};
+
+    auto first = adjacency_matrix.insert(0u, 1u);
+    auto second = adjacency_matrix.insert(0u, 2u);
+    auto other = adjacency_matrix.insert(0u, 1u);
+
+    ASSERT_TRUE(first.second);
+    ASSERT_TRUE(second.second);
+    ASSERT_FALSE(other.second);
+
+    ASSERT_NE(first.first, second.first);
+    ASSERT_EQ(first.first, other.first);
+
+    ASSERT_EQ(*first.first, std::make_pair(std::size_t{0u}, std::size_t{1u}));
+    ASSERT_EQ(*second.first, std::make_pair(std::size_t{0u}, std::size_t{2u}));
+
+    ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_TRUE(adjacency_matrix.contains(2u, 0u));
+}
+
+TEST(AdjacencyMatrix, EraseDirected) {
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
 
     adjacency_matrix.insert(0u, 1u);
 
     ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_FALSE(adjacency_matrix.contains(1u, 0u));
+
     ASSERT_EQ(adjacency_matrix.erase(0u, 1u), 1u);
     ASSERT_EQ(adjacency_matrix.erase(0u, 1u), 0u);
+
     ASSERT_FALSE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_FALSE(adjacency_matrix.contains(1u, 0u));
+}
+
+TEST(AdjacencyMatrix, EraseUndirected) {
+    entt::adjacency_matrix<entt::undirected_tag> adjacency_matrix{3u};
+
+    adjacency_matrix.insert(0u, 1u);
+
+    ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_TRUE(adjacency_matrix.contains(1u, 0u));
+
+    ASSERT_EQ(adjacency_matrix.erase(0u, 1u), 1u);
+    ASSERT_EQ(adjacency_matrix.erase(0u, 1u), 0u);
+
+    ASSERT_FALSE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_FALSE(adjacency_matrix.contains(1u, 0u));
 }
 
 TEST(AdjacencyMatrix, Clear) {
-    entt::adjacency_matrix adjacency_matrix{3u};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
 
     adjacency_matrix.insert(0u, 1u);
     adjacency_matrix.insert(0u, 2u);
@@ -158,13 +201,13 @@ TEST(AdjacencyMatrix, Clear) {
 }
 
 TEST(AdjacencyMatrix, VertexIterator) {
-    using iterator = typename entt::adjacency_matrix::vertex_iterator;
+    using iterator = typename entt::adjacency_matrix<entt::directed_tag>::vertex_iterator;
 
     static_assert(std::is_same_v<iterator::value_type, std::size_t>);
     static_assert(std::is_same_v<iterator::pointer, void>);
     static_assert(std::is_same_v<iterator::reference, std::size_t>);
 
-    entt::adjacency_matrix adjacency_matrix{2u};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{2u};
     const auto iterable = adjacency_matrix.vertices();
 
     iterator end{iterable.begin()};
@@ -184,13 +227,13 @@ TEST(AdjacencyMatrix, VertexIterator) {
 }
 
 TEST(AdjacencyMatrix, EdgeIterator) {
-    using iterator = typename entt::adjacency_matrix::edge_iterator;
+    using iterator = typename entt::adjacency_matrix<entt::directed_tag>::edge_iterator;
 
     static_assert(std::is_same_v<iterator::value_type, std::pair<std::size_t, std::size_t>>);
     static_assert(std::is_same_v<iterator::pointer, entt::input_iterator_pointer<std::pair<std::size_t, std::size_t>>>);
     static_assert(std::is_same_v<iterator::reference, std::pair<std::size_t, std::size_t>>);
 
-    entt::adjacency_matrix adjacency_matrix{3u};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
 
     adjacency_matrix.insert(0u, 1u);
     adjacency_matrix.insert(0u, 2u);
@@ -214,7 +257,7 @@ TEST(AdjacencyMatrix, EdgeIterator) {
 }
 
 TEST(AdjacencyMatrix, Vertices) {
-    entt::adjacency_matrix adjacency_matrix{};
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{};
     auto iterable = adjacency_matrix.vertices();
 
     ASSERT_EQ(adjacency_matrix.size(), 0u);
@@ -233,8 +276,8 @@ TEST(AdjacencyMatrix, Vertices) {
     ASSERT_EQ(++it, iterable.end());
 }
 
-TEST(AdjacencyMatrix, Edges) {
-    entt::adjacency_matrix adjacency_matrix{3u};
+TEST(AdjacencyMatrix, EdgesDirected) {
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
     auto iterable = adjacency_matrix.edges();
 
     ASSERT_EQ(iterable.begin(), iterable.end());
@@ -252,8 +295,30 @@ TEST(AdjacencyMatrix, Edges) {
     ASSERT_EQ(++it, iterable.end());
 }
 
-TEST(AdjacencyMatrix, OutEdges) {
-    entt::adjacency_matrix adjacency_matrix{3u};
+TEST(AdjacencyMatrix, EdgesUndirected) {
+    entt::adjacency_matrix<entt::undirected_tag> adjacency_matrix{3u};
+    auto iterable = adjacency_matrix.edges();
+
+    ASSERT_EQ(iterable.begin(), iterable.end());
+
+    adjacency_matrix.insert(0u, 1u);
+    adjacency_matrix.insert(1u, 2u);
+    iterable = adjacency_matrix.edges();
+
+    ASSERT_NE(iterable.begin(), iterable.end());
+
+    auto it = iterable.begin();
+
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{1u}));
+    ASSERT_EQ(*it.operator->(), std::make_pair(std::size_t{1u}, std::size_t{0u}));
+    ASSERT_EQ(*(++it).operator->(), std::make_pair(std::size_t{1u}, std::size_t{2u}));
+    ASSERT_EQ(*++it, std::make_pair(std::size_t{2u}, std::size_t{1u}));
+
+    ASSERT_EQ(++it, iterable.end());
+}
+
+TEST(AdjacencyMatrix, OutEdgesDirected) {
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
     auto iterable = adjacency_matrix.out_edges(0u);
 
     ASSERT_EQ(iterable.begin(), iterable.end());
@@ -268,10 +333,40 @@ TEST(AdjacencyMatrix, OutEdges) {
 
     ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{1u}));
     ASSERT_EQ(it, iterable.end());
+
+    iterable = adjacency_matrix.out_edges(2u);
+    it = iterable.cbegin();
+
+    ASSERT_EQ(it, iterable.cend());
 }
 
-TEST(AdjacencyMatrix, InEdges) {
-    entt::adjacency_matrix adjacency_matrix{3u};
+TEST(AdjacencyMatrix, OutEdgesUndirected) {
+    entt::adjacency_matrix<entt::undirected_tag> adjacency_matrix{3u};
+    auto iterable = adjacency_matrix.out_edges(0u);
+
+    ASSERT_EQ(iterable.begin(), iterable.end());
+
+    adjacency_matrix.insert(0u, 1u);
+    adjacency_matrix.insert(1u, 2u);
+    iterable = adjacency_matrix.out_edges(0u);
+
+    ASSERT_NE(iterable.begin(), iterable.end());
+
+    auto it = iterable.begin();
+
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{1u}));
+    ASSERT_EQ(it, iterable.end());
+
+    iterable = adjacency_matrix.out_edges(2u);
+    it = iterable.cbegin();
+
+    ASSERT_NE(it, iterable.cend());
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{2u}, std::size_t{1u}));
+    ASSERT_EQ(it, iterable.cend());
+}
+
+TEST(AdjacencyMatrix, InEdgesDirected) {
+    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
     auto iterable = adjacency_matrix.in_edges(1u);
 
     ASSERT_EQ(iterable.begin(), iterable.end());
@@ -286,13 +381,43 @@ TEST(AdjacencyMatrix, InEdges) {
 
     ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{1u}));
     ASSERT_EQ(it, iterable.end());
+
+    iterable = adjacency_matrix.in_edges(0u);
+    it = iterable.cbegin();
+
+    ASSERT_EQ(it, iterable.cend());
+}
+
+TEST(AdjacencyMatrix, InEdgesUndirected) {
+    entt::adjacency_matrix<entt::undirected_tag> adjacency_matrix{3u};
+    auto iterable = adjacency_matrix.in_edges(1u);
+
+    ASSERT_EQ(iterable.begin(), iterable.end());
+
+    adjacency_matrix.insert(0u, 1u);
+    adjacency_matrix.insert(1u, 2u);
+    iterable = adjacency_matrix.in_edges(1u);
+
+    ASSERT_NE(iterable.begin(), iterable.end());
+
+    auto it = iterable.begin();
+
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{0u}, std::size_t{1u}));
+    ASSERT_EQ(it, iterable.end());
+
+    iterable = adjacency_matrix.in_edges(0u);
+    it = iterable.cbegin();
+
+    ASSERT_NE(it, iterable.cend());
+    ASSERT_EQ(*it++, std::make_pair(std::size_t{1u}, std::size_t{0u}));
+    ASSERT_EQ(it, iterable.cend());
 }
 
 TEST(AdjacencyMatrix, ThrowingAllocator) {
     using allocator = test::throwing_allocator<std::size_t>;
     using exception = typename allocator::exception_type;
 
-    entt::basic_adjacency_matrix<allocator> adjacency_matrix{2u};
+    entt::adjacency_matrix<entt::directed_tag, allocator> adjacency_matrix{2u};
     adjacency_matrix.insert(0u, 1u);
 
     allocator::trigger_on_allocate = true;
