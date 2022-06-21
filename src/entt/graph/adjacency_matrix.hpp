@@ -21,7 +21,7 @@ namespace entt {
 namespace internal {
 
 template<typename It>
-class row_edge_iterator {
+class edge_iterator {
     using size_type = std::size_t;
 
 public:
@@ -31,27 +31,29 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    constexpr row_edge_iterator() noexcept
+    constexpr edge_iterator() noexcept
         : it{},
           vert{},
           pos{},
-          last{} {}
+          last{},
+          offset{} {}
 
-    constexpr row_edge_iterator(It base, const size_type vertices, const size_type from, const size_type to) noexcept
+    constexpr edge_iterator(It base, const size_type vertices, const size_type from, const size_type to, const size_type step) noexcept
         : it{std::move(base)},
           vert{vertices},
           pos{from},
-          last{to} {
-        for(; pos != last && !it[pos]; ++pos) {}
+          last{to},
+          offset{step} {
+        for(; pos != last && !it[pos]; pos += offset) {}
     }
 
-    constexpr row_edge_iterator &operator++() noexcept {
-        for(++pos; pos != last && !it[pos]; ++pos) {}
+    constexpr edge_iterator &operator++() noexcept {
+        for(pos += offset; pos != last && !it[pos]; pos += offset) {}
         return *this;
     }
 
-    constexpr row_edge_iterator operator++(int) noexcept {
-        row_edge_iterator orig = *this;
+    constexpr edge_iterator operator++(int) noexcept {
+        edge_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -64,85 +66,23 @@ public:
     }
 
     template<typename Type>
-    friend constexpr bool operator==(const row_edge_iterator<Type> &, const row_edge_iterator<Type> &) noexcept;
+    friend constexpr bool operator==(const edge_iterator<Type> &, const edge_iterator<Type> &) noexcept;
 
 private:
     It it;
     size_type vert;
     size_type pos;
     size_type last;
+    size_type offset{};
 };
 
 template<typename Container>
-[[nodiscard]] inline constexpr bool operator==(const row_edge_iterator<Container> &lhs, const row_edge_iterator<Container> &rhs) noexcept {
+[[nodiscard]] inline constexpr bool operator==(const edge_iterator<Container> &lhs, const edge_iterator<Container> &rhs) noexcept {
     return lhs.pos == rhs.pos;
 }
 
 template<typename Container>
-[[nodiscard]] inline constexpr bool operator!=(const row_edge_iterator<Container> &lhs, const row_edge_iterator<Container> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-template<typename It>
-class col_edge_iterator {
-    using size_type = std::size_t;
-
-public:
-    using value_type = std::pair<size_type, size_type>;
-    using pointer = input_iterator_pointer<value_type>;
-    using reference = value_type;
-    using difference_type = std::ptrdiff_t;
-    using iterator_category = std::input_iterator_tag;
-
-    constexpr col_edge_iterator() noexcept
-        : it{},
-          vert{},
-          pos{},
-          last{} {}
-
-    constexpr col_edge_iterator(It base, const size_type vertices, const size_type from, const size_type to) noexcept
-        : it{std::move(base)},
-          vert{vertices},
-          pos{from},
-          last{to} {
-        for(; pos != last && !it[pos]; pos += vert) {}
-    }
-
-    constexpr col_edge_iterator &operator++() noexcept {
-        for(pos += vert; pos != last && !it[pos]; pos += vert) {}
-        return *this;
-    }
-
-    constexpr col_edge_iterator operator++(int) noexcept {
-        col_edge_iterator orig = *this;
-        return ++(*this), orig;
-    }
-
-    [[nodiscard]] constexpr reference operator*() const noexcept {
-        return *operator->();
-    }
-
-    [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::make_pair<size_type>(pos / vert, pos % vert);
-    }
-
-    template<typename Type>
-    friend constexpr bool operator==(const col_edge_iterator<Type> &, const col_edge_iterator<Type> &) noexcept;
-
-private:
-    It it;
-    size_type vert;
-    size_type pos;
-    size_type last;
-};
-
-template<typename Container>
-[[nodiscard]] inline constexpr bool operator==(const col_edge_iterator<Container> &lhs, const col_edge_iterator<Container> &rhs) noexcept {
-    return lhs.pos == rhs.pos;
-}
-
-template<typename Container>
-[[nodiscard]] inline constexpr bool operator!=(const col_edge_iterator<Container> &lhs, const col_edge_iterator<Container> &rhs) noexcept {
+[[nodiscard]] inline constexpr bool operator!=(const edge_iterator<Container> &lhs, const edge_iterator<Container> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
@@ -177,11 +117,11 @@ public:
     /*! @brief Vertex iterator type. */
     using vertex_iterator = iota_iterator<vertex_type>;
     /*! @brief Edge iterator type. */
-    using edge_iterator = internal::row_edge_iterator<typename container_type::const_iterator>;
+    using edge_iterator = internal::edge_iterator<typename container_type::const_iterator>;
     /*! @brief Out edge iterator type. */
-    using out_edge_iterator = internal::row_edge_iterator<typename container_type::const_iterator>;
+    using out_edge_iterator = edge_iterator;
     /*! @brief In edge iterator type. */
-    using in_edge_iterator = internal::col_edge_iterator<typename container_type::const_iterator>;
+    using in_edge_iterator = edge_iterator;
     /*! @brieg Graph category tag. */
     using graph_category = Category;
 
@@ -307,7 +247,7 @@ public:
     [[nodiscard]] iterable_adaptor<edge_iterator> edges() const noexcept {
         const auto it = matrix.cbegin();
         const auto sz = matrix.size();
-        return {{it, vert, 0u, sz}, {it, vert, sz, sz}};
+        return {{it, vert, 0u, sz, 1u}, {it, vert, sz, sz, 1u}};
     }
 
     /**
@@ -319,7 +259,7 @@ public:
         const auto it = matrix.cbegin();
         const auto from = vertex * vert;
         const auto to = vertex * vert + vert;
-        return {{it, vert, from, to}, {it, vert, to, to}};
+        return {{it, vert, from, to, 1u}, {it, vert, to, to, 1u}};
     }
 
     /**
@@ -331,7 +271,7 @@ public:
         const auto it = matrix.cbegin();
         const auto from = vertex;
         const auto to = vert * (vert - 1u) + vertex;
-        return {{it, vert, from, to}, {it, vert, to, to}};
+        return {{it, vert, from, to, vert}, {it, vert, to, to, vert}};
     }
 
     /**
@@ -366,7 +306,7 @@ public:
         }
 
         const auto inserted = !std::exchange(matrix[pos], 1u);
-        return {edge_iterator{matrix.cbegin(), vert, pos, matrix.size()}, inserted};
+        return {edge_iterator{matrix.cbegin(), vert, pos, matrix.size(), 1u}, inserted};
     }
 
     /**

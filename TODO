@@ -13,8 +13,6 @@ DOC:
 * update entity doc when the storage based model is in place
 
 WIP:
-* refine graph iterators a little
-* add directed/undirected support to dot
 * dense_map/set and registry: move ctor/op should be noexcept (op is conditionally noexcept though)
 * "replace" organizer with flow
 * add storage getter for filters to views and groups
