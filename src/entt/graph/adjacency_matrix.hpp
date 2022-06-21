@@ -274,7 +274,7 @@ public:
      * @brief Exchanges the contents with those of a given adjacency matrix.
      * @param other Adjacency matrix to exchange the content with.
      */
-    void swap(adjacency_matrix &other) {
+    void swap(basic_adjacency_matrix &other) {
         using std::swap;
         swap(matrix, other.matrix);
         swap(vert, other.vert);
@@ -335,8 +335,13 @@ public:
      * @param vertices The new number of vertices.
      */
     void resize(const size_type vertices) {
-        matrix.resize(vertices * vertices);
-        vert = vertices;
+        basic_adjacency_matrix other{vertices, get_allocator()};
+
+        for(auto [lhs, rhs]: edges()) {
+            other.insert(lhs, rhs);
+        }
+
+        other.swap(*this);
     }
 
     /**

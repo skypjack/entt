@@ -6,15 +6,15 @@
 
 TEST(AdjacencyMatrix, Resize) {
     entt::adjacency_matrix adjacency_matrix{2};
-    adjacency_matrix.insert(0u, 1u);
+    adjacency_matrix.insert(1u, 0u);
 
     ASSERT_EQ(adjacency_matrix.size(), 2u);
-    ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_TRUE(adjacency_matrix.contains(1u, 0u));
 
     adjacency_matrix.resize(3u);
 
     ASSERT_EQ(adjacency_matrix.size(), 3u);
-    ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_TRUE(adjacency_matrix.contains(1u, 0u));
 }
 
 TEST(AdjacencyMatrix, Constructors) {
