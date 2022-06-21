@@ -220,6 +220,7 @@ SETUP_BASIC_TEST(view entt/entity/view.cpp)
 # Test graph
 
 SETUP_BASIC_TEST(adjacency_matrix entt/graph/adjacency_matrix.cpp)
+SETUP_BASIC_TEST(dot entt/graph/dot.cpp)
 SETUP_BASIC_TEST(flow entt/graph/flow.cpp)
 
 # Test locator

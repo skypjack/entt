@@ -33,6 +33,7 @@
 #include "entity/storage.hpp"
 #include "entity/view.hpp"
 #include "graph/adjacency_matrix.hpp"
+#include "graph/dot.hpp"
 #include "graph/flow.hpp"
 #include "locator/locator.hpp"
 #include "meta/adl_pointer.hpp"
