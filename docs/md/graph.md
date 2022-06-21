@@ -8,6 +8,7 @@
 * [Introduction](#introduction)
 * [Data structures](#data-structures)
   * [Adjacency matrix](#adjacency-matrix)
+  * [Dot](#dot)
 * [Flow builder](#flow-builder)
   * [Tasks and resources](#tasks-and-resources)
   * [Fake resources and order of execution](#fake-resources-and-order-of-execution)
@@ -37,7 +38,15 @@ development and support of some tools which are also part of the same submodule.
 
 ## Adjacency matrix
 
-The adjacency matrix is (for now) designed to represent a directed graph.<br/>
+The adjacency matrix is designed to represent either a directed or an undirected
+graph:
+
+```cpp
+entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{};
+```
+
+The `directed_tag` type _creates_ the graph as directed. There is also an
+`undirected_tag` counterpart which creates it as undirected.<br/>
 The interface deviates slightly from the typical double indexing of C and offers
 an API that is perhaps more familiar to a C++ programmer. Therefore, the access
 and modification of an element will take place via the `contains`, `insert` and
@@ -61,7 +70,7 @@ An adjacency matrix must be initialized with the number of elements (vertices)
 when constructing it but can also be resized later using the `resize` function:
 
 ```cpp
-entt::adjacency_matrix adjacency_matrix{3u};
+entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
 ```
 
 To visit all vertices, the class offers a function named `vertices` that returns
@@ -107,6 +116,32 @@ return the in- or out-edges for) as an argument.<br/>
 Finally, the adjacency matrix is an allocator-aware container and offers most of
 the functionality one would expect from this type of containers, such as `clear`
 or 'get_allocator` and so on.
+
+## Dot
+
+As it's one of the most popular formats, the library offers minimal support for
+converting a graph to a dot plot.<br/>
+The simplest way is to pass both an output stream and a graph to the `dot`
+function:
+
+```cpp
+std::ostringstream output{};
+entt::dot(output, adjacency_matrix);
+```
+
+However, there is also the option of providing a callback to which the vertices
+are passed and which can be used to add (dot) properties to the output from time
+to time:
+
+```cpp
+std::ostringstream output{};
+entt::dot(output, adjacency_matrix, [](auto &output, auto vertex) {
+	out << "label=\"v\"" << vertex << ",shape=\"box\"";
+});
+```
+
+This second mode is particularly convenient when the user wants to associate
+data managed externally to the graph being converted.
 
 # Flow builder
 
