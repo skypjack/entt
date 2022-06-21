@@ -161,7 +161,7 @@ template<typename Container>
 template<typename Category, typename Allocator>
 class adjacency_matrix {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_base_of_v<undirected_tag, Category>, "Invalid graph category");
+    static_assert(std::is_base_of_v<directed_tag, Category>, "Invalid graph category");
     static_assert(std::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");
     using container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
 

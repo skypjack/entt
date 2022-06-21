@@ -8,10 +8,10 @@
 namespace entt {
 
 /*! @brief Undirected graph category tag. */
-struct undirected_tag {};
+struct directed_tag {};
 
 /*! @brief Directed graph category tag. */
-struct directed_tag: undirected_tag {};
+struct undirected_tag: directed_tag {};
 
 template<typename, typename = std::allocator<std::size_t>>
 class adjacency_matrix;

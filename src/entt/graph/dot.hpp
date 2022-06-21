@@ -2,6 +2,7 @@
 #define ENTT_GRAPH_DOT_HPP
 
 #include <ostream>
+#include <type_traits>
 #include "adjacency_matrix.hpp"
 
 namespace entt {
@@ -16,7 +17,13 @@ namespace entt {
  */
 template<typename Graph, typename Writer>
 void dot(std::ostream &out, const Graph &graph, Writer writer) {
-    out << "digraph{";
+    static_assert(std::is_base_of_v<directed_tag, typename Graph::graph_category>, "Invalid graph category");
+
+    if constexpr(std::is_same_v<typename Graph::graph_category, undirected_tag>) {
+        out << "graph{";
+    } else {
+        out << "digraph{";
+    }
 
     for(auto &&vertex: graph.vertices()) {
         out << vertex << "[";
@@ -25,7 +32,11 @@ void dot(std::ostream &out, const Graph &graph, Writer writer) {
     }
 
     for(auto [lhs, rhs]: graph.edges()) {
-        out << lhs << "->" << rhs << ";";
+        if constexpr(std::is_same_v<typename Graph::graph_category, undirected_tag>) {
+            out << lhs << "--" << rhs << ";";
+        } else {
+            out << lhs << "->" << rhs << ";";
+        }
     }
 
     out << "}";
