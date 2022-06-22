@@ -280,7 +280,7 @@ purpose of this tool is to generate an execution graph that takes into account
 all specified constraints to return the best scheduling for the vertices:
 
 ```cpp
-entt::adjacency_matrix graph = builder.graph();
+entt::adjacency_matrix<entt::directed_tag> graph = builder.graph();
 ```
 
 The search for the main vertices, that is those without in-edges, is usually the
