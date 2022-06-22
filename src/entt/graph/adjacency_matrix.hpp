@@ -122,7 +122,7 @@ public:
     using out_edge_iterator = edge_iterator;
     /*! @brief In edge iterator type. */
     using in_edge_iterator = edge_iterator;
-    /*! @brieg Graph category tag. */
+    /*! @brief Graph category tag. */
     using graph_category = Category;
 
     /*! @brief Default constructor. */
