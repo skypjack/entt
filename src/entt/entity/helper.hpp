@@ -16,7 +16,13 @@ namespace entt {
  * @tparam Registry Basic registry type.
  */
 template<typename Registry>
-struct as_view {
+class as_view {
+    template<typename... Get, typename... Exclude>
+    auto dispatch(get_t<Get...>, exclude_t<Exclude...>) const {
+        return reg.template view<constness_as_t<typename Get::value_type, Get>...>(exclude_t<constness_as_t<typename Exclude::value_type, Exclude>...>{});
+    }
+
+public:
     /*! @brief Type of registry to convert. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
@@ -31,13 +37,13 @@ struct as_view {
 
     /**
      * @brief Conversion function from a registry to a view.
-     * @tparam Exclude Types of components used to filter the view.
-     * @tparam Component Type of components used to construct the view.
+     * @tparam Get Type of storage used to construct the view.
+     * @tparam Exclude Types of storage used to filter the view.
      * @return A newly created view.
      */
-    template<typename Exclude, typename... Component>
-    operator basic_view<entity_type, get_t<Component...>, Exclude>() const {
-        return reg.template view<Component...>(Exclude{});
+    template<typename Get, typename Exclude>
+    operator basic_view<Get, Exclude>() const {
+        return dispatch(Get{}, Exclude{});
     }
 
 private:

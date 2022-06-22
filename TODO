@@ -13,12 +13,12 @@ DOC:
 * update entity doc when the storage based model is in place
 
 WIP:
+* get rid of observers, storage based views made them pointless - document alternatives
 * dense_map/set and registry: move ctor/op should be noexcept (op is conditionally noexcept though)
 * "replace" organizer with flow
 * add storage getter for filters to views and groups
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
 * emitter: runtime handlers, allocator support (ready for both already)
-* view: no storage_traits dependency -> use storage instead of components for the definition
 * basic_storage::bind for cross-registry setups (see and remove todo from entity_copy.cpp)
 * uses-allocator construction: any (with allocator support), poly, ...
 * process scheduler: reviews, use free lists internally
@@ -29,5 +29,4 @@ WIP:
 * add test for maximum number of entities reached
 * add user data to type_info
 * make runtime views use opaque storage and therefore return also elements.
-* entity-aware observer, add observer functions aside observer class
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views

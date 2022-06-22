@@ -25,8 +25,8 @@ namespace internal {
 template<typename>
 struct is_view: std::false_type {};
 
-template<typename Entity, typename... Component, typename... Exclude>
-struct is_view<basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>>>: std::true_type {};
+template<typename... Get, typename... Exclude>
+struct is_view<basic_view<get_t<Get...>, exclude_t<Exclude...>>>: std::true_type {};
 
 template<typename Type>
 inline constexpr bool is_view_v = is_view<Type>::value;
@@ -54,15 +54,15 @@ template<typename... Args, typename... Override>
 struct unpack_type<const basic_registry<Args...>, type_list<Override...>>
     : unpack_type<basic_registry<Args...>, type_list<Override...>> {};
 
-template<typename Entity, typename... Component, typename... Exclude, typename... Override>
-struct unpack_type<basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>>, type_list<Override...>> {
-    using ro = type_list_cat_t<type_list<Exclude...>, typename unpack_type<Component, type_list<Override...>>::ro...>;
-    using rw = type_list_cat_t<typename unpack_type<Component, type_list<Override...>>::rw...>;
+template<typename... Get, typename... Exclude, typename... Override>
+struct unpack_type<basic_view<get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>> {
+    using ro = type_list_cat_t<type_list<typename Exclude::value_type...>, typename unpack_type<constness_as_t<typename Get::value_type, Get>, type_list<Override...>>::ro...>;
+    using rw = type_list_cat_t<typename unpack_type<constness_as_t<typename Get::value_type, Get>, type_list<Override...>>::rw...>;
 };
 
-template<typename Entity, typename... Component, typename... Exclude, typename... Override>
-struct unpack_type<const basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>>, type_list<Override...>>
-    : unpack_type<basic_view<Entity, get_t<Component...>, exclude_t<Exclude...>>, type_list<Override...>> {};
+template<typename... Get, typename... Exclude, typename... Override>
+struct unpack_type<const basic_view<get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>>
+    : unpack_type<basic_view<get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>> {};
 
 template<typename, typename>
 struct resource_traits;

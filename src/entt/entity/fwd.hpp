@@ -28,7 +28,7 @@ class sigh_storage_mixin;
 template<typename = entity>
 class basic_registry;
 
-template<typename, typename, typename, typename = void>
+template<typename, typename, typename = void>
 class basic_view;
 
 template<typename>
@@ -147,11 +147,11 @@ using continuous_loader = basic_continuous_loader<registry>;
 
 /**
  * @brief Alias declaration for the most common use case.
- * @tparam Get Types of components iterated by the view.
- * @tparam Exclude Types of components used to filter the view.
+ * @tparam Get Types of storage iterated by the view.
+ * @tparam Exclude Types of storage used to filter the view.
  */
 template<typename Get, typename Exclude = exclude_t<>>
-using view = basic_view<entity, Get, Exclude>;
+using view = basic_view<type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
 
 /*! @brief Alias declaration for the most common use case. */
 using runtime_view = basic_runtime_view<sparse_set>;
