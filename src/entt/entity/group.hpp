@@ -172,7 +172,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<index_of<Type>>(pools);
+        return storage<index_of<Type>>();
     }
 
     /**
@@ -560,7 +560,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<index_of<Type>>(pools);
+        return storage<index_of<Type>>();
     }
 
     /**
