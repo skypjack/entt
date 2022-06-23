@@ -70,6 +70,20 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(SingleComponentView, Constructors) {
+    entt::storage<int> storage{};
+
+    entt::view<entt::get_t<int>> invalid{};
+    entt::basic_view from_storage{storage};
+    entt::basic_view from_tuple{std::forward_as_tuple(storage)};
+
+    ASSERT_FALSE(invalid);
+    ASSERT_TRUE(from_storage);
+    ASSERT_TRUE(from_tuple);
+
+    ASSERT_EQ(&from_storage.handle(), &from_tuple.handle());
+}
+
 TEST(SingleComponentView, Handle) {
     entt::registry registry;
     const auto entity = registry.create();
@@ -516,6 +530,20 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
     ASSERT_FALSE(invalid);
+}
+
+TEST(MultiComponentView, Constructors) {
+    entt::storage<int> storage{};
+
+    entt::view<entt::get_t<int, int>> invalid{};
+    entt::basic_view from_storage{storage, storage};
+    entt::basic_view from_tuple{std::forward_as_tuple(storage, storage)};
+
+    ASSERT_FALSE(invalid);
+    ASSERT_TRUE(from_storage);
+    ASSERT_TRUE(from_tuple);
+
+    ASSERT_EQ(&from_storage.handle(), &from_tuple.handle());
 }
 
 TEST(MultiComponentView, Handle) {
