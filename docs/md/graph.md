@@ -54,9 +54,9 @@ and modification of an element will take place via the `contains`, `insert` and
 
 ```cpp
 if(adjacency_matrix.contains(0u, 1u)) {
-	adjacency_matrix.erase(0u, 1u);
+    adjacency_matrix.erase(0u, 1u);
 } else {
-	adjacency_matrix.insert(0u, 1u);
+    adjacency_matrix.insert(0u, 1u);
 }
 ```
 
@@ -78,7 +78,7 @@ an iterable object suitable for the purpose:
 
 ```cpp
 for(auto &&vertex: adjacency_matrix.vertices()) {
-	// ...
+    // ...
 }
 ```
 
@@ -87,7 +87,7 @@ vertices are unsigned integral values:
 
 ```cpp
 for(auto last = adjacency_matrix.size(), pos = {}; pos < last; ++pos) {
-	// ...
+    // ...
 }
 ```
 
@@ -98,7 +98,7 @@ pairs of vertices:
 
 ```cpp
 for(auto [lhs, rhs]: adjacency_matrix.edges()) {
-	// ...
+    // ...
 }
 ```
 
@@ -107,7 +107,7 @@ vertex, the `in_edges` and `out_edges` functions are meant for that:
 
 ```cpp
 for(auto [lhs, rhs]: adjacency_matrix.out_edges(3u)) {
-	// ...
+    // ...
 }
 ```
 
@@ -136,7 +136,7 @@ to time:
 ```cpp
 std::ostringstream output{};
 entt::dot(output, adjacency_matrix, [](auto &output, auto vertex) {
-	out << "label=\"v\"" << vertex << ",shape=\"box\"";
+    out << "label=\"v\"" << vertex << ",shape=\"box\"";
 });
 ```
 
@@ -195,10 +195,10 @@ read-only or read-write resources, as appropriate:
 ```cpp
 builder
     .bind("task_1"_hs)
-		.ro("resource_1"_hs)
-		.ro("resource_2"_hs)
+        .ro("resource_1"_hs)
+        .ro("resource_2"_hs)
     .bind("task_2"_hs)
-		.rw("resource_2"_hs)
+        .rw("resource_2"_hs)
 ```
 
 As mentioned, many functions return the builder itself and it's therefore easy
@@ -225,14 +225,14 @@ the order execution:
 ```cpp
 builder
     .bind("task_1"_hs)
-		.ro("resource_1"_hs)
-		.rw("fake"_hs)
+        .ro("resource_1"_hs)
+        .rw("fake"_hs)
     .bind("task_2"_hs)
-		.ro("resource_2"_hs)
-		.ro("fake"_hs)
+        .ro("resource_2"_hs)
+        .ro("fake"_hs)
     .bind("task_3"_hs)
-		.ro("resource_2"_hs)
-		.ro("fake"_hs)
+        .ro("resource_2"_hs)
+        .ro("fake"_hs)
 ```
 
 This snippet forces the execution of `task_2` and `task_3` **after** `task_1`.
@@ -243,14 +243,14 @@ Similarly, it's possible to force a task to run after a certain group:
 ```cpp
 builder
     .bind("task_1"_hs)
-		.ro("resource_1"_hs)
-		.ro("fake"_hs)
+        .ro("resource_1"_hs)
+        .ro("fake"_hs)
     .bind("task_2"_hs)
-		.ro("resource_1"_hs)
-		.ro("fake"_hs)
+        .ro("resource_1"_hs)
+        .ro("fake"_hs)
     .bind("task_3"_hs)
-		.ro("resource_2"_hs)
-		.rw("fake"_hs)
+        .ro("resource_2"_hs)
+        .rw("fake"_hs)
 ```
 
 In this case, since there are a number of processes that want to read a specific
@@ -288,9 +288,9 @@ first thing required:
 
 ```cpp
 for(auto &&vertex: graph) {
-	if(auto in_edges = graph.in_edges(vertex); in_edges.begin() == in_edges.end()) {
-		// ...
-	}
+    if(auto in_edges = graph.in_edges(vertex); in_edges.begin() == in_edges.end()) {
+        // ...
+    }
 }
 ```
 
