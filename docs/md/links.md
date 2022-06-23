@@ -98,6 +98,8 @@ I hope this list can grow much more in the future:
     game with some fluid dynamics.
   * [Crimson Rush](https://github.com/WilKam01/LuaCGame): a dungeon-crawler and
     rougelike inspired game about exploring and surviving as long as possible.
+  * [Space Fight](https://github.com/cholushkin/SpaceFight): one screen
+    multi-player arcade shooter game prototype.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
