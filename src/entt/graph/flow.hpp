@@ -117,7 +117,7 @@ public:
      * @param pos Position of the identifier to return.
      * @return The requested identifier.
      */
-    id_type operator[](const size_type pos) const {
+    [[nodiscard]] id_type operator[](const size_type pos) const {
         return vertices.cbegin()[pos];
     }
 
@@ -233,7 +233,7 @@ public:
      * @brief Generates a task graph for the current content.
      * @return The adjacency matrix of the task graph.
      */
-    adjacency_matrix<directed_tag> graph() const {
+    [[nodiscard]] adjacency_matrix<directed_tag> graph() const {
         const auto length = vertices.size();
         adjacency_matrix<directed_tag> matrix{length};
 
