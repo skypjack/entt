@@ -265,7 +265,7 @@ assigning this role to a vertex is always the same: first it's tied to the flow
 builder, then the `sync` function is invoked:
 
 ```cpp
-builder.bind("sync_point").sync();
+builder.bind("sync_point"_hs).sync();
 ```
 
 The choice to assign an _identity_ to this type of nodes lies in the fact that,
