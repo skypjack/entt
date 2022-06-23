@@ -164,7 +164,7 @@ public:
      * @brief Turns the current task into a sync point.
      * @return This flow builder.
      */
-    basic_flow& sync() {
+    basic_flow &sync() {
         ENTT_ASSERT(index.first() < vertices.size(), "Invalid node");
         sync_on = index.first();
 
