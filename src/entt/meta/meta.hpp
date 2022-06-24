@@ -934,14 +934,14 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
-    template<auto Member, typename Pred>
-    [[nodiscard]] std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Pred pred) const {
+    template<auto Member, typename... Check>
+    [[nodiscard]] std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Check... check) const {
         std::decay_t<decltype(node->*Member)> candidate{};
         size_type extent{sz + 1u};
         bool ambiguous{};
 
         for(auto *curr = (node->*Member); curr; curr = curr->next) {
-            if(pred(curr) && curr->arity == sz) {
+            if(((curr->id == check) && ... && (curr->arity == sz))) {
                 size_type direct{};
                 size_type ext{};
 
@@ -1216,7 +1216,7 @@ public:
      * @return A wrapper containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any *const args, const size_type sz) const {
-        const auto *candidate = lookup<&node_type::ctor>(args, sz, [](const auto *) { return true; });
+        const auto *candidate = lookup<&node_type::ctor>(args, sz);
         return candidate ? candidate->invoke(args) : ((!sz && node->default_constructor) ? node->default_constructor() : meta_any{});
     }
 
@@ -1250,10 +1250,10 @@ public:
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
-        const auto *candidate = lookup<&node_type::func>(args, sz, [id](const auto *curr) { return curr->id == id; });
+        const auto *candidate = lookup<&node_type::func>(args, sz, id);
 
         for(auto it = base().begin(), last = base().end(); it != last && !candidate; ++it) {
-            candidate = it->lookup<&node_type::func>(args, sz, [id](const auto *curr) { return curr->id == id; });
+            candidate = it->lookup<&node_type::func>(args, sz, id);
         }
 
         return candidate ? candidate->invoke(std::move(instance), args) : meta_any{};
