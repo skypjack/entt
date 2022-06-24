@@ -8,7 +8,7 @@
 * [Introduction](#introduction)
 * [Data structures](#data-structures)
   * [Adjacency matrix](#adjacency-matrix)
-  * [Dot](#dot)
+  * [Graphviz dot language](#graphviz-dot-language)
 * [Flow builder](#flow-builder)
   * [Tasks and resources](#tasks-and-resources)
   * [Fake resources and order of execution](#fake-resources-and-order-of-execution)
@@ -117,10 +117,10 @@ Finally, the adjacency matrix is an allocator-aware container and offers most of
 the functionality one would expect from this type of containers, such as `clear`
 or 'get_allocator` and so on.
 
-## Dot
+## Graphviz dot language
 
 As it's one of the most popular formats, the library offers minimal support for
-converting a graph to a dot plot.<br/>
+converting a graph to a Graphviz dot snippet.<br/>
 The simplest way is to pass both an output stream and a graph to the `dot`
 function:
 
@@ -130,8 +130,8 @@ entt::dot(output, adjacency_matrix);
 ```
 
 However, there is also the option of providing a callback to which the vertices
-are passed and which can be used to add (dot) properties to the output from time
-to time:
+are passed and which can be used to add (`dot`) properties to the output from
+time to time:
 
 ```cpp
 std::ostringstream output{};
