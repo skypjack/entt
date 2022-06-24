@@ -233,13 +233,13 @@ class basic_registry {
         static_assert(!std::disjunction_v<std::bool_constant<component_traits<Owned>::in_place_delete>...>, "Groups do not support in-place delete");
         std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t> current{};
 
-        template<typename Component>
+        template<typename Type>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
             [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
 
-            const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<storage_for_type<Owned> &>(cpools).contains(entt)) && ...)
-                                  && ((std::is_same_v<Component, Get> || owner.assure<Get>().contains(entt)) && ...)
-                                  && ((std::is_same_v<Component, Exclude> || !owner.assure<Exclude>().contains(entt)) && ...);
+            const auto is_valid = ((std::is_same_v<Type, Owned> || std::get<storage_for_type<Owned> &>(cpools).contains(entt)) && ...)
+                                  && ((std::is_same_v<Type, Get> || owner.assure<Get>().contains(entt)) && ...)
+                                  && ((std::is_same_v<Type, Exclude> || !owner.assure<Exclude>().contains(entt)) && ...);
 
             if constexpr(sizeof...(Owned) == 0) {
                 if(is_valid && !current.contains(entt)) {
@@ -273,30 +273,30 @@ class basic_registry {
         bool (*exclude)(const id_type) noexcept;
     };
 
-    template<typename Component>
-    [[nodiscard]] auto &assure(const id_type id = type_hash<Component>::value()) {
-        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
+    template<typename Type>
+    [[nodiscard]] auto &assure(const id_type id = type_hash<Type>::value()) {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
         auto &&cpool = pools[id];
 
         if(!cpool) {
-            cpool.reset(new storage_for_type<Component>{});
+            cpool.reset(new storage_for_type<Type>{});
             cpool->bind(forward_as_any(*this));
         }
 
-        ENTT_ASSERT(cpool->type() == type_id<Component>(), "Unexpected type");
-        return static_cast<storage_for_type<Component> &>(*cpool);
+        ENTT_ASSERT(cpool->type() == type_id<Type>(), "Unexpected type");
+        return static_cast<storage_for_type<Type> &>(*cpool);
     }
 
-    template<typename Component>
-    [[nodiscard]] const auto &assure(const id_type id = type_hash<Component>::value()) const {
-        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Non-decayed types not allowed");
+    template<typename Type>
+    [[nodiscard]] const auto &assure(const id_type id = type_hash<Type>::value()) const {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
 
         if(const auto it = pools.find(id); it != pools.cend()) {
-            ENTT_ASSERT(it->second->type() == type_id<Component>(), "Unexpected type");
-            return static_cast<const storage_for_type<Component> &>(*it->second);
+            ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
+            return static_cast<const storage_for_type<Type> &>(*it->second);
         }
 
-        static storage_for_type<Component> placeholder{};
+        static storage_for_type<Type> placeholder{};
         return placeholder;
     }
 
@@ -421,13 +421,13 @@ public:
 
     /**
      * @brief Returns the storage for a given component type.
-     * @tparam Component Type of component of which to return the storage.
+     * @tparam Type Type of component of which to return the storage.
      * @param id Optional name used to map the storage within the registry.
      * @return The storage for the given component type.
      */
-    template<typename Component>
-    decltype(auto) storage(const id_type id = type_hash<Component>::value()) {
-        return assure<Component>(id);
+    template<typename Type>
+    decltype(auto) storage(const id_type id = type_hash<Type>::value()) {
+        return assure<Type>(id);
     }
 
     /**
@@ -437,13 +437,13 @@ public:
      * If a storage for the given component doesn't exist yet, a temporary
      * placeholder is returned instead.
      *
-     * @tparam Component Type of component of which to return the storage.
+     * @tparam Type Type of component of which to return the storage.
      * @param id Optional name used to map the storage within the registry.
      * @return The storage for the given component type.
      */
-    template<typename Component>
-    decltype(auto) storage(const id_type id = type_hash<Component>::value()) const {
-        return assure<Component>(id);
+    template<typename Type>
+    decltype(auto) storage(const id_type id = type_hash<Type>::value()) const {
+        return assure<Type>(id);
     }
 
     /**
@@ -741,16 +741,16 @@ public:
      * Attempting to use an invalid entity or to assign a component to an entity
      * that already owns it results in undefined behavior.
      *
-     * @tparam Component Type of component to create.
+     * @tparam Type Type of component to create.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
-    template<typename Component, typename... Args>
+    template<typename Type, typename... Args>
     decltype(auto) emplace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Component>().emplace(entity, std::forward<Args>(args)...);
+        return assure<Type>().emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -758,16 +758,16 @@ public:
      *
      * @sa emplace
      *
-     * @tparam Component Type of component to create.
+     * @tparam Type Type of component to create.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the component to assign.
      */
-    template<typename Component, typename It>
-    void insert(It first, It last, const Component &value = {}) {
+    template<typename Type, typename It>
+    void insert(It first, It last, const Type &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-        assure<Component>().insert(first, last, value);
+        assure<Type>().insert(first, last, value);
     }
 
     /**
@@ -775,17 +775,17 @@ public:
      *
      * @sa emplace
      *
-     * @tparam Component Type of component to create.
+     * @tparam Type Type of component to create.
      * @tparam EIt Type of input iterator.
      * @tparam CIt Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of components.
      */
-    template<typename Component, typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, Component>>>
+    template<typename Type, typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, Type>>>
     void insert(EIt first, EIt last, CIt from) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-        assure<Component>().insert(first, last, from);
+        assure<Type>().insert(first, last, from);
     }
 
     /**
@@ -794,19 +794,19 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Type of component to assign or replace.
+     * @tparam Type Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
-    template<typename Component, typename... Args>
+    template<typename Type, typename... Args>
     decltype(auto) emplace_or_replace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        auto &cpool = assure<Component>();
+        auto &cpool = assure<Type>();
 
         return cpool.contains(entity)
-                   ? cpool.patch(entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); })
+                   ? cpool.patch(entity, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); })
                    : cpool.emplace(entity, std::forward<Args>(args)...);
     }
 
@@ -816,7 +816,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(Component &);
+     * void(Type &);
      * @endcode
      *
      * @note
@@ -828,16 +828,16 @@ public:
      * Attempting to use an invalid entity or to patch a component of an entity
      * that doesn't own it results in undefined behavior.
      *
-     * @tparam Component Type of component to patch.
+     * @tparam Type Type of component to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid identifier.
      * @param func Valid function objects.
      * @return A reference to the patched component.
      */
-    template<typename Component, typename... Func>
+    template<typename Type, typename... Func>
     decltype(auto) patch(const entity_type entity, Func &&...func) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Component>().patch(entity, std::forward<Func>(func)...);
+        return assure<Type>().patch(entity, std::forward<Func>(func)...);
     }
 
     /**
@@ -849,15 +849,15 @@ public:
      * Attempting to use an invalid entity or to replace a component of an
      * entity that doesn't own it results in undefined behavior.
      *
-     * @tparam Component Type of component to replace.
+     * @tparam Type Type of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the component being replaced.
      */
-    template<typename Component, typename... Args>
+    template<typename Type, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&...args) {
-        return patch<Component>(entity, [&args...](auto &...curr) { ((curr = Component{std::forward<Args>(args)...}), ...); });
+        return patch<Type>(entity, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); });
     }
 
     /**
@@ -866,15 +866,15 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Type of component to remove.
+     * @tparam Type Type of component to remove.
      * @tparam Other Other types of components to remove.
      * @param entity A valid identifier.
      * @return The number of components actually removed.
      */
-    template<typename Component, typename... Other>
+    template<typename Type, typename... Other>
     size_type remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<Component>().remove(entity) + ... + assure<Other>().remove(entity));
+        return (assure<Type>().remove(entity) + ... + assure<Other>().remove(entity));
     }
 
     /**
@@ -882,22 +882,22 @@ public:
      *
      * @sa remove
      *
-     * @tparam Component Type of component to remove.
+     * @tparam Type Type of component to remove.
      * @tparam Other Other types of components to remove.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @return The number of components actually removed.
      */
-    template<typename Component, typename... Other, typename It>
+    template<typename Type, typename... Other, typename It>
     size_type remove(It first, It last) {
         if constexpr(sizeof...(Other) == 0u) {
             ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-            return assure<Component>().remove(std::move(first), std::move(last));
+            return assure<Type>().remove(std::move(first), std::move(last));
         } else {
             size_type count{};
 
-            for(auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
+            for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
                 ENTT_ASSERT(valid(*first), "Invalid entity");
                 count += std::apply([entt = *first](auto &...curr) { return (curr.remove(entt) + ... + 0u); }, cpools);
             }
@@ -913,14 +913,14 @@ public:
      * Attempting to use an invalid entity or to erase a component from an
      * entity that doesn't own it results in undefined behavior.
      *
-     * @tparam Component Types of components to erase.
+     * @tparam Type Types of components to erase.
      * @tparam Other Other types of components to erase.
      * @param entity A valid identifier.
      */
-    template<typename Component, typename... Other>
+    template<typename Type, typename... Other>
     void erase(const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        (assure<Component>().erase(entity), (assure<Other>().erase(entity), ...));
+        (assure<Type>().erase(entity), (assure<Other>().erase(entity), ...));
     }
 
     /**
@@ -928,19 +928,19 @@ public:
      *
      * @sa erase
      *
-     * @tparam Component Types of components to erase.
+     * @tparam Type Types of components to erase.
      * @tparam Other Other types of components to erase.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename Component, typename... Other, typename It>
+    template<typename Type, typename... Other, typename It>
     void erase(It first, It last) {
         if constexpr(sizeof...(Other) == 0u) {
             ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
-            assure<Component>().erase(std::move(first), std::move(last));
+            assure<Type>().erase(std::move(first), std::move(last));
         } else {
-            for(auto cpools = std::forward_as_tuple(assure<Component>(), assure<Other>()...); first != last; ++first) {
+            for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
                 ENTT_ASSERT(valid(*first), "Invalid entity");
                 std::apply([entt = *first](auto &...curr) { (curr.erase(entt), ...); }, cpools);
             }
@@ -950,16 +950,16 @@ public:
     /**
      * @brief Removes all tombstones from a registry or only the pools for the
      * given components.
-     * @tparam Component Types of components for which to clear all tombstones.
+     * @tparam Type Types of components for which to clear all tombstones.
      */
-    template<typename... Component>
+    template<typename... Type>
     void compact() {
-        if constexpr(sizeof...(Component) == 0) {
+        if constexpr(sizeof...(Type) == 0) {
             for(auto &&curr: pools) {
                 curr.second->compact();
             }
         } else {
-            (assure<Component>().compact(), ...);
+            (assure<Type>().compact(), ...);
         }
     }
 
@@ -969,14 +969,14 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Components for which to perform the check.
+     * @tparam Type Components for which to perform the check.
      * @param entity A valid identifier.
      * @return True if the entity has all the components, false otherwise.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] bool all_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<std::remove_const_t<Component>>().contains(entity) && ...);
+        return (assure<std::remove_const_t<Type>>().contains(entity) && ...);
     }
 
     /**
@@ -985,15 +985,15 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Components for which to perform the check.
+     * @tparam Type Components for which to perform the check.
      * @param entity A valid identifier.
      * @return True if the entity has at least one of the given components,
      * false otherwise.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] bool any_of(const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<std::remove_const_t<Component>>().contains(entity) || ...);
+        return (assure<std::remove_const_t<Type>>().contains(entity) || ...);
     }
 
     /**
@@ -1003,21 +1003,21 @@ public:
      * Attempting to use an invalid entity or to get a component from an entity
      * that doesn't own it results in undefined behavior.
      *
-     * @tparam Component Types of components to get.
+     * @tparam Type Types of components to get.
      * @param entity A valid identifier.
      * @return References to the components owned by the entity.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return view<Component...>().template get<const Component...>(entity);
+        return view<Type...>().template get<const Type...>(entity);
     }
 
     /*! @copydoc get */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        return view<Component...>().template get<Component...>(entity);
+        return view<Type...>().template get<Type...>(entity);
     }
 
     /**
@@ -1029,16 +1029,16 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Type of component to get.
+     * @tparam Type Type of component to get.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return Reference to the component owned by the entity.
      */
-    template<typename Component, typename... Args>
+    template<typename Type, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entity, Args &&...args) {
         ENTT_ASSERT(valid(entity), "Invalid entity");
-        auto &cpool = assure<Component>();
+        auto &cpool = assure<Type>();
         return cpool.contains(entity) ? cpool.get(entity) : cpool.emplace(entity, std::forward<Args>(args)...);
     }
 
@@ -1051,46 +1051,46 @@ public:
      * @note
      * The registry retains ownership of the pointed-to components.
      *
-     * @tparam Component Types of components to get.
+     * @tparam Type Types of components to get.
      * @param entity A valid identifier.
      * @return Pointers to the components owned by the entity.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entity) const {
         ENTT_ASSERT(valid(entity), "Invalid entity");
 
-        if constexpr(sizeof...(Component) == 1) {
-            const auto &cpool = assure<std::remove_const_t<Component>...>();
+        if constexpr(sizeof...(Type) == 1) {
+            const auto &cpool = assure<std::remove_const_t<Type>...>();
             return cpool.contains(entity) ? std::addressof(cpool.get(entity)) : nullptr;
         } else {
-            return std::make_tuple(try_get<Component>(entity)...);
+            return std::make_tuple(try_get<Type>(entity)...);
         }
     }
 
     /*! @copydoc try_get */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entity) {
-        if constexpr(sizeof...(Component) == 1) {
-            return (const_cast<Component *>(std::as_const(*this).template try_get<Component>(entity)), ...);
+        if constexpr(sizeof...(Type) == 1) {
+            return (const_cast<Type *>(std::as_const(*this).template try_get<Type>(entity)), ...);
         } else {
-            return std::make_tuple(try_get<Component>(entity)...);
+            return std::make_tuple(try_get<Type>(entity)...);
         }
     }
 
     /**
      * @brief Clears a whole registry or the pools for the given components.
-     * @tparam Component Types of components to remove from their entities.
+     * @tparam Type Types of components to remove from their entities.
      */
-    template<typename... Component>
+    template<typename... Type>
     void clear() {
-        if constexpr(sizeof...(Component) == 0) {
+        if constexpr(sizeof...(Type) == 0) {
             for(auto &&curr: pools) {
                 curr.second->clear();
             }
 
             each([this](const auto entity) { this->release(entity); });
         } else {
-            (assure<Component>().clear(), ...);
+            (assure<Type>().clear(), ...);
         }
     }
 
@@ -1148,12 +1148,12 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Type Type of component of which to get the sink.
      * @return A temporary sink object.
      */
-    template<typename Component>
+    template<typename Type>
     [[nodiscard]] auto on_construct() {
-        return assure<Component>().on_construct();
+        return assure<Type>().on_construct();
     }
 
     /**
@@ -1171,12 +1171,12 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Type Type of component of which to get the sink.
      * @return A temporary sink object.
      */
-    template<typename Component>
+    template<typename Type>
     [[nodiscard]] auto on_update() {
-        return assure<Component>().on_update();
+        return assure<Type>().on_update();
     }
 
     /**
@@ -1194,12 +1194,12 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Type Type of component of which to get the sink.
      * @return A temporary sink object.
      */
-    template<typename Component>
+    template<typename Type>
     [[nodiscard]] auto on_destroy() {
-        return assure<Component>().on_destroy();
+        return assure<Type>().on_destroy();
     }
 
     /**
@@ -1210,22 +1210,22 @@ public:
      * Creating and destroying a view is an incredibly cheap operation. As a
      * rule of thumb, storing a view should never be an option.
      *
-     * @tparam Component Type of component used to construct the view.
+     * @tparam Type Type of component used to construct the view.
      * @tparam Other Other types of components used to construct the view.
      * @tparam Exclude Types of components used to filter the view.
      * @return A newly created view.
      */
-    template<typename Component, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_view<get_t<storage_for_type<const Component>, storage_for_type<const Other>...>, exclude_t<storage_for_type<const Exclude>...>>
+    template<typename Type, typename... Other, typename... Exclude>
+    [[nodiscard]] basic_view<get_t<storage_for_type<const Type>, storage_for_type<const Other>...>, exclude_t<storage_for_type<const Exclude>...>>
     view(exclude_t<Exclude...> = {}) const {
-        return {assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
+        return {assure<std::remove_const_t<Type>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
 
     /*! @copydoc view */
-    template<typename Component, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_view<get_t<storage_for_type<Component>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
+    template<typename Type, typename... Other, typename... Exclude>
+    [[nodiscard]] basic_view<get_t<storage_for_type<Type>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
     view(exclude_t<Exclude...> = {}) {
-        return {assure<std::remove_const_t<Component>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
+        return {assure<std::remove_const_t<Type>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
 
     /**
@@ -1359,9 +1359,9 @@ public:
      * @return True if the pools of the given components are _free_, false
      * otherwise.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] bool owned() const {
-        return std::any_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::remove_const_t<Component>>::value()) || ...); });
+        return std::any_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::remove_const_t<Type>>::value()) || ...); });
     }
 
     /**
@@ -1389,7 +1389,7 @@ public:
      *
      * @code{.cpp}
      * bool(const Entity, const Entity);
-     * bool(const Component &, const Component &);
+     * bool(const Type &, const Type &);
      * @endcode
      *
      * Moreover, it shall induce a _strict weak ordering_ on the values.<br/>
@@ -1405,7 +1405,7 @@ public:
      * @warning
      * Pools of components owned by a group cannot be sorted.
      *
-     * @tparam Component Type of components to sort.
+     * @tparam Type Type of components to sort.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -1413,10 +1413,10 @@ public:
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
-    template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
+    template<typename Type, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
-        ENTT_ASSERT(!owned<Component>(), "Cannot sort owned storage");
-        auto &cpool = assure<Component>();
+        ENTT_ASSERT(!owned<Type>(), "Cannot sort owned storage");
+        auto &cpool = assure<Type>();
 
         if constexpr(std::is_invocable_v<Compare, decltype(cpool.get({})), decltype(cpool.get({}))>) {
             auto comp = [&cpool, compare = std::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool.get(lhs)), std::as_const(cpool.get(rhs))); };
