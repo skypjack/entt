@@ -119,7 +119,7 @@ public:
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
     inline bool insert(meta_any, meta_any);
-    inline bool erase(meta_any);
+    inline size_type erase(meta_any);
     [[nodiscard]] inline iterator find(meta_any);
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
@@ -132,7 +132,7 @@ private:
     bool (*clear_fn)(any &) = nullptr;
     iterator (*iter_fn)(any &, const bool) = nullptr;
     bool (*insert_fn)(any &, meta_any &, meta_any &) = nullptr;
-    bool (*erase_fn)(any &, meta_any &) = nullptr;
+    size_type (*erase_fn)(any &, meta_any &) = nullptr;
     iterator (*find_fn)(any &, meta_any &) = nullptr;
     any storage{};
 };
@@ -1764,7 +1764,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
  * @param key The key of the element to remove.
  * @return A bool denoting whether the removal took place.
  */
-inline bool meta_associative_container::erase(meta_any key) {
+inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
     return erase_fn(storage, key);
 }
 

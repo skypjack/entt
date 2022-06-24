@@ -131,10 +131,9 @@ struct basic_meta_associative_container_traits {
         }
     }
 
-    [[nodiscard]] static bool erase(any &container, meta_any &key) {
+    [[nodiscard]] static size_type erase(any &container, meta_any &key) {
         auto *const cont = any_cast<Type>(&container);
-        return cont && key.allow_cast<const typename Type::key_type &>()
-               && (cont->erase(key.cast<const typename Type::key_type &>()) != cont->size());
+        return cont && key.allow_cast<const typename Type::key_type &>() ? cont->erase(key.cast<const typename Type::key_type &>()) : size_type{};
     }
 
     [[nodiscard]] static iterator find(any &container, meta_any &key) {

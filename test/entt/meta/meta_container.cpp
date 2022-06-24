@@ -230,11 +230,11 @@ TEST_F(MetaContainer, StdMap) {
     ASSERT_EQ(view.find(0)->second.cast<char>(), 'a');
     ASSERT_EQ(view.find(1.)->second.cast<char>(), 'b');
 
-    ASSERT_FALSE(view.erase(invalid_type{}));
+    ASSERT_EQ(view.erase(invalid_type{}), 0u);
     ASSERT_FALSE(view.find(invalid_type{}));
     ASSERT_EQ(view.size(), 5u);
 
-    ASSERT_TRUE(view.erase(0));
+    ASSERT_EQ(view.erase(0), 1u);
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
@@ -242,7 +242,7 @@ TEST_F(MetaContainer, StdMap) {
 
     ASSERT_EQ(view.find(1.f)->second.cast<char>(), 'f');
 
-    ASSERT_TRUE(view.erase(1.));
+    ASSERT_EQ(view.erase(1.), 1u);
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
 }
@@ -272,11 +272,11 @@ TEST_F(MetaContainer, StdSet) {
     ASSERT_EQ(view.find(0)->first.cast<int>(), 0);
     ASSERT_EQ(view.find(1.)->first.cast<int>(), 1);
 
-    ASSERT_FALSE(view.erase(invalid_type{}));
+    ASSERT_EQ(view.erase(invalid_type{}), 0u);
     ASSERT_FALSE(view.find(invalid_type{}));
     ASSERT_EQ(view.size(), 5u);
 
-    ASSERT_TRUE(view.erase(0));
+    ASSERT_EQ(view.erase(0), 1u);
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
@@ -284,7 +284,7 @@ TEST_F(MetaContainer, StdSet) {
     ASSERT_NE(view.find(1.)->first.try_cast<const int>(), nullptr);
     ASSERT_EQ(view.find(true)->first.cast<const int &>(), 1);
 
-    ASSERT_TRUE(view.erase(1.));
+    ASSERT_EQ(view.erase(1.), 1u);
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
 }
@@ -319,11 +319,11 @@ TEST_F(MetaContainer, DenseMap) {
     ASSERT_EQ(view.find(0)->second.cast<char>(), 'a');
     ASSERT_EQ(view.find(1.)->second.cast<char>(), 'b');
 
-    ASSERT_FALSE(view.erase(invalid_type{}));
+    ASSERT_EQ(view.erase(invalid_type{}), 0u);
     ASSERT_FALSE(view.find(invalid_type{}));
     ASSERT_EQ(view.size(), 5u);
 
-    ASSERT_TRUE(view.erase(0));
+    ASSERT_EQ(view.erase(0), 1u);
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
@@ -331,7 +331,7 @@ TEST_F(MetaContainer, DenseMap) {
 
     ASSERT_EQ(view.find(1.f)->second.cast<char>(), 'f');
 
-    ASSERT_TRUE(view.erase(1.));
+    ASSERT_EQ(view.erase(1.), 1u);
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
 }
@@ -365,11 +365,11 @@ TEST_F(MetaContainer, DenseSet) {
     ASSERT_EQ(view.find(0)->first.cast<int>(), 0);
     ASSERT_EQ(view.find(1.)->first.cast<int>(), 1);
 
-    ASSERT_FALSE(view.erase(invalid_type{}));
+    ASSERT_EQ(view.erase(invalid_type{}), 0u);
     ASSERT_FALSE(view.find(invalid_type{}));
     ASSERT_EQ(view.size(), 5u);
 
-    ASSERT_TRUE(view.erase(0));
+    ASSERT_EQ(view.erase(0), 1u);
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
@@ -377,7 +377,7 @@ TEST_F(MetaContainer, DenseSet) {
     ASSERT_NE(view.find(1.)->first.try_cast<const int>(), nullptr);
     ASSERT_EQ(view.find(true)->first.cast<const int &>(), 1);
 
-    ASSERT_TRUE(view.erase(1.));
+    ASSERT_EQ(view.erase(1.), 1u);
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
 }
@@ -454,7 +454,7 @@ TEST_F(MetaContainer, ConstKeyValueAssociativeContainer) {
     ASSERT_EQ(view.find(0), view.end());
     ASSERT_EQ(view.find(2)->second.cast<char>(), 'c');
 
-    ASSERT_FALSE(view.erase(2));
+    ASSERT_EQ(view.erase(2), 0u);
     ASSERT_EQ(view.size(), 1u);
     ASSERT_NE(view.find(2), view.end());
 
@@ -500,7 +500,7 @@ TEST_F(MetaContainer, ConstKeyOnlyAssociativeContainer) {
     ASSERT_EQ(view.find(0), view.end());
     ASSERT_EQ(view.find(2)->first.cast<int>(), 2);
 
-    ASSERT_FALSE(view.erase(2));
+    ASSERT_EQ(view.erase(2), 0u);
     ASSERT_EQ(view.size(), 1u);
     ASSERT_NE(view.find(2), view.end());
 
