@@ -176,6 +176,17 @@ public:
     }
 
     /**
+     * @brief Assigns a resource to the current task with a given access mode.
+     * @param res Resource identifier.
+     * @param is_rw Access mode.
+     * @return This flow builder.
+     */
+    basic_flow &set(const id_type res, bool is_rw = false) {
+        emplace(res, is_rw);
+        return *this;
+    }
+
+    /**
      * @brief Assigns a read-only resource to the current task.
      * @param res Resource identifier.
      * @return This flow builder.

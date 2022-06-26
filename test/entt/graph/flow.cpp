@@ -120,6 +120,19 @@ TEST(Flow, Clear) {
     ASSERT_EQ(flow.size(), 0u);
 }
 
+TEST(Flow, Set) {
+    entt::flow flow{};
+    flow.bind(0).set(10, true).bind(1).set(10, true).set(11, false);
+    auto graph = flow.graph();
+
+    ASSERT_EQ(flow.size(), 2u);
+    ASSERT_EQ(flow.size(), graph.size());
+    ASSERT_NE(graph.edges().cbegin(), graph.edges().cend());
+
+    ASSERT_TRUE(graph.contains(0u, 1u));
+    ASSERT_FALSE(graph.contains(1u, 0u));
+}
+
 TEST(Flow, RO) {
     entt::flow flow{};
     flow.bind(0).ro(10).bind(1).ro(10).ro(11);
