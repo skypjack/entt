@@ -1,7 +1,6 @@
 #ifndef ENTT_CONTAINER_DENSE_SET_HPP
 #define ENTT_CONTAINER_DENSE_SET_HPP
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -772,12 +771,16 @@ public:
      * @param count New number of buckets.
      */
     void rehash(const size_type count) {
-        auto value = (std::max)(count, minimum_capacity);
-        value = (std::max)(value, static_cast<size_type>(size() / max_load_factor()));
+        auto value = count > minimum_capacity ? count : minimum_capacity;
+        const auto cap = static_cast<size_type>(size() / max_load_factor());
+        value = value > cap ? value : cap;
 
         if(const auto sz = next_power_of_two(value); sz != bucket_count()) {
             sparse.first().resize(sz);
-            std::fill(sparse.first().begin(), sparse.first().end(), (std::numeric_limits<size_type>::max)());
+
+            for(auto &&elem: sparse.first()) {
+                elem = std::numeric_limits<size_type>::max();
+            }
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
                 const auto index = value_to_bucket(packed.first()[pos].second);
