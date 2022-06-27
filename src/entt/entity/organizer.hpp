@@ -10,6 +10,8 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
+#include "../graph/adjacency_matrix.hpp"
+#include "../graph/flow.hpp"
 #include "fwd.hpp"
 #include "helper.hpp"
 
@@ -151,77 +153,10 @@ class basic_organizer final {
 
     template<typename... RO, typename... RW>
     void track_dependencies(std::size_t index, const bool requires_registry, type_list<RO...>, type_list<RW...>) {
-        dependencies[type_hash<Registry>::value()].emplace_back(index, requires_registry || (sizeof...(RO) + sizeof...(RW) == 0u));
-        (dependencies[type_hash<RO>::value()].emplace_back(index, false), ...);
-        (dependencies[type_hash<RW>::value()].emplace_back(index, true), ...);
-    }
-
-    [[nodiscard]] std::vector<bool> adjacency_matrix() {
-        const auto length = vertices.size();
-        std::vector<bool> edges(length * length, false);
-
-        // creates the adjacency matrix
-        for(const auto &deps: dependencies) {
-            const auto last = deps.second.cend();
-            auto it = deps.second.cbegin();
-
-            while(it != last) {
-                if(it->second) {
-                    // rw item
-                    if(auto curr = it++; it != last) {
-                        if(it->second) {
-                            edges[curr->first * length + it->first] = true;
-                        } else if(const auto next = std::find_if(it, last, [](const auto &elem) { return elem.second; }); next != last) {
-                            for(; it != next; ++it) {
-                                edges[curr->first * length + it->first] = true;
-                                edges[it->first * length + next->first] = true;
-                            }
-                        } else {
-                            for(; it != next; ++it) {
-                                edges[curr->first * length + it->first] = true;
-                            }
-                        }
-                    }
-                } else {
-                    // ro item, possibly only on first iteration
-                    if(const auto next = std::find_if(it, last, [](const auto &elem) { return elem.second; }); next != last) {
-                        for(; it != next; ++it) {
-                            edges[it->first * length + next->first] = true;
-                        }
-                    } else {
-                        it = last;
-                    }
-                }
-            }
-        }
-
-        // computes the transitive closure
-        for(std::size_t vk{}; vk < length; ++vk) {
-            for(std::size_t vi{}; vi < length; ++vi) {
-                for(std::size_t vj{}; vj < length; ++vj) {
-                    edges[vi * length + vj] = edges[vi * length + vj] || (edges[vi * length + vk] && edges[vk * length + vj]);
-                }
-            }
-        }
-
-        // applies the transitive reduction
-        for(std::size_t vert{}; vert < length; ++vert) {
-            edges[vert * length + vert] = false;
-        }
-
-        for(std::size_t vj{}; vj < length; ++vj) {
-            for(std::size_t vi{}; vi < length; ++vi) {
-                if(edges[vi * length + vj]) {
-                    for(std::size_t vk{}; vk < length; ++vk) {
-                        if(edges[vj * length + vk]) {
-                            edges[vi * length + vk] = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        return edges;
+        builder.bind(static_cast<id_type>(index));
+        builder.set(type_hash<Registry>::value(), requires_registry || (sizeof...(RO) + sizeof...(RW) == 0u));
+        (builder.ro(type_hash<RO>::value()), ...);
+        (builder.rw(type_hash<RW>::value()), ...);
     }
 
 public:
@@ -441,28 +376,19 @@ public:
      * @return The adjacency list of the task graph.
      */
     std::vector<vertex> graph() {
-        const auto edges = adjacency_matrix();
-
-        // creates the adjacency list
         std::vector<vertex> adjacency_list{};
         adjacency_list.reserve(vertices.size());
+        auto adjacency_matrix = builder.graph();
 
-        for(std::size_t col{}, length = vertices.size(); col < length; ++col) {
+        for(auto vertex: adjacency_matrix.vertices()) {
+            const auto iterable = adjacency_matrix.in_edges(vertex);
             std::vector<std::size_t> reachable{};
-            const auto row = col * length;
-            bool is_top_level = true;
 
-            for(std::size_t next{}; next < length; ++next) {
-                if(edges[row + next]) {
-                    reachable.push_back(next);
-                }
+            for(auto &&edge: adjacency_matrix.out_edges(vertex)) {
+                reachable.push_back(edge.second);
             }
 
-            for(std::size_t next{}; next < length && is_top_level; ++next) {
-                is_top_level = !edges[next * length + col];
-            }
-
-            adjacency_list.emplace_back(is_top_level, vertices[col], std::move(reachable));
+            adjacency_list.emplace_back(iterable.cbegin() == iterable.cend(), vertices[vertex], std::move(reachable));
         }
 
         return adjacency_list;
@@ -470,13 +396,13 @@ public:
 
     /*! @brief Erases all elements from a container. */
     void clear() {
-        dependencies.clear();
+        builder.clear();
         vertices.clear();
     }
 
 private:
-    dense_map<id_type, std::vector<std::pair<std::size_t, bool>>, identity> dependencies;
     std::vector<vertex_data> vertices;
+    flow builder;
 };
 
 } // namespace entt
