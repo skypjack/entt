@@ -22,7 +22,6 @@
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
-#include "runtime_view.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
 #include "view.hpp"
