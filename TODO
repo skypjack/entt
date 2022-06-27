@@ -13,6 +13,7 @@ DOC:
 * update entity doc when the storage based model is in place
 
 WIP:
+* runtime view: const/non-const support, allocator support, storage access
 * get rid of observers, storage based views made them pointless - document alternatives
 * dense_map/set and registry: move ctor/op should be noexcept (op is conditionally noexcept though)
 * add storage getter for filters to views and groups
