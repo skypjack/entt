@@ -31,8 +31,8 @@ class basic_registry;
 template<typename, typename, typename = void>
 class basic_view;
 
-template<typename>
-struct basic_runtime_view;
+template<typename Type>
+class basic_runtime_view;
 
 template<typename, typename, typename>
 class basic_group;
@@ -155,6 +155,9 @@ using view = basic_view<type_list_transform_t<Get, storage_for>, type_list_trans
 
 /*! @brief Alias declaration for the most common use case. */
 using runtime_view = basic_runtime_view<sparse_set>;
+
+/*! @brief Alias declaration for the most common use case. */
+using const_runtime_view = basic_runtime_view<const sparse_set>;
 
 /**
  * @brief Alias declaration for the most common use case.

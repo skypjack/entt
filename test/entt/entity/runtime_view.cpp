@@ -11,9 +11,20 @@ struct stable_type {
     int value;
 };
 
-TEST(RuntimeView, Functionalities) {
+template<typename Type>
+struct RuntimeView: testing::Test {
+    using type = Type;
+};
+
+using RuntimeViewTypes = ::testing::Types<entt::runtime_view, entt::const_runtime_view>;
+
+TYPED_TEST_SUITE(RuntimeView, RuntimeViewTypes, );
+
+TYPED_TEST(RuntimeView, Functionalities) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -66,9 +77,11 @@ TEST(RuntimeView, Functionalities) {
     ASSERT_EQ(empty.begin(), empty.end());
 }
 
-TEST(RuntimeView, Iterator) {
+TYPED_TEST(RuntimeView, Iterator) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto entity = registry.create();
     registry.emplace<int>(entity);
@@ -96,9 +109,11 @@ TEST(RuntimeView, Iterator) {
     ASSERT_EQ(*begin.operator->(), entity);
 }
 
-TEST(RuntimeView, Contains) {
+TYPED_TEST(RuntimeView, Contains) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto e0 = registry.create();
     registry.emplace<int>(e0);
@@ -116,9 +131,11 @@ TEST(RuntimeView, Contains) {
     ASSERT_TRUE(view.contains(e1));
 }
 
-TEST(RuntimeView, Empty) {
+TYPED_TEST(RuntimeView, Empty) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto e0 = registry.create();
     registry.emplace<double>(e0);
@@ -140,9 +157,11 @@ TEST(RuntimeView, Empty) {
     ASSERT_EQ((std::find(view.begin(), view.end(), e1)), view.end());
 }
 
-TEST(RuntimeView, Each) {
+TYPED_TEST(RuntimeView, Each) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto e0 = registry.create();
     registry.emplace<int>(e0);
@@ -158,9 +177,11 @@ TEST(RuntimeView, Each) {
     });
 }
 
-TEST(RuntimeView, EachWithHoles) {
+TYPED_TEST(RuntimeView, EachWithHoles) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -179,9 +200,11 @@ TEST(RuntimeView, EachWithHoles) {
     });
 }
 
-TEST(RuntimeView, ExcludedComponents) {
+TYPED_TEST(RuntimeView, ExcludedComponents) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto e0 = registry.create();
     registry.emplace<int>(e0);
@@ -202,9 +225,11 @@ TEST(RuntimeView, ExcludedComponents) {
     });
 }
 
-TEST(RuntimeView, StableType) {
+TYPED_TEST(RuntimeView, StableType) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -242,9 +267,11 @@ TEST(RuntimeView, StableType) {
     ASSERT_EQ(view.size_hint(), 1u);
 }
 
-TEST(RuntimeView, StableTypeWithExcludedComponent) {
+TYPED_TEST(RuntimeView, StableTypeWithExcludedComponent) {
+    using runtime_view_type = typename TestFixture::type;
+
     entt::registry registry;
-    entt::runtime_view view{};
+    runtime_view_type view{};
 
     const auto entity = registry.create();
     const auto other = registry.create();

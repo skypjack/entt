@@ -41,7 +41,7 @@ public:
           it{},
           tombstone_check{} {}
 
-    runtime_view_iterator(const std::vector<const Set *> &cpools, const std::vector<const Set *> &ignore, iterator_type curr) noexcept
+    runtime_view_iterator(const std::vector<Set *> &cpools, const std::vector<Set *> &ignore, iterator_type curr) noexcept
         : pools{&cpools},
           filter{&ignore},
           it{curr},
@@ -88,8 +88,8 @@ public:
     }
 
 private:
-    const std::vector<const Set *> *pools;
-    const std::vector<const Set *> *filter;
+    const std::vector<Set *> *pools;
+    const std::vector<Set *> *filter;
     iterator_type it;
     bool tombstone_check;
 };
@@ -160,7 +160,7 @@ struct basic_runtime_view {
      * @param base An opaque reference to a storage object.
      * @return This runtime view.
      */
-    basic_runtime_view &iterate(const base_type &base) {
+    basic_runtime_view &iterate(base_type &base) {
         if(pools.empty() || !(base.size() < pools[0u]->size())) {
             pools.push_back(&base);
         } else {
@@ -175,7 +175,7 @@ struct basic_runtime_view {
      * @param base An opaque reference to a storage object.
      * @return This runtime view.
      */
-    basic_runtime_view &exclude(const base_type &base) {
+    basic_runtime_view &exclude(base_type &base) {
         filter.push_back(&base);
         return *this;
     }
@@ -251,8 +251,8 @@ struct basic_runtime_view {
     }
 
 private:
-    std::vector<const base_type *> pools;
-    std::vector<const base_type *> filter;
+    std::vector<base_type *> pools;
+    std::vector<base_type *> filter;
 };
 
 } // namespace entt

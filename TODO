@@ -13,7 +13,7 @@ DOC:
 * update entity doc when the storage based model is in place
 
 WIP:
-* runtime view: const/non-const support, allocator support, storage access
+* runtime view: allocator support, storage access
 * get rid of observers, storage based views made them pointless - document alternatives
 * dense_map/set and registry: move ctor/op should be noexcept (op is conditionally noexcept though)
 * add storage getter for filters to views and groups
@@ -28,5 +28,4 @@ WIP:
 * custom allocators all over (registry, ...)
 * add test for maximum number of entities reached
 * add user data to type_info
-* make runtime views use opaque storage and therefore return also elements.
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
