@@ -31,7 +31,7 @@ class basic_registry;
 template<typename, typename, typename = void>
 class basic_view;
 
-template<typename Type>
+template<typename Type, typename = std::allocator<Type *>>
 class basic_runtime_view;
 
 template<typename, typename, typename>

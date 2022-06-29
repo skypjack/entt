@@ -138,9 +138,17 @@ private:
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Type Common base type.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type>
-struct basic_runtime_view {
+template<typename Type, typename Allocator>
+class basic_runtime_view {
+    using alloc_traits = std::allocator_traits<Allocator>;
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Type *>, "Invalid value type");
+    using container_type = std::vector<Type *, Allocator>;
+
+public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
     /*! @brief Unsigned integer type. */
@@ -152,8 +160,75 @@ struct basic_runtime_view {
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_runtime_view() noexcept
-        : pools{},
-          filter{} {}
+        : basic_runtime_view{allocator_type{}} {}
+
+    /**
+     * @brief Constructs an empty, invalid view with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_runtime_view(const allocator_type &allocator)
+        : pools{allocator},
+          filter{allocator} {}
+
+    /*! @brief Default copy constructor. */
+    basic_runtime_view(const basic_runtime_view &other) = default;
+
+    /**
+     * @brief Allocator-extended copy constructor.
+     * @param other The instance to copy from.
+     * @param allocator The allocator to use.
+     */
+    basic_runtime_view(const basic_runtime_view &other, const allocator_type &allocator)
+        : pools{other.pools, allocator},
+          filter{other.filter, allocator} {}
+
+    /*! @brief Default move constructor. */
+    basic_runtime_view(basic_runtime_view &&other) noexcept(std::is_nothrow_move_constructible_v<container_type>) = default;
+
+    /**
+     * @brief Allocator-extended move constructor.
+     * @param other The instance to move from.
+     * @param allocator The allocator to use.
+     */
+    basic_runtime_view(basic_runtime_view &&other, const allocator_type &allocator)
+        : pools{std::move(other.pools), allocator},
+          filter{std::move(other.filter), allocator} {}
+
+    /**
+     * @brief Default copy assignment operator.
+     * @return This container.
+     */
+    basic_runtime_view &operator=(const basic_runtime_view &other) = default;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This container.
+     */
+    basic_runtime_view &operator=(basic_runtime_view &&other) noexcept(std::is_nothrow_move_assignable_v<container_type>) = default;
+
+    /**
+     * @brief Exchanges the contents with those of a given view.
+     * @param other View to exchange the content with.
+     */
+    void swap(basic_runtime_view &other) {
+        using std::swap;
+        swap(pools, other.pools);
+        swap(filter, other.filter);
+    }
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
+        return pools.get_allocator();
+    }
+
+    /*! @brief Clears the view. */
+    void clear() {
+        pools.clear();
+        filter.clear();
+    }
 
     /**
      * @brief Appends an opaque storage object to a runtime view.
@@ -251,8 +326,8 @@ struct basic_runtime_view {
     }
 
 private:
-    std::vector<base_type *> pools;
-    std::vector<base_type *> filter;
+    container_type pools;
+    container_type filter;
 };
 
 } // namespace entt

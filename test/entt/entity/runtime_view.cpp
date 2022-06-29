@@ -71,13 +71,35 @@ TYPED_TEST(RuntimeView, Functionalities) {
         ASSERT_EQ(registry.get<char>(entity), '2');
     }
 
-    entt::runtime_view empty{};
+    view.clear();
 
-    ASSERT_EQ(empty.size_hint(), 0u);
-    ASSERT_EQ(empty.begin(), empty.end());
+    ASSERT_EQ(view.size_hint(), 0u);
+    ASSERT_EQ(view.begin(), view.end());
 }
 
-TYPED_TEST(RuntimeView, Iterator) {
+TYPED_TEST(RuntimeView, Constructors) {
+    using runtime_view_type = typename TestFixture::type;
+
+    entt::registry registry;
+    runtime_view_type view{};
+
+    const auto entity = registry.create();
+    registry.emplace<int>(entity);
+
+    view = runtime_view_type{std::allocator<int>{}};
+    view.iterate(registry.storage<int>());
+
+    ASSERT_TRUE(view.contains(entity));
+
+    runtime_view_type temp{view, view.get_allocator()};
+    runtime_view_type other{std::move(temp), view.get_allocator()};
+
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_FALSE(temp.contains(entity));
+    ASSERT_TRUE(other.contains(entity));
+}
+
+TYPED_TEST(RuntimeView, Copy) {
     using runtime_view_type = typename TestFixture::type;
 
     entt::registry registry;
@@ -87,8 +109,97 @@ TYPED_TEST(RuntimeView, Iterator) {
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
 
-    view.iterate(registry.storage<int>()).iterate(registry.storage<char>());
-    using iterator = typename decltype(view)::iterator;
+    view.iterate(registry.storage<int>());
+
+    ASSERT_TRUE(view.contains(entity));
+
+    runtime_view_type other{view};
+
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_TRUE(other.contains(entity));
+
+    other.iterate(registry.storage<int>()).exclude(registry.storage<char>());
+
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_FALSE(other.contains(entity));
+
+    other = view;
+
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_TRUE(other.contains(entity));
+}
+
+TYPED_TEST(RuntimeView, Move) {
+    using runtime_view_type = typename TestFixture::type;
+
+    entt::registry registry;
+    runtime_view_type view{};
+
+    const auto entity = registry.create();
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+
+    view.iterate(registry.storage<int>());
+
+    ASSERT_TRUE(view.contains(entity));
+
+    runtime_view_type other{std::move(view)};
+
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(other.contains(entity));
+
+    view = other;
+    other.iterate(registry.storage<int>()).exclude(registry.storage<char>());
+
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_FALSE(other.contains(entity));
+
+    other = std::move(view);
+
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(other.contains(entity));
+}
+
+TYPED_TEST(RuntimeView, Swap) {
+    using runtime_view_type = typename TestFixture::type;
+
+    entt::registry registry;
+    runtime_view_type view{};
+    runtime_view_type other{};
+
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity);
+    view.iterate(registry.storage<int>());
+
+    ASSERT_EQ(view.size_hint(), 1u);
+    ASSERT_EQ(other.size_hint(), 0u);
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_FALSE(other.contains(entity));
+    ASSERT_NE(view.begin(), view.end());
+    ASSERT_EQ(other.begin(), other.end());
+
+    view.swap(other);
+
+    ASSERT_EQ(view.size_hint(), 0u);
+    ASSERT_EQ(other.size_hint(), 1u);
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(other.contains(entity));
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_NE(other.begin(), other.end());
+}
+
+TYPED_TEST(RuntimeView, Iterator) {
+    using runtime_view_type = typename TestFixture::type;
+    using iterator = typename runtime_view_type::iterator;
+
+    entt::registry registry;
+    runtime_view_type view{};
+
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity);
+    view.iterate(registry.storage<int>());
 
     iterator end{view.begin()};
     iterator begin{};
@@ -115,20 +226,18 @@ TYPED_TEST(RuntimeView, Contains) {
     entt::registry registry;
     runtime_view_type view{};
 
-    const auto e0 = registry.create();
-    registry.emplace<int>(e0);
-    registry.emplace<char>(e0);
+    const auto entity = registry.create();
+    const auto other = registry.create();
 
-    const auto e1 = registry.create();
-    registry.emplace<int>(e1);
-    registry.emplace<char>(e1);
+    registry.emplace<int>(entity);
+    registry.emplace<int>(other);
 
-    registry.destroy(e0);
+    registry.destroy(entity);
 
-    view.iterate(registry.storage<int>()).iterate(registry.storage<char>());
+    view.iterate(registry.storage<int>());
 
-    ASSERT_FALSE(view.contains(e0));
-    ASSERT_TRUE(view.contains(e1));
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
 }
 
 TYPED_TEST(RuntimeView, Empty) {
@@ -137,24 +246,19 @@ TYPED_TEST(RuntimeView, Empty) {
     entt::registry registry;
     runtime_view_type view{};
 
-    const auto e0 = registry.create();
-    registry.emplace<double>(e0);
-    registry.emplace<int>(e0);
-    registry.emplace<float>(e0);
+    const auto entity = registry.create();
+    const auto other = registry.create();
 
-    const auto e1 = registry.create();
-    registry.emplace<char>(e1);
-    registry.emplace<float>(e1);
+    registry.emplace<double>(entity);
+    registry.emplace<float>(other);
 
-    view.iterate(registry.storage<int>())
-        .iterate(registry.storage<char>())
-        .iterate(registry.storage<float>());
+    view.iterate(registry.storage<int>());
 
-    ASSERT_FALSE(view.contains(e0));
-    ASSERT_FALSE(view.contains(e1));
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_FALSE(view.contains(other));
     ASSERT_EQ(view.begin(), view.end());
-    ASSERT_EQ((std::find(view.begin(), view.end(), e0)), view.end());
-    ASSERT_EQ((std::find(view.begin(), view.end(), e1)), view.end());
+    ASSERT_EQ((std::find(view.begin(), view.end(), entity)), view.end());
+    ASSERT_EQ((std::find(view.begin(), view.end(), other)), view.end());
 }
 
 TYPED_TEST(RuntimeView, Each) {
@@ -163,17 +267,16 @@ TYPED_TEST(RuntimeView, Each) {
     entt::registry registry;
     runtime_view_type view{};
 
-    const auto e0 = registry.create();
-    registry.emplace<int>(e0);
-    registry.emplace<char>(e0);
+    const auto entity = registry.create();
+    const auto other = registry.create();
 
-    const auto e1 = registry.create();
-    registry.emplace<char>(e1);
+    registry.emplace<int>(entity);
+    registry.emplace<char>(other);
 
     view.iterate(registry.storage<int>()).iterate(registry.storage<char>());
 
-    view.each([e0](const auto entt) {
-        ASSERT_EQ(entt, e0);
+    view.each([entity](const auto entt) {
+        ASSERT_EQ(entt, entity);
     });
 }
 
@@ -195,8 +298,8 @@ TYPED_TEST(RuntimeView, EachWithHoles) {
 
     view.iterate(registry.storage<int>()).iterate(registry.storage<char>());
 
-    view.each([e0](auto entity) {
-        ASSERT_EQ(e0, entity);
+    view.each([e0](auto entt) {
+        ASSERT_EQ(e0, entt);
     });
 }
 
@@ -214,14 +317,13 @@ TYPED_TEST(RuntimeView, ExcludedComponents) {
     registry.emplace<char>(e1);
 
     view.iterate(registry.storage<int>())
-        .exclude(registry.storage<char>())
-        .exclude(registry.storage<double>());
+        .exclude(registry.storage<char>());
 
     ASSERT_TRUE(view.contains(e0));
     ASSERT_FALSE(view.contains(e1));
 
-    view.each([e0](auto entity) {
-        ASSERT_EQ(e0, entity);
+    view.each([e0](auto entt) {
+        ASSERT_EQ(e0, entt);
     });
 }
 
