@@ -50,7 +50,7 @@ public:
 
     constexpr storage_iterator() noexcept = default;
 
-    constexpr storage_iterator(Container *ref, difference_type idx) noexcept
+    constexpr storage_iterator(Container *ref, const difference_type idx) noexcept
         : packed{ref},
           offset{idx} {}
 
