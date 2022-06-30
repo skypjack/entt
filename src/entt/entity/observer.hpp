@@ -158,8 +158,8 @@ inline constexpr basic_collector<> collector{};
  * @tparam Registry Basic registry type.
  */
 template<typename Registry>
-class basic_observer {
-    using payload_type = std::uint32_t;
+class basic_observer: private basic_storage<std::uint32_t, typename Registry::entity_type> {
+    using base_type = basic_storage<std::uint32_t, typename Registry::entity_type>;
 
     template<typename>
     struct matcher_handler;
@@ -169,18 +169,18 @@ class basic_observer {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, Registry &reg, const typename Registry::entity_type entt) {
             if(reg.template all_of<Require...>(entt) && !reg.template any_of<Reject...>(entt)) {
-                if(!obs.storage.contains(entt)) {
-                    obs.storage.emplace(entt);
+                if(!obs.contains(entt)) {
+                    obs.emplace(entt);
                 }
 
-                obs.storage.get(entt) |= (1 << Index);
+                obs.get(entt) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, Registry &, const typename Registry::entity_type entt) {
-            if(obs.storage.contains(entt) && !(obs.storage.get(entt) &= (~(1 << Index)))) {
-                obs.storage.erase(entt);
+            if(obs.contains(entt) && !(obs.get(entt) &= (~(1 << Index)))) {
+                obs.erase(entt);
             }
         }
 
@@ -213,18 +213,18 @@ class basic_observer {
             };
 
             if(condition()) {
-                if(!obs.storage.contains(entt)) {
-                    obs.storage.emplace(entt);
+                if(!obs.contains(entt)) {
+                    obs.emplace(entt);
                 }
 
-                obs.storage.get(entt) |= (1 << Index);
+                obs.get(entt) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, Registry &, const typename Registry::entity_type entt) {
-            if(obs.storage.contains(entt) && !(obs.storage.get(entt) &= (~(1 << Index)))) {
-                obs.storage.erase(entt);
+            if(obs.contains(entt) && !(obs.get(entt) &= (~(1 << Index)))) {
+                obs.erase(entt);
             }
         }
 
@@ -255,7 +255,7 @@ class basic_observer {
 
     template<typename... Matcher, std::size_t... Index>
     void connect(Registry &reg, std::index_sequence<Index...>) {
-        static_assert(sizeof...(Matcher) < std::numeric_limits<payload_type>::digits, "Too many matchers");
+        static_assert(sizeof...(Matcher) < std::numeric_limits<typename base_type::value_type>::digits, "Too many matchers");
         (matcher_handler<Matcher>::template connect<Index>(*this, reg), ...);
         release.template connect<&basic_observer::disconnect<Matcher...>>(reg);
     }
@@ -272,8 +272,7 @@ public:
 
     /*! @brief Default constructor. */
     basic_observer()
-        : release{},
-          storage{} {}
+        : release{} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     basic_observer(const basic_observer &) = delete;
@@ -315,7 +314,7 @@ public:
     void connect(registry_type &reg, basic_collector<Matcher...>) {
         disconnect();
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
-        storage.clear();
+        base_type::clear();
     }
 
     /*! @brief Disconnects an observer from the registry it keeps track of. */
@@ -331,7 +330,7 @@ public:
      * @return Number of elements.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return storage.size();
+        return base_type::size();
     }
 
     /**
@@ -339,7 +338,7 @@ public:
      * @return True if the observer is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return storage.empty();
+        return base_type::empty();
     }
 
     /**
@@ -355,7 +354,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type *data() const noexcept {
-        return storage.data();
+        return base_type::data();
     }
 
     /**
@@ -367,7 +366,7 @@ public:
      * @return An iterator to the first entity of the observer.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return storage.registry_type::base_type::begin();
+        return base_type::base_type::begin();
     }
 
     /**
@@ -381,12 +380,12 @@ public:
      * observer.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return storage.registry_type::base_type::end();
+        return base_type::base_type::end();
     }
 
     /*! @brief Clears the underlying container. */
     void clear() noexcept {
-        storage.clear();
+        base_type::clear();
     }
 
     /**
@@ -426,7 +425,6 @@ public:
 
 private:
     delegate<void(basic_observer &)> release;
-    basic_storage<payload_type, entity_type> storage;
 };
 
 } // namespace entt
