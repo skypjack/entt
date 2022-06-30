@@ -287,11 +287,11 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = typename entity_traits::value_type;
     /*! @brief Underlying version type. */
     using version_type = typename entity_traits::version_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename packed_container_type::size_type;
+    using size_type = std::size_t;
     /*! @brief Pointer type to contained entities. */
     using pointer = typename packed_container_type::const_pointer;
     /*! @brief Random access iterator type. */
