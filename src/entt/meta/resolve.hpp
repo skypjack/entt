@@ -25,7 +25,7 @@ template<typename Type>
  * @return An iterable range to use to visit all meta types.
  */
 [[nodiscard]] inline meta_range<meta_type> resolve() noexcept {
-    return *internal::meta_context::global();
+    return {*internal::meta_context::global(), nullptr};
 }
 
 /**

@@ -783,7 +783,7 @@ struct meta_data {
      * @return An iterable range to visit registered meta properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const noexcept {
-        return node->prop;
+        return {node->prop, nullptr};
     }
 
     /**
@@ -902,7 +902,7 @@ struct meta_func {
 
     /*! @copydoc meta_data::prop */
     [[nodiscard]] meta_range<meta_prop> prop() const noexcept {
-        return node->prop;
+        return {node->prop, nullptr};
     }
 
     /**
@@ -1150,7 +1150,7 @@ public:
      * @return An iterable range to visit registered top-level base meta types.
      */
     [[nodiscard]] meta_range<meta_type, internal::meta_base_node> base() const noexcept {
-        return node->base;
+        return {node->base, nullptr};
     }
 
     /**
@@ -1167,7 +1167,7 @@ public:
      * @return An iterable range to visit registered top-level meta data.
      */
     [[nodiscard]] meta_range<meta_data> data() const noexcept {
-        return node->data;
+        return {node->data, nullptr};
     }
 
     /**
@@ -1187,7 +1187,7 @@ public:
      * @return An iterable range to visit registered top-level functions.
      */
     [[nodiscard]] meta_range<meta_func> func() const noexcept {
-        return node->func;
+        return {node->func, nullptr};
     }
 
     /**
@@ -1316,7 +1316,7 @@ public:
      * @return An iterable range to visit registered top-level meta properties.
      */
     [[nodiscard]] meta_range<meta_prop> prop() const noexcept {
-        return node->prop;
+        return {node->prop, nullptr};
     }
 
     /**

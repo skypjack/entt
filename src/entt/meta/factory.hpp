@@ -27,7 +27,7 @@ namespace entt {
 namespace internal {
 
 inline void link_prop_if_required(internal::meta_prop_node **ref, internal::meta_prop_node &node) noexcept {
-    if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*ref}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+    if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*ref, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&node](const auto *curr) { return curr->id == node.id; }) == range.cend(), "Duplicate identifier");
         node.next = *ref;
         *ref = &node;
@@ -35,7 +35,7 @@ inline void link_prop_if_required(internal::meta_prop_node **ref, internal::meta
 }
 
 inline void link_type_if_required(meta_type_node *owner, const id_type id) noexcept {
-    meta_range<meta_type_node *, meta_type_node> range{*meta_context::global()};
+    meta_range<meta_type_node *, meta_type_node> range{*meta_context::global(), nullptr};
     ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&](const auto *curr) { return curr != owner && curr->id == id; }) == range.cend(), "Duplicate identifier");
     owner->id = id;
 
@@ -46,28 +46,28 @@ inline void link_type_if_required(meta_type_node *owner, const id_type id) noexc
 }
 
 inline void link_base_if_required(meta_type_node *owner, meta_base_node &node) noexcept {
-    if(meta_range<meta_base_node *, meta_base_node> range{owner->base}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+    if(meta_range<meta_base_node *, meta_base_node> range{owner->base, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         node.next = owner->base;
         owner->base = &node;
     }
 }
 
 inline void link_conv_if_required(meta_type_node *owner, meta_conv_node &node) noexcept {
-    if(meta_range<meta_conv_node *, meta_conv_node> range{owner->conv}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+    if(meta_range<meta_conv_node *, meta_conv_node> range{owner->conv, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         node.next = owner->conv;
         owner->conv = &node;
     }
 }
 
 inline void link_ctor_if_required(meta_type_node *owner, meta_ctor_node &node) noexcept {
-    if(meta_range<meta_ctor_node *, meta_ctor_node> range{owner->ctor}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+    if(meta_range<meta_ctor_node *, meta_ctor_node> range{owner->ctor, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         node.next = owner->ctor;
         owner->ctor = &node;
     }
 }
 
 inline void link_data_if_required(meta_type_node *owner, const id_type id, meta_data_node &node) noexcept {
-    meta_range<meta_data_node *, meta_data_node> range{owner->data};
+    meta_range<meta_data_node *, meta_data_node> range{owner->data, nullptr};
     ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id, &node](const auto *curr) { return curr != &node && curr->id == id; }) == range.cend(), "Duplicate identifier");
     node.id = id;
 
@@ -80,7 +80,7 @@ inline void link_data_if_required(meta_type_node *owner, const id_type id, meta_
 inline void link_func_if_required(meta_type_node *owner, const id_type id, meta_func_node &node) noexcept {
     node.id = id;
 
-    if(meta_range<meta_func_node *, meta_func_node> range{owner->func}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+    if(meta_range<meta_func_node *, meta_func_node> range{owner->func, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
         node.next = owner->func;
         owner->func = &node;
     }
