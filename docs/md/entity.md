@@ -731,8 +731,8 @@ There are two aliases that use `entt::entity` as their default entity:
 Users can also easily create their own aliases for custom identifiers as:
 
 ```cpp
-using my_handle = entt::basic_handle<my_identifier>;
-using my_const_handle = entt::basic_handle<const my_identifier>;
+using my_handle = entt::basic_handle<entt::basic_registry<my_identifier>>;
+using my_const_handle = entt::basic_handle<const entt::basic_registry<my_identifier>>;
 ```
 
 Handles are also implicitly convertible to const handles out of the box but not
@@ -773,7 +773,7 @@ organizer.emplace(+[](const void *, entt::registry &) { /* ... */ });
 These are the parameters that a free function or a member function can accept:
 
 * A possibly constant reference to a registry.
-* An `entt::basic_view` with any possible combination of types.
+* An `entt::basic_view` with any possible combination of storage classes.
 * A possibly constant reference to any type `T` (that is, a context variable).
 
 The function type for free functions and decayed lambdas passed as parameters to
