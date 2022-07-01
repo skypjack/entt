@@ -765,7 +765,7 @@ public:
      */
     template<typename Type, typename It>
     void insert(It first, It last, const Type &value = {}) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+        ENTT_ASSERT(([this, it = first, &last]() mutable { for(; it != last && valid(*it); ++it); return it; }() == last), "Invalid entity");
         assure<Type>().insert(first, last, value);
     }
 
@@ -783,7 +783,7 @@ public:
      */
     template<typename Type, typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, Type>>>
     void insert(EIt first, EIt last, CIt from) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+        ENTT_ASSERT(([this, it = first, &last]() mutable { for(; it != last && valid(*it); ++it); return it; }() == last), "Invalid entity");
         assure<Type>().insert(first, last, from);
     }
 
@@ -891,7 +891,7 @@ public:
     template<typename Type, typename... Other, typename It>
     size_type remove(It first, It last) {
         if constexpr(sizeof...(Other) == 0u) {
-            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+            ENTT_ASSERT(([this, it = first, &last]() mutable { for(; it != last && valid(*it); ++it); return it; }() == last), "Invalid entity");
             return assure<Type>().remove(std::move(first), std::move(last));
         } else {
             size_type count{};
@@ -936,7 +936,7 @@ public:
     template<typename Type, typename... Other, typename It>
     void erase(It first, It last) {
         if constexpr(sizeof...(Other) == 0u) {
-            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }), "Invalid entity");
+            ENTT_ASSERT(([this, it = first, &last]() mutable { for(; it != last && valid(*it); ++it); return it; }() == last), "Invalid entity");
             assure<Type>().erase(std::move(first), std::move(last));
         } else {
             for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
