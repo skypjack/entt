@@ -54,7 +54,7 @@ I hope this list can grow much more in the future:
     puzzler with logic gates and other cool stuff.
     [Check it out](https://indi-kernick.itch.io/the-machine-web-version).
   * [EnTTPong](https://github.com/DomRe/EnttPong): a basic game made to showcase
-    different parts of EnTT and C++17.
+    different parts of `EnTT` and C++17.
   * [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
     playground.
   * [EnTT Tower Defense](https://github.com/Daivuk/tddod): a data oriented tower
