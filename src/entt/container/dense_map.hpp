@@ -1,7 +1,6 @@
 #ifndef ENTT_CONTAINER_DENSE_MAP_HPP
 #define ENTT_CONTAINER_DENSE_MAP_HPP
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <functional>
