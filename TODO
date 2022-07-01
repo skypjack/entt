@@ -9,7 +9,6 @@ DOC:
 * storage<void>
 * custom storage/view
 * examples (and credits) from @alanjfs :)
-* document iterator.hpp (see core.md)
 * update entity doc when the storage based model is in place
 
 WIP:

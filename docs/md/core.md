@@ -14,6 +14,10 @@
 * [Hashed strings](#hashed-strings)
   * [Wide characters](wide-characters)
   * [Conflicts](#conflicts)
+* [Iterators](#iterators)
+  * [Input iterator pointer](#input-iterator-pointer)
+  * [Iota iterator](#iota-iterator)
+  * [Iterable adaptor](#iterable-adaptor)
 * [Memory](#memory)
   * [Power of two and fast modulus](#power-of-two-and-fast-modulus)
   * [Allocator aware unique pointers](#allocator-aware-unique-pointers)
@@ -371,9 +375,81 @@ and over which users have not the control. Choosing a slightly different
 identifier is probably the best solution to make the conflict disappear in this
 case.
 
+# Iterators
+
+Writing and working with iterators isn't always easy and more often than not
+leads to duplicated code.<br/>
+`EnTT` tries to overcome this problem by offering some utilities designed to
+make this hard work easier.
+
+## Input iterator pointer
+
+When writing an input iterator that returns in-place constructed values if
+dereferenced, it's not always straightforward to figure out what `value_type` is
+and how to make it behave like a full-fledged pointer.<br/>
+Conversely, it would be very useful to have an `operator->` available on the
+iterator itself that always works without too much complexity.
+
+The input iterator pointer is meant for this. It's a small class that wraps the
+in-place constructed value and adds some functions on top of it to make it
+suitable for use with input iterators: 
+
+```cpp
+struct iterator_type {
+    using value_type = std::pair<first_type, second_type>;
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::input_iterator_tag;
+
+    // ...
+}
+```
+
+The library makes extensive use of this class internally. In many cases, the
+`value_type` of the returned iterators is just an input iterator pointer.
+
+## Iota iterator
+
+Waiting for C++20, this iterator accepts an integral value and returns all
+elements in a certain range:
+
+```cpp
+entt::iota_iterator first{0};
+entt::iota_iterator last{100};
+
+for(; first != last; ++first) {
+    int value = *first;
+    // ...
+}
+```
+
+In the future, views will replace this class. Meanwhile, the library makes some
+interesting uses of it when a range of integral values is to be returned to the
+user.
+
+## Iterable adaptor
+
+Typically, a container class provides `begin` and `end` member functions (with
+their const counterparts) to be iterated by the user.<br/>
+However, it can happen that a class offers multiple iteration methods or allows
+users to iterate different sets of _elements_.
+
+The iterable adaptor is an utility class that makes it easier to use and access
+data in this case.<br/>
+It accepts a couple of iterators (or an iterator and a sentinel) and offers an
+_iterable_ object with all the expected methods like `begin`, `end` and whatnot.
+
+The library uses this class extensively.<br/>
+Think for example of views, which can be iterated to access entities but also
+offer a method of obtaining an iterable object that returns tuples of entities
+and components at once.<br/>
+Another example is the registry class which allows users to iterate its storage
+by returning an iterable object for the purpose.
+
 # Memory
 
-There are a handful of tools within EnTT to interact with memory in one way or
+There are a handful of tools within `EnTT` to interact with memory in one way or
 another.<br/>
 Some are geared towards simplifying the implementation of (internal or external)
 allocator aware containers. Others, on the other hand, are designed to help the
