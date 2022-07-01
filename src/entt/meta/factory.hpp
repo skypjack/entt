@@ -289,9 +289,7 @@ public:
         static internal::meta_conv_node node{
             nullptr,
             internal::meta_node<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>>::resolve(),
-            [](const meta_any &instance) -> meta_any {
-                return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data())));
-            }
+            [](const meta_any &instance) -> meta_any { return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data()))); }
             // tricks clang-format
         };
 
