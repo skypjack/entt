@@ -106,17 +106,17 @@ struct basic_meta_associative_container_traits {
 
     [[nodiscard]] static iterator iter(any &container, const bool as_end) {
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::integral_constant<bool, key_only>{}, as_end ? cont->end() : cont->begin()};
+            return iterator{std::bool_constant<key_only>{}, as_end ? cont->end() : cont->begin()};
         }
 
         const auto &as_const = any_cast<const Type &>(container);
-        return iterator{std::integral_constant<bool, key_only>{}, as_end ? as_const.end() : as_const.begin()};
+        return iterator{std::bool_constant<key_only>{}, as_end ? as_const.end() : as_const.begin()};
     }
 
     [[nodiscard]] static size_type insert_or_erase(any &container, meta_any &key, meta_any &value) {
         if(auto *const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
             if(value) {
-                if constexpr(is_key_only_meta_associative_container<Type>::value) {
+                if constexpr(key_only) {
                     return cont->insert(key.cast<const typename Type::key_type &>()).second;
                 } else {
                     return value.allow_cast<const typename Type::mapped_type &>() && cont->emplace(key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>()).second;
@@ -132,10 +132,10 @@ struct basic_meta_associative_container_traits {
     [[nodiscard]] static iterator find(any &container, meta_any &key) {
         if(key.allow_cast<const typename Type::key_type &>()) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
-                return iterator{std::integral_constant<bool, key_only>{}, cont->find(key.cast<const typename Type::key_type &>())};
+                return iterator{std::bool_constant<key_only>{}, cont->find(key.cast<const typename Type::key_type &>())};
             }
 
-            return iterator{std::integral_constant<bool, key_only>{}, any_cast<const Type &>(container).find(key.cast<const typename Type::key_type &>())};
+            return iterator{std::bool_constant<key_only>{}, any_cast<const Type &>(container).find(key.cast<const typename Type::key_type &>())};
         }
 
         return {};
