@@ -380,15 +380,15 @@ public:
         adjacency_list.reserve(vertices.size());
         auto adjacency_matrix = builder.graph();
 
-        for(auto vertex: adjacency_matrix.vertices()) {
-            const auto iterable = adjacency_matrix.in_edges(vertex);
+        for(auto curr: adjacency_matrix.vertices()) {
+            const auto iterable = adjacency_matrix.in_edges(curr);
             std::vector<std::size_t> reachable{};
 
-            for(auto &&edge: adjacency_matrix.out_edges(vertex)) {
+            for(auto &&edge: adjacency_matrix.out_edges(curr)) {
                 reachable.push_back(edge.second);
             }
 
-            adjacency_list.emplace_back(iterable.cbegin() == iterable.cend(), vertices[vertex], std::move(reachable));
+            adjacency_list.emplace_back(iterable.cbegin() == iterable.cend(), vertices[curr], std::move(reachable));
         }
 
         return adjacency_list;
