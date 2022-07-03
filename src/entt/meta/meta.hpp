@@ -49,8 +49,7 @@ public:
           size_fn{&meta_sequence_container_traits<Type>::size},
           resize_fn{&meta_sequence_container_traits<Type>::resize},
           iter_fn{&meta_sequence_container_traits<Type>::iter},
-          insert_fn{&meta_sequence_container_traits<Type>::insert},
-          erase_fn{&meta_sequence_container_traits<Type>::erase},
+          insert_or_erase_fn{&meta_sequence_container_traits<Type>::insert_or_erase},
           storage{std::move(instance)} {}
 
     [[nodiscard]] inline meta_type value_type() const noexcept;
@@ -69,8 +68,7 @@ private:
     size_type (*size_fn)(const any &) noexcept = nullptr;
     bool (*resize_fn)(any &, size_type) = nullptr;
     iterator (*iter_fn)(any &, const bool) = nullptr;
-    iterator (*insert_fn)(any &, const std::ptrdiff_t, meta_any &) = nullptr;
-    iterator (*erase_fn)(any &, const std::ptrdiff_t) = nullptr;
+    iterator (*insert_or_erase_fn)(any &, const std::ptrdiff_t, meta_any &) = nullptr;
     any storage{};
 };
 
@@ -101,8 +99,7 @@ public:
           size_fn{&meta_associative_container_traits<Type>::size},
           clear_fn{&meta_associative_container_traits<Type>::clear},
           iter_fn{&meta_associative_container_traits<Type>::iter},
-          insert_fn{&meta_associative_container_traits<Type>::insert},
-          erase_fn{&meta_associative_container_traits<Type>::erase},
+          insert_or_erase_fn{&meta_associative_container_traits<Type>::insert_or_erase},
           find_fn{&meta_associative_container_traits<Type>::find},
           storage{std::move(instance)} {
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
@@ -131,8 +128,7 @@ private:
     size_type (*size_fn)(const any &) noexcept = nullptr;
     bool (*clear_fn)(any &) = nullptr;
     iterator (*iter_fn)(any &, const bool) = nullptr;
-    bool (*insert_fn)(any &, meta_any &, meta_any &) = nullptr;
-    size_type (*erase_fn)(any &, meta_any &) = nullptr;
+    size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &) = nullptr;
     iterator (*find_fn)(any &, meta_any &) = nullptr;
     any storage{};
 };
@@ -1668,7 +1664,7 @@ inline bool meta_sequence_container::clear() {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return insert_fn(storage, it.offset, value);
+    return insert_or_erase_fn(storage, it.offset, value);
 }
 
 /**
@@ -1677,7 +1673,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(iterato
  * @return A possibly invalid iterator following the last removed element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
-    return erase_fn(storage, it.offset);
+    return insert(std::move(it), {});
 }
 
 /**
@@ -1755,8 +1751,8 @@ inline bool meta_associative_container::clear() {
  * @param value The value of the element to insert.
  * @return A bool denoting whether the insertion took place.
  */
-inline bool meta_associative_container::insert(meta_any key, meta_any value = {}) {
-    return insert_fn(storage, key, value);
+inline bool meta_associative_container::insert(meta_any key, meta_any value = std::in_place_type<void>) {
+    return (insert_or_erase_fn(storage, key, value) != 0u);
 }
 
 /**
@@ -1765,7 +1761,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
  * @return A bool denoting whether the removal took place.
  */
 inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
-    return erase_fn(storage, key);
+    return insert(std::move(key), {});
 }
 
 /**
