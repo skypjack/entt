@@ -255,21 +255,21 @@ public:
 
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
-     * @param get The storage for the types to iterate.
+     * @param value The storage for the types to iterate.
      * @param exclude The storage for the types used to filter the view.
      */
-    basic_view(Get &...get, Exclude &...exclude) noexcept
-        : pools{&get...},
+    basic_view(Get &...value, Exclude &...exclude) noexcept
+        : pools{&value...},
           filter{&exclude...},
-          view{[](const base_type *first, const auto *...other) { ((first = other->size() < first->size() ? other : first), ...); return first; }(&get...)} {}
+          view{[](const base_type *first, const auto *...other) { ((first = other->size() < first->size() ? other : first), ...); return first; }(&value...)} {}
 
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
-     * @param get The storage for the types to iterate.
+     * @param value The storage for the types to iterate.
      * @param exclude The storage for the types used to filter the view.
      */
-    basic_view(std::tuple<Get &...> get, std::tuple<Exclude &...> exclude = {}) noexcept
-        : pools{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, get)},
+    basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> exclude = {}) noexcept
+        : pools{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, value)},
           filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, exclude)},
           view{std::apply([](const base_type *first, const auto *...other) { ((first = other->size() < first->size() ? other : first), ...); return first; }, pools)} {}
 
