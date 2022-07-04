@@ -180,7 +180,7 @@ struct uses_allocator_construction {
             static_assert(std::uses_allocator_v<Type, Allocator>, "Ill-formed request");
 
             if constexpr(std::is_constructible_v<Type, std::allocator_arg_t, const Allocator &, Params...>) {
-                return std::tuple<std::allocator_arg_t, const Allocator &, Params &&...>(std::allocator_arg, allocator, std::forward<Params>(params)...);
+                return std::tuple<std::allocator_arg_t, const Allocator &, Params &&...>{std::allocator_arg, allocator, std::forward<Params>(params)...};
             } else {
                 static_assert(std::is_constructible_v<Type, Params..., const Allocator &>, "Ill-formed request");
                 return std::forward_as_tuple(std::forward<Params>(params)..., allocator);
@@ -281,7 +281,7 @@ constexpr Type make_obj_using_allocator(const Allocator &allocator, Args &&...ar
  */
 template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
-    return std::apply([&](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
+    return std::apply([value](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
 
 } // namespace entt
