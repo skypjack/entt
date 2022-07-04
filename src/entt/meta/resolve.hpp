@@ -1,7 +1,7 @@
 #ifndef ENTT_META_RESOLVE_HPP
 #define ENTT_META_RESOLVE_HPP
 
-#include <algorithm>
+#include <type_traits>
 #include "../core/type_info.hpp"
 #include "ctx.hpp"
 #include "meta.hpp"
