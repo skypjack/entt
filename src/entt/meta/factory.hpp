@@ -1,7 +1,6 @@
 #ifndef ENTT_META_FACTORY_HPP
 #define ENTT_META_FACTORY_HPP
 
-#include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <tuple>
@@ -15,6 +14,7 @@
 #include "node.hpp"
 #include "policy.hpp"
 #include "range.hpp"
+#include "resolve.hpp"
 #include "utility.hpp"
 
 namespace entt {
@@ -27,51 +27,57 @@ namespace entt {
 namespace internal {
 
 inline void link_prop_if_required(internal::meta_prop_node **ref, internal::meta_prop_node &node) noexcept {
-    if(meta_range<internal::meta_prop_node *, internal::meta_prop_node> range{*ref, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-        ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&node](const auto *curr) { return curr->id == node.id; }) == range.cend(), "Duplicate identifier");
-        node.next = *ref;
-        *ref = &node;
+    for(auto it = *ref; it; it = it->next) {
+        if(it == &node) { return; }
+        ENTT_ASSERT(it->id != node.id, "Duplicate identifier");
     }
+
+    node.next = *ref;
+    *ref = &node;
 }
 
 inline void link_type_if_required(meta_type_node *owner, const id_type id) noexcept {
-    meta_range<meta_type_node *, meta_type_node> range{*meta_context::global(), nullptr};
-    ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [&](const auto *curr) { return curr != owner && curr->id == id; }) == range.cend(), "Duplicate identifier");
+    ENTT_ASSERT((owner->id = {}, !resolve(id)), "Duplicate identifier");
     owner->id = id;
 
-    if(std::find(range.cbegin(), range.cend(), owner) == range.cend()) {
+    if(!resolve(id)) {
         owner->next = *meta_context::global();
         *meta_context::global() = owner;
     }
 }
 
 inline void link_base_if_required(meta_type_node *owner, meta_base_node &node) noexcept {
-    if(meta_range<meta_base_node *, meta_base_node> range{owner->base, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-        node.next = owner->base;
-        owner->base = &node;
+    for(auto it = owner->base; it; it = it->next) {
+        if(it == &node) { return; }
     }
+
+    node.next = owner->base;
+    owner->base = &node;
 }
 
 inline void link_conv_if_required(meta_type_node *owner, meta_conv_node &node) noexcept {
-    if(meta_range<meta_conv_node *, meta_conv_node> range{owner->conv, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-        node.next = owner->conv;
-        owner->conv = &node;
+    for(auto it = owner->conv; it; it = it->next) {
+        if(it == &node) { return; }
     }
+
+    node.next = owner->conv;
+    owner->conv = &node;
 }
 
 inline void link_ctor_if_required(meta_type_node *owner, meta_ctor_node &node) noexcept {
-    if(meta_range<meta_ctor_node *, meta_ctor_node> range{owner->ctor, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-        node.next = owner->ctor;
-        owner->ctor = &node;
+    for(auto it = owner->ctor; it; it = it->next) {
+        if(it == &node) { return; }
     }
+
+    node.next = owner->ctor;
+    owner->ctor = &node;
 }
 
 inline void link_data_if_required(meta_type_node *owner, const id_type id, meta_data_node &node) noexcept {
-    meta_range<meta_data_node *, meta_data_node> range{owner->data, nullptr};
-    ENTT_ASSERT(std::find_if(range.cbegin(), range.cend(), [id, &node](const auto *curr) { return curr != &node && curr->id == id; }) == range.cend(), "Duplicate identifier");
+    ENTT_ASSERT((node.id = {}, !meta_type{owner}.data(id)), "Duplicate identifier");
     node.id = id;
 
-    if(std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
+    if(!meta_type{owner}.data(id)) {
         node.next = owner->data;
         owner->data = &node;
     }
@@ -80,10 +86,12 @@ inline void link_data_if_required(meta_type_node *owner, const id_type id, meta_
 inline void link_func_if_required(meta_type_node *owner, const id_type id, meta_func_node &node) noexcept {
     node.id = id;
 
-    if(meta_range<meta_func_node *, meta_func_node> range{owner->func, nullptr}; std::find(range.cbegin(), range.cend(), &node) == range.cend()) {
-        node.next = owner->func;
-        owner->func = &node;
+    for(auto it = owner->func; it; it = it->next) {
+        if(it == &node) { return; }
     }
+
+    node.next = owner->func;
+    owner->func = &node;
 }
 
 } // namespace internal
