@@ -351,7 +351,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_registry(basic_registry &&other)
+    basic_registry(basic_registry &&other) noexcept
         : pools{std::move(other.pools)},
           groups{std::move(other.groups)},
           epool{std::move(other.epool)},
@@ -367,7 +367,7 @@ public:
      * @param other The instance to move from.
      * @return This registry.
      */
-    basic_registry &operator=(basic_registry &&other) {
+    basic_registry &operator=(basic_registry &&other) noexcept {
         pools = std::move(other.pools);
         groups = std::move(other.groups);
         epool = std::move(other.epool);
