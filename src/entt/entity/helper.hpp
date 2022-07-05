@@ -1,13 +1,15 @@
 #ifndef ENTT_ENTITY_HELPER_HPP
 #define ENTT_ENTITY_HELPER_HPP
 
+#include <memory>
 #include <type_traits>
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
 #include "component.hpp"
 #include "fwd.hpp"
-#include "registry.hpp"
+#include "group.hpp"
+#include "view.hpp"
 
 namespace entt {
 
