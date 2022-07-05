@@ -5,9 +5,9 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
-#include "registry.hpp"
 
 namespace entt {
 

@@ -14,7 +14,7 @@
 #include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
-#include "registry.hpp"
+#include "view.hpp"
 
 namespace entt {
 
