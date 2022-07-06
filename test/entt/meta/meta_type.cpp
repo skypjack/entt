@@ -8,7 +8,7 @@
 #include <entt/core/type_info.hpp>
 #include <entt/core/utility.hpp>
 #include <entt/meta/container.hpp>
-#include <entt/meta/ctx.hpp>
+#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/pointer.hpp>
