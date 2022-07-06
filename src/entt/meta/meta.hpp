@@ -1237,12 +1237,12 @@ public:
      * @return A wrapper that references the given instance.
      */
     meta_any from_void(void *element) {
-        return node->from_void ? node->from_void(element, nullptr) : meta_any{};
+        return (element && node->from_void) ? node->from_void(element, nullptr) : meta_any{};
     }
 
     /*! @copydoc from_void */
     meta_any from_void(const void *element) {
-        return node->from_void ? node->from_void(nullptr, element) : meta_any{};
+        return (element && node->from_void) ? node->from_void(nullptr, element) : meta_any{};
     }
 
     /**

@@ -468,11 +468,14 @@ TEST_F(MetaType, ConstructArithmeticConversion) {
 TEST_F(MetaType, FromVoid) {
     using namespace entt::literals;
 
-    ASSERT_FALSE(entt::resolve<void>().from_void(static_cast<void *>(nullptr)));
-    ASSERT_FALSE(entt::resolve<void>().from_void(static_cast<const void *>(nullptr)));
+    ASSERT_FALSE(entt::resolve<double>().from_void(static_cast<double *>(nullptr)));
+    ASSERT_FALSE(entt::resolve<double>().from_void(static_cast<const double *>(nullptr)));
 
     auto type = entt::resolve<double>();
     double value = 4.2;
+
+    ASSERT_FALSE(entt::resolve<void>().from_void(static_cast<void *>(&value)));
+    ASSERT_FALSE(entt::resolve<void>().from_void(static_cast<const void *>(&value)));
 
     auto as_void = type.from_void(static_cast<void *>(&value));
     auto as_const_void = type.from_void(static_cast<const void *>(&value));

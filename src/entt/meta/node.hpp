@@ -155,7 +155,11 @@ class ENTT_API meta_node {
             return static_cast<std::decay_t<decltype(meta_type_node::from_void)>>(nullptr);
         } else {
             return +[](void *element, const void *as_const) {
-                return element ? meta_any{std::in_place_type<Type &>, *static_cast<Type *>(element)} : meta_any{std::in_place_type<const Type &>, *static_cast<const Type *>(as_const)};
+                if (element) {
+                    return meta_any{std::in_place_type<Type &>, *static_cast<Type *>(element)};
+                }
+
+                return meta_any{std::in_place_type<const Type &>, *static_cast<const Type *>(as_const)};
             };
         }
     }
