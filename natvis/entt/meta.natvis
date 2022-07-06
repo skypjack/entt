@@ -92,6 +92,7 @@
 			<Item Name="[is_meta_associative_container]">has_property(entt::internal::meta_traits::is_meta_associative_container)</Item>
 			<Item Name="[default_constructor]">default_constructor != nullptr</Item>
 			<Item Name="[conversion_helper]">conversion_helper != nullptr</Item>
+			<Item Name="[from_void]">from_void != nullptr</Item>
 			<Item Name="[template_info]" Condition="templ != nullptr">*templ</Item>
 			<Synthetic Name="[ctor]" Condition="ctor != nullptr">
 				<Expand>
