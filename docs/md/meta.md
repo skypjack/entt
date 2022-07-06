@@ -15,6 +15,7 @@
   * [Template information](#template-information)
   * [Automatic conversions](#automatic-conversions)
   * [Implicitly generated default constructor](#implicitly-generated-default-constructor)
+  * [From void to any](#from-void-to-any)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
   * [Properties and meta objects](#properties-and-meta-objects)
@@ -782,6 +783,24 @@ useful for building keys without knowing or having to register the actual types.
 
 In all cases, when users register default constructors, they are preferred both
 during searches and when the `construct` member function is invoked.
+
+## From void to any
+
+Sometimes all a user has is an opaque pointer to an object of a known meta type.
+It would be handy in this case to be able to construct a `meta_any` object from
+them.<br/>
+For this purpose, the `meta_type` class offers a `from_void` member function
+designed to convert an opaque pointer into a `meta_any`:
+
+```cpp
+entt::meta_any any = entt::resolve(id).from_void(element);
+```
+
+It goes without saying that it's not possible to do a check on the actual type.
+Therefore, this call can be considered as a _static cast_ with all the problems
+and undefined behaviors of the case following errors.<br/>
+On the other hand, the ability to construct a `meta_any` from an opaque pointer
+opens the door to some pretty interesting uses that are worth exploring.
 
 ## Policies: the more, the less
 

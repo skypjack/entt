@@ -1232,6 +1232,20 @@ public:
     }
 
     /**
+     * @brief Wraps an opaque element of the underlying type.
+     * @param element A valid pointer to an element of the underlying type.
+     * @return A wrapper that references the given instance.
+     */
+    meta_any from_void(void *element) {
+        return node->from_void ? node->from_void(element, nullptr) : meta_any{};
+    }
+
+    /*! @copydoc from_void */
+    meta_any from_void(const void *element) {
+        return node->from_void ? node->from_void(nullptr, element) : meta_any{};
+    }
+
+    /**
      * @brief Invokes a function given an identifier, if possible.
      *
      * It must be possible to cast the instance to the parent type of the member

@@ -111,6 +111,7 @@ struct meta_type_node {
     meta_type_node *(*const remove_pointer)() noexcept;
     meta_any (*const default_constructor)();
     double (*const conversion_helper)(void *, const void *);
+    meta_any (*const from_void)(void *, const void *);
     const meta_template_node *const templ;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
@@ -149,6 +150,16 @@ class ENTT_API meta_node {
         }
     }
 
+    [[nodiscard]] static auto *meta_from_void() noexcept {
+        if constexpr(std::is_same_v<Type, void> || std::is_array_v<Type> || std::is_function_v<Type>) {
+            return static_cast<std::decay_t<decltype(meta_type_node::from_void)>>(nullptr);
+        } else {
+            return +[](void *element, const void *as_const) {
+                return element ? meta_any{std::in_place_type<Type &>, *static_cast<Type *>(element)} : meta_any{std::in_place_type<const Type &>, *static_cast<const Type *>(as_const)};
+            };
+        }
+    }
+
     [[nodiscard]] static meta_template_node *meta_template_info() noexcept {
         if constexpr(is_complete_v<meta_template_traits<Type>>) {
             static meta_template_node node{
@@ -184,6 +195,7 @@ public:
             &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,
             meta_default_constructor(),
             meta_conversion_helper(),
+            meta_from_void(),
             meta_template_info()
             // tricks clang-format
         };

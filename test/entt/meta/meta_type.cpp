@@ -465,6 +465,34 @@ TEST_F(MetaType, ConstructArithmeticConversion) {
     ASSERT_EQ(any.cast<clazz_t>().value, 1);
 }
 
+TEST_F(MetaType, FromVoid) {
+    using namespace entt::literals;
+
+    ASSERT_FALSE(entt::resolve<void>().from_void(static_cast<void *>(nullptr)));
+    ASSERT_FALSE(entt::resolve<void>().from_void(static_cast<const void *>(nullptr)));
+
+    auto type = entt::resolve<double>();
+    double value = 4.2;
+
+    auto as_void = type.from_void(static_cast<void *>(&value));
+    auto as_const_void = type.from_void(static_cast<const void *>(&value));
+
+    ASSERT_TRUE(as_void);
+    ASSERT_TRUE(as_const_void);
+
+    ASSERT_EQ(as_void.type(), entt::resolve<double>());
+    ASSERT_NE(as_void.try_cast<double>(), nullptr);
+
+    ASSERT_EQ(as_const_void.type(), entt::resolve<double>());
+    ASSERT_EQ(as_const_void.try_cast<double>(), nullptr);
+    ASSERT_NE(as_const_void.try_cast<const double>(), nullptr);
+
+    value = 1.2;
+
+    ASSERT_EQ(as_void.cast<double>(), as_const_void.cast<double>());
+    ASSERT_EQ(as_void.cast<double>(), 1.2);
+}
+
 TEST_F(MetaType, Reset) {
     using namespace entt::literals;
 
