@@ -137,18 +137,6 @@ class basic_dispatcher {
         return static_cast<handler_type<Type> &>(*ptr);
     }
 
-    template<typename Type>
-    [[nodiscard]] const handler_type<Type> *assure(const id_type id) const {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
-        auto &container = pools.first();
-
-        if(const auto it = container.find(id); it != container.end()) {
-            return static_cast<const handler_type<Type> *>(it->second.get());
-        }
-
-        return nullptr;
-    }
-
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
@@ -216,8 +204,11 @@ public:
      */
     template<typename Type>
     size_type size(const id_type id = type_hash<Type>::value()) const noexcept {
-        const auto *cpool = assure<Type>(id);
-        return cpool ? cpool->size() : 0u;
+        if(auto it = pools.first().find(id); it != pools.first().cend()) {
+            return it->second->size();
+        }
+
+        return 0u;
     }
 
     /**
