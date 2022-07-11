@@ -26,7 +26,7 @@ template<typename, typename = void>
 struct is_dynamic_sequence_container: std::false_type {};
 
 template<typename Type>
-struct is_dynamic_sequence_container<Type, std::void_t<decltype(&Type::reserve)>>: std::true_type {};
+struct is_dynamic_sequence_container<Type, std::void_t<decltype(&Type::clear)>>: std::true_type {};
 
 template<typename, typename = void>
 struct is_key_only_meta_associative_container: std::true_type {};
