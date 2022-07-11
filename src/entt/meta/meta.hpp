@@ -1236,12 +1236,12 @@ public:
      * @param element A valid pointer to an element of the underlying type.
      * @return A wrapper that references the given instance.
      */
-    meta_any from_void(void *element) {
+    meta_any from_void(void *element) const {
         return (element && node->from_void) ? node->from_void(element, nullptr) : meta_any{};
     }
 
     /*! @copydoc from_void */
-    meta_any from_void(const void *element) {
+    meta_any from_void(const void *element) const {
         return (element && node->from_void) ? node->from_void(nullptr, element) : meta_any{};
     }
 
