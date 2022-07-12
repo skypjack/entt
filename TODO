@@ -13,6 +13,7 @@ DOC:
 
 WIP:
 * meta: add deque support as sequence container
+* no gh-pages, use main/docs or similar, see settings/pages on gh
 * sparse set/storage support for move-only types, internal rework required
 * get rid of observers, storage based views made them pointless - document alternatives
 * add storage getter for filters to views and groups
