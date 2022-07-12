@@ -1,4 +1,5 @@
 #include <array>
+#include <list>
 #include <map>
 #include <set>
 #include <utility>
@@ -202,6 +203,53 @@ TEST_F(MetaContainer, StdArray) {
 
     ASSERT_FALSE(view.clear());
     ASSERT_EQ(view.size(), 3u);
+}
+
+TEST_F(MetaContainer, StdList) {
+    std::list<int> list{};
+    auto any = entt::forward_as_meta(list);
+    auto view = any.as_sequence_container();
+
+    ASSERT_TRUE(view);
+    ASSERT_EQ(view.value_type(), entt::resolve<int>());
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.resize(3u));
+    ASSERT_EQ(view.size(), 3u);
+    ASSERT_NE(view.begin(), view.end());
+
+    view[0].cast<int &>() = 2;
+    view[1].cast<int &>() = 3;
+    view[2].cast<int &>() = 4;
+
+    ASSERT_EQ(view[1u].cast<int>(), 3);
+
+    auto it = view.begin();
+    auto ret = view.insert(it, 0);
+
+    ASSERT_TRUE(ret);
+    ASSERT_FALSE(view.insert(ret, invalid_type{}));
+    ASSERT_TRUE(view.insert(++ret, 1.));
+
+    ASSERT_EQ(view.size(), 5u);
+    ASSERT_EQ(view.begin()->cast<int>(), 0);
+    ASSERT_EQ((++view.begin())->cast<int>(), 1);
+
+    ret = view.insert(view.end(), 42);
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(*ret, 42);
+
+    it = view.begin();
+    ret = view.erase(it);
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 5u);
+    ASSERT_EQ(ret->cast<int>(), 1);
+
+    ASSERT_TRUE(view.clear());
+    ASSERT_EQ(view.size(), 0u);
 }
 
 TEST_F(MetaContainer, StdMap) {

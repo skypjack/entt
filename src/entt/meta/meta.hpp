@@ -1471,7 +1471,7 @@ class meta_sequence_container::meta_iterator final {
 
     template<typename It>
     static meta_any deref_fn(const any &value, const std::ptrdiff_t pos) {
-        return meta_any{std::in_place_type<typename std::iterator_traits<It>::reference>, any_cast<const It &>(value)[pos]};
+        return meta_any{std::in_place_type<typename std::iterator_traits<It>::reference>, *std::next(any_cast<const It &>(value), pos)};
     }
 
 public:

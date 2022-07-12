@@ -12,6 +12,7 @@ DOC:
 * update entity doc when the storage based model is in place
 
 WIP:
+* meta: add deque support as sequence container
 * sparse set/storage support for move-only types, internal rework required
 * get rid of observers, storage based views made them pointless - document alternatives
 * add storage getter for filters to views and groups

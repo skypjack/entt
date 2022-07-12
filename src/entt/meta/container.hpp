@@ -2,6 +2,8 @@
 #define ENTT_META_CONTAINER_HPP
 
 #include <array>
+#include <iterator>
+#include <list>
 #include <map>
 #include <set>
 #include <type_traits>
@@ -70,12 +72,12 @@ struct basic_meta_sequence_container_traits {
                     // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
                     if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
                         const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                        const auto curr = cont->insert(cont->begin() + offset, element ? *element : value.cast<typename Type::value_type>());
-                        return iterator{*cont, curr - cont->begin()};
+                        const auto curr = cont->insert(std::next(cont->begin(), offset), element ? *element : value.cast<typename Type::value_type>());
+                        return iterator{*cont, static_cast<std::ptrdiff_t>(offset)};
                     }
                 } else {
-                    const auto curr = cont->erase(cont->begin() + offset);
-                    return iterator{*cont, curr - cont->begin()};
+                    const auto curr = cont->erase(std::next(cont->begin(), offset));
+                    return iterator{*cont, static_cast<std::ptrdiff_t>(offset)};
                 }
             }
         }
@@ -166,6 +168,15 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>
 template<typename Type, auto N>
 struct meta_sequence_container_traits<std::array<Type, N>>
     : internal::basic_meta_sequence_container_traits<std::array<Type, N>> {};
+
+/**
+ * @brief Meta sequence container traits for `std::list`s of any type.
+ * @tparam Type The type of elements.
+ * @tparam Args Other arguments.
+ */
+template<typename Type, typename... Args>
+struct meta_sequence_container_traits<std::list<Type, Args...>>
+    : internal::basic_meta_sequence_container_traits<std::list<Type, Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::map`s of any type.
