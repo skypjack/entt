@@ -143,7 +143,7 @@ public:
      * @param allocator The allocator to use.
      */
     adjacency_matrix(const size_type vertices, const allocator_type &allocator = allocator_type{})
-        : matrix(vertices * vertices),
+        : matrix{vertices * vertices, allocator},
           vert{vertices} {}
 
     /**
