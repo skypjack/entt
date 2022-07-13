@@ -2,6 +2,7 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -786,6 +787,24 @@ TEST(DenseMap, Erase) {
 
     ASSERT_EQ(map.bucket_count(), 2 * minimum_bucket_count);
     ASSERT_EQ(map.size(), 0u);
+}
+
+TEST(DenseMap, EraseWithMovableKeyValue) {
+    static constexpr std::size_t minimum_bucket_count = 8u;
+    entt::dense_map<std::string, std::size_t> map;
+
+    map.emplace("0", 0u);
+    map.emplace("1", 1u);
+
+    ASSERT_EQ(map.bucket_count(), minimum_bucket_count);
+    ASSERT_EQ(map.size(), 2u);
+
+    auto it = map.erase(map.find("0"));
+
+    ASSERT_EQ(it->first, "1");
+    ASSERT_EQ(it->second, 1u);
+    ASSERT_EQ(map.size(), 1u);
+    ASSERT_FALSE(map.contains("0"));
 }
 
 TEST(DenseMap, EraseFromBucket) {
