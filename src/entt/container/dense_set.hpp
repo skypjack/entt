@@ -279,8 +279,8 @@ class dense_set {
 
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
-            packed.first()[pos] = std::move(packed.first().back());
             size_type *curr = sparse.first().data() + value_to_bucket(packed.first().back().second);
+            packed.first()[pos] = std::move(packed.first().back());
             for(; *curr != last; curr = &packed.first()[*curr].first) {}
             *curr = pos;
         }

@@ -2,6 +2,7 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -541,6 +542,25 @@ TEST(DenseSet, Erase) {
 
     ASSERT_EQ(set.bucket_count(), 2 * minimum_bucket_count);
     ASSERT_EQ(set.size(), 0u);
+}
+
+TEST(DenseSet, EraseWithMovableKeyValue) {
+    // TODO
+
+    static constexpr std::size_t minimum_bucket_count = 8u;
+    entt::dense_set<std::string> set;
+
+    set.emplace("0");
+    set.emplace("1");
+
+    ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
+    ASSERT_EQ(set.size(), 2u);
+
+    auto it = set.erase(set.find("0"));
+
+    ASSERT_EQ(*it, "1");
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_FALSE(set.contains("0"));
 }
 
 TEST(DenseSet, EraseFromBucket) {
