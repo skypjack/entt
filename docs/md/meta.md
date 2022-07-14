@@ -364,8 +364,9 @@ of the container.<br/>
 `EnTT` already exports the specializations for some common classes. In
 particular:
 
-* `std::vector` and `std::array` are exported as _sequence containers_.
-* `std::map`, `std::set` and their unordered counterparts are exported as
+* `std::vector`, `std::array`, `std::deque` and `std::list` (but not
+  `std::forward_list`) are supported as _sequence containers_.
+* `std::map`, `std::set` and their unordered counterparts are supported as
   _associative containers_.
 
 It's important to include the header file `container.hpp` to make these
@@ -491,7 +492,11 @@ to case. In particular:
 
   The function returns instances of `meta_any` that directly refer to the actual
   elements. Modifying the returned object will then directly modify the element
-  inside the container.
+  inside the container.<br/>
+  Depending on the underlying sequence container, this operation may not be as
+  efficient. For example, in the case of an `std::list`, a positional access
+  translates to a linear visit of the list itself (probably not what the user
+  expects).
 
 Similarly, also the interface of the `meta_associative_container` proxy object
 is the same for all types of associative containers. However, there are some
