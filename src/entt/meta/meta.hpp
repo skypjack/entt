@@ -68,7 +68,7 @@ private:
     size_type (*size_fn)(const any &) noexcept = nullptr;
     bool (*resize_fn)(any &, size_type) = nullptr;
     iterator (*iter_fn)(any &, const bool) = nullptr;
-    iterator (*insert_or_erase_fn)(any &, const std::ptrdiff_t, meta_any &) = nullptr;
+    iterator (*insert_or_erase_fn)(any &, const any &, meta_any &) = nullptr;
     any storage{};
 };
 
@@ -1467,11 +1467,25 @@ inline bool meta_any::assign(meta_any &&other) {
 class meta_sequence_container::meta_iterator final {
     friend class meta_sequence_container;
 
-    using deref_fn_type = meta_any(const any &, const std::ptrdiff_t);
+    enum class operation : std::uint8_t {
+        incr,
+        deref
+    };
+
+    using vtable_type = void(const operation, const any &, const std::ptrdiff_t, meta_any *);
 
     template<typename It>
-    static meta_any deref_fn(const any &value, const std::ptrdiff_t pos) {
-        return meta_any{std::in_place_type<typename std::iterator_traits<It>::reference>, *std::next(any_cast<const It &>(value), pos)};
+    static void basic_vtable(const operation op, const any &value, const std::ptrdiff_t offset, meta_any *other) {
+        switch(op) {
+        case operation::incr: {
+            auto &it = any_cast<It &>(const_cast<any &>(value));
+            it = std::next(it, offset);
+        } break;
+        case operation::deref: {
+            const auto &it = any_cast<const It &>(value);
+            other->emplace<decltype(*it)>(*it);
+        } break;
+        }
     }
 
 public:
@@ -1482,38 +1496,40 @@ public:
     using iterator_category = std::input_iterator_tag;
 
     constexpr meta_iterator() noexcept
-        : deref{},
-          offset{},
+        : vtable{},
           handle{} {}
 
-    template<typename Type>
-    explicit meta_iterator(Type &cont, const difference_type init) noexcept
-        : deref{&deref_fn<decltype(cont.begin())>},
-          offset{init},
-          handle{cont.begin()} {}
+    template<typename It>
+    explicit meta_iterator(It iter) noexcept
+        : vtable{&basic_vtable<It>},
+          handle{std::move(iter)} {}
 
     meta_iterator &operator++() noexcept {
-        return ++offset, *this;
+        vtable(operation::incr, handle, 1, nullptr);
+        return *this;
     }
 
     meta_iterator operator++(int value) noexcept {
         meta_iterator orig = *this;
-        offset += ++value;
+        vtable(operation::incr, handle, ++value, nullptr);
         return orig;
     }
 
     meta_iterator &operator--() noexcept {
-        return --offset, *this;
+        vtable(operation::incr, handle, -1, nullptr);
+        return *this;
     }
 
     meta_iterator operator--(int value) noexcept {
         meta_iterator orig = *this;
-        offset -= ++value;
+        vtable(operation::incr, handle, --value, nullptr);
         return orig;
     }
 
     [[nodiscard]] reference operator*() const {
-        return deref(handle, offset);
+        reference other;
+        vtable(operation::deref, handle, 0, &other);
+        return other;
     }
 
     [[nodiscard]] pointer operator->() const {
@@ -1525,7 +1541,7 @@ public:
     }
 
     [[nodiscard]] bool operator==(const meta_iterator &other) const noexcept {
-        return offset == other.offset;
+        return handle == other.handle;
     }
 
     [[nodiscard]] bool operator!=(const meta_iterator &other) const noexcept {
@@ -1533,8 +1549,7 @@ public:
     }
 
 private:
-    deref_fn_type *deref;
-    difference_type offset;
+    vtable_type *vtable;
     any handle;
 };
 
@@ -1678,7 +1693,7 @@ inline bool meta_sequence_container::clear() {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return insert_or_erase_fn(storage, it.offset, value);
+    return insert_or_erase_fn(storage, it.handle, value);
 }
 
 /**
