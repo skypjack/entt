@@ -86,6 +86,7 @@ Here is a brief, yet incomplete list of what it offers today:
   patterns, from **perfect SoA** to fully random.
 * A lot of **facilities** built on top of the entity-component system to help
   the users and avoid reinventing the wheel.
+* General purpose execution graph builder for optimal scheduling.
 * The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free runtime **reflection system**.
 * **Static polymorphism** made simple and within everyone's reach.
