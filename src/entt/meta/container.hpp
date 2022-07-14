@@ -69,19 +69,22 @@ struct basic_meta_sequence_container_traits {
     [[nodiscard]] static iterator insert_or_erase([[maybe_unused]] any &container, [[maybe_unused]] const any &handle, [[maybe_unused]] meta_any &value) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
+                typename Type::const_iterator it{};
+
+                if(auto *non_const = any_cast<typename Type::iterator>(&handle); non_const) {
+                    it = *non_const;
+                } else {
+                    it = any_cast<const typename Type::const_iterator &>(handle);
+                }
+
                 if(value) {
                     // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
                     if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
                         const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                        auto *it = any_cast<typename Type::iterator>(&handle);
-
-                        return iterator{cont->insert(
-                            it ? *it : any_cast<typename Type::const_iterator>(handle),
-                            element ? *element : value.cast<typename Type::value_type>())};
+                        return iterator{cont->insert(it, element ? *element : value.cast<typename Type::value_type>())};
                     }
                 } else {
-                    auto *it = any_cast<typename Type::iterator>(&handle);
-                    return iterator{it ? cont->erase(*it) : cont->erase(any_cast<typename Type::const_iterator>(handle))};
+                    return iterator{cont->erase(it)};
                 }
             }
         }
