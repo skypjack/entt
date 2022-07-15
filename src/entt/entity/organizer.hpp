@@ -1,12 +1,10 @@
 #ifndef ENTT_ENTITY_ORGANIZER_HPP
 #define ENTT_ENTITY_ORGANIZER_HPP
 
-#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "../container/dense_map.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
@@ -145,8 +143,12 @@ class basic_organizer final {
             return {};
         } else {
             const type_info *info[sizeof...(Type)]{&type_id<Type>()...};
-            const auto length = (std::min)(count, sizeof...(Type));
-            std::copy_n(info, length, buffer);
+            const auto length = count < sizeof...(Type) ? count : sizeof...(Type);
+
+            for(std::size_t pos{}; pos < length; ++pos) {
+                buffer[pos] = info[pos];
+            }
+
             return length;
         }
     }
