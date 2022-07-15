@@ -2,7 +2,6 @@
 #define ENTT_SIGNAL_EMITTER_HPP
 
 #include <functional>
-#include <memory>
 #include <type_traits>
 #include <utility>
 #include "../container/dense_map.hpp"
@@ -33,26 +32,7 @@ namespace entt {
  */
 template<typename Derived>
 class emitter {
-    template<typename Type>
-    using function_type = std::function<void(Type &, Derived &)>;
-
-    template<typename Type>
-    [[nodiscard]] function_type<Type> &assure() {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
-        auto &&ptr = handlers[type_hash<Type>::value()];
-
-        if(!ptr) {
-            ptr = std::make_shared<function_type<Type>>();
-        }
-
-        return *static_cast<function_type<Type> *>(ptr.get());
-    }
-
-    template<typename Type>
-    [[nodiscard]] const function_type<Type> *assure() const {
-        const auto it = handlers.find(type_hash<Type>::value());
-        return (it == handlers.cend()) ? nullptr : static_cast<const function_type<Type> *>(it->second.get());
-    }
+    using function_type = std::function<void(void *)>;
 
 public:
     /*! @brief Default constructor. */
@@ -65,13 +45,13 @@ public:
     }
 
     /*! @brief Default move constructor. */
-    emitter(emitter &&) = default;
+    emitter(emitter &&) noexcept = default;
 
     /**
      * @brief Default move assignment operator.
      * @return This emitter.
      */
-    emitter &operator=(emitter &&) = default;
+    emitter &operator=(emitter &&) noexcept = default;
 
     /**
      * @brief Publishes a given event.
@@ -80,8 +60,8 @@ public:
      */
     template<typename Type>
     void publish(Type &&value) {
-        if(auto &handler = assure<std::remove_cv_t<std::remove_reference_t<Type>>>(); handler) {
-            handler(value, *static_cast<Derived *>(this));
+        if(const auto id = type_id<Type>().hash(); handlers.contains(id)) {
+            handlers[id](&value);
         }
     }
 
@@ -92,7 +72,9 @@ public:
      */
     template<typename Type>
     void on(std::function<void(Type &, Derived &)> func) {
-        assure<Type>() = std::move(func);
+        handlers.insert_or_assign(type_id<Type>().hash(), [func = std::move(func), this](void *value) {
+            func(*static_cast<Type *>(value), static_cast<Derived &>(*this));
+        });
     }
 
     /**
@@ -128,7 +110,7 @@ public:
     }
 
 private:
-    dense_map<id_type, std::shared_ptr<void>, identity> handlers{};
+    dense_map<id_type, function_type, identity> handlers{};
 };
 
 } // namespace entt
