@@ -155,10 +155,15 @@ template<typename ILhs, typename IRhs>
     return !(lhs < rhs);
 }
 
-struct registry_context {
+class registry_context {
+    using key_type = id_type;
+    using mapped_type = basic_any<0u>;
+    using container_type = dense_map<key_type, mapped_type, identity>;
+
+public:
     template<typename Type, typename... Args>
     Type &emplace_hint(const id_type id, Args &&...args) {
-        return any_cast<Type &>(data.try_emplace(id, std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
+        return any_cast<Type &>(ctx.try_emplace(id, std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
     }
 
     template<typename Type, typename... Args>
@@ -168,40 +173,40 @@ struct registry_context {
 
     template<typename Type>
     bool erase(const id_type id = type_id<Type>().hash()) {
-        const auto it = data.find(id);
-        return it != data.end() && it->second.type() == type_id<Type>() ? (data.erase(it), true) : false;
+        const auto it = ctx.find(id);
+        return it != ctx.end() && it->second.type() == type_id<Type>() ? (ctx.erase(it), true) : false;
     }
 
     template<typename Type>
     [[nodiscard]] const Type &at(const id_type id = type_id<Type>().hash()) const {
-        return any_cast<const Type &>(data.at(id));
+        return any_cast<const Type &>(ctx.at(id));
     }
 
     template<typename Type>
     [[nodiscard]] Type &at(const id_type id = type_id<Type>().hash()) {
-        return any_cast<Type &>(data.at(id));
+        return any_cast<Type &>(ctx.at(id));
     }
 
     template<typename Type>
     [[nodiscard]] const Type *find(const id_type id = type_id<Type>().hash()) const {
-        const auto it = data.find(id);
-        return it != data.cend() ? any_cast<const Type>(&it->second) : nullptr;
+        const auto it = ctx.find(id);
+        return it != ctx.cend() ? any_cast<const Type>(&it->second) : nullptr;
     }
 
     template<typename Type>
     [[nodiscard]] Type *find(const id_type id = type_id<Type>().hash()) {
-        const auto it = data.find(id);
-        return it != data.end() ? any_cast<Type>(&it->second) : nullptr;
+        const auto it = ctx.find(id);
+        return it != ctx.end() ? any_cast<Type>(&it->second) : nullptr;
     }
 
     template<typename Type>
     [[nodiscard]] bool contains(const id_type id = type_id<Type>().hash()) const {
-        const auto it = data.find(id);
-        return it != data.cend() && it->second.type() == type_id<Type>();
+        const auto it = ctx.find(id);
+        return it != ctx.cend() && it->second.type() == type_id<Type>();
     }
 
 private:
-    dense_map<id_type, basic_any<0u>, identity> data;
+    container_type ctx;
 };
 
 } // namespace internal
