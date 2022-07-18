@@ -12,14 +12,13 @@ DOC:
 * update entity doc when the storage based model is in place
 
 WIP:
+* any: assert-if-dynamic like tag to the constructor
 * no gh-pages, use main/docs or similar, see settings/pages on gh
 * sparse set/storage support for move-only types, internal rework required
 * get rid of observers, storage based views made them pointless - document alternatives
 * add storage getter for filters to views and groups
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
-* emitter: runtime handlers, allocator support (ready for both already)
 * basic_storage::bind for cross-registry setups (see and remove todo from entity_copy.cpp)
-* uses-allocator construction: any (with allocator support), poly, ...
 * process scheduler: reviews, use free lists internally
 * iterator based try_emplace vs try_insert for perf reasons
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model

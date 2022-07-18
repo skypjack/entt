@@ -3,11 +3,12 @@
 #include <gtest/gtest.h>
 #include <entt/signal/emitter.hpp>
 
-struct test_emitter: entt::emitter<test_emitter> {};
+struct test_emitter: entt::emitter<test_emitter> {
+    using entt::emitter<test_emitter>::emitter;
+};
 
 struct foo_event {
     int i;
-    char c;
 };
 
 struct bar_event {};
@@ -31,6 +32,30 @@ TEST(Emitter, Move) {
     ASSERT_FALSE(emitter.empty());
     ASSERT_TRUE(emitter.contains<foo_event>());
     ASSERT_TRUE(other.empty());
+}
+
+TEST(Emitter, Swap) {
+    test_emitter emitter;
+    test_emitter other;
+    int value{};
+
+    emitter.on<foo_event>([&value](auto &event, const auto &) {
+        value = event.i;
+    });
+
+    ASSERT_FALSE(emitter.empty());
+    ASSERT_TRUE(other.empty());
+
+    emitter.swap(other);
+    emitter.publish(foo_event{42});
+
+    ASSERT_EQ(value, 0);
+    ASSERT_TRUE(emitter.empty());
+    ASSERT_FALSE(other.empty());
+
+    other.publish(foo_event{42});
+
+    ASSERT_EQ(value, 42);
 }
 
 TEST(Emitter, Clear) {
@@ -110,7 +135,7 @@ TEST(Emitter, On) {
     ASSERT_TRUE(emitter.contains<foo_event>());
     ASSERT_EQ(value, 0);
 
-    emitter.publish(foo_event{42, 'c'});
+    emitter.publish(foo_event{42});
 
     ASSERT_EQ(value, 42);
 }
@@ -128,4 +153,18 @@ TEST(Emitter, OnAndErase) {
 
     ASSERT_TRUE(emitter.empty());
     ASSERT_FALSE(emitter.contains<bar_event>());
+}
+
+TEST(Emitter, CustomAllocator) {
+    std::allocator<void> allocator;
+    test_emitter emitter{allocator};
+
+    ASSERT_EQ(emitter.get_allocator(), allocator);
+    ASSERT_FALSE(emitter.get_allocator() != allocator);
+
+    emitter.on<foo_event>([](auto &, const auto &) {});
+    decltype(emitter) other{std::move(emitter), allocator};
+
+    ASSERT_TRUE(emitter.empty());
+    ASSERT_FALSE(other.empty());
 }

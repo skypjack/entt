@@ -11,7 +11,7 @@ class delegate;
 template<typename = std::allocator<void>>
 class basic_dispatcher;
 
-template<typename>
+template<typename, typename = std::allocator<void>>
 class emitter;
 
 class connection;
