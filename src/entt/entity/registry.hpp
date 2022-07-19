@@ -968,35 +968,25 @@ public:
     }
 
     /**
-     * @brief Checks if an entity has all the given components.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
-     *
-     * @tparam Type Components for which to perform the check.
+     * @brief Check if an entity is part of all the given storage.
+     * @tparam Type Type of storage to check for.
      * @param entity A valid identifier.
-     * @return True if the entity has all the components, false otherwise.
+     * @return True if the entity is part of all the storage, false otherwise.
      */
     template<typename... Type>
     [[nodiscard]] bool all_of(const entity_type entity) const {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
         return (assure<std::remove_const_t<Type>>().contains(entity) && ...);
     }
 
     /**
-     * @brief Checks if an entity has at least one of the given components.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
-     *
-     * @tparam Type Components for which to perform the check.
+     * @brief Check if an entity is part of at least one given storage.
+     * @tparam Type Type of storage to check for.
      * @param entity A valid identifier.
-     * @return True if the entity has at least one of the given components,
-     * false otherwise.
+     * @return True if the entity is part of at least one storage, false
+     * otherwise.
      */
     template<typename... Type>
     [[nodiscard]] bool any_of(const entity_type entity) const {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
         return (assure<std::remove_const_t<Type>>().contains(entity) || ...);
     }
 
