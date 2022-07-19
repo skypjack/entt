@@ -527,22 +527,22 @@ public:
 
     /**
      * @brief Checks if an identifier refers to a valid entity.
-     * @param entity An identifier, either valid or not.
+     * @param entt An identifier, either valid or not.
      * @return True if the identifier is valid, false otherwise.
      */
-    [[nodiscard]] bool valid(const entity_type entity) const {
-        const auto pos = size_type(entity_traits::to_entity(entity));
-        return (pos < epool.size() && epool[pos] == entity);
+    [[nodiscard]] bool valid(const entity_type entt) const {
+        const auto pos = size_type(entity_traits::to_entity(entt));
+        return (pos < epool.size() && epool[pos] == entt);
     }
 
     /**
      * @brief Returns the actual version for an identifier.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return The version for the given identifier if valid, the tombstone
      * version otherwise.
      */
-    [[nodiscard]] version_type current(const entity_type entity) const {
-        const auto pos = size_type(entity_traits::to_entity(entity));
+    [[nodiscard]] version_type current(const entity_type entt) const {
+        const auto pos = size_type(entity_traits::to_entity(entt));
         return entity_traits::to_version(pos < epool.size() ? epool[pos] : tombstone);
     }
 
@@ -641,11 +641,11 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return The version of the recycled entity.
      */
-    version_type release(const entity_type entity) {
-        return release(entity, static_cast<version_type>(entity_traits::to_version(entity) + 1u));
+    version_type release(const entity_type entt) {
+        return release(entt, static_cast<version_type>(entity_traits::to_version(entt) + 1u));
     }
 
     /**
@@ -656,13 +656,13 @@ public:
      *
      * @sa release
      *
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @param version A desired version upon destruction.
      * @return The version actually assigned to the entity.
      */
-    version_type release(const entity_type entity, const version_type version) {
-        ENTT_ASSERT(orphan(entity), "Non-orphan entity");
-        return release_entity(entity, version);
+    version_type release(const entity_type entt, const version_type version) {
+        ENTT_ASSERT(orphan(entt), "Non-orphan entity");
+        return release_entity(entt, version);
     }
 
     /**
@@ -691,11 +691,11 @@ public:
      * result in undefined behavior. Attempting to use an invalid entity results
      * in undefined behavior.
      *
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return The version of the recycled entity.
      */
-    version_type destroy(const entity_type entity) {
-        return destroy(entity, static_cast<version_type>(entity_traits::to_version(entity) + 1u));
+    version_type destroy(const entity_type entt) {
+        return destroy(entt, static_cast<version_type>(entity_traits::to_version(entt) + 1u));
     }
 
     /**
@@ -706,18 +706,18 @@ public:
      *
      * @sa destroy
      *
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @param version A desired version upon destruction.
      * @return The version actually assigned to the entity.
      */
-    version_type destroy(const entity_type entity, const version_type version) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
+    version_type destroy(const entity_type entt, const version_type version) {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
 
         for(size_type pos = pools.size(); pos; --pos) {
-            pools.begin()[pos - 1u].second->remove(entity);
+            pools.begin()[pos - 1u].second->remove(entt);
         }
 
-        return release_entity(entity, version);
+        return release_entity(entt, version);
     }
 
     /**
@@ -747,14 +747,14 @@ public:
      *
      * @tparam Type Type of component to create.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
     template<typename Type, typename... Args>
-    decltype(auto) emplace(const entity_type entity, Args &&...args) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Type>().emplace(entity, std::forward<Args>(args)...);
+    decltype(auto) emplace(const entity_type entt, Args &&...args) {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
+        return assure<Type>().emplace(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -800,18 +800,18 @@ public:
      *
      * @tparam Type Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
     template<typename Type, typename... Args>
-    decltype(auto) emplace_or_replace(const entity_type entity, Args &&...args) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
+    decltype(auto) emplace_or_replace(const entity_type entt, Args &&...args) {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
         auto &cpool = assure<Type>();
 
-        return cpool.contains(entity)
-                   ? cpool.patch(entity, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); })
-                   : cpool.emplace(entity, std::forward<Args>(args)...);
+        return cpool.contains(entt)
+                   ? cpool.patch(entt, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); })
+                   : cpool.emplace(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -834,14 +834,14 @@ public:
      *
      * @tparam Type Type of component to patch.
      * @tparam Func Types of the function objects to invoke.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @param func Valid function objects.
      * @return A reference to the patched component.
      */
     template<typename Type, typename... Func>
-    decltype(auto) patch(const entity_type entity, Func &&...func) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        return assure<Type>().patch(entity, std::forward<Func>(func)...);
+    decltype(auto) patch(const entity_type entt, Func &&...func) {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
+        return assure<Type>().patch(entt, std::forward<Func>(func)...);
     }
 
     /**
@@ -855,13 +855,13 @@ public:
      *
      * @tparam Type Type of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the component being replaced.
      */
     template<typename Type, typename... Args>
-    decltype(auto) replace(const entity_type entity, Args &&...args) {
-        return patch<Type>(entity, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); });
+    decltype(auto) replace(const entity_type entt, Args &&...args) {
+        return patch<Type>(entt, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); });
     }
 
     /**
@@ -872,13 +872,13 @@ public:
      *
      * @tparam Type Type of component to remove.
      * @tparam Other Other types of components to remove.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return The number of components actually removed.
      */
     template<typename Type, typename... Other>
-    size_type remove(const entity_type entity) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        return (assure<Type>().remove(entity) + ... + assure<Other>().remove(entity));
+    size_type remove(const entity_type entt) {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
+        return (assure<Type>().remove(entt) + ... + assure<Other>().remove(entt));
     }
 
     /**
@@ -919,12 +919,12 @@ public:
      *
      * @tparam Type Types of components to erase.
      * @tparam Other Other types of components to erase.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      */
     template<typename Type, typename... Other>
-    void erase(const entity_type entity) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        (assure<Type>().erase(entity), (assure<Other>().erase(entity), ...));
+    void erase(const entity_type entt) {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
+        (assure<Type>().erase(entt), (assure<Other>().erase(entt), ...));
     }
 
     /**
@@ -970,24 +970,24 @@ public:
     /**
      * @brief Check if an entity is part of all the given storage.
      * @tparam Type Type of storage to check for.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return True if the entity is part of all the storage, false otherwise.
      */
     template<typename... Type>
-    [[nodiscard]] bool all_of(const entity_type entity) const {
-        return (assure<std::remove_const_t<Type>>().contains(entity) && ...);
+    [[nodiscard]] bool all_of(const entity_type entt) const {
+        return (assure<std::remove_const_t<Type>>().contains(entt) && ...);
     }
 
     /**
      * @brief Check if an entity is part of at least one given storage.
      * @tparam Type Type of storage to check for.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return True if the entity is part of at least one storage, false
      * otherwise.
      */
     template<typename... Type>
-    [[nodiscard]] bool any_of(const entity_type entity) const {
-        return (assure<std::remove_const_t<Type>>().contains(entity) || ...);
+    [[nodiscard]] bool any_of(const entity_type entt) const {
+        return (assure<std::remove_const_t<Type>>().contains(entt) || ...);
     }
 
     /**
@@ -998,20 +998,20 @@ public:
      * that doesn't own it results in undefined behavior.
      *
      * @tparam Type Types of components to get.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return References to the components owned by the entity.
      */
     template<typename... Type>
-    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) const {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        return view<Type...>().template get<const Type...>(entity);
+    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
+        return view<Type...>().template get<const Type...>(entt);
     }
 
     /*! @copydoc get */
     template<typename... Type>
-    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entity) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        return view<Type...>().template get<Type...>(entity);
+    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
+        return view<Type...>().template get<Type...>(entt);
     }
 
     /**
@@ -1025,15 +1025,15 @@ public:
      *
      * @tparam Type Type of component to get.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @param args Parameters to use to initialize the component.
      * @return Reference to the component owned by the entity.
      */
     template<typename Type, typename... Args>
-    [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entity, Args &&...args) {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
+    [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entt, Args &&...args) {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
         auto &cpool = assure<Type>();
-        return cpool.contains(entity) ? cpool.get(entity) : cpool.emplace(entity, std::forward<Args>(args)...);
+        return cpool.contains(entt) ? cpool.get(entt) : cpool.emplace(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -1046,28 +1046,28 @@ public:
      * The registry retains ownership of the pointed-to components.
      *
      * @tparam Type Types of components to get.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return Pointers to the components owned by the entity.
      */
     template<typename... Type>
-    [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entity) const {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
+    [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) const {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
 
         if constexpr(sizeof...(Type) == 1) {
             const auto &cpool = assure<std::remove_const_t<Type>...>();
-            return cpool.contains(entity) ? std::addressof(cpool.get(entity)) : nullptr;
+            return cpool.contains(entt) ? std::addressof(cpool.get(entt)) : nullptr;
         } else {
-            return std::make_tuple(try_get<Type>(entity)...);
+            return std::make_tuple(try_get<Type>(entt)...);
         }
     }
 
     /*! @copydoc try_get */
     template<typename... Type>
-    [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entity) {
+    [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) {
         if constexpr(sizeof...(Type) == 1) {
-            return (const_cast<Type *>(std::as_const(*this).template try_get<Type>(entity)), ...);
+            return (const_cast<Type *>(std::as_const(*this).template try_get<Type>(entt)), ...);
         } else {
-            return std::make_tuple(try_get<Type>(entity)...);
+            return std::make_tuple(try_get<Type>(entt)...);
         }
     }
 
@@ -1119,12 +1119,12 @@ public:
 
     /**
      * @brief Checks if an entity has components assigned.
-     * @param entity A valid identifier.
+     * @param entt A valid identifier.
      * @return True if the entity has no components assigned, false otherwise.
      */
-    [[nodiscard]] bool orphan(const entity_type entity) const {
-        ENTT_ASSERT(valid(entity), "Invalid entity");
-        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&curr) { return curr.second->contains(entity); });
+    [[nodiscard]] bool orphan(const entity_type entt) const {
+        ENTT_ASSERT(valid(entt), "Invalid entity");
+        return std::none_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return curr.second->contains(entt); });
     }
 
     /**
