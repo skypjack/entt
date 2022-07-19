@@ -318,7 +318,7 @@ public:
 
     /*! @brief Default constructor. */
     dense_set()
-        : dense_set(minimum_capacity) {}
+        : dense_set{minimum_capacity} {}
 
     /**
      * @brief Constructs an empty container with a given allocator.

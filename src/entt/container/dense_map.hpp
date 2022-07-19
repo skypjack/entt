@@ -372,7 +372,7 @@ public:
 
     /*! @brief Default constructor. */
     dense_map()
-        : dense_map(minimum_capacity) {}
+        : dense_map{minimum_capacity} {}
 
     /**
      * @brief Constructs an empty container with a given allocator.
