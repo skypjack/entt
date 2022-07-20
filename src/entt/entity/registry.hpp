@@ -280,7 +280,7 @@ class basic_registry {
     template<typename Type>
     [[nodiscard]] auto &assure(const id_type id = type_hash<Type>::value()) {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
-        auto &&cpool = pools[id];
+        auto &cpool = pools[id];
 
         if(!cpool) {
             cpool.reset(new storage_for_type<Type>{});
