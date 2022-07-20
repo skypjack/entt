@@ -840,7 +840,6 @@ public:
      */
     template<typename Type, typename... Func>
     decltype(auto) patch(const entity_type entt, Func &&...func) {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
         return assure<Type>().patch(entt, std::forward<Func>(func)...);
     }
 
