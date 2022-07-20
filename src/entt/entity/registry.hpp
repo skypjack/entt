@@ -1048,8 +1048,6 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) const {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
-
         if constexpr(sizeof...(Type) == 1) {
             const auto &cpool = assure<std::remove_const_t<Type>...>();
             return cpool.contains(entt) ? std::addressof(cpool.get(entt)) : nullptr;
