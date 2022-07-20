@@ -1003,14 +1003,12 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
         return view<Type...>().template get<const Type...>(entt);
     }
 
     /*! @copydoc get */
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
         return view<Type...>().template get<Type...>(entt);
     }
 
