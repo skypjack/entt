@@ -922,7 +922,6 @@ public:
      */
     template<typename Type, typename... Other>
     void erase(const entity_type entt) {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
         (assure<Type>().erase(entt), (assure<Other>().erase(entt), ...));
     }
 
@@ -944,7 +943,6 @@ public:
             assure<Type>().erase(std::move(first), std::move(last));
         } else {
             for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
-                ENTT_ASSERT(valid(*first), "Invalid entity");
                 std::apply([entt = *first](auto &...curr) { (curr.erase(entt), ...); }, cpools);
             }
         }
