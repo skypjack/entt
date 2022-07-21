@@ -939,7 +939,6 @@ public:
     template<typename Type, typename... Other, typename It>
     void erase(It first, It last) {
         if constexpr(sizeof...(Other) == 0u) {
-            ENTT_ASSERT(([this, it = first, &last]() mutable { for(; it != last && valid(*it); ++it); return it; }() == last), "Invalid entity");
             assure<Type>().erase(std::move(first), std::move(last));
         } else {
             for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
