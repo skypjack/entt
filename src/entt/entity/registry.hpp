@@ -806,7 +806,7 @@ public:
      */
     template<typename Type, typename... Args>
     decltype(auto) emplace_or_replace(const entity_type entt, Args &&...args) {
-        if (auto& cpool = assure<Type>(); cpool.contains(entt)) {
+        if(auto &cpool = assure<Type>(); cpool.contains(entt)) {
             return cpool.patch(entt, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); });
         } else {
             ENTT_ASSERT(valid(entt), "Invalid entity");
@@ -1025,9 +1025,12 @@ public:
      */
     template<typename Type, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entt, Args &&...args) {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
-        auto &cpool = assure<Type>();
-        return cpool.contains(entt) ? cpool.get(entt) : cpool.emplace(entt, std::forward<Args>(args)...);
+        if(auto &cpool = assure<Type>(); cpool.contains(entt)) {
+            return cpool.get(entt);
+        } else {
+            ENTT_ASSERT(valid(entt), "Invalid entity");
+            return cpool.emplace(entt, std::forward<Args>(args)...);
+        }
     }
 
     /**
