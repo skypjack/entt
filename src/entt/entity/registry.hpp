@@ -876,7 +876,6 @@ public:
      */
     template<typename Type, typename... Other>
     size_type remove(const entity_type entt) {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
         return (assure<Type>().remove(entt) + ... + assure<Other>().remove(entt));
     }
 
@@ -895,13 +894,11 @@ public:
     template<typename Type, typename... Other, typename It>
     size_type remove(It first, It last) {
         if constexpr(sizeof...(Other) == 0u) {
-            ENTT_ASSERT(([this, it = first, &last]() mutable { for(; it != last && valid(*it); ++it); return it; }() == last), "Invalid entity");
             return assure<Type>().remove(std::move(first), std::move(last));
         } else {
             size_type count{};
 
             for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
-                ENTT_ASSERT(valid(*first), "Invalid entity");
                 count += std::apply([entt = *first](auto &...curr) { return (curr.remove(entt) + ... + 0u); }, cpools);
             }
 
