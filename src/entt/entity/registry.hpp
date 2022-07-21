@@ -661,7 +661,7 @@ public:
      * @return The version actually assigned to the entity.
      */
     version_type release(const entity_type entt, const version_type version) {
-        ENTT_ASSERT(orphan(entt), "Non-orphan entity");
+        ENTT_ASSERT(valid(entt) && orphan(entt), "Invalid or non-orphan entity");
         return release_entity(entt, version);
     }
 
@@ -1118,7 +1118,6 @@ public:
      * @return True if the entity has no components assigned, false otherwise.
      */
     [[nodiscard]] bool orphan(const entity_type entt) const {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
         return std::none_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return curr.second->contains(entt); });
     }
 
