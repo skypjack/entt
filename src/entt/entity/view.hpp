@@ -427,8 +427,6 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        ENTT_ASSERT(contains(entt), "View does not contain entity");
-
         if constexpr(sizeof...(Type) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools);
         } else if constexpr(sizeof...(Type) == 1) {
@@ -452,8 +450,6 @@ public:
      */
     template<std::size_t First, std::size_t... Other>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        ENTT_ASSERT(contains(entt), "View does not contain entity");
-
         if constexpr(sizeof...(Other) == 0) {
             return std::get<First>(pools)->get(entt);
         } else {
@@ -749,8 +745,6 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        ENTT_ASSERT(contains(entt), "View does not contain entity");
-
         if constexpr(sizeof...(Type) == 0) {
             return std::get<0>(pools)->get_as_tuple(entt);
         } else {
@@ -762,7 +756,6 @@ public:
     /*! @copydoc get */
     template<std::size_t Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        ENTT_ASSERT(contains(entt), "View does not contain entity");
         return std::get<0>(pools)->get(entt);
     }
 
