@@ -753,7 +753,6 @@ public:
      */
     template<typename Type, typename... Args>
     decltype(auto) emplace(const entity_type entt, Args &&...args) {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
         return assure<Type>().emplace(entt, std::forward<Args>(args)...);
     }
 
@@ -770,7 +769,6 @@ public:
      */
     template<typename Type, typename It>
     void insert(It first, It last, const Type &value = {}) {
-        ENTT_ASSERT(([this, it = first, &last]() mutable { for(; it != last && valid(*it); ++it); return it; }() == last), "Invalid entity");
         assure<Type>().insert(first, last, value);
     }
 
@@ -788,7 +786,6 @@ public:
      */
     template<typename Type, typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, Type>>>
     void insert(EIt first, EIt last, CIt from) {
-        ENTT_ASSERT(([this, it = first, &last]() mutable { for(; it != last && valid(*it); ++it); return it; }() == last), "Invalid entity");
         assure<Type>().insert(first, last, from);
     }
 
@@ -809,7 +806,6 @@ public:
         if(auto &cpool = assure<Type>(); cpool.contains(entt)) {
             return cpool.patch(entt, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); });
         } else {
-            ENTT_ASSERT(valid(entt), "Invalid entity");
             return cpool.emplace(entt, std::forward<Args>(args)...);
         }
     }
@@ -1025,7 +1021,6 @@ public:
         if(auto &cpool = assure<Type>(); cpool.contains(entt)) {
             return cpool.get(entt);
         } else {
-            ENTT_ASSERT(valid(entt), "Invalid entity");
             return cpool.emplace(entt, std::forward<Args>(args)...);
         }
     }
