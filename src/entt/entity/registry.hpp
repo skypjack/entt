@@ -711,13 +711,11 @@ public:
      * @return The version actually assigned to the entity.
      */
     version_type destroy(const entity_type entt, const version_type version) {
-        ENTT_ASSERT(valid(entt), "Invalid entity");
-
         for(size_type pos = pools.size(); pos; --pos) {
             pools.begin()[pos - 1u].second->remove(entt);
         }
 
-        return release_entity(entt, version);
+        return release(entt, version);
     }
 
     /**
