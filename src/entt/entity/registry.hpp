@@ -661,7 +661,8 @@ public:
      * @return The version actually assigned to the entity.
      */
     version_type release(const entity_type entt, const version_type version) {
-        ENTT_ASSERT(valid(entt) && orphan(entt), "Invalid or non-orphan entity");
+        ENTT_ASSERT(valid(entt), "Invalid identifier");
+        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return (curr.second->current(entt) == entity_traits::to_version(entt::tombstone)); }), "Non-orphan entity");
         return release_entity(entt, version);
     }
 
