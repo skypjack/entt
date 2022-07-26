@@ -741,8 +741,8 @@ public:
      * The component must have a proper constructor or be of aggregate type.
      *
      * @warning
-     * Attempting to use an invalid entity or to assign a component to an entity
-     * that already owns it results in undefined behavior.
+     * Attempting to assign a component to an entity that already owns it
+     * results in undefined behavior.
      *
      * @tparam Type Type of component to create.
      * @tparam Args Types of arguments to use to construct the component.
@@ -791,8 +791,8 @@ public:
     /**
      * @brief Assigns or replaces the given component for an entity.
      *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
+     * @sa emplace
+     * @sa replace
      *
      * @tparam Type Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
@@ -824,8 +824,8 @@ public:
      * for them.
      *
      * @warning
-     * Attempting to use an invalid entity or to patch a component of an entity
-     * that doesn't own it results in undefined behavior.
+     * Attempting to to patch a component of an entity that doesn't own it
+     * results in undefined behavior.
      *
      * @tparam Type Type of component to patch.
      * @tparam Func Types of the function objects to invoke.
@@ -844,8 +844,8 @@ public:
      * The component must have a proper constructor or be of aggregate type.
      *
      * @warning
-     * Attempting to use an invalid entity or to replace a component of an
-     * entity that doesn't own it results in undefined behavior.
+     * Attempting to replace a component of an entity that doesn't own it
+     * results in undefined behavior.
      *
      * @tparam Type Type of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
@@ -860,9 +860,6 @@ public:
 
     /**
      * @brief Removes the given components from an entity.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Type Type of component to remove.
      * @tparam Other Other types of components to remove.
@@ -905,8 +902,8 @@ public:
      * @brief Erases the given components from an entity.
      *
      * @warning
-     * Attempting to use an invalid entity or to erase a component from an
-     * entity that doesn't own it results in undefined behavior.
+     * Attempting to erase a component from an entity that doesn't own it
+     * results in undefined behavior.
      *
      * @tparam Type Types of components to erase.
      * @tparam Other Other types of components to erase.
@@ -982,8 +979,8 @@ public:
      * @brief Returns references to the given components for an entity.
      *
      * @warning
-     * Attempting to use an invalid entity or to get a component from an entity
-     * that doesn't own it results in undefined behavior.
+     * Attempting to get a component from an entity that doesn't own it results
+     * in undefined behavior.
      *
      * @tparam Type Types of components to get.
      * @param entt A valid identifier.
@@ -1006,8 +1003,8 @@ public:
      * In case the entity doesn't own the component, the parameters provided are
      * used to construct it.
      *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
+     * @sa get
+     * @sa emplace
      *
      * @tparam Type Type of component to get.
      * @tparam Args Types of arguments to use to construct the component.
@@ -1026,9 +1023,6 @@ public:
 
     /**
      * @brief Returns pointers to the given components for an entity.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @note
      * The registry retains ownership of the pointed-to components.
