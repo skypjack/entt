@@ -313,22 +313,3 @@ if(ENTT_BUILD_DOCS)
         add_subdirectory(docs)
     endif()
 endif()
-
-#
-# AOB
-#
-
-add_custom_target(
-    aob
-    SOURCES
-        .github/workflows/build.yml
-        .github/workflows/coverage.yml
-        .github/workflows/deploy.yml
-        .github/workflows/sanitizer.yml
-        .github/FUNDING.yml
-        AUTHORS
-        CONTRIBUTING.md
-        LICENSE
-        README.md
-        TODO
-)
