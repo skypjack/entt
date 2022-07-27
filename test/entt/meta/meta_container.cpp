@@ -122,6 +122,7 @@ TEST_F(MetaContainer, StdVector) {
     std::vector<int> vec{};
     auto any = entt::forward_as_meta(vec);
     auto view = any.as_sequence_container();
+    auto cview = std::as_const(any).as_sequence_container();
 
     ASSERT_TRUE(view);
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
@@ -149,7 +150,7 @@ TEST_F(MetaContainer, StdVector) {
     ASSERT_EQ(view.begin()->cast<int>(), 0);
     ASSERT_EQ((++view.begin())->cast<int>(), 1);
 
-    ret = view.insert(view.end(), 42);
+    ret = view.insert(cview.end(), 42);
 
     ASSERT_TRUE(ret);
     ASSERT_EQ(*ret, 42);
@@ -160,6 +161,12 @@ TEST_F(MetaContainer, StdVector) {
     ASSERT_TRUE(ret);
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ(ret->cast<int>(), 1);
+
+    ret = view.erase(cview.begin());
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ(ret->cast<int>(), 2);
 
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
@@ -210,6 +217,7 @@ TEST_F(MetaContainer, StdList) {
     std::list<int> list{};
     auto any = entt::forward_as_meta(list);
     auto view = any.as_sequence_container();
+    auto cview = std::as_const(any).as_sequence_container();
 
     ASSERT_TRUE(view);
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
@@ -237,7 +245,7 @@ TEST_F(MetaContainer, StdList) {
     ASSERT_EQ(view.begin()->cast<int>(), 0);
     ASSERT_EQ((++view.begin())->cast<int>(), 1);
 
-    ret = view.insert(view.end(), 42);
+    ret = view.insert(cview.end(), 42);
 
     ASSERT_TRUE(ret);
     ASSERT_EQ(*ret, 42);
@@ -248,6 +256,12 @@ TEST_F(MetaContainer, StdList) {
     ASSERT_TRUE(ret);
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ(ret->cast<int>(), 1);
+
+    ret = view.erase(cview.begin());
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ(ret->cast<int>(), 2);
 
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
@@ -257,6 +271,7 @@ TEST_F(MetaContainer, StdDeque) {
     std::deque<int> deque{};
     auto any = entt::forward_as_meta(deque);
     auto view = any.as_sequence_container();
+    auto cview = std::as_const(any).as_sequence_container();
 
     ASSERT_TRUE(view);
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
@@ -284,7 +299,7 @@ TEST_F(MetaContainer, StdDeque) {
     ASSERT_EQ(view.begin()->cast<int>(), 0);
     ASSERT_EQ((++view.begin())->cast<int>(), 1);
 
-    ret = view.insert(view.end(), 42);
+    ret = view.insert(cview.end(), 42);
 
     ASSERT_TRUE(ret);
     ASSERT_EQ(*ret, 42);
@@ -295,6 +310,12 @@ TEST_F(MetaContainer, StdDeque) {
     ASSERT_TRUE(ret);
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ(ret->cast<int>(), 1);
+
+    ret = view.erase(cview.begin());
+
+    ASSERT_TRUE(ret);
+    ASSERT_EQ(view.size(), 4u);
+    ASSERT_EQ(ret->cast<int>(), 2);
 
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
