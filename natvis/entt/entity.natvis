@@ -136,6 +136,14 @@
 			<Item Name="[filter]">filter,na</Item>
 		</Expand>
 	</Type>
+	<Type Name="entt::basic_runtime_view&lt;*&gt;">
+		<DisplayString Condition="pools.size() != 0u">{{ size_hint={ pools[0]->packed.size() } }}</DisplayString>
+		<DisplayString>{{ size_hint=0 }}</DisplayString>
+		<Expand>
+			<Item Name="[pools]">pools,na</Item>
+			<Item Name="[filter]">filter,na</Item>
+		</Expand>
+	</Type>
 	<Type Name="entt::null_t">
 		<DisplayString>&lt;null&gt;</DisplayString>
 	</Type>
