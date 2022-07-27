@@ -29,7 +29,7 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::emitter&lt;*&gt;">
-		<DisplayString>{{ size={ handlers.packed.first_base::value.size() } }}</DisplayString>
+		<DisplayString>{{ size={ handlers.first_base::value.packed.first_base::value.size() } }}</DisplayString>
 	</Type>
 	<Type Name="entt::connection">
 		<DisplayString>{{ bound={ signal != nullptr } }}</DisplayString>
