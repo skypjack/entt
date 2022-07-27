@@ -545,8 +545,6 @@ TEST(DenseSet, Erase) {
 }
 
 TEST(DenseSet, EraseWithMovableKeyValue) {
-    // TODO
-
     static constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::string> set;
 
