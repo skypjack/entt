@@ -271,6 +271,7 @@ TYPED_TEST(RuntimeView, Each) {
     const auto other = registry.create();
 
     registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
     registry.emplace<char>(other);
 
     view.iterate(registry.storage<int>()).iterate(registry.storage<char>());
