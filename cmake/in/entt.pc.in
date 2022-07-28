@@ -1,5 +1,5 @@
 prefix=@CMAKE_INSTALL_PREFIX@
-includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+includedir=@EnTT_PKGCONFIG_INCLUDEDIR@
 
 Name: EnTT
 Description: Gaming meets modern C++
