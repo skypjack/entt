@@ -102,8 +102,8 @@ TEST(Registry, Context) {
 
     ASSERT_EQ(ctx.emplace<char>('a'), 'c');
     ASSERT_EQ(ctx.find<const char>(), cctx.find<char>());
-    ASSERT_EQ(ctx.at<char>(), cctx.at<const char>());
-    ASSERT_EQ(ctx.at<char>(), 'c');
+    ASSERT_EQ(ctx.get<char>(), cctx.get<const char>());
+    ASSERT_EQ(ctx.get<char>(), 'c');
 
     ASSERT_EQ(ctx.emplace<const int>(0), 42);
     ASSERT_EQ(ctx.find<const int>(), cctx.find<int>());
@@ -132,14 +132,14 @@ TEST(Registry, ContextHint) {
     ASSERT_NE(ctx.find<int>("other"_hs), nullptr);
     ASSERT_EQ(cctx.find<const char>("other"_hs), nullptr);
 
-    ASSERT_EQ(ctx.at<int>(), 42);
-    ASSERT_EQ(cctx.at<const int>("other"_hs), 3);
+    ASSERT_EQ(ctx.get<int>(), 42);
+    ASSERT_EQ(cctx.get<const int>("other"_hs), 3);
 
     ASSERT_FALSE(ctx.erase<char>("other"_hs));
     ASSERT_TRUE(ctx.erase<int>());
 
     ASSERT_TRUE(cctx.contains<int>("other"_hs));
-    ASSERT_EQ(ctx.at<int>("other"_hs), 3);
+    ASSERT_EQ(ctx.get<int>("other"_hs), 3);
 
     ASSERT_TRUE(ctx.erase<int>("other"_hs));
 
@@ -156,17 +156,17 @@ TEST(Registry, ContextAsRef) {
     ASSERT_NE(registry.ctx().find<int>(), nullptr);
     ASSERT_NE(registry.ctx().find<const int>(), nullptr);
     ASSERT_NE(std::as_const(registry).ctx().find<const int>(), nullptr);
-    ASSERT_EQ(registry.ctx().at<const int>(), 3);
-    ASSERT_EQ(registry.ctx().at<int>(), 3);
+    ASSERT_EQ(registry.ctx().get<const int>(), 3);
+    ASSERT_EQ(registry.ctx().get<int>(), 3);
 
-    registry.ctx().at<int>() = 42;
+    registry.ctx().get<int>() = 42;
 
-    ASSERT_EQ(registry.ctx().at<int>(), 42);
+    ASSERT_EQ(registry.ctx().get<int>(), 42);
     ASSERT_EQ(value, 42);
 
     value = 3;
 
-    ASSERT_EQ(std::as_const(registry).ctx().at<const int>(), 3);
+    ASSERT_EQ(std::as_const(registry).ctx().get<const int>(), 3);
 }
 
 TEST(Registry, ContextAsConstRef) {
@@ -178,11 +178,11 @@ TEST(Registry, ContextAsConstRef) {
     ASSERT_EQ(registry.ctx().find<int>(), nullptr);
     ASSERT_NE(registry.ctx().find<const int>(), nullptr);
     ASSERT_NE(std::as_const(registry).ctx().find<const int>(), nullptr);
-    ASSERT_EQ(registry.ctx().at<const int>(), 3);
+    ASSERT_EQ(registry.ctx().get<const int>(), 3);
 
     value = 42;
 
-    ASSERT_EQ(std::as_const(registry).ctx().at<const int>(), 42);
+    ASSERT_EQ(std::as_const(registry).ctx().get<const int>(), 42);
 }
 
 TEST(Registry, Functionalities) {
@@ -1827,8 +1827,8 @@ TEST(Registry, Constness) {
     static_assert((std::is_same_v<decltype(registry.try_get<int>({})), int *>));
     static_assert((std::is_same_v<decltype(registry.try_get<int, const char>({})), std::tuple<int *, const char *>>));
 
-    static_assert((std::is_same_v<decltype(registry.ctx().at<int>()), int &>));
-    static_assert((std::is_same_v<decltype(registry.ctx().at<const char>()), const char &>));
+    static_assert((std::is_same_v<decltype(registry.ctx().get<int>()), int &>));
+    static_assert((std::is_same_v<decltype(registry.ctx().get<const char>()), const char &>));
 
     static_assert((std::is_same_v<decltype(registry.ctx().find<int>()), int *>));
     static_assert((std::is_same_v<decltype(registry.ctx().find<const char>()), const char *>));
@@ -1839,8 +1839,8 @@ TEST(Registry, Constness) {
     static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
     static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<int, const char>({})), std::tuple<const int *, const char *>>));
 
-    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().at<int>()), const int &>));
-    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().at<const char>()), const char &>));
+    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().get<int>()), const int &>));
+    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().get<const char>()), const char &>));
 
     static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().find<int>()), const int *>));
     static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().find<const char>()), const char *>));

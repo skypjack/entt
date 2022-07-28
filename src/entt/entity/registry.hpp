@@ -178,12 +178,22 @@ public:
     }
 
     template<typename Type>
-    [[nodiscard]] const Type &at(const id_type id = type_id<Type>().hash()) const {
+    [[deprecated("Use ::get instead")]] [[nodiscard]] const Type &at(const id_type id = type_id<Type>().hash()) const {
+        return get<Type>(id);
+    }
+
+    template<typename Type>
+    [[deprecated("Use ::get instead")]] [[nodiscard]] Type &at(const id_type id = type_id<Type>().hash()) {
+        return get<Type>(id);
+    }
+
+    template<typename Type>
+    [[nodiscard]] const Type &get(const id_type id = type_id<Type>().hash()) const {
         return any_cast<const Type &>(ctx.at(id));
     }
 
     template<typename Type>
-    [[nodiscard]] Type &at(const id_type id = type_id<Type>().hash()) {
+    [[nodiscard]] Type &get(const id_type id = type_id<Type>().hash()) {
         return any_cast<Type &>(ctx.at(id));
     }
 
