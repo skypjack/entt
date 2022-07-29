@@ -422,6 +422,56 @@ public:
         std::as_const(*this).each(std::move(func));
         clear();
     }
+    
+    /**
+     * @brief Iterates the first N entities and applies the given function object to them.
+     *
+     * The function object is invoked for each entity.<br/>
+     * The signature of the function must be equivalent to the following form:
+     *
+     * @code{.cpp}
+     * void(const entity_type);
+     * @endcode
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param n The number of entities to apply against
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void each(std::size_t n, Func func) const {
+        std::size_t i = 0;
+        for(const auto entity: *this) {
+            if (i >= n) {
+              break;
+            }
+            func(entity);
+            i++;
+        }
+    }
+
+    /**
+     * @brief Iterates the first N entities and applies the given function object to
+     * them, then removes them from the observer.
+     *
+     * @sa each
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param n The number of entities to apply against
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void each(std::size_t n, Func func) {
+        std::size_t i = 0;
+        const auto begin = base_type::base_type::begin();
+        auto it = begin;
+        for(; it != base_type::base_type::end(); ++it, ++i) {
+            if (i >= n) {
+              break;
+            }
+            func(*it);
+        }
+        base_type::base_type::remove(begin, it);
+    }
 
 private:
     delegate<void(basic_observer &)> release;
