@@ -11,6 +11,7 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../common/config.h"
 
 struct invalid_type {};
 
@@ -537,7 +538,7 @@ TEST_F(MetaContainer, ConstSequenceContainer) {
     ASSERT_EQ(view.size(), 1u);
 }
 
-TEST_F(MetaContainerDeathTest, ConstSequenceContainer) {
+ENTT_DEBUG_TEST_F(MetaContainerDeathTest, ConstSequenceContainer) {
     std::vector<int> vec{};
     auto any = entt::forward_as_meta(std::as_const(vec));
     auto view = any.as_sequence_container();
@@ -579,7 +580,7 @@ TEST_F(MetaContainer, ConstKeyValueAssociativeContainer) {
     ASSERT_EQ(view.size(), 1u);
 }
 
-TEST_F(MetaContainerDeathTest, ConstKeyValueAssociativeContainer) {
+ENTT_DEBUG_TEST_F(MetaContainerDeathTest, ConstKeyValueAssociativeContainer) {
     std::map<int, char> map{};
     auto any = entt::forward_as_meta(std::as_const(map));
     auto view = any.as_associative_container();
@@ -641,7 +642,7 @@ TEST_F(MetaContainer, SequenceContainerConstMetaAny) {
     test(entt::forward_as_meta(std::as_const(vec)));
 }
 
-TEST_F(MetaContainerDeathTest, SequenceContainerConstMetaAny) {
+ENTT_DEBUG_TEST_F(MetaContainerDeathTest, SequenceContainerConstMetaAny) {
     auto test = [](const entt::meta_any any) {
         auto view = any.as_sequence_container();
 
@@ -672,7 +673,7 @@ TEST_F(MetaContainer, KeyValueAssociativeContainerConstMetaAny) {
     test(entt::forward_as_meta(std::as_const(map)));
 }
 
-TEST_F(MetaContainerDeathTest, KeyValueAssociativeContainerConstMetaAny) {
+ENTT_DEBUG_TEST_F(MetaContainerDeathTest, KeyValueAssociativeContainerConstMetaAny) {
     auto test = [](const entt::meta_any any) {
         auto view = any.as_associative_container();
 

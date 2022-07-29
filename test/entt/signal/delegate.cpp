@@ -3,6 +3,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/signal/delegate.hpp>
+#include "../common/config.h"
 
 int delegate_function(const int &i) {
     return i * i;
@@ -108,7 +109,7 @@ TEST(Delegate, Functionalities) {
     ASSERT_NE(mf_del, lf_del);
 }
 
-TEST(DelegateDeathTest, InvokeEmpty) {
+ENTT_DEBUG_TEST(DelegateDeathTest, InvokeEmpty) {
     entt::delegate<int(int)> del;
 
     ASSERT_FALSE(del);

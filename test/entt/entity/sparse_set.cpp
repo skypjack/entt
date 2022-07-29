@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
+#include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 
 struct empty_type {};
@@ -163,7 +164,7 @@ TEST(SparseSet, Index) {
     ASSERT_EQ(set.index(traits_type::construct(3, 3)), 0u);
 }
 
-TEST(SparseSetDeathTest, Index) {
+ENTT_DEBUG_TEST(SparseSetDeathTest, Index) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::sparse_set set{};
@@ -290,7 +291,7 @@ TEST(SparseSet, Emplace) {
     ASSERT_EQ(set.index(entities[1u]), 0u);
 }
 
-TEST(SparseSetDeathTest, Emplace) {
+ENTT_DEBUG_TEST(SparseSetDeathTest, Emplace) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     set.emplace(entt::entity{42});
 
@@ -334,7 +335,7 @@ TEST(SparseSet, Bump) {
     ASSERT_EQ(set.current(entities[2u]), 0u);
 }
 
-TEST(SparseSetDeathTest, Bump) {
+ENTT_DEBUG_TEST(SparseSetDeathTest, Bump) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::sparse_set set{entt::deletion_policy::in_place};
@@ -426,7 +427,7 @@ TEST(SparseSet, Erase) {
     ASSERT_EQ(*set.begin(), entities[2u]);
 }
 
-TEST(SparseSetDeathTest, Erase) {
+ENTT_DEBUG_TEST(SparseSetDeathTest, Erase) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::sparse_set set;
@@ -550,7 +551,7 @@ TEST(SparseSet, StableErase) {
     ASSERT_NE(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
 }
 
-TEST(SparseSetDeathTest, StableErase) {
+ENTT_DEBUG_TEST(SparseSetDeathTest, StableErase) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::sparse_set set{entt::deletion_policy::in_place};
@@ -811,7 +812,7 @@ TEST(SparseSet, SwapEntity) {
     ASSERT_EQ(set.index(traits_type::construct(42, 99)), 1u);
 }
 
-TEST(SparseSetDeathTest, SwapEntity) {
+ENTT_DEBUG_TEST(SparseSetDeathTest, SwapEntity) {
     entt::sparse_set set;
 
     ASSERT_TRUE(set.empty());
@@ -1106,7 +1107,7 @@ TEST(SparseSet, SortRange) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSetDeathTest, SortRange) {
+ENTT_DEBUG_TEST(SparseSetDeathTest, SortRange) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entity{42};
 

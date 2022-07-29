@@ -14,6 +14,7 @@
 #include <entt/meta/pointer.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/template.hpp>
+#include "../common/config.h"
 
 template<typename Type>
 void set(Type &prop, Type value) {
@@ -715,7 +716,7 @@ TEST_F(MetaType, NameCollision) {
     ASSERT_TRUE(entt::resolve("quux"_hs));
 }
 
-TEST_F(MetaTypeDeathTest, NameCollision) {
+ENTT_DEBUG_TEST_F(MetaTypeDeathTest, NameCollision) {
     using namespace entt::literals;
 
     ASSERT_DEATH(entt::meta<clazz_t>().type("abstract"_hs), "");

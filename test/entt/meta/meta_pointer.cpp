@@ -5,6 +5,7 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/pointer.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../common/config.h"
 
 template<typename Type>
 struct wrapped_shared_ptr {
@@ -120,7 +121,7 @@ TEST(MetaPointerLike, DereferenceOperatorConstType) {
     ASSERT_EQ(deref.cast<const int &>(), 42);
 }
 
-TEST(MetaPointerLikeDeathTest, DereferenceOperatorConstType) {
+ENTT_DEBUG_TEST(MetaPointerLikeDeathTest, DereferenceOperatorConstType) {
     const int value = 42;
     entt::meta_any any{&value};
     auto deref = *any;
@@ -160,7 +161,7 @@ TEST(MetaPointerLike, DereferenceOperatorConstAnyConstType) {
     ASSERT_EQ(deref.cast<const int &>(), 42);
 }
 
-TEST(MetaPointerLikeDeathTest, DereferenceOperatorConstAnyConstType) {
+ENTT_DEBUG_TEST(MetaPointerLikeDeathTest, DereferenceOperatorConstAnyConstType) {
     const int value = 42;
     const entt::meta_any any{&value};
     auto deref = *any;
@@ -306,7 +307,7 @@ TEST(MetaPointerLike, DereferencePointerToConstOverload) {
     test(spec_wrapped_shared_ptr<const int>{42});
 }
 
-TEST(MetaPointerLikeDeathTest, DereferencePointerToConstOverload) {
+ENTT_DEBUG_TEST(MetaPointerLikeDeathTest, DereferencePointerToConstOverload) {
     auto test = [](entt::meta_any any) {
         auto deref = *any;
 

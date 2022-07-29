@@ -7,6 +7,7 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../common/config.h"
 
 struct base_t {
     base_t() {}
@@ -504,7 +505,7 @@ TEST_F(MetaFunc, AsConstRef) {
     ASSERT_EQ(func.invoke(instance).cast<int>(), 3);
 }
 
-TEST_F(MetaFuncDeathTest, AsConstRef) {
+ENTT_DEBUG_TEST_F(MetaFuncDeathTest, AsConstRef) {
     using namespace entt::literals;
 
     func_t instance{};

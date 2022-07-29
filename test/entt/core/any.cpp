@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>
+#include "../common/config.h"
 
 struct empty {
     ~empty() {
@@ -1192,7 +1193,7 @@ TEST_F(Any, AnyCast) {
     ASSERT_EQ(entt::any_cast<int>(entt::any{42}), 42);
 }
 
-TEST_F(AnyDeathTest, AnyCast) {
+ENTT_DEBUG_TEST_F(AnyDeathTest, AnyCast) {
     entt::any any{42};
     const auto &cany = any;
 

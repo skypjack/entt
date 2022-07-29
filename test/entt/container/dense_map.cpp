@@ -11,6 +11,7 @@
 #include <entt/core/iterator.hpp>
 #include <entt/core/memory.hpp>
 #include <entt/core/utility.hpp>
+#include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 #include "../common/tracked_memory_resource.hpp"
 
@@ -931,7 +932,7 @@ TEST(DenseMap, Indexing) {
     ASSERT_EQ(map.at(key), 99);
 }
 
-TEST(DenseMapDeathTest, Indexing) {
+ENTT_DEBUG_TEST(DenseMapDeathTest, Indexing) {
     entt::dense_map<int, int> map;
 
     ASSERT_DEATH([[maybe_unused]] auto value = std::as_const(map).at(0), "");

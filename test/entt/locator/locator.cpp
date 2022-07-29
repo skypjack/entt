@@ -1,6 +1,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <entt/locator/locator.hpp>
+#include "../common/config.h"
 
 struct base_service {
     virtual ~base_service() = default;
@@ -59,7 +60,7 @@ TEST(ServiceLocator, Functionalities) {
     ASSERT_TRUE(derived_service::invoked);
 }
 
-TEST(ServiceLocatorDeathTest, UninitializedValue) {
+ENTT_DEBUG_TEST(ServiceLocatorDeathTest, UninitializedValue) {
     ASSERT_NO_FATAL_FAILURE(entt::locator<base_service>::value_or().invoke());
 
     entt::locator<base_service>::reset();

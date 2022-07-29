@@ -5,6 +5,7 @@
 #include <entt/core/type_info.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
+#include "../common/config.h"
 
 template<typename Base>
 struct common_type: Base {
@@ -297,7 +298,7 @@ TYPED_TEST(Poly, Reference) {
     ASSERT_EQ(poly->mul(3), 3);
 }
 
-TYPED_TEST(Poly, ConstReference) {
+ENTT_DEBUG_TYPED_TEST(Poly, ConstReference) {
     using poly_type = typename TestFixture::template type<>;
 
     impl instance{};

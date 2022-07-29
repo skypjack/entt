@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/memory.hpp>
 #include "../common/basic_test_allocator.hpp"
+#include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 #include "../common/throwing_type.hpp"
 #include "../common/tracked_memory_resource.hpp"
@@ -57,7 +58,7 @@ TEST(NextPowerOfTwo, Functionalities) {
     ASSERT_EQ(entt::next_power_of_two(std::pow(2, 16) + 1u), std::pow(2, 17));
 }
 
-TEST(NextPowerOfTwoDeathTest, Functionalities) {
+ENTT_DEBUG_TEST(NextPowerOfTwoDeathTest, Functionalities) {
     ASSERT_DEATH(static_cast<void>(entt::next_power_of_two((std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)) + 1)), "");
 }
 

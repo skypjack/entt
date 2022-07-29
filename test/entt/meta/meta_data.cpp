@@ -8,6 +8,7 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/node.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../common/config.h"
 
 struct base_t {
     virtual ~base_t() = default;
@@ -617,7 +618,7 @@ TEST_F(MetaData, AsConstRef) {
     ASSERT_EQ(instance.i, 0);
 }
 
-TEST_F(MetaDataDeathTest, AsConstRef) {
+ENTT_DEBUG_TEST_F(MetaDataDeathTest, AsConstRef) {
     using namespace entt::literals;
 
     clazz_t instance{};
@@ -685,7 +686,7 @@ TEST_F(MetaData, NameCollision) {
     ASSERT_TRUE(entt::resolve<clazz_t>().data("cj"_hs));
 }
 
-TEST_F(MetaDataDeathTest, NameCollision) {
+ENTT_DEBUG_TEST_F(MetaDataDeathTest, NameCollision) {
     using namespace entt::literals;
 
     ASSERT_DEATH(entt::meta<clazz_t>().data<&clazz_t::j>("i"_hs), "");

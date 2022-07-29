@@ -8,6 +8,7 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../common/config.h"
 
 struct clazz_t {
     clazz_t()
@@ -234,7 +235,7 @@ TEST_F(MetaAny, SBOAsConstRefConstruction) {
     ASSERT_EQ(other.data(), any.data());
 }
 
-TEST_F(MetaAnyDeathTest, SBOAsConstRefConstruction) {
+ENTT_DEBUG_TEST_F(MetaAnyDeathTest, SBOAsConstRefConstruction) {
     const int value = 3;
     auto any = entt::forward_as_meta(value);
 
@@ -499,7 +500,7 @@ TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
     ASSERT_EQ(other.data(), any.data());
 }
 
-TEST_F(MetaAnyDeathTest, NoSBOAsConstRefConstruction) {
+ENTT_DEBUG_TEST_F(MetaAnyDeathTest, NoSBOAsConstRefConstruction) {
     const fat_t instance{.1, .2, .3, .4};
     auto any = entt::forward_as_meta(instance);
 
@@ -1026,7 +1027,7 @@ TEST_F(MetaAny, AsRef) {
     ASSERT_FALSE(cref);
 }
 
-TEST_F(MetaAnyDeathTest, AsRef) {
+ENTT_DEBUG_TEST_F(MetaAnyDeathTest, AsRef) {
     entt::meta_any any{42};
     auto cref = std::as_const(any).as_ref();
 

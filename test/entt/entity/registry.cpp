@@ -11,6 +11,7 @@
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include "../common/config.h"
 
 struct empty_type {};
 
@@ -583,7 +584,7 @@ TEST(Registry, DestroyVersion) {
     ASSERT_EQ(registry.current(e1), 3u);
 }
 
-TEST(RegistryDeathTest, DestroyVersion) {
+ENTT_DEBUG_TEST(RegistryDeathTest, DestroyVersion) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -709,7 +710,7 @@ TEST(Registry, ReleaseVersion) {
     ASSERT_EQ(registry.current(entities[1u]), 3u);
 }
 
-TEST(RegistryDeathTest, ReleaseVersion) {
+ENTT_DEBUG_TEST(RegistryDeathTest, ReleaseVersion) {
     entt::registry registry;
     entt::entity entity = registry.create();
 
@@ -1519,7 +1520,7 @@ TEST(Registry, Erase) {
     ASSERT_TRUE(registry.orphan(entities[2u]));
 }
 
-TEST(RegistryDeathTest, Erase) {
+ENTT_DEBUG_TEST(RegistryDeathTest, Erase) {
     entt::registry registry;
     const entt::entity entities[1u]{registry.create()};
 
@@ -1978,7 +1979,7 @@ TEST(Registry, RuntimePools) {
     ASSERT_FALSE(registry.any_of<empty_type>(entity));
 }
 
-TEST(RegistryDeathTest, RuntimePools) {
+ENTT_DEBUG_TEST(RegistryDeathTest, RuntimePools) {
     using namespace entt::literals;
 
     entt::registry registry;
