@@ -2,6 +2,7 @@
 #define ENTT_SIGNAL_DISPATCHER_HPP
 
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <type_traits>
 #include <utility>
