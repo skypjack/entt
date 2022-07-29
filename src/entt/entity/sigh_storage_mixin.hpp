@@ -27,24 +27,15 @@ class sigh_storage_mixin final: public Type {
     using sigh_type = sigh<void(basic_registry<typename Type::entity_type> &, const typename Type::entity_type), typename Type::allocator_type>;
     using basic_iterator = typename Type::basic_iterator;
 
-    template<typename Func>
-    void notify_destruction(basic_iterator first, basic_iterator last, Func func) {
+    void pop(basic_iterator first, basic_iterator last) override {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
 
         for(; first != last; ++first) {
             const auto entt = *first;
             destruction.publish(*owner, entt);
             const auto it = Type::find(entt);
-            func(it, it + 1u);
+            Type::pop(it, it + 1u);
         }
-    }
-
-    void swap_and_pop(basic_iterator first, basic_iterator last) final {
-        notify_destruction(std::move(first), std::move(last), [this](auto... args) { Type::swap_and_pop(args...); });
-    }
-
-    void in_place_pop(basic_iterator first, basic_iterator last) final {
-        notify_destruction(std::move(first), std::move(last), [this](auto... args) { Type::in_place_pop(args...); });
     }
 
     basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {

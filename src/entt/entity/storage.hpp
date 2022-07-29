@@ -275,12 +275,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             entt::uninitialized_construct_using_allocator(to_address(elem), packed.second(), std::forward<Args>(args)...);
         }
         ENTT_CATCH {
-            if constexpr(comp_traits::in_place_delete) {
-                base_type::in_place_pop(it, it + 1u);
-            } else {
-                base_type::swap_and_pop(it, it + 1u);
-            }
-
+            base_type::pop(it, it + 1u);
             ENTT_THROW;
         }
 
@@ -330,29 +325,22 @@ protected:
     using basic_iterator = typename underlying_type::basic_iterator;
 
     /**
-     * @brief Erases elements from a storage.
-     * @param first An iterator to the first element to erase.
-     * @param last An iterator past the last element to erase.
+     * @brief Erases entities from a sparse set.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
      */
-    void swap_and_pop(basic_iterator first, basic_iterator last) override {
+    void pop(basic_iterator first, basic_iterator last) override {
         for(; first != last; ++first) {
-            auto &elem = element_at(base_type::size() - 1u);
-            // destroying on exit allows reentrant destructors
-            [[maybe_unused]] auto unused = std::exchange(element_at(static_cast<size_type>(first.index())), std::move(elem));
-            std::destroy_at(std::addressof(elem));
-            base_type::swap_and_pop(first, first + 1u);
-        }
-    }
-
-    /**
-     * @brief Erases elements from a storage.
-     * @param first An iterator to the first element to erase.
-     * @param last An iterator past the last element to erase.
-     */
-    void in_place_pop(basic_iterator first, basic_iterator last) override {
-        for(; first != last; ++first) {
-            base_type::in_place_pop(first, first + 1u);
-            std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
+            if constexpr(comp_traits::in_place_delete) {
+                base_type::in_place_pop(first);
+                std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
+            } else {
+                auto &elem = element_at(base_type::size() - 1u);
+                // destroying on exit allows reentrant destructors
+                [[maybe_unused]] auto unused = std::exchange(element_at(static_cast<size_type>(first.index())), std::move(elem));
+                std::destroy_at(std::addressof(elem));
+                base_type::swap_and_pop(first);
+            }
         }
     }
 
