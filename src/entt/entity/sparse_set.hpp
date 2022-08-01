@@ -240,12 +240,14 @@ protected:
      */
     virtual void swap_and_pop(basic_iterator first, basic_iterator last) {
         for(; first != last; ++first) {
-            sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(first.index()), entity_traits::to_integral(packed.back()));
-            const auto entt = std::exchange(packed[first.index()], packed.back());
+            auto &self = sparse_ref(*first);
+            const auto entt = entity_traits::to_entity(self);
+            sparse_ref(packed.back()) = entity_traits::combine(entt, entity_traits::to_integral(packed.back()));
+            packed[static_cast<size_type>(entt)] = packed.back();
             // unnecessary but it helps to detect nasty bugs
             ENTT_ASSERT((packed.back() = tombstone, true), "");
             // lazy self-assignment guard
-            sparse_ref(entt) = null;
+            self = null;
             packed.pop_back();
         }
     }
@@ -257,8 +259,8 @@ protected:
      */
     virtual void in_place_pop(basic_iterator first, basic_iterator last) {
         for(; first != last; ++first) {
-            sparse_ref(*first) = null;
-            packed[first.index()] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(first.index()), entity_traits::reserved));
+            const auto entt = entity_traits::to_entity(std::exchange(sparse_ref(*first), null));
+            packed[static_cast<size_type>(entt)] = std::exchange(free_list, entity_traits::combine(entt, entity_traits::reserved));
         }
     }
 
