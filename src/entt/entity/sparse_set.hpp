@@ -238,12 +238,14 @@ protected:
      * @param it An iterator to the element to pop.
      */
     void swap_and_pop(const basic_iterator it) {
-        sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(it.index()), entity_traits::to_integral(packed.back()));
-        const auto entt = std::exchange(packed[it.index()], packed.back());
+        auto &self = sparse_ref(*it);
+        const auto entt = entity_traits::to_entity(self);
+        sparse_ref(packed.back()) = entity_traits::combine(entt, entity_traits::to_integral(packed.back()));
+        packed[static_cast<size_type>(entt)] = packed.back();
         // unnecessary but it helps to detect nasty bugs
         ENTT_ASSERT((packed.back() = null, true), "");
         // lazy self-assignment guard
-        sparse_ref(entt) = null;
+        self = null;
         packed.pop_back();
     }
 
@@ -252,8 +254,8 @@ protected:
      * @param it An iterator to the element to pop.
      */
     void in_place_pop(const basic_iterator it) {
-        sparse_ref(*it) = null;
-        packed[it.index()] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(it.index()), entity_traits::reserved));
+        const auto entt = entity_traits::to_entity(std::exchange(sparse_ref(*it), null));
+        packed[static_cast<size_type>(entt)] = std::exchange(free_list, entity_traits::combine(entt, entity_traits::reserved));
     }
 
 protected:

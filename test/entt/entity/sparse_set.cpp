@@ -437,6 +437,20 @@ ENTT_DEBUG_TEST(SparseSetDeathTest, Erase) {
     ASSERT_DEATH(set.erase(entt::null), "");
 }
 
+TEST(SparseSet, CrossErase) {
+    entt::sparse_set set;
+    entt::sparse_set other;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    set.insert(std::begin(entities), std::end(entities));
+    other.emplace(entities[1u]);
+    set.erase(other.begin(), other.end());
+
+    ASSERT_TRUE(set.contains(entities[0u]));
+    ASSERT_FALSE(set.contains(entities[1u]));
+    ASSERT_EQ(set.data()[0u], entities[0u]);
+}
+
 TEST(SparseSet, StableErase) {
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -561,6 +575,20 @@ ENTT_DEBUG_TEST(SparseSetDeathTest, StableErase) {
     ASSERT_DEATH(set.erase(entt::null), "");
 }
 
+TEST(SparseSet, CrossStableErase) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+    entt::sparse_set other{entt::deletion_policy::in_place};
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    set.insert(std::begin(entities), std::end(entities));
+    other.emplace(entities[1u]);
+    set.erase(other.begin(), other.end());
+
+    ASSERT_TRUE(set.contains(entities[0u]));
+    ASSERT_FALSE(set.contains(entities[1u]));
+    ASSERT_EQ(set.data()[0u], entities[0u]);
+}
+
 TEST(SparseSet, Remove) {
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -616,6 +644,20 @@ TEST(SparseSet, Remove) {
     ASSERT_EQ(set.remove(traits_type::construct(9, 0)), 0u);
     ASSERT_EQ(set.remove(entt::tombstone), 0u);
     ASSERT_EQ(set.remove(entt::null), 0u);
+}
+
+TEST(SparseSet, CrossRemove) {
+    entt::sparse_set set;
+    entt::sparse_set other;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    set.insert(std::begin(entities), std::end(entities));
+    other.emplace(entities[1u]);
+    set.remove(other.begin(), other.end());
+
+    ASSERT_TRUE(set.contains(entities[0u]));
+    ASSERT_FALSE(set.contains(entities[1u]));
+    ASSERT_EQ(set.data()[0u], entities[0u]);
 }
 
 TEST(SparseSet, StableRemove) {
@@ -746,6 +788,20 @@ TEST(SparseSet, StableRemove) {
 
     ASSERT_EQ(set.remove(traits_type::construct(9, 0)), 0u);
     ASSERT_EQ(set.remove(entt::null), 0u);
+}
+
+TEST(SparseSet, CrossStableRemove) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+    entt::sparse_set other{entt::deletion_policy::in_place};
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    set.insert(std::begin(entities), std::end(entities));
+    other.emplace(entities[1u]);
+    set.remove(other.begin(), other.end());
+
+    ASSERT_TRUE(set.contains(entities[0u]));
+    ASSERT_FALSE(set.contains(entities[1u]));
+    ASSERT_EQ(set.data()[0u], entities[0u]);
 }
 
 TEST(SparseSet, Compact) {
