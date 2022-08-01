@@ -18,7 +18,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -120,7 +120,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -163,7 +163,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -275,7 +275,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -4236,7 +4236,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -4581,7 +4581,7 @@ struct radix_sort {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -8988,7 +8988,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -9168,7 +9168,7 @@ inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -11271,7 +11271,7 @@ struct radix_sort {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -14035,12 +14035,14 @@ protected:
      */
     virtual void swap_and_pop(basic_iterator first, basic_iterator last) {
         for(; first != last; ++first) {
-            sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(first.index()), entity_traits::to_integral(packed.back()));
-            const auto entt = std::exchange(packed[first.index()], packed.back());
+            auto &self = sparse_ref(*first);
+            const auto entt = entity_traits::to_entity(self);
+            sparse_ref(packed.back()) = entity_traits::combine(entt, entity_traits::to_integral(packed.back()));
+            packed[static_cast<size_type>(entt)] = packed.back();
             // unnecessary but it helps to detect nasty bugs
             ENTT_ASSERT((packed.back() = tombstone, true), "");
             // lazy self-assignment guard
-            sparse_ref(entt) = null;
+            self = null;
             packed.pop_back();
         }
     }
@@ -14052,8 +14054,8 @@ protected:
      */
     virtual void in_place_pop(basic_iterator first, basic_iterator last) {
         for(; first != last; ++first) {
-            sparse_ref(*first) = null;
-            packed[first.index()] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(first.index()), entity_traits::reserved));
+            const auto entt = entity_traits::to_entity(std::exchange(sparse_ref(*first), null));
+            packed[static_cast<size_type>(entt)] = std::exchange(free_list, entity_traits::combine(entt, entity_traits::reserved));
         }
     }
 
@@ -15100,7 +15102,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -15223,7 +15225,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -18958,7 +18960,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -19070,7 +19072,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -30542,12 +30544,14 @@ protected:
      */
     virtual void swap_and_pop(basic_iterator first, basic_iterator last) {
         for(; first != last; ++first) {
-            sparse_ref(packed.back()) = entity_traits::combine(static_cast<typename entity_traits::entity_type>(first.index()), entity_traits::to_integral(packed.back()));
-            const auto entt = std::exchange(packed[first.index()], packed.back());
+            auto &self = sparse_ref(*first);
+            const auto entt = entity_traits::to_entity(self);
+            sparse_ref(packed.back()) = entity_traits::combine(entt, entity_traits::to_integral(packed.back()));
+            packed[static_cast<size_type>(entt)] = packed.back();
             // unnecessary but it helps to detect nasty bugs
             ENTT_ASSERT((packed.back() = tombstone, true), "");
             // lazy self-assignment guard
-            sparse_ref(entt) = null;
+            self = null;
             packed.pop_back();
         }
     }
@@ -30559,8 +30563,8 @@ protected:
      */
     virtual void in_place_pop(basic_iterator first, basic_iterator last) {
         for(; first != last; ++first) {
-            sparse_ref(*first) = null;
-            packed[first.index()] = std::exchange(free_list, entity_traits::combine(static_cast<typename entity_traits::entity_type>(first.index()), entity_traits::reserved));
+            const auto entt = entity_traits::to_entity(std::exchange(sparse_ref(*first), null));
+            packed[static_cast<size_type>(entt)] = std::exchange(free_list, entity_traits::combine(entt, entity_traits::reserved));
         }
     }
 
@@ -33115,7 +33119,7 @@ basic_view(Storage &...storage) -> basic_view<std::common_type_t<typename Storag
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -33391,7 +33395,7 @@ struct adl_meta_pointer_like {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -33503,7 +33507,7 @@ struct adl_meta_pointer_like {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -37459,7 +37463,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -37571,7 +37575,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -37680,7 +37684,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -47668,7 +47672,7 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -47780,7 +47784,7 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -47889,7 +47893,7 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -51160,7 +51164,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -52221,7 +52225,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -52340,7 +52344,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -52452,7 +52456,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -55577,7 +55581,7 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -57878,7 +57882,7 @@ template<typename Res, typename Other>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -57990,7 +57994,7 @@ template<typename Res, typename Other>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -59152,7 +59156,7 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -59264,7 +59268,7 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 1
+#define ENTT_VERSION_PATCH 2
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
