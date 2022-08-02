@@ -331,14 +331,17 @@ protected:
      */
     void pop(basic_iterator first, basic_iterator last) override {
         for(; first != last; ++first) {
+            // cannot use first.index() because it would break with cross iterators
+            auto &elem = element_at(base_type::index(*first));
+
             if constexpr(comp_traits::in_place_delete) {
                 base_type::in_place_pop(first);
-                std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
-            } else {
-                auto &elem = element_at(base_type::size() - 1u);
-                // destroying on exit allows reentrant destructors
-                [[maybe_unused]] auto unused = std::exchange(element_at(static_cast<size_type>(first.index())), std::move(elem));
                 std::destroy_at(std::addressof(elem));
+            } else {
+                auto &other = element_at(base_type::size() - 1u);
+                // destroying on exit allows reentrant destructors
+                [[maybe_unused]] auto unused = std::exchange(elem, std::move(other));
+                std::destroy_at(std::addressof(other));
                 base_type::swap_and_pop(first);
             }
         }

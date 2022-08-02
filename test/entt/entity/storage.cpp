@@ -364,6 +364,21 @@ TEST(Storage, Erase) {
     ASSERT_EQ(*pool.begin(), 1);
 }
 
+TEST(Storage, CrossErase) {
+    entt::sparse_set set;
+    entt::storage<int> pool;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    pool.emplace(entities[0u], 3);
+    pool.emplace(entities[1u], 42);
+    set.emplace(entities[1u]);
+    pool.erase(set.begin(), set.end());
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(pool.raw()[0u][0u], 3);
+}
+
 TEST(Storage, StableErase) {
     entt::storage<stable_type> pool;
     entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
@@ -458,6 +473,21 @@ TEST(Storage, StableErase) {
     ASSERT_EQ(pool.get(entities[2u]).value, 1);
 }
 
+TEST(Storage, CrossStableErase) {
+    entt::sparse_set set;
+    entt::storage<stable_type> pool;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    pool.emplace(entities[0u], 3);
+    pool.emplace(entities[1u], 42);
+    set.emplace(entities[1u]);
+    pool.erase(set.begin(), set.end());
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(pool.raw()[0u][0u].value, 3);
+}
+
 TEST(Storage, Remove) {
     entt::storage<int> pool;
     entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
@@ -490,6 +520,21 @@ TEST(Storage, Remove) {
     ASSERT_EQ(pool.remove(entities, entities + 2u), 2u);
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 1);
+}
+
+TEST(Storage, CrossRemove) {
+    entt::sparse_set set;
+    entt::storage<int> pool;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    pool.emplace(entities[0u], 3);
+    pool.emplace(entities[1u], 42);
+    set.emplace(entities[1u]);
+    pool.remove(set.begin(), set.end());
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(pool.raw()[0u][0u], 3);
 }
 
 TEST(Storage, StableRemove) {
@@ -587,6 +632,21 @@ TEST(Storage, StableRemove) {
     ASSERT_EQ(pool.get(entities[0u]).value, 99);
     ASSERT_EQ(pool.get(entities[1u]).value, 2);
     ASSERT_EQ(pool.get(entities[2u]).value, 1);
+}
+
+TEST(Storage, CrossStableRemove) {
+    entt::sparse_set set;
+    entt::storage<stable_type> pool;
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+
+    pool.emplace(entities[0u], 3);
+    pool.emplace(entities[1u], 42);
+    set.emplace(entities[1u]);
+    pool.remove(set.begin(), set.end());
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_EQ(pool.raw()[0u][0u].value, 3);
 }
 
 TEST(Storage, TypeFromBase) {
