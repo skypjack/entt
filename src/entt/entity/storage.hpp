@@ -334,7 +334,7 @@ protected:
     void swap_and_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
         for(; first != last; ++first) {
             // cannot use first::index() because it would break with cross iterators
-            const auto pos = index(*first);
+            const auto pos = base_type::index(*first);
             auto &elem = element_at(base_type::size() - 1u);
             // destroying on exit allows reentrant destructors
             [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
@@ -351,7 +351,7 @@ protected:
     void in_place_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
         for(; first != last; ++first) {
             // cannot use first::index() because it would break with cross iterators
-            const auto pos = index(*first);
+            const auto pos = base_type::index(*first);
             base_type::in_place_pop(first, first + 1u);
             std::destroy_at(std::addressof(element_at(pos)));
         }
