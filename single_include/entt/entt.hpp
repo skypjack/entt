@@ -18,7 +18,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -120,7 +120,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -163,7 +163,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -275,7 +275,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -4236,7 +4236,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -4581,7 +4581,7 @@ struct radix_sort {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -8988,7 +8988,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -9168,7 +9168,7 @@ inline constexpr bool ignore_as_empty_v = (component_traits<Type>::page_size == 
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -11271,7 +11271,7 @@ struct radix_sort {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -15102,7 +15102,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -15225,7 +15225,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -17429,9 +17429,11 @@ protected:
      */
     void swap_and_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
         for(; first != last; ++first) {
+            // cannot use first::index() because it would break with cross iterators
+            const auto pos = index(*first);
             auto &elem = element_at(base_type::size() - 1u);
             // destroying on exit allows reentrant destructors
-            [[maybe_unused]] auto unused = std::exchange(element_at(static_cast<size_type>(first.index())), std::move(elem));
+            [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
             std::destroy_at(std::addressof(elem));
             base_type::swap_and_pop(first, first + 1u);
         }
@@ -17444,8 +17446,10 @@ protected:
      */
     void in_place_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
         for(; first != last; ++first) {
+            // cannot use first::index() because it would break with cross iterators
+            const auto pos = index(*first);
             base_type::in_place_pop(first, first + 1u);
-            std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
+            std::destroy_at(std::addressof(element_at(pos)));
         }
     }
 
@@ -18960,7 +18964,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -19072,7 +19076,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -31610,9 +31614,11 @@ protected:
      */
     void swap_and_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
         for(; first != last; ++first) {
+            // cannot use first::index() because it would break with cross iterators
+            const auto pos = index(*first);
             auto &elem = element_at(base_type::size() - 1u);
             // destroying on exit allows reentrant destructors
-            [[maybe_unused]] auto unused = std::exchange(element_at(static_cast<size_type>(first.index())), std::move(elem));
+            [[maybe_unused]] auto unused = std::exchange(element_at(pos), std::move(elem));
             std::destroy_at(std::addressof(elem));
             base_type::swap_and_pop(first, first + 1u);
         }
@@ -31625,8 +31631,10 @@ protected:
      */
     void in_place_pop(typename underlying_type::basic_iterator first, typename underlying_type::basic_iterator last) override {
         for(; first != last; ++first) {
+            // cannot use first::index() because it would break with cross iterators
+            const auto pos = index(*first);
             base_type::in_place_pop(first, first + 1u);
-            std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
+            std::destroy_at(std::addressof(element_at(pos)));
         }
     }
 
@@ -33119,7 +33127,7 @@ basic_view(Storage &...storage) -> basic_view<std::common_type_t<typename Storag
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -33395,7 +33403,7 @@ struct adl_meta_pointer_like {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -33507,7 +33515,7 @@ struct adl_meta_pointer_like {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -37463,7 +37471,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -37575,7 +37583,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -37684,7 +37692,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -47672,7 +47680,7 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -47784,7 +47792,7 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -47893,7 +47901,7 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -51164,7 +51172,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -52225,7 +52233,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -52344,7 +52352,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -52456,7 +52464,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -55581,7 +55589,7 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -57882,7 +57890,7 @@ template<typename Res, typename Other>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -57994,7 +58002,7 @@ template<typename Res, typename Other>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -59156,7 +59164,7 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -59268,7 +59276,7 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 10
-#define ENTT_VERSION_PATCH 2
+#define ENTT_VERSION_PATCH 3
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
