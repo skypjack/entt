@@ -14,8 +14,8 @@ namespace entt {
 
 namespace internal {
 
-template<typename, typename = void>
-struct in_place_delete: std::false_type {};
+template<typename Type, typename = void>
+struct in_place_delete: std::bool_constant<!(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>)> {};
 
 template<typename Type>
 struct in_place_delete<Type, std::enable_if_t<Type::in_place_delete>>
