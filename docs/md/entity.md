@@ -878,17 +878,23 @@ The context is returned via the `ctx` functions and offers a minimal set of
 feature including the following:
 
 ```cpp
-// creates a new context variable by type
+// creates a new context variable by type and returns it
 registry.ctx().emplace<my_type>(42, 'c');
 
-// creates a new context variable with a name
-registry.ctx().emplace_hint<my_type>("my_variable"_hs, 42, 'c');
+// creates a new named context variable by type and returns it
+registry.ctx().emplace_as<my_type>("my_variable"_hs, 42, 'c');
+
+// inserts or assigns a context variable by (deduced) type and returns it
+registry.ctx().insert_or_assign(my_type{42, 'c'});
+
+// inserts or assigns a named context variable by (deduced) type and returns it
+registry.ctx().insert_or_assign("my_variable"_hs, my_type{42, 'c'});
 
 // gets the context variable by type as a non-const reference from a non-const registry
-auto &var = registry.ctx().at<my_type>();
+auto &var = registry.ctx().get<my_type>();
 
 // gets the context variable by name as a const reference from either a const or a non-const registry
-const auto &cvar = registry.ctx().at<const my_type>("my_variable"_hs);
+const auto &cvar = registry.ctx().get<const my_type>("my_variable"_hs);
 
 // resets the context variable by type
 registry.ctx().erase<my_type>();
@@ -930,6 +936,11 @@ Read-only aliased properties are created using const types instead:
 registry.ctx().emplace<const time &>(clock);
 ```
 
+Note that `insert_or_assign` doesn't support aliased properties and users must
+necessarily use `emplace` or `emplace_as` for this purpose.<br/>
+When `insert_or_assign` is used to update an aliased property, it _converts_
+the property itself into a non-aliased one.
+
 From the point of view of the user, there are no differences between a variable
 that is managed by the registry and an aliased property. However, read-only
 variables aren't accessible as non-const references:
@@ -937,7 +948,7 @@ variables aren't accessible as non-const references:
 ```cpp
 // read-only variables only support const access
 const my_type *ptr = registry.ctx().find<const my_type>();
-const my_type &var = registry.ctx().at<const my_type>();
+const my_type &var = registry.ctx().get<const my_type>();
 ```
 
 Aliased properties can be erased as it happens with any other variable.
