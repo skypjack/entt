@@ -133,7 +133,7 @@ TEST(Registry, ContextHint) {
     const auto &cctx = std::as_const(registry).ctx();
 
     ctx.emplace<int>(42);
-    ctx.emplace_hint<int>("other"_hs, 3);
+    ctx.emplace_as<int>("other"_hs, 3);
 
     ASSERT_TRUE(ctx.contains<int>());
     ASSERT_TRUE(cctx.contains<const int>("other"_hs));

@@ -162,13 +162,18 @@ class registry_context {
 
 public:
     template<typename Type, typename... Args>
-    Type &emplace_hint(const id_type id, Args &&...args) {
+    [[deprecated("Use ::emplace_as instead")]] Type &emplace_hint(const id_type id, Args &&...args) {
+        return emplace_as<Type>(id, std::forward<Args>(args)...);
+    }
+
+    template<typename Type, typename... Args>
+    Type &emplace_as(const id_type id, Args &&...args) {
         return any_cast<Type &>(ctx.try_emplace(id, std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
     }
 
     template<typename Type, typename... Args>
     Type &emplace(Args &&...args) {
-        return emplace_hint<Type>(type_id<Type>().hash(), std::forward<Args>(args)...);
+        return emplace_as<Type>(type_id<Type>().hash(), std::forward<Args>(args)...);
     }
 
     template<typename Type>
