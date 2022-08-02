@@ -113,6 +113,16 @@ TEST(Registry, Context) {
 
     ASSERT_EQ(ctx.find<double>(), nullptr);
     ASSERT_EQ(cctx.find<double>(), nullptr);
+
+    ASSERT_EQ(ctx.insert_or_assign<char>('a'), 'a');
+    ASSERT_EQ(ctx.find<const char>(), cctx.find<char>());
+    ASSERT_EQ(ctx.get<char>(), cctx.get<const char>());
+    ASSERT_EQ(ctx.get<const char>(), 'a');
+
+    ASSERT_EQ(ctx.insert_or_assign<const int>(0), 0);
+    ASSERT_EQ(ctx.find<const int>(), cctx.find<int>());
+    ASSERT_EQ(ctx.at<int>(), cctx.at<const int>());
+    ASSERT_EQ(ctx.at<int>(), 0);
 }
 
 TEST(Registry, ContextHint) {
@@ -136,11 +146,17 @@ TEST(Registry, ContextHint) {
     ASSERT_EQ(ctx.get<int>(), 42);
     ASSERT_EQ(cctx.get<const int>("other"_hs), 3);
 
+    ctx.insert_or_assign(3);
+    ctx.insert_or_assign("other"_hs, 42);
+
+    ASSERT_EQ(ctx.get<const int>(), 3);
+    ASSERT_EQ(cctx.get<int>("other"_hs), 42);
+
     ASSERT_FALSE(ctx.erase<char>("other"_hs));
     ASSERT_TRUE(ctx.erase<int>());
 
     ASSERT_TRUE(cctx.contains<int>("other"_hs));
-    ASSERT_EQ(ctx.get<int>("other"_hs), 3);
+    ASSERT_EQ(ctx.get<int>("other"_hs), 42);
 
     ASSERT_TRUE(ctx.erase<int>("other"_hs));
 

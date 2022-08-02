@@ -172,6 +172,16 @@ public:
     }
 
     template<typename Type>
+    Type &insert_or_assign(const id_type id, Type &&value) {
+        return any_cast<std::remove_const_t<std::remove_reference_t<Type>> &>(ctx.insert_or_assign(id, std::forward<Type>(value)).first->second);
+    }
+
+    template<typename Type>
+    Type &insert_or_assign(Type &&value) {
+        return insert_or_assign(type_id<Type>().hash(), std::forward<Type>(value));
+    }
+
+    template<typename Type>
     bool erase(const id_type id = type_id<Type>().hash()) {
         const auto it = ctx.find(id);
         return it != ctx.end() && it->second.type() == type_id<Type>() ? (ctx.erase(it), true) : false;
