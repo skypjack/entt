@@ -32,6 +32,7 @@ TEST(DenseSet, Functionalities) {
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(set.load_factor(), 0.f);
     ASSERT_EQ(set.max_load_factor(), .875f);
+    ASSERT_EQ(set.max_size(), (std::vector<std::pair<std::size_t, std::size_t>>{}.max_size()));
 
     set.max_load_factor(.9f);
 
