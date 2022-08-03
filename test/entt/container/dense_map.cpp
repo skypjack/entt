@@ -26,7 +26,7 @@ struct transparent_equal_to {
 };
 
 TEST(DenseMap, Functionalities) {
-    entt::dense_map<std::size_t, std::size_t, entt::identity, transparent_equal_to> map;
+    entt::dense_map<int, int, entt::identity, transparent_equal_to> map;
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = map.get_allocator());
 
@@ -34,7 +34,7 @@ TEST(DenseMap, Functionalities) {
     ASSERT_EQ(map.size(), 0u);
     ASSERT_EQ(map.load_factor(), 0.f);
     ASSERT_EQ(map.max_load_factor(), .875f);
-    ASSERT_EQ(map.max_size(), (std::vector<entt::internal::dense_map_node<std::size_t, std::size_t>>{}.max_size()));
+    ASSERT_EQ(map.max_size(), (std::vector<entt::internal::dense_map_node<int, int>>{}.max_size()));
 
     map.max_load_factor(.9f);
 
@@ -68,7 +68,12 @@ TEST(DenseMap, Functionalities) {
     ASSERT_EQ(map.hash_function()(42), 42);
     ASSERT_TRUE(map.key_eq()(42, 42));
 
-    map.emplace(0u, 0u);
+    map.emplace(0, 0);
+
+    ASSERT_EQ(map.count(0), 1u);
+    ASSERT_EQ(map.count(4.2), 0u);
+    ASSERT_EQ(std::as_const(map).count(0.0), 1u);
+    ASSERT_EQ(std::as_const(map).count(42), 0u);
 
     ASSERT_FALSE(map.empty());
     ASSERT_EQ(map.size(), 1u);
@@ -77,8 +82,8 @@ TEST(DenseMap, Functionalities) {
     ASSERT_NE(std::as_const(map).begin(), std::as_const(map).end());
     ASSERT_NE(map.cbegin(), map.cend());
 
-    ASSERT_TRUE(map.contains(0u));
-    ASSERT_EQ(map.bucket(0u), 0u);
+    ASSERT_TRUE(map.contains(0));
+    ASSERT_EQ(map.bucket(0), 0u);
 
     map.clear();
 
@@ -89,7 +94,7 @@ TEST(DenseMap, Functionalities) {
     ASSERT_EQ(std::as_const(map).begin(), std::as_const(map).end());
     ASSERT_EQ(map.cbegin(), map.cend());
 
-    ASSERT_FALSE(map.contains(0u));
+    ASSERT_FALSE(map.contains(0));
 }
 
 TEST(DenseMap, Constructors) {
