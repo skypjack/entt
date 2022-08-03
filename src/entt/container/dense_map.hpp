@@ -523,6 +523,14 @@ public:
         return packed.first().size();
     }
 
+    /**
+     * @brief Returns the maximum possible number of elements.
+     * @return Maximum possible number of elements.
+     */
+    [[nodiscard]] size_type max_size() const noexcept {
+        return packed.first().max_size();
+    }
+
     /*! @brief Clears the container. */
     void clear() noexcept {
         sparse.first().clear();

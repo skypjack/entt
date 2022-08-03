@@ -34,6 +34,7 @@ TEST(DenseMap, Functionalities) {
     ASSERT_EQ(map.size(), 0u);
     ASSERT_EQ(map.load_factor(), 0.f);
     ASSERT_EQ(map.max_load_factor(), .875f);
+    ASSERT_EQ(map.max_size(), (std::vector<entt::internal::dense_map_node<std::size_t, std::size_t>>{}.max_size()));
 
     map.max_load_factor(.9f);
 
