@@ -24,7 +24,7 @@ struct transparent_equal_to {
 };
 
 TEST(DenseSet, Functionalities) {
-    entt::dense_set<std::size_t, entt::identity, transparent_equal_to> set;
+    entt::dense_set<int, entt::identity, transparent_equal_to> set;
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
 
@@ -32,7 +32,7 @@ TEST(DenseSet, Functionalities) {
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(set.load_factor(), 0.f);
     ASSERT_EQ(set.max_load_factor(), .875f);
-    ASSERT_EQ(set.max_size(), (std::vector<std::pair<std::size_t, std::size_t>>{}.max_size()));
+    ASSERT_EQ(set.max_size(), (std::vector<std::pair<std::size_t, int>>{}.max_size()));
 
     set.max_load_factor(.9f);
 
@@ -66,7 +66,12 @@ TEST(DenseSet, Functionalities) {
     ASSERT_EQ(set.hash_function()(42), 42);
     ASSERT_TRUE(set.key_eq()(42, 42));
 
-    set.emplace(0u);
+    set.emplace(0);
+
+    ASSERT_EQ(set.count(0), 1u);
+    ASSERT_EQ(set.count(4.2), 0u);
+    ASSERT_EQ(std::as_const(set).count(0.0), 1u);
+    ASSERT_EQ(std::as_const(set).count(42), 0u);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
@@ -75,8 +80,8 @@ TEST(DenseSet, Functionalities) {
     ASSERT_NE(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_NE(set.cbegin(), set.cend());
 
-    ASSERT_TRUE(set.contains(0u));
-    ASSERT_EQ(set.bucket(0u), 0u);
+    ASSERT_TRUE(set.contains(0));
+    ASSERT_EQ(set.bucket(0), 0u);
 
     set.clear();
 
@@ -87,7 +92,7 @@ TEST(DenseSet, Functionalities) {
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.cbegin(), set.cend());
 
-    ASSERT_FALSE(set.contains(0u));
+    ASSERT_FALSE(set.contains(0));
 }
 
 TEST(DenseSet, Constructors) {

@@ -603,6 +603,27 @@ public:
     }
 
     /**
+     * @brief Returns the number of elements matching a key (either 1 or 0).
+     * @param key Key value of an element to search for.
+     * @return Number of elements matching the key (either 1 or 0).
+     */
+    [[nodiscard]] size_type count(const key_type &key) const {
+        return find(key) != end();
+    }
+
+    /**
+     * @brief Returns the number of elements matching a key (either 1 or 0).
+     * @tparam Other Type of the key value of an element to search for.
+     * @param key Key value of an element to search for.
+     * @return Number of elements matching the key (either 1 or 0).
+     */
+    template<typename Other>
+    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, size_type>>
+    count(const Other &key) const {
+        return find(key) != end();
+    }
+
+    /**
      * @brief Finds an element with a given value.
      * @param value Value of an element to search for.
      * @return An iterator to an element with the given value. If no such
