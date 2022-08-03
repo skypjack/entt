@@ -1659,7 +1659,7 @@ ENTT_DEBUG_TEST(StorageDeathTest, PinnedComponent) {
 
     ASSERT_DEATH(pool.swap_elements(entity, other), "");
     ASSERT_DEATH(pool.compact(), "");
-    ASSERT_DEATH(pool.sort([&pool](auto &&lhs, auto &&rhs) { return lhs < rhs; }), "");
+    ASSERT_DEATH(pool.sort([](auto &&lhs, auto &&rhs) { return lhs < rhs; }), "");
 }
 
 TEST(Storage, UpdateFromDestructor) {
