@@ -139,8 +139,8 @@ The registry to store, the views and the groups to iterate. That's all.
 The `entt::entity` type implements the concept of _entity identifier_. An entity
 (the _E_ of an _ECS_) is an opaque element to use as-is. Inspecting it isn't
 recommended since its format can change in future.<br/>
-Components (the _C_ of an _ECS_) are both move constructible and move assignable
-types. No need to register them nor their types.<br/>
+Components (the _C_ of an _ECS_) are of any type, without any constraints, not
+even that of being movable. No need to register them nor their types.<br/>
 Systems (the _S_ of an _ECS_) can be plain functions, functors, lambdas and so
 on. It's not required to announce them in any case and have no requirements.
 
@@ -965,9 +965,11 @@ makes it possible to use any type as a component, as long as its specialization
 of `component_traits` implements all the required functionalities.<br/>
 The non-specialized version of this class contains the following members:
 
-* `in_place_delete`: `Type::in_place_delete` if present, false otherwise.
-* `page_size`: `Type::page_size` if present, `ENTT_PACKED_PAGE` (for non-empty
-  types) or 0 (for empty types) otherwise.
+* `in_place_delete`: `Type::in_place_delete` if present, true for non-movable
+  types and false otherwise.
+
+* `page_size`: `Type::page_size` if present, `ENTT_PACKED_PAGE` for non-empty
+  types and 0 otherwise.
 
 Where `Type` is any type of component. All properties can be customized by
 specializing the above class and defining all its members, or by adding only

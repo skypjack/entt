@@ -81,12 +81,13 @@ Here is a brief, yet incomplete list of what it offers today:
 * A `constexpr` utility for human readable **resource names**.
 * Minimal **configuration system** built using the monostate pattern.
 * Incredibly fast **entity-component system** with its own _pay for what you
-  use_ policy.
+  use_ policy, unconstrained component types with optional pointer stability and
+  hooks for storage customization.
 * Views and groups to iterate entities and components and allow different access
   patterns, from **perfect SoA** to fully random.
 * A lot of **facilities** built on top of the entity-component system to help
   the users and avoid reinventing the wheel.
-* General purpose execution graph builder for optimal scheduling.
+* General purpose **execution graph builder** for optimal scheduling.
 * The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free runtime **reflection system**.
 * **Static polymorphism** made simple and within everyone's reach.
@@ -98,7 +99,7 @@ Here is a brief, yet incomplete list of what it offers today:
 * And **much more**! Check out the
   [**wiki**](https://github.com/skypjack/entt/wiki).
 
-Consider these lists a work in progress as well as the project. The whole API is
+Consider this list a work in progress as well as the project. The whole API is
 fully documented in-code for those who are brave enough to read it.<br/>
 Please, do note that all tools are also DLL-friendly now and run smoothly across
 boundaries.
