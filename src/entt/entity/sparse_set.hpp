@@ -238,6 +238,7 @@ protected:
      * @param it An iterator to the element to pop.
      */
     void swap_and_pop(const basic_iterator it) {
+        ENTT_ASSERT(mode == deletion_policy::swap_and_pop, "Deletion policy mismatched");
         auto &self = sparse_ref(*it);
         const auto entt = entity_traits::to_entity(self);
         sparse_ref(packed.back()) = entity_traits::combine(entt, entity_traits::to_integral(packed.back()));
@@ -254,6 +255,7 @@ protected:
      * @param it An iterator to the element to pop.
      */
     void in_place_pop(const basic_iterator it) {
+        ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatched");
         const auto entt = entity_traits::to_entity(std::exchange(sparse_ref(*it), null));
         packed[static_cast<size_type>(entt)] = std::exchange(free_list, entity_traits::combine(entt, entity_traits::reserved));
     }
@@ -265,13 +267,13 @@ protected:
      * @param last An iterator past the last element of the range of entities.
      */
     virtual void pop(basic_iterator first, basic_iterator last) {
-        if(mode == deletion_policy::in_place) {
+        if(mode == deletion_policy::swap_and_pop) {
             for(; first != last; ++first) {
-                in_place_pop(first);
+                swap_and_pop(first);
             }
         } else {
             for(; first != last; ++first) {
-                swap_and_pop(first);
+                in_place_pop(first);
             }
         }
     }

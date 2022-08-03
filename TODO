@@ -14,7 +14,6 @@ DOC:
 WIP:
 * any: assert-if-dynamic like tag to the constructor
 * no gh-pages, use main/docs or similar, see settings/pages on gh
-* sparse set/storage support for move-only types, internal rework required
 * get rid of observers, storage based views made them pointless - document alternatives
 * add storage getter for filters to views and groups
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)

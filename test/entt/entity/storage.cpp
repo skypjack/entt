@@ -9,9 +9,14 @@
 #include <gtest/gtest.h>
 #include <entt/entity/component.hpp>
 #include <entt/entity/storage.hpp>
+#include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 #include "../common/throwing_type.hpp"
 #include "../common/tracked_memory_resource.hpp"
+
+struct pinned_type {
+    const int value{42};
+};
 
 struct empty_stable_type {
     static constexpr auto in_place_delete = true;
@@ -1633,6 +1638,28 @@ TEST(Storage, ReferencesGuaranteed) {
 TEST(Storage, MoveOnlyComponent) {
     // the purpose is to ensure that move only components are always accepted
     [[maybe_unused]] entt::storage<std::unique_ptr<int>> pool;
+}
+
+TEST(Storage, PinnedComponent) {
+    // the purpose is to ensure that non-movable components are always accepted
+    [[maybe_unused]] entt::storage<pinned_type> pool;
+}
+
+ENTT_DEBUG_TEST(StorageDeathTest, PinnedComponent) {
+    entt::storage<pinned_type> pool;
+    const entt::entity entity{0};
+    const entt::entity destroy{1};
+    const entt::entity other{2};
+
+    pool.emplace(entity);
+    pool.emplace(destroy);
+    pool.emplace(other);
+
+    pool.erase(destroy);
+
+    ASSERT_DEATH(pool.swap_elements(entity, other), "");
+    ASSERT_DEATH(pool.compact(), "");
+    ASSERT_DEATH(pool.sort([&pool](auto &&lhs, auto &&rhs) { return lhs < rhs; }), "");
 }
 
 TEST(Storage, UpdateFromDestructor) {

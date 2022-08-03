@@ -232,13 +232,13 @@ template<typename... CLhs, typename... CRhs>
  */
 template<typename Type, typename Entity, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
-    static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The type must be at least move constructible/assignable");
-
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using comp_traits = component_traits<Type>;
+
+    static constexpr bool is_pinned_type_v = !(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>);
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
         return packed.first()[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
@@ -309,15 +309,23 @@ private:
         return std::addressof(element_at(pos));
     }
 
-    void swap_at(const std::size_t lhs, const std::size_t rhs) final {
-        using std::swap;
-        swap(element_at(lhs), element_at(rhs));
+    void swap_at([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) final {
+        if constexpr(is_pinned_type_v) {
+            ENTT_ASSERT(false, "Pinned type");
+        } else {
+            using std::swap;
+            swap(element_at(lhs), element_at(rhs));
+        }
     }
 
-    void move_element(const std::size_t from, const std::size_t to) final {
-        auto &elem = element_at(from);
-        entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), packed.second(), std::move(elem));
-        std::destroy_at(std::addressof(elem));
+    void move_element([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) final {
+        if constexpr(is_pinned_type_v) {
+            ENTT_ASSERT(false, "Pinned type");
+        } else {
+            auto &elem = element_at(from);
+            entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), packed.second(), std::move(elem));
+            std::destroy_at(std::addressof(elem));
+        }
     }
 
 protected:
