@@ -421,8 +421,11 @@ public:
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        const auto other = allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve());
-        return (!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>> || other.owner()) ? other : meta_any{};
+        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
+            return meta_any{};
+        } else {
+            return allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve());
+        }
     }
 
     /**
@@ -432,16 +435,11 @@ public:
      */
     template<typename Type>
     bool allow_cast() {
-        if(auto other = std::as_const(*this).allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve()); other) {
-            if(other.owner()) {
-                std::swap(*this, other);
-                return true;
-            }
-
-            return (static_cast<constness_as_t<any, std::remove_reference_t<const Type>> &>(storage).data() != nullptr);
+        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
+            return allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve()) && (storage.data() != nullptr);
+        } else {
+            return allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve());
         }
-
-        return false;
     }
 
     /*! @copydoc any::emplace */
