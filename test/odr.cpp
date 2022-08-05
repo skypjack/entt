@@ -1,2 +1,2 @@
-#include <entt/entt.hpp>
-#include <entt/fwd.hpp>
+#include <entt/entt.hpp> // IWYU pragma: keep
+#include <entt/fwd.hpp>  // IWYU pragma: keep
