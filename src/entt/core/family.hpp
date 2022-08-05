@@ -2,7 +2,7 @@
 #define ENTT_CORE_FAMILY_HPP
 
 #include "../config/config.h"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 
 namespace entt {
 

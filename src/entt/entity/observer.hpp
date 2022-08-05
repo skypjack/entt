@@ -8,7 +8,7 @@
 #include <utility>
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 #include "storage.hpp"
 
 namespace entt {

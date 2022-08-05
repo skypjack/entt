@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <type_traits>
 #include "../config/config.h"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 
 namespace entt {
 

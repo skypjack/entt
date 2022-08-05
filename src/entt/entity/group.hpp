@@ -9,7 +9,7 @@
 #include "../core/type_traits.hpp"
 #include "component.hpp"
 #include "entity.hpp"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 #include "sparse_set.hpp"
 #include "storage.hpp"
 

@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 
 namespace entt {
 

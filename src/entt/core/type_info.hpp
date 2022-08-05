@@ -6,7 +6,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/attribute.h"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 #include "hashed_string.hpp"
 
 namespace entt {

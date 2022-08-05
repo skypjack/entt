@@ -13,7 +13,7 @@
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/utility.hpp"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 #include "loader.hpp"
 #include "resource.hpp"
 

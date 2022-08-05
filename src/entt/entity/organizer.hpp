@@ -10,7 +10,7 @@
 #include "../core/utility.hpp"
 #include "../graph/adjacency_matrix.hpp"
 #include "../graph/flow.hpp"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 #include "helper.hpp"
 
 namespace entt {

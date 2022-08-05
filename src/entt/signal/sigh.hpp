@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 #include "delegate.hpp"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 
 namespace entt {
 

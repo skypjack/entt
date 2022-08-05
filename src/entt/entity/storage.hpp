@@ -15,7 +15,7 @@
 #include "../core/type_info.hpp"
 #include "component.hpp"
 #include "entity.hpp"
-#include "fwd.hpp"
+#include "fwd.hpp" // IWYU pragma: export
 #include "sigh_storage_mixin.hpp"
 #include "sparse_set.hpp"
 
