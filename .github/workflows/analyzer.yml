@@ -3,10 +3,8 @@ name: analyzer
 on:
   push:
     branches:
-      - 'iwyu'
-  schedule:
-    # run at 01:00 every day
-    - cron: '0 1 * * *'
+      - master
+      - wip
 
 jobs:
 
@@ -14,8 +12,8 @@ jobs:
     timeout-minutes: 30
 
     env:
-      IWYU: 0.17
-      LLVM: 13
+      IWYU: 0.18
+      LLVM: 14
 
     runs-on: ubuntu-latest
     continue-on-error: true
