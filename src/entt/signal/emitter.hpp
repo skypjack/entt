@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <utility>
 #include "../container/dense_map.hpp"
+#include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/utility.hpp"
