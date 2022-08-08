@@ -7,7 +7,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/utility.hpp"
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 #include "type_info.hpp"
 #include "type_traits.hpp"
 

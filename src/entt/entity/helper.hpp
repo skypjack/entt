@@ -7,7 +7,7 @@
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
 #include "component.hpp"
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 #include "group.hpp"
 #include "view.hpp"
 

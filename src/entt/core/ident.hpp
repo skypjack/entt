@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 #include "type_traits.hpp"
 
 namespace entt {

@@ -8,7 +8,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 
 namespace entt {
 

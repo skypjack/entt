@@ -15,7 +15,7 @@
 #include "../core/utility.hpp"
 #include "adl_pointer.hpp"
 #include "context.hpp"
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 #include "node.hpp"
 #include "range.hpp"
 #include "type_traits.hpp"

@@ -13,7 +13,7 @@
 #include "../core/type_traits.hpp"
 #include "component.hpp"
 #include "entity.hpp"
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 #include "view.hpp"
 
 namespace entt {

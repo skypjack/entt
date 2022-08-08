@@ -4,7 +4,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 
 namespace entt {
 

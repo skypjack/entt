@@ -9,7 +9,7 @@
 #include "../core/any.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 
 namespace entt {
 
