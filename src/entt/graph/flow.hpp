@@ -17,7 +17,7 @@
 #include "../core/iterator.hpp"
 #include "../core/utility.hpp"
 #include "adjacency_matrix.hpp"
-#include "fwd.hpp" // IWYU pragma: export
+#include "fwd.hpp"
 
 namespace entt {
 
