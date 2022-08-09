@@ -603,11 +603,11 @@ public:
     }
 
     /**
-     * @brief Returns the number of elements matching a key (either 1 or 0).
+     * @brief Returns the number of elements matching a value (either 1 or 0).
      * @param key Key value of an element to search for.
      * @return Number of elements matching the key (either 1 or 0).
      */
-    [[nodiscard]] size_type count(const key_type &key) const {
+    [[nodiscard]] size_type count(const value_type &key) const {
         return find(key) != end();
     }
 
@@ -656,6 +656,46 @@ public:
     [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, const_iterator>>
     find(const Other &value) const {
         return constrained_find(value, value_to_bucket(value));
+    }
+
+    /**
+     * @brief Returns a range containing all elements with a given value.
+     * @param value Value of an element to search for.
+     * @return A pair of iterators pointing to the first element and past the
+     * last element of the range.
+     */
+    [[nodiscard]] std::pair<iterator, iterator> equal_range(const value_type &value) {
+        const auto it = find(value);
+        return {it, it + !(it == end())};
+    }
+
+    /*! @copydoc equal_range */
+    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const value_type &value) const {
+        const auto it = find(value);
+        return {it, it + !(it == cend())};
+    }
+
+    /**
+     * @brief Returns a range containing all elements that compare _equivalent_
+     * to a given value.
+     * @tparam Other Type of an element to search for.
+     * @param value Value of an element to search for.
+     * @return A pair of iterators pointing to the first element and past the
+     * last element of the range.
+     */
+    template<typename Other>
+    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<iterator, iterator>>>
+    equal_range(const Other &value) {
+        const auto it = find(value);
+        return {it, it + !(it == end())};
+    }
+
+    /*! @copydoc equal_range */
+    template<class Other>
+    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<const_iterator, const_iterator>>>
+    equal_range(const Other &value) const {
+        const auto it = find(value);
+        return {it, it + !(it == cend())};
     }
 
     /**
