@@ -786,7 +786,7 @@ public:
 
     /**
      * @brief Finds an element with a key that compares _equivalent_ to a given
-     * value.
+     * key.
      * @tparam Other Type of the key value of an element to search for.
      * @param key Key value of an element to search for.
      * @return An iterator to an element with the given key. If no such element
@@ -803,6 +803,46 @@ public:
     [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, const_iterator>>
     find(const Other &key) const {
         return constrained_find(key, key_to_bucket(key));
+    }
+
+    /**
+     * @brief Returns a range containing all elements with a given key.
+     * @param key Key value of an element to search for.
+     * @return A pair of iterators pointing to the first element and past the
+     * last element of the range.
+     */
+    [[nodiscard]] std::pair<iterator, iterator> equal_range(const key_type &key) {
+        const auto it = find(key);
+        return {it, it + !(it == end())};
+    }
+
+    /*! @copydoc equal_range */
+    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const key_type &key) const {
+        const auto it = find(key);
+        return {it, it + !(it == cend())};
+    }
+
+    /**
+     * @brief Returns a range containing all elements that compare _equivalent_
+     * to a given key.
+     * @tparam Other Type of an element to search for.
+     * @param key Key value of an element to search for.
+     * @return A pair of iterators pointing to the first element and past the
+     * last element of the range.
+     */
+    template<typename Other>
+    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<iterator, iterator>>>
+    equal_range(const Other &key) {
+        const auto it = find(key);
+        return {it, it + !(it == end())};
+    }
+
+    /*! @copydoc equal_range */
+    template<class Other>
+    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<const_iterator, const_iterator>>>
+    equal_range(const Other &key) const {
+        const auto it = find(key);
+        return {it, it + !(it == cend())};
     }
 
     /**
