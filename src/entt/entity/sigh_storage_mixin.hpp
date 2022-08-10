@@ -62,9 +62,9 @@ public:
     explicit sigh_storage_mixin(const allocator_type &allocator)
         : Type{allocator},
           owner{},
-          construction{},
-          destruction{},
-          update{} {}
+          construction{allocator},
+          destruction{allocator},
+          update{allocator} {}
 
     /**
      * @brief Move constructor.
