@@ -24,7 +24,8 @@ namespace entt {
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
-    using sigh_type = sigh<void(basic_registry<typename Type::entity_type> &, const typename Type::entity_type), typename Type::allocator_type>;
+    using basic_registry_type = basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>;
+    using sigh_type = sigh<void(basic_registry_type &, const typename Type::entity_type), typename Type::allocator_type>;
     using basic_iterator = typename Type::basic_iterator;
 
     void pop(basic_iterator first, basic_iterator last) override {
@@ -38,7 +39,7 @@ class sigh_storage_mixin final: public Type {
         }
     }
 
-    basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
+    basic_iterator try_emplace(const typename basic_registry_type::entity_type entt, const bool force_back, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::try_emplace(entt, force_back, value);
         construction.publish(*owner, entt);
@@ -50,6 +51,8 @@ public:
     using allocator_type = typename Type::allocator_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
+    /*! @brief Expected registry type. */
+    using registry_type = basic_registry_type;
 
     /*! @brief Default constructor. */
     sigh_storage_mixin()
@@ -216,13 +219,13 @@ public:
      * @param value A variable wrapped in an opaque container.
      */
     void bind(any value) noexcept final {
-        auto *reg = any_cast<basic_registry<entity_type>>(&value);
+        auto *reg = any_cast<basic_registry_type>(&value);
         owner = reg ? reg : owner;
         Type::bind(std::move(value));
     }
 
 private:
-    basic_registry<entity_type> *owner;
+    basic_registry_type *owner;
     sigh_type construction;
     sigh_type destruction;
     sigh_type update;
