@@ -16,7 +16,7 @@
 #include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
-#include "sigh_storage_mixin.hpp"
+#include "storage_mixin.hpp"
 #include "sparse_set.hpp"
 
 namespace entt {
