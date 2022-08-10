@@ -132,13 +132,6 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type...>>;
 
-    /*! @brief A registry is allowed to create groups. */
-    friend class basic_registry<underlying_type>;
-
-    basic_group(basic_common_type &ref, Get &...gpool) noexcept
-        : handler{&ref},
-          pools{&gpool...} {}
-
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = underlying_type;
@@ -156,6 +149,15 @@ public:
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
         : handler{} {}
+
+    /**
+     * @brief Constructs a group from a set of storage classes.
+     * @param ref The actual entities to iterate.
+     * @param gpool Storage types to iterate _observed_ by the group.
+     */
+    basic_group(basic_common_type &ref, Get &...gpool) noexcept
+        : handler{&ref},
+          pools{&gpool...} {}
 
     /**
      * @brief Returns a const reference to the underlying handler.
@@ -523,15 +525,8 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
     using basic_common_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
 
-    /*! @brief A registry is allowed to create groups. */
-    friend class basic_registry<underlying_type>;
-
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type...>>;
-
-    basic_group(const std::size_t &extent, Owned &...opool, Get &...gpool) noexcept
-        : pools{&opool..., &gpool...},
-          length{&extent} {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -550,6 +545,16 @@ public:
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
         : length{} {}
+
+    /**
+     * @brief Constructs a group from a set of storage classes.
+     * @param extent The actual number of entities to iterate.
+     * @param opool Storage types to iterate _owned_ by the group.
+     * @param gpool Storage types to iterate _observed_ by the group.
+     */
+    basic_group(const std::size_t &extent, Owned &...opool, Get &...gpool) noexcept
+        : pools{&opool..., &gpool...},
+          length{&extent} {}
 
     /**
      * @brief Returns the storage for a given component type.
