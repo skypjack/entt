@@ -42,6 +42,8 @@
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
     * [View pack](#view-pack)
+    * [Iterating multi type views in a specified order](#iterating-multi-type-views-in-a-specified-order)
+    * [Iterating views in reversed order](#iterating-views-in-reversed-order)
     * [Runtime views](#runtime-views)
   * [Groups](#groups)
     * [Full-owning groups](#full-owning-groups)
@@ -1590,6 +1592,68 @@ which the views are combined. Therefore, the pack in the example above will
 return an instance of `position` first and then one of `velocity`.<br/>
 Since combining views generates views, a chain can be of arbitrary length and
 the above type order rules apply sequentially.
+
+### Iterating multi type views in a specified order
+
+By default, the view is iterated along the pool that contains the smallest number of components. For example, if the registry contains 5 instances of `velocity` components and 10 instances of `position` components, then for iterating a view constructed like this:
+
+```cpp
+auto view = registry.view<positon, velocity>();
+for(auto entity : view) { 
+    // ...
+}
+```
+
+The order will depend on how the `velocity` components are arranged in the pool. The order of types when calling the `view` function (`<position, velocity>` vs `<velocity, position>`) do not matter. Neither does the order of views in [view packs](#view-pack).
+
+To enforce iteration of the view by given component order, use the `use` function:
+
+```cpp
+// Now iteration order depends on how `position` components are arranged in the pool
+auto view = registry.view<position, velocity>().use<position>();
+for(auto entity : view) {
+    // ...
+}
+```
+To learn how to sort components in a pool, see: [Sorting: is it possible?](#sorting-is-it-possible)
+
+### Iterating views in reversed order
+
+You can iterate single type views in reversed order using `reverse_iterator`:
+
+```cpp
+auto view = registry.view<position>();
+for(auto iter = view.rbegin(); iter != view.rend(); iter++)
+{
+    auto [position] = view.get(*entity);
+    // ...
+}
+```
+
+or with C++20 ranges:
+
+```cpp
+auto view = registry.view<position>();
+for(auto entity : view | std::views::reverse)
+{
+    auto [position] = view.get(entity);
+    // ...
+}
+```
+
+Unfortunately multi type views don't have `reverse_interator`. At this moment the only way is to implement this functionality manually:
+
+```cpp
+auto view = registry.view<position>();
+for(auto entity : view | std::views::reverse)
+{
+    if(!registry.all_of<velocity>(entity)) {
+        continue;
+    }
+    auto [position, view] = registry.get<position, velocity>(entity);
+    // ...
+}
+```
 
 ### Runtime views
 
