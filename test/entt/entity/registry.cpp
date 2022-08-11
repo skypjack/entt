@@ -207,6 +207,8 @@ TEST(Registry, Functionalities) {
 
     entt::registry registry;
 
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = registry.get_allocator());
+
     ASSERT_EQ(registry.size(), 0u);
     ASSERT_EQ(registry.alive(), 0u);
     ASSERT_NO_FATAL_FAILURE(registry.reserve(42));
@@ -552,14 +554,20 @@ TEST(Registry, CreateClearCycle) {
     for(int i = 0; i < 7; ++i) {
         const auto entity = registry.create();
         registry.emplace<int>(entity);
-        if(i == 3) { pre = entity; }
+
+        if(i == 3) {
+            pre = entity;
+        }
     }
 
     registry.clear();
 
     for(int i = 0; i < 5; ++i) {
         const auto entity = registry.create();
-        if(i == 3) { post = entity; }
+
+        if(i == 3) {
+            post = entity;
+        }
     }
 
     ASSERT_FALSE(registry.valid(pre));
@@ -814,7 +822,10 @@ TEST(Registry, Each) {
     match = 0u;
 
     registry.each([&](auto entity) {
-        if(registry.all_of<int>(entity)) { ++match; }
+        if(registry.all_of<int>(entity)) {
+            ++match;
+        }
+
         static_cast<void>(registry.create());
         ++tot;
     });
@@ -841,7 +852,10 @@ TEST(Registry, Each) {
     match = 0u;
 
     registry.each([&](auto entity) {
-        if(registry.all_of<int>(entity)) { ++match; }
+        if(registry.all_of<int>(entity)) {
+            ++match;
+        }
+
         registry.destroy(entity);
         ++tot;
     });

@@ -13,6 +13,7 @@
 #include "../container/dense_map.hpp"
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
+#include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
@@ -336,20 +337,28 @@ class basic_registry {
     }
 
     auto recycle_identifier() noexcept {
-        ENTT_ASSERT(free_list != null, "No entities available");
-        const auto curr = entity_traits::to_entity(free_list);
-        free_list = entity_traits::combine(entity_traits::to_integral(epool[curr]), tombstone);
+        ENTT_ASSERT(free_list.first() != null, "No entities available");
+        const auto curr = entity_traits::to_entity(free_list.first());
+        free_list.first() = entity_traits::combine(entity_traits::to_integral(epool[curr]), tombstone);
         return (epool[curr] = entity_traits::combine(curr, entity_traits::to_integral(epool[curr])));
     }
 
     auto release_entity(const Entity entt, const typename entity_traits::version_type version) {
         const typename entity_traits::version_type vers = version + (version == entity_traits::to_version(tombstone));
-        epool[entity_traits::to_entity(entt)] = entity_traits::construct(entity_traits::to_integral(free_list), vers);
-        free_list = entity_traits::combine(entity_traits::to_integral(entt), tombstone);
+        epool[entity_traits::to_entity(entt)] = entity_traits::construct(entity_traits::to_integral(free_list.first()), vers);
+        free_list.first() = entity_traits::combine(entity_traits::to_integral(entt), tombstone);
         return vers;
     }
 
+    void rebind() {
+        for(auto &&curr: pools) {
+            curr.second->bind(forward_as_any(*this));
+        }
+    }
+
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Underlying version type. */
@@ -363,18 +372,26 @@ public:
 
     /*! @brief Default constructor. */
     basic_registry()
-        : pools{},
-          groups{},
-          epool{},
-          free_list{tombstone},
-          vars{} {}
+        : basic_registry{allocator_type{}} {}
+
+    /**
+     * @brief Constructs an empty registry with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_registry(const allocator_type &allocator)
+        : basic_registry{0u, allocator} {}
 
     /**
      * @brief Allocates enough memory upon construction to store `count` pools.
      * @param count The number of pools to allocate memory for.
+     * @param allocator The allocator to use.
      */
-    basic_registry(const size_type count)
-        : basic_registry{} {
+    basic_registry(const size_type count, const allocator_type &allocator = allocator_type{})
+        : free_list{tombstone, allocator},
+          pools{},
+          groups{},
+          epool{},
+          vars{} {
         pools.reserve(count);
     }
 
@@ -383,14 +400,12 @@ public:
      * @param other The instance to move from.
      */
     basic_registry(basic_registry &&other) noexcept
-        : pools{std::move(other.pools)},
+        : free_list{std::move(other.free_list)},
+          pools{std::move(other.pools)},
           groups{std::move(other.groups)},
           epool{std::move(other.epool)},
-          free_list{other.free_list},
           vars{std::move(other.vars)} {
-        for(auto &&curr: pools) {
-            curr.second->bind(forward_as_any(*this));
-        }
+        rebind();
     }
 
     /**
@@ -399,17 +414,23 @@ public:
      * @return This registry.
      */
     basic_registry &operator=(basic_registry &&other) noexcept {
+        free_list = std::move(other.free_list);
         pools = std::move(other.pools);
         groups = std::move(other.groups);
         epool = std::move(other.epool);
-        free_list = other.free_list;
         vars = std::move(other.vars);
 
-        for(auto &&curr: pools) {
-            curr.second->bind(forward_as_any(*this));
-        }
+        rebind();
 
         return *this;
+    }
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
+        return allocator_type{free_list.second()};
     }
 
     /**
@@ -491,7 +512,7 @@ public:
     [[nodiscard]] size_type alive() const {
         auto sz = epool.size();
 
-        for(auto curr = free_list; curr != null; --sz) {
+        for(auto curr = free_list.first(); curr != null; --sz) {
             curr = epool[entity_traits::to_entity(curr)];
         }
 
@@ -548,7 +569,7 @@ public:
      * @return The head of the list of released entities.
      */
     [[nodiscard]] entity_type released() const noexcept {
-        return free_list;
+        return free_list.first();
     }
 
     /**
@@ -577,7 +598,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
-        return (free_list == null) ? epool.emplace_back(generate_identifier(epool.size())) : recycle_identifier();
+        return (free_list.first() == null) ? epool.emplace_back(generate_identifier(epool.size())) : recycle_identifier();
     }
 
     /**
@@ -605,7 +626,7 @@ public:
         } else if(const auto curr = entity_traits::to_entity(epool[req]); req == curr) {
             return create();
         } else {
-            auto *it = &free_list;
+            auto *it = &free_list.first();
             for(; entity_traits::to_entity(*it) != req; it = &epool[entity_traits::to_entity(*it)]) {}
             *it = entity_traits::combine(curr, entity_traits::to_integral(*it));
             return (epool[req] = hint);
@@ -623,7 +644,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        for(; free_list != null && first != last; ++first) {
+        for(; free_list.first() != null && first != last; ++first) {
             *first = recycle_identifier();
         }
 
@@ -656,7 +677,7 @@ public:
     void assign(It first, It last, const entity_type destroyed) {
         ENTT_ASSERT(!alive(), "Entities still alive");
         epool.assign(first, last);
-        free_list = destroyed;
+        free_list.first() = destroyed;
     }
 
     /**
@@ -1110,7 +1131,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if(free_list == null) {
+        if(free_list.first() == null) {
             for(auto pos = epool.size(); pos; --pos) {
                 func(epool[pos - 1]);
             }
@@ -1464,10 +1485,10 @@ public:
     }
 
 private:
+    compressed_pair<entity_type, allocator_type> free_list;
     dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
     std::vector<group_data> groups;
     std::vector<entity_type> epool;
-    entity_type free_list;
     context vars;
 };
 
