@@ -426,6 +426,23 @@ public:
     }
 
     /**
+     * @brief Exchanges the contents with those of a given registry.
+     * @param other Registry to exchange the content with.
+     */
+    void swap(basic_registry &other) {
+        using std::swap;
+        propagate_on_container_swap(free_list.second(), other.free_list.second());
+        swap(free_list.first(), other.free_list.first());
+        swap(pools, other.pools);
+        swap(groups, other.groups);
+        swap(epool, other.epool);
+        swap(vars, other.vars);
+
+        rebind();
+        other.rebind();
+    }
+
+    /**
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */

@@ -396,6 +396,36 @@ TEST(Registry, Move) {
     ASSERT_EQ(test.parent, &registry);
 }
 
+TEST(Registry, Swap) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    owner test{};
+
+    registry.on_construct<int>().connect<&owner::receive>(test);
+    registry.on_destroy<int>().connect<&owner::receive>(test);
+
+    ASSERT_EQ(test.parent, nullptr);
+
+    registry.emplace<int>(entity);
+
+    ASSERT_EQ(test.parent, &registry);
+
+    entt::registry other;
+    other.swap(registry);
+    other.erase<int>(entity);
+
+    registry = {};
+    registry.emplace<int>(registry.create(entity));
+
+    ASSERT_EQ(test.parent, &other);
+
+    registry.swap(other);
+    registry.emplace<int>(entity);
+    registry.emplace<int>(registry.create(entity));
+
+    ASSERT_EQ(test.parent, &registry);
+}
+
 TEST(Registry, ReplaceAggregate) {
     entt::registry registry;
     const auto entity = registry.create();
