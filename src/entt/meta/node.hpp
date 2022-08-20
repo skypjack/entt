@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include "../container/dense_map.hpp"
 #include "../core/attribute.h"
 #include "../core/enum.hpp"
 #include "../core/fwd.hpp"
@@ -56,13 +57,12 @@ struct meta_base_node {
 };
 
 struct meta_conv_node {
-    meta_conv_node *next;
-    meta_type_node *const type;
-    meta_any (*const conv)(const meta_any &);
+    meta_any (*conv)(const meta_any &);
 };
 
 struct meta_ctor_node {
     using size_type = std::size_t;
+
     meta_ctor_node *next;
     const size_type arity;
     meta_type (*const arg)(const size_type) noexcept;
@@ -71,6 +71,7 @@ struct meta_ctor_node {
 
 struct meta_data_node {
     using size_type = std::size_t;
+
     id_type id;
     const meta_traits traits;
     meta_data_node *next;
@@ -84,6 +85,7 @@ struct meta_data_node {
 
 struct meta_func_node {
     using size_type = std::size_t;
+
     id_type id;
     const meta_traits traits;
     meta_func_node *next;
@@ -96,6 +98,7 @@ struct meta_func_node {
 
 struct meta_template_node {
     using size_type = std::size_t;
+
     size_type arity;
     meta_type_node *type;
     meta_type_node *(*arg)(const size_type) noexcept;
@@ -103,6 +106,7 @@ struct meta_template_node {
 
 struct meta_type_node {
     using size_type = std::size_t;
+
     const type_info *info;
     id_type id;
     const meta_traits traits;
@@ -116,7 +120,7 @@ struct meta_type_node {
     std::unique_ptr<meta_template_node> templ;
     meta_ctor_node *ctor{nullptr};
     meta_base_node *base{nullptr};
-    meta_conv_node *conv{nullptr};
+    dense_map<id_type, meta_conv_node, identity> conv{};
     meta_data_node *data{nullptr};
     meta_func_node *func{nullptr};
     void (*dtor)(void *){nullptr};

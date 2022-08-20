@@ -28,7 +28,9 @@ namespace internal {
 
 inline void link_prop_if_required(internal::meta_prop_node **ref, internal::meta_prop_node &node) noexcept {
     for(auto it = *ref; it; it = it->next) {
-        if(it == &node) { return; }
+        if(it == &node) {
+            return;
+        }
         ENTT_ASSERT(it->id != node.id, "Duplicate identifier");
     }
 
@@ -48,25 +50,20 @@ inline void link_type_if_required(meta_type_node *owner, const id_type id) noexc
 
 inline void link_base_if_required(meta_type_node *owner, meta_base_node &node) noexcept {
     for(auto it = owner->base; it; it = it->next) {
-        if(it == &node) { return; }
+        if(it == &node) {
+            return;
+        }
     }
 
     node.next = owner->base;
     owner->base = &node;
 }
 
-inline void link_conv_if_required(meta_type_node *owner, meta_conv_node &node) noexcept {
-    for(auto it = owner->conv; it; it = it->next) {
-        if(it == &node) { return; }
-    }
-
-    node.next = owner->conv;
-    owner->conv = &node;
-}
-
 inline void link_ctor_if_required(meta_type_node *owner, meta_ctor_node &node) noexcept {
     for(auto it = owner->ctor; it; it = it->next) {
-        if(it == &node) { return; }
+        if(it == &node) {
+            return;
+        }
     }
 
     node.next = owner->ctor;
@@ -87,7 +84,9 @@ inline void link_func_if_required(meta_type_node *owner, const id_type id, meta_
     node.id = id;
 
     for(auto it = owner->func; it; it = it->next) {
-        if(it == &node) { return; }
+        if(it == &node) {
+            return;
+        }
     }
 
     node.next = owner->func;
@@ -294,14 +293,13 @@ public:
      */
     template<auto Candidate>
     auto conv() noexcept {
-        static internal::meta_conv_node node{
-            nullptr,
-            internal::meta_node<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>>::resolve(),
-            [](const meta_any &instance) -> meta_any { return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data()))); }
-            // tricks clang-format
-        };
+        using conv_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
-        internal::link_conv_if_required(owner, node);
+        owner->conv[type_id<conv_type>().hash()] = internal::meta_conv_node{
+            [](const meta_any &instance) -> meta_any {
+                return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data())));
+            }};
+
         return meta_factory<Type>{};
     }
 
@@ -316,14 +314,13 @@ public:
      */
     template<typename To>
     auto conv() noexcept {
-        static internal::meta_conv_node node{
-            nullptr,
-            internal::meta_node<std::remove_cv_t<std::remove_reference_t<To>>>::resolve(),
-            [](const meta_any &instance) -> meta_any { return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance.data()))); }
-            // tricks clang-format
-        };
+        using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
 
-        internal::link_conv_if_required(owner, node);
+        owner->conv[type_id<conv_type>().hash()] = internal::meta_conv_node{
+            [](const meta_any &instance) -> meta_any {
+                return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance.data())));
+            }};
+
         return meta_factory<Type>{};
     }
 
@@ -631,12 +628,12 @@ inline void meta_reset(const id_type id) noexcept {
         if(auto *node = *it; node->id == id) {
             clear_chain(&node->prop);
             clear_chain(&node->base);
-            clear_chain(&node->conv);
             clear_chain(&node->ctor);
             clear_chain(&node->data, &internal::meta_data_node::prop);
             clear_chain(&node->func, &internal::meta_func_node::prop);
 
             node->id = {};
+            node->conv.clear();
             node->templ.reset();
             node->dtor = nullptr;
             *it = std::exchange(node->next, nullptr);

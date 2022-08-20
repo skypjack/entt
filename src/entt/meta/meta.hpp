@@ -944,7 +944,7 @@ class meta_type {
                         ++direct;
                     } else {
                         ext += internal::find_by<&node_type::base>(info, type.node)
-                               || internal::find_by<&node_type::conv>(info, type.node)
+                               || type.node->conv.contains(info.hash())
                                || (type.node->conversion_helper && other.node->conversion_helper);
                     }
                 }
@@ -1398,10 +1398,8 @@ bool meta_any::set(const id_type id, Type &&value) {
     if(const auto &info = type.info(); node && *node->info == info) {
         return as_ref();
     } else if(node) {
-        for(auto *it = node->conv; it; it = it->next) {
-            if(*it->type->info == info) {
-                return it->conv(*this);
-            }
+        if(auto it = node->conv.find(info.hash()); it != node->conv.cend()) {
+            return it->second.conv(*this);
         }
 
         if(node->conversion_helper && (type.is_arithmetic() || type.is_enum())) {
