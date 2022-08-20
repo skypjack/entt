@@ -181,8 +181,8 @@ class meta_any {
     }
 
     void release() {
-        if(node && node->dtor && owner()) {
-            node->dtor(storage.data());
+        if(node && node->dtor.dtor && owner()) {
+            node->dtor.dtor(storage.data());
         }
     }
 

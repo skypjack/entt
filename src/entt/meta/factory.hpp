@@ -387,7 +387,7 @@ public:
     template<auto Func>
     auto dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
-        owner->dtor = [](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
+        owner->dtor.dtor = [](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
         return meta_factory<Type>{};
     }
 
@@ -620,7 +620,7 @@ inline void meta_reset(const id_type id) noexcept {
             node->base.clear();
             node->conv.clear();
             node->templ.reset();
-            node->dtor = nullptr;
+            node->dtor.dtor = nullptr;
             *it = std::exchange(node->next, nullptr);
 
             break;

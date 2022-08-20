@@ -103,7 +103,7 @@ TEST_F(MetaDtor, ReRegistration) {
 
     auto *node = entt::internal::meta_node<clazz_t>::resolve();
 
-    ASSERT_NE(node->dtor, nullptr);
+    ASSERT_NE(node->dtor.dtor, nullptr);
 
     entt::meta<clazz_t>().dtor<&clazz_t::destroy_incr>();
     entt::resolve<clazz_t>().construct().reset();

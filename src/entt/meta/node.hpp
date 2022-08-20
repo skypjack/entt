@@ -68,6 +68,10 @@ struct meta_ctor_node {
     meta_any (*const invoke)(meta_any *const);
 };
 
+struct meta_dtor_node {
+    void (*dtor)(void *){nullptr};
+};
+
 struct meta_data_node {
     using size_type = std::size_t;
 
@@ -122,7 +126,7 @@ struct meta_type_node {
     dense_map<id_type, meta_conv_node, identity> conv{};
     meta_data_node *data{nullptr};
     meta_func_node *func{nullptr};
-    void (*dtor)(void *){nullptr};
+    meta_dtor_node dtor{};
 };
 
 template<typename... Args>
