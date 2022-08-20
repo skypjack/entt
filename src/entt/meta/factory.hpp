@@ -197,7 +197,6 @@ class meta_factory<Type> {
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         owner->data[id] = internal::meta_data_node{
-            id,
             /* this is never static */
             (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
             nullptr,
@@ -396,7 +395,6 @@ public:
             using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
 
             owner->data[id] = internal::meta_data_node{
-                id,
                 /* this is never static */
                 std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                 nullptr,
@@ -411,7 +409,6 @@ public:
             using data_type = std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>;
 
             owner->data[id] = internal::meta_data_node{
-                id,
                 ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                 nullptr,
                 1u,
@@ -451,7 +448,6 @@ public:
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
             owner->data[id] = internal::meta_data_node{
-                id,
                 /* this is never static */
                 internal::meta_traits::is_const,
                 nullptr,
@@ -466,7 +462,6 @@ public:
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
             owner->data[id] = internal::meta_data_node{
-                id,
                 /* this is never static nor const */
                 internal::meta_traits::is_none,
                 nullptr,

@@ -703,11 +703,6 @@ struct meta_data {
     meta_data(const node_type *curr = nullptr) noexcept
         : node{curr} {}
 
-    /*! @copydoc meta_type::id */
-    [[nodiscard]] id_type id() const noexcept {
-        return node->id;
-    }
-
     /**
      * @brief Returns the number of setters available.
      * @return The number of setters available.

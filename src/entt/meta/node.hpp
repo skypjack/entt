@@ -75,7 +75,6 @@ struct meta_dtor_node {
 struct meta_data_node {
     using size_type = std::size_t;
 
-    id_type id;
     meta_traits traits;
     meta_prop_node *prop;
     size_type arity;
