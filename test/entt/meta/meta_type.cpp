@@ -292,18 +292,13 @@ TEST_F(MetaType, TemplateInfo) {
 
 TEST_F(MetaType, Base) {
     using namespace entt::literals;
-
     auto type = entt::resolve<derived_t>();
-    bool iterate = false;
+
+    ASSERT_NE(type.base().cbegin(), type.base().cend());
 
     for(auto curr: type.base()) {
         ASSERT_EQ(curr, entt::resolve<base_t>());
-        iterate = true;
     }
-
-    ASSERT_TRUE(iterate);
-    ASSERT_EQ(type.base("base"_hs), entt::resolve<base_t>());
-    ASSERT_FALSE(type.base("esabe"_hs));
 }
 
 TEST_F(MetaType, Ctor) {

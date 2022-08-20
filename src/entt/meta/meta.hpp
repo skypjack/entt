@@ -1145,15 +1145,6 @@ public:
     }
 
     /**
-     * @brief Lookup function for registered base meta types.
-     * @param id Unique identifier.
-     * @return The registered base meta type for the given identifier, if any.
-     */
-    [[nodiscard]] meta_type base(const id_type id) const {
-        return internal::find_by<&node_type::base>(id, node);
-    }
-
-    /**
      * @brief Returns a range to visit registered top-level meta data.
      * @return An iterable range to visit registered top-level meta data.
      */
