@@ -983,8 +983,8 @@ public:
      * @brief Constructs an instance from a given base node.
      * @param curr The base node with which to construct the instance.
      */
-    meta_type(const base_node_type &curr) noexcept
-        : node{curr.type} {}
+    meta_type(const base_node_type *curr) noexcept
+        : node{curr ? curr->type : nullptr} {}
 
     /**
      * @brief Returns the type info object of the underlying type.
@@ -1151,8 +1151,8 @@ public:
      * @brief Returns a range to visit registered top-level meta data.
      * @return An iterable range to visit registered top-level meta data.
      */
-    [[nodiscard]] old_meta_range<meta_data> data() const noexcept {
-        return {node->data, nullptr};
+    [[nodiscard]] meta_range<meta_data, typename decltype(internal::meta_type_node::data)::const_iterator> data() const noexcept {
+        return {node->data.cbegin(), node->data.cend()};
     }
 
     /**
@@ -1164,7 +1164,17 @@ public:
      * @return The registered meta data for the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        return internal::find_by<&node_type::data>(id, node);
+        if(auto it = node->data.find(id); it != node->data.cend()) {
+            return &it->second;
+        }
+
+        for(auto &&curr: base()) {
+            if(auto &&elem = curr.data(id); elem) {
+                return elem;
+            }
+        }
+
+        return meta_data{};
     }
 
     /**

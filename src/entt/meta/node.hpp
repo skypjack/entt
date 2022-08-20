@@ -76,14 +76,13 @@ struct meta_data_node {
     using size_type = std::size_t;
 
     id_type id;
-    const meta_traits traits;
-    meta_data_node *next;
+    meta_traits traits;
     meta_prop_node *prop;
-    const size_type arity;
-    meta_type_node *const type;
-    meta_type (*const arg)(const size_type) noexcept;
-    bool (*const set)(meta_handle, meta_any);
-    meta_any (*const get)(meta_handle);
+    size_type arity;
+    meta_type_node *type;
+    meta_type (*arg)(const size_type) noexcept;
+    bool (*set)(meta_handle, meta_any);
+    meta_any (*get)(meta_handle);
 };
 
 struct meta_func_node {
@@ -124,7 +123,7 @@ struct meta_type_node {
     meta_ctor_node *ctor{nullptr};
     dense_map<id_type, meta_base_node, identity> base{};
     dense_map<id_type, meta_conv_node, identity> conv{};
-    meta_data_node *data{nullptr};
+    dense_map<id_type, meta_data_node, identity> data{};
     meta_func_node *func{nullptr};
     meta_dtor_node dtor{};
 };

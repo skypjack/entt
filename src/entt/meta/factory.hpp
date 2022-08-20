@@ -59,16 +59,6 @@ inline void link_ctor_if_required(meta_type_node *owner, meta_ctor_node &node) n
     owner->ctor = &node;
 }
 
-inline void link_data_if_required(meta_type_node *owner, const id_type id, meta_data_node &node) noexcept {
-    ENTT_ASSERT((node.id = {}, !meta_type{owner}.data(id)), "Duplicate identifier");
-    node.id = id;
-
-    if(!meta_type{owner}.data(id)) {
-        node.next = owner->data;
-        owner->data = &node;
-    }
-}
-
 inline void link_func_if_required(meta_type_node *owner, const id_type id, meta_func_node &node) noexcept {
     node.id = id;
 
@@ -206,22 +196,18 @@ class meta_factory<Type> {
         using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
-        static internal::meta_data_node node{
-            {},
+        owner->data[id] = internal::meta_data_node{
+            id,
             /* this is never static */
             (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
-            nullptr,
             nullptr,
             Setter::size,
             internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
             [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
-            &meta_getter<Type, Getter, Policy>
-            // tricks clang-format
-        };
+            &meta_getter<Type, Getter, Policy>};
 
-        internal::link_data_if_required(owner, id, node);
-        return meta_factory<Type, Setter, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
+        return meta_factory<Type, Setter, std::integral_constant<decltype(Getter), Getter>>{&owner->data[id].prop};
     }
 
 public:
@@ -409,40 +395,32 @@ public:
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
 
-            static internal::meta_data_node node{
-                {},
+            owner->data[id] = internal::meta_data_node{
+                id,
                 /* this is never static */
                 std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                 nullptr,
-                nullptr,
                 1u,
                 internal::meta_node<std::remove_const_t<data_type>>::resolve(),
                 &meta_arg<type_list<std::remove_const_t<data_type>>>,
                 &meta_setter<Type, Data>,
-                &meta_getter<Type, Data, Policy>
-                // tricks clang-format
-            };
+                &meta_getter<Type, Data, Policy>};
 
-            internal::link_data_if_required(owner, id, node);
-            return meta_factory<Type, std::integral_constant<decltype(Data), Data>, std::integral_constant<decltype(Data), Data>>{&node.prop};
+            return meta_factory<Type, std::integral_constant<decltype(Data), Data>, std::integral_constant<decltype(Data), Data>>{&owner->data[id].prop};
         } else {
             using data_type = std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>;
 
-            static internal::meta_data_node node{
-                {},
+            owner->data[id] = internal::meta_data_node{
+                id,
                 ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
-                nullptr,
                 nullptr,
                 1u,
                 internal::meta_node<std::remove_const_t<data_type>>::resolve(),
                 &meta_arg<type_list<std::remove_const_t<data_type>>>,
                 &meta_setter<Type, Data>,
-                &meta_getter<Type, Data, Policy>
-                // tricks clang-format
-            };
+                &meta_getter<Type, Data, Policy>};
 
-            internal::link_data_if_required(owner, id, node);
-            return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&node.prop};
+            return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&owner->data[id].prop};
         }
     }
 
@@ -472,41 +450,33 @@ public:
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
-            static internal::meta_data_node node{
-                {},
+            owner->data[id] = internal::meta_data_node{
+                id,
                 /* this is never static */
                 internal::meta_traits::is_const,
-                nullptr,
                 nullptr,
                 0u,
                 internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<>>,
                 &meta_setter<Type, Setter>,
-                &meta_getter<Type, Getter, Policy>
-                // tricks clang-format
-            };
+                &meta_getter<Type, Getter, Policy>};
 
-            internal::link_data_if_required(owner, id, node);
-            return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
+            return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&owner->data[id].prop};
         } else {
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
-            static internal::meta_data_node node{
-                {},
+            owner->data[id] = internal::meta_data_node{
+                id,
                 /* this is never static nor const */
                 internal::meta_traits::is_none,
-                nullptr,
                 nullptr,
                 1u,
                 internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                 &meta_setter<Type, Setter>,
-                &meta_getter<Type, Getter, Policy>
-                // tricks clang-format
-            };
+                &meta_getter<Type, Getter, Policy>};
 
-            internal::link_data_if_required(owner, id, node);
-            return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
+            return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&owner->data[id].prop};
         }
     }
 
@@ -613,12 +583,12 @@ inline void meta_reset(const id_type id) noexcept {
         if(auto *node = *it; node->id == id) {
             clear_chain(&node->prop);
             clear_chain(&node->ctor);
-            clear_chain(&node->data, &internal::meta_data_node::prop);
             clear_chain(&node->func, &internal::meta_func_node::prop);
 
             node->id = {};
             node->base.clear();
             node->conv.clear();
+            node->data.clear();
             node->dtor.dtor = nullptr;
             *it = std::exchange(node->next, nullptr);
 

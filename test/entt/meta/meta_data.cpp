@@ -663,31 +663,28 @@ TEST_F(MetaData, ReRegistration) {
     auto *node = entt::internal::meta_node<base_t>::resolve();
     auto type = entt::resolve<base_t>();
 
-    ASSERT_NE(node->data, nullptr);
-    ASSERT_EQ(node->data->next, nullptr);
+    ASSERT_FALSE(node->data.empty());
+    ASSERT_EQ(node->data.size(), 1u);
     ASSERT_TRUE(type.data("value"_hs));
 
     entt::meta<base_t>().data<&base_t::value>("field"_hs);
 
-    ASSERT_NE(node->data, nullptr);
-    ASSERT_EQ(node->data->next, nullptr);
-    ASSERT_FALSE(type.data("value"_hs));
+    ASSERT_EQ(node->data.size(), 2u);
+    ASSERT_TRUE(type.data("value"_hs));
     ASSERT_TRUE(type.data("field"_hs));
 }
 
-TEST_F(MetaData, NameCollision) {
+TEST_F(MetaData, CollisionAndReuse) {
     using namespace entt::literals;
 
-    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().data<&clazz_t::j>("j"_hs));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs));
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("cj"_hs));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs).is_const());
 
+    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().data<&clazz_t::i>("j"_hs));
     ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().data<&clazz_t::j>("cj"_hs));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs));
+
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("cj"_hs));
-}
-
-ENTT_DEBUG_TEST_F(MetaDataDeathTest, NameCollision) {
-    using namespace entt::literals;
-
-    ASSERT_DEATH(entt::meta<clazz_t>().data<&clazz_t::j>("i"_hs), "");
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs).is_const());
 }

@@ -82,7 +82,7 @@ struct meta_range_iterator final {
     }
 
     [[nodiscard]] reference operator*() const noexcept {
-        return it->second;
+        return &it->second;
     }
 
     [[nodiscard]] pointer operator->() const noexcept {
