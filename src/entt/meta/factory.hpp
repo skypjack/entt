@@ -619,7 +619,6 @@ inline void meta_reset(const id_type id) noexcept {
             node->id = {};
             node->base.clear();
             node->conv.clear();
-            node->templ.reset();
             node->dtor.dtor = nullptr;
             *it = std::exchange(node->next, nullptr);
 

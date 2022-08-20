@@ -102,9 +102,9 @@ struct meta_func_node {
 struct meta_template_node {
     using size_type = std::size_t;
 
-    size_type arity;
-    meta_type_node *type;
-    meta_type_node *(*arg)(const size_type) noexcept;
+    size_type arity{0u};
+    meta_type_node *type{nullptr};
+    meta_type_node *(*arg)(const size_type) noexcept {nullptr};
 };
 
 struct meta_type_node {
@@ -120,7 +120,7 @@ struct meta_type_node {
     meta_any (*const default_constructor)();
     double (*const conversion_helper)(void *, const void *);
     meta_any (*const from_void)(void *, const void *);
-    std::unique_ptr<meta_template_node> templ;
+    meta_template_node templ;
     meta_ctor_node *ctor{nullptr};
     dense_map<id_type, meta_base_node, identity> base{};
     dense_map<id_type, meta_conv_node, identity> conv{};
@@ -174,15 +174,12 @@ class ENTT_API meta_node {
 
     [[nodiscard]] static auto meta_template_info() noexcept {
         if constexpr(is_complete_v<meta_template_traits<Type>>) {
-            auto node = std::make_unique<meta_template_node>();
-
-            node->arg = +[](const std::size_t index) noexcept -> meta_type_node * { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); };
-            node->arity = meta_template_traits<Type>::args_type::size;
-            node->type = meta_node<typename meta_template_traits<Type>::class_type>::resolve();
-
-            return node;
+            return meta_template_node{
+                meta_template_traits<Type>::args_type::size,
+                meta_node<typename meta_template_traits<Type>::class_type>::resolve(),
+                +[](const std::size_t index) noexcept -> meta_type_node * { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }};
         } else {
-            return std::unique_ptr<meta_template_node>{};
+            return meta_template_node{};
         }
     }
 

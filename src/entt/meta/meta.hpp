@@ -1108,7 +1108,7 @@ public:
      * false otherwise.
      */
     [[nodiscard]] bool is_template_specialization() const noexcept {
-        return (node->templ != nullptr);
+        return (node->templ.arity != 0u);
     }
 
     /**
@@ -1116,7 +1116,7 @@ public:
      * @return The number of template arguments.
      */
     [[nodiscard]] size_type template_arity() const noexcept {
-        return node->templ ? node->templ->arity : size_type{};
+        return node->templ.arity;
     }
 
     /**
@@ -1127,7 +1127,7 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const noexcept {
-        return node->templ ? node->templ->type : meta_type{};
+        return node->templ.type;
     }
 
     /**
@@ -1136,7 +1136,7 @@ public:
      * @return The type of the i-th template argument of a type.
      */
     [[nodiscard]] inline meta_type template_arg(const size_type index) const noexcept {
-        return index < template_arity() ? node->templ->arg(index) : meta_type{};
+        return index < template_arity() ? node->templ.arg(index) : meta_type{};
     }
 
     /**
