@@ -15,7 +15,7 @@ namespace entt {
 namespace internal {
 
 template<typename Type, typename Node>
-struct meta_range_iterator final {
+struct old_meta_range_iterator final {
     using difference_type = std::ptrdiff_t;
     using value_type = Type;
     using pointer = input_iterator_pointer<value_type>;
@@ -23,18 +23,18 @@ struct meta_range_iterator final {
     using iterator_category = std::input_iterator_tag;
     using node_type = Node;
 
-    meta_range_iterator() noexcept
+    old_meta_range_iterator() noexcept
         : it{} {}
 
-    meta_range_iterator(node_type *head) noexcept
+    old_meta_range_iterator(node_type *head) noexcept
         : it{head} {}
 
-    meta_range_iterator &operator++() noexcept {
+    old_meta_range_iterator &operator++() noexcept {
         return (it = it->next), *this;
     }
 
-    meta_range_iterator operator++(int) noexcept {
-        meta_range_iterator orig = *this;
+    old_meta_range_iterator operator++(int) noexcept {
+        old_meta_range_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -46,11 +46,11 @@ struct meta_range_iterator final {
         return operator*();
     }
 
-    [[nodiscard]] bool operator==(const meta_range_iterator &other) const noexcept {
+    [[nodiscard]] bool operator==(const old_meta_range_iterator &other) const noexcept {
         return it == other.it;
     }
 
-    [[nodiscard]] bool operator!=(const meta_range_iterator &other) const noexcept {
+    [[nodiscard]] bool operator!=(const old_meta_range_iterator &other) const noexcept {
         return !(*this == other);
     }
 
@@ -71,7 +71,7 @@ private:
  * @tparam Node Type of meta nodes iterated.
  */
 template<typename Type, typename Node = typename Type::node_type>
-using meta_range = iterable_adaptor<internal::meta_range_iterator<Type, Node>>;
+using old_meta_range = iterable_adaptor<internal::old_meta_range_iterator<Type, Node>>;
 
 } // namespace entt
 

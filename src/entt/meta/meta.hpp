@@ -773,7 +773,7 @@ struct meta_data {
      * @brief Returns a range to visit registered meta properties.
      * @return An iterable range to visit registered meta properties.
      */
-    [[nodiscard]] meta_range<meta_prop> prop() const noexcept {
+    [[nodiscard]] old_meta_range<meta_prop> prop() const noexcept {
         return {node->prop, nullptr};
     }
 
@@ -892,7 +892,7 @@ struct meta_func {
     }
 
     /*! @copydoc meta_data::prop */
-    [[nodiscard]] meta_range<meta_prop> prop() const noexcept {
+    [[nodiscard]] old_meta_range<meta_prop> prop() const noexcept {
         return {node->prop, nullptr};
     }
 
@@ -1140,7 +1140,7 @@ public:
      * @brief Returns a range to visit registered top-level base meta types.
      * @return An iterable range to visit registered top-level base meta types.
      */
-    [[nodiscard]] meta_range<meta_type, internal::meta_base_node> base() const noexcept {
+    [[nodiscard]] old_meta_range<meta_type, internal::meta_base_node> base() const noexcept {
         return {node->base, nullptr};
     }
 
@@ -1148,7 +1148,7 @@ public:
      * @brief Returns a range to visit registered top-level meta data.
      * @return An iterable range to visit registered top-level meta data.
      */
-    [[nodiscard]] meta_range<meta_data> data() const noexcept {
+    [[nodiscard]] old_meta_range<meta_data> data() const noexcept {
         return {node->data, nullptr};
     }
 
@@ -1168,7 +1168,7 @@ public:
      * @brief Returns a range to visit registered top-level functions.
      * @return An iterable range to visit registered top-level functions.
      */
-    [[nodiscard]] meta_range<meta_func> func() const noexcept {
+    [[nodiscard]] old_meta_range<meta_func> func() const noexcept {
         return {node->func, nullptr};
     }
 
@@ -1311,7 +1311,7 @@ public:
      * @brief Returns a range to visit registered top-level meta properties.
      * @return An iterable range to visit registered top-level meta properties.
      */
-    [[nodiscard]] meta_range<meta_prop> prop() const noexcept {
+    [[nodiscard]] old_meta_range<meta_prop> prop() const noexcept {
         return {node->prop, nullptr};
     }
 

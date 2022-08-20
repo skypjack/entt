@@ -22,7 +22,7 @@ struct MetaRange: ::testing::Test {
 TEST_F(MetaRange, Range) {
     using namespace entt::literals;
 
-    entt::meta_range<entt::meta_type> range{entt::internal::meta_context::local(), nullptr};
+    entt::old_meta_range<entt::meta_type> range{entt::internal::meta_context::local(), nullptr};
     auto it = range.begin();
 
     ASSERT_NE(it, range.end());
@@ -37,6 +37,6 @@ TEST_F(MetaRange, Range) {
 }
 
 TEST_F(MetaRange, EmptyRange) {
-    entt::meta_range<entt::meta_data> range{};
+    entt::old_meta_range<entt::meta_data> range{};
     ASSERT_EQ(range.begin(), range.end());
 }
