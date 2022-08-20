@@ -343,9 +343,11 @@ public:
     [[nodiscard]] const Type *try_cast() const {
         auto *self = any_cast<Type>(&storage);
 
-        for(auto *it = node ? node->base : nullptr; it && !self; it = it->next) {
-            const auto &as_const = it->cast(as_ref());
-            self = as_const.template try_cast<Type>();
+        if(!self && node) {
+            for(auto it = node->base.cbegin(), last = node->base.cend(); it != last && !self; ++it) {
+                const auto &as_const = it->second.cast(as_ref());
+                self = as_const.template try_cast<Type>();
+            }
         }
 
         return self;
@@ -356,8 +358,10 @@ public:
     [[nodiscard]] Type *try_cast() {
         auto *self = any_cast<Type>(&storage);
 
-        for(auto *it = node ? node->base : nullptr; it && !self; it = it->next) {
-            self = it->cast(as_ref()).template try_cast<Type>();
+        if(!self && node) {
+            for(auto it = node->base.cbegin(), last = node->base.cend(); it != last && !self; ++it) {
+                self = it->second.cast(as_ref()).template try_cast<Type>();
+            }
         }
 
         return self;
@@ -943,8 +947,7 @@ class meta_type {
                     if(const auto &info = other.info(); info == type.info()) {
                         ++direct;
                     } else {
-                        ext += internal::find_by<&node_type::base>(info, type.node)
-                               || type.node->conv.contains(info.hash())
+                        ext += type.node->base.contains(info.hash()) || type.node->conv.contains(info.hash())
                                || (type.node->conversion_helper && other.node->conversion_helper);
                     }
                 }
@@ -980,8 +983,8 @@ public:
      * @brief Constructs an instance from a given base node.
      * @param curr The base node with which to construct the instance.
      */
-    meta_type(const base_node_type *curr) noexcept
-        : node{curr ? curr->type : nullptr} {}
+    meta_type(const base_node_type &curr) noexcept
+        : node{curr.type} {}
 
     /**
      * @brief Returns the type info object of the underlying type.
@@ -1140,8 +1143,8 @@ public:
      * @brief Returns a range to visit registered top-level base meta types.
      * @return An iterable range to visit registered top-level base meta types.
      */
-    [[nodiscard]] old_meta_range<meta_type, internal::meta_base_node> base() const noexcept {
-        return {node->base, nullptr};
+    [[nodiscard]] meta_range<meta_type, typename decltype(internal::meta_type_node::base)::const_iterator> base() const noexcept {
+        return {node->base.cbegin(), node->base.cend()};
     }
 
     /**
@@ -1402,8 +1405,8 @@ bool meta_any::set(const id_type id, Type &&value) {
             return other;
         }
 
-        for(auto *it = node->base; it; it = it->next) {
-            const auto &as_const = it->cast(as_ref());
+        for(auto &&curr: node->base) {
+            const auto &as_const = curr.second.cast(as_ref());
 
             if(auto other = as_const.allow_cast(type); other) {
                 return other;

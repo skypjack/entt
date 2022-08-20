@@ -48,17 +48,6 @@ inline void link_type_if_required(meta_type_node *owner, const id_type id) noexc
     }
 }
 
-inline void link_base_if_required(meta_type_node *owner, meta_base_node &node) noexcept {
-    for(auto it = owner->base; it; it = it->next) {
-        if(it == &node) {
-            return;
-        }
-    }
-
-    node.next = owner->base;
-    owner->base = &node;
-}
-
 inline void link_ctor_if_required(meta_type_node *owner, meta_ctor_node &node) noexcept {
     for(auto it = owner->ctor; it; it = it->next) {
         if(it == &node) {
@@ -262,8 +251,7 @@ public:
     auto base() noexcept {
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
 
-        static internal::meta_base_node node{
-            nullptr,
+        owner->base[type_id<Base>().hash()] = internal::meta_base_node{
             internal::meta_node<Base>::resolve(),
             [](meta_any other) noexcept -> meta_any {
                 if(auto *ptr = other.data(); ptr) {
@@ -271,11 +259,8 @@ public:
                 }
 
                 return forward_as_meta(*static_cast<const Base *>(static_cast<const Type *>(std::as_const(other).data())));
-            }
-            // tricks clang-format
-        };
+            }};
 
-        internal::link_base_if_required(owner, node);
         return meta_factory<Type>{};
     }
 
@@ -627,12 +612,12 @@ inline void meta_reset(const id_type id) noexcept {
     for(auto **it = internal::meta_context::global(); *it; it = &(*it)->next) {
         if(auto *node = *it; node->id == id) {
             clear_chain(&node->prop);
-            clear_chain(&node->base);
             clear_chain(&node->ctor);
             clear_chain(&node->data, &internal::meta_data_node::prop);
             clear_chain(&node->func, &internal::meta_func_node::prop);
 
             node->id = {};
+            node->base.clear();
             node->conv.clear();
             node->templ.reset();
             node->dtor = nullptr;

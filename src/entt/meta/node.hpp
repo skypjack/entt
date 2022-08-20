@@ -51,9 +51,8 @@ struct meta_prop_node {
 };
 
 struct meta_base_node {
-    meta_base_node *next;
-    meta_type_node *const type;
-    meta_any (*const cast)(meta_any) noexcept;
+    meta_type_node *type;
+    meta_any (*cast)(meta_any) noexcept;
 };
 
 struct meta_conv_node {
@@ -119,7 +118,7 @@ struct meta_type_node {
     meta_any (*const from_void)(void *, const void *);
     std::unique_ptr<meta_template_node> templ;
     meta_ctor_node *ctor{nullptr};
-    meta_base_node *base{nullptr};
+    dense_map<id_type, meta_base_node, identity> base{};
     dense_map<id_type, meta_conv_node, identity> conv{};
     meta_data_node *data{nullptr};
     meta_func_node *func{nullptr};
@@ -236,8 +235,8 @@ template<auto Member, typename Type>
         }
     }
 
-    for(auto *curr = node->base; curr; curr = curr->next) {
-        if(auto *ret = find_by<Member>(info_or_id, curr->type); ret) {
+    for(auto &&curr: node->base) {
+        if(auto *ret = find_by<Member>(info_or_id, curr.second.type); ret) {
             return ret;
         }
     }
