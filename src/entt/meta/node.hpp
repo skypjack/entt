@@ -157,15 +157,14 @@ class ENTT_API meta_node {
     }
 
     [[nodiscard]] static auto *meta_from_void() noexcept {
-        if constexpr(std::is_same_v<Type, void> || std::is_array_v<Type> || std::is_function_v<Type>) {
+        if constexpr(std::is_same_v<Type, void> || std::is_function_v<Type>) {
             return static_cast<std::decay_t<decltype(meta_type_node::from_void)>>(nullptr);
         } else {
             return +[](void *element, const void *as_const) {
-                if(element) {
-                    return meta_any{std::in_place_type<Type &>, *static_cast<Type *>(element)};
-                }
+                using value_type = std::decay_t<Type>;
 
-                return meta_any{std::in_place_type<const Type &>, *static_cast<const Type *>(as_const)};
+                return element ? meta_any{std::in_place_type<value_type &>, *static_cast<value_type *>(element)}
+                               : meta_any{std::in_place_type<const value_type &>, *static_cast<const value_type *>(as_const)};
             };
         }
     }
