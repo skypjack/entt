@@ -3,6 +3,8 @@
 
 #include <cstddef>
 #include <iterator>
+#include <utility>
+#include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 
 namespace entt {
@@ -61,7 +63,7 @@ private:
 template<typename Type, typename It>
 struct meta_range_iterator final {
     using difference_type = std::ptrdiff_t;
-    using value_type = Type;
+    using value_type = std::pair<id_type, Type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
@@ -82,7 +84,7 @@ struct meta_range_iterator final {
     }
 
     [[nodiscard]] reference operator*() const noexcept {
-        return &it->second;
+        return std::make_pair(it->first, &it->second);
     }
 
     [[nodiscard]] pointer operator->() const noexcept {

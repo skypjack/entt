@@ -297,7 +297,8 @@ TEST_F(MetaType, Base) {
     ASSERT_NE(type.base().cbegin(), type.base().cend());
 
     for(auto curr: type.base()) {
-        ASSERT_EQ(curr, entt::resolve<base_t>());
+        ASSERT_EQ(curr.first, entt::type_id<base_t>().hash());
+        ASSERT_EQ(curr.second, entt::resolve<base_t>());
     }
 }
 

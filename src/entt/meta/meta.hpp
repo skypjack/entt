@@ -1202,7 +1202,7 @@ public:
         }
 
         for(auto &&curr: base()) {
-            if(auto &&elem = curr.data(id); elem) {
+            if(auto &&elem = curr.second.data(id); elem) {
                 return elem;
             }
         }
@@ -1295,13 +1295,17 @@ public:
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
-        const auto *candidate = old_lookup<&node_type::func>(args, sz, id);
-
-        for(auto it = base().begin(), last = base().end(); it != last && !candidate; ++it) {
-            candidate = it->old_lookup<&node_type::func>(args, sz, id);
+        if(const auto *candidate = old_lookup<&node_type::func>(args, sz, id); candidate) {
+            return candidate->invoke(std::move(instance), args);
         }
 
-        return candidate ? candidate->invoke(std::move(instance), args) : meta_any{};
+        for(auto &&curr: base()) {
+            if(auto res = curr.second.invoke(id, instance->as_ref(), args, sz); res) {
+                return res;
+            }
+        }
+
+        return meta_any{};
     }
 
     /**
