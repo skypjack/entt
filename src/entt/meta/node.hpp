@@ -11,6 +11,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../core/utility.hpp"
 #include "type_traits.hpp"
 
 namespace entt {
@@ -62,10 +63,9 @@ struct meta_conv_node {
 struct meta_ctor_node {
     using size_type = std::size_t;
 
-    meta_ctor_node *next;
-    const size_type arity;
-    meta_type (*const arg)(const size_type) noexcept;
-    meta_any (*const invoke)(meta_any *const);
+    size_type arity;
+    meta_type (*arg)(const size_type) noexcept;
+    meta_any (*invoke)(meta_any *const);
 };
 
 struct meta_dtor_node {
@@ -119,7 +119,7 @@ struct meta_type_node {
     double (*const conversion_helper)(void *, const void *);
     meta_any (*const from_void)(void *, const void *);
     meta_template_node templ;
-    meta_ctor_node *ctor{nullptr};
+    dense_map<id_type, meta_ctor_node, identity> ctor{};
     dense_map<id_type, meta_base_node, identity> base{};
     dense_map<id_type, meta_conv_node, identity> conv{};
     dense_map<id_type, meta_data_node, identity> data{};

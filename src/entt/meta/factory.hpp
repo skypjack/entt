@@ -48,17 +48,6 @@ inline void link_type_if_required(meta_type_node *owner, const id_type id) noexc
     }
 }
 
-inline void link_ctor_if_required(meta_type_node *owner, meta_ctor_node &node) noexcept {
-    for(auto it = owner->ctor; it; it = it->next) {
-        if(it == &node) {
-            return;
-        }
-    }
-
-    node.next = owner->ctor;
-    owner->ctor = &node;
-}
-
 inline void link_func_if_required(meta_type_node *owner, const id_type id, meta_func_node &node) noexcept {
     node.id = id;
 
@@ -313,15 +302,11 @@ public:
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
 
-        static internal::meta_ctor_node node{
-            nullptr,
+        owner->ctor[type_id<typename descriptor::args_type>().hash()] = internal::meta_ctor_node{
             descriptor::args_type::size,
             &meta_arg<typename descriptor::args_type>,
-            &meta_construct<Type, Candidate, Policy>
-            // tricks clang-format
-        };
+            &meta_construct<Type, Candidate, Policy>};
 
-        internal::link_ctor_if_required(owner, node);
         return meta_factory<Type>{};
     }
 
@@ -339,15 +324,11 @@ public:
     auto ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
 
-        static internal::meta_ctor_node node{
-            nullptr,
+        owner->ctor[type_id<typename descriptor::args_type>().hash()] = internal::meta_ctor_node{
             descriptor::args_type::size,
             &meta_arg<typename descriptor::args_type>,
-            &meta_construct<Type, Args...>
-            // tricks clang-format
-        };
+            &meta_construct<Type, Args...>};
 
-        internal::link_ctor_if_required(owner, node);
         return meta_factory<Type>{};
     }
 
@@ -577,10 +558,10 @@ inline void meta_reset(const id_type id) noexcept {
     for(auto **it = internal::meta_context::global(); *it; it = &(*it)->next) {
         if(auto *node = *it; node->id == id) {
             clear_chain(&node->prop);
-            clear_chain(&node->ctor);
             clear_chain(&node->func, &internal::meta_func_node::prop);
 
             node->id = {};
+            node->ctor.clear();
             node->base.clear();
             node->conv.clear();
             node->data.clear();

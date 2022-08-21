@@ -924,8 +924,46 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
+    template<typename It>
+    [[nodiscard]] auto lookup(It begin, It end, meta_any *const args, const typename internal::meta_type_node::size_type sz) const {
+        size_type extent{sz + 1u};
+        bool ambiguous{};
+        auto candidate = end;
+
+        for(; begin != end; ++begin) {
+            if(begin->second.arity == sz) {
+                size_type direct{};
+                size_type ext{};
+
+                for(size_type next{}; next < sz && next == (direct + ext) && args[next]; ++next) {
+                    const auto type = args[next].type();
+                    const auto other = begin->second.arg(next);
+
+                    if(const auto &info = other.info(); info == type.info()) {
+                        ++direct;
+                    } else {
+                        ext += type.node->base.contains(info.hash()) || type.node->conv.contains(info.hash())
+                               || (type.node->conversion_helper && other.node->conversion_helper);
+                    }
+                }
+
+                if((direct + ext) == sz) {
+                    if(ext < extent) {
+                        candidate = begin;
+                        extent = ext;
+                        ambiguous = false;
+                    } else if(ext == extent) {
+                        ambiguous = true;
+                    }
+                }
+            }
+        }
+
+        return ambiguous ? end : candidate;
+    }
+
     template<auto Member, typename... Check>
-    [[nodiscard]] std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Check... check) const {
+    [[nodiscard]] std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> old_lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Check... check) const {
         std::decay_t<decltype(node->*Member)> candidate{};
         size_type extent{sz + 1u};
         bool ambiguous{};
@@ -1206,8 +1244,11 @@ public:
      * @return A wrapper containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any *const args, const size_type sz) const {
-        const auto *candidate = lookup<&node_type::ctor>(args, sz);
-        return candidate ? candidate->invoke(args) : ((!sz && node->default_constructor) ? node->default_constructor() : meta_any{});
+        if(auto it = lookup(node->ctor.cbegin(), node->ctor.cend(), args, sz); it != node->ctor.cend()) {
+            return it->second.invoke(args);
+        }
+
+        return (sz == 0u && node->default_constructor) ? node->default_constructor() : meta_any{};
     }
 
     /**
@@ -1254,10 +1295,10 @@ public:
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
-        const auto *candidate = lookup<&node_type::func>(args, sz, id);
+        const auto *candidate = old_lookup<&node_type::func>(args, sz, id);
 
         for(auto it = base().begin(), last = base().end(); it != last && !candidate; ++it) {
-            candidate = it->lookup<&node_type::func>(args, sz, id);
+            candidate = it->old_lookup<&node_type::func>(args, sz, id);
         }
 
         return candidate ? candidate->invoke(std::move(instance), args) : meta_any{};
