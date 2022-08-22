@@ -665,19 +665,11 @@ struct meta_prop {
         : node{curr} {}
 
     /**
-     * @brief Returns the stored key as a const reference.
-     * @return A wrapper containing the key stored with the property.
-     */
-    [[nodiscard]] meta_any key() const {
-        return node->id.as_ref();
-    }
-
-    /**
      * @brief Returns the stored value by copy.
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node->value;
+        return (node && node->type) ? node->type->from_void(nullptr, node->value.data()) : meta_any{};
     }
 
     /**
@@ -772,8 +764,8 @@ struct meta_data {
      * @brief Returns a range to visit registered meta properties.
      * @return An iterable range to visit registered meta properties.
      */
-    [[nodiscard]] old_meta_range<meta_prop> prop() const noexcept {
-        return {node->prop, nullptr};
+    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_data_node::prop)::const_iterator> prop() const noexcept {
+        return {node->prop.cbegin(), node->prop.cend()};
     }
 
     /**
@@ -781,11 +773,9 @@ struct meta_data {
      * @param key The key to use to search for a property.
      * @return The registered meta property for the given key, if any.
      */
-    [[nodiscard]] meta_prop prop(meta_any key) const {
-        for(auto curr: prop()) {
-            if(curr.key() == key) {
-                return curr;
-            }
+    [[nodiscard]] meta_prop prop(const id_type key) const {
+        if(auto it = node->prop.find(key); it != node->prop.cend()) {
+            return &it->second;
         }
 
         return nullptr;
@@ -891,8 +881,8 @@ struct meta_func {
     }
 
     /*! @copydoc meta_data::prop */
-    [[nodiscard]] old_meta_range<meta_prop> prop() const noexcept {
-        return {node->prop, nullptr};
+    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_func_node::prop)::const_iterator> prop() const noexcept {
+        return {node->prop.cbegin(), node->prop.cend()};
     }
 
     /**
@@ -900,11 +890,9 @@ struct meta_func {
      * @param key The key to use to search for a property.
      * @return The registered meta property for the given key, if any.
      */
-    [[nodiscard]] meta_prop prop(meta_any key) const {
-        for(auto curr: prop()) {
-            if(curr.key() == key) {
-                return curr;
-            }
+    [[nodiscard]] meta_prop prop(const id_type key) const {
+        if(auto it = node->prop.find(key); it != node->prop.cend()) {
+            return &it->second;
         }
 
         return nullptr;
@@ -1364,8 +1352,8 @@ public:
      * @brief Returns a range to visit registered top-level meta properties.
      * @return An iterable range to visit registered top-level meta properties.
      */
-    [[nodiscard]] old_meta_range<meta_prop> prop() const noexcept {
-        return {node->prop, nullptr};
+    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_type_node::prop)::const_iterator> prop() const noexcept {
+        return {node->prop.cbegin(), node->prop.cend()};
     }
 
     /**
@@ -1376,8 +1364,18 @@ public:
      * @param key The key to use to search for a property.
      * @return The registered meta property for the given key, if any.
      */
-    [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::find_by<&internal::meta_type_node::prop>(key, node);
+    [[nodiscard]] meta_prop prop(const id_type key) const {
+        if(auto it = node->prop.find(key); it != node->prop.cend()) {
+            return &it->second;
+        }
+
+        for(auto &&curr: base()) {
+            if(auto elem = curr.second.prop(key); elem) {
+                return elem;
+            }
+        }
+
+        return nullptr;
     }
 
     /**

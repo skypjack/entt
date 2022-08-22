@@ -46,9 +46,8 @@ enum class meta_traits : std::uint32_t {
 struct meta_type_node;
 
 struct meta_prop_node {
-    meta_prop_node *next;
-    const meta_any &id;
-    meta_any &value;
+    meta_type_node *type{nullptr};
+    basic_any<0u> value{};
 };
 
 struct meta_base_node {
@@ -76,12 +75,12 @@ struct meta_data_node {
     using size_type = std::size_t;
 
     meta_traits traits;
-    meta_prop_node *prop;
     size_type arity;
     meta_type_node *type;
     meta_type (*arg)(const size_type) noexcept;
     bool (*set)(meta_handle, meta_any);
     meta_any (*get)(meta_handle);
+    dense_map<id_type, meta_prop_node, identity> prop{};
 };
 
 struct meta_func_node {
@@ -90,11 +89,11 @@ struct meta_func_node {
     id_type id;
     const meta_traits traits;
     meta_func_node *next;
-    meta_prop_node *prop;
     const size_type arity;
     meta_type_node *const ret;
     meta_type (*const arg)(const size_type) noexcept;
     meta_any (*const invoke)(meta_handle, meta_any *const);
+    dense_map<id_type, meta_prop_node, identity> prop{};
 };
 
 struct meta_template_node {
@@ -112,13 +111,13 @@ struct meta_type_node {
     id_type id;
     const meta_traits traits;
     meta_type_node *next;
-    meta_prop_node *prop;
     const size_type size_of;
     meta_type_node *(*const remove_pointer)() noexcept;
     meta_any (*const default_constructor)();
     double (*const conversion_helper)(void *, const void *);
     meta_any (*const from_void)(void *, const void *);
     meta_template_node templ;
+    dense_map<id_type, meta_prop_node, identity> prop{};
     dense_map<id_type, meta_ctor_node, identity> ctor{};
     dense_map<id_type, meta_base_node, identity> base{};
     dense_map<id_type, meta_conv_node, identity> conv{};
@@ -132,7 +131,7 @@ meta_type_node *meta_arg_node(type_list<Args...>, const std::size_t index) noexc
 
 template<typename Type>
 class ENTT_API meta_node {
-    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
+    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
 
     [[nodiscard]] static auto *meta_default_constructor() noexcept {
         if constexpr(std::is_default_constructible_v<Type>) {
@@ -194,7 +193,6 @@ public:
                 | (is_meta_pointer_like_v<Type> ? internal::meta_traits::is_meta_pointer_like : internal::meta_traits::is_none)
                 | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_meta_sequence_container : internal::meta_traits::is_none)
                 | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::is_meta_associative_container : internal::meta_traits::is_none),
-            nullptr,
             nullptr,
             size_of_v<Type>,
             &meta_node<std::remove_cv_t<std::remove_pointer_t<Type>>>::resolve,

@@ -100,7 +100,7 @@ struct overloaded_func_t {
     inline static int value = 0;
 };
 
-enum class property_t {
+enum class property_t : entt::id_type {
     random,
     value,
     key_only,
@@ -150,18 +150,24 @@ struct MetaType: ::testing::Test {
         entt::meta<property_t>()
             .type("property"_hs)
             .data<property_t::random>("random"_hs)
-            .props(std::make_pair(property_t::random, 0), std::make_pair(property_t::value, 3))
+            .prop(static_cast<entt::id_type>(property_t::random), 0)
+            .prop(static_cast<entt::id_type>(property_t::value), 3)
             .data<property_t::value>("value"_hs)
-            .props(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only, property_t::list)
+            .prop(static_cast<entt::id_type>(property_t::random), true)
+            .prop(static_cast<entt::id_type>(property_t::value), 0)
+            .prop(static_cast<entt::id_type>(property_t::key_only))
+            .prop(static_cast<entt::id_type>(property_t::list))
             .data<property_t::key_only>("key_only"_hs)
-            .prop(property_t::key_only)
+            .prop(static_cast<entt::id_type>(property_t::key_only))
             .data<property_t::list>("list"_hs)
-            .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
+            .prop(static_cast<entt::id_type>(property_t::random), false)
+            .prop(static_cast<entt::id_type>(property_t::value), 0)
+            .prop(static_cast<entt::id_type>(property_t::key_only))
             .data<set<property_t>, get<property_t>>("var"_hs);
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
-            .prop(property_t::value, 42)
+            .prop(static_cast<entt::id_type>(property_t::value), 42)
             .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
@@ -210,17 +216,16 @@ TEST_F(MetaType, Functionalities) {
     ASSERT_EQ(type.info(), entt::type_id<clazz_t>());
 
     for(auto curr: type.prop()) {
-        ASSERT_EQ(curr.key(), property_t::value);
-        ASSERT_EQ(curr.value(), 42);
+        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::value));
+        ASSERT_EQ(curr.second.value(), 42);
     }
 
-    ASSERT_FALSE(type.prop(property_t::key_only));
+    ASSERT_FALSE(type.prop(static_cast<entt::id_type>(property_t::key_only)));
     ASSERT_FALSE(type.prop("property"_hs));
 
-    auto prop = type.prop(property_t::value);
+    auto prop = type.prop(static_cast<entt::id_type>(property_t::value));
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), property_t::value);
     ASSERT_EQ(prop.value(), 42);
 }
 
@@ -498,7 +503,7 @@ TEST_F(MetaType, Reset) {
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
     ASSERT_EQ(entt::resolve<clazz_t>().id(), "clazz"_hs);
-    ASSERT_TRUE(entt::resolve<clazz_t>().prop(property_t::value));
+    ASSERT_TRUE(entt::resolve<clazz_t>().prop(static_cast<entt::id_type>(property_t::value)));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_TRUE((entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{})));
     // implicitly generated default constructor
@@ -508,7 +513,7 @@ TEST_F(MetaType, Reset) {
 
     ASSERT_FALSE(entt::resolve("clazz"_hs));
     ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
-    ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
+    ASSERT_FALSE(entt::resolve<clazz_t>().prop(static_cast<entt::id_type>(property_t::value)));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_FALSE((entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{})));
     // implicitly generated default constructor is not cleared
@@ -612,21 +617,21 @@ TEST_F(MetaType, PropertiesAndCornerCases) {
 
     auto type = entt::resolve<property_t>();
 
-    ASSERT_EQ(type.data("random"_hs).prop(property_t::random).value().cast<int>(), 0);
-    ASSERT_EQ(type.data("random"_hs).prop(property_t::value).value().cast<int>(), 3);
+    ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_t::random)).value().cast<int>(), 0);
+    ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_t::value)).value().cast<int>(), 3);
 
-    ASSERT_EQ(type.data("value"_hs).prop(property_t::random).value().cast<bool>(), true);
-    ASSERT_EQ(type.data("value"_hs).prop(property_t::value).value().cast<int>(), 0);
-    ASSERT_TRUE(type.data("value"_hs).prop(property_t::key_only));
-    ASSERT_FALSE(type.data("value"_hs).prop(property_t::key_only).value());
+    ASSERT_EQ(type.data("value"_hs).prop(static_cast<entt::id_type>(property_t::random)).value().cast<bool>(), true);
+    ASSERT_EQ(type.data("value"_hs).prop(static_cast<entt::id_type>(property_t::value)).value().cast<int>(), 0);
+    ASSERT_TRUE(type.data("value"_hs).prop(static_cast<entt::id_type>(property_t::key_only)));
+    ASSERT_FALSE(type.data("value"_hs).prop(static_cast<entt::id_type>(property_t::key_only)).value());
 
-    ASSERT_TRUE(type.data("key_only"_hs).prop(property_t::key_only));
-    ASSERT_FALSE(type.data("key_only"_hs).prop(property_t::key_only).value());
+    ASSERT_TRUE(type.data("key_only"_hs).prop(static_cast<entt::id_type>(property_t::key_only)));
+    ASSERT_FALSE(type.data("key_only"_hs).prop(static_cast<entt::id_type>(property_t::key_only)).value());
 
-    ASSERT_EQ(type.data("list"_hs).prop(property_t::random).value().cast<bool>(), false);
-    ASSERT_EQ(type.data("list"_hs).prop(property_t::value).value().cast<int>(), 0);
-    ASSERT_TRUE(type.data("list"_hs).prop(property_t::key_only));
-    ASSERT_FALSE(type.data("list"_hs).prop(property_t::key_only).value());
+    ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::random)).value().cast<bool>(), false);
+    ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::value)).value().cast<int>(), 0);
+    ASSERT_TRUE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::key_only)));
+    ASSERT_FALSE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::key_only)).value());
 }
 
 TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
@@ -651,7 +656,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
 
     ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
 
-    ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
+    ASSERT_FALSE(entt::resolve<clazz_t>().prop(static_cast<entt::id_type>(property_t::value)));
     // implicitly generated default constructor is not cleared
     ASSERT_TRUE(entt::resolve<clazz_t>().construct());
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
@@ -670,10 +675,11 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::meta<property_t>()
         .type("property"_hs)
         .data<property_t::random>("rand"_hs)
-        .props(std::make_pair(property_t::value, 42), std::make_pair(property_t::random, 3));
+        .prop(static_cast<entt::id_type>(property_t::value), 42)
+        .prop(static_cast<entt::id_type>(property_t::random), 3);
 
-    ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::value));
-    ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::random));
+    ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(static_cast<entt::id_type>(property_t::value)));
+    ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(static_cast<entt::id_type>(property_t::random)));
 }
 
 TEST_F(MetaType, ReRegistration) {

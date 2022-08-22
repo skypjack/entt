@@ -114,15 +114,15 @@ struct MetaFunc: ::testing::Test {
             .func<&entt::registry::emplace_or_replace<func_t>>("emplace"_hs)
             .func<entt::overload<int(const base_t &, int, int)>(&func_t::f)>("f3"_hs)
             .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs)
-            .prop(true, false)
+            .prop("true"_hs, false)
             .func<entt::overload<int(int) const>(&func_t::f)>("f1"_hs)
-            .prop(true, false)
+            .prop("true"_hs, false)
             .func<&func_t::g>("g"_hs)
-            .prop(true, false)
+            .prop("true"_hs, false)
             .func<func_t::h>("h"_hs)
-            .prop(true, false)
+            .prop("true"_hs, false)
             .func<func_t::k>("k"_hs)
-            .prop(true, false)
+            .prop("true"_hs, false)
             .func<&func_t::v, entt::as_void_t>("v"_hs)
             .func<&func_t::a, entt::as_ref_t>("a"_hs)
             .func<&func_t::a, entt::as_cref_t>("ca"_hs)
@@ -180,17 +180,16 @@ TEST_F(MetaFunc, Functionalities) {
     ASSERT_EQ(func_t::value, 3);
 
     for(auto curr: func.prop()) {
-        ASSERT_EQ(curr.key(), true);
-        ASSERT_FALSE(curr.value().template cast<bool>());
+        ASSERT_EQ(curr.first, "true"_hs);
+        ASSERT_FALSE(curr.second.value().template cast<bool>());
     }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
 
-    auto prop = func.prop(true);
+    auto prop = func.prop("true"_hs);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), true);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -218,17 +217,16 @@ TEST_F(MetaFunc, Const) {
     ASSERT_EQ(any.cast<int>(), 16);
 
     for(auto curr: func.prop()) {
-        ASSERT_EQ(curr.key(), true);
-        ASSERT_FALSE(curr.value().template cast<bool>());
+        ASSERT_EQ(curr.first, "true"_hs);
+        ASSERT_FALSE(curr.second.value().template cast<bool>());
     }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
 
-    auto prop = func.prop(true);
+    auto prop = func.prop("true"_hs);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), true);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -254,17 +252,16 @@ TEST_F(MetaFunc, RetVoid) {
     ASSERT_EQ(func_t::value, 25);
 
     for(auto curr: func.prop()) {
-        ASSERT_EQ(curr.key(), true);
-        ASSERT_FALSE(curr.value().template cast<bool>());
+        ASSERT_EQ(curr.first, "true"_hs);
+        ASSERT_FALSE(curr.second.value().template cast<bool>());
     }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
 
-    auto prop = func.prop(true);
+    auto prop = func.prop("true"_hs);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), true);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -292,17 +289,16 @@ TEST_F(MetaFunc, Static) {
     ASSERT_EQ(any.cast<int>(), 6);
 
     for(auto curr: func.prop()) {
-        ASSERT_EQ(curr.key(), true);
-        ASSERT_FALSE(curr.value().template cast<bool>());
+        ASSERT_EQ(curr.first, "true"_hs);
+        ASSERT_FALSE(curr.second.value().template cast<bool>());
     }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
 
-    auto prop = func.prop(true);
+    auto prop = func.prop("true"_hs);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), true);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -327,18 +323,16 @@ TEST_F(MetaFunc, StaticRetVoid) {
     ASSERT_EQ(func_t::value, 42);
 
     for(auto curr: func.prop()) {
-        ASSERT_TRUE(curr);
-        ASSERT_EQ(curr.key(), true);
-        ASSERT_FALSE(curr.value().template cast<bool>());
+        ASSERT_EQ(curr.first, "true"_hs);
+        ASSERT_FALSE(curr.second.value().template cast<bool>());
     }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
 
-    auto prop = func.prop(true);
+    auto prop = func.prop("true"_hs);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), true);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 

@@ -93,7 +93,7 @@ struct array_t {
     int local[5];
 };
 
-enum class property_t {
+enum class property_t : entt::id_type {
     random,
     value
 };
@@ -119,14 +119,14 @@ struct MetaData: ::testing::Test {
         entt::meta<clazz_t>()
             .type("clazz"_hs)
             .data<&clazz_t::i, entt::as_ref_t>("i"_hs)
-            .prop(3, 0)
+            .prop(3u, 0)
             .data<&clazz_t::i, entt::as_cref_t>("ci"_hs)
             .data<&clazz_t::j>("j"_hs)
-            .prop(true, 1)
+            .prop("true"_hs, 1)
             .data<&clazz_t::h>("h"_hs)
-            .prop(property_t::random, 2)
+            .prop(static_cast<entt::id_type>(property_t::random), 2)
             .data<&clazz_t::k>("k"_hs)
-            .prop(property_t::value, 3)
+            .prop(static_cast<entt::id_type>(property_t::value), 3)
             .data<&clazz_t::base>("base"_hs)
             .data<&clazz_t::i, entt::as_void_t>("void"_hs)
             .conv<int>();
@@ -176,17 +176,16 @@ TEST_F(MetaData, Functionalities) {
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
 
     for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.key(), 3);
-        ASSERT_EQ(curr.value(), 0);
+        ASSERT_EQ(curr.first, 3u);
+        ASSERT_EQ(curr.second.value(), 0);
     }
 
     ASSERT_FALSE(data.prop(2));
     ASSERT_FALSE(data.prop('c'));
 
-    auto prop = data.prop(3);
+    auto prop = data.prop(3u);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), 3);
     ASSERT_EQ(prop.value(), 0);
 }
 
@@ -207,17 +206,16 @@ TEST_F(MetaData, Const) {
     ASSERT_EQ(data.get(instance).cast<int>(), 1);
 
     for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.key(), true);
-        ASSERT_EQ(curr.value(), 1);
+        ASSERT_EQ(curr.first, "true"_hs);
+        ASSERT_EQ(curr.second.value(), 1);
     }
 
     ASSERT_FALSE(data.prop(false));
     ASSERT_FALSE(data.prop('c'));
 
-    auto prop = data.prop(true);
+    auto prop = data.prop("true"_hs);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), true);
     ASSERT_EQ(prop.value(), 1);
 }
 
@@ -237,17 +235,16 @@ TEST_F(MetaData, Static) {
     ASSERT_EQ(data.get({}).cast<int>(), 42);
 
     for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.key(), property_t::random);
-        ASSERT_EQ(curr.value(), 2);
+        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::random));
+        ASSERT_EQ(curr.second.value(), 2);
     }
 
-    ASSERT_FALSE(data.prop(property_t::value));
+    ASSERT_FALSE(data.prop(static_cast<entt::id_type>(property_t::value)));
     ASSERT_FALSE(data.prop('c'));
 
-    auto prop = data.prop(property_t::random);
+    auto prop = data.prop(static_cast<entt::id_type>(property_t::random));
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), property_t::random);
     ASSERT_EQ(prop.value(), 2);
 }
 
@@ -267,17 +264,16 @@ TEST_F(MetaData, ConstStatic) {
     ASSERT_EQ(data.get({}).cast<int>(), 3);
 
     for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.key(), property_t::value);
-        ASSERT_EQ(curr.value(), 3);
+        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::value));
+        ASSERT_EQ(curr.second.value(), 3);
     }
 
-    ASSERT_FALSE(data.prop(property_t::random));
+    ASSERT_FALSE(data.prop(static_cast<entt::id_type>(property_t::random)));
     ASSERT_FALSE(data.prop('c'));
 
-    auto prop = data.prop(property_t::value);
+    auto prop = data.prop(static_cast<entt::id_type>(property_t::value));
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), property_t::value);
     ASSERT_EQ(prop.value(), 3);
 }
 

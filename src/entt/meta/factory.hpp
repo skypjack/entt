@@ -26,18 +26,6 @@ namespace entt {
 
 namespace internal {
 
-inline void link_prop_if_required(internal::meta_prop_node **ref, internal::meta_prop_node &node) noexcept {
-    for(auto it = *ref; it; it = it->next) {
-        if(it == &node) {
-            return;
-        }
-        ENTT_ASSERT(it->id != node.id, "Duplicate identifier");
-    }
-
-    node.next = *ref;
-    *ref = &node;
-}
-
 inline void link_type_if_required(meta_type_node *owner, const id_type id) noexcept {
     ENTT_ASSERT((owner->id = {}, !resolve(id)), "Duplicate identifier");
     owner->id = id;
@@ -82,95 +70,39 @@ class meta_factory;
 /**
  * @brief Extended meta factory to be used for reflection purposes.
  * @tparam Type Reflected type for which the factory was created.
- * @tparam Spec Property specialization pack used to disambiguate overloads.
+ * @tparam Prop Type of container to store properties.
  */
-template<typename Type, typename... Spec>
-class meta_factory<Type, Spec...>: public meta_factory<Type> {
-    template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<2>, std::tuple<Property...> property, Other &&...other) noexcept {
-        std::apply([this](auto &&...curr) { (this->unroll<Step>(choice<2>, std::forward<Property>(curr)...)); }, property);
-        unroll<Step + sizeof...(Property)>(choice<2>, std::forward<Other>(other)...);
-    }
-
-    template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<1>, std::pair<Property...> property, Other &&...other) noexcept {
-        assign<Step>(std::move(property.first), std::move(property.second));
-        unroll<Step + 1>(choice<2>, std::forward<Other>(other)...);
-    }
-
-    template<std::size_t Step = 0, typename Property, typename... Other>
-    void unroll(choice_t<0>, Property &&property, Other &&...other) noexcept {
-        assign<Step>(std::forward<Property>(property));
-        unroll<Step + 1>(choice<2>, std::forward<Other>(other)...);
-    }
-
-    template<std::size_t>
-    void unroll(choice_t<0>) noexcept {}
-
-    template<std::size_t = 0>
-    void assign(meta_any key, meta_any value = {}) {
-        static meta_any property[2u]{};
-
-        static internal::meta_prop_node node{
-            nullptr,
-            property[0u],
-            property[1u]
-            // tricks clang-format
-        };
-
-        property[0u] = std::move(key);
-        property[1u] = std::move(value);
-
-        internal::link_prop_if_required(ref, node);
-    }
-
+template<typename Type, typename Prop>
+class meta_factory<Type, Prop>: public meta_factory<Type> {
 public:
     /**
      * @brief Constructs an extended factory from a given node.
-     * @param target The underlying node to which to assign the properties.
+     * @param target The underlying container to store properties.
      */
-    meta_factory(internal::meta_prop_node **target) noexcept
-        : ref{target} {}
+    meta_factory(Prop &target) noexcept
+        : container{&target} {}
 
     /**
      * @brief Assigns a property to the last meta object created.
      *
      * Both the key and the value (if any) must be at least copy constructible.
      *
-     * @tparam PropertyOrKey Type of the property or property key.
      * @tparam Value Optional type of the property value.
-     * @param property_or_key Property or property key.
+     * @param key Property key.
      * @param value Optional property value.
-     * @return A meta factory for the parent type.
+     * @return An extended meta factory for the given type.
      */
-    template<typename PropertyOrKey, typename... Value>
-    meta_factory<Type> prop(PropertyOrKey &&property_or_key, Value &&...value) {
-        if constexpr(sizeof...(Value) == 0) {
-            unroll(choice<2>, std::forward<PropertyOrKey>(property_or_key));
-        } else {
-            assign(std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
-        }
+    template<typename... Value>
+    meta_factory prop(id_type key, Value &&...value) {
+        (*container)[key] = internal::meta_prop_node{
+            internal::meta_node<std::decay_t<Value>>::resolve()...,
+            std::forward<Value>(value)...};
 
-        return {};
-    }
-
-    /**
-     * @brief Assigns properties to the last meta object created.
-     *
-     * Both key and value (if any) must be at least copy constructible.
-     *
-     * @tparam Property Types of the properties.
-     * @param property Properties to assign to the last meta object created.
-     * @return A meta factory for the parent type.
-     */
-    template<typename... Property>
-    meta_factory<Type> props(Property... property) {
-        unroll(choice<2>, std::forward<Property>(property)...);
-        return {};
+        return *this;
     }
 
 private:
-    internal::meta_prop_node **ref;
+    Prop *container;
 };
 
 /**
@@ -188,14 +120,13 @@ class meta_factory<Type> {
         owner->data[id] = internal::meta_data_node{
             /* this is never static */
             (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
-            nullptr,
             Setter::size,
             internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
             [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
             &meta_getter<Type, Getter, Policy>};
 
-        return meta_factory<Type, Setter, std::integral_constant<decltype(Getter), Getter>>{&owner->data[id].prop};
+        return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
     }
 
 public:
@@ -210,7 +141,7 @@ public:
      */
     auto type(const id_type id = type_hash<Type>::value()) noexcept {
         internal::link_type_if_required(owner, id);
-        return meta_factory<Type, Type>{&owner->prop};
+        return meta_factory<Type, decltype(internal::meta_type_node::prop)>{owner->prop};
     }
 
     /**
@@ -378,27 +309,25 @@ public:
             owner->data[id] = internal::meta_data_node{
                 /* this is never static */
                 std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
-                nullptr,
                 1u,
                 internal::meta_node<std::remove_const_t<data_type>>::resolve(),
                 &meta_arg<type_list<std::remove_const_t<data_type>>>,
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>};
 
-            return meta_factory<Type, std::integral_constant<decltype(Data), Data>, std::integral_constant<decltype(Data), Data>>{&owner->data[id].prop};
+            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
         } else {
             using data_type = std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>;
 
             owner->data[id] = internal::meta_data_node{
                 ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
-                nullptr,
                 1u,
                 internal::meta_node<std::remove_const_t<data_type>>::resolve(),
                 &meta_arg<type_list<std::remove_const_t<data_type>>>,
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>};
 
-            return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&owner->data[id].prop};
+            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
         }
     }
 
@@ -431,28 +360,26 @@ public:
             owner->data[id] = internal::meta_data_node{
                 /* this is never static */
                 internal::meta_traits::is_const,
-                nullptr,
                 0u,
                 internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>};
 
-            return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&owner->data[id].prop};
+            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
         } else {
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
             owner->data[id] = internal::meta_data_node{
                 /* this is never static nor const */
                 internal::meta_traits::is_none,
-                nullptr,
                 1u,
                 internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
                 &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>};
 
-            return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&owner->data[id].prop};
+            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
         }
     }
 
@@ -500,7 +427,6 @@ public:
             {},
             (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
             nullptr,
-            nullptr,
             descriptor::args_type::size,
             internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve(),
             &meta_arg<typename descriptor::args_type>,
@@ -509,7 +435,7 @@ public:
         };
 
         internal::link_func_if_required(owner, id, node);
-        return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
+        return meta_factory<Type, decltype(internal::meta_func_node::prop)>{node.prop};
     }
 
 private:
@@ -531,7 +457,7 @@ template<typename Type>
 [[nodiscard]] auto meta() noexcept {
     auto *const node = internal::meta_node<Type>::resolve();
     // extended meta factory to allow assigning properties to opaque meta types
-    return meta_factory<Type, Type>{&node->prop};
+    return meta_factory<Type, decltype(internal::meta_type_node::prop)>{node->prop};
 }
 
 /**
@@ -546,26 +472,20 @@ template<typename Type>
  * @param id Unique identifier.
  */
 inline void meta_reset(const id_type id) noexcept {
-    auto clear_chain = [](auto **curr, auto... member) {
-        for(; *curr; *curr = std::exchange((*curr)->next, nullptr)) {
-            if constexpr(sizeof...(member) != 0u) {
-                static_assert(sizeof...(member) == 1u, "Assert in defense of the future me");
-                for(auto **sub = (&((*curr)->*member), ...); *sub; *sub = std::exchange((*sub)->next, nullptr)) {}
-            }
-        }
-    };
-
     for(auto **it = internal::meta_context::global(); *it; it = &(*it)->next) {
         if(auto *node = *it; node->id == id) {
-            clear_chain(&node->prop);
-            clear_chain(&node->func, &internal::meta_func_node::prop);
+            for(auto **curr = &node->func; *curr; *curr = std::exchange((*curr)->next, nullptr)) {
+                (*curr)->prop.clear();
+            }
 
             node->id = {};
+            node->prop.clear();
             node->ctor.clear();
             node->base.clear();
             node->conv.clear();
             node->data.clear();
             node->dtor.dtor = nullptr;
+
             *it = std::exchange(node->next, nullptr);
 
             break;
