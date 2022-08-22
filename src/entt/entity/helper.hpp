@@ -103,7 +103,7 @@ private:
  * @param reg A registry that contains the given entity and its components.
  * @param entt Entity from which to get the component.
  */
-template<auto Member, typename Registry = std::remove_const_t<std::remove_reference_t<nth_argument_t<0u, Member>>>>
+template<auto Member, typename Registry = std::remove_cv_t<std::remove_reference_t<nth_argument_t<0u, Member>>>>
 void invoke(Registry &reg, const typename Registry::entity_type entt) {
     static_assert(std::is_member_function_pointer_v<decltype(Member)>, "Invalid pointer to non-static member function");
     delegate<void(Registry &, const typename Registry::entity_type)> func;
