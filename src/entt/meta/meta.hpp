@@ -45,7 +45,7 @@ public:
      */
     template<typename Type>
     meta_sequence_container(std::in_place_type_t<Type>, any instance) noexcept
-        : value_type_node{internal::meta_node<std::remove_cv_t<std::remove_reference_t<typename Type::value_type>>>::resolve()},
+        : value_type_node{internal::meta_node<typename Type::value_type>::resolve()},
           size_fn{&meta_sequence_container_traits<Type>::size},
           resize_fn{&meta_sequence_container_traits<Type>::resize},
           iter_fn{&meta_sequence_container_traits<Type>::iter},
@@ -93,9 +93,9 @@ public:
     template<typename Type>
     meta_associative_container(std::in_place_type_t<Type>, any instance) noexcept
         : key_only_container{meta_associative_container_traits<Type>::key_only},
-          key_type_node{internal::meta_node<std::remove_cv_t<std::remove_reference_t<typename Type::key_type>>>::resolve()},
+          key_type_node{internal::meta_node<typename Type::key_type>::resolve()},
           mapped_type_node{nullptr},
-          value_type_node{internal::meta_node<std::remove_cv_t<std::remove_reference_t<typename Type::value_type>>>::resolve()},
+          value_type_node{internal::meta_node<typename Type::value_type>::resolve()},
           size_fn{&meta_associative_container_traits<Type>::size},
           clear_fn{&meta_associative_container_traits<Type>::clear},
           iter_fn{&meta_associative_container_traits<Type>::iter},
@@ -103,7 +103,7 @@ public:
           find_fn{&meta_associative_container_traits<Type>::find},
           storage{std::move(instance)} {
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
-            mapped_type_node = internal::meta_node<std::remove_cv_t<std::remove_reference_t<typename Type::mapped_type>>>::resolve();
+            mapped_type_node = internal::meta_node<typename Type::mapped_type>::resolve();
         }
     }
 
