@@ -162,8 +162,11 @@ class ENTT_API meta_node {
             return +[](void *element, const void *as_const) {
                 using value_type = std::decay_t<Type>;
 
-                return element ? meta_any{std::in_place_type<value_type &>, *static_cast<value_type *>(element)}
-                               : meta_any{std::in_place_type<const value_type &>, *static_cast<const value_type *>(as_const)};
+                if(element) {
+                    return meta_any{std::in_place_type<value_type &>, *static_cast<value_type *>(element)};
+                }
+
+                return meta_any{std::in_place_type<const value_type &>, *static_cast<const value_type *>(as_const)};
             };
         }
     }
