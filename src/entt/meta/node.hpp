@@ -51,7 +51,7 @@ struct meta_prop_node {
 };
 
 struct meta_base_node {
-    meta_type_node *type;
+    meta_type_node *(*type)() noexcept;
     meta_any (*cast)(meta_any) noexcept;
 };
 

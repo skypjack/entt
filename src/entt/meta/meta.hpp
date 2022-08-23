@@ -972,7 +972,7 @@ public:
      * @param curr The base node with which to construct the instance.
      */
     meta_type(const base_node_type *curr) noexcept
-        : node{curr ? curr->type : nullptr} {}
+        : node{curr ? curr->type() : nullptr} {}
 
     /**
      * @brief Returns the type info object of the underlying type.

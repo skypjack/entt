@@ -144,7 +144,7 @@ public:
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
 
         owner->base[type_id<Base>().hash()] = internal::meta_base_node{
-            internal::meta_node<Base>::resolve(),
+            &internal::meta_node<Base>::resolve,
             [](meta_any other) noexcept -> meta_any {
                 if(auto *ptr = other.data(); ptr) {
                     return forward_as_meta(*static_cast<Base *>(static_cast<Type *>(ptr)));
