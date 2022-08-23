@@ -1470,7 +1470,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return node->ret;
+    return node->ret();
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {

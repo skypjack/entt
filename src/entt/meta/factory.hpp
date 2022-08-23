@@ -414,7 +414,7 @@ public:
             type_id<type_list_cat_t<type_list<descriptor::return_type>, descriptor::args_type>>().hash(),
             (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
             descriptor::args_type::size,
-            internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve(),
+            &internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve,
             &meta_arg<typename descriptor::args_type>,
             &meta_invoke<Type, Candidate, Policy>};
 

@@ -89,7 +89,7 @@ struct meta_func_node {
     id_type watermark;
     meta_traits traits;
     size_type arity;
-    meta_type_node *ret;
+    meta_type_node *(*ret)() noexcept;
     meta_type (*arg)(const size_type) noexcept;
     meta_any (*invoke)(meta_handle, meta_any *const);
     dense_map<id_type, meta_prop_node, identity> prop{};
