@@ -46,7 +46,7 @@ enum class meta_traits : std::uint32_t {
 struct meta_type_node;
 
 struct meta_prop_node {
-    meta_type_node *type{nullptr};
+    meta_type_node *(*type)() noexcept {nullptr};
     basic_any<0u> value{};
 };
 

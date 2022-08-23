@@ -82,7 +82,7 @@ public:
     template<typename... Value>
     meta_factory prop(id_type key, Value &&...value) {
         (*container)[key] = internal::meta_prop_node{
-            internal::meta_node<std::decay_t<Value>>::resolve()...,
+            &internal::meta_node<std::decay_t<Value>>::resolve...,
             std::forward<Value>(value)...};
 
         return *this;
