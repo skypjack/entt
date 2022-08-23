@@ -1115,7 +1115,7 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const noexcept {
-        return node->templ.type;
+        return node->templ.type ? node->templ.type() : nullptr;
     }
 
     /**

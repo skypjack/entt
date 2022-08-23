@@ -100,7 +100,7 @@ struct meta_template_node {
     using size_type = std::size_t;
 
     size_type arity{0u};
-    meta_type_node *type{nullptr};
+    meta_type_node *(*type)() noexcept {nullptr};
     meta_type_node *(*arg)(const size_type) noexcept {nullptr};
 };
 
@@ -172,7 +172,7 @@ class ENTT_API meta_node {
         if constexpr(is_complete_v<meta_template_traits<Type>>) {
             return meta_template_node{
                 meta_template_traits<Type>::args_type::size,
-                meta_node<typename meta_template_traits<Type>::class_type>::resolve(),
+                &meta_node<typename meta_template_traits<Type>::class_type>::resolve,
                 +[](const std::size_t index) noexcept -> meta_type_node * { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }};
         } else {
             return meta_template_node{};
