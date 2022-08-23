@@ -11,15 +11,11 @@ struct custom_type_hash;
 
 #define ASSIGN_TYPE_ID(clazz) \
     template<> \
-    struct custom_type_hash<clazz> \
-        : std::integral_constant<entt::id_type, entt::basic_hashed_string<std::remove_const_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}> {}
-
-template<typename Type>
-struct entt::type_hash<Type> {
-    static constexpr entt::id_type value() noexcept {
-        return custom_type_hash<Type>::value;
-    }
-};
+    struct entt::type_hash<clazz> { \
+        static constexpr entt::id_type value() noexcept { \
+            return entt::basic_hashed_string<std::remove_const_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}; \
+        } \
+    };
 
 struct position {
     int x;
