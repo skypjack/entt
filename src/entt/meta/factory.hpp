@@ -108,7 +108,7 @@ class meta_factory<Type> {
             /* this is never static */
             (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
             Setter::size,
-            internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
+            &internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve,
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
             [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
             &meta_getter<Type, Getter, Policy>};
@@ -297,7 +297,7 @@ public:
                 /* this is never static */
                 std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                 1u,
-                internal::meta_node<std::remove_const_t<data_type>>::resolve(),
+                &internal::meta_node<std::remove_const_t<data_type>>::resolve,
                 &meta_arg<type_list<std::remove_const_t<data_type>>>,
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>};
@@ -309,7 +309,7 @@ public:
             owner->data[id] = internal::meta_data_node{
                 ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                 1u,
-                internal::meta_node<std::remove_const_t<data_type>>::resolve(),
+                &internal::meta_node<std::remove_const_t<data_type>>::resolve,
                 &meta_arg<type_list<std::remove_const_t<data_type>>>,
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>};
@@ -348,7 +348,7 @@ public:
                 /* this is never static */
                 internal::meta_traits::is_const,
                 0u,
-                internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
+                &internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve,
                 &meta_arg<type_list<>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>};
@@ -361,7 +361,7 @@ public:
                 /* this is never static nor const */
                 internal::meta_traits::is_none,
                 1u,
-                internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve(),
+                &internal::meta_node<std::remove_cv_t<std::remove_reference_t<data_type>>>::resolve,
                 &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>};

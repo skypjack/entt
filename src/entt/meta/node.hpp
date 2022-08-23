@@ -76,7 +76,7 @@ struct meta_data_node {
 
     meta_traits traits;
     size_type arity;
-    meta_type_node *type;
+    meta_type_node *(*type)() noexcept;
     meta_type (*arg)(const size_type) noexcept;
     bool (*set)(meta_handle, meta_any);
     meta_any (*get)(meta_handle);

@@ -1466,7 +1466,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return node->type;
+    return node->type();
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
