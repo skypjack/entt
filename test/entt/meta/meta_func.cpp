@@ -139,13 +139,17 @@ struct MetaFunc: ::testing::Test {
         std::size_t count = 0;
 
         for(auto func: entt::resolve<func_t>().func()) {
-            count += static_cast<bool>(func);
+            for(auto curr = func.second; curr; curr = curr.next()) {
+                ++count;
+            }
         }
 
         SetUp();
 
         for(auto func: entt::resolve<func_t>().func()) {
-            count -= static_cast<bool>(func);
+            for(auto curr = func.second; curr; curr = curr.next()) {
+                --count;
+            }
         }
 
         return count;
@@ -161,7 +165,6 @@ TEST_F(MetaFunc, Functionalities) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.id(), "f2"_hs);
     ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
@@ -200,7 +203,6 @@ TEST_F(MetaFunc, Const) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.id(), "f1"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_TRUE(func.is_const());
     ASSERT_FALSE(func.is_static());
@@ -237,7 +239,6 @@ TEST_F(MetaFunc, RetVoid) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.id(), "g"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
@@ -272,7 +273,6 @@ TEST_F(MetaFunc, Static) {
     func_t::value = 2;
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.id(), "h"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
@@ -308,7 +308,6 @@ TEST_F(MetaFunc, StaticRetVoid) {
     auto func = entt::resolve<func_t>().func("k"_hs);
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.id(), "k"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
@@ -344,7 +343,6 @@ TEST_F(MetaFunc, StaticAsMember) {
     auto any = func.invoke(instance, 42);
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.id(), "fake_member"_hs);
     ASSERT_EQ(func.arity(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
@@ -368,7 +366,6 @@ TEST_F(MetaFunc, StaticAsConstMember) {
     auto any = func.invoke(std::as_const(instance));
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.id(), "fake_const_member"_hs);
     ASSERT_EQ(func.arity(), 0u);
     ASSERT_TRUE(func.is_const());
     ASSERT_FALSE(func.is_static());
@@ -558,7 +555,6 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     auto func = entt::resolve<func_t>().func("emplace"_hs);
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.id(), "emplace"_hs);
     ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
@@ -597,8 +593,8 @@ TEST_F(MetaFunc, ReRegistration) {
         .func<entt::overload<int(int, int)>(&func_t::f)>("f"_hs)
         .func<entt::overload<int(int) const>(&func_t::f)>("f"_hs);
 
-    ASSERT_FALSE(type.func("f1"_hs));
-    ASSERT_FALSE(type.func("f2"_hs));
+    ASSERT_TRUE(type.func("f1"_hs));
+    ASSERT_TRUE(type.func("f2"_hs));
     ASSERT_TRUE(type.func("f"_hs));
 
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0));

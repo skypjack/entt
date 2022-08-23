@@ -804,11 +804,6 @@ struct meta_func {
     meta_func(const node_type *curr = nullptr) noexcept
         : node{curr} {}
 
-    /*! @copydoc meta_type::id */
-    [[nodiscard]] id_type id() const noexcept {
-        return node->id;
-    }
-
     /**
      * @brief Returns the number of arguments accepted by a member function.
      * @return The number of arguments accepted by the member function.
@@ -899,6 +894,14 @@ struct meta_func {
     }
 
     /**
+     * @brief Returns the next overload of a given function, if any.
+     * @return The next overload of the given function, if any.
+     */
+    [[nodiscard]] meta_func next() const {
+        return node->next ? meta_func{node->next.get()} : meta_func{};
+    }
+
+    /**
      * @brief Returns true if an object is valid, false otherwise.
      * @return True if the object is valid, false otherwise.
      */
@@ -912,52 +915,16 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
-    template<typename It>
-    [[nodiscard]] auto lookup(It begin, It end, meta_any *const args, const typename internal::meta_type_node::size_type sz) const {
-        size_type extent{sz + 1u};
-        bool ambiguous{};
-        auto candidate = end;
+    template<typename Func>
+    [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Func next) const {
+        using element_type = decltype(next());
 
-        for(; begin != end; ++begin) {
-            if(begin->second.arity == sz) {
-                size_type direct{};
-                size_type ext{};
-
-                for(size_type next{}; next < sz && next == (direct + ext) && args[next]; ++next) {
-                    const auto type = args[next].type();
-                    const auto other = begin->second.arg(next);
-
-                    if(const auto &info = other.info(); info == type.info()) {
-                        ++direct;
-                    } else {
-                        ext += type.node->base.contains(info.hash()) || type.node->conv.contains(info.hash())
-                               || (type.node->conversion_helper && other.node->conversion_helper);
-                    }
-                }
-
-                if((direct + ext) == sz) {
-                    if(ext < extent) {
-                        candidate = begin;
-                        extent = ext;
-                        ambiguous = false;
-                    } else if(ext == extent) {
-                        ambiguous = true;
-                    }
-                }
-            }
-        }
-
-        return ambiguous ? end : candidate;
-    }
-
-    template<auto Member, typename... Check>
-    [[nodiscard]] std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> old_lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Check... check) const {
-        std::decay_t<decltype(node->*Member)> candidate{};
+        element_type candidate = nullptr;
         size_type extent{sz + 1u};
         bool ambiguous{};
 
-        for(auto *curr = (node->*Member); curr; curr = curr->next) {
-            if(((curr->id == check) && ... && (curr->arity == sz))) {
+        for(element_type curr = next(); curr; curr = next()) {
+            if(curr->arity == sz) {
                 size_type direct{};
                 size_type ext{};
 
@@ -985,7 +952,7 @@ class meta_type {
             }
         }
 
-        return (candidate && !ambiguous) ? candidate : decltype(candidate){};
+        return ambiguous ? nullptr : candidate;
     }
 
 public:
@@ -1202,8 +1169,8 @@ public:
      * @brief Returns a range to visit registered top-level functions.
      * @return An iterable range to visit registered top-level functions.
      */
-    [[nodiscard]] old_meta_range<meta_func> func() const noexcept {
-        return {node->func, nullptr};
+    [[nodiscard]] meta_range<meta_func, typename decltype(internal::meta_type_node::func)::const_iterator> func() const noexcept {
+        return {node->func.cbegin(), node->func.cend()};
     }
 
     /**
@@ -1217,7 +1184,17 @@ public:
      * @return The registered meta function for the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        return internal::find_by<&node_type::func>(id, node);
+        if(auto it = node->func.find(id); it != node->func.cend()) {
+            return &it->second;
+        }
+
+        for(auto &&curr: base()) {
+            if(auto &&elem = curr.second.func(id); elem) {
+                return elem;
+            }
+        }
+
+        return meta_func{};
     }
 
     /**
@@ -1232,8 +1209,12 @@ public:
      * @return A wrapper containing the new instance, if any.
      */
     [[nodiscard]] meta_any construct(meta_any *const args, const size_type sz) const {
-        if(auto it = lookup(node->ctor.cbegin(), node->ctor.cend(), args, sz); it != node->ctor.cend()) {
-            return it->second.invoke(args);
+        const auto *candidate = lookup(args, sz, [first = node->ctor.cbegin(), last = node->ctor.cend()]() mutable {
+            return first == last ? nullptr : &(first++)->second;
+        });
+
+        if(candidate) {
+            return candidate->invoke(args);
         }
 
         return (sz == 0u && node->default_constructor) ? node->default_constructor() : meta_any{};
@@ -1283,8 +1264,14 @@ public:
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
-        if(const auto *candidate = old_lookup<&node_type::func>(args, sz, id); candidate) {
-            return candidate->invoke(std::move(instance), args);
+        if(auto it = node->func.find(id); it != node->func.cend()) {
+            const auto *candidate = lookup(args, sz, [curr = &it->second]() mutable {
+                return curr ? std::exchange(curr, curr->next.get()) : nullptr;
+            });
+
+            if(candidate) {
+                return candidate->invoke(std::move(instance), args);
+            }
         }
 
         for(auto &&curr: base()) {

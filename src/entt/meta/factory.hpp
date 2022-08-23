@@ -36,19 +36,6 @@ inline void link_type_if_required(meta_type_node *owner, const id_type id) noexc
     }
 }
 
-inline void link_func_if_required(meta_type_node *owner, const id_type id, meta_func_node &node) noexcept {
-    node.id = id;
-
-    for(auto it = owner->func; it; it = it->next) {
-        if(it == &node) {
-            return;
-        }
-    }
-
-    node.next = owner->func;
-    owner->func = &node;
-}
-
 } // namespace internal
 
 /**
@@ -423,19 +410,30 @@ public:
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
-        static internal::meta_func_node node{
-            {},
+        internal::meta_func_node node{
+            type_id<type_list_cat_t<type_list<descriptor::return_type>, descriptor::args_type>>().hash(),
             (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
-            nullptr,
             descriptor::args_type::size,
             internal::meta_node<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>::resolve(),
             &meta_arg<typename descriptor::args_type>,
-            &meta_invoke<Type, Candidate, Policy>
-            // tricks clang-format
-        };
+            &meta_invoke<Type, Candidate, Policy>};
 
-        internal::link_func_if_required(owner, id, node);
-        return meta_factory<Type, decltype(internal::meta_func_node::prop)>{node.prop};
+        if(owner->func.contains(id)) {
+            for(auto *curr = &owner->func[id]; curr; curr = curr->next.get()) {
+                if(curr->watermark == node.watermark && curr->traits == node.traits) {
+                    node.next = std::move(curr->next);
+                    *curr = std::move(node);
+
+                    return meta_factory<Type, decltype(internal::meta_func_node::prop)>{curr->prop};
+                }
+            }
+
+            // locally overloaded function
+            node.next = std::make_unique<internal::meta_func_node>(std::move(owner->func[id]));
+        }
+
+        owner->func[id] = std::move(node);
+        return meta_factory<Type, decltype(internal::meta_func_node::prop)>{owner->func[id].prop};
     }
 
 private:
@@ -474,16 +472,13 @@ template<typename Type>
 inline void meta_reset(const id_type id) noexcept {
     for(auto **it = internal::meta_context::global(); *it; it = &(*it)->next) {
         if(auto *node = *it; node->id == id) {
-            for(auto **curr = &node->func; *curr; *curr = std::exchange((*curr)->next, nullptr)) {
-                (*curr)->prop.clear();
-            }
-
             node->id = {};
             node->prop.clear();
             node->ctor.clear();
             node->base.clear();
             node->conv.clear();
             node->data.clear();
+            node->func.clear();
             node->dtor.dtor = nullptr;
 
             *it = std::exchange(node->next, nullptr);

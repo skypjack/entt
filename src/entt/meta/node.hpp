@@ -86,14 +86,14 @@ struct meta_data_node {
 struct meta_func_node {
     using size_type = std::size_t;
 
-    id_type id;
-    const meta_traits traits;
-    meta_func_node *next;
-    const size_type arity;
-    meta_type_node *const ret;
-    meta_type (*const arg)(const size_type) noexcept;
-    meta_any (*const invoke)(meta_handle, meta_any *const);
+    id_type watermark;
+    meta_traits traits;
+    size_type arity;
+    meta_type_node *ret;
+    meta_type (*arg)(const size_type) noexcept;
+    meta_any (*invoke)(meta_handle, meta_any *const);
     dense_map<id_type, meta_prop_node, identity> prop{};
+    std::unique_ptr<meta_func_node> next{};
 };
 
 struct meta_template_node {
@@ -122,7 +122,7 @@ struct meta_type_node {
     dense_map<id_type, meta_base_node, identity> base{};
     dense_map<id_type, meta_conv_node, identity> conv{};
     dense_map<id_type, meta_data_node, identity> data{};
-    meta_func_node *func{nullptr};
+    dense_map<id_type, meta_func_node, identity> func{};
     meta_dtor_node dtor{};
 };
 
@@ -211,33 +211,6 @@ template<typename... Args>
 [[nodiscard]] meta_type_node *meta_arg_node(type_list<Args...>, const std::size_t index) noexcept {
     meta_type_node *args[sizeof...(Args) + 1u]{nullptr, internal::meta_node<std::remove_cv_t<std::remove_reference_t<Args>>>::resolve()...};
     return args[index + 1u];
-}
-
-template<auto Member, typename Type>
-[[nodiscard]] static std::decay_t<decltype(std::declval<internal::meta_type_node>().*Member)> find_by(const Type &info_or_id, const internal::meta_type_node *node) noexcept {
-    for(auto *curr = node->*Member; curr; curr = curr->next) {
-        if constexpr(std::is_same_v<Type, type_info>) {
-            if(*curr->type->info == info_or_id) {
-                return curr;
-            }
-        } else if constexpr(std::is_same_v<decltype(curr), meta_base_node *>) {
-            if(curr->type->id == info_or_id) {
-                return curr;
-            }
-        } else {
-            if(curr->id == info_or_id) {
-                return curr;
-            }
-        }
-    }
-
-    for(auto &&curr: node->base) {
-        if(auto *ret = find_by<Member>(info_or_id, curr.second.type); ret) {
-            return ret;
-        }
-    }
-
-    return nullptr;
 }
 
 } // namespace internal
