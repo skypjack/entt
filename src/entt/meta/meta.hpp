@@ -1275,7 +1275,7 @@ public:
         }
 
         for(auto &&curr: base()) {
-            if(auto res = curr.second.invoke(id, instance->as_ref(), args, sz); res) {
+            if(auto res = curr.second.invoke(id, *instance.operator->(), args, sz); res) {
                 return res;
             }
         }
