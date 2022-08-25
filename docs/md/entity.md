@@ -2003,7 +2003,7 @@ iteration undergoes in-place deletion.<br/>
 As an example, consider the following snippet:
 
 ```cpp
-registry.view<position>([&](const auto entity, auto &pos) {
+registry.view<position>().each([&](const auto entity, auto &pos) {
     registry.emplace<position>(registry.create(), 0., 0.);
     // references remain stable after adding new instances
     pos.x = 0.;
