@@ -928,9 +928,9 @@ class meta_type {
                 size_type direct{};
                 size_type ext{};
 
-                for(size_type next{}; next < sz && next == (direct + ext) && args[next]; ++next) {
-                    const auto type = args[next].type();
-                    const auto other = curr->arg(next);
+                for(size_type pos{}; pos < sz && pos == (direct + ext) && args[pos]; ++pos) {
+                    const auto type = args[pos].type();
+                    const auto other = curr->arg(pos);
 
                     if(const auto &info = other.info(); info == type.info()) {
                         ++direct;
