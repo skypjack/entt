@@ -104,7 +104,7 @@ class meta_factory<Type> {
         using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
-        owner->data[id] = internal::meta_data_node{
+        internal::meta_data_node node{
             /* this is never static */
             (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
             Setter::size,
@@ -113,7 +113,8 @@ class meta_factory<Type> {
             [](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
             &meta_getter<Type, Getter, Policy>};
 
-        return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
+        auto it = owner->data.insert_or_assign(id, std::move(node)).first;
+        return meta_factory<Type, decltype(internal::meta_data_node::prop)>{it->second.prop};
     }
 
 public:
@@ -293,7 +294,7 @@ public:
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
 
-            owner->data[id] = internal::meta_data_node{
+            internal::meta_data_node node{
                 /* this is never static */
                 std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                 1u,
@@ -302,11 +303,12 @@ public:
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>};
 
-            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
+            auto it = owner->data.insert_or_assign(id, std::move(node)).first;
+            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{it->second.prop};
         } else {
             using data_type = std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>;
 
-            owner->data[id] = internal::meta_data_node{
+            internal::meta_data_node node{
                 ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                 1u,
                 &internal::meta_node<std::remove_const_t<data_type>>::resolve,
@@ -314,7 +316,8 @@ public:
                 &meta_setter<Type, Data>,
                 &meta_getter<Type, Data, Policy>};
 
-            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
+            auto it = owner->data.insert_or_assign(id, std::move(node)).first;
+            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{it->second.prop};
         }
     }
 
@@ -344,7 +347,7 @@ public:
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
-            owner->data[id] = internal::meta_data_node{
+            internal::meta_data_node node{
                 /* this is never static */
                 internal::meta_traits::is_const,
                 0u,
@@ -353,11 +356,12 @@ public:
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>};
 
-            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
+            auto it = owner->data.insert_or_assign(id, std::move(node)).first;
+            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{it->second.prop};
         } else {
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
-            owner->data[id] = internal::meta_data_node{
+            internal::meta_data_node node{
                 /* this is never static nor const */
                 internal::meta_traits::is_none,
                 1u,
@@ -366,7 +370,8 @@ public:
                 &meta_setter<Type, Setter>,
                 &meta_getter<Type, Getter, Policy>};
 
-            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{owner->data[id].prop};
+            auto it = owner->data.insert_or_assign(id, std::move(node)).first;
+            return meta_factory<Type, decltype(internal::meta_data_node::prop)>{it->second.prop};
         }
     }
 
@@ -418,8 +423,8 @@ public:
             &meta_arg<typename descriptor::args_type>,
             &meta_invoke<Type, Candidate, Policy>};
 
-        if(owner->func.contains(id)) {
-            for(auto *curr = &owner->func[id]; curr; curr = curr->next.get()) {
+        if(auto it = owner->func.find(id); it != owner->func.end()) {
+            for(auto *curr = &it->second; curr; curr = curr->next.get()) {
                 if(curr->watermark == node.watermark && curr->traits == node.traits) {
                     node.next = std::move(curr->next);
                     *curr = std::move(node);
@@ -432,7 +437,7 @@ public:
             node.next = std::make_unique<internal::meta_func_node>(std::move(owner->func[id]));
         }
 
-        owner->func[id] = std::move(node);
+        owner->func.insert_or_assign(id, std::move(node));
         return meta_factory<Type, decltype(internal::meta_func_node::prop)>{owner->func[id].prop};
     }
 
