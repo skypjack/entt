@@ -24,9 +24,17 @@ namespace entt {
  * @tparam Service Service type.
  */
 template<typename Service>
-struct locator final {
+class locator final {
+    class service_handle {
+        friend class locator<Service>;
+        std::shared_ptr<Service> value{};
+    };
+
+public:
     /*! @brief Service type. */
     using type = Service;
+    /*! @brief Service node type. */
+    using node_type = service_handle;
 
     /*! @brief Default constructor, deleted on purpose. */
     locator() = delete;
@@ -38,7 +46,7 @@ struct locator final {
      * @return True if the service locator contains a value, false otherwise.
      */
     [[nodiscard]] static bool has_value() noexcept {
-        return (service != nullptr);
+        return (service.value != nullptr);
     }
 
     /**
@@ -52,7 +60,7 @@ struct locator final {
      */
     [[nodiscard]] static Service &value() noexcept {
         ENTT_ASSERT(has_value(), "Service not available");
-        return *service;
+        return *service.value;
     }
 
     /**
@@ -68,7 +76,7 @@ struct locator final {
      */
     template<typename Impl = Service, typename... Args>
     [[nodiscard]] static Service &value_or(Args &&...args) {
-        return service ? *service : emplace<Impl>(std::forward<Args>(args)...);
+        return service.value ? *service.value : emplace<Impl>(std::forward<Args>(args)...);
     }
 
     /**
@@ -80,8 +88,8 @@ struct locator final {
      */
     template<typename Impl = Service, typename... Args>
     static Service &emplace(Args &&...args) {
-        service = std::make_shared<Impl>(std::forward<Args>(args)...);
-        return *service;
+        service.value = std::make_shared<Impl>(std::forward<Args>(args)...);
+        return *service.value;
     }
 
     /**
@@ -95,18 +103,28 @@ struct locator final {
      */
     template<typename Impl = Service, typename Allocator, typename... Args>
     static Service &allocate_emplace(Allocator alloc, Args &&...args) {
-        service = std::allocate_shared<Impl>(alloc, std::forward<Args>(args)...);
-        return *service;
+        service.value = std::allocate_shared<Impl>(alloc, std::forward<Args>(args)...);
+        return *service.value;
     }
 
-    /*! @brief Resets a service. */
-    static void reset() noexcept {
-        service.reset();
+    /**
+     * @brief Returns a handle to the underlying service.
+     * @return A handle to the underlying service.
+     */
+    static node_type handle() noexcept {
+        return service;
+    }
+
+    /**
+     * @brief Resets or replaces a service.
+     * @param handle Optional handle with which to replace the service.
+     */
+    static void reset(const node_type &handle = {}) noexcept {
+        service = handle;
     }
 
 private:
-    // std::shared_ptr because of its type erased allocator which is pretty useful here
-    inline static std::shared_ptr<Service> service = nullptr;
+    inline static service_handle service{};
 };
 
 } // namespace entt
