@@ -15,7 +15,7 @@ struct custom_type_hash;
         static constexpr entt::id_type value() noexcept { \
             return entt::basic_hashed_string<std::remove_const_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}; \
         } \
-    };
+    }
 
 struct position {
     int x;
@@ -28,7 +28,7 @@ struct velocity {
 };
 
 struct userdata {
-    entt::meta_ctx ctx;
+    entt::locator<entt::meta_ctx>::node_type ctx;
     entt::meta_any any;
 };
 

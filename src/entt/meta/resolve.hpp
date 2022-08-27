@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include "../core/type_info.hpp"
+#include "../locator/locator.hpp"
 #include "context.hpp"
 #include "meta.hpp"
 #include "node.hpp"
@@ -17,15 +18,16 @@ namespace entt {
  */
 template<typename Type>
 [[nodiscard]] meta_type resolve() noexcept {
-    return internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve();
+    return internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
 
 /**
  * @brief Returns a range to use to visit all meta types.
  * @return An iterable range to use to visit all meta types.
  */
-[[nodiscard]] inline old_meta_range<meta_type> resolve() noexcept {
-    return {*internal::meta_context::global(), nullptr};
+[[nodiscard]] inline meta_range<meta_type, typename decltype(internal::meta_context::value)::const_iterator> resolve() noexcept {
+    auto &&context = internal::meta_context::from(locator<meta_ctx>::value_or());
+    return {context.value.cbegin(), context.value.cend()};
 }
 
 /**
@@ -35,8 +37,8 @@ template<typename Type>
  */
 [[nodiscard]] inline meta_type resolve(const id_type id) noexcept {
     for(auto &&curr: resolve()) {
-        if(curr.id() == id) {
-            return curr;
+        if(curr.second.id() == id) {
+            return curr.second;
         }
     }
 
@@ -49,10 +51,10 @@ template<typename Type>
  * @return The meta type associated with the given type info object, if any.
  */
 [[nodiscard]] inline meta_type resolve(const type_info &info) noexcept {
-    for(auto &&curr: resolve()) {
-        if(curr.info() == info) {
-            return curr;
-        }
+    auto &&context = internal::meta_context::from(locator<meta_ctx>::value_or());
+
+    if(auto it = context.value.find(info.hash()); it != context.value.cend()) {
+        return it->second.get();
     }
 
     return {};

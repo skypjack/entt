@@ -8,6 +8,10 @@ position create_position(int x, int y) {
     return position{x, y};
 }
 
+ENTT_API void share(entt::locator<entt::meta_ctx>::node_type handle) {
+    entt::locator<entt::meta_ctx>::reset(handle);
+}
+
 ENTT_API void set_up() {
     using namespace entt::literals;
 

@@ -62,7 +62,7 @@ TEST_F(MetaConv, Functionalities) {
 TEST_F(MetaConv, ReRegistration) {
     SetUp();
 
-    auto *node = entt::internal::meta_node<clazz_t>::resolve();
+    auto *node = entt::internal::resolve<clazz_t>();
 
     ASSERT_FALSE(node->conv.empty());
     ASSERT_EQ(node->conv.size(), 3u);

@@ -11,6 +11,10 @@ DOC:
 * examples (and credits) from @alanjfs :)
 * update entity doc when the storage based model is in place
 
+TODO:
+* update doc (meta, lib)
+* update meta natvis files
+
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
 * add storage getter for filters to views and groups

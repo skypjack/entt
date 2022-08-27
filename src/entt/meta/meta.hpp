@@ -45,7 +45,7 @@ public:
      */
     template<typename Type>
     meta_sequence_container(std::in_place_type_t<Type>, any instance) noexcept
-        : value_type_node{&internal::meta_node<typename Type::value_type>::resolve},
+        : value_type_node{&internal::resolve<typename Type::value_type>},
           size_fn{&meta_sequence_container_traits<Type>::size},
           resize_fn{&meta_sequence_container_traits<Type>::resize},
           iter_fn{&meta_sequence_container_traits<Type>::iter},
@@ -93,9 +93,9 @@ public:
     template<typename Type>
     meta_associative_container(std::in_place_type_t<Type>, any instance) noexcept
         : key_only_container{meta_associative_container_traits<Type>::key_only},
-          key_type_node{&internal::meta_node<typename Type::key_type>::resolve},
+          key_type_node{&internal::resolve<typename Type::key_type>},
           mapped_type_node{nullptr},
-          value_type_node{&internal::meta_node<typename Type::value_type>::resolve},
+          value_type_node{&internal::resolve<typename Type::value_type>},
           size_fn{&meta_associative_container_traits<Type>::size},
           clear_fn{&meta_associative_container_traits<Type>::clear},
           iter_fn{&meta_associative_container_traits<Type>::iter},
@@ -103,7 +103,7 @@ public:
           find_fn{&meta_associative_container_traits<Type>::find},
           storage{std::move(instance)} {
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
-            mapped_type_node = &internal::meta_node<typename Type::mapped_type>::resolve;
+            mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
     }
 
@@ -207,7 +207,7 @@ public:
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          node{internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve()},
+          node{internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>()},
           vtable{&basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>} {}
 
     /**
@@ -218,7 +218,7 @@ public:
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(Type &&value)
         : storage{std::forward<Type>(value)},
-          node{internal::meta_node<std::decay_t<Type>>::resolve()},
+          node{internal::resolve<std::decay_t<Type>>()},
           vtable{&basic_vtable<std::decay_t<Type>>} {}
 
     /**
@@ -430,7 +430,7 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return meta_any{};
         } else {
-            return allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve());
+            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>());
         }
     }
 
@@ -442,9 +442,9 @@ public:
     template<typename Type>
     bool allow_cast() {
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve()) && (storage.data() != nullptr);
+            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>()) && (storage.data() != nullptr);
         } else {
-            return allow_cast(internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve());
+            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>());
         }
     }
 
@@ -454,7 +454,7 @@ public:
         release();
         vtable = &basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
         storage.emplace<Type>(std::forward<Args>(args)...);
-        node = internal::meta_node<std::remove_cv_t<std::remove_reference_t<Type>>>::resolve();
+        node = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>();
     }
 
     /*! @copydoc any::assign */

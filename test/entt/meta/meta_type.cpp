@@ -5,6 +5,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/core/utility.hpp>
 #include <entt/meta/container.hpp>
@@ -191,15 +192,15 @@ TEST_F(MetaType, Resolve) {
 
     auto range = entt::resolve();
     // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
-    const auto it = std::find_if(range.begin(), range.end(), [](auto type) { return type.id() == entt::hashed_string::value("clazz"); });
+    const auto it = std::find_if(range.begin(), range.end(), [](auto curr) { return curr.second.id() == entt::hashed_string::value("clazz"); });
 
     ASSERT_NE(it, range.end());
-    ASSERT_EQ(*it, entt::resolve<clazz_t>());
+    ASSERT_EQ(it->second, entt::resolve<clazz_t>());
 
     bool found = false;
 
     for(auto curr: entt::resolve()) {
-        found = found || curr == entt::resolve<double>();
+        found = found || curr.second == entt::resolve<double>();
     }
 
     ASSERT_TRUE(found);
@@ -637,7 +638,7 @@ TEST_F(MetaType, PropertiesAndCornerCases) {
 TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     using namespace entt::literals;
 
-    ASSERT_NE(*entt::internal::meta_context::global(), nullptr);
+    ASSERT_FALSE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).value.empty());
 
     entt::meta_reset<double>();
     entt::meta_reset<unsigned int>();
@@ -654,7 +655,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve("derived"_hs));
     ASSERT_FALSE(entt::resolve("clazz"_hs));
 
-    ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
+    ASSERT_TRUE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).value.empty());
 
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(static_cast<entt::id_type>(property_t::value)));
     // implicitly generated default constructor is not cleared
@@ -687,14 +688,14 @@ TEST_F(MetaType, ReRegistration) {
 
     int count = 0;
 
-    for(auto type: entt::resolve()) {
-        count += static_cast<bool>(type);
+    for([[maybe_unused]] auto type: entt::resolve()) {
+        ++count;
     }
 
     SetUp();
 
-    for(auto type: entt::resolve()) {
-        count -= static_cast<bool>(type);
+    for([[maybe_unused]] auto type: entt::resolve()) {
+        --count;
     }
 
     ASSERT_EQ(count, 0);

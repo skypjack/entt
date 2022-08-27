@@ -1,9 +1,14 @@
 #ifndef ENTT_META_CTX_HPP
 #define ENTT_META_CTX_HPP
 
-#include "../core/attribute.h"
+#include <memory>
+#include "../container/dense_map.hpp"
+#include "../core/fwd.hpp"
+#include "../core/utility.hpp"
 
 namespace entt {
+
+class meta_ctx;
 
 /**
  * @cond TURN_OFF_DOXYGEN
@@ -14,20 +19,11 @@ namespace internal {
 
 struct meta_type_node;
 
-struct ENTT_API meta_context {
-    // we could use the lines below but VS2017 returns with an ICE if combined with ENTT_API despite the code being valid C++
-    //     inline static meta_type_node *local = nullptr;
-    //     inline static meta_type_node **global = &local;
+struct meta_context {
+    dense_map<id_type, std::unique_ptr<meta_type_node>, identity> value{};
 
-    [[nodiscard]] static meta_type_node *&local() noexcept {
-        static meta_type_node *chain = nullptr;
-        return chain;
-    }
-
-    [[nodiscard]] static meta_type_node **&global() noexcept {
-        static meta_type_node **chain = &local();
-        return chain;
-    }
+    static inline meta_context &from(meta_ctx &ctx);
+    static inline const meta_context &from(const meta_ctx &ctx);
 };
 
 } // namespace internal
@@ -37,19 +33,29 @@ struct ENTT_API meta_context {
  * @endcond
  */
 
-/*! @brief Opaque container for a meta context. */
-struct meta_ctx {
-    /**
-     * @brief Binds the meta system to a given context.
-     * @param other A valid context to which to bind.
-     */
-    static void bind(meta_ctx other) noexcept {
-        internal::meta_context::global() = other.ctx;
-    }
-
-private:
-    internal::meta_type_node **ctx{&internal::meta_context::local()};
+/*! @brief Opaque meta context type. */
+class meta_ctx: private internal::meta_context {
+    /*! @brief Attorney idiom like model to access the base class. */
+    friend struct internal::meta_context;
 };
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+inline internal::meta_context &internal::meta_context::from(meta_ctx &ctx) {
+    return ctx;
+}
+
+inline const internal::meta_context &internal::meta_context::from(const meta_ctx &ctx) {
+    return ctx;
+}
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 } // namespace entt
 

@@ -6,6 +6,7 @@
 #include <entt/meta/resolve.hpp>
 #include "types.h"
 
+ENTT_API void share(entt::locator<entt::meta_ctx>::node_type);
 ENTT_API void set_up();
 ENTT_API void tear_down();
 ENTT_API entt::meta_any wrap_int(int);
@@ -16,6 +17,7 @@ TEST(Lib, Meta) {
     ASSERT_FALSE(entt::resolve("position"_hs));
     ASSERT_FALSE(entt::resolve("velocity"_hs));
 
+    share(entt::locator<entt::meta_ctx>::handle());
     set_up();
     entt::meta<double>().conv<int>();
 
@@ -39,6 +41,9 @@ TEST(Lib, Meta) {
     ASSERT_TRUE(vel.type().data("dy"_hs).get(vel).allow_cast<double>());
     ASSERT_EQ(vel.type().data("dx"_hs).get(vel).cast<double>(), 0.);
     ASSERT_EQ(vel.type().data("dy"_hs).get(vel).cast<double>(), 0.);
+
+    pos.reset();
+    vel.reset();
 
     ASSERT_EQ(wrap_int(42).type(), entt::resolve<int>());
     ASSERT_EQ(wrap_int(42).cast<int>(), 42);
