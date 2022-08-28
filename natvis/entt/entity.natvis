@@ -26,10 +26,10 @@
 				</Expand>
 			</Synthetic>
 			<Synthetic Name="[destroyed]" ExcludeView="simple">
-				<DisplayString>{ to_entity(free_list) != entity_traits::entity_mask }</DisplayString>
+				<DisplayString>{ to_entity(free_list.first_base::value) != entity_traits::entity_mask }</DisplayString>
 				<Expand>
 					<CustomListItems>
-						<Variable Name="it" InitialValue="to_entity(free_list)" />
+						<Variable Name="it" InitialValue="to_entity(free_list.first_base::value)" />
 						<Loop>
 							<Break Condition="it == entity_traits::entity_mask"/>
 							<Item Name="[{ it }]">epool[it]</Item>
