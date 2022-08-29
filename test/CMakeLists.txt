@@ -84,6 +84,7 @@ function(SETUP_TARGET TARGET_NAME)
 endfunction()
 
 add_library(odr OBJECT odr.cpp)
+set_target_properties(odr PROPERTIES POSITION_INDEPENDENT_CODE ON)
 SETUP_TARGET(odr)
 
 function(SETUP_BASIC_TEST TEST_NAME TEST_SOURCES)
