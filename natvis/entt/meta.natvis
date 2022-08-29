@@ -1,75 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="entt::internal::meta_base_node">
-		<DisplayString Condition="type != nullptr">{{ type={ type->info->alias,na } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 	</Type>
 	<Type Name="entt::internal::meta_conv_node">
-		<DisplayString Condition="type != nullptr">{{ type={ type->info->alias,na } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 	</Type>
 	<Type Name="entt::internal::meta_ctor_node">
-		<DisplayString Condition="arg != nullptr">{{ arity={ arity } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{{ arity={ arity } }}</DisplayString>
 	</Type>
 	<Type Name="entt::internal::meta_data_node">
 		<Intrinsic Name="has_property" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
 		</Intrinsic>
-		<DisplayString Condition="type != nullptr">{{ type={ type->info->alias,na } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{{ arity={ arity } }}</DisplayString>
 		<Expand>
-			<Item Name="[id]">id</Item>
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_property(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_property(entt::internal::meta_traits::is_static)</Item>
-			<Synthetic Name="[prop]" Condition="prop != nullptr">
-				<Expand>
-					<LinkedListItems>
-						<HeadPointer>prop</HeadPointer>
-						<NextPointer>next</NextPointer>
-						<ValueNode>*this</ValueNode>
-					</LinkedListItems>
-				</Expand>
-			</Synthetic>
+			<Item Name="[prop]">prop</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_func_node"	>
 		<Intrinsic Name="has_property" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
 		</Intrinsic>
-		<DisplayString Condition="ret != nullptr">{{ arity={ arity }, ret={ ret->info->alias,na } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{{ arity={ arity } }}</DisplayString>
 		<Expand>
-			<Item Name="[id]">id</Item>
 			<Item Name="[is_const]">has_property(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_property(entt::internal::meta_traits::is_static)</Item>
-			<Synthetic Name="[prop]" Condition="prop != nullptr">
-				<Expand>
-					<LinkedListItems>
-						<HeadPointer>prop</HeadPointer>
-						<NextPointer>next</NextPointer>
-						<ValueNode>*this</ValueNode>
-					</LinkedListItems>
-				</Expand>
-			</Synthetic>
+			<Item Name="[prop]">prop</Item>
+			<Item Name="[next]" Condition="next != nullptr">*next</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_prop_node">
-		<DisplayString Condition="value.node != nullptr">{{ key_type={ id.node->info->alias,na }, mapped_type={ value.node->info->alias,na } }}</DisplayString>
-		<DisplayString Condition="id.node != nullptr">{{ key_type={ id.node->info->alias,na } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-		<Expand>
-			<Item Name="[key]">id</Item>
-			<Item Name="[value]">value</Item>
-		</Expand>
+		<DisplayString>{ value }</DisplayString>
 	</Type>
 	<Type Name="entt::internal::meta_template_node">
-		<DisplayString Condition="type != nullptr">{{ type={ type->info->alias,na } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-		<Expand>
-			<Item Name="[arity]">arity</Item>
-		</Expand>
+		<DisplayString>{{ arity={ arity } }}</DisplayString>
 	</Type>
 	<Type Name="entt::internal::meta_type_node">
 		<Intrinsic Name="has_property" Expression="!!(traits &amp; property)">
@@ -92,63 +60,16 @@
 			<Item Name="[default_constructor]">default_constructor != nullptr</Item>
 			<Item Name="[conversion_helper]">conversion_helper != nullptr</Item>
 			<Item Name="[from_void]">from_void != nullptr</Item>
-			<Item Name="[template_info]" Condition="templ != nullptr">*templ</Item>
-			<Synthetic Name="[ctor]" Condition="ctor != nullptr">
-				<Expand>
-					<LinkedListItems>
-						<HeadPointer>ctor</HeadPointer>
-						<NextPointer>next</NextPointer>
-						<ValueNode>*this</ValueNode>
-					</LinkedListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[base]" Condition="base != nullptr">
-				<Expand>
-					<LinkedListItems>
-						<HeadPointer>base</HeadPointer>
-						<NextPointer>next</NextPointer>
-						<ValueNode>*this</ValueNode>
-					</LinkedListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[conv]" Condition="conv != nullptr">
-				<Expand>
-					<LinkedListItems>
-						<HeadPointer>conv</HeadPointer>
-						<NextPointer>next</NextPointer>
-						<ValueNode>*this</ValueNode>
-					</LinkedListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[data]" Condition="data != nullptr">
-				<Expand>
-					<LinkedListItems>
-						<HeadPointer>data</HeadPointer>
-						<NextPointer>next</NextPointer>
-						<ValueNode>*this</ValueNode>
-					</LinkedListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[func]" Condition="func != nullptr">
-				<Expand>
-					<LinkedListItems>
-						<HeadPointer>func</HeadPointer>
-						<NextPointer>next</NextPointer>
-						<ValueNode>*this</ValueNode>
-					</LinkedListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[prop]" Condition="prop != nullptr">
-				<Expand>
-					<LinkedListItems>
-						<HeadPointer>prop</HeadPointer>
-						<NextPointer>next</NextPointer>
-						<ValueNode>*this</ValueNode>
-					</LinkedListItems>
-				</Expand>
-			</Synthetic>
+			<Item Name="[template_info]">templ</Item>
+			<Item Name="[ctor]">ctor</Item>
+			<Item Name="[base]">base</Item>
+			<Item Name="[conv]">conv</Item>
+			<Item Name="[data]">data</Item>
+			<Item Name="[func]">func</Item>
+			<Item Name="[prop]">prop</Item>
 		</Expand>
-	</Type>	<Type Name="entt::meta_any">
+	</Type>
+	<Type Name="entt::meta_any">
 		<DisplayString Condition="node != nullptr">{{ type={ node->info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
@@ -159,13 +80,10 @@
 		<DisplayString>{ any }</DisplayString>
 	</Type>
 	<Type Name="entt::meta_associative_container">
-		<DisplayString Condition="mapped_type_node != nullptr">{{ key_type={ key_type_node->info->alias,na }, mapped_type={ mapped_type_node->info->alias,na } }}</DisplayString>
-		<DisplayString Condition="key_type_node != nullptr">{{ key_type={ key_type_node->info->alias,na } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{ storage }</DisplayString>
 	</Type>
 	<Type Name="entt::meta_sequence_container">
-		<DisplayString Condition="value_type_node != nullptr">{{ value_type={ value_type_node->info->alias,na } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{ storage }</DisplayString>
 	</Type>
 	<Type Name="entt::meta_data">
 		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>

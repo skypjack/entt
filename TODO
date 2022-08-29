@@ -13,7 +13,6 @@ DOC:
 
 TODO:
 * update doc (meta, lib)
-* update meta natvis files
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
