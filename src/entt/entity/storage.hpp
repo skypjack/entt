@@ -310,7 +310,8 @@ private:
     }
 
     void swap_at([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) final {
-        ENTT_ASSERT(!is_pinned_type_v, "Pinned type");
+        // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
+        ENTT_ASSERT((lhs + 1u) && !is_pinned_type_v, "Pinned type");
 
         if constexpr(!is_pinned_type_v) {
             using std::swap;
@@ -319,7 +320,8 @@ private:
     }
 
     void move_element([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) final {
-        ENTT_ASSERT(!is_pinned_type_v, "Pinned type");
+        // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
+        ENTT_ASSERT((from + 1u) && !is_pinned_type_v, "Pinned type");
 
         if constexpr(!is_pinned_type_v) {
             auto &elem = element_at(from);
