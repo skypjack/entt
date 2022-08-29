@@ -852,10 +852,7 @@ TEST(Registry, Each) {
     match = 0u;
 
     registry.each([&](auto entity) {
-        if(registry.all_of<int>(entity)) {
-            ++match;
-        }
-
+        match += registry.all_of<int>(entity);
         static_cast<void>(registry.create());
         ++tot;
     });
@@ -882,10 +879,7 @@ TEST(Registry, Each) {
     match = 0u;
 
     registry.each([&](auto entity) {
-        if(registry.all_of<int>(entity)) {
-            ++match;
-        }
-
+        match += registry.all_of<int>(entity);
         registry.destroy(entity);
         ++tot;
     });
