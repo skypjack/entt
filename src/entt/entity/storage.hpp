@@ -16,8 +16,8 @@
 #include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
-#include "storage_mixin.hpp"
 #include "sparse_set.hpp"
+#include "storage_mixin.hpp"
 
 namespace entt {
 
@@ -310,18 +310,18 @@ private:
     }
 
     void swap_at([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) final {
-        if constexpr(is_pinned_type_v) {
-            ENTT_ASSERT(false, "Pinned type");
-        } else {
+        ENTT_ASSERT(!is_pinned_type_v, "Pinned type");
+
+        if constexpr(!is_pinned_type_v) {
             using std::swap;
             swap(element_at(lhs), element_at(rhs));
         }
     }
 
     void move_element([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) final {
-        if constexpr(is_pinned_type_v) {
-            ENTT_ASSERT(false, "Pinned type");
-        } else {
+        ENTT_ASSERT(!is_pinned_type_v, "Pinned type");
+
+        if constexpr(!is_pinned_type_v) {
             auto &elem = element_at(from);
             entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), packed.second(), std::move(elem));
             std::destroy_at(std::addressof(elem));
