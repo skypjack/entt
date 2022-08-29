@@ -143,6 +143,7 @@ if(ENTT_BUILD_LIB)
 
     SETUP_LIB_TEST(dispatcher)
     SETUP_LIB_TEST(emitter)
+    SETUP_LIB_TEST(locator)
     SETUP_LIB_TEST(meta)
     SETUP_LIB_TEST(registry)
 
