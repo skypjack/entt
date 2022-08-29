@@ -86,7 +86,6 @@
 			<Item Name="[is_array]">has_property(entt::internal::meta_traits::is_array)</Item>
 			<Item Name="[is_enum]">has_property(entt::internal::meta_traits::is_enum)</Item>
 			<Item Name="[is_class]">has_property(entt::internal::meta_traits::is_class)</Item>
-			<Item Name="[is_pointer]">has_property(entt::internal::meta_traits::is_pointer)</Item>
 			<Item Name="[is_meta_pointer_like]">has_property(entt::internal::meta_traits::is_meta_pointer_like)</Item>
 			<Item Name="[is_meta_sequence_container]">has_property(entt::internal::meta_traits::is_meta_sequence_container)</Item>
 			<Item Name="[is_meta_associative_container]">has_property(entt::internal::meta_traits::is_meta_associative_container)</Item>
