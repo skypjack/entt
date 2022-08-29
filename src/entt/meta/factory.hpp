@@ -393,7 +393,6 @@ public:
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
         internal::meta_func_node node{
-            type_id<type_list_cat_t<type_list<typename descriptor::return_type>, typename descriptor::args_type>>().hash(),
             (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
             descriptor::args_type::size,
             &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
@@ -402,7 +401,7 @@ public:
 
         if(auto it = owner->func.find(id); it != owner->func.end()) {
             for(auto *curr = &it->second; curr; curr = curr->next.get()) {
-                if(curr->watermark == node.watermark && curr->traits == node.traits) {
+                if(curr->invoke == node.invoke) {
                     node.next = std::move(curr->next);
                     *curr = std::move(node);
 

@@ -88,7 +88,6 @@ struct meta_data_node {
 struct meta_func_node {
     using size_type = std::size_t;
 
-    id_type watermark;
     meta_traits traits;
     size_type arity;
     meta_type_node *(*ret)() noexcept;
