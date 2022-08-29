@@ -117,10 +117,10 @@ public:
 
     /**
      * @brief Resets or replaces a service.
-     * @param handle Optional handle with which to replace the service.
+     * @param other Optional handle with which to replace the service.
      */
-    static void reset(const node_type &handle = {}) noexcept {
-        service = handle;
+    static void reset(const node_type &other = {}) noexcept {
+        service = other;
     }
 
 private:
