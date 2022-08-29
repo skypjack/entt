@@ -108,6 +108,7 @@ function(SETUP_PLUGIN_TEST TEST_NAME)
     target_include_directories(_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_include_directories(lib_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_link_libraries(lib_${TEST_NAME} PRIVATE ${CMAKE_DL_LIBS})
+    add_dependencies(lib_${TEST_NAME} _${TEST_NAME})
 endfunction()
 
 # Test benchmark
