@@ -149,6 +149,7 @@ if(ENTT_BUILD_LIB)
 
     SETUP_PLUGIN_TEST(dispatcher_plugin)
     SETUP_PLUGIN_TEST(emitter_plugin)
+    SETUP_PLUGIN_TEST(locator_plugin)
     SETUP_PLUGIN_TEST(meta_plugin)
     SETUP_PLUGIN_TEST(registry_plugin)
 
