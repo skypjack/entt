@@ -83,7 +83,7 @@ struct create_from_constructor {
 template<>
 struct entt::component_traits<std::unordered_set<char>> {
     static constexpr auto in_place_delete = true;
-    static constexpr auto page_size = 128u;
+    static constexpr auto page_size = 4u;
 };
 
 inline bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
@@ -1197,6 +1197,21 @@ TEST(Storage, IteratorConversion) {
     ASSERT_GE(cit, it);
     ASSERT_EQ(it, cit);
     ASSERT_NE(++cit, it);
+}
+
+TEST(Storage, IteratorPageSizeAwareness) {
+    entt::storage<std::unordered_set<char>> pool;
+    constexpr auto page_size = entt::component_traits<std::unordered_set<char>>::page_size;
+    const std::unordered_set<char> check{'c'};
+
+    for(unsigned int next{}; next < page_size; ++next) {
+        pool.emplace(entt::entity{next});
+    }
+
+    pool.emplace(entt::entity{page_size}, check);
+
+    // test the proper use of component traits by the storage iterator
+    ASSERT_EQ(*pool.begin(), check);
 }
 
 TEST(Storage, Iterable) {
