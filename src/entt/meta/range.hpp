@@ -20,12 +20,12 @@ template<typename Type, typename It>
 class meta_range_iterator final {
     template<typename Value>
     auto to_value(int, const Value &value) const -> decltype(*value, Type{}) {
-        return &*it->second;
+        return &*value;
     }
 
     template<typename Value>
     Type to_value(char, const Value &value) const {
-        return &it->second;
+        return &value;
     }
 
 public:
