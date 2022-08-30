@@ -34,7 +34,7 @@ class storage_iterator final {
 
     using container_type = std::remove_const_t<Container>;
     using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
-    using comp_traits = component_traits<typename container_type::value_type>;
+    using comp_traits = component_traits<std::remove_pointer_t<typename container_type::value_type>>;
 
     using iterator_traits = std::iterator_traits<std::conditional_t<
         std::is_const_v<Container>,
