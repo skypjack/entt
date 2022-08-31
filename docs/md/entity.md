@@ -41,6 +41,7 @@
     * [One example to rule them all](#one-example-to-rule-them-all)
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
+    * [Iteration order](#iteration-order)
     * [View pack](#view-pack)
     * [Runtime views](#runtime-views)
   * [Groups](#groups)
@@ -1569,6 +1570,46 @@ for(auto entity: view) {
 
 **Note**: prefer the `get` member function of a view instead of that of a
 registry during iterations to get the types iterated by the view itself.
+
+### Iteration order
+
+By default, a view is iterated along the pool that contains the smallest number
+of components.<br/>
+For example, if the registry contains fewer `velocity`s than it contains
+`position`s, then the order of the elements returned by the following view
+depends on how the `velocity` components are arranged in their pool:
+
+```cpp
+for(auto entity: registry.view<positon, velocity>()) { 
+    // ...
+}
+```
+
+Moreover, the order of types when constructing a view doesn't matter. Neither
+does the order of views in a view pack.<br/>
+However, it's possible to _enforce_ iteration of a view by given component order
+by means of the `use` function:
+
+```cpp
+for(auto entity : registry.view<position, velocity>().use<position>()) {
+    // ...
+}
+```
+
+On the other hand, if all a user wants is to iterate the elements in reverse
+order, this is possible for a single type view using its reverse iterators:
+
+```cpp
+auto view = registry.view<position>();
+
+for(auto it = view.rbegin(), last = view.rend(); it != last; ++iter) {
+    // ...
+}
+```
+
+Unfortunately, multi type views don't offer reverse iterators. Therefore, in
+this case it's a must to implement this functionality manually or to use single
+type views to lead the iteration.
 
 ### View pack
 
