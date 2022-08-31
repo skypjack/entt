@@ -38,7 +38,7 @@ public:
     meta_range_iterator() noexcept
         : it{} {}
 
-    meta_range_iterator(It iter) noexcept
+    meta_range_iterator(const It iter) noexcept
         : it{iter} {}
 
     meta_range_iterator &operator++() noexcept {
@@ -50,25 +50,92 @@ public:
         return ++(*this), orig;
     }
 
-    [[nodiscard]] reference operator*() const noexcept {
-        return std::make_pair(it->first, to_value(0, it->second));
+    constexpr meta_range_iterator &operator--() noexcept {
+        return --it, *this;
     }
 
-    [[nodiscard]] pointer operator->() const noexcept {
+    constexpr meta_range_iterator operator--(int) noexcept {
+        meta_range_iterator orig = *this;
+        return operator--(), orig;
+    }
+
+    constexpr meta_range_iterator &operator+=(const difference_type value) noexcept {
+        it += value;
+        return *this;
+    }
+
+    constexpr meta_range_iterator operator+(const difference_type value) const noexcept {
+        meta_range_iterator copy = *this;
+        return (copy += value);
+    }
+
+    constexpr meta_range_iterator &operator-=(const difference_type value) noexcept {
+        return (*this += -value);
+    }
+
+    constexpr meta_range_iterator operator-(const difference_type value) const noexcept {
+        return (*this + -value);
+    }
+
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
+        return {it[value].first, to_value(0, it[value].second)};
+    }
+
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
         return operator*();
     }
 
-    [[nodiscard]] bool operator==(const meta_range_iterator &other) const noexcept {
-        return it == other.it;
+    [[nodiscard]] constexpr reference operator*() const noexcept {
+        return {it->first, to_value(0, it->second)};
     }
 
-    [[nodiscard]] bool operator!=(const meta_range_iterator &other) const noexcept {
-        return !(*this == other);
-    }
+    template<typename... Args>
+    friend constexpr std::ptrdiff_t operator-(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
+
+    template<typename... Args>
+    friend constexpr bool operator==(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
+
+    template<typename... Args>
+    friend constexpr bool operator<(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
 
 private:
     It it;
 };
+
+template<typename... Args>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return lhs.it - rhs.it;
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator==(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return lhs.it == rhs.it;
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator!=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator<(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return lhs.it < rhs.it;
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator>(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return rhs < lhs;
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator<=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return !(lhs > rhs);
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator>=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return !(lhs < rhs);
+}
 
 } // namespace internal
 
