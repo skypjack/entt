@@ -2132,3 +2132,27 @@ TEST(Registry, NoEtoType) {
 
     ASSERT_EQ((std::get<0>(view.get<no_eto_type, int>(entity))), (std::get<0>(cview.get<const no_eto_type, const int>(entity))));
 }
+
+TEST(Registry, CtxAndPoolMemberDestructionOrder) {
+    using test_type = std::shared_ptr<int>;
+
+    struct test_component {
+        test_type ctx{};
+        int *dtor_use_count{};
+
+        ~test_component() {
+            *dtor_use_count = ctx.use_count();
+        }
+    };
+
+    int dtor_use_count = 0;
+
+    {
+        entt::registry registry;
+        const test_type& test_ctx = registry.ctx().emplace<test_type>(std::make_shared<int>(0));
+        const entt::entity entity = registry.create();
+        registry.emplace<test_component>(entity, test_ctx, &dtor_use_count);
+    }
+
+    ASSERT_EQ(2, dtor_use_count);
+}
