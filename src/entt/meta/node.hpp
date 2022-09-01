@@ -53,20 +53,20 @@ struct meta_prop_node {
 };
 
 struct meta_base_node {
-    meta_type_node *(*type)() noexcept;
-    meta_any (*cast)(meta_any) noexcept;
+    meta_type_node *(*type)() noexcept {nullptr};
+    meta_any (*cast)(meta_any) noexcept {nullptr};
 };
 
 struct meta_conv_node {
-    meta_any (*conv)(const meta_any &);
+    meta_any (*conv)(const meta_any &){nullptr};
 };
 
 struct meta_ctor_node {
     using size_type = std::size_t;
 
-    size_type arity;
-    meta_type (*arg)(const size_type) noexcept;
-    meta_any (*invoke)(meta_any *const);
+    size_type arity{0u};
+    meta_type (*arg)(const size_type) noexcept {nullptr};
+    meta_any (*invoke)(meta_any *const){nullptr};
 };
 
 struct meta_dtor_node {
@@ -76,23 +76,23 @@ struct meta_dtor_node {
 struct meta_data_node {
     using size_type = std::size_t;
 
-    meta_traits traits;
-    size_type arity;
-    meta_type_node *(*type)() noexcept;
-    meta_type (*arg)(const size_type) noexcept;
-    bool (*set)(meta_handle, meta_any);
-    meta_any (*get)(meta_handle);
+    meta_traits traits{meta_traits::is_none};
+    size_type arity{0u};
+    meta_type_node *(*type)() noexcept {nullptr};
+    meta_type (*arg)(const size_type) noexcept {nullptr};
+    bool (*set)(meta_handle, meta_any){nullptr};
+    meta_any (*get)(meta_handle){nullptr};
     dense_map<id_type, meta_prop_node, identity> prop{};
 };
 
 struct meta_func_node {
     using size_type = std::size_t;
 
-    meta_traits traits;
-    size_type arity;
-    meta_type_node *(*ret)() noexcept;
-    meta_type (*arg)(const size_type) noexcept;
-    meta_any (*invoke)(meta_handle, meta_any *const);
+    meta_traits traits{meta_traits::is_none};
+    size_type arity{0u};
+    meta_type_node *(*ret)() noexcept {nullptr};
+    meta_type (*arg)(const size_type) noexcept {nullptr};
+    meta_any (*invoke)(meta_handle, meta_any *const){nullptr};
     dense_map<id_type, meta_prop_node, identity> prop{};
     std::unique_ptr<meta_func_node> next{};
 };
@@ -108,15 +108,15 @@ struct meta_template_node {
 struct meta_type_node {
     using size_type = std::size_t;
 
-    const type_info *info;
-    id_type id;
-    meta_traits traits;
-    size_type size_of;
-    meta_type_node *(*remove_pointer)() noexcept;
-    meta_any (*default_constructor)();
-    double (*conversion_helper)(void *, const void *);
-    meta_any (*from_void)(void *, const void *);
-    meta_template_node templ;
+    const type_info *info{nullptr};
+    id_type id{};
+    meta_traits traits{meta_traits::is_none};
+    size_type size_of{0u};
+    meta_type_node *(*remove_pointer)() noexcept {nullptr};
+    meta_any (*default_constructor)(){nullptr};
+    double (*conversion_helper)(void *, const void *){nullptr};
+    meta_any (*from_void)(void *, const void *){nullptr};
+    meta_template_node templ{};
     dense_map<id_type, meta_prop_node, identity> prop{};
     dense_map<id_type, meta_ctor_node, identity> ctor{};
     dense_map<id_type, meta_base_node, identity> base{};
