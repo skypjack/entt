@@ -99,11 +99,11 @@ public:
         : owner{internal::resolve<Type>()} {}
 
     /**
-     * @brief Makes a meta type _searchable_.
-     * @param id Optional unique identifier.
+     * @brief Assigns a custom unique identifier to a meta type.
+     * @param id A custom unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto type(const id_type id = type_hash<Type>::value()) noexcept {
+    auto type(const id_type id) noexcept {
         ENTT_ASSERT(owner->id == id || !resolve(id), "Duplicate identifier");
         owner->id = id;
         return meta_factory<Type, decltype(internal::meta_type_node::prop)>{owner->prop};
