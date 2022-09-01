@@ -207,7 +207,7 @@ TEST_F(MetaCtor, ReRegistration) {
 
     auto *node = entt::internal::resolve<double>();
 
-    ASSERT_NE(node->ctor, nullptr);
+    ASSERT_FALSE(node->ctor.empty());
     // implicitly generated default constructor is not cleared
     ASSERT_NE(node->default_constructor, nullptr);
 }
