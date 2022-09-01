@@ -1463,11 +1463,11 @@ public:
     }
 
 private:
-    dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
-    std::vector<group_data> groups;
+    context vars;
     std::vector<entity_type> epool;
     entity_type free_list;
-    context vars;
+    dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
+    std::vector<group_data> groups;
 };
 
 } // namespace entt
