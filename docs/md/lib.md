@@ -50,40 +50,29 @@ However, what is offered should hopefully serve as a basis for all of them.
 
 The runtime reflection system deserves a special mention when it comes to using
 it across boundaries.<br/>
-Since it's linked already to a static context to which the visible components
-are attached and different contexts don't relate to each other, they must be
-_shared_ to allow the use of meta types across boundaries.
+Since it's linked already to a static context to which the elements are attached
+and different contexts don't relate to each other, they must be _shared_ to
+allow the use of meta types across boundaries.
 
-Sharing a context is trivial though. First of all, the local one must be
-acquired in the main space:
-
-```cpp
-entt::meta_ctx ctx{};
-```
-
-Then, it must passed to the receiving space that will set it as its global
-context, thus releasing the local one that remains available but is no longer
-referred to by the runtime reflection system:
+Fortunately, sharing a context is also trivial to do. First of all, the local
+one is acquired in the main space:
 
 ```cpp
-entt::meta_ctx::bind(ctx);
+auto handle = entt::locator<entt::meta_ctx>::handle();
 ```
 
-From now on, both spaces will refer to the same context and on it will be
-attached the new visible meta types, no matter where they are created.<br/>
-A context can also be reset and then associated again locally as:
+Then, it's passed to the receiving space that sets it as its default context,
+thus discarding or storing aside the local one:
 
 ```cpp
-entt::meta_ctx::bind(entt::meta_ctx{});
+entt::locator<entt::meta_ctx>::reset(handle);
 ```
 
-This is allowed because local and global contexts are separated. Therefore, it's
-always possible to make the local context the current one again.
-
-Before to release a context, all locally registered types should be reset to
-avoid dangling references. Otherwise, if a type is accessed from another space
-by name, there could be an attempt to address its parts that are no longer
-available.
+From now on, both spaces refer to the same context and on it are attached all
+new meta types, no matter where they are created.<br/>
+Note that resetting the main context doesn't also propagate changes across
+boundaries. In other words, resetting a context results in the decoupling of the
+two sides and therefore a divergence in the contents.
 
 ## Memory Management
 
