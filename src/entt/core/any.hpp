@@ -368,12 +368,21 @@ public:
      * @param other Wrapper with which to compare.
      * @return False if the two objects differ in their content, true otherwise.
      */
-    bool operator==(const basic_any &other) const noexcept {
+    [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
         if(vtable && *info == *other.info) {
             return (vtable(operation::compare, *this, other.data()) != nullptr);
         }
 
         return (!vtable && !other.vtable);
+    }
+
+    /**
+     * @brief Checks if two wrappers differ in their content.
+     * @param other Wrapper with which to compare.
+     * @return True if the two objects differ in their content, false otherwise.
+     */
+    [[nodiscard]] bool operator!=(const basic_any &other) const noexcept {
+        return !(*this == other);
     }
 
     /**
@@ -406,19 +415,6 @@ private:
     vtable_type *vtable;
     policy mode;
 };
-
-/**
- * @brief Checks if two wrappers differ in their content.
- * @tparam Len Size of the storage reserved for the small buffer optimization.
- * @tparam Align Alignment requirement.
- * @param lhs A wrapper, either empty or not.
- * @param rhs A wrapper, either empty or not.
- * @return True if the two wrappers differ in their content, false otherwise.
- */
-template<std::size_t Len, std::size_t Align>
-[[nodiscard]] inline bool operator!=(const basic_any<Len, Align> &lhs, const basic_any<Len, Align> &rhs) noexcept {
-    return !(lhs == rhs);
-}
 
 /**
  * @brief Performs type-safe access to the contained object.
