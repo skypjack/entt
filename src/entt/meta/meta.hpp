@@ -525,8 +525,13 @@ public:
     }
 
     /*! @copydoc any::operator== */
-    [[nodiscard]] bool operator==(const meta_any &other) const {
+    [[nodiscard]] bool operator==(const meta_any &other) const noexcept {
         return (!node && !other.node) || (node && other.node && *node->info == *other.node->info && storage == other.storage);
+    }
+
+    /*! @copydoc any::operator!= */
+    [[nodiscard]] bool operator!=(const meta_any &other) const noexcept {
+        return !(*this == other);
     }
 
     /*! @copydoc any::as_ref */
@@ -549,16 +554,6 @@ private:
     internal::meta_type_node *node;
     vtable_type *vtable;
 };
-
-/**
- * @brief Checks if two wrappers differ in their content.
- * @param lhs A wrapper, either empty or not.
- * @param rhs A wrapper, either empty or not.
- * @return True if the two wrappers differ in their content, false otherwise.
- */
-[[nodiscard]] inline bool operator!=(const meta_any &lhs, const meta_any &rhs) noexcept {
-    return !(lhs == rhs);
-}
 
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
