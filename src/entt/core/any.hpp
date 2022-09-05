@@ -53,11 +53,10 @@ class basic_any {
     using operation = internal::any_operation;
     using policy = internal::any_policy;
 
-    using storage_type = std::aligned_storage_t<Len + !Len, Align>;
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
-    static constexpr bool in_situ = Len && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ = Len && alignof(Type) <= Align && sizeof(Type) <= Len &&std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     static const void *basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const basic_any &value, [[maybe_unused]] const void *other) {
@@ -409,7 +408,7 @@ public:
 private:
     union {
         const void *instance;
-        storage_type storage;
+        alignas(Align) std::byte storage[Len + !Len];
     };
     const type_info *info;
     vtable_type *vtable;
