@@ -453,9 +453,11 @@ template<typename Type>
 inline void meta_reset(const id_type id) noexcept {
     auto &&context = internal::meta_context::from(locator<meta_ctx>::value_or());
 
-    for(auto it = context.value.begin(); it != context.value.end(); ++it) {
+    for(auto it = context.value.begin(); it != context.value.end();) {
         if(it->second->id == id) {
             it = context.value.erase(it);
+        } else {
+            ++it;
         }
     }
 }

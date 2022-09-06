@@ -5,9 +5,9 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
-#include <entt/locator/locator.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/core/utility.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/container.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
@@ -523,6 +523,16 @@ TEST_F(MetaType, Reset) {
     entt::meta<clazz_t>().type("clazz"_hs);
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
+}
+
+TEST_F(MetaType, ResetLast) {
+    auto id = (entt::resolve().cend() - 1u)->second.id();
+
+    ASSERT_TRUE(entt::resolve(id));
+
+    entt::meta_reset(id);
+
+    ASSERT_FALSE(entt::resolve(id));
 }
 
 TEST_F(MetaType, ResetAll) {
