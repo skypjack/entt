@@ -428,7 +428,7 @@ public:
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return meta_any{};
+            return {};
         } else {
             return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>());
         }
@@ -692,7 +692,7 @@ struct meta_data {
     using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
-    meta_data(const node_type *curr = nullptr) noexcept
+    meta_data(const node_type &curr = {}) noexcept
         : node{curr} {}
 
     /**
@@ -700,7 +700,7 @@ struct meta_data {
      * @return The number of setters available.
      */
     [[nodiscard]] size_type arity() const noexcept {
-        return node->arity;
+        return node.arity;
     }
 
     /**
@@ -708,7 +708,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return static_cast<bool>(node->traits & internal::meta_traits::is_const);
+        return static_cast<bool>(node.traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -716,7 +716,7 @@ struct meta_data {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return static_cast<bool>(node->traits & internal::meta_traits::is_static);
+        return static_cast<bool>(node.traits & internal::meta_traits::is_static);
     }
 
     /*! @copydoc meta_any::type */
@@ -737,7 +737,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node->set && node->set(std::move(instance), std::forward<Type>(value));
+        return node.set && node.set(std::move(instance), std::forward<Type>(value));
     }
 
     /**
@@ -750,7 +750,7 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node->get(std::move(instance));
+        return node.get(std::move(instance));
     }
 
     /**
@@ -765,8 +765,8 @@ struct meta_data {
      * @return An iterable range to visit registered meta properties.
      */
     [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_data_node::cold_data_t::prop)::const_iterator> prop() const noexcept {
-        if(node->details) {
-            return {node->details->prop.cbegin(), node->details->prop.cend()};
+        if(node.details) {
+            return {node.details->prop.cbegin(), node.details->prop.cend()};
         }
 
         return {};
@@ -778,8 +778,8 @@ struct meta_data {
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        if(node->details) {
-            if(auto it = node->details->prop.find(key); it != node->details->prop.cend()) {
+        if(node.details) {
+            if(auto it = node.details->prop.find(key); it != node.details->prop.cend()) {
                 return it->second;
             }
         }
@@ -792,11 +792,11 @@ struct meta_data {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(node == nullptr);
+        return !(node.type == nullptr);
     }
 
 private:
-    const node_type *node;
+    node_type node;
 };
 
 /*! @brief Opaque wrapper for member functions. */
@@ -1174,7 +1174,7 @@ public:
     [[nodiscard]] meta_data data(const id_type id) const {
         if(node->details) {
             if(auto it = node->details->data.find(id); it != node->details->data.cend()) {
-                return &it->second;
+                return it->second;
             }
         }
 
@@ -1184,7 +1184,7 @@ public:
             }
         }
 
-        return meta_data{};
+        return {};
     }
 
     /**
@@ -1222,7 +1222,7 @@ public:
             }
         }
 
-        return meta_func{};
+        return {};
     }
 
     /**
@@ -1251,7 +1251,7 @@ public:
             return node->default_constructor();
         }
 
-        return meta_any{};
+        return {};
     }
 
     /**
@@ -1316,7 +1316,7 @@ public:
             }
         }
 
-        return meta_any{};
+        return {};
     }
 
     /**
@@ -1512,7 +1512,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return node->type();
+    return node.type();
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
@@ -1520,7 +1520,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
-    return index < arity() ? node->arg(index) : meta_type{};
+    return index < arity() ? node.arg(index) : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
