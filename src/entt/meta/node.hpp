@@ -49,7 +49,7 @@ struct meta_type_node;
 
 struct meta_prop_node {
     meta_type_node *(*type)() noexcept {};
-    basic_any<0u> value{};
+    std::shared_ptr<void> value{};
 };
 
 struct meta_base_node {

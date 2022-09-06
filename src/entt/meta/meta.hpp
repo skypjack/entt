@@ -669,7 +669,7 @@ struct meta_prop {
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return (node && node->type) ? node->type()->from_void(nullptr, node->value.data()) : meta_any{};
+        return (node && node->type) ? node->type()->from_void(nullptr, node->value.get()) : meta_any{};
     }
 
     /**

@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -82,7 +83,7 @@ public:
 
         node->details->prop[key] = internal::meta_prop_node{
             &internal::resolve<std::decay_t<Value>>...,
-            std::forward<Value>(value)...};
+            std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...};
 
         return *this;
     }
