@@ -25,7 +25,7 @@ class meta_range_iterator final {
 
     template<typename Value>
     Type to_value(char, const Value &value) const {
-        if constexpr(std::is_same_v<std::decay_t<Value>, internal::meta_prop_node> || std::is_same_v<std::decay_t<Value>, internal::meta_data_node>) {
+        if constexpr(std::is_same_v<std::decay_t<Value>, internal::meta_prop_node> || std::is_same_v<std::decay_t<Value>, internal::meta_data_node> || std::is_same_v<std::decay_t<Value>, internal::meta_func_node>) {
             return value;
         } else {
             return &value;

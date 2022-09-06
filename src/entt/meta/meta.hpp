@@ -807,7 +807,7 @@ struct meta_func {
     using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
-    meta_func(const node_type *curr = nullptr) noexcept
+    meta_func(const node_type &curr = {}) noexcept
         : node{curr} {}
 
     /**
@@ -815,7 +815,7 @@ struct meta_func {
      * @return The number of arguments accepted by the member function.
      */
     [[nodiscard]] size_type arity() const noexcept {
-        return node->arity;
+        return node.arity;
     }
 
     /**
@@ -823,7 +823,7 @@ struct meta_func {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return static_cast<bool>(node->traits & internal::meta_traits::is_const);
+        return static_cast<bool>(node.traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -831,7 +831,7 @@ struct meta_func {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return static_cast<bool>(node->traits & internal::meta_traits::is_static);
+        return static_cast<bool>(node.traits & internal::meta_traits::is_static);
     }
 
     /**
@@ -862,7 +862,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return sz == arity() ? node->invoke(std::move(instance), args) : meta_any{};
+        return sz == arity() ? node.invoke(std::move(instance), args) : meta_any{};
     }
 
     /**
@@ -883,8 +883,8 @@ struct meta_func {
 
     /*! @copydoc meta_data::prop */
     [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_func_node::cold_data_t::prop)::const_iterator> prop() const noexcept {
-        if(node->details) {
-            return {node->details->prop.cbegin(), node->details->prop.cend()};
+        if(node.details) {
+            return {node.details->prop.cbegin(), node.details->prop.cend()};
         }
 
         return {};
@@ -896,8 +896,8 @@ struct meta_func {
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        if(node->details) {
-            if(auto it = node->details->prop.find(key); it != node->details->prop.cend()) {
+        if(node.details) {
+            if(auto it = node.details->prop.find(key); it != node.details->prop.cend()) {
                 return it->second;
             }
         }
@@ -910,7 +910,7 @@ struct meta_func {
      * @return The next overload of the given function, if any.
      */
     [[nodiscard]] meta_func next() const {
-        return node->next ? meta_func{node->next.get()} : meta_func{};
+        return node.next ? meta_func{*node.next} : meta_func{};
     }
 
     /**
@@ -918,11 +918,11 @@ struct meta_func {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(node == nullptr);
+        return !(node.invoke == nullptr);
     }
 
 private:
-    const node_type *node;
+    node_type node;
 };
 
 /*! @brief Opaque wrapper for types. */
@@ -1212,7 +1212,7 @@ public:
     [[nodiscard]] meta_func func(const id_type id) const {
         if(node->details) {
             if(auto it = node->details->func.find(id); it != node->details->func.cend()) {
-                return &it->second;
+                return it->second;
             }
         }
 
@@ -1516,7 +1516,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return node->ret();
+    return node.ret();
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
@@ -1524,7 +1524,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
-    return index < arity() ? node->arg(index) : meta_type{};
+    return index < arity() ? node.arg(index) : meta_type{};
 }
 
 /**
