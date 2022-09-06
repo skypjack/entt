@@ -250,7 +250,8 @@ private:
 template<typename Entity, typename Allocator>
 class basic_registry {
     using entity_traits = entt_traits<Entity>;
-    using basic_common_type = basic_sparse_set<Entity>;
+    using basic_common_type = basic_sparse_set<Entity, Allocator>;
+    using alloc_traits = typename std::allocator_traits<Allocator>;
 
     template<typename Type>
     using storage_for_type = typename storage_for<Type, Entity>::type;
