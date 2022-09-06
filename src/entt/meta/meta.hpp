@@ -1179,7 +1179,7 @@ public:
         }
 
         for(auto &&curr: base()) {
-            if(auto &&elem = curr.second.data(id); elem) {
+            if(auto elem = curr.second.data(id); elem) {
                 return elem;
             }
         }
@@ -1217,7 +1217,7 @@ public:
         }
 
         for(auto &&curr: base()) {
-            if(auto &&elem = curr.second.func(id); elem) {
+            if(auto elem = curr.second.func(id); elem) {
                 return elem;
             }
         }
