@@ -661,7 +661,7 @@ struct meta_prop {
      * @brief Constructs an instance from a given node.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_prop(const node_type *curr = nullptr) noexcept
+    meta_prop(const node_type &curr = {}) noexcept
         : node{curr} {}
 
     /**
@@ -669,7 +669,7 @@ struct meta_prop {
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return (node && node->type) ? node->type()->from_void(nullptr, node->value.get()) : meta_any{};
+        return node.value ? node.type()->from_void(nullptr, node.value.get()) : meta_any{};
     }
 
     /**
@@ -677,11 +677,11 @@ struct meta_prop {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(node == nullptr);
+        return !(node.type == nullptr);
     }
 
 private:
-    const node_type *node;
+    node_type node;
 };
 
 /*! @brief Opaque wrapper for data members. */
@@ -780,11 +780,11 @@ struct meta_data {
     [[nodiscard]] meta_prop prop(const id_type key) const {
         if(node->details) {
             if(auto it = node->details->prop.find(key); it != node->details->prop.cend()) {
-                return &it->second;
+                return it->second;
             }
         }
 
-        return nullptr;
+        return {};
     }
 
     /**
@@ -898,11 +898,11 @@ struct meta_func {
     [[nodiscard]] meta_prop prop(const id_type key) const {
         if(node->details) {
             if(auto it = node->details->prop.find(key); it != node->details->prop.cend()) {
-                return &it->second;
+                return it->second;
             }
         }
 
-        return nullptr;
+        return {};
     }
 
     /**
@@ -1394,7 +1394,7 @@ public:
     [[nodiscard]] meta_prop prop(const id_type key) const {
         if(node->details) {
             if(auto it = node->details->prop.find(key); it != node->details->prop.cend()) {
-                return &it->second;
+                return it->second;
             }
         }
 
@@ -1404,7 +1404,7 @@ public:
             }
         }
 
-        return nullptr;
+        return {};
     }
 
     /**

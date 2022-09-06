@@ -78,12 +78,16 @@ public:
      * @return An extended meta factory for the given type.
      */
     template<typename... Value>
-    meta_factory prop(id_type key, Value &&...value) {
+    meta_factory prop(id_type key, [[maybe_unused]] Value &&...value) {
         internal::meta_details_setup(*node);
 
-        node->details->prop[key] = internal::meta_prop_node{
-            &internal::resolve<std::decay_t<Value>>...,
-            std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...};
+        if constexpr(sizeof...(Value) == 0u) {
+            node->details->prop[key] = internal::meta_prop_node{&internal::resolve<void>};
+        } else {
+            node->details->prop[key] = internal::meta_prop_node{
+                &internal::resolve<std::decay_t<Value>>...,
+                std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...};
+        }
 
         return *this;
     }
