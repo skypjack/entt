@@ -161,7 +161,7 @@ public:
                 return forward_as_meta(*static_cast<const Base *>(static_cast<const Type *>(std::as_const(other).data())));
             }};
 
-        return meta_factory<Type>{};
+        return *this;
     }
 
     /**
@@ -186,7 +186,7 @@ public:
                 return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data())));
             }};
 
-        return meta_factory<Type>{};
+        return *this;
     }
 
     /**
@@ -208,7 +208,7 @@ public:
                 return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance.data())));
             }};
 
-        return meta_factory<Type>{};
+        return *this;
     }
 
     /**
@@ -236,7 +236,7 @@ public:
             &meta_arg<typename descriptor::args_type>,
             &meta_construct<Type, Candidate, Policy>};
 
-        return meta_factory<Type>{};
+        return *this;
     }
 
     /**
@@ -259,7 +259,7 @@ public:
             &meta_arg<typename descriptor::args_type>,
             &meta_construct<Type, Args...>};
 
-        return meta_factory<Type>{};
+        return *this;
     }
 
     /**
@@ -284,7 +284,7 @@ public:
     auto dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         owner->dtor.dtor = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
-        return meta_factory<Type>{};
+        return *this;
     }
 
     /**
