@@ -54,6 +54,10 @@ class basic_any {
     using policy = internal::any_policy;
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
+    struct storage_type {
+        alignas(Align) std::byte data[Len + !Len];
+    };
+
     template<typename Type>
     static constexpr bool in_situ = Len && alignof(Type) <= Align && sizeof(Type) <= Len &&std::is_nothrow_move_constructible_v<Type>;
 
@@ -407,9 +411,7 @@ public:
 private:
     union {
         const void *instance;
-        struct storage_type {
-            alignas(Align) std::byte data[Len + !Len];
-        } storage;
+        storage_type storage;
     };
     const type_info *info;
     vtable_type *vtable;
