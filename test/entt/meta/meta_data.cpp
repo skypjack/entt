@@ -646,13 +646,15 @@ TEST_F(MetaData, ReRegistration) {
     auto *node = entt::internal::resolve<base_t>();
     auto type = entt::resolve<base_t>();
 
-    ASSERT_FALSE(node->data.empty());
-    ASSERT_EQ(node->data.size(), 1u);
+    ASSERT_TRUE(node->details);
+    ASSERT_FALSE(node->details->data.empty());
+    ASSERT_EQ(node->details->data.size(), 1u);
     ASSERT_TRUE(type.data("value"_hs));
 
     entt::meta<base_t>().data<&base_t::value>("field"_hs);
 
-    ASSERT_EQ(node->data.size(), 2u);
+    ASSERT_TRUE(node->details);
+    ASSERT_EQ(node->details->data.size(), 2u);
     ASSERT_TRUE(type.data("value"_hs));
     ASSERT_TRUE(type.data("field"_hs));
 }

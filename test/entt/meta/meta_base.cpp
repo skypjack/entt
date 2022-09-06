@@ -183,6 +183,7 @@ TEST_F(MetaBase, ReRegistration) {
 
     auto *node = entt::internal::resolve<derived_t>();
 
-    ASSERT_FALSE(node->base.empty());
-    ASSERT_EQ(node->base.size(), 2u);
+    ASSERT_TRUE(node->details);
+    ASSERT_FALSE(node->details->base.empty());
+    ASSERT_EQ(node->details->base.size(), 2u);
 }

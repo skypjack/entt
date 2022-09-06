@@ -89,8 +89,9 @@ TEST_F(MetaProp, ReRegistration) {
     auto *node = entt::internal::resolve<base_1_t>();
     auto type = entt::resolve<base_1_t>();
 
-    ASSERT_FALSE(node->prop.empty());
-    ASSERT_EQ(node->prop.size(), 1u);
+    ASSERT_TRUE(node->details);
+    ASSERT_FALSE(node->details->prop.empty());
+    ASSERT_EQ(node->details->prop.size(), 1u);
 
     ASSERT_TRUE(type.prop("int"_hs));
     ASSERT_EQ(type.prop("int"_hs).value().cast<int>(), 42);
@@ -98,8 +99,9 @@ TEST_F(MetaProp, ReRegistration) {
     entt::meta<base_1_t>().prop("int"_hs, 0);
     entt::meta<base_1_t>().prop("double"_hs, 3.);
 
-    ASSERT_FALSE(node->prop.empty());
-    ASSERT_EQ(node->prop.size(), 2u);
+    ASSERT_TRUE(node->details);
+    ASSERT_FALSE(node->details->prop.empty());
+    ASSERT_EQ(node->details->prop.size(), 2u);
 
     ASSERT_TRUE(type.prop("int"_hs));
     ASSERT_TRUE(type.prop("double"_hs));
