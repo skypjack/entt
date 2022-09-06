@@ -54,7 +54,7 @@ template<typename Type>
     auto &&context = internal::meta_context::from(locator<meta_ctx>::value_or());
 
     if(auto it = context.value.find(info.hash()); it != context.value.cend()) {
-        return it->second.get();
+        return it->second;
     }
 
     return {};

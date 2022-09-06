@@ -205,10 +205,10 @@ TEST_F(MetaCtor, NonDefaultConstructibleType) {
 TEST_F(MetaCtor, ReRegistration) {
     SetUp();
 
-    auto *node = entt::internal::resolve<double>();
+    auto &&node = entt::internal::resolve<double>();
 
-    ASSERT_TRUE(node->details);
-    ASSERT_FALSE(node->details->ctor.empty());
+    ASSERT_TRUE(node.details);
+    ASSERT_FALSE(node.details->ctor.empty());
     // implicitly generated default constructor is not cleared
-    ASSERT_NE(node->default_constructor, nullptr);
+    ASSERT_NE(node.default_constructor, nullptr);
 }

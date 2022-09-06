@@ -17,22 +17,7 @@ namespace entt {
 namespace internal {
 
 template<typename Type, typename It>
-class meta_range_iterator final {
-    template<typename Value>
-    auto to_value(int, const Value &value) const -> decltype(*value, Type{}) {
-        return &*value;
-    }
-
-    template<typename Value>
-    Type to_value(char, const Value &value) const {
-        if constexpr(std::is_same_v<std::decay_t<Value>, internal::meta_prop_node> || std::is_same_v<std::decay_t<Value>, internal::meta_data_node> || std::is_same_v<std::decay_t<Value>, internal::meta_func_node>) {
-            return value;
-        } else {
-            return &value;
-        }
-    }
-
-public:
+struct meta_range_iterator final {
     using difference_type = std::ptrdiff_t;
     using value_type = std::pair<id_type, Type>;
     using pointer = input_iterator_pointer<value_type>;
@@ -82,7 +67,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        return {it[value].first, to_value(0, it[value].second)};
+        return {it[value].first, it[value].second};
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
@@ -90,7 +75,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return {it->first, to_value(0, it->second)};
+        return {it->first, it->second};
     }
 
     template<typename... Args>

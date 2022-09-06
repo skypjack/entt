@@ -48,12 +48,12 @@ enum class meta_traits : std::uint32_t {
 struct meta_type_node;
 
 struct meta_prop_node {
-    meta_type_node *(*type)() noexcept {};
+    meta_type_node (*type)() noexcept {};
     std::shared_ptr<void> value{};
 };
 
 struct meta_base_node {
-    meta_type_node *(*type)() noexcept {};
+    meta_type_node (*type)() noexcept {};
     meta_any (*cast)(meta_any) noexcept {};
 };
 
@@ -82,7 +82,7 @@ struct meta_data_node {
 
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
-    meta_type_node *(*type)() noexcept {};
+    meta_type_node (*type)() noexcept {};
     meta_type (*arg)(const size_type) noexcept {};
     bool (*set)(meta_handle, meta_any){};
     meta_any (*get)(meta_handle){};
@@ -98,7 +98,7 @@ struct meta_func_node {
 
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
-    meta_type_node *(*ret)() noexcept {};
+    meta_type_node (*ret)() noexcept {};
     meta_type (*arg)(const size_type) noexcept {};
     meta_any (*invoke)(meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next{};
@@ -109,8 +109,8 @@ struct meta_template_node {
     using size_type = std::size_t;
 
     size_type arity{0u};
-    meta_type_node *(*type)() noexcept {};
-    meta_type_node *(*arg)(const size_type) noexcept {};
+    meta_type_node (*type)() noexcept {};
+    meta_type_node (*arg)(const size_type) noexcept {};
 };
 
 struct meta_type_node {
@@ -129,7 +129,7 @@ struct meta_type_node {
     id_type id{};
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
-    meta_type_node *(*remove_pointer)() noexcept {};
+    meta_type_node (*remove_pointer)() noexcept {};
     meta_any (*default_constructor)(){};
     double (*conversion_helper)(void *, const void *){};
     meta_any (*from_void)(void *, const void *){};
@@ -139,11 +139,11 @@ struct meta_type_node {
 };
 
 template<typename Type>
-meta_type_node *resolve() noexcept;
+meta_type_node resolve() noexcept;
 
 template<typename... Args>
-[[nodiscard]] meta_type_node *meta_arg_node(type_list<Args...>, const std::size_t index) noexcept {
-    meta_type_node *args[sizeof...(Args) + 1u]{nullptr, internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>()...};
+[[nodiscard]] meta_type_node meta_arg_node(type_list<Args...>, const std::size_t index) noexcept {
+    meta_type_node args[sizeof...(Args) + 1u]{{}, internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>()...};
     return args[index + 1u];
 }
 
@@ -202,21 +202,21 @@ template<typename Type>
         return meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve<typename meta_template_traits<Type>::class_type>,
-            +[](const std::size_t index) noexcept -> meta_type_node * { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }};
+            +[](const std::size_t index) noexcept -> meta_type_node { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }};
     } else {
         return meta_template_node{};
     }
 }
 
 template<typename Type>
-[[nodiscard]] meta_type_node *resolve() noexcept {
+[[nodiscard]] meta_type_node resolve() noexcept {
     static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
 
     auto &&context = meta_context::from(locator<meta_ctx>::value_or());
     auto it = context.value.find(type_id<Type>().hash());
 
     if(it == context.value.end()) {
-        meta_type_node node{
+        return meta_type_node{
             &type_id<Type>(),
             type_id<Type>().hash(),
             (std::is_arithmetic_v<Type> ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)
@@ -234,11 +234,9 @@ template<typename Type>
             meta_conversion_helper<Type>(),
             meta_from_void<Type>(),
             meta_template_info<Type>()};
-
-        it = context.value.insert_or_assign(node.info->hash(), std::make_unique<meta_type_node>(std::move(node))).first;
     }
 
-    return it->second.get();
+    return it->second;
 }
 
 } // namespace internal

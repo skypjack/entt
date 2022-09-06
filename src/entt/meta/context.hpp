@@ -1,7 +1,6 @@
 #ifndef ENTT_META_CTX_HPP
 #define ENTT_META_CTX_HPP
 
-#include <memory>
 #include "../container/dense_map.hpp"
 #include "../core/fwd.hpp"
 #include "../core/utility.hpp"
@@ -20,7 +19,7 @@ namespace internal {
 struct meta_type_node;
 
 struct meta_context {
-    dense_map<id_type, std::unique_ptr<meta_type_node>, identity> value{};
+    dense_map<id_type, meta_type_node, identity> value{};
 
     static inline meta_context &from(meta_ctx &ctx);
     static inline const meta_context &from(const meta_ctx &ctx);

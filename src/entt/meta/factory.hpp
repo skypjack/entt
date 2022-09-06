@@ -11,6 +11,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "context.hpp"
 #include "meta.hpp"
 #include "node.hpp"
 #include "policy.hpp"
@@ -125,7 +126,7 @@ class meta_factory<Type> {
 public:
     /*! @brief Default constructor. */
     meta_factory() noexcept
-        : owner{internal::resolve<Type>()} {}
+        : owner{&internal::meta_context::from(locator<meta_ctx>::value_or()).value.try_emplace(type_id<Type>().hash(), internal::resolve<Type>()).first->second} {}
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
@@ -472,9 +473,8 @@ private:
  */
 template<typename Type>
 [[nodiscard]] auto meta() noexcept {
-    auto *const node = internal::resolve<Type>();
     // extended meta factory to allow assigning properties to opaque meta types
-    return meta_factory<Type, internal::meta_type_node>{*node};
+    return meta_factory<Type, internal::meta_type_node>{internal::meta_context::from(locator<meta_ctx>::value_or()).value.try_emplace(type_id<Type>().hash(), internal::resolve<Type>()).first->second};
 }
 
 /**
@@ -492,7 +492,7 @@ inline void meta_reset(const id_type id) noexcept {
     auto &&context = internal::meta_context::from(locator<meta_ctx>::value_or());
 
     for(auto it = context.value.begin(); it != context.value.end();) {
-        if(it->second->id == id) {
+        if(it->second.id == id) {
             it = context.value.erase(it);
         } else {
             ++it;
