@@ -350,6 +350,8 @@ TEST_F(MetaFunc, StaticAsMember) {
     ASSERT_EQ(func.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(func.arg(1u));
 
+    ASSERT_EQ(func.prop().cbegin(), func.prop().cend());
+
     ASSERT_FALSE(func.invoke({}, 42));
     ASSERT_FALSE(func.invoke(std::as_const(instance), 42));
 
@@ -371,6 +373,8 @@ TEST_F(MetaFunc, StaticAsConstMember) {
     ASSERT_FALSE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_FALSE(func.arg(0u));
+
+    ASSERT_EQ(func.prop().cbegin(), func.prop().cend());
 
     ASSERT_FALSE(func.invoke({}));
     ASSERT_TRUE(func.invoke(instance));

@@ -579,6 +579,7 @@ TEST_F(MetaData, AsRef) {
     ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
+    ASSERT_NE(data.prop().cbegin(), data.prop().cend());
     ASSERT_EQ(instance.i, 0);
 
     data.get(instance).cast<int &>() = 3;
@@ -598,6 +599,7 @@ TEST_F(MetaData, AsConstRef) {
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.get(instance).cast<const int &>(), 0);
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_EQ(data.prop().cbegin(), data.prop().cend());
     ASSERT_EQ(instance.i, 0);
 }
 

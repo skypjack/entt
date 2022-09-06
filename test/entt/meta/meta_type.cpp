@@ -335,6 +335,11 @@ TEST_F(MetaType, Data) {
 
     ASSERT_EQ(counter, 1);
     ASSERT_TRUE(type.data("value"_hs));
+
+    type = entt::resolve<void>();
+
+    ASSERT_TRUE(type);
+    ASSERT_EQ(type.data().cbegin(), type.data().cend());
 }
 
 TEST_F(MetaType, Func) {
@@ -353,6 +358,11 @@ TEST_F(MetaType, Func) {
     ASSERT_TRUE(type.func("func"_hs));
     ASSERT_TRUE(type.func("member"_hs).invoke(instance));
     ASSERT_TRUE(type.func("func"_hs).invoke({}));
+
+    type = entt::resolve<void>();
+
+    ASSERT_TRUE(type);
+    ASSERT_EQ(type.func().cbegin(), type.func().cend());
 }
 
 TEST_F(MetaType, Invoke) {
@@ -628,6 +638,8 @@ TEST_F(MetaType, PropertiesAndCornerCases) {
 
     auto type = entt::resolve<property_t>();
 
+    ASSERT_EQ(type.prop().cbegin(), type.prop().cend());
+
     ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_t::random)).value().cast<int>(), 0);
     ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_t::value)).value().cast<int>(), 3);
 
@@ -643,6 +655,10 @@ TEST_F(MetaType, PropertiesAndCornerCases) {
     ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::value)).value().cast<int>(), 0);
     ASSERT_TRUE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::key_only)));
     ASSERT_FALSE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::key_only)).value());
+
+    type = entt::resolve<void>();
+
+    ASSERT_EQ(type.prop().cbegin(), type.prop().cend());
 }
 
 TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
