@@ -52,7 +52,6 @@ template<std::size_t Len, std::size_t Align>
 class basic_any {
     using operation = internal::any_operation;
     using policy = internal::any_policy;
-
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     template<typename Type>
@@ -408,7 +407,9 @@ public:
 private:
     union {
         const void *instance;
-        alignas(Align) std::byte storage[Len + !Len];
+        struct storage_type {
+            alignas(Align) std::byte data[Len + !Len];
+        } storage;
     };
     const type_info *info;
     vtable_type *vtable;
