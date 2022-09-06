@@ -48,29 +48,29 @@ enum class meta_traits : std::uint32_t {
 struct meta_type_node;
 
 struct meta_prop_node {
-    meta_type_node *(*type)() noexcept {nullptr};
+    meta_type_node *(*type)() noexcept {};
     basic_any<0u> value{};
 };
 
 struct meta_base_node {
-    meta_type_node *(*type)() noexcept {nullptr};
-    meta_any (*cast)(meta_any) noexcept {nullptr};
+    meta_type_node *(*type)() noexcept {};
+    meta_any (*cast)(meta_any) noexcept {};
 };
 
 struct meta_conv_node {
-    meta_any (*conv)(const meta_any &){nullptr};
+    meta_any (*conv)(const meta_any &){};
 };
 
 struct meta_ctor_node {
     using size_type = std::size_t;
 
     size_type arity{0u};
-    meta_type (*arg)(const size_type) noexcept {nullptr};
-    meta_any (*invoke)(meta_any *const){nullptr};
+    meta_type (*arg)(const size_type) noexcept {};
+    meta_any (*invoke)(meta_any *const){};
 };
 
 struct meta_dtor_node {
-    void (*dtor)(void *){nullptr};
+    void (*dtor)(void *){};
 };
 
 struct meta_data_node {
@@ -82,10 +82,10 @@ struct meta_data_node {
 
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
-    meta_type_node *(*type)() noexcept {nullptr};
-    meta_type (*arg)(const size_type) noexcept {nullptr};
-    bool (*set)(meta_handle, meta_any){nullptr};
-    meta_any (*get)(meta_handle){nullptr};
+    meta_type_node *(*type)() noexcept {};
+    meta_type (*arg)(const size_type) noexcept {};
+    bool (*set)(meta_handle, meta_any){};
+    meta_any (*get)(meta_handle){};
     std::shared_ptr<cold_data_t> details{};
 };
 
@@ -98,9 +98,9 @@ struct meta_func_node {
 
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
-    meta_type_node *(*ret)() noexcept {nullptr};
-    meta_type (*arg)(const size_type) noexcept {nullptr};
-    meta_any (*invoke)(meta_handle, meta_any *const){nullptr};
+    meta_type_node *(*ret)() noexcept {};
+    meta_type (*arg)(const size_type) noexcept {};
+    meta_any (*invoke)(meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next{};
     std::shared_ptr<cold_data_t> details{};
 };
@@ -109,8 +109,8 @@ struct meta_template_node {
     using size_type = std::size_t;
 
     size_type arity{0u};
-    meta_type_node *(*type)() noexcept {nullptr};
-    meta_type_node *(*arg)(const size_type) noexcept {nullptr};
+    meta_type_node *(*type)() noexcept {};
+    meta_type_node *(*arg)(const size_type) noexcept {};
 };
 
 struct meta_type_node {
@@ -125,14 +125,14 @@ struct meta_type_node {
         dense_map<id_type, meta_func_node, identity> func{};
     };
 
-    const type_info *info{nullptr};
+    const type_info *info{};
     id_type id{};
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
-    meta_type_node *(*remove_pointer)() noexcept {nullptr};
-    meta_any (*default_constructor)(){nullptr};
-    double (*conversion_helper)(void *, const void *){nullptr};
-    meta_any (*from_void)(void *, const void *){nullptr};
+    meta_type_node *(*remove_pointer)() noexcept {};
+    meta_any (*default_constructor)(){};
+    double (*conversion_helper)(void *, const void *){};
+    meta_any (*from_void)(void *, const void *){};
     meta_template_node templ{};
     meta_dtor_node dtor{};
     std::shared_ptr<cold_data_t> details{};
