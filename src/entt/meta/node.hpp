@@ -52,6 +52,10 @@ struct meta_prop_node {
     std::shared_ptr<void> value{};
 };
 
+struct meta_prop_map {
+    dense_map<id_type, meta_prop_node, identity> prop{};
+};
+
 struct meta_base_node {
     meta_type_node (*type)() noexcept {};
     meta_any (*cast)(meta_any) noexcept {};
@@ -76,25 +80,17 @@ struct meta_dtor_node {
 struct meta_data_node {
     using size_type = std::size_t;
 
-    struct cold_data_t {
-        dense_map<id_type, meta_prop_node, identity> prop;
-    };
-
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
     meta_type_node (*type)() noexcept {};
     meta_type (*arg)(const size_type) noexcept {};
     bool (*set)(meta_handle, meta_any){};
     meta_any (*get)(meta_handle){};
-    std::shared_ptr<cold_data_t> details{};
+    std::shared_ptr<meta_prop_map> details{};
 };
 
 struct meta_func_node {
     using size_type = std::size_t;
-
-    struct cold_data_t {
-        dense_map<id_type, meta_prop_node, identity> prop;
-    };
 
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
@@ -102,7 +98,7 @@ struct meta_func_node {
     meta_type (*arg)(const size_type) noexcept {};
     meta_any (*invoke)(meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next{};
-    std::shared_ptr<cold_data_t> details{};
+    std::shared_ptr<meta_prop_map> details{};
 };
 
 struct meta_template_node {
@@ -113,17 +109,16 @@ struct meta_template_node {
     meta_type_node (*arg)(const size_type) noexcept {};
 };
 
+struct meta_type_descriptor: meta_prop_map {
+    dense_map<id_type, meta_ctor_node, identity> ctor{};
+    dense_map<id_type, meta_base_node, identity> base{};
+    dense_map<id_type, meta_conv_node, identity> conv{};
+    dense_map<id_type, meta_data_node, identity> data{};
+    dense_map<id_type, meta_func_node, identity> func{};
+};
+
 struct meta_type_node {
     using size_type = std::size_t;
-
-    struct cold_data_t {
-        dense_map<id_type, meta_prop_node, identity> prop{};
-        dense_map<id_type, meta_ctor_node, identity> ctor{};
-        dense_map<id_type, meta_base_node, identity> base{};
-        dense_map<id_type, meta_conv_node, identity> conv{};
-        dense_map<id_type, meta_data_node, identity> data{};
-        dense_map<id_type, meta_func_node, identity> func{};
-    };
 
     const type_info *info{};
     id_type id{};
@@ -135,7 +130,7 @@ struct meta_type_node {
     meta_any (*from_void)(void *, const void *){};
     meta_template_node templ{};
     meta_dtor_node dtor{};
-    std::shared_ptr<cold_data_t> details{};
+    std::shared_ptr<meta_type_descriptor> details{};
 };
 
 template<typename Type>

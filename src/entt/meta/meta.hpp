@@ -764,7 +764,7 @@ struct meta_data {
      * @brief Returns a range to visit registered meta properties.
      * @return An iterable range to visit registered meta properties.
      */
-    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_data_node::cold_data_t::prop)::const_iterator> prop() const noexcept {
+    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_prop_map::prop)::const_iterator> prop() const noexcept {
         if(node.details) {
             return {node.details->prop.cbegin(), node.details->prop.cend()};
         }
@@ -882,7 +882,7 @@ struct meta_func {
     }
 
     /*! @copydoc meta_data::prop */
-    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_func_node::cold_data_t::prop)::const_iterator> prop() const noexcept {
+    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_prop_map::prop)::const_iterator> prop() const noexcept {
         if(node.details) {
             return {node.details->prop.cbegin(), node.details->prop.cend()};
         }
@@ -1143,7 +1143,7 @@ public:
      * @brief Returns a range to visit registered top-level base meta types.
      * @return An iterable range to visit registered top-level base meta types.
      */
-    [[nodiscard]] meta_range<meta_type, typename decltype(internal::meta_type_node::cold_data_t::base)::const_iterator> base() const noexcept {
+    [[nodiscard]] meta_range<meta_type, typename decltype(internal::meta_type_descriptor::base)::const_iterator> base() const noexcept {
         if(node.details) {
             return {node.details->base.cbegin(), node.details->base.cend()};
         }
@@ -1155,7 +1155,7 @@ public:
      * @brief Returns a range to visit registered top-level meta data.
      * @return An iterable range to visit registered top-level meta data.
      */
-    [[nodiscard]] meta_range<meta_data, typename decltype(internal::meta_type_node::cold_data_t::data)::const_iterator> data() const noexcept {
+    [[nodiscard]] meta_range<meta_data, typename decltype(internal::meta_type_descriptor::data)::const_iterator> data() const noexcept {
         if(node.details) {
             return {node.details->data.cbegin(), node.details->data.cend()};
         }
@@ -1191,7 +1191,7 @@ public:
      * @brief Returns a range to visit registered top-level functions.
      * @return An iterable range to visit registered top-level functions.
      */
-    [[nodiscard]] meta_range<meta_func, typename decltype(internal::meta_type_node::cold_data_t::func)::const_iterator> func() const noexcept {
+    [[nodiscard]] meta_range<meta_func, typename decltype(internal::meta_type_descriptor::func)::const_iterator> func() const noexcept {
         if(node.details) {
             return {node.details->func.cbegin(), node.details->func.cend()};
         }
@@ -1375,7 +1375,7 @@ public:
      * @brief Returns a range to visit registered top-level meta properties.
      * @return An iterable range to visit registered top-level meta properties.
      */
-    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_type_node::cold_data_t::prop)::const_iterator> prop() const noexcept {
+    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_prop_map::prop)::const_iterator> prop() const noexcept {
         if(node.details) {
             return {node.details->prop.cbegin(), node.details->prop.cend()};
         }
