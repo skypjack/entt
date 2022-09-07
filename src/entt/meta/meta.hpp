@@ -64,11 +64,11 @@ public:
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
-    internal::meta_type_node value_type_node = {};
-    size_type (*size_fn)(const any &) noexcept = nullptr;
-    bool (*resize_fn)(any &, size_type) = nullptr;
-    iterator (*iter_fn)(any &, const bool) = nullptr;
-    iterator (*insert_or_erase_fn)(any &, const any &, meta_any &) = nullptr;
+    internal::meta_type_node value_type_node{};
+    size_type (*size_fn)(const any &) noexcept {};
+    bool (*resize_fn)(any &, size_type){};
+    iterator (*iter_fn)(any &, const bool){};
+    iterator (*insert_or_erase_fn)(any &, const any &, meta_any &){};
     any storage{};
 };
 
@@ -122,14 +122,14 @@ public:
 
 private:
     bool key_only_container{};
-    internal::meta_type_node key_type_node = {};
-    internal::meta_type_node mapped_type_node = {};
-    internal::meta_type_node value_type_node = {};
-    size_type (*size_fn)(const any &) noexcept = nullptr;
-    bool (*clear_fn)(any &) = nullptr;
-    iterator (*iter_fn)(any &, const bool) = nullptr;
-    size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &) = nullptr;
-    iterator (*find_fn)(any &, meta_any &) = nullptr;
+    internal::meta_type_node key_type_node{};
+    internal::meta_type_node mapped_type_node{};
+    internal::meta_type_node value_type_node{};
+    size_type (*size_fn)(const any &) noexcept {};
+    bool (*clear_fn)(any &){};
+    iterator (*iter_fn)(any &, const bool){};
+    size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &){};
+    iterator (*find_fn)(any &, meta_any &){};
     any storage{};
 };
 

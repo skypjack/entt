@@ -492,8 +492,9 @@ public:
  */
 template<typename Type>
 [[nodiscard]] auto meta() noexcept {
+    auto res = internal::meta_context::from(locator<meta_ctx>::value_or()).value.try_emplace(type_id<Type>().hash(), internal::resolve<Type>());
     // extended meta factory to allow assigning properties to opaque meta types
-    return meta_factory<Type, internal::meta_type_node>{internal::meta_context::from(locator<meta_ctx>::value_or()).value.try_emplace(type_id<Type>().hash(), internal::resolve<Type>()).first->second};
+    return meta_factory<Type, internal::meta_type_node>{res.first->second};
 }
 
 /**
