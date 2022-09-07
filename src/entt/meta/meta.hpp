@@ -45,7 +45,7 @@ public:
      */
     template<typename Type>
     meta_sequence_container(std::in_place_type_t<Type>, any instance) noexcept
-        : value_type_node{internal::resolve<typename Type::value_type>()},
+        : value_type_node{&internal::resolve<typename Type::value_type>},
           size_fn{&meta_sequence_container_traits<Type>::size},
           resize_fn{&meta_sequence_container_traits<Type>::resize},
           iter_fn{&meta_sequence_container_traits<Type>::iter},
@@ -64,7 +64,7 @@ public:
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
-    internal::meta_type_node value_type_node{};
+    internal::meta_type_node (*value_type_node)(){};
     size_type (*size_fn)(const any &) noexcept {};
     bool (*resize_fn)(any &, size_type){};
     iterator (*iter_fn)(any &, const bool){};
@@ -93,9 +93,9 @@ public:
     template<typename Type>
     meta_associative_container(std::in_place_type_t<Type>, any instance) noexcept
         : key_only_container{meta_associative_container_traits<Type>::key_only},
-          key_type_node{internal::resolve<typename Type::key_type>()},
+          key_type_node{&internal::resolve<typename Type::key_type>},
           mapped_type_node{},
-          value_type_node{internal::resolve<typename Type::value_type>()},
+          value_type_node{&internal::resolve<typename Type::value_type>},
           size_fn{&meta_associative_container_traits<Type>::size},
           clear_fn{&meta_associative_container_traits<Type>::clear},
           iter_fn{&meta_associative_container_traits<Type>::iter},
@@ -103,7 +103,7 @@ public:
           find_fn{&meta_associative_container_traits<Type>::find},
           storage{std::move(instance)} {
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
-            mapped_type_node = internal::resolve<typename Type::mapped_type>();
+            mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
     }
 
@@ -122,9 +122,9 @@ public:
 
 private:
     bool key_only_container{};
-    internal::meta_type_node key_type_node{};
-    internal::meta_type_node mapped_type_node{};
-    internal::meta_type_node value_type_node{};
+    internal::meta_type_node (*key_type_node)(){};
+    internal::meta_type_node (*mapped_type_node)(){};
+    internal::meta_type_node (*value_type_node)(){};
     size_type (*size_fn)(const any &) noexcept {};
     bool (*clear_fn)(any &){};
     iterator (*iter_fn)(any &, const bool){};
@@ -1710,7 +1710,7 @@ private:
  * @return The meta value type of the container.
  */
 [[nodiscard]] inline meta_type meta_sequence_container::value_type() const noexcept {
-    return value_type_node;
+    return value_type_node ? value_type_node() : meta_type{};
 }
 
 /**
@@ -1806,7 +1806,7 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @return The meta key type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::key_type() const noexcept {
-    return key_type_node;
+    return key_type_node ? key_type_node() : meta_type{};
 }
 
 /**
@@ -1814,12 +1814,12 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @return The meta mapped type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::mapped_type() const noexcept {
-    return mapped_type_node;
+    return mapped_type_node ? mapped_type_node() : meta_type{};
 }
 
 /*! @copydoc meta_sequence_container::value_type */
 [[nodiscard]] inline meta_type meta_associative_container::value_type() const noexcept {
-    return value_type_node;
+    return value_type_node ? value_type_node() : meta_type{};
 }
 
 /*! @copydoc meta_sequence_container::size */
