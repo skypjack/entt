@@ -18,7 +18,7 @@
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_property(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_property(entt::internal::meta_traits::is_static)</Item>
-			<Item Name="[prop]">prop</Item>
+			<Item Name="[details]" Condition="details != nullptr">*details</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_func_node"	>
@@ -29,7 +29,7 @@
 		<Expand>
 			<Item Name="[is_const]">has_property(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_property(entt::internal::meta_traits::is_static)</Item>
-			<Item Name="[prop]">prop</Item>
+			<Item Name="[details]" Condition="details != nullptr">*details</Item>
 			<Item Name="[next]" Condition="next != nullptr">*next</Item>
 		</Expand>
 	</Type>
@@ -61,19 +61,14 @@
 			<Item Name="[conversion_helper]">conversion_helper != nullptr</Item>
 			<Item Name="[from_void]">from_void != nullptr</Item>
 			<Item Name="[template_info]">templ</Item>
-			<Item Name="[ctor]">ctor</Item>
-			<Item Name="[base]">base</Item>
-			<Item Name="[conv]">conv</Item>
-			<Item Name="[data]">data</Item>
-			<Item Name="[func]">func</Item>
-			<Item Name="[prop]">prop</Item>
+			<Item Name="[details]" Condition="details != nullptr">*details</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_any">
-		<DisplayString Condition="node != nullptr">{{ type={ node->info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
+		<DisplayString Condition="node.info != nullptr">{{ type={ node.info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node != nullptr">*node</ExpandedItem>
+			<ExpandedItem>node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_handle">
@@ -86,31 +81,27 @@
 		<DisplayString>{ storage }</DisplayString>
 	</Type>
 	<Type Name="entt::meta_data">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{ node }</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<ExpandedItem>node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_func">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{ node }</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<ExpandedItem>node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_prop">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{ node }</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<ExpandedItem>node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_type">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
-		<DisplayString>{{}}</DisplayString>
+		<DisplayString>{ node }</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<ExpandedItem>node</ExpandedItem>
 		</Expand>
 	</Type>
 </AutoVisualizer>
