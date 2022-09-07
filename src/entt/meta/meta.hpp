@@ -691,19 +691,21 @@ private:
 
 namespace internal {
 
-struct meta_prop_owner {
-    [[nodiscard]] auto prop(const std::shared_ptr<internal::meta_prop_map> &node) const noexcept {
-        using return_type = meta_range<meta_prop, typename decltype(internal::meta_prop_map::prop)::const_iterator>;
-        return node ? return_type{node->prop.cbegin(), node->prop.cend()} : return_type{};
+struct meta_common {
+    template<typename Type, auto Member, typename Node>
+    [[nodiscard]] auto range(const std::shared_ptr<Node> &node) const noexcept {
+        using return_type = meta_range<Type, typename std::decay_t<decltype(((*node).*Member))>::const_iterator>;
+        return node ? return_type{((*node).*Member).cbegin(), ((*node).*Member).cend()} : return_type{};
     }
 
-    [[nodiscard]] meta_prop prop(const std::shared_ptr<internal::meta_prop_map> &node, const id_type key) const {
+    template<typename Type, auto Member, typename Node>
+    [[nodiscard]] auto find(const std::shared_ptr<Node> &node, const id_type key) const {
         if(!node) {
-            return {};
+            return Type{};
         }
 
-        const auto it = node->prop.find(key);
-        return it != node->prop.cend() ? it->second : meta_prop{};
+        const auto it = ((*node).*Member).find(key);
+        return it != ((*node).*Member).cend() ? it->second : Type{};
     }
 };
 
@@ -715,7 +717,7 @@ struct meta_prop_owner {
  */
 
 /*! @brief Opaque wrapper for data members. */
-struct meta_data: private internal::meta_prop_owner {
+struct meta_data: private internal::meta_common {
     /*! @brief Node type. */
     using node_type = internal::meta_data_node;
     /*! @brief Unsigned integer type. */
@@ -795,7 +797,7 @@ struct meta_data: private internal::meta_prop_owner {
      * @return An iterable range to visit registered meta properties.
      */
     [[nodiscard]] auto prop() const noexcept {
-        return meta_prop_owner::prop(node.details);
+        return meta_common::range<meta_prop, &internal::meta_prop_map::prop>(node.details);
     }
 
     /**
@@ -804,7 +806,7 @@ struct meta_data: private internal::meta_prop_owner {
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        return meta_prop_owner::prop(node.details, key);
+        return meta_common::find<meta_prop, &internal::meta_prop_map::prop>(node.details, key);
     }
 
     /**
@@ -820,7 +822,7 @@ private:
 };
 
 /*! @brief Opaque wrapper for member functions. */
-struct meta_func: private internal::meta_prop_owner {
+struct meta_func: private internal::meta_common {
     /*! @brief Node type. */
     using node_type = internal::meta_func_node;
     /*! @brief Unsigned integer type. */
@@ -903,7 +905,7 @@ struct meta_func: private internal::meta_prop_owner {
 
     /*! @copydoc meta_data::prop */
     [[nodiscard]] auto prop() const noexcept {
-        return meta_prop_owner::prop(node.details);
+        return meta_common::range<meta_prop, &internal::meta_prop_map::prop>(node.details);
     }
 
     /**
@@ -912,7 +914,7 @@ struct meta_func: private internal::meta_prop_owner {
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        return meta_prop_owner::prop(node.details, key);
+        return meta_common::find<meta_prop, &internal::meta_prop_map::prop>(node.details, key);
     }
 
     /**
@@ -936,7 +938,7 @@ private:
 };
 
 /*! @brief Opaque wrapper for types. */
-class meta_type: private internal::meta_prop_owner {
+class meta_type: private internal::meta_common {
     template<typename Func>
     [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Func next) const {
         using element_type = decltype(next());
@@ -1154,8 +1156,7 @@ public:
      * @return An iterable range to visit registered top-level base meta types.
      */
     [[nodiscard]] auto base() const noexcept {
-        using return_type = meta_range<meta_type, typename decltype(internal::meta_type_descriptor::base)::const_iterator>;
-        return node.details ? return_type{node.details->base.cbegin(), node.details->base.cend()} : return_type{};
+        return meta_common::range<meta_type, &internal::meta_type_descriptor::base>(node.details);
     }
 
     /**
@@ -1163,8 +1164,7 @@ public:
      * @return An iterable range to visit registered top-level meta data.
      */
     [[nodiscard]] auto data() const noexcept {
-        using return_type = meta_range<meta_data, typename decltype(internal::meta_type_descriptor::data)::const_iterator>;
-        return node.details ? return_type{node.details->data.cbegin(), node.details->data.cend()} : return_type{};
+        return meta_common::range<meta_data, &internal::meta_type_descriptor::data>(node.details);
     }
 
     /**
@@ -1176,10 +1176,8 @@ public:
      * @return The registered meta data for the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        if(node.details) {
-            if(auto it = node.details->data.find(id); it != node.details->data.cend()) {
-                return it->second;
-            }
+        if(auto elem = meta_common::find<meta_data, &internal::meta_type_descriptor::data>(node.details, id)) {
+            return elem;
         }
 
         for(auto &&curr: base()) {
@@ -1211,10 +1209,8 @@ public:
      * @return The registered meta function for the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        if(node.details) {
-            if(auto it = node.details->func.find(id); it != node.details->func.cend()) {
-                return it->second;
-            }
+        if(auto elem = meta_common::find<meta_func, &internal::meta_type_descriptor::func>(node.details, id)) {
+            return elem;
         }
 
         for(auto &&curr: base()) {
@@ -1377,7 +1373,7 @@ public:
      * @return An iterable range to visit registered top-level meta properties.
      */
     [[nodiscard]] auto prop() const noexcept {
-        return meta_prop_owner::prop(node.details);
+        return meta_common::range<meta_prop, &internal::meta_type_descriptor::prop>(node.details);
     }
 
     /**
@@ -1389,7 +1385,7 @@ public:
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        if(auto elem = meta_prop_owner::prop(node.details, key)) {
+        if(auto elem = meta_common::find<meta_prop, &internal::meta_type_descriptor::prop>(node.details, key)) {
             return elem;
         }
 
