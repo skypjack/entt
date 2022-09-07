@@ -143,95 +143,61 @@ template<typename... Args>
 }
 
 template<typename Type>
-[[nodiscard]] auto *meta_default_constructor() noexcept {
+[[nodiscard]] meta_type_node resolve() noexcept {
     static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
+    auto &&context = meta_context::from(locator<meta_ctx>::value_or());
+
+    if(auto it = context.value.find(type_id<Type>().hash()); it != context.value.end()) {
+        return it->second;
+    }
+
+    meta_type_node node{
+        &type_id<Type>(),
+        type_id<Type>().hash(),
+        (std::is_arithmetic_v<Type> ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)
+            | (std::is_integral_v<Type> ? internal::meta_traits::is_integral : internal::meta_traits::is_none)
+            | (std::is_signed_v<Type> ? internal::meta_traits::is_signed : internal::meta_traits::is_none)
+            | (std::is_array_v<Type> ? internal::meta_traits::is_array : internal::meta_traits::is_none)
+            | (std::is_enum_v<Type> ? internal::meta_traits::is_enum : internal::meta_traits::is_none)
+            | (std::is_class_v<Type> ? internal::meta_traits::is_class : internal::meta_traits::is_none)
+            | (is_meta_pointer_like_v<Type> ? internal::meta_traits::is_meta_pointer_like : internal::meta_traits::is_none)
+            | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_meta_sequence_container : internal::meta_traits::is_none)
+            | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::is_meta_associative_container : internal::meta_traits::is_none),
+        size_of_v<Type>,
+        &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>};
 
     if constexpr(std::is_default_constructible_v<Type>) {
-        return +[]() { return meta_any{std::in_place_type<Type>}; };
-    } else {
-        return static_cast<std::decay_t<decltype(meta_type_node::default_constructor)>>(nullptr);
+        node.default_constructor = +[]() { return meta_any{std::in_place_type<Type>}; };
     }
-}
-
-template<typename Type>
-[[nodiscard]] auto *meta_conversion_helper() noexcept {
-    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
 
     if constexpr(std::is_arithmetic_v<Type>) {
-        return +[](void *bin, const void *value) {
+        node.conversion_helper = +[](void *bin, const void *value) {
             return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(*static_cast<const double *>(value))) : static_cast<double>(*static_cast<const Type *>(value));
         };
     } else if constexpr(std::is_enum_v<Type>) {
-        return +[](void *bin, const void *value) {
+        node.conversion_helper = +[](void *bin, const void *value) {
             return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(value)))) : static_cast<double>(*static_cast<const Type *>(value));
         };
-    } else {
-        return static_cast<std::decay_t<decltype(meta_type_node::conversion_helper)>>(nullptr);
     }
-}
 
-template<typename Type>
-[[nodiscard]] auto *meta_from_void() noexcept {
-    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
-
-    if constexpr(std::is_same_v<Type, void> || std::is_function_v<Type>) {
-        return static_cast<std::decay_t<decltype(meta_type_node::from_void)>>(nullptr);
-    } else {
-        return +[](void *element, const void *as_const) {
-            using value_type = std::decay_t<Type>;
-
+    if constexpr(!std::is_same_v<Type, void> && !std::is_function_v<Type>) {
+        node.from_void = +[](void *element, const void *as_const) {
             if(element) {
-                return meta_any{std::in_place_type<value_type &>, *static_cast<value_type *>(element)};
+                return meta_any{std::in_place_type<std::decay_t<Type> &>, *static_cast<std::decay_t<Type> *>(element)};
             }
 
-            return meta_any{std::in_place_type<const value_type &>, *static_cast<const value_type *>(as_const)};
+            return meta_any{std::in_place_type<const std::decay_t<Type> &>, *static_cast<const std::decay_t<Type> *>(as_const)};
         };
     }
-}
-
-template<typename Type>
-[[nodiscard]] auto meta_template_info() noexcept {
-    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
 
     if constexpr(is_complete_v<meta_template_traits<Type>>) {
-        return meta_template_node{
+        node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve<typename meta_template_traits<Type>::class_type>,
             +[](const std::size_t index) noexcept -> meta_type_node { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }};
-    } else {
-        return meta_template_node{};
-    }
-}
-
-template<typename Type>
-[[nodiscard]] meta_type_node resolve() noexcept {
-    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
-
-    auto &&context = meta_context::from(locator<meta_ctx>::value_or());
-    auto it = context.value.find(type_id<Type>().hash());
-
-    if(it == context.value.end()) {
-        return meta_type_node{
-            &type_id<Type>(),
-            type_id<Type>().hash(),
-            (std::is_arithmetic_v<Type> ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)
-                | (std::is_integral_v<Type> ? internal::meta_traits::is_integral : internal::meta_traits::is_none)
-                | (std::is_signed_v<Type> ? internal::meta_traits::is_signed : internal::meta_traits::is_none)
-                | (std::is_array_v<Type> ? internal::meta_traits::is_array : internal::meta_traits::is_none)
-                | (std::is_enum_v<Type> ? internal::meta_traits::is_enum : internal::meta_traits::is_none)
-                | (std::is_class_v<Type> ? internal::meta_traits::is_class : internal::meta_traits::is_none)
-                | (is_meta_pointer_like_v<Type> ? internal::meta_traits::is_meta_pointer_like : internal::meta_traits::is_none)
-                | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_meta_sequence_container : internal::meta_traits::is_none)
-                | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::is_meta_associative_container : internal::meta_traits::is_none),
-            size_of_v<Type>,
-            &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>,
-            meta_default_constructor<Type>(),
-            meta_conversion_helper<Type>(),
-            meta_from_void<Type>(),
-            meta_template_info<Type>()};
     }
 
-    return it->second;
+    return node;
 }
 
 } // namespace internal
