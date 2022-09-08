@@ -979,6 +979,17 @@ class meta_type: private internal::meta_common {
         return ambiguous ? nullptr : candidate;
     }
 
+    template<typename Func>
+    auto forward_to_bases(Func func) const -> decltype(func(std::declval<meta_type>())) {
+        for(auto &&curr: base()) {
+            if(auto elem = func(curr.second); elem) {
+                return elem;
+            }
+        }
+
+        return {};
+    }
+
 public:
     /*! @brief Node type. */
     using node_type = internal::meta_type_node;
@@ -1180,13 +1191,7 @@ public:
             return elem;
         }
 
-        for(auto &&curr: base()) {
-            if(auto elem = curr.second.data(id); elem) {
-                return elem;
-            }
-        }
-
-        return {};
+        return forward_to_bases([id](auto &&type) { return type.data(id); });
     }
 
     /**
@@ -1213,13 +1218,7 @@ public:
             return elem;
         }
 
-        for(auto &&curr: base()) {
-            if(auto elem = curr.second.func(id); elem) {
-                return elem;
-            }
-        }
-
-        return {};
+        return forward_to_bases([id](auto &&type) { return type.func(id); });
     }
 
     /**
@@ -1307,13 +1306,7 @@ public:
             }
         }
 
-        for(auto &&curr: base()) {
-            if(auto res = curr.second.invoke(id, *instance.operator->(), args, sz); res) {
-                return res;
-            }
-        }
-
-        return {};
+        return forward_to_bases([id, &instance, args, sz](auto &&type) { return type.invoke(id, *instance.operator->(), args, sz); });
     }
 
     /**
@@ -1389,13 +1382,7 @@ public:
             return elem;
         }
 
-        for(auto &&curr: base()) {
-            if(auto elem = curr.second.prop(key); elem) {
-                return elem;
-            }
-        }
-
-        return {};
+        return forward_to_bases([key](auto &&type) { return type.prop(key); });
     }
 
     /**
