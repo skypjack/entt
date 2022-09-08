@@ -941,13 +941,11 @@ private:
 class meta_type: private internal::meta_common {
     template<typename Func>
     [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Func next) const {
-        using element_type = decltype(next());
-
-        element_type candidate = nullptr;
+        decltype(next()) candidate = nullptr;
         size_type extent{sz + 1u};
         bool ambiguous{};
 
-        for(element_type curr = next(); curr; curr = next()) {
+        for(auto curr = next(); curr; curr = next()) {
             if(curr->arity == sz) {
                 size_type direct{};
                 size_type ext{};
