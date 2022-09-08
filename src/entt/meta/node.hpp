@@ -138,12 +138,14 @@ meta_type_node resolve() noexcept;
 
 template<typename... Args>
 [[nodiscard]] meta_type_node meta_arg_node(type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
-    if constexpr(sizeof...(Args) == 0u) {
-        return {};
-    } else {
-        const meta_type_node args[sizeof...(Args)]{internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>()...};
-        return args[index];
+    if constexpr(sizeof...(Args) != 0u) {
+        if(index < sizeof...(Args)) {
+            const meta_type_node args[sizeof...(Args)]{internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>()...};
+            return args[index];
+        }
     }
+
+    return {};
 }
 
 template<typename Type>
