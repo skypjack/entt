@@ -130,7 +130,7 @@ TEST_F(MetaAny, NoSBO) {
     ASSERT_EQ(any.cast<fat_t>(), instance);
     ASSERT_NE(any.data(), nullptr);
     ASSERT_EQ(any, entt::meta_any{instance});
-    ASSERT_NE(fat_t{}, any);
+    ASSERT_NE(any, fat_t{});
 }
 
 TEST_F(MetaAny, Empty) {
@@ -572,7 +572,7 @@ TEST_F(MetaAny, NoSBODirectAssignment) {
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<fat_t>(), instance);
     ASSERT_EQ(any, (entt::meta_any{fat_t{.1, .2, .3, .4}}));
-    ASSERT_NE(fat_t{}, any);
+    ASSERT_NE(any, fat_t{});
 }
 
 TEST_F(MetaAny, NoSBOAssignValue) {

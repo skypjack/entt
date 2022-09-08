@@ -16,8 +16,8 @@
 #include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
-#include "sigh_storage_mixin.hpp"
 #include "sparse_set.hpp"
+#include "storage_mixin.hpp"
 
 namespace entt {
 
@@ -34,7 +34,7 @@ class storage_iterator final {
 
     using container_type = std::remove_const_t<Container>;
     using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
-    using comp_traits = component_traits<typename container_type::value_type>;
+    using comp_traits = component_traits<std::remove_pointer_t<typename container_type::value_type>>;
 
     using iterator_traits = std::iterator_traits<std::conditional_t<
         std::is_const_v<Container>,
@@ -310,18 +310,20 @@ private:
     }
 
     void swap_at([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) final {
-        if constexpr(is_pinned_type_v) {
-            ENTT_ASSERT(false, "Pinned type");
-        } else {
+        // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
+        ENTT_ASSERT((lhs + 1u) && !is_pinned_type_v, "Pinned type");
+
+        if constexpr(!is_pinned_type_v) {
             using std::swap;
             swap(element_at(lhs), element_at(rhs));
         }
     }
 
     void move_element([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) final {
-        if constexpr(is_pinned_type_v) {
-            ENTT_ASSERT(false, "Pinned type");
-        } else {
+        // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
+        ENTT_ASSERT((from + 1u) && !is_pinned_type_v, "Pinned type");
+
+        if constexpr(!is_pinned_type_v) {
             auto &elem = element_at(from);
             entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), packed.second(), std::move(elem));
             std::destroy_at(std::addressof(elem));

@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <entt/core/fwd.hpp>
 #include <entt/core/hashed_string.hpp>
 #include <entt/graph/flow.hpp>
 #include "../common/throwing_allocator.hpp"

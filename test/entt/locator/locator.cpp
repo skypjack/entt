@@ -35,6 +35,7 @@ using ServiceLocatorDeathTest = ServiceLocator;
 
 TEST(ServiceLocator, Functionalities) {
     ASSERT_FALSE(entt::locator<base_service>::has_value());
+    ASSERT_FALSE(derived_service::invoked);
     ASSERT_FALSE(null_service::invoked);
 
     entt::locator<base_service>::value_or<null_service>().invoke();
@@ -42,10 +43,18 @@ TEST(ServiceLocator, Functionalities) {
     ASSERT_TRUE(entt::locator<base_service>::has_value());
     ASSERT_TRUE(null_service::invoked);
 
+    auto handle = entt::locator<base_service>::handle();
     entt::locator<base_service>::reset();
 
     ASSERT_FALSE(entt::locator<base_service>::has_value());
-    ASSERT_FALSE(derived_service::invoked);
+
+    entt::locator<base_service>::reset(handle);
+
+    ASSERT_TRUE(entt::locator<base_service>::has_value());
+
+    entt::locator<base_service>::reset(decltype(handle){});
+
+    ASSERT_FALSE(entt::locator<base_service>::has_value());
 
     entt::locator<base_service>::emplace<derived_service>();
     entt::locator<base_service>::value().invoke();

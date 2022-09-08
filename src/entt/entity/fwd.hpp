@@ -25,7 +25,7 @@ struct storage_for;
 template<typename Type>
 class sigh_storage_mixin;
 
-template<typename = entity>
+template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_registry;
 
 template<typename, typename, typename = void>

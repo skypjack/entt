@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <cr.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
@@ -14,11 +15,12 @@ TEST(Lib, Meta) {
     ASSERT_FALSE(entt::resolve("position"_hs));
 
     userdata ud{};
+    ud.ctx = entt::locator<entt::meta_ctx>::handle();
 
     cr_plugin ctx;
-    cr_plugin_load(ctx, PLUGIN);
-
     ctx.userdata = &ud;
+
+    cr_plugin_load(ctx, PLUGIN);
     cr_plugin_update(ctx);
 
     entt::meta<double>().conv<int>();

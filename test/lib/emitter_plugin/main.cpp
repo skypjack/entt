@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 #include <cr.h>
-#include <entt/signal/emitter.hpp>
 #include "types.h"
 
 TEST(Lib, Emitter) {
