@@ -100,6 +100,8 @@ I hope this list can grow much more in the future:
     rougelike inspired game about exploring and surviving as long as possible.
   * [Space Fight](https://github.com/cholushkin/SpaceFight): one screen
     multi-player arcade shooter game prototype.
+  * [Confetti Party](https://github.com/hexerei/entt-confetti): C++ sample
+    application as a starting point using `EnTT` and `SDL2`.
 
 * Engines and the like:
   * [Aether Engine](https://hadean.com/spatial-simulation/)
