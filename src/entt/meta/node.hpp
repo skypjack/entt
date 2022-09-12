@@ -148,7 +148,7 @@ template<typename... Args>
     return {};
 }
 
-inline [[nodiscard]] meta_type_node *try_resolve(const type_info &info) noexcept {
+[[nodiscard]] inline meta_type_node *try_resolve(const type_info &info) noexcept {
     auto &&context = meta_context::from(locator<meta_ctx>::value_or());
     const auto it = context.value.find(info.hash());
     return it != context.value.end() ? &it->second : nullptr;
