@@ -48,10 +48,10 @@ also limited to this library only.
 ## ENTT_USE_ATOMIC
 
 In general, `EnTT` doesn't offer primitives to support multi-threading. Many of
-the feature can be split over multiple threads without any explicit control and
+the features can be split over multiple threads without any explicit control and
 the user is the one who knows if a synchronization point is required.<br/>
-However, some feature aren't easily accessible to users and are made thread-safe
-by means of this definition.
+However, some features aren't easily accessible to users and are made
+thread-safe by means of this definition.
 
 ## ENTT_ID_TYPE
 

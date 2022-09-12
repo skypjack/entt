@@ -168,7 +168,8 @@ Therefore, the function type must be declared explicitly for unbound members.
 The `delegate` class is meant to be used primarily with template arguments.
 However, as a consequence of its design, it can also offer minimal support for
 runtime arguments.<br/>
-When used in this modality, some feature aren't supported though. In particular:
+When used in this modality, some features aren't supported though. In
+particular:
 
 * Curried functions aren't accepted.
 * Functions with an argument list that differs from that of the delegate aren't
@@ -209,7 +210,7 @@ their nuances. The reason is pretty simple: a `delegate` isn't a drop-in
 replacement for an `std::function`. Instead, it tries to overcome the problems
 with the latter.<br/>
 That being said, non-capturing lambda functions are supported, even though some
-feature aren't available in this case.
+features aren't available in this case.
 
 This is a logical consequence of the support for connecting functions at
 runtime. Therefore, lambda functions undergo the same rules and

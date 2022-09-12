@@ -61,7 +61,7 @@ acquired in the main space:
 entt::meta_ctx ctx{};
 ```
 
-Then, it must passed to the receiving space that will set it as its global
+Then, it must be passed to the receiving space that will set it as its global
 context, thus releasing the local one that remains available but is no longer
 referred to by the runtime reflection system:
 
