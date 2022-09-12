@@ -700,12 +700,13 @@ struct meta_common {
 
     template<typename Type, auto Member, typename Node>
     [[nodiscard]] auto find(const std::shared_ptr<Node> &node, const id_type key) const {
-        if(!node) {
-            return Type{};
+        if(node) {
+            if(const auto it = ((*node).*Member).find(key); it != ((*node).*Member).cend()) {
+                return Type{it->second};
+            }
         }
 
-        const auto it = ((*node).*Member).find(key);
-        return it != ((*node).*Member).cend() ? it->second : Type{};
+        return Type{};
     }
 };
 
