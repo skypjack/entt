@@ -148,13 +148,18 @@ template<typename... Args>
     return {};
 }
 
+inline [[nodiscard]] meta_type_node *try_resolve(const type_info &info) noexcept {
+    auto &&context = meta_context::from(locator<meta_ctx>::value_or());
+    const auto it = context.value.find(info.hash());
+    return it != context.value.end() ? &it->second : nullptr;
+}
+
 template<typename Type>
 [[nodiscard]] meta_type_node resolve() noexcept {
     static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
-    auto &&context = meta_context::from(locator<meta_ctx>::value_or());
 
-    if(auto it = context.value.find(type_id<Type>().hash()); it != context.value.end()) {
-        return it->second;
+    if(auto *elem = try_resolve(type_id<Type>()); elem) {
+        return *elem;
     }
 
     meta_type_node node{

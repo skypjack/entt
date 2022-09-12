@@ -51,13 +51,8 @@ template<typename Type>
  * @return The meta type associated with the given type info object, if any.
  */
 [[nodiscard]] inline meta_type resolve(const type_info &info) noexcept {
-    auto &&context = internal::meta_context::from(locator<meta_ctx>::value_or());
-
-    if(auto it = context.value.find(info.hash()); it != context.value.cend()) {
-        return it->second;
-    }
-
-    return {};
+    const auto *elem = internal::try_resolve(info);
+    return elem ? *elem : meta_type{};
 }
 
 } // namespace entt
