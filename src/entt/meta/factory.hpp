@@ -28,27 +28,27 @@ namespace entt {
 
 namespace internal {
 
-inline internal::meta_base_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_base_node &node) {
+inline internal::meta_base_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_base_node node) {
     return owner.details->base.insert_or_assign(id, std::move(node)).first->second;
 }
 
-inline internal::meta_conv_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_conv_node &node) {
+inline internal::meta_conv_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_conv_node node) {
     return owner.details->conv.insert_or_assign(id, std::move(node)).first->second;
 }
 
-inline internal::meta_ctor_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_ctor_node &node) {
+inline internal::meta_ctor_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_ctor_node node) {
     return owner.details->ctor.insert_or_assign(id, std::move(node)).first->second;
 }
 
-inline internal::meta_dtor_node &meta_extend(internal::meta_type_node &owner, internal::meta_dtor_node &node) {
+inline internal::meta_dtor_node &meta_extend(internal::meta_type_node &owner, internal::meta_dtor_node node) {
     return (owner.dtor = std::move(node));
 }
 
-inline internal::meta_data_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_data_node &node) {
+inline internal::meta_data_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_data_node node) {
     return owner.details->data.insert_or_assign(id, std::move(node)).first->second;
 }
 
-inline internal::meta_func_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_func_node &node) {
+inline internal::meta_func_node &meta_extend(internal::meta_type_node &owner, const id_type id, internal::meta_func_node node) {
     if(auto it = owner.details->func.find(id); it != owner.details->func.end()) {
         for(auto *curr = &it->second; curr; curr = curr->next.get()) {
             if(curr->invoke == node.invoke) {
@@ -66,7 +66,7 @@ inline internal::meta_func_node &meta_extend(internal::meta_type_node &owner, co
 }
 
 template<typename Owner>
-inline internal::meta_prop_node &meta_extend(Owner &owner, const id_type id, internal::meta_prop_node &node) {
+inline internal::meta_prop_node &meta_extend(Owner &owner, const id_type id, internal::meta_prop_node node) {
     if(!owner.details) {
         owner.details = std::make_shared<typename decltype(owner.details)::element_type>();
     }
