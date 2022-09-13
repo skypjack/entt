@@ -73,10 +73,8 @@ TEST_F(MetaUtility, MetaDispatch) {
 }
 
 TEST_F(MetaUtility, MetaArg) {
-    ASSERT_EQ((entt::meta_arg<entt::type_list<>>(3u)), entt::meta_type{});
     ASSERT_EQ((entt::meta_arg<entt::type_list<int, char>>(0u)), entt::resolve<int>());
     ASSERT_EQ((entt::meta_arg<entt::type_list<int, char>>(1u)), entt::resolve<char>());
-    ASSERT_EQ((entt::meta_arg<entt::type_list<int, char>>(2u)), entt::meta_type{});
 }
 
 TEST_F(MetaUtility, MetaSetter) {

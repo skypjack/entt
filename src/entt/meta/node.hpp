@@ -137,15 +137,15 @@ template<typename Type>
 meta_type_node resolve() noexcept;
 
 template<typename... Args>
-[[nodiscard]] meta_type_node meta_arg_node(type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
-    if constexpr(sizeof...(Args) != 0u) {
-        if(index < sizeof...(Args)) {
-            const meta_type_node args[sizeof...(Args)]{internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>()...};
-            return args[index];
-        }
-    }
+[[nodiscard]] auto *meta_arg_node(type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
+    using element_type = meta_type_node() noexcept;
 
-    return {};
+    if constexpr(sizeof...(Args) == 0u) {
+        return static_cast<element_type *>(nullptr);
+    } else {
+        element_type *args[sizeof...(Args)]{&internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>...};
+        return args[index];
+    }
 }
 
 [[nodiscard]] inline meta_type_node *try_resolve(const type_info &info) noexcept {
@@ -205,7 +205,7 @@ template<typename Type>
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve<typename meta_template_traits<Type>::class_type>,
-            +[](const std::size_t index) noexcept -> meta_type_node { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }};
+            +[](const std::size_t index) noexcept { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index)(); }};
     }
 
     return node;

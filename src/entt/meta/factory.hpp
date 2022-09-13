@@ -161,7 +161,7 @@ class meta_factory<Type> {
             Setter::size,
             &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
             &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
-            +[](meta_handle instance, meta_any value) -> bool { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
+            +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
             &meta_getter<Type, Getter, Policy>};
 
         auto &&elem = internal::meta_extend(owner(), id, std::move(node));
@@ -202,7 +202,7 @@ public:
 
         internal::meta_base_node node{
             &internal::resolve<Base>,
-            +[](meta_any other) noexcept -> meta_any {
+            +[](meta_any other) noexcept {
                 if(auto *ptr = other.data(); ptr) {
                     return forward_as_meta(*static_cast<Base *>(static_cast<Type *>(ptr)));
                 }
@@ -231,7 +231,7 @@ public:
         using conv_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
         internal::meta_conv_node node{
-            +[](const meta_any &instance) -> meta_any {
+            +[](const meta_any &instance) {
                 return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data())));
             }};
 
@@ -253,7 +253,7 @@ public:
         using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
 
         internal::meta_conv_node node{
-            +[](const meta_any &instance) -> meta_any {
+            +[](const meta_any &instance) {
                 return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance.data())));
             }};
 
