@@ -58,7 +58,7 @@ struct meta_prop_map {
 
 struct meta_base_node {
     meta_type_node (*type)() noexcept {};
-    meta_any (*cast)(meta_any) noexcept {};
+    const void *(*cast)(const void *) noexcept {};
 };
 
 struct meta_conv_node {
@@ -152,6 +152,22 @@ template<typename... Args>
     auto &&context = meta_context::from(locator<meta_ctx>::value_or());
     const auto it = context.value.find(info.hash());
     return it != context.value.end() ? &it->second : nullptr;
+}
+
+[[nodiscard]] inline const void *try_cast(const meta_type_node &from, const meta_type_node &to, const void *instance) noexcept {
+    if(from.info && to.info && *from.info == *to.info) {
+        return instance;
+    }
+
+    if(from.details) {
+        for(auto &&curr: from.details->base) {
+            if(const void *elem = try_cast(curr.second.type(), to, curr.second.cast(instance)); elem) {
+                return elem;
+            }
+        }
+    }
+
+    return nullptr;
 }
 
 template<typename Type>

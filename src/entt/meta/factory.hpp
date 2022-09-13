@@ -202,12 +202,8 @@ public:
 
         internal::meta_base_node node{
             &internal::resolve<Base>,
-            +[](meta_any other) noexcept {
-                if(auto *ptr = other.data(); ptr) {
-                    return forward_as_meta(*static_cast<Base *>(static_cast<Type *>(ptr)));
-                }
-
-                return forward_as_meta(*static_cast<const Base *>(static_cast<const Type *>(std::as_const(other).data())));
+            +[](const void *instance) noexcept {
+                return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance)));
             }};
 
         internal::meta_extend(owner(), type_id<Base>().hash(), std::move(node));

@@ -341,30 +341,17 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
-        auto *self = any_cast<Type>(&storage);
-
-        if(!self && node.details) {
-            for(auto it = node.details->base.cbegin(), last = node.details->base.cend(); it != last && !self; ++it) {
-                const auto &as_const = it->second.cast(as_ref());
-                self = as_const.template try_cast<Type>();
-            }
-        }
-
-        return self;
+        return static_cast<const Type *>(internal::try_cast(node, internal::resolve<std::remove_cv_t<Type>>(), data()));
     }
 
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        auto *self = any_cast<Type>(&storage);
-
-        if(!self && node.details) {
-            for(auto it = node.details->base.cbegin(), last = node.details->base.cend(); it != last && !self; ++it) {
-                self = it->second.cast(as_ref()).template try_cast<Type>();
-            }
+        if constexpr(std::is_const_v<Type>) {
+            return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
+        } else {
+            return static_cast<Type *>(const_cast<void *>(internal::try_cast(node, internal::resolve<Type>(), data())));
         }
-
-        return self;
     }
 
     /**
@@ -1447,7 +1434,15 @@ bool meta_any::set(const id_type id, Type &&value) {
         return as_ref();
     }
 
-    if(node.details) {
+    if(const auto *value = data(); node.details) {
+        for(auto &&curr: node.details->base) {
+            const auto &as_const = curr.second.type().from_void(nullptr, curr.second.cast(value));
+
+            if(auto other = as_const.allow_cast(type); other) {
+                return other;
+            }
+        }
+
         if(auto it = node.details->conv.find(type.info().hash()); it != node.details->conv.cend()) {
             return it->second.conv(data());
         }
@@ -1460,16 +1455,6 @@ bool meta_any::set(const id_type id, Type &&value) {
         const auto value = node.conversion_helper(nullptr, storage.data());
         other.node.conversion_helper(other.storage.data(), &value);
         return other;
-    }
-
-    if(node.details) {
-        for(auto &&curr: node.details->base) {
-            const auto &as_const = curr.second.cast(as_ref());
-
-            if(auto other = as_const.allow_cast(type); other) {
-                return other;
-            }
-        }
     }
 
     return {};
