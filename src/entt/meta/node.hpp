@@ -138,12 +138,12 @@ meta_type_node resolve() noexcept;
 
 template<typename... Args>
 [[nodiscard]] auto *meta_arg_node(type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
-    using element_type = meta_type_node() noexcept;
+    using element_type = meta_type_node (*)() noexcept;
 
     if constexpr(sizeof...(Args) == 0u) {
-        return static_cast<element_type *>(nullptr);
+        return static_cast<element_type>(nullptr);
     } else {
-        element_type *args[sizeof...(Args)]{&internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>...};
+        element_type args[sizeof...(Args)]{&internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>...};
         return args[index];
     }
 }
