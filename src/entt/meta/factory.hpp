@@ -231,8 +231,8 @@ public:
         using conv_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
         internal::meta_conv_node node{
-            +[](const meta_any &instance) {
-                return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance.data())));
+            +[](const void *instance) {
+                return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance)));
             }};
 
         internal::meta_extend(owner(), type_id<conv_type>().hash(), std::move(node));
@@ -253,8 +253,8 @@ public:
         using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
 
         internal::meta_conv_node node{
-            +[](const meta_any &instance) {
-                return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance.data())));
+            +[](const void *instance) {
+                return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)));
             }};
 
         internal::meta_extend(owner(), type_id<conv_type>().hash(), std::move(node));

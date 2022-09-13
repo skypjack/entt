@@ -1449,7 +1449,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 
     if(node.details) {
         if(auto it = node.details->conv.find(type.info().hash()); it != node.details->conv.cend()) {
-            return it->second.conv(*this);
+            return it->second.conv(data());
         }
     }
 
