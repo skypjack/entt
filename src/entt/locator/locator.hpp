@@ -46,7 +46,7 @@ public:
      * @return True if the service locator contains a value, false otherwise.
      */
     [[nodiscard]] static bool has_value() noexcept {
-        return (service.value != nullptr);
+        return (service != nullptr);
     }
 
     /**
@@ -60,7 +60,7 @@ public:
      */
     [[nodiscard]] static Service &value() noexcept {
         ENTT_ASSERT(has_value(), "Service not available");
-        return *service.value;
+        return *service;
     }
 
     /**
@@ -76,7 +76,7 @@ public:
      */
     template<typename Impl = Service, typename... Args>
     [[nodiscard]] static Service &value_or(Args &&...args) {
-        return service.value ? *service.value : emplace<Impl>(std::forward<Args>(args)...);
+        return service ? *service : emplace<Impl>(std::forward<Args>(args)...);
     }
 
     /**
@@ -88,8 +88,8 @@ public:
      */
     template<typename Impl = Service, typename... Args>
     static Service &emplace(Args &&...args) {
-        service.value = std::make_shared<Impl>(std::forward<Args>(args)...);
-        return *service.value;
+        service = std::make_shared<Impl>(std::forward<Args>(args)...);
+        return *service;
     }
 
     /**
@@ -103,8 +103,8 @@ public:
      */
     template<typename Impl = Service, typename Allocator, typename... Args>
     static Service &allocate_emplace(Allocator alloc, Args &&...args) {
-        service.value = std::allocate_shared<Impl>(alloc, std::forward<Args>(args)...);
-        return *service.value;
+        service = std::allocate_shared<Impl>(alloc, std::forward<Args>(args)...);
+        return *service;
     }
 
     /**
@@ -112,7 +112,9 @@ public:
      * @return A handle to the underlying service.
      */
     static node_type handle() noexcept {
-        return service;
+        node_type node{};
+        node.value = service;
+        return node;
     }
 
     /**
@@ -120,11 +122,11 @@ public:
      * @param other Optional handle with which to replace the service.
      */
     static void reset(const node_type &other = {}) noexcept {
-        service = other;
+        service = other.value;
     }
 
 private:
-    inline static service_handle service{};
+    inline static std::shared_ptr<Service> service{};
 };
 
 } // namespace entt
