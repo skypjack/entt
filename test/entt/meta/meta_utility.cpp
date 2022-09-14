@@ -43,6 +43,8 @@ struct clazz {
     inline static int arr[3u]{};
 };
 
+struct dummy {};
+
 struct MetaUtility: ::testing::Test {
     void SetUp() override {
         clazz::value = 0;
@@ -158,6 +160,12 @@ TEST_F(MetaUtility, MetaInvokeWithCandidate) {
     ASSERT_EQ((entt::meta_invoke<clazz>({}, &clazz::get_value, nullptr)).cast<int>(), 99);
     ASSERT_TRUE((entt::meta_invoke<clazz>({}, &clazz::reset_value, nullptr)));
     ASSERT_EQ(args[0u].cast<clazz &>().value, 0);
+
+    const auto setter = [](int &value) { value = 3; };
+    const auto getter = [](int value) { return value * 2; };
+
+    ASSERT_TRUE(entt::meta_invoke<dummy>({}, setter, args + 1u));
+    ASSERT_EQ(entt::meta_invoke<dummy>({}, getter, args + 1u).cast<int>(), 6);
 }
 
 TEST_F(MetaUtility, MetaInvoke) {
@@ -197,6 +205,12 @@ TEST_F(MetaUtility, MetaConstructWithCandidate) {
     ASSERT_EQ(args[0u].cast<const clazz &>().member, 0);
     ASSERT_TRUE((entt::meta_construct<clazz>(&clazz::static_setter, args)));
     ASSERT_EQ(args[0u].cast<const clazz &>().member, 42);
+
+    const auto setter = [](int &value) { value = 3; };
+    const auto builder = [](int value) { return value * 2; };
+
+    ASSERT_TRUE(entt::meta_construct<dummy>(setter, args + 1u));
+    ASSERT_EQ(entt::meta_construct<dummy>(builder, args + 1u).cast<int>(), 6);
 }
 
 TEST_F(MetaUtility, MetaConstruct) {
