@@ -143,7 +143,7 @@ template<typename... Args>
     if constexpr(sizeof...(Args) == 0u) {
         return static_cast<element_type>(nullptr);
     } else {
-        element_type args[sizeof...(Args)]{&internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>...};
+        const element_type args[sizeof...(Args)]{&internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>...};
         return args[index];
     }
 }
