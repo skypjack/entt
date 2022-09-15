@@ -120,16 +120,18 @@ public:
     template<typename... Value>
     meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
         if constexpr(sizeof...(Value) == 0u) {
-            internal::meta_prop_node node{
-                &internal::resolve<void>};
-
-            internal::meta_extend(*parent, id, std::move(node));
+            internal::meta_extend(
+                *parent,
+                id,
+                internal::meta_prop_node{
+                    &internal::resolve<void>});
         } else {
-            internal::meta_prop_node node{
-                &internal::resolve<std::decay_t<Value>>...,
-                std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...};
-
-            internal::meta_extend(*parent, id, std::move(node));
+            internal::meta_extend(
+                *parent,
+                id,
+                internal::meta_prop_node{
+                    &internal::resolve<std::decay_t<Value>>...,
+                    std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
         }
 
         return *this;
@@ -155,16 +157,18 @@ class meta_factory<Type> {
         using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
-        internal::meta_data_node node{
-            /* this is never static */
-            (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
-            Setter::size,
-            &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
-            &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
-            +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
-            &meta_getter<Type, Getter, Policy>};
+        auto &&elem = internal::meta_extend(
+            owner(),
+            id,
+            internal::meta_data_node{
+                /* this is never static */
+                (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
+                Setter::size,
+                &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
+                &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
+                +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
+                &meta_getter<Type, Getter, Policy>});
 
-        auto &&elem = internal::meta_extend(owner(), id, std::move(node));
         return meta_factory<Type, internal::meta_data_node>{elem};
     }
 
@@ -200,13 +204,15 @@ public:
     auto base() noexcept {
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
 
-        internal::meta_base_node node{
-            &internal::resolve<Base>,
-            +[](const void *instance) noexcept {
-                return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance)));
-            }};
+        internal::meta_extend(
+            owner(),
+            type_id<Base>().hash(),
+            internal::meta_base_node{
+                &internal::resolve<Base>,
+                +[](const void *instance) noexcept {
+                    return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance)));
+                }});
 
-        internal::meta_extend(owner(), type_id<Base>().hash(), std::move(node));
         return *this;
     }
 
@@ -226,12 +232,14 @@ public:
     auto conv() noexcept {
         using conv_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
-        internal::meta_conv_node node{
-            +[](const void *instance) {
-                return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance)));
-            }};
+        internal::meta_extend(
+            owner(),
+            type_id<conv_type>().hash(),
+            internal::meta_conv_node{
+                +[](const void *instance) {
+                    return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance)));
+                }});
 
-        internal::meta_extend(owner(), type_id<conv_type>().hash(), std::move(node));
         return *this;
     }
 
@@ -248,12 +256,14 @@ public:
     auto conv() noexcept {
         using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
 
-        internal::meta_conv_node node{
-            +[](const void *instance) {
-                return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)));
-            }};
+        internal::meta_extend(
+            owner(),
+            type_id<conv_type>().hash(),
+            internal::meta_conv_node{
+                +[](const void *instance) {
+                    return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)));
+                }});
 
-        internal::meta_extend(owner(), type_id<conv_type>().hash(), std::move(node));
         return *this;
     }
 
@@ -276,12 +286,14 @@ public:
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
 
-        internal::meta_ctor_node node{
-            descriptor::args_type::size,
-            &meta_arg<typename descriptor::args_type>,
-            &meta_construct<Type, Candidate, Policy>};
+        internal::meta_extend(
+            owner(),
+            type_id<typename descriptor::args_type>().hash(),
+            internal::meta_ctor_node{
+                descriptor::args_type::size,
+                &meta_arg<typename descriptor::args_type>,
+                &meta_construct<Type, Candidate, Policy>});
 
-        internal::meta_extend(owner(), type_id<typename descriptor::args_type>().hash(), std::move(node));
         return *this;
     }
 
@@ -299,12 +311,14 @@ public:
     auto ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
 
-        internal::meta_ctor_node node{
-            descriptor::args_type::size,
-            &meta_arg<typename descriptor::args_type>,
-            &meta_construct<Type, Args...>};
+        internal::meta_extend(
+            owner(),
+            type_id<typename descriptor::args_type>().hash(),
+            internal::meta_ctor_node{
+                descriptor::args_type::size,
+                &meta_arg<typename descriptor::args_type>,
+                &meta_construct<Type, Args...>});
 
-        internal::meta_extend(owner(), type_id<typename descriptor::args_type>().hash(), std::move(node));
         return *this;
     }
 
@@ -329,8 +343,12 @@ public:
     template<auto Func>
     auto dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
-        internal::meta_dtor_node node{+[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); }};
-        internal::meta_extend(owner(), std::move(node));
+
+        internal::meta_extend(
+            owner(),
+            internal::meta_dtor_node{
+                +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); }});
+
         return *this;
     }
 
@@ -352,29 +370,33 @@ public:
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
 
-            internal::meta_data_node node{
-                /* this is never static */
-                std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
-                1u,
-                &internal::resolve<std::remove_const_t<data_type>>,
-                &meta_arg<type_list<std::remove_const_t<data_type>>>,
-                &meta_setter<Type, Data>,
-                &meta_getter<Type, Data, Policy>};
+            auto &&elem = internal::meta_extend(
+                owner(),
+                id,
+                internal::meta_data_node{
+                    /* this is never static */
+                    std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
+                    1u,
+                    &internal::resolve<std::remove_const_t<data_type>>,
+                    &meta_arg<type_list<std::remove_const_t<data_type>>>,
+                    &meta_setter<Type, Data>,
+                    &meta_getter<Type, Data, Policy>});
 
-            auto &&elem = internal::meta_extend(owner(), id, std::move(node));
             return meta_factory<Type, internal::meta_data_node>{elem};
         } else {
             using data_type = std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>;
 
-            internal::meta_data_node node{
-                ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
-                1u,
-                &internal::resolve<std::remove_const_t<data_type>>,
-                &meta_arg<type_list<std::remove_const_t<data_type>>>,
-                &meta_setter<Type, Data>,
-                &meta_getter<Type, Data, Policy>};
+            auto &&elem = internal::meta_extend(
+                owner(),
+                id,
+                internal::meta_data_node{
+                    ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
+                    1u,
+                    &internal::resolve<std::remove_const_t<data_type>>,
+                    &meta_arg<type_list<std::remove_const_t<data_type>>>,
+                    &meta_setter<Type, Data>,
+                    &meta_getter<Type, Data, Policy>});
 
-            auto &&elem = internal::meta_extend(owner(), id, std::move(node));
             return meta_factory<Type, internal::meta_data_node>{elem};
         }
     }
@@ -405,30 +427,34 @@ public:
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
-            internal::meta_data_node node{
-                /* this is never static */
-                internal::meta_traits::is_const,
-                0u,
-                &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
-                &meta_arg<type_list<>>,
-                &meta_setter<Type, Setter>,
-                &meta_getter<Type, Getter, Policy>};
+            auto &&elem = internal::meta_extend(
+                owner(),
+                id,
+                internal::meta_data_node{
+                    /* this is never static */
+                    internal::meta_traits::is_const,
+                    0u,
+                    &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
+                    &meta_arg<type_list<>>,
+                    &meta_setter<Type, Setter>,
+                    &meta_getter<Type, Getter, Policy>});
 
-            auto &&elem = internal::meta_extend(owner(), id, std::move(node));
             return meta_factory<Type, internal::meta_data_node>{elem};
         } else {
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
-            internal::meta_data_node node{
-                /* this is never static nor const */
-                internal::meta_traits::is_none,
-                1u,
-                &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
-                &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
-                &meta_setter<Type, Setter>,
-                &meta_getter<Type, Getter, Policy>};
+            auto &&elem = internal::meta_extend(
+                owner(),
+                id,
+                internal::meta_data_node{
+                    /* this is never static nor const */
+                    internal::meta_traits::is_none,
+                    1u,
+                    &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
+                    &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
+                    &meta_setter<Type, Setter>,
+                    &meta_getter<Type, Getter, Policy>});
 
-            auto &&elem = internal::meta_extend(owner(), id, std::move(node));
             return meta_factory<Type, internal::meta_data_node>{elem};
         }
     }
@@ -473,14 +499,16 @@ public:
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
-        internal::meta_func_node node{
-            (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
-            descriptor::args_type::size,
-            &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
-            &meta_arg<typename descriptor::args_type>,
-            &meta_invoke<Type, Candidate, Policy>};
+        auto &&elem = internal::meta_extend(
+            owner(),
+            id,
+            internal::meta_func_node{
+                (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
+                descriptor::args_type::size,
+                &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
+                &meta_arg<typename descriptor::args_type>,
+                &meta_invoke<Type, Candidate, Policy>});
 
-        auto &&elem = internal::meta_extend(owner(), id, std::move(node));
         return meta_factory<Type, internal::meta_func_node>{elem};
     }
 };
