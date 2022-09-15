@@ -52,10 +52,6 @@ struct meta_prop_node {
     std::shared_ptr<void> value{};
 };
 
-struct meta_prop_map {
-    dense_map<id_type, meta_prop_node, identity> prop{};
-};
-
 struct meta_base_node {
     meta_type_node (*type)() noexcept {};
     const void *(*cast)(const void *) noexcept {};
@@ -86,7 +82,7 @@ struct meta_data_node {
     meta_type (*arg)(const size_type) noexcept {};
     bool (*set)(meta_handle, meta_any){};
     meta_any (*get)(meta_handle){};
-    std::shared_ptr<meta_prop_map> details{};
+    dense_map<id_type, meta_prop_node, identity> prop{};
 };
 
 struct meta_func_node {
@@ -98,7 +94,7 @@ struct meta_func_node {
     meta_type (*arg)(const size_type) noexcept {};
     meta_any (*invoke)(meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next{};
-    std::shared_ptr<meta_prop_map> details{};
+    dense_map<id_type, meta_prop_node, identity> prop{};
 };
 
 struct meta_template_node {
@@ -109,12 +105,13 @@ struct meta_template_node {
     meta_type_node (*arg)(const size_type) noexcept {};
 };
 
-struct meta_type_descriptor: meta_prop_map {
+struct meta_type_descriptor {
     dense_map<id_type, meta_ctor_node, identity> ctor{};
     dense_map<id_type, meta_base_node, identity> base{};
     dense_map<id_type, meta_conv_node, identity> conv{};
     dense_map<id_type, meta_data_node, identity> data{};
     dense_map<id_type, meta_func_node, identity> func{};
+    dense_map<id_type, meta_prop_node, identity> prop{};
 };
 
 struct meta_type_node {

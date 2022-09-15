@@ -644,19 +644,23 @@ struct meta_prop {
     /*! @brief Node type. */
     using node_type = internal::meta_prop_node;
 
+    /*! @brief Default constructor. */
+    meta_prop() noexcept
+        : node{} {}
+
     /**
      * @brief Constructs an instance from a given node.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_prop(const node_type &curr = {}) noexcept
-        : node{curr} {}
+    meta_prop(const node_type &curr) noexcept
+        : node{&curr} {}
 
     /**
      * @brief Returns the stored value by copy.
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node.value ? node.type().from_void(nullptr, node.value.get()) : meta_any{};
+        return node->value ? node->type().from_void(nullptr, node->value.get()) : meta_any{};
     }
 
     /**
@@ -664,63 +668,37 @@ struct meta_prop {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(node.type == nullptr);
+        return (node != nullptr);
     }
 
 private:
-    node_type node;
+    const node_type *node;
 };
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-namespace internal {
-
-struct meta_common {
-    template<typename Type, auto Member, typename Node>
-    [[nodiscard]] auto range(const std::shared_ptr<Node> &node) const noexcept {
-        using return_type = meta_range<Type, typename std::decay_t<decltype(((*node).*Member))>::const_iterator>;
-        return node ? return_type{((*node).*Member).cbegin(), ((*node).*Member).cend()} : return_type{};
-    }
-
-    template<typename Type, auto Member, typename Node>
-    [[nodiscard]] auto find(const std::shared_ptr<Node> &node, const id_type key) const {
-        if(node) {
-            if(const auto it = ((*node).*Member).find(key); it != ((*node).*Member).cend()) {
-                return Type{it->second};
-            }
-        }
-
-        return Type{};
-    }
-};
-
-} // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
 
 /*! @brief Opaque wrapper for data members. */
-struct meta_data: private internal::meta_common {
+struct meta_data {
     /*! @brief Node type. */
     using node_type = internal::meta_data_node;
     /*! @brief Unsigned integer type. */
     using size_type = typename node_type::size_type;
 
-    /*! @copydoc meta_prop::meta_prop */
-    meta_data(const node_type &curr = {}) noexcept
-        : node{curr} {}
+    /*! @brief Default constructor. */
+    meta_data() noexcept
+        : node{} {}
+
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_data(const node_type &curr) noexcept
+        : node{&curr} {}
 
     /**
      * @brief Returns the number of setters available.
      * @return The number of setters available.
      */
     [[nodiscard]] size_type arity() const noexcept {
-        return node.arity;
+        return node->arity;
     }
 
     /**
@@ -728,7 +706,7 @@ struct meta_data: private internal::meta_common {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_const);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -736,7 +714,7 @@ struct meta_data: private internal::meta_common {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_static);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_static);
     }
 
     /*! @copydoc meta_any::type */
@@ -757,7 +735,7 @@ struct meta_data: private internal::meta_common {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node.set && node.set(std::move(instance), std::forward<Type>(value));
+        return node->set && node->set(std::move(instance), std::forward<Type>(value));
     }
 
     /**
@@ -770,7 +748,7 @@ struct meta_data: private internal::meta_common {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node.get(std::move(instance));
+        return node->get(std::move(instance));
     }
 
     /**
@@ -784,8 +762,8 @@ struct meta_data: private internal::meta_common {
      * @brief Returns a range to visit registered meta properties.
      * @return An iterable range to visit registered meta properties.
      */
-    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_prop_map::prop)::const_iterator> prop() const noexcept {
-        return meta_common::range<meta_prop, &internal::meta_prop_map::prop>(node.details);
+    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_data_node::prop)::const_iterator> prop() const noexcept {
+        return {node->prop.cbegin(), node->prop.cend()};
     }
 
     /**
@@ -794,7 +772,8 @@ struct meta_data: private internal::meta_common {
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        return meta_common::find<meta_prop, &internal::meta_prop_map::prop>(node.details, key);
+        const auto it = node->prop.find(key);
+        return it != node->prop.cend() ? meta_prop{it->second} : meta_prop{};
     }
 
     /**
@@ -802,30 +781,37 @@ struct meta_data: private internal::meta_common {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(node.type == nullptr);
+        return (node != nullptr);
     }
 
 private:
-    node_type node;
+    const node_type *node;
 };
 
 /*! @brief Opaque wrapper for member functions. */
-struct meta_func: private internal::meta_common {
+struct meta_func {
     /*! @brief Node type. */
     using node_type = internal::meta_func_node;
     /*! @brief Unsigned integer type. */
     using size_type = typename node_type::size_type;
 
-    /*! @copydoc meta_prop::meta_prop */
-    meta_func(const node_type &curr = {}) noexcept
-        : node{curr} {}
+    /*! @brief Default constructor. */
+    meta_func() noexcept
+        : node{} {}
+
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_func(const node_type &curr) noexcept
+        : node{&curr} {}
 
     /**
      * @brief Returns the number of arguments accepted by a member function.
      * @return The number of arguments accepted by the member function.
      */
     [[nodiscard]] size_type arity() const noexcept {
-        return node.arity;
+        return node->arity;
     }
 
     /**
@@ -833,7 +819,7 @@ struct meta_func: private internal::meta_common {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_const);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -841,7 +827,7 @@ struct meta_func: private internal::meta_common {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_static);
+        return static_cast<bool>(node->traits & internal::meta_traits::is_static);
     }
 
     /**
@@ -872,7 +858,7 @@ struct meta_func: private internal::meta_common {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return sz == arity() ? node.invoke(std::move(instance), args) : meta_any{};
+        return sz == arity() ? node->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**
@@ -892,8 +878,8 @@ struct meta_func: private internal::meta_common {
     }
 
     /*! @copydoc meta_data::prop */
-    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_prop_map::prop)::const_iterator> prop() const noexcept {
-        return meta_common::range<meta_prop, &internal::meta_prop_map::prop>(node.details);
+    [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_func_node::prop)::const_iterator> prop() const noexcept {
+        return {node->prop.cbegin(), node->prop.cend()};
     }
 
     /**
@@ -902,7 +888,8 @@ struct meta_func: private internal::meta_common {
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        return meta_common::find<meta_prop, &internal::meta_prop_map::prop>(node.details, key);
+        const auto it = node->prop.find(key);
+        return it != node->prop.cend() ? meta_prop{it->second} : meta_prop{};
     }
 
     /**
@@ -910,7 +897,7 @@ struct meta_func: private internal::meta_common {
      * @return The next overload of the given function, if any.
      */
     [[nodiscard]] meta_func next() const {
-        return node.next ? meta_func{*node.next} : meta_func{};
+        return node->next ? meta_func{*node->next} : meta_func{};
     }
 
     /**
@@ -918,15 +905,15 @@ struct meta_func: private internal::meta_common {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(node.invoke == nullptr);
+        return (node != nullptr);
     }
 
 private:
-    node_type node;
+    const node_type *node;
 };
 
 /*! @brief Opaque wrapper for types. */
-class meta_type: private internal::meta_common {
+class meta_type {
     template<typename Func>
     [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Func next) const {
         decltype(next()) candidate = nullptr;
@@ -984,7 +971,10 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename node_type::size_type;
 
-    /*! @copydoc meta_prop::meta_prop */
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
     meta_type(const node_type &curr = {}) noexcept
         : node{curr} {}
 
@@ -1153,7 +1143,8 @@ public:
      * @return An iterable range to visit registered top-level base meta types.
      */
     [[nodiscard]] meta_range<meta_type, typename decltype(internal::meta_type_descriptor::base)::const_iterator> base() const noexcept {
-        return meta_common::range<meta_type, &internal::meta_type_descriptor::base>(node.details);
+        using range_type = meta_range<meta_type, typename decltype(internal::meta_type_descriptor::base)::const_iterator>;
+        return node.details ? range_type{node.details->base.cbegin(), node.details->base.cend()} : range_type{};
     }
 
     /**
@@ -1161,7 +1152,8 @@ public:
      * @return An iterable range to visit registered top-level meta data.
      */
     [[nodiscard]] meta_range<meta_data, typename decltype(internal::meta_type_descriptor::data)::const_iterator> data() const noexcept {
-        return meta_common::range<meta_data, &internal::meta_type_descriptor::data>(node.details);
+        using range_type = meta_range<meta_data, typename decltype(internal::meta_type_descriptor::data)::const_iterator>;
+        return node.details ? range_type{node.details->data.cbegin(), node.details->data.cend()} : range_type{};
     }
 
     /**
@@ -1173,8 +1165,10 @@ public:
      * @return The registered meta data for the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        if(auto elem = meta_common::find<meta_data, &internal::meta_type_descriptor::data>(node.details, id)) {
-            return elem;
+        if(node.details) {
+            if(const auto it = node.details->data.find(id); it != node.details->data.cend()) {
+                return it->second;
+            }
         }
 
         return forward_to_bases([id](auto &&type) { return type.data(id); });
@@ -1200,8 +1194,10 @@ public:
      * @return The registered meta function for the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        if(auto elem = meta_common::find<meta_func, &internal::meta_type_descriptor::func>(node.details, id)) {
-            return elem;
+        if(node.details) {
+            if(const auto it = node.details->func.find(id); it != node.details->func.cend()) {
+                return it->second;
+            }
         }
 
         return forward_to_bases([id](auto &&type) { return type.func(id); });
@@ -1352,7 +1348,8 @@ public:
      * @return An iterable range to visit registered top-level meta properties.
      */
     [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_type_descriptor::prop)::const_iterator> prop() const noexcept {
-        return meta_common::range<meta_prop, &internal::meta_type_descriptor::prop>(node.details);
+        using range_type = meta_range<meta_prop, typename decltype(internal::meta_type_descriptor::prop)::const_iterator>;
+        return node.details ? range_type{node.details->prop.cbegin(), node.details->prop.cend()} : range_type{};
     }
 
     /**
@@ -1364,8 +1361,10 @@ public:
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        if(auto elem = meta_common::find<meta_prop, &internal::meta_type_descriptor::prop>(node.details, key)) {
-            return elem;
+        if(node.details) {
+            if(const auto it = node.details->prop.find(key); it != node.details->prop.cend()) {
+                return it->second;
+            }
         }
 
         return forward_to_bases([key](auto &&type) { return type.prop(key); });
@@ -1474,19 +1473,19 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return node.type();
+    return node->type();
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
-    return index < arity() ? node.arg(index) : meta_type{};
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return node.ret();
+    return node->ret();
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
-    return index < arity() ? node.arg(index) : meta_type{};
+    return index < arity() ? node->arg(index) : meta_type{};
 }
 
 /**
