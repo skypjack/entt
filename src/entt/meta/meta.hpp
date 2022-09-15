@@ -1477,12 +1477,12 @@ inline bool meta_any::assign(meta_any &&other) {
     return node.type();
 }
 
-[[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return node.ret();
-}
-
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
     return index < arity() ? node.arg(index) : meta_type{};
+}
+
+[[nodiscard]] inline meta_type meta_func::ret() const noexcept {
+    return node.ret();
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
