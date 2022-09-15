@@ -18,7 +18,7 @@
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_property(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_property(entt::internal::meta_traits::is_static)</Item>
-			<Item Name="[details]" Condition="details != nullptr">*details</Item>
+			<Item Name="[prop]">prop</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_func_node"	>
@@ -29,8 +29,8 @@
 		<Expand>
 			<Item Name="[is_const]">has_property(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_property(entt::internal::meta_traits::is_static)</Item>
-			<Item Name="[details]" Condition="details != nullptr">*details</Item>
 			<Item Name="[next]" Condition="next != nullptr">*next</Item>
+			<Item Name="[prop]">prop</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_prop_node">
@@ -81,21 +81,24 @@
 		<DisplayString>{ storage }</DisplayString>
 	</Type>
 	<Type Name="entt::meta_data">
-		<DisplayString>{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem>node</ExpandedItem>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_func">
-		<DisplayString>{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem>node</ExpandedItem>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_prop">
-		<DisplayString>{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem>node</ExpandedItem>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_type">
