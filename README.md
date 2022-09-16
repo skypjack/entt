@@ -13,6 +13,8 @@
 
 > `EnTT` has been a dream so far, we haven't found a single bug to date and it's
 > super easy to work with
+>
+> -- Every EnTT User Ever
 
 `EnTT` is a header-only, tiny and easy to use library for game programming and
 much more written in **modern C++**.<br/>
