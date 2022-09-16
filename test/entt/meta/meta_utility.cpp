@@ -4,6 +4,7 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/utility.hpp>
+#include "../common/config.h"
 
 struct clazz {
     void setter(int v) {
@@ -51,6 +52,8 @@ struct MetaUtility: ::testing::Test {
     }
 };
 
+using MetaUtilityDeathTest = MetaUtility;
+
 TEST_F(MetaUtility, MetaDispatch) {
     int value = 42;
 
@@ -77,6 +80,11 @@ TEST_F(MetaUtility, MetaDispatch) {
 TEST_F(MetaUtility, MetaArg) {
     ASSERT_EQ((entt::meta_arg<entt::type_list<int, char>>(0u)), entt::resolve<int>());
     ASSERT_EQ((entt::meta_arg<entt::type_list<int, char>>(1u)), entt::resolve<char>());
+}
+
+ENTT_DEBUG_TEST_F(MetaUtilityDeathTest, MetaArg) {
+    ASSERT_DEATH([[maybe_unused]] auto type = entt::meta_arg<entt::type_list<>>(0u), "");
+    ASSERT_DEATH([[maybe_unused]] auto type = entt::meta_arg<entt::type_list<int>>(3u), "");
 }
 
 TEST_F(MetaUtility, MetaSetter) {

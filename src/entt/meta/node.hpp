@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/attribute.h"
 #include "../core/enum.hpp"
@@ -141,6 +142,7 @@ template<typename... Args>
         return static_cast<element_type>(nullptr);
     } else {
         const element_type args[sizeof...(Args)]{&internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>>...};
+        ENTT_ASSERT(index < sizeof...(Args), "Out of bounds");
         return args[index];
     }
 }
