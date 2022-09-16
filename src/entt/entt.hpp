@@ -1,3 +1,4 @@
+// IWYU pragma: begin_exports
 #include "config/config.h"
 #include "config/macro.h"
 #include "config/version.h"
@@ -27,10 +28,10 @@
 #include "entity/organizer.hpp"
 #include "entity/registry.hpp"
 #include "entity/runtime_view.hpp"
-#include "entity/sigh_storage_mixin.hpp"
 #include "entity/snapshot.hpp"
 #include "entity/sparse_set.hpp"
 #include "entity/storage.hpp"
+#include "entity/storage_mixin.hpp"
 #include "entity/view.hpp"
 #include "graph/adjacency_matrix.hpp"
 #include "graph/dot.hpp"
@@ -60,3 +61,4 @@
 #include "signal/dispatcher.hpp"
 #include "signal/emitter.hpp"
 #include "signal/sigh.hpp"
+// IWYU pragma: end_exports

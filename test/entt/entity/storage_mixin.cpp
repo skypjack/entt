@@ -25,7 +25,8 @@ struct counter {
     int value{};
 };
 
-void listener(counter &counter, entt::registry &, entt::entity) {
+template<typename Registry>
+void listener(counter &counter, Registry &, typename Registry::entity_type) {
     ++counter.value;
 }
 
@@ -39,8 +40,8 @@ TEST(SighStorageMixin, GenericType) {
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener>(on_construct);
-    pool.on_destroy().connect<&listener>(on_destroy);
+    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
     ASSERT_NE(base.emplace(entities[0u]), base.end());
 
@@ -104,8 +105,8 @@ TEST(SighStorageMixin, StableType) {
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener>(on_construct);
-    pool.on_destroy().connect<&listener>(on_destroy);
+    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
     ASSERT_NE(base.emplace(entities[0u]), base.end());
 
@@ -169,8 +170,8 @@ TEST(SighStorageMixin, EmptyType) {
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener>(on_construct);
-    pool.on_destroy().connect<&listener>(on_destroy);
+    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
     ASSERT_NE(base.emplace(entities[0u]), base.end());
 
@@ -234,8 +235,8 @@ TEST(SighStorageMixin, NonDefaultConstructibleType) {
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener>(on_construct);
-    pool.on_destroy().connect<&listener>(on_destroy);
+    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
     ASSERT_EQ(base.emplace(entities[0u]), base.end());
 
@@ -288,8 +289,8 @@ TEST(SighStorageMixin, VoidType) {
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener>(on_construct);
-    pool.on_destroy().connect<&listener>(on_destroy);
+    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
     pool.emplace(entt::entity{99});
 
@@ -320,8 +321,8 @@ TEST(SighStorageMixin, Move) {
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener>(on_construct);
-    pool.on_destroy().connect<&listener>(on_destroy);
+    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
     pool.emplace(entt::entity{3}, 3);
 
@@ -373,12 +374,12 @@ TEST(SighStorageMixin, Swap) {
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener>(on_construct);
-    pool.on_destroy().connect<&listener>(on_destroy);
+    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
     other.bind(entt::forward_as_any(registry));
-    other.on_construct().connect<&listener>(on_construct);
-    other.on_destroy().connect<&listener>(on_destroy);
+    other.on_construct().connect<&listener<entt::registry>>(on_construct);
+    other.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
     pool.emplace(entt::entity{42}, 41);
 
@@ -412,14 +413,15 @@ TEST(SighStorageMixin, Swap) {
 
 TEST(SighStorageMixin, CustomAllocator) {
     auto test = [](auto pool, auto alloc) {
-        entt::registry registry;
+        using registry_type = typename decltype(pool)::registry_type;
+        registry_type registry;
 
         counter on_construct{};
         counter on_destroy{};
 
         pool.bind(entt::forward_as_any(registry));
-        pool.on_construct().template connect<&listener>(on_construct);
-        pool.on_destroy().template connect<&listener>(on_destroy);
+        pool.on_construct().template connect<&listener<registry_type>>(on_construct);
+        pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
 
         pool.reserve(1u);
 
@@ -473,18 +475,19 @@ TEST(SighStorageMixin, ThrowingAllocator) {
     auto test = [](auto pool) {
         using pool_allocator_type = typename decltype(pool)::allocator_type;
         using value_type = typename decltype(pool)::value_type;
+        using registry_type = typename decltype(pool)::registry_type;
 
         typename std::decay_t<decltype(pool)>::base_type &base = pool;
         constexpr auto packed_page_size = entt::component_traits<typename decltype(pool)::value_type>::page_size;
         constexpr auto sparse_page_size = entt::entt_traits<typename decltype(pool)::entity_type>::page_size;
-        entt::registry registry;
+        registry_type registry;
 
         counter on_construct{};
         counter on_destroy{};
 
         pool.bind(entt::forward_as_any(registry));
-        pool.on_construct().template connect<&listener>(on_construct);
-        pool.on_destroy().template connect<&listener>(on_destroy);
+        pool.on_construct().template connect<&listener<registry_type>>(on_construct);
+        pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
 
         pool_allocator_type::trigger_on_allocate = true;
 
@@ -546,14 +549,15 @@ TEST(SighStorageMixin, ThrowingAllocator) {
 
 TEST(SighStorageMixin, ThrowingComponent) {
     entt::sigh_storage_mixin<entt::storage<test::throwing_type>> pool;
-    entt::registry registry;
+    using registry_type = typename decltype(pool)::registry_type;
+    registry_type registry;
 
     counter on_construct{};
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener>(on_construct);
-    pool.on_destroy().connect<&listener>(on_destroy);
+    pool.on_construct().connect<&listener<registry_type>>(on_construct);
+    pool.on_destroy().connect<&listener<registry_type>>(on_destroy);
 
     test::throwing_type::trigger_on_value = 42;
 

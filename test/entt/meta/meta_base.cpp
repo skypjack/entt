@@ -181,15 +181,9 @@ TEST_F(MetaBase, TransferWithMutatingThis) {
 TEST_F(MetaBase, ReRegistration) {
     SetUp();
 
-    auto *node = entt::internal::meta_node<derived_t>::resolve();
+    auto &&node = entt::internal::resolve<derived_t>();
 
-    ASSERT_NE(node->base, nullptr);
-    ASSERT_NE(node->base->type->base, nullptr);
-    ASSERT_EQ(node->base->type->base->next, nullptr);
-    ASSERT_EQ(node->base->type->base->type->base, nullptr);
-
-    ASSERT_NE(node->base->next, nullptr);
-    ASSERT_EQ(node->base->next->type->base, nullptr);
-
-    ASSERT_EQ(node->base->next->next, nullptr);
+    ASSERT_TRUE(node.details);
+    ASSERT_FALSE(node.details->base.empty());
+    ASSERT_EQ(node.details->base.size(), 2u);
 }

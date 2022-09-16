@@ -24,9 +24,17 @@ namespace entt {
  * @tparam Service Service type.
  */
 template<typename Service>
-struct locator final {
+class locator final {
+    class service_handle {
+        friend class locator<Service>;
+        std::shared_ptr<Service> value{};
+    };
+
+public:
     /*! @brief Service type. */
     using type = Service;
+    /*! @brief Service node type. */
+    using node_type = service_handle;
 
     /*! @brief Default constructor, deleted on purpose. */
     locator() = delete;
@@ -99,14 +107,26 @@ struct locator final {
         return *service;
     }
 
-    /*! @brief Resets a service. */
-    static void reset() noexcept {
-        service.reset();
+    /**
+     * @brief Returns a handle to the underlying service.
+     * @return A handle to the underlying service.
+     */
+    static node_type handle() noexcept {
+        node_type node{};
+        node.value = service;
+        return node;
+    }
+
+    /**
+     * @brief Resets or replaces a service.
+     * @param other Optional handle with which to replace the service.
+     */
+    static void reset(const node_type &other = {}) noexcept {
+        service = other.value;
     }
 
 private:
-    // std::shared_ptr because of its type erased allocator which is pretty useful here
-    inline static std::shared_ptr<Service> service = nullptr;
+    inline static std::shared_ptr<Service> service{};
 };
 
 } // namespace entt

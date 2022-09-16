@@ -207,6 +207,8 @@ TEST(Registry, Functionalities) {
 
     entt::registry registry;
 
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = registry.get_allocator());
+
     ASSERT_EQ(registry.size(), 0u);
     ASSERT_EQ(registry.alive(), 0u);
     ASSERT_NO_FATAL_FAILURE(registry.reserve(42));
@@ -394,6 +396,36 @@ TEST(Registry, Move) {
     ASSERT_EQ(test.parent, &registry);
 }
 
+TEST(Registry, Swap) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    owner test{};
+
+    registry.on_construct<int>().connect<&owner::receive>(test);
+    registry.on_destroy<int>().connect<&owner::receive>(test);
+
+    ASSERT_EQ(test.parent, nullptr);
+
+    registry.emplace<int>(entity);
+
+    ASSERT_EQ(test.parent, &registry);
+
+    entt::registry other;
+    other.swap(registry);
+    other.erase<int>(entity);
+
+    registry = {};
+    registry.emplace<int>(registry.create(entity));
+
+    ASSERT_EQ(test.parent, &other);
+
+    registry.swap(other);
+    registry.emplace<int>(entity);
+    registry.emplace<int>(registry.create(entity));
+
+    ASSERT_EQ(test.parent, &registry);
+}
+
 TEST(Registry, ReplaceAggregate) {
     entt::registry registry;
     const auto entity = registry.create();
@@ -552,14 +584,20 @@ TEST(Registry, CreateClearCycle) {
     for(int i = 0; i < 7; ++i) {
         const auto entity = registry.create();
         registry.emplace<int>(entity);
-        if(i == 3) { pre = entity; }
+
+        if(i == 3) {
+            pre = entity;
+        }
     }
 
     registry.clear();
 
     for(int i = 0; i < 5; ++i) {
         const auto entity = registry.create();
-        if(i == 3) { post = entity; }
+
+        if(i == 3) {
+            post = entity;
+        }
     }
 
     ASSERT_FALSE(registry.valid(pre));
@@ -814,7 +852,7 @@ TEST(Registry, Each) {
     match = 0u;
 
     registry.each([&](auto entity) {
-        if(registry.all_of<int>(entity)) { ++match; }
+        match += registry.all_of<int>(entity);
         static_cast<void>(registry.create());
         ++tot;
     });
@@ -841,7 +879,7 @@ TEST(Registry, Each) {
     match = 0u;
 
     registry.each([&](auto entity) {
-        if(registry.all_of<int>(entity)) { ++match; }
+        match += registry.all_of<int>(entity);
         registry.destroy(entity);
         ++tot;
     });

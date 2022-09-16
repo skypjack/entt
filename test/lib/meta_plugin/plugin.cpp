@@ -1,5 +1,6 @@
 #include <cr.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
@@ -33,7 +34,7 @@ void tear_down() {
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
     switch(operation) {
     case CR_LOAD:
-        entt::meta_ctx::bind(static_cast<userdata *>(ctx->userdata)->ctx);
+        entt::locator<entt::meta_ctx>::reset(static_cast<userdata *>(ctx->userdata)->ctx);
         set_up();
         break;
     case CR_STEP:

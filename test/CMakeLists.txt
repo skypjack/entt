@@ -84,6 +84,7 @@ function(SETUP_TARGET TARGET_NAME)
 endfunction()
 
 add_library(odr OBJECT odr.cpp)
+set_target_properties(odr PROPERTIES POSITION_INDEPENDENT_CODE ON)
 SETUP_TARGET(odr)
 
 function(SETUP_BASIC_TEST TEST_NAME TEST_SOURCES)
@@ -107,6 +108,7 @@ function(SETUP_PLUGIN_TEST TEST_NAME)
     target_include_directories(_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_include_directories(lib_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_link_libraries(lib_${TEST_NAME} PRIVATE ${CMAKE_DL_LIBS})
+    add_dependencies(lib_${TEST_NAME} _${TEST_NAME})
 endfunction()
 
 # Test benchmark
@@ -142,11 +144,13 @@ if(ENTT_BUILD_LIB)
 
     SETUP_LIB_TEST(dispatcher)
     SETUP_LIB_TEST(emitter)
+    SETUP_LIB_TEST(locator)
     SETUP_LIB_TEST(meta)
     SETUP_LIB_TEST(registry)
 
     SETUP_PLUGIN_TEST(dispatcher_plugin)
     SETUP_PLUGIN_TEST(emitter_plugin)
+    SETUP_PLUGIN_TEST(locator_plugin)
     SETUP_PLUGIN_TEST(meta_plugin)
     SETUP_PLUGIN_TEST(registry_plugin)
 
@@ -211,10 +215,10 @@ SETUP_BASIC_TEST(observer entt/entity/observer.cpp)
 SETUP_BASIC_TEST(organizer entt/entity/organizer.cpp)
 SETUP_BASIC_TEST(registry entt/entity/registry.cpp)
 SETUP_BASIC_TEST(runtime_view entt/entity/runtime_view.cpp)
-SETUP_BASIC_TEST(sigh_storage_mixin entt/entity/sigh_storage_mixin.cpp)
 SETUP_BASIC_TEST(snapshot entt/entity/snapshot.cpp)
 SETUP_BASIC_TEST(sparse_set entt/entity/sparse_set.cpp)
 SETUP_BASIC_TEST(storage entt/entity/storage.cpp)
+SETUP_BASIC_TEST(storage_mixin entt/entity/storage_mixin.cpp)
 SETUP_BASIC_TEST(view entt/entity/view.cpp)
 
 # Test graph

@@ -13,6 +13,7 @@
 #include "../container/dense_map.hpp"
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
+#include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
@@ -178,7 +179,7 @@ public:
 
     template<typename Type>
     Type &insert_or_assign(const id_type id, Type &&value) {
-        return any_cast<std::remove_const_t<std::remove_reference_t<Type>> &>(ctx.insert_or_assign(id, std::forward<Type>(value)).first->second);
+        return any_cast<std::remove_cv_t<std::remove_reference_t<Type>> &>(ctx.insert_or_assign(id, std::forward<Type>(value)).first->second);
     }
 
     template<typename Type>
@@ -244,11 +245,13 @@ private:
 /**
  * @brief Fast and reliable entity-component system.
  * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Entity>
+template<typename Entity, typename Allocator>
 class basic_registry {
     using entity_traits = entt_traits<Entity>;
-    using basic_common_type = basic_sparse_set<Entity>;
+    using basic_common_type = basic_sparse_set<Entity, Allocator>;
+    using alloc_traits = typename std::allocator_traits<Allocator>;
 
     template<typename Type>
     using storage_for_type = typename storage_for<Type, Entity>::type;
@@ -348,7 +351,15 @@ class basic_registry {
         return vers;
     }
 
+    void rebind() {
+        for(auto &&curr: pools) {
+            curr.second->bind(forward_as_any(*this));
+        }
+    }
+
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Underlying version type. */
@@ -362,18 +373,26 @@ public:
 
     /*! @brief Default constructor. */
     basic_registry()
-        : pools{},
-          groups{},
-          epool{},
-          free_list{tombstone},
-          vars{} {}
+        : basic_registry{allocator_type{}} {}
+
+    /**
+     * @brief Constructs an empty registry with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_registry(const allocator_type &allocator)
+        : basic_registry{0u, allocator} {}
 
     /**
      * @brief Allocates enough memory upon construction to store `count` pools.
      * @param count The number of pools to allocate memory for.
+     * @param allocator The allocator to use.
      */
-    basic_registry(const size_type count)
-        : basic_registry{} {
+    basic_registry(const size_type count, const allocator_type &allocator = allocator_type{})
+        : free_list{tombstone},
+          pools{},
+          groups{},
+          epool{allocator},
+          vars{} {
         pools.reserve(count);
     }
 
@@ -382,14 +401,12 @@ public:
      * @param other The instance to move from.
      */
     basic_registry(basic_registry &&other) noexcept
-        : pools{std::move(other.pools)},
+        : free_list{std::move(other.free_list)},
+          pools{std::move(other.pools)},
           groups{std::move(other.groups)},
           epool{std::move(other.epool)},
-          free_list{other.free_list},
           vars{std::move(other.vars)} {
-        for(auto &&curr: pools) {
-            curr.second->bind(forward_as_any(*this));
-        }
+        rebind();
     }
 
     /**
@@ -398,17 +415,39 @@ public:
      * @return This registry.
      */
     basic_registry &operator=(basic_registry &&other) noexcept {
+        free_list = std::move(other.free_list);
         pools = std::move(other.pools);
         groups = std::move(other.groups);
         epool = std::move(other.epool);
-        free_list = other.free_list;
         vars = std::move(other.vars);
 
-        for(auto &&curr: pools) {
-            curr.second->bind(forward_as_any(*this));
-        }
+        rebind();
 
         return *this;
+    }
+
+    /**
+     * @brief Exchanges the contents with those of a given registry.
+     * @param other Registry to exchange the content with.
+     */
+    void swap(basic_registry &other) {
+        using std::swap;
+        swap(free_list, other.free_list);
+        swap(pools, other.pools);
+        swap(groups, other.groups);
+        swap(epool, other.epool);
+        swap(vars, other.vars);
+
+        rebind();
+        other.rebind();
+    }
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
+        return epool.get_allocator();
     }
 
     /**
@@ -1463,10 +1502,10 @@ public:
     }
 
 private:
+    entity_type free_list;
     dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
     std::vector<group_data> groups;
-    std::vector<entity_type> epool;
-    entity_type free_list;
+    std::vector<entity_type, allocator_type> epool;
     context vars;
 };
 

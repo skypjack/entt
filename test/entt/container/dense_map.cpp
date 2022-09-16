@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -26,7 +27,8 @@ struct transparent_equal_to {
 };
 
 TEST(DenseMap, Functionalities) {
-    entt::dense_map<std::size_t, std::size_t, entt::identity, transparent_equal_to> map;
+    entt::dense_map<int, int, entt::identity, transparent_equal_to> map;
+    const auto &cmap = map;
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = map.get_allocator());
 
@@ -34,13 +36,14 @@ TEST(DenseMap, Functionalities) {
     ASSERT_EQ(map.size(), 0u);
     ASSERT_EQ(map.load_factor(), 0.f);
     ASSERT_EQ(map.max_load_factor(), .875f);
+    ASSERT_EQ(map.max_size(), (std::vector<entt::internal::dense_map_node<int, int>>{}.max_size()));
 
     map.max_load_factor(.9f);
 
     ASSERT_EQ(map.max_load_factor(), .9f);
 
     ASSERT_EQ(map.begin(), map.end());
-    ASSERT_EQ(std::as_const(map).begin(), std::as_const(map).end());
+    ASSERT_EQ(cmap.begin(), cmap.end());
     ASSERT_EQ(map.cbegin(), map.cend());
 
     ASSERT_NE(map.max_bucket_count(), 0u);
@@ -53,7 +56,7 @@ TEST(DenseMap, Functionalities) {
     ASSERT_EQ(map.bucket(10), 2u);
 
     ASSERT_EQ(map.begin(1u), map.end(1u));
-    ASSERT_EQ(std::as_const(map).begin(1u), std::as_const(map).end(1u));
+    ASSERT_EQ(cmap.begin(1u), cmap.end(1u));
     ASSERT_EQ(map.cbegin(1u), map.cend(1u));
 
     ASSERT_FALSE(map.contains(42));
@@ -61,23 +64,28 @@ TEST(DenseMap, Functionalities) {
 
     ASSERT_EQ(map.find(42), map.end());
     ASSERT_EQ(map.find(4.2), map.end());
-    ASSERT_EQ(std::as_const(map).find(42), map.cend());
-    ASSERT_EQ(std::as_const(map).find(4.2), map.cend());
+    ASSERT_EQ(cmap.find(42), map.cend());
+    ASSERT_EQ(cmap.find(4.2), map.cend());
 
     ASSERT_EQ(map.hash_function()(42), 42);
     ASSERT_TRUE(map.key_eq()(42, 42));
 
-    map.emplace(0u, 0u);
+    map.emplace(0, 0);
+
+    ASSERT_EQ(map.count(0), 1u);
+    ASSERT_EQ(map.count(4.2), 0u);
+    ASSERT_EQ(cmap.count(0.0), 1u);
+    ASSERT_EQ(cmap.count(42), 0u);
 
     ASSERT_FALSE(map.empty());
     ASSERT_EQ(map.size(), 1u);
 
     ASSERT_NE(map.begin(), map.end());
-    ASSERT_NE(std::as_const(map).begin(), std::as_const(map).end());
+    ASSERT_NE(cmap.begin(), cmap.end());
     ASSERT_NE(map.cbegin(), map.cend());
 
-    ASSERT_TRUE(map.contains(0u));
-    ASSERT_EQ(map.bucket(0u), 0u);
+    ASSERT_TRUE(map.contains(0));
+    ASSERT_EQ(map.bucket(0), 0u);
 
     map.clear();
 
@@ -85,10 +93,10 @@ TEST(DenseMap, Functionalities) {
     ASSERT_EQ(map.size(), 0u);
 
     ASSERT_EQ(map.begin(), map.end());
-    ASSERT_EQ(std::as_const(map).begin(), std::as_const(map).end());
+    ASSERT_EQ(cmap.begin(), cmap.end());
     ASSERT_EQ(map.cbegin(), map.cend());
 
-    ASSERT_FALSE(map.contains(0u));
+    ASSERT_FALSE(map.contains(0));
 }
 
 TEST(DenseMap, Constructors) {
@@ -918,8 +926,48 @@ TEST(DenseMap, Swap) {
     ASSERT_TRUE(other.contains(0));
 }
 
+TEST(DenseMap, EqualRange) {
+    entt::dense_map<int, int, entt::identity, transparent_equal_to> map;
+    const auto &cmap = map;
+
+    map.emplace(42, 3);
+
+    ASSERT_EQ(map.equal_range(0).first, map.end());
+    ASSERT_EQ(map.equal_range(0).second, map.end());
+
+    ASSERT_EQ(cmap.equal_range(0).first, cmap.cend());
+    ASSERT_EQ(cmap.equal_range(0).second, cmap.cend());
+
+    ASSERT_EQ(map.equal_range(0.0).first, map.end());
+    ASSERT_EQ(map.equal_range(0.0).second, map.end());
+
+    ASSERT_EQ(cmap.equal_range(0.0).first, cmap.cend());
+    ASSERT_EQ(cmap.equal_range(0.0).second, cmap.cend());
+
+    ASSERT_NE(map.equal_range(42).first, map.end());
+    ASSERT_EQ(map.equal_range(42).first->first, 42);
+    ASSERT_EQ(map.equal_range(42).first->second, 3);
+    ASSERT_EQ(map.equal_range(42).second, map.end());
+
+    ASSERT_NE(cmap.equal_range(42).first, cmap.cend());
+    ASSERT_EQ(cmap.equal_range(42).first->first, 42);
+    ASSERT_EQ(cmap.equal_range(42).first->second, 3);
+    ASSERT_EQ(cmap.equal_range(42).second, cmap.cend());
+
+    ASSERT_NE(map.equal_range(42.0).first, map.end());
+    ASSERT_EQ(map.equal_range(42.0).first->first, 42);
+    ASSERT_EQ(map.equal_range(42.0).first->second, 3);
+    ASSERT_EQ(map.equal_range(42.0).second, map.end());
+
+    ASSERT_NE(cmap.equal_range(42.0).first, cmap.cend());
+    ASSERT_EQ(cmap.equal_range(42.0).first->first, 42);
+    ASSERT_EQ(cmap.equal_range(42.0).first->second, 3);
+    ASSERT_EQ(cmap.equal_range(42.0).second, cmap.cend());
+}
+
 TEST(DenseMap, Indexing) {
     entt::dense_map<int, int> map;
+    const auto &cmap = map;
     const auto key = 1;
 
     ASSERT_FALSE(map.contains(key));
@@ -928,14 +976,15 @@ TEST(DenseMap, Indexing) {
 
     ASSERT_TRUE(map.contains(key));
     ASSERT_EQ(map[std::move(key)], 99);
-    ASSERT_EQ(std::as_const(map).at(key), 99);
+    ASSERT_EQ(cmap.at(key), 99);
     ASSERT_EQ(map.at(key), 99);
 }
 
 ENTT_DEBUG_TEST(DenseMapDeathTest, Indexing) {
     entt::dense_map<int, int> map;
+    const auto &cmap = map;
 
-    ASSERT_DEATH([[maybe_unused]] auto value = std::as_const(map).at(0), "");
+    ASSERT_DEATH([[maybe_unused]] auto value = cmap.at(0), "");
     ASSERT_DEATH([[maybe_unused]] auto value = map.at(42), "");
 }
 
