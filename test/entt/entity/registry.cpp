@@ -69,6 +69,24 @@ struct owner {
     const entt::registry *parent{nullptr};
 };
 
+struct destruction_order {
+    using ctx_check_type = int;
+
+    destruction_order(const entt::registry &ref, bool &ctx)
+        : registry{&ref},
+          ctx_check{&ctx} {
+        *ctx_check = (registry->ctx().find<int>() != nullptr);
+    }
+
+    ~destruction_order() {
+        *ctx_check = *ctx_check && (registry->ctx().find<int>() != nullptr);
+    }
+
+private:
+    const entt::registry *registry;
+    bool *ctx_check{};
+};
+
 TEST(Registry, Context) {
     entt::registry registry;
     auto &ctx = registry.ctx();
@@ -2169,4 +2187,16 @@ TEST(Registry, NoEtoType) {
     auto cview = std::as_const(registry).view<const no_eto_type, const int>();
 
     ASSERT_EQ((std::get<0>(view.get<no_eto_type, int>(entity))), (std::get<0>(cview.get<const no_eto_type, const int>(entity))));
+}
+
+TEST(Registry, CtxAndPoolMemberDestructionOrder) {
+    auto registry = std::make_unique<entt::registry>();
+    const auto entity = registry->create();
+    bool ctx_check = false;
+
+    registry->ctx().emplace<typename destruction_order::ctx_check_type>();
+    registry->emplace<destruction_order>(entity, *registry, ctx_check);
+    registry.reset();
+
+    ASSERT_TRUE(ctx_check);
 }

@@ -1502,11 +1502,11 @@ public:
     }
 
 private:
+    context vars;
     entity_type free_list;
+    std::vector<entity_type, allocator_type> epool;
     dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
     std::vector<group_data> groups;
-    std::vector<entity_type, allocator_type> epool;
-    context vars;
 };
 
 } // namespace entt
