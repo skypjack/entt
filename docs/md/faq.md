@@ -62,7 +62,7 @@ These asserts are introduced to help the users but they require to access to the
 underlying containers and therefore risk ruining the performance in some cases.
 
 With these changes, debug performance should increase enough for most cases. If
-you want something more, you can can also switch to an optimization level `O0`
+you want something more, you can also switch to an optimization level `O0`
 or preferably `O1`.
 
 ## How can I represent hierarchies with my components?

@@ -28,7 +28,7 @@
 # Introduction
 
 Reflection (or rather, its lack) is a trending topic in the C++ world and a tool
-that can unlock a lot of interesting feature in the specific case of `EnTT`. I
+that can unlock a lot of interesting features in the specific case of `EnTT`. I
 looked for a third-party library that met my needs on the subject, but I always
 came across some details that I didn't like: macros, being intrusive, too many
 allocations, and so on.<br/>
@@ -49,7 +49,7 @@ compile-time or with custom functions.
 
 That being said, the examples in the following sections are all based on the
 `hashed_string` class as provided by this library. Therefore, where an
-identifier is required, it's likely that an user defined literal is used as
+identifier is required, it's likely that a user defined literal is used as
 follows:
 
 ```cpp
@@ -349,7 +349,7 @@ meta system in many cases.
 
 To make a container be recognized as such by the meta system, users are required
 to provide specializations for either the `meta_sequence_container_traits` class
-or the `meta_associative_container_traits` class, according with the actual type
+or the `meta_associative_container_traits` class, according to the actual type
 of the container.<br/>
 `EnTT` already exports the specializations for some common classes. In
 particular:
@@ -656,7 +656,7 @@ regardless of the pointed type, no user intervention is required.
 Meta types also provide a minimal set of information about the nature of the
 original type in case it's a class template.<br/>
 By default, this works out of the box and requires no user action. However, it's
-important to include the header file `template.hpp` to make these information
+important to include the header file `template.hpp` to make this information
 available to the compiler when needed.
 
 Meta template information are easily found:
@@ -723,7 +723,7 @@ entt::meta<int>()
 ```
 
 Repeated for each type eligible to undergo this type of conversions. This is
-both error prone and repetitive.<br/>
+both error-prone and repetitive.<br/>
 Similarly, the language allows users to silently convert unscoped enums to their
 underlying types and offers what it takes to do the same for scoped enums. It
 would result in the following if it were to be done explicitly:

@@ -80,7 +80,7 @@ codebase has grown as more and more classes and functionalities were added.<br/>
 Here is a brief, yet incomplete list of what it offers today:
 
 * Built-in **RTTI system** mostly similar to the standard one.
-* A `constexpr` utility for human readable **resource names**.
+* A `constexpr` utility for human-readable **resource names**.
 * Minimal **configuration system** built using the monostate pattern.
 * Incredibly fast **entity-component system** with its own _pay for what you
   use_ policy, unconstrained component types with optional pointer stability and

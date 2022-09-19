@@ -435,7 +435,7 @@ their const counterparts) to be iterated by the user.<br/>
 However, it can happen that a class offers multiple iteration methods or allows
 users to iterate different sets of _elements_.
 
-The iterable adaptor is an utility class that makes it easier to use and access
+The iterable adaptor is a utility class that makes it easier to use and access
 data in this case.<br/>
 It accepts a couple of iterators (or an iterator and a sentinel) and offers an
 _iterable_ object with all the expected methods like `begin`, `end` and whatnot.
@@ -770,7 +770,7 @@ tuple-like type and simplify the code at the call site.
 
 ### Constness as
 
-An utility to easily transfer the constness of a type to another type:
+A utility to easily transfer the constness of a type to another type:
 
 ```cpp
 // type is const dst_type because of the constness of src_type
@@ -794,7 +794,7 @@ using clazz = entt::member_class_t<Member>;
 
 ### N-th argument
 
-An utility to quickly find the n-th argument of a function, member function or
+A utility to quickly find the n-th argument of a function, member function or
 data member (for blind operations on opaque types):
 
 ```cpp
@@ -901,8 +901,8 @@ where constant expressions are required.
 
 As long as the list remains unchanged, identifiers are also guaranteed to be
 stable across different runs. In case they have been used in a production
-environment and a type has to be removed, one can just use a placeholder to left
-the other identifiers unchanged:
+environment and a type has to be removed, one can just use a placeholder to
+leave the other identifiers unchanged:
 
 ```cpp
 template<typename> struct ignore_type {};

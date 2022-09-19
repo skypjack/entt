@@ -98,7 +98,7 @@ private:
 Lambdas and functors can't be used directly with a scheduler for they are not
 properly defined processes with managed life cycles.<br/>
 This class helps in filling the gap and turning lambdas and functors into
-full featured processes usable by a scheduler.
+full-featured processes usable by a scheduler.
 
 The function call operator has a signature similar to the one of the `update`
 function of a process but for the fact that it receives two extra arguments to

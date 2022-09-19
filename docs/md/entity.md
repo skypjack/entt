@@ -487,7 +487,7 @@ At least as long as the `observer` isn't const. This means that the non-const
 overload of `each` does also reset the underlying data structure before to
 return to the caller, while the const overload does not for obvious reasons.
 
-The `collector` is an utility aimed to generate a list of `matcher`s (the actual
+The `collector` is a utility aimed to generate a list of `matcher`s (the actual
 rules) to use with an `observer` instead.<br/>
 There are two types of `matcher`s:
 
@@ -1236,7 +1236,7 @@ list is a consequence of a couple of design choices from the past and in the
 present:
 
 * First of all, there is no reason to force a user to serialize all the
-  components at once and most of the times it isn't desiderable. As an example,
+  components at once and most of the time it isn't desiderable. As an example,
   in case the stuff for the HUD in a game is put into the registry for some
   reasons, its components can be freely discarded during a serialization step
   because probably the software already knows how to reconstruct them correctly.
@@ -1771,7 +1771,7 @@ registry during iterations to get the types iterated by the group itself.
 
 ### Full-owning groups
 
-A full-owning group is the fastest tool an user can expect to use to iterate
+A full-owning group is the fastest tool a user can expect to use to iterate
 multiple components at once. It iterates all the components directly, no
 indirection required. This type of groups performs more or less as if users are
 accessing sequentially a bunch of packed arrays of components all sorted
@@ -2181,7 +2181,7 @@ See the relevant documentation for more information.
 ## Iterators
 
 A special mention is needed for the iterators returned by views and groups. Most
-of the times they meet the requirements of random access iterators, in all cases
+of the time they meet the requirements of random access iterators, in all cases
 they meet at least the requirements of forward iterators.<br/>
 In other terms, they are suitable for use with the parallel algorithms of the
 standard library. If it's not clear, this is a great thing.
