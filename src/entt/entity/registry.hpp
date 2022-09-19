@@ -388,11 +388,11 @@ public:
      * @param allocator The allocator to use.
      */
     basic_registry(const size_type count, const allocator_type &allocator = allocator_type{})
-        : free_list{tombstone},
-          pools{},
-          groups{},
+        : vars{},
+          free_list{tombstone},
           epool{allocator},
-          vars{} {
+          pools{},
+          groups{} {
         pools.reserve(count);
     }
 
@@ -401,11 +401,11 @@ public:
      * @param other The instance to move from.
      */
     basic_registry(basic_registry &&other) noexcept
-        : free_list{std::move(other.free_list)},
-          pools{std::move(other.pools)},
-          groups{std::move(other.groups)},
+        : vars{std::move(other.vars)},
+          free_list{std::move(other.free_list)},
           epool{std::move(other.epool)},
-          vars{std::move(other.vars)} {
+          pools{std::move(other.pools)},
+          groups{std::move(other.groups)} {
         rebind();
     }
 
@@ -415,11 +415,11 @@ public:
      * @return This registry.
      */
     basic_registry &operator=(basic_registry &&other) noexcept {
+        vars = std::move(other.vars);
         free_list = std::move(other.free_list);
+        epool = std::move(other.epool);
         pools = std::move(other.pools);
         groups = std::move(other.groups);
-        epool = std::move(other.epool);
-        vars = std::move(other.vars);
 
         rebind();
 
@@ -432,11 +432,11 @@ public:
      */
     void swap(basic_registry &other) {
         using std::swap;
+        swap(vars, other.vars);
         swap(free_list, other.free_list);
+        swap(epool, other.epool);
         swap(pools, other.pools);
         swap(groups, other.groups);
-        swap(epool, other.epool);
-        swap(vars, other.vars);
 
         rebind();
         other.rebind();
