@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_FWD_HPP
 
 #include <memory>
+#include <type_traits>
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 
@@ -16,10 +17,10 @@ class basic_sparse_set;
 template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
 class basic_storage;
 
-template<typename, typename = entity, typename = void>
+template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
 struct storage_type;
 
-template<typename, typename = entity>
+template<typename Type, typename = entity, typename = std::allocator<std::remove_const_t<Type>>>
 struct storage_for;
 
 template<typename Type>
