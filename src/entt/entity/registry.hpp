@@ -249,9 +249,10 @@ private:
  */
 template<typename Entity, typename Allocator>
 class basic_registry {
-    using entity_traits = entt_traits<Entity>;
-    using basic_common_type = basic_sparse_set<Entity, Allocator>;
     using alloc_traits = typename std::allocator_traits<Allocator>;
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
+    using basic_common_type = basic_sparse_set<Entity, Allocator>;
+    using entity_traits = entt_traits<Entity>;
 
     template<typename Type>
     using storage_for_type = typename storage_for<Type, Entity>::type;
