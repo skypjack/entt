@@ -255,7 +255,7 @@ class basic_registry {
     using entity_traits = entt_traits<Entity>;
 
     template<typename Type>
-    using storage_for_type = typename storage_for<Type, Entity>::type;
+    using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
 
     template<typename...>
     struct group_handler;
@@ -312,7 +312,7 @@ class basic_registry {
         auto &cpool = pools[id];
 
         if(!cpool) {
-            cpool.reset(new storage_for_type<Type>{});
+            cpool.reset(new storage_for_type<Type>{get_allocator()});
             cpool->bind(forward_as_any(*this));
         }
 
@@ -329,7 +329,7 @@ class basic_registry {
             return static_cast<const storage_for_type<Type> &>(*it->second);
         }
 
-        static storage_for_type<Type> placeholder{};
+        static storage_for_type<Type> placeholder{get_allocator()};
         return placeholder;
     }
 

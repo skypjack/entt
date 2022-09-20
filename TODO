@@ -11,6 +11,9 @@ DOC:
 * examples (and credits) from @alanjfs :)
 * update entity doc when the storage based model is in place
 
+TODO (high prio):
+* remove the static storage from the const assure in the registry
+
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
 * add storage getter for filters to views and groups
