@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
@@ -85,6 +86,10 @@ struct overloaded_func_t {
         return g(b);
     }
 
+    int f(int v) {
+        return 2 * std::as_const(*this).f(v);
+    }
+
     int f(int v) const {
         return g(v);
     }
@@ -144,6 +149,7 @@ struct MetaType: ::testing::Test {
             .func<&overloaded_func_t::e>("e"_hs)
             .func<entt::overload<int(const base_t &, int, int)>(&overloaded_func_t::f)>("f"_hs)
             .func<entt::overload<int(int, int)>(&overloaded_func_t::f)>("f"_hs)
+            .func<entt::overload<int(int)>(&overloaded_func_t::f)>("f"_hs)
             .func<entt::overload<int(int) const>(&overloaded_func_t::f)>("f"_hs)
             .func<entt::overload<float(int, float)>(&overloaded_func_t::f)>("f"_hs)
             .func<&overloaded_func_t::g>("g"_hs);
@@ -390,49 +396,56 @@ TEST_F(MetaType, OverloadedFunc) {
 
     const auto type = entt::resolve<overloaded_func_t>();
     overloaded_func_t instance{};
+    entt::meta_any res{};
 
     ASSERT_TRUE(type.func("f"_hs));
     ASSERT_TRUE(type.func("e"_hs));
     ASSERT_TRUE(type.func("g"_hs));
 
-    const auto first = type.invoke("f"_hs, instance, base_t{}, 1, 2);
+    res = type.invoke("f"_hs, instance, base_t{}, 1, 2);
 
-    ASSERT_TRUE(first);
+    ASSERT_TRUE(res);
     ASSERT_EQ(overloaded_func_t::value, 1);
-    ASSERT_NE(first.try_cast<int>(), nullptr);
-    ASSERT_EQ(first.cast<int>(), 4);
+    ASSERT_NE(res.try_cast<int>(), nullptr);
+    ASSERT_EQ(res.cast<int>(), 4);
 
-    const auto second = type.invoke("f"_hs, instance, 3, 4);
+    res = type.invoke("f"_hs, instance, 3, 4);
 
-    ASSERT_TRUE(second);
+    ASSERT_TRUE(res);
     ASSERT_EQ(overloaded_func_t::value, 3);
-    ASSERT_NE(second.try_cast<int>(), nullptr);
-    ASSERT_EQ(second.cast<int>(), 16);
+    ASSERT_NE(res.try_cast<int>(), nullptr);
+    ASSERT_EQ(res.cast<int>(), 16);
 
-    const auto third = type.invoke("f"_hs, instance, 5);
+    res = type.invoke("f"_hs, instance, 5);
 
-    ASSERT_TRUE(third);
+    ASSERT_TRUE(res);
     ASSERT_EQ(overloaded_func_t::value, 3);
-    ASSERT_NE(third.try_cast<int>(), nullptr);
-    ASSERT_EQ(third.cast<int>(), 25);
+    ASSERT_NE(res.try_cast<int>(), nullptr);
+    ASSERT_EQ(res.cast<int>(), 50);
 
-    const auto fourth = type.invoke("f"_hs, instance, 6, 7.f);
+    res = type.invoke("f"_hs, std::as_const(instance), 5);
 
-    ASSERT_TRUE(fourth);
+    ASSERT_TRUE(res);
+    ASSERT_EQ(overloaded_func_t::value, 3);
+    ASSERT_NE(res.try_cast<int>(), nullptr);
+    ASSERT_EQ(res.cast<int>(), 25);
+
+    res = type.invoke("f"_hs, instance, 6, 7.f);
+
+    ASSERT_TRUE(res);
     ASSERT_EQ(overloaded_func_t::value, 6);
-    ASSERT_NE(fourth.try_cast<float>(), nullptr);
-    ASSERT_EQ(fourth.cast<float>(), 14.f);
+    ASSERT_NE(res.try_cast<float>(), nullptr);
+    ASSERT_EQ(res.cast<float>(), 14.f);
 
-    const auto cast = type.invoke("f"_hs, instance, 8, 9.f);
+    res = type.invoke("f"_hs, instance, 8, 9.f);
 
-    ASSERT_TRUE(cast);
+    ASSERT_TRUE(res);
     ASSERT_EQ(overloaded_func_t::value, 8);
-    ASSERT_NE(cast.try_cast<float>(), nullptr);
-    ASSERT_EQ(cast.cast<float>(), 18.f);
+    ASSERT_NE(res.try_cast<float>(), nullptr);
+    ASSERT_EQ(res.cast<float>(), 18.f);
 
-    const auto ambiguous = type.invoke("f"_hs, instance, 8, 9.);
-
-    ASSERT_FALSE(ambiguous);
+    // it fails as an ambiguous call
+    ASSERT_FALSE(type.invoke("f"_hs, instance, 8, 9.));
 }
 
 TEST_F(MetaType, Construct) {

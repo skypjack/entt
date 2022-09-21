@@ -915,34 +915,48 @@ private:
 /*! @brief Opaque wrapper for types. */
 class meta_type {
     template<typename Func>
-    [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, Func next) const {
+    [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, [[maybe_unused]] bool constness, Func next) const {
         decltype(next()) candidate = nullptr;
-        size_type extent{sz + 1u};
+        size_type same{};
         bool ambiguous{};
 
         for(auto curr = next(); curr; curr = next()) {
-            if(curr->arity == sz) {
-                size_type direct{};
-                size_type ext{};
+            if constexpr(std::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
+                if(constness && !static_cast<bool>(curr->traits & internal::meta_traits::is_const)) {
+                    continue;
+                }
+            }
 
-                for(size_type pos{}; pos < sz && pos == (direct + ext) && args[pos]; ++pos) {
+            if(curr->arity == sz) {
+                size_type match{};
+                size_type pos{};
+
+                for(; pos < sz && args[pos]; ++pos) {
                     const auto type = args[pos].type();
                     const auto other = curr->arg(pos);
 
                     if(const auto &info = other.info(); info == type.info()) {
-                        ++direct;
-                    } else {
-                        ext += (type.node.details && (type.node.details->base.contains(info.hash()) || type.node.details->conv.contains(info.hash())))
-                               || (type.node.conversion_helper && other.node.conversion_helper);
+                        ++match;
+                    } else if(!((type.node.details && (type.node.details->base.contains(info.hash()) || type.node.details->conv.contains(info.hash())))
+                                || (type.node.conversion_helper && other.node.conversion_helper))) {
+                        break;
                     }
                 }
 
-                if((direct + ext) == sz) {
-                    if(ext < extent) {
+                if(pos == sz) {
+                    if(!candidate || match > same) {
                         candidate = curr;
-                        extent = ext;
+                        same = match;
                         ambiguous = false;
-                    } else if(ext == extent) {
+                    } else if(match == same) {
+                        if constexpr(std::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
+                            if(static_cast<bool>(curr->traits & internal::meta_traits::is_const) != static_cast<bool>(candidate->traits & internal::meta_traits::is_const)) {
+                                candidate = static_cast<bool>(candidate->traits & internal::meta_traits::is_const) ? curr : candidate;
+                                ambiguous = false;
+                                continue;
+                            }
+                        }
+
                         ambiguous = true;
                     }
                 }
@@ -1216,7 +1230,7 @@ public:
      */
     [[nodiscard]] meta_any construct(meta_any *const args, const size_type sz) const {
         if(node.details) {
-            const auto *candidate = lookup(args, sz, [first = node.details->ctor.cbegin(), last = node.details->ctor.cend()]() mutable {
+            const auto *candidate = lookup(args, sz, false, [first = node.details->ctor.cbegin(), last = node.details->ctor.cend()]() mutable {
                 return first == last ? nullptr : &(first++)->second;
             });
 
@@ -1278,7 +1292,7 @@ public:
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
         if(node.details) {
             if(auto it = node.details->func.find(id); it != node.details->func.cend()) {
-                const auto *candidate = lookup(args, sz, [curr = &it->second]() mutable {
+                const auto *candidate = lookup(args, sz, (instance->data() == nullptr), [curr = &it->second]() mutable {
                     return curr ? std::exchange(curr, curr->next.get()) : nullptr;
                 });
 
