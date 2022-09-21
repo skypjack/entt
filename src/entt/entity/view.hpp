@@ -52,7 +52,9 @@ public:
           last{to},
           pools{all_of},
           filter{none_of} {
-        while(it != last && !valid()) { ++it; }
+        while(it != last && !valid()) {
+            ++it;
+        }
     }
 
     view_iterator &operator++() noexcept {
@@ -293,6 +295,14 @@ public:
         basic_view other{*this};
         other.view = std::get<Index>(pools);
         return other;
+    }
+
+    /**
+     * @brief Updates the internal leading view if required.
+     * @return A newly created and internally optimized view.
+     */
+    [[nodiscard]] basic_view refresh() const noexcept {
+        return std::apply([](auto *...elem) { return basic_view{*elem...}; }, std::tuple_cat(pools, filter));
     }
 
     /**

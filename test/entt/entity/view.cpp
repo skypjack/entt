@@ -563,7 +563,7 @@ TEST(MultiComponentView, Handle) {
     ASSERT_TRUE(handle.contains(entity));
     ASSERT_EQ(&handle, &view.handle());
 
-    view = registry.view<int, char>();
+    view = view.refresh();
     auto &&other = view.handle();
 
     ASSERT_TRUE(other.empty());
