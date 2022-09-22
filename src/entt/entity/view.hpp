@@ -211,17 +211,17 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
         if constexpr(Curr == Other) {
             return std::forward_as_tuple(std::get<Args>(curr)...);
         } else {
-            return std::get<Other>(pools)->get_as_tuple(std::get<0>(curr));
+            return storage<Other>().get_as_tuple(std::get<0>(curr));
         }
     }
 
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func func, std::index_sequence<Index...>) const {
-        for(const auto curr: std::get<Curr>(pools)->each()) {
+        for(const auto curr: storage<Curr>().each()) {
             const auto entt = std::get<0>(curr);
 
             if(((sizeof...(Get) != 1u) || (entt != tombstone))
-               && ((Curr == Index || std::get<Index>(pools)->contains(entt)) && ...)
+               && ((Curr == Index || storage<Index>().contains(entt)) && ...)
                && std::apply([entt](const auto *...epool) { return (!epool->contains(entt) && ...); }, filter)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
@@ -234,7 +234,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
 
     template<typename Func, std::size_t... Index>
     void pick_and_each(Func func, std::index_sequence<Index...> seq) const {
-        ((std::get<Index>(pools) == view ? each<Index>(std::move(func), seq) : void()), ...);
+        ((&storage<Index>() == view ? each<Index>(std::move(func), seq) : void()), ...);
     }
 
 public:
@@ -293,7 +293,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] basic_view use() const noexcept {
         basic_view other{*this};
-        other.view = std::get<Index>(pools);
+        other.view = &storage<Index>();
         return other;
     }
 
@@ -440,9 +440,9 @@ public:
         if constexpr(sizeof...(Type) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools);
         } else if constexpr(sizeof...(Type) == 1) {
-            return (std::get<index_of<Type>>(pools)->get(entt), ...);
+            return (storage<index_of<Type>>().get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<index_of<Type>>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(storage<index_of<Type>>().get_as_tuple(entt)...);
         }
     }
 
@@ -461,9 +461,9 @@ public:
     template<std::size_t First, std::size_t... Other>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Other) == 0) {
-            return std::get<First>(pools)->get(entt);
+            return storage<First>().get(entt);
         } else {
-            return std::tuple_cat(std::get<First>(pools)->get_as_tuple(entt), std::get<Other>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(storage<First>().get_as_tuple(entt), storage<Other>().get_as_tuple(entt)...);
         }
     }
 
