@@ -797,17 +797,13 @@ public:
             for(const auto pack: each()) {
                 std::apply(func, pack);
             }
-        } else if constexpr(std::is_invocable_v<Func, constness_as_t<typename Get::value_type, Get> &>) {
-            for(auto &&component: *std::get<0>(pools)) {
-                func(component);
-            }
-        } else if constexpr(std::is_invocable_v<Func, entity_type>) {
-            for(auto entity: *this) {
-                func(entity);
-            }
-        } else {
+        } else if constexpr(ignore_as_empty_v<typename Get::value_type>) {
             for(size_type pos{}, last = size(); pos < last; ++pos) {
                 func();
+            }
+        } else {
+            for(auto &&component: *std::get<0>(pools)) {
+                func(component);
             }
         }
     }
