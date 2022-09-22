@@ -580,14 +580,15 @@ public:
      * @param ref The storage for the type to iterate.
      */
     basic_view(std::tuple<Get &> ref, std::tuple<> = {}) noexcept
-        : basic_view{std::get<0>(ref)} {}
+        : pools{&std::get<0>(ref)},
+          filter{} {}
 
     /**
      * @brief Returns the leading storage of a view.
      * @return The leading storage of the view.
      */
     const base_type &handle() const noexcept {
-        return *std::get<0>(pools);
+        return storage();
     }
 
     /**
@@ -598,7 +599,7 @@ public:
     template<typename Type = typename Get::value_type>
     [[nodiscard]] decltype(auto) storage() const noexcept {
         static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::value_type>, "Invalid component type");
-        return *std::get<0>(pools);
+        return storage<0>();
     }
 
     /**
@@ -722,7 +723,7 @@ public:
      * @return The component assigned to the given entity.
      */
     [[nodiscard]] decltype(auto) operator[](const entity_type entt) const {
-        return get<0u>(entt);
+        return storage().get(entt);
     }
 
     /**
@@ -756,17 +757,17 @@ public:
     template<typename... Type>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Type) == 0) {
-            return std::get<0>(pools)->get_as_tuple(entt);
+            return storage().get_as_tuple(entt);
         } else {
             static_assert((std::is_same_v<std::remove_const_t<Type>, typename Get::value_type> && ...), "Invalid component type");
-            return std::get<0>(pools)->get(entt);
+            return storage().get(entt);
         }
     }
 
     /*! @copydoc get */
     template<std::size_t Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        return std::get<0>(pools)->get(entt);
+        return storage().get(entt);
     }
 
     /**
@@ -802,7 +803,7 @@ public:
                 func();
             }
         } else {
-            for(auto &&component: *std::get<0>(pools)) {
+            for(auto &&component: storage()) {
                 func(component);
             }
         }
@@ -818,7 +819,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return std::get<0>(pools)->each();
+        return storage().each();
     }
 
     /**
