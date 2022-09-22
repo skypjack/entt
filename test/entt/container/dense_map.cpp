@@ -30,7 +30,7 @@ TEST(DenseMap, Functionalities) {
     entt::dense_map<int, int, entt::identity, transparent_equal_to> map;
     const auto &cmap = map;
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = map.get_allocator());
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = map.get_allocator());
 
     ASSERT_TRUE(map.empty());
     ASSERT_EQ(map.size(), 0u);

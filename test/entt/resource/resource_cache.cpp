@@ -36,7 +36,7 @@ TEST(ResourceCache, Functionalities) {
 
     entt::resource_cache<int> cache;
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = cache.get_allocator());
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = cache.get_allocator());
 
     ASSERT_TRUE(cache.empty());
     ASSERT_EQ(cache.size(), 0u);

@@ -18,7 +18,7 @@ struct boxed_int {
 TEST(SparseSet, Functionalities) {
     entt::sparse_set set;
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = set.get_allocator());
     ASSERT_EQ(set.type(), entt::type_id<void>());
 
     set.reserve(42);
@@ -78,7 +78,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_FALSE(set.contains(entt::entity{0}));
     ASSERT_FALSE(set.contains(entt::entity{42}));
 
-    ASSERT_NO_THROW(set.bind(entt::any{}));
+    ASSERT_NO_FATAL_FAILURE(set.bind(entt::any{}));
 }
 
 TEST(SparseSet, Contains) {

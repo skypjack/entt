@@ -28,7 +28,7 @@ TEST(DenseSet, Functionalities) {
     entt::dense_set<int, entt::identity, transparent_equal_to> set;
     const auto &cset = set;
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = set.get_allocator());
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);

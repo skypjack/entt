@@ -519,7 +519,7 @@ TEST(SighStorageMixin, ThrowingAllocator) {
 
         ASSERT_THROW(pool.emplace(entt::entity{0}, 0), typename pool_allocator_type::exception_type);
         ASSERT_FALSE(pool.contains(entt::entity{0}));
-        ASSERT_NO_THROW(pool.compact());
+        ASSERT_NO_FATAL_FAILURE(pool.compact());
         ASSERT_TRUE(pool.empty());
 
         pool.emplace(entt::entity{0}, 0);

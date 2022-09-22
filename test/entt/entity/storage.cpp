@@ -94,7 +94,7 @@ TEST(Storage, Functionalities) {
     entt::storage<int> pool;
     constexpr auto page_size = entt::component_traits<int>::page_size;
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_EQ(pool.type(), entt::type_id<int>());
 
     pool.reserve(42);
@@ -272,7 +272,7 @@ TEST(Storage, EmptyType) {
     entt::storage<empty_stable_type> pool;
     pool.emplace(entt::entity{99});
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_EQ(pool.type(), entt::type_id<empty_stable_type>());
     ASSERT_TRUE(pool.contains(entt::entity{99}));
 
@@ -1805,7 +1805,7 @@ TEST(Storage, ThrowingAllocator) {
 
         ASSERT_THROW(pool.emplace(entt::entity{0}, 0), typename pool_allocator_type::exception_type);
         ASSERT_FALSE(pool.contains(entt::entity{0}));
-        ASSERT_NO_THROW(pool.compact());
+        ASSERT_NO_FATAL_FAILURE(pool.compact());
         ASSERT_TRUE(pool.empty());
 
         pool.emplace(entt::entity{0}, 0);

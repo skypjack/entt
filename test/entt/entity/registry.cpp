@@ -225,7 +225,7 @@ TEST(Registry, Functionalities) {
 
     entt::registry registry;
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = registry.get_allocator());
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = registry.get_allocator());
 
     ASSERT_EQ(registry.size(), 0u);
     ASSERT_EQ(registry.alive(), 0u);

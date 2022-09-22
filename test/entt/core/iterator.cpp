@@ -39,8 +39,8 @@ TEST(IterableAdaptor, Functionalities) {
     entt::iterable_adaptor iterable{vec.begin(), vec.end()};
     decltype(iterable) other{};
 
-    ASSERT_NO_THROW(other = iterable);
-    ASSERT_NO_THROW(std::swap(other, iterable));
+    ASSERT_NO_FATAL_FAILURE(other = iterable);
+    ASSERT_NO_FATAL_FAILURE(std::swap(other, iterable));
 
     ASSERT_EQ(iterable.begin(), vec.begin());
     ASSERT_EQ(iterable.end(), vec.end());
