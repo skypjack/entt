@@ -1110,7 +1110,8 @@ public:
     template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) {
         if constexpr(sizeof...(Type) == 1) {
-            return (const_cast<Type *>(std::as_const(*this).template try_get<Type>(entt)), ...);
+            auto &cpool = assure<std::remove_const_t<Type>...>();
+            return (static_cast<Type *>(cpool.contains(entt) ? std::addressof(cpool.get(entt)) : nullptr), ...);
         } else {
             return std::make_tuple(try_get<Type>(entt)...);
         }
