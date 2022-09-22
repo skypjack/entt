@@ -163,7 +163,7 @@ public:
      * @brief Returns a const reference to the underlying handler.
      * @return A const reference to the underlying handler.
      */
-    const base_type &handle() const noexcept {
+    [[nodiscard]] const base_type &handle() const noexcept {
         return *handler;
     }
 

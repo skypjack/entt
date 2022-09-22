@@ -309,7 +309,7 @@ public:
      * @brief Returns the leading storage of a view.
      * @return The leading storage of the view.
      */
-    const base_type &handle() const noexcept {
+    [[nodiscard]] const base_type &handle() const noexcept {
         return *view;
     }
 
@@ -587,7 +587,7 @@ public:
      * @brief Returns the leading storage of a view.
      * @return The leading storage of the view.
      */
-    const base_type &handle() const noexcept {
+    [[nodiscard]] const base_type &handle() const noexcept {
         return storage();
     }
 
