@@ -222,9 +222,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>().each()) {
-            const auto entt = std::get<0>(curr);
-
-            if(((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || storage<Index>().contains(entt)) && ...) && !reject(entt)) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || storage<Index>().contains(entt)) && ...) && !reject(entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
