@@ -220,7 +220,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     }
 
     template<std::size_t Curr, typename Func, std::size_t... Index>
-    void each(Func func, std::index_sequence<Index...>) const {
+    void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>().each()) {
             if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || storage<Index>().contains(entt)) && ...) && !reject(entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
@@ -233,8 +233,8 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     }
 
     template<typename Func, std::size_t... Index>
-    void pick_and_each(Func func, std::index_sequence<Index...> seq) const {
-        ((&storage<Index>() == view ? each<Index>(std::move(func), seq) : void()), ...);
+    void pick_and_each(Func &func, std::index_sequence<Index...> seq) const {
+        ((&storage<Index>() == view ? each<Index>(func, seq) : void()), ...);
     }
 
 public:
@@ -487,7 +487,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        pick_and_each(std::move(func), std::index_sequence_for<Get...>{});
+        pick_and_each(func, std::index_sequence_for<Get...>{});
     }
 
     /**
