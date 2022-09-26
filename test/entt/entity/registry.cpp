@@ -1487,14 +1487,14 @@ TEST(Registry, SignalWhenDestroying) {
     registry.emplace<double>(entity);
     registry.emplace<int>(entity);
 
-    ASSERT_NE(registry.storage(entt::type_id<double>().hash()), registry.storage().end());
-    ASSERT_NE(registry.storage(entt::type_id<int>().hash()), registry.storage().end());
-    ASSERT_EQ(registry.storage(entt::type_id<char>().hash()), registry.storage().end());
+    ASSERT_NE(registry.storage(entt::type_id<double>().hash()), nullptr);
+    ASSERT_NE(registry.storage(entt::type_id<int>().hash()), nullptr);
+    ASSERT_EQ(registry.storage(entt::type_id<char>().hash()), nullptr);
     ASSERT_TRUE(registry.valid(entity));
 
     registry.destroy(entity);
 
-    ASSERT_NE(registry.storage(entt::type_id<char>().hash()), registry.storage().end());
+    ASSERT_NE(registry.storage(entt::type_id<char>().hash()), nullptr);
     ASSERT_FALSE(registry.valid(entity));
 }
 
@@ -2019,11 +2019,11 @@ TEST(Registry, RuntimePools) {
     static_assert(std::is_same_v<decltype(registry.storage<empty_type>()), entt::storage_type_t<empty_type> &>);
     static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const entt::storage_type_t<empty_type> &>);
 
-    static_assert(std::is_same_v<decltype(registry.storage("other"_hs)->second), entt::storage_type_t<empty_type>::base_type &>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)->second), const entt::storage_type_t<empty_type>::base_type &>);
+    static_assert(std::is_same_v<decltype(registry.storage("other"_hs)), entt::storage_type_t<empty_type>::base_type *>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)), const entt::storage_type_t<empty_type>::base_type *>);
 
-    ASSERT_NE(registry.storage("other"_hs), registry.storage().end());
-    ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), registry.storage().end());
+    ASSERT_NE(registry.storage("other"_hs), nullptr);
+    ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), nullptr);
 
     ASSERT_EQ(&registry.storage<empty_type>("other"_hs), &storage);
     ASSERT_NE(&std::as_const(registry).storage<empty_type>(), &storage);

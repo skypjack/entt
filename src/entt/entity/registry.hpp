@@ -471,21 +471,20 @@ public:
     /**
      * @brief Finds the storage associated with a given name, if any.
      * @param id Name used to map the storage within the registry.
-     * @return An iterator to the given storage if it's found, past the end
-     * iterator otherwise.
+     * @return A pointer to the storage if it exists, a null pointer otherwise.
      */
-    [[nodiscard]] auto storage(const id_type id) {
-        return internal::registry_storage_iterator{pools.find(id)};
+    [[nodiscard]] base_type *storage(const id_type id) {
+        return const_cast<base_type *>(std::as_const(*this).storage(id));
     }
 
     /**
      * @brief Finds the storage associated with a given name, if any.
      * @param id Name used to map the storage within the registry.
-     * @return An iterator to the given storage if it's found, past the end
-     * iterator otherwise.
+     * @return A pointer to the storage if it exists, a null pointer otherwise.
      */
-    [[nodiscard]] auto storage(const id_type id) const {
-        return internal::registry_storage_iterator{pools.find(id)};
+    [[nodiscard]] const base_type *storage(const id_type id) const {
+        const auto it = pools.find(id);
+        return it == pools.cend() ? nullptr : it->second.get();
     }
 
     /**
