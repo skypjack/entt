@@ -138,7 +138,7 @@ template<typename... Args>
 [[nodiscard]] auto meta_arg_node(type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
     std::size_t pos{};
     meta_type_node (*value)() noexcept = nullptr;
-    ((value = (pos++ == index ? &internal::resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
+    ((value = (pos++ == index ? &resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
     ENTT_ASSERT(value != nullptr, "Out of bounds");
     return value();
 }
@@ -176,15 +176,15 @@ template<typename Type>
     meta_type_node node{
         &type_id<Type>(),
         type_id<Type>().hash(),
-        (std::is_arithmetic_v<Type> ? internal::meta_traits::is_arithmetic : internal::meta_traits::is_none)
-            | (std::is_integral_v<Type> ? internal::meta_traits::is_integral : internal::meta_traits::is_none)
-            | (std::is_signed_v<Type> ? internal::meta_traits::is_signed : internal::meta_traits::is_none)
-            | (std::is_array_v<Type> ? internal::meta_traits::is_array : internal::meta_traits::is_none)
-            | (std::is_enum_v<Type> ? internal::meta_traits::is_enum : internal::meta_traits::is_none)
-            | (std::is_class_v<Type> ? internal::meta_traits::is_class : internal::meta_traits::is_none)
-            | (is_meta_pointer_like_v<Type> ? internal::meta_traits::is_meta_pointer_like : internal::meta_traits::is_none)
-            | (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_meta_sequence_container : internal::meta_traits::is_none)
-            | (is_complete_v<meta_associative_container_traits<Type>> ? internal::meta_traits::is_meta_associative_container : internal::meta_traits::is_none),
+        (std::is_arithmetic_v<Type> ? meta_traits::is_arithmetic : meta_traits::is_none)
+            | (std::is_integral_v<Type> ? meta_traits::is_integral : meta_traits::is_none)
+            | (std::is_signed_v<Type> ? meta_traits::is_signed : meta_traits::is_none)
+            | (std::is_array_v<Type> ? meta_traits::is_array : meta_traits::is_none)
+            | (std::is_enum_v<Type> ? meta_traits::is_enum : meta_traits::is_none)
+            | (std::is_class_v<Type> ? meta_traits::is_class : meta_traits::is_none)
+            | (is_meta_pointer_like_v<Type> ? meta_traits::is_meta_pointer_like : meta_traits::is_none)
+            | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_meta_sequence_container : meta_traits::is_none)
+            | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_meta_associative_container : meta_traits::is_none),
         size_of_v<Type>,
         &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>};
 
