@@ -329,7 +329,7 @@ class basic_registry {
             return static_cast<const storage_for_type<Type> &>(*it->second);
         }
 
-        static storage_for_type<Type> placeholder{get_allocator()};
+        static storage_for_type<Type> placeholder{};
         return placeholder;
     }
 
