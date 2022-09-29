@@ -143,12 +143,6 @@ template<typename... Args>
     return value();
 }
 
-[[nodiscard]] inline meta_type_node *try_resolve(const type_info &info) noexcept {
-    auto &&context = meta_context::from(locator<meta_ctx>::value_or());
-    const auto it = context.value.find(info.hash());
-    return it != context.value.end() ? &it->second : nullptr;
-}
-
 [[nodiscard]] inline const void *try_cast(const meta_type_node &from, const meta_type_node &to, const void *instance) noexcept {
     if(from.info && to.info && *from.info == *to.info) {
         return instance;
@@ -163,6 +157,12 @@ template<typename... Args>
     }
 
     return nullptr;
+}
+
+[[nodiscard]] inline meta_type_node *try_resolve(const type_info &info) noexcept {
+    auto &&context = meta_context::from(locator<meta_ctx>::value_or());
+    const auto it = context.value.find(info.hash());
+    return it != context.value.end() ? &it->second : nullptr;
 }
 
 template<typename Type>
