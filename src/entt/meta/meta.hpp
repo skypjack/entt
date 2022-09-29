@@ -641,9 +641,6 @@ private:
 
 /*! @brief Opaque wrapper for properties of any type. */
 struct meta_prop {
-    /*! @brief Node type. */
-    using node_type = internal::meta_prop_node;
-
     /*! @brief Default constructor. */
     meta_prop() noexcept
         : node{} {}
@@ -652,7 +649,7 @@ struct meta_prop {
      * @brief Constructs an instance from a given node.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_prop(const node_type &curr) noexcept
+    meta_prop(const internal::meta_prop_node &curr) noexcept
         : node{&curr} {}
 
     /**
@@ -672,15 +669,13 @@ struct meta_prop {
     }
 
 private:
-    const node_type *node;
+    const internal::meta_prop_node *node;
 };
 
 /*! @brief Opaque wrapper for data members. */
 struct meta_data {
-    /*! @brief Node type. */
-    using node_type = internal::meta_data_node;
     /*! @brief Unsigned integer type. */
-    using size_type = typename node_type::size_type;
+    using size_type = typename internal::meta_data_node::size_type;
 
     /*! @brief Default constructor. */
     meta_data() noexcept
@@ -690,7 +685,7 @@ struct meta_data {
      * @brief Constructs an instance from a given node.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_data(const node_type &curr) noexcept
+    meta_data(const internal::meta_data_node &curr) noexcept
         : node{&curr} {}
 
     /**
@@ -785,15 +780,13 @@ struct meta_data {
     }
 
 private:
-    const node_type *node;
+    const internal::meta_data_node *node;
 };
 
 /*! @brief Opaque wrapper for member functions. */
 struct meta_func {
-    /*! @brief Node type. */
-    using node_type = internal::meta_func_node;
     /*! @brief Unsigned integer type. */
-    using size_type = typename node_type::size_type;
+    using size_type = typename internal::meta_func_node::size_type;
 
     /*! @brief Default constructor. */
     meta_func() noexcept
@@ -803,7 +796,7 @@ struct meta_func {
      * @brief Constructs an instance from a given node.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_func(const node_type &curr) noexcept
+    meta_func(const internal::meta_func_node &curr) noexcept
         : node{&curr} {}
 
     /**
@@ -909,7 +902,7 @@ struct meta_func {
     }
 
 private:
-    const node_type *node;
+    const internal::meta_func_node *node;
 };
 
 /*! @brief Opaque wrapper for types. */
@@ -978,25 +971,21 @@ class meta_type {
     }
 
 public:
-    /*! @brief Node type. */
-    using node_type = internal::meta_type_node;
-    /*! @brief Node type. */
-    using base_node_type = internal::meta_base_node;
     /*! @brief Unsigned integer type. */
-    using size_type = typename node_type::size_type;
+    using size_type = typename internal::meta_type_node::size_type;
 
     /**
      * @brief Constructs an instance from a given node.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_type(const node_type &curr = {}) noexcept
+    meta_type(const internal::meta_type_node &curr = {}) noexcept
         : node{curr} {}
 
     /**
      * @brief Constructs an instance from a given base node.
      * @param curr The base node with which to construct the instance.
      */
-    meta_type(const base_node_type &curr) noexcept
+    meta_type(const internal::meta_base_node &curr) noexcept
         : meta_type{curr.type ? curr.type() : meta_type{}} {}
 
     /**
@@ -1402,7 +1391,7 @@ public:
     }
 
 private:
-    node_type node;
+    internal::meta_type_node node;
 };
 
 /**
