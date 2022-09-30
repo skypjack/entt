@@ -193,14 +193,18 @@ public:
             if constexpr(std::is_void_v<Ret>) {
                 if constexpr(std::is_invocable_r_v<bool, Func>) {
                     call(args...);
-                    if(func()) { break; }
+                    if(func()) {
+                        break;
+                    }
                 } else {
                     call(args...);
                     func();
                 }
             } else {
                 if constexpr(std::is_invocable_r_v<bool, Func, Ret>) {
-                    if(func(call(args...))) { break; }
+                    if(func(call(args...))) {
+                        break;
+                    }
                 } else {
                     func(call(args...));
                 }
@@ -366,6 +370,15 @@ class sink<sigh<Ret(Args...), Allocator>> {
         sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>();
     }
 
+    auto before(delegate<Ret(Args...)> call) {
+        const auto &calls = signal->calls;
+        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
+
+        sink other{*this};
+        other.offset = calls.cend() - it;
+        return other;
+    }
+
 public:
     /**
      * @brief Constructs a sink that is allowed to modify a given signal.
@@ -393,13 +406,7 @@ public:
     [[nodiscard]] sink before() {
         delegate<Ret(Args...)> call{};
         call.template connect<Function>();
-
-        const auto &calls = signal->calls;
-        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
-
-        sink other{*this};
-        other.offset = calls.cend() - it;
-        return other;
+        return before(std::move(call));
     }
 
     /**
@@ -414,13 +421,7 @@ public:
     [[nodiscard]] sink before(Type &&value_or_instance) {
         delegate<Ret(Args...)> call{};
         call.template connect<Candidate>(value_or_instance);
-
-        const auto &calls = signal->calls;
-        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
-
-        sink other{*this};
-        other.offset = calls.cend() - it;
-        return other;
+        return before(std::move(call));
     }
 
     /**
@@ -431,19 +432,17 @@ public:
      * @return A properly initialized sink object.
      */
     template<typename Type>
-    [[nodiscard]] sink before(Type &value_or_instance) {
+    [[nodiscard]] std::enable_if_t<!std::is_same_v<std::decay_t<std::remove_pointer_t<Type>>, void>, sink> before(Type &value_or_instance) {
         return before(&value_or_instance);
     }
 
     /**
      * @brief Returns a sink that connects before a given instance or specific
      * payload.
-     * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      * @return A properly initialized sink object.
      */
-    template<typename Type>
-    [[nodiscard]] sink before(Type *value_or_instance) {
+    [[nodiscard]] sink before(const void *value_or_instance) {
         sink other{*this};
 
         if(value_or_instance) {
@@ -520,18 +519,16 @@ public:
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
-    void disconnect(Type &value_or_instance) {
+    std::enable_if_t<!std::is_same_v<std::decay_t<std::remove_pointer_t<Type>>, void>> disconnect(Type &value_or_instance) {
         disconnect(&value_or_instance);
     }
 
     /**
      * @brief Disconnects free functions with payload or bound members from a
      * signal.
-     * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
-    template<typename Type>
-    void disconnect(Type *value_or_instance) {
+    void disconnect(const void *value_or_instance) {
         if(value_or_instance) {
             auto &calls = signal->calls;
             auto predicate = [value_or_instance](const auto &delegate) { return delegate.data() == value_or_instance; };
