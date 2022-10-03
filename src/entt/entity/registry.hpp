@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <tuple>
@@ -392,8 +393,8 @@ public:
         : vars{},
           free_list{tombstone},
           epool{allocator},
-          pools{},
-          groups{} {
+          pools{allocator},
+          groups{allocator} {
         pools.reserve(count);
     }
 
@@ -1505,8 +1506,8 @@ private:
     context vars;
     entity_type free_list;
     std::vector<entity_type, allocator_type> epool;
-    dense_map<id_type, std::unique_ptr<base_type>, identity> pools;
-    std::vector<group_data> groups;
+    dense_map<id_type, std::unique_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::unique_ptr<base_type>>>> pools;
+    std::vector<group_data, typename alloc_traits::template rebind_alloc<group_data>> groups;
 };
 
 } // namespace entt
