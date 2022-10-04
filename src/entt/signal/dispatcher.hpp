@@ -118,7 +118,7 @@ class basic_dispatcher {
     using handler_type = internal::dispatcher_handler<Type, Allocator>;
 
     using key_type = id_type;
-    // std::shared_ptr because of its type erased allocator which is pretty useful here
+    // std::shared_ptr because of its type erased allocator which is useful here
     using mapped_type = std::shared_ptr<internal::basic_dispatcher_handler>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
