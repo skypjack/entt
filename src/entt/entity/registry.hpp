@@ -313,7 +313,7 @@ class basic_registry {
         auto &cpool = pools[id];
 
         if(!cpool) {
-            cpool.reset(new storage_for_type<Type>{get_allocator()});
+            cpool = std::allocate_shared<storage_for_type<std::remove_const_t<Type>>>(get_allocator(), get_allocator());
             cpool->bind(forward_as_any(*this));
         }
 
@@ -1506,7 +1506,8 @@ private:
     context vars;
     entity_type free_list;
     std::vector<entity_type, allocator_type> epool;
-    dense_map<id_type, std::unique_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::unique_ptr<base_type>>>> pools;
+    // std::shared_ptr because of its type erased allocator which is useful here
+    dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>> pools;
     std::vector<group_data, typename alloc_traits::template rebind_alloc<group_data>> groups;
 };
 
