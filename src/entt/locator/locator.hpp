@@ -126,6 +126,7 @@ public:
     }
 
 private:
+    // std::shared_ptr because of its type erased allocator which is useful here
     inline static std::shared_ptr<Service> service{};
 };
 
