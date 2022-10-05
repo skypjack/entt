@@ -13,7 +13,6 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
-#include "../locator/locator.hpp"
 #include "context.hpp"
 #include "type_traits.hpp"
 
@@ -138,7 +137,7 @@ template<typename... Args>
 [[nodiscard]] auto meta_arg_node(type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
     std::size_t pos{};
     meta_type_node (*value)() noexcept = nullptr;
-    ((value = (pos++ == index ? &resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
+    ((value = (pos++ == index ? &resolve_TODO<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
     ENTT_ASSERT(value != nullptr, "Out of bounds");
     return value();
 }
@@ -159,17 +158,21 @@ template<typename... Args>
     return nullptr;
 }
 
-[[nodiscard]] inline meta_type_node *try_resolve(const type_info &info) noexcept {
-    auto &&context = meta_context::from(locator<meta_ctx>::value_or());
+[[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
     const auto it = context.value.find(info.hash());
     return it != context.value.end() ? &it->second : nullptr;
 }
 
 template<typename Type>
-[[nodiscard]] meta_type_node resolve() noexcept {
+[[nodiscard]] meta_type_node resolve_TODO() noexcept {
+    return resolve<Type>(meta_context::from(locator<meta_ctx>::value_or()));
+}
+
+template<typename Type>
+[[nodiscard]] meta_type_node resolve(const meta_context &context) noexcept {
     static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
 
-    if(auto *elem = try_resolve(type_id<Type>()); elem) {
+    if(auto *elem = try_resolve(context, type_id<Type>()); elem) {
         return *elem;
     }
 
@@ -186,7 +189,7 @@ template<typename Type>
             | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_meta_sequence_container : meta_traits::is_none)
             | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_meta_associative_container : meta_traits::is_none),
         size_of_v<Type>,
-        &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>};
+        &resolve_TODO<std::remove_cv_t<std::remove_pointer_t<Type>>>};
 
     if constexpr(std::is_default_constructible_v<Type>) {
         node.default_constructor = +[]() { return meta_any{std::in_place_type<Type>}; };
@@ -215,7 +218,7 @@ template<typename Type>
     if constexpr(is_complete_v<meta_template_traits<Type>>) {
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
-            &resolve<typename meta_template_traits<Type>::class_type>,
+            &resolve_TODO<typename meta_template_traits<Type>::class_type>,
             +[](const std::size_t index) noexcept { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }};
     }
 

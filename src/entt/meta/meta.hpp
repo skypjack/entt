@@ -45,7 +45,7 @@ public:
      */
     template<typename Type>
     meta_sequence_container(std::in_place_type_t<Type>, any instance) noexcept
-        : value_type_node{&internal::resolve<typename Type::value_type>},
+        : value_type_node{&internal::resolve_TODO<typename Type::value_type>},
           size_fn{&meta_sequence_container_traits<Type>::size},
           resize_fn{&meta_sequence_container_traits<Type>::resize},
           iter_fn{&meta_sequence_container_traits<Type>::iter},
@@ -93,9 +93,9 @@ public:
     template<typename Type>
     meta_associative_container(std::in_place_type_t<Type>, any instance) noexcept
         : key_only_container{meta_associative_container_traits<Type>::key_only},
-          key_type_node{&internal::resolve<typename Type::key_type>},
+          key_type_node{&internal::resolve_TODO<typename Type::key_type>},
           mapped_type_node{},
-          value_type_node{&internal::resolve<typename Type::value_type>},
+          value_type_node{&internal::resolve_TODO<typename Type::value_type>},
           size_fn{&meta_associative_container_traits<Type>::size},
           clear_fn{&meta_associative_container_traits<Type>::clear},
           iter_fn{&meta_associative_container_traits<Type>::iter},
@@ -103,7 +103,7 @@ public:
           find_fn{&meta_associative_container_traits<Type>::find},
           storage{std::move(instance)} {
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
-            mapped_type_node = &internal::resolve<typename Type::mapped_type>;
+            mapped_type_node = &internal::resolve_TODO<typename Type::mapped_type>;
         }
     }
 
@@ -207,7 +207,7 @@ public:
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          node{internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>()},
+          node{internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>()},
           vtable{&basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>} {}
 
     /**
@@ -339,7 +339,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
-        return static_cast<const Type *>(internal::try_cast(node, internal::resolve<std::remove_cv_t<Type>>(), data()));
+        return static_cast<const Type *>(internal::try_cast(node, internal::resolve_TODO<std::remove_cv_t<Type>>(), data()));
     }
 
     /*! @copydoc try_cast */
@@ -348,7 +348,7 @@ public:
         if constexpr(std::is_const_v<Type>) {
             return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
         } else {
-            return static_cast<Type *>(const_cast<void *>(internal::try_cast(node, internal::resolve<Type>(), data())));
+            return static_cast<Type *>(const_cast<void *>(internal::try_cast(node, internal::resolve_TODO<Type>(), data())));
         }
     }
 
@@ -415,7 +415,7 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return {};
         } else {
-            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>());
+            return allow_cast(internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>());
         }
     }
 
@@ -427,9 +427,9 @@ public:
     template<typename Type>
     bool allow_cast() {
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>()) && (storage.data() != nullptr);
+            return allow_cast(internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>()) && (storage.data() != nullptr);
         } else {
-            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>());
+            return allow_cast(internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>());
         }
     }
 
@@ -438,7 +438,7 @@ public:
     void emplace(Args &&...args) {
         release();
         storage.emplace<Type>(std::forward<Args>(args)...);
-        node = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>();
+        node = internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>();
         vtable = &basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
     }
 

@@ -181,7 +181,7 @@ TEST_F(MetaBase, TransferWithMutatingThis) {
 TEST_F(MetaBase, ReRegistration) {
     SetUp();
 
-    auto &&node = entt::internal::resolve<derived_t>();
+    auto &&node = entt::internal::resolve_TODO<derived_t>();
 
     ASSERT_TRUE(node.details);
     ASSERT_FALSE(node.details->base.empty());

@@ -101,7 +101,7 @@ TEST_F(MetaDtor, AsRefConstruction) {
 TEST_F(MetaDtor, ReRegistration) {
     SetUp();
 
-    auto &&node = entt::internal::resolve<clazz_t>();
+    auto &&node = entt::internal::resolve_TODO<clazz_t>();
 
     ASSERT_NE(node.dtor.dtor, nullptr);
 

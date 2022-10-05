@@ -86,7 +86,7 @@ TEST_F(MetaProp, ReRegistration) {
 
     SetUp();
 
-    auto &&node = entt::internal::resolve<base_1_t>();
+    auto &&node = entt::internal::resolve_TODO<base_1_t>();
     auto type = entt::resolve<base_1_t>();
 
     ASSERT_TRUE(node.details);

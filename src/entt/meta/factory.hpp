@@ -103,7 +103,7 @@ class meta_factory {
                 /* this is never static */
                 (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                 Setter::size,
-                &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
+                &internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<data_type>>>,
                 &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
                 +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
                 &meta_getter<Type, Getter, Policy>});
@@ -154,7 +154,7 @@ public:
             *info,
             type_id<Base>().hash(),
             internal::meta_base_node{
-                &internal::resolve<Base>,
+                &internal::resolve_TODO<Base>,
                 +[](const void *instance) noexcept {
                     return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance)));
                 }});
@@ -329,7 +329,7 @@ public:
                     /* this is never static */
                     std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
-                    &internal::resolve<std::remove_const_t<data_type>>,
+                    &internal::resolve_TODO<std::remove_const_t<data_type>>,
                     &meta_arg<type_list<std::remove_const_t<data_type>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
@@ -344,7 +344,7 @@ public:
                 internal::meta_data_node{
                     ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
-                    &internal::resolve<std::remove_const_t<data_type>>,
+                    &internal::resolve_TODO<std::remove_const_t<data_type>>,
                     &meta_arg<type_list<std::remove_const_t<data_type>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
@@ -388,7 +388,7 @@ public:
                     /* this is never static */
                     internal::meta_traits::is_const,
                     0u,
-                    &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
+                    &internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<data_type>>>,
                     &meta_arg<type_list<>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
@@ -404,7 +404,7 @@ public:
                     /* this is never static nor const */
                     internal::meta_traits::is_none,
                     1u,
-                    &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
+                    &internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<data_type>>>,
                     &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
@@ -462,7 +462,7 @@ public:
             internal::meta_func_node{
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
                 descriptor::args_type::size,
-                &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
+                &internal::resolve_TODO<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
                 &meta_arg<typename descriptor::args_type>,
                 &meta_invoke<Type, Candidate, Policy>});
 
@@ -489,13 +489,13 @@ public:
                 *bucket,
                 id,
                 internal::meta_prop_node{
-                    &internal::resolve<void>});
+                    &internal::resolve_TODO<void>});
         } else {
             internal::meta_extend(
                 *bucket,
                 id,
                 internal::meta_prop_node{
-                    &internal::resolve<std::decay_t<Value>>...,
+                    &internal::resolve_TODO<std::decay_t<Value>>...,
                     std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
         }
 
@@ -521,7 +521,7 @@ private:
 template<typename Type>
 [[nodiscard]] auto meta() noexcept {
     // make sure the type exists in the context before returning a factory
-    internal::meta_context::from(locator<meta_ctx>::value_or()).value.try_emplace(type_id<Type>().hash(), internal::resolve<Type>());
+    internal::meta_context::from(locator<meta_ctx>::value_or()).value.try_emplace(type_id<Type>().hash(), internal::resolve_TODO<Type>());
     return meta_factory<Type>{};
 }
 

@@ -205,7 +205,7 @@ TEST_F(MetaCtor, NonDefaultConstructibleType) {
 TEST_F(MetaCtor, ReRegistration) {
     SetUp();
 
-    auto &&node = entt::internal::resolve<double>();
+    auto &&node = entt::internal::resolve_TODO<double>();
 
     ASSERT_TRUE(node.details);
     ASSERT_FALSE(node.details->ctor.empty());

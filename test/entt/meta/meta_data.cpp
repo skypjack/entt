@@ -645,7 +645,7 @@ TEST_F(MetaData, ReRegistration) {
 
     SetUp();
 
-    auto &&node = entt::internal::resolve<base_t>();
+    auto &&node = entt::internal::resolve_TODO<base_t>();
     auto type = entt::resolve<base_t>();
 
     ASSERT_TRUE(node.details);
