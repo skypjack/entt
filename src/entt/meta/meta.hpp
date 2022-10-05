@@ -1451,9 +1451,10 @@ bool meta_any::set(const id_type id, Type &&value) {
     }
 
     if(const auto *value = data(); node.details) {
+        auto &&ctx_TODO = locator<meta_ctx>::value_or();
+        auto &&context_TODO = internal::meta_context::from(ctx_TODO);
+
         for(auto &&curr: node.details->base) {
-            auto &&ctx_TODO = locator<meta_ctx>::value_or();
-            auto &&context_TODO = internal::meta_context::from(ctx_TODO);
             const auto &as_const = curr.second.type(context_TODO).from_void(nullptr, curr.second.cast(value), ctx_TODO);
 
             if(auto other = as_const.allow_cast(type); other) {
@@ -1462,7 +1463,7 @@ bool meta_any::set(const id_type id, Type &&value) {
         }
 
         if(auto it = node.details->conv.find(type.info().hash()); it != node.details->conv.cend()) {
-            return it->second.conv(data());
+            return it->second.conv(data(), ctx_TODO);
         }
     }
 

@@ -59,7 +59,7 @@ struct meta_base_node {
 };
 
 struct meta_conv_node {
-    meta_any (*conv)(const void *){};
+    meta_any (*conv)(const void *, const meta_ctx &){};
 };
 
 struct meta_ctor_node {
