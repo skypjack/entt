@@ -131,15 +131,25 @@ struct meta_type_node {
 };
 
 template<typename Type>
-meta_type_node resolve() noexcept;
+meta_type_node resolve(const meta_context &) noexcept;
+
+template<typename Type>
+[[nodiscard]] meta_type_node resolve_TODO() noexcept {
+    return resolve<Type>(meta_context::from(locator<meta_ctx>::value_or()));
+}
 
 template<typename... Args>
-[[nodiscard]] auto meta_arg_node(type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
+[[nodiscard]] auto meta_arg_node(type_list<Args...>, const meta_context &context, [[maybe_unused]] const std::size_t index) noexcept {
     std::size_t pos{};
-    meta_type_node (*value)() noexcept = nullptr;
-    ((value = (pos++ == index ? &resolve_TODO<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
+    meta_type_node (*value)(const meta_context &) noexcept = nullptr;
+    ((value = (pos++ == index ? &resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
     ENTT_ASSERT(value != nullptr, "Out of bounds");
-    return value();
+    return value(context);
+}
+
+template<typename Args>
+[[nodiscard]] auto meta_arg_node_TODO(Args, const std::size_t index) noexcept {
+    return meta_arg_node(Args{}, meta_context::from(locator<meta_ctx>::value_or()), index);
 }
 
 [[nodiscard]] inline const void *try_cast(const meta_type_node &from, const meta_type_node &to, const void *instance) noexcept {
@@ -161,11 +171,6 @@ template<typename... Args>
 [[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
     const auto it = context.value.find(info.hash());
     return it != context.value.end() ? &it->second : nullptr;
-}
-
-template<typename Type>
-[[nodiscard]] meta_type_node resolve_TODO() noexcept {
-    return resolve<Type>(meta_context::from(locator<meta_ctx>::value_or()));
 }
 
 template<typename Type>
@@ -219,7 +224,7 @@ template<typename Type>
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve_TODO<typename meta_template_traits<Type>::class_type>,
-            +[](const std::size_t index) noexcept { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index); }};
+            +[](const std::size_t index) noexcept { return meta_arg_node_TODO(typename meta_template_traits<Type>::args_type{}, index); }};
     }
 
     return node;
