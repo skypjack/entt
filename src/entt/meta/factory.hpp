@@ -105,7 +105,7 @@ class meta_factory {
                 (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                 Setter::size,
                 &internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<data_type>>>,
-                &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
+                &meta_arg_TODO<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
                 +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
                 &meta_getter<Type, Getter, Policy>});
 
@@ -241,7 +241,7 @@ public:
             type_id<typename descriptor::args_type>().hash(),
             internal::meta_ctor_node{
                 descriptor::args_type::size,
-                &meta_arg<typename descriptor::args_type>,
+                &meta_arg_TODO<typename descriptor::args_type>,
                 &meta_construct<Type, Candidate, Policy>});
 
         bucket = nullptr;
@@ -267,7 +267,7 @@ public:
             type_id<typename descriptor::args_type>().hash(),
             internal::meta_ctor_node{
                 descriptor::args_type::size,
-                &meta_arg<typename descriptor::args_type>,
+                &meta_arg_TODO<typename descriptor::args_type>,
                 &meta_construct<Type, Args...>});
 
         bucket = nullptr;
@@ -331,7 +331,7 @@ public:
                     std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
                     &internal::resolve_TODO<std::remove_const_t<data_type>>,
-                    &meta_arg<type_list<std::remove_const_t<data_type>>>,
+                    &meta_arg_TODO<type_list<std::remove_const_t<data_type>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
 
@@ -346,7 +346,7 @@ public:
                     ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
                     &internal::resolve_TODO<std::remove_const_t<data_type>>,
-                    &meta_arg<type_list<std::remove_const_t<data_type>>>,
+                    &meta_arg_TODO<type_list<std::remove_const_t<data_type>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
 
@@ -390,7 +390,7 @@ public:
                     internal::meta_traits::is_const,
                     0u,
                     &internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<data_type>>>,
-                    &meta_arg<type_list<>>,
+                    &meta_arg_TODO<type_list<>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
 
@@ -406,7 +406,7 @@ public:
                     internal::meta_traits::is_none,
                     1u,
                     &internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<data_type>>>,
-                    &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
+                    &meta_arg_TODO<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
 
@@ -464,7 +464,7 @@ public:
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
                 descriptor::args_type::size,
                 &internal::resolve_TODO<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
-                &meta_arg<typename descriptor::args_type>,
+                &meta_arg_TODO<typename descriptor::args_type>,
                 &meta_invoke<Type, Candidate, Policy>});
 
         bucket = &elem.prop;

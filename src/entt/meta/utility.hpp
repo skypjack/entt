@@ -172,11 +172,23 @@ meta_any meta_dispatch([[maybe_unused]] Type &&value) {
 /**
  * @brief Returns the meta type of the i-th element of a list of arguments.
  * @tparam Type Type list of the actual types of arguments.
+ * @param context The context from which to search for meta types.
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
-[[nodiscard]] static meta_type meta_arg(const std::size_t index) noexcept {
-    return internal::meta_arg_node_TODO(Type{}, index);
+[[nodiscard]] static meta_type meta_arg(const std::size_t index, const meta_ctx &context = locator<meta_ctx>::value_or()) noexcept {
+    auto &&ctx = internal::meta_context::from(context);
+    return internal::meta_arg_node(Type{}, index, ctx);
+}
+
+/**
+ * @brief Returns the meta type of the i-th element of a list of arguments.
+ * @tparam Type Type list of the actual types of arguments.
+ * @return The meta type of the i-th element of the list of arguments.
+ */
+template<typename Type>
+[[nodiscard]] static meta_type meta_arg_TODO(const std::size_t index) noexcept {
+    return meta_arg<Type>(index);
 }
 
 /**

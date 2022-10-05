@@ -148,11 +148,6 @@ template<typename... Args>
     return value(context);
 }
 
-template<typename Args>
-[[nodiscard]] auto meta_arg_node_TODO(Args, const std::size_t index) noexcept {
-    return meta_arg_node(Args{}, index, meta_context::from(locator<meta_ctx>::value_or()));
-}
-
 [[nodiscard]] inline const void *try_cast(const meta_type_node &from, const meta_type_node &to, const void *instance) noexcept {
     if(from.info && to.info && *from.info == *to.info) {
         return instance;
