@@ -54,7 +54,7 @@ struct meta_prop_node {
 };
 
 struct meta_base_node {
-    meta_type_node (*type)() noexcept {};
+    meta_type_node (*type)(const meta_context &) noexcept {};
     const void *(*cast)(const void *) noexcept {};
 };
 
@@ -154,8 +154,10 @@ template<typename... Args>
     }
 
     if(from.details) {
+        const auto &ctx_TODO = meta_context::from(locator<meta_ctx>::value_or());
+
         for(auto &&curr: from.details->base) {
-            if(const void *elem = try_cast(curr.second.type(), to, curr.second.cast(instance)); elem) {
+            if(const void *elem = try_cast(curr.second.type(ctx_TODO), to, curr.second.cast(instance)); elem) {
                 return elem;
             }
         }

@@ -155,7 +155,7 @@ public:
             *info,
             type_id<Base>().hash(),
             internal::meta_base_node{
-                &internal::resolve_TODO<Base>,
+                &internal::resolve<Base>,
                 +[](const void *instance) noexcept {
                     return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance)));
                 }});

@@ -987,7 +987,11 @@ public:
      * @param curr The base node with which to construct the instance.
      */
     meta_type(const internal::meta_base_node &curr) noexcept
-        : meta_type{curr.type ? curr.type() : meta_type{}} {}
+        : meta_type{} {
+        if(const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or()); curr.type) {
+            node = curr.type(ctx_TODO);
+        }
+    }
 
     /**
      * @brief Returns the type info object of the underlying type.
@@ -1441,7 +1445,8 @@ bool meta_any::set(const id_type id, Type &&value) {
 
     if(const auto *value = data(); node.details) {
         for(auto &&curr: node.details->base) {
-            const auto &as_const = curr.second.type().from_void(nullptr, curr.second.cast(value));
+            const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+            const auto &as_const = curr.second.type(ctx_TODO).from_void(nullptr, curr.second.cast(value));
 
             if(auto other = as_const.allow_cast(type); other) {
                 return other;
