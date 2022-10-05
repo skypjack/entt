@@ -656,8 +656,8 @@ struct meta_prop {
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return node->value ? node->type(ctx_TODO).from_void(nullptr, node->value.get()) : meta_any{};
+        const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+        return node->value ? node->type(context_TODO).from_void(nullptr, node->value.get()) : meta_any{};
     }
 
     /**
@@ -988,8 +988,8 @@ public:
      */
     meta_type(const internal::meta_base_node &curr) noexcept
         : meta_type{} {
-        if(const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or()); curr.type) {
-            node = curr.type(ctx_TODO);
+        if(const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or()); curr.type) {
+            node = curr.type(context_TODO);
         }
     }
 
@@ -1080,8 +1080,8 @@ public:
      * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const noexcept {
-        const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return node.remove_pointer(ctx_TODO);
+        const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+        return node.remove_pointer(context_TODO);
     }
 
     /**
@@ -1135,8 +1135,8 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const noexcept {
-        const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return node.templ.type ? meta_type{node.templ.type(ctx_TODO)} : meta_type{};
+        const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+        return node.templ.type ? meta_type{node.templ.type(context_TODO)} : meta_type{};
     }
 
     /**
@@ -1145,8 +1145,8 @@ public:
      * @return The type of the i-th template argument of a type.
      */
     [[nodiscard]] inline meta_type template_arg(const size_type index) const noexcept {
-        const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return index < template_arity() ? meta_type{node.templ.arg(index, ctx_TODO)} : meta_type{};
+        const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+        return index < template_arity() ? meta_type{node.templ.arg(index, context_TODO)} : meta_type{};
     }
 
     /**
@@ -1447,8 +1447,8 @@ bool meta_any::set(const id_type id, Type &&value) {
 
     if(const auto *value = data(); node.details) {
         for(auto &&curr: node.details->base) {
-            const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-            const auto &as_const = curr.second.type(ctx_TODO).from_void(nullptr, curr.second.cast(value));
+            const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+            const auto &as_const = curr.second.type(context_TODO).from_void(nullptr, curr.second.cast(value));
 
             if(auto other = as_const.allow_cast(type); other) {
                 return other;
@@ -1486,8 +1486,8 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-    return node->type(ctx_TODO);
+    const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+    return node->type(context_TODO);
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
@@ -1496,8 +1496,8 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-    return node->ret(ctx_TODO);
+    const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+    return node->ret(context_TODO);
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {

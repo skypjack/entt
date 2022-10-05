@@ -176,9 +176,9 @@ meta_any meta_dispatch([[maybe_unused]] Type &&value) {
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
-[[nodiscard]] static meta_type meta_arg(const std::size_t index, const meta_ctx &context = locator<meta_ctx>::value_or()) noexcept {
-    auto &&ctx = internal::meta_context::from(context);
-    return internal::meta_arg_node(Type{}, index, ctx);
+[[nodiscard]] static meta_type meta_arg(const std::size_t index, const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+    auto &&context = internal::meta_context::from(ctx);
+    return internal::meta_arg_node(Type{}, index, context);
 }
 
 /**
