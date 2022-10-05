@@ -731,7 +731,8 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node->set && node->set(std::move(instance), std::forward<Type>(value));
+        auto &&ctx_TODO = locator<meta_ctx>::value_or();
+        return node->set && node->set(std::move(instance), std::forward<Type>(value), ctx_TODO);
     }
 
     /**
@@ -744,7 +745,8 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node->get(std::move(instance));
+        auto &&ctx_TODO = locator<meta_ctx>::value_or();
+        return node->get(std::move(instance), ctx_TODO);
     }
 
     /**

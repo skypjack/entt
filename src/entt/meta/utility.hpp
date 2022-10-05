@@ -187,10 +187,11 @@ template<typename Type>
  * @tparam Data The actual variable to set.
  * @param instance An opaque instance of the underlying type, if required.
  * @param value Parameter to use to set the variable.
+ * @param ctx The context from which to search for meta types.
  * @return True in case of success, false otherwise.
  */
 template<typename Type, auto Data>
-[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
+[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value, const meta_ctx &ctx/*_TODO*/ = locator<meta_ctx>::value_or()) {
     if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
         if constexpr(std::is_member_function_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
             using descriptor = meta_function_helper_t<Type, decltype(Data)>;
@@ -230,10 +231,11 @@ template<typename Type, auto Data>
  * @tparam Data The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
  * @param instance An opaque instance of the underlying type, if required.
+ * @param ctx The context from which to search for meta types.
  * @return A meta any containing the value of the underlying variable.
  */
 template<typename Type, auto Data, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance) {
+[[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance, const meta_ctx &ctx/*_TODO*/ = locator<meta_ctx>::value_or()) {
     if constexpr(std::is_member_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
         if constexpr(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>>>) {
             if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
