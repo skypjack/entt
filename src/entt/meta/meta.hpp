@@ -658,7 +658,7 @@ struct meta_prop {
     [[nodiscard]] meta_any value() const {
         auto &&ctx_TODO = locator<meta_ctx>::value_or();
         auto &&context_TODO = internal::meta_context::from(ctx_TODO);
-        return node->value ? node->type(context_TODO).from_void(nullptr, node->value.get(), ctx) : meta_any{};
+        return node->value ? node->type(context_TODO).from_void(nullptr, node->value.get(), ctx_TODO) : meta_any{};
     }
 
     /**
@@ -1266,12 +1266,14 @@ public:
      * @return A wrapper that references the given instance.
      */
     meta_any from_void(void *element) const {
-        return (element && node.from_void) ? node.from_void(element, nullptr) : meta_any{};
+        auto &&ctx_TODO = locator<meta_ctx>::value_or();
+        return (element && node.from_void) ? node.from_void(element, nullptr, ctx_TODO) : meta_any{};
     }
 
     /*! @copydoc from_void */
     meta_any from_void(const void *element) const {
-        return (element && node.from_void) ? node.from_void(nullptr, element) : meta_any{};
+        auto &&ctx_TODO = locator<meta_ctx>::value_or();
+        return (element && node.from_void) ? node.from_void(nullptr, element, ctx_TODO) : meta_any{};
     }
 
     /**
@@ -1448,8 +1450,9 @@ bool meta_any::set(const id_type id, Type &&value) {
 
     if(const auto *value = data(); node.details) {
         for(auto &&curr: node.details->base) {
-            auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-            const auto &as_const = curr.second.type(context_TODO).from_void(nullptr, curr.second.cast(value));
+            auto &&ctx_TODO = locator<meta_ctx>::value_or();
+            auto &&context_TODO = internal::meta_context::from(ctx_TODO);
+            const auto &as_const = curr.second.type(context_TODO).from_void(nullptr, curr.second.cast(value), ctx_TODO);
 
             if(auto other = as_const.allow_cast(type); other) {
                 return other;
