@@ -182,16 +182,6 @@ template<typename Type>
 }
 
 /**
- * @brief Returns the meta type of the i-th element of a list of arguments.
- * @tparam Type Type list of the actual types of arguments.
- * @return The meta type of the i-th element of the list of arguments.
- */
-template<typename Type>
-[[nodiscard]] static meta_type meta_arg_TODO(const std::size_t index) noexcept {
-    return meta_arg<Type>(index);
-}
-
-/**
  * @brief Sets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
  * @tparam Data The actual variable to set.
