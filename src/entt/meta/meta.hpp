@@ -1237,7 +1237,8 @@ public:
         }
 
         if(sz == 0u && node.default_constructor) {
-            return node.default_constructor();
+            const auto &ctx_TODO = locator<meta_ctx>::value_or();
+            return node.default_constructor(ctx_TODO);
         }
 
         return {};

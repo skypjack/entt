@@ -123,7 +123,7 @@ struct meta_type_node {
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
     meta_type_node (*remove_pointer)(const meta_context &) noexcept {};
-    meta_any (*default_constructor)(){};
+    meta_any (*default_constructor)(const meta_ctx &){};
     double (*conversion_helper)(void *, const void *){};
     meta_any (*from_void)(void *, const void *){};
     meta_template_node templ{};
@@ -195,7 +195,7 @@ template<typename Type>
         &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>};
 
     if constexpr(std::is_default_constructible_v<Type>) {
-        node.default_constructor = +[]() { return meta_any{std::in_place_type<Type>}; };
+        node.default_constructor = +[](const meta_ctx &ctx_TODO) { return meta_any{std::in_place_type<Type>}; };
     }
 
     if constexpr(std::is_arithmetic_v<Type>) {
