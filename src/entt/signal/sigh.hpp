@@ -431,8 +431,8 @@ public:
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
-    template<typename Type>
-    [[nodiscard]] std::enable_if_t<!std::is_same_v<std::decay_t<std::remove_pointer_t<Type>>, void>, sink> before(Type &value_or_instance) {
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<std::remove_pointer_t<Type>>, void>, sink>>
+    [[nodiscard]] sink before(Type &value_or_instance) {
         return before(&value_or_instance);
     }
 
@@ -518,8 +518,8 @@ public:
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
-    template<typename Type>
-    std::enable_if_t<!std::is_same_v<std::decay_t<std::remove_pointer_t<Type>>, void>> disconnect(Type &value_or_instance) {
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<std::remove_pointer_t<Type>>, void>>>
+    void disconnect(Type &value_or_instance) {
         disconnect(&value_or_instance);
     }
 
