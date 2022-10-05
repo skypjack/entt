@@ -13,6 +13,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
+#include "../locator/locator.hpp" // TODO
 #include "adl_pointer.hpp"
 #include "context.hpp"
 #include "fwd.hpp"
@@ -655,7 +656,8 @@ struct meta_prop {
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node->value ? node->type().from_void(nullptr, node->value.get()) : meta_any{};
+        const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+        return node->value ? node->type(ctx_TODO).from_void(nullptr, node->value.get()) : meta_any{};
     }
 
     /**

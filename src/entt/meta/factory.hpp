@@ -11,6 +11,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../locator/locator.hpp" // TODO
 #include "context.hpp"
 #include "meta.hpp"
 #include "node.hpp"
@@ -489,13 +490,13 @@ public:
                 *bucket,
                 id,
                 internal::meta_prop_node{
-                    &internal::resolve_TODO<void>});
+                    &internal::resolve<void>});
         } else {
             internal::meta_extend(
                 *bucket,
                 id,
                 internal::meta_prop_node{
-                    &internal::resolve_TODO<std::decay_t<Value>>...,
+                    &internal::resolve<std::decay_t<Value>>...,
                     std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
         }
 

@@ -13,6 +13,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
+#include "../locator/locator.hpp" // TODO
 #include "context.hpp"
 #include "type_traits.hpp"
 
@@ -48,7 +49,7 @@ enum class meta_traits : std::uint32_t {
 struct meta_type_node;
 
 struct meta_prop_node {
-    meta_type_node (*type)() noexcept {};
+    meta_type_node (*type)(const meta_context &) noexcept {};
     std::shared_ptr<void> value{};
 };
 
