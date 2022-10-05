@@ -1478,11 +1478,13 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return node->type();
+    const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+    return node->type(ctx_TODO);
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
-    return index < arity() ? node->arg(index) : meta_type{};
+    const auto &ctx_TODO = locator<meta_ctx>::value_or();
+    return index < arity() ? node->arg(index, ctx_TODO) : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
