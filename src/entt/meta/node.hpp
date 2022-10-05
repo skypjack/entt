@@ -125,7 +125,7 @@ struct meta_type_node {
     meta_type_node (*remove_pointer)(const meta_context &) noexcept {};
     meta_any (*default_constructor)(const meta_ctx &){};
     double (*conversion_helper)(void *, const void *){};
-    meta_any (*from_void)(void *, const void *){};
+    meta_any (*from_void)(void *, const void *, const meta_ctx &){};
     meta_template_node templ{};
     meta_dtor_node dtor{};
     std::shared_ptr<meta_type_descriptor> details{};
@@ -209,7 +209,7 @@ template<typename Type>
     }
 
     if constexpr(!std::is_same_v<Type, void> && !std::is_function_v<Type>) {
-        node.from_void = +[](void *element, const void *as_const) {
+        node.from_void = +[](void *element, const void *as_const, const meta_ctx &ctx_TODO) {
             if(element) {
                 return meta_any{std::in_place_type<std::decay_t<Type> &>, *static_cast<std::decay_t<Type> *>(element)};
             }

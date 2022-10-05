@@ -656,8 +656,9 @@ struct meta_prop {
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        const auto &context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return node->value ? node->type(context_TODO).from_void(nullptr, node->value.get()) : meta_any{};
+        const auto &ctx = locator<meta_ctx>::value_or();
+        const auto &context_TODO = internal::meta_context::from(ctx);
+        return node->value ? node->type(context_TODO).from_void(nullptr, node->value.get(), ctx) : meta_any{};
     }
 
     /**
