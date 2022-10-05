@@ -172,7 +172,7 @@ meta_any meta_dispatch([[maybe_unused]] Type &&value) {
 /**
  * @brief Returns the meta type of the i-th element of a list of arguments.
  * @tparam Type Type list of the actual types of arguments.
- * @param context The context from which to search for meta types.
+ * @param ctx The context from which to search for meta types.
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
