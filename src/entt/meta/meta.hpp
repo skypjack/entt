@@ -1129,7 +1129,8 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const noexcept {
-        return node.templ.type ? meta_type{node.templ.type()} : meta_type{};
+        const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+        return node.templ.type ? meta_type{node.templ.type(ctx_TODO)} : meta_type{};
     }
 
     /**
@@ -1138,7 +1139,8 @@ public:
      * @return The type of the i-th template argument of a type.
      */
     [[nodiscard]] inline meta_type template_arg(const size_type index) const noexcept {
-        return index < template_arity() ? meta_type{node.templ.arg(index)} : meta_type{};
+        const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+        return index < template_arity() ? meta_type{node.templ.arg(ctx_TODO, index)} : meta_type{};
     }
 
     /**

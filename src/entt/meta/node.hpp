@@ -102,8 +102,8 @@ struct meta_template_node {
     using size_type = std::size_t;
 
     size_type arity{0u};
-    meta_type_node (*type)() noexcept {};
-    meta_type_node (*arg)(const size_type) noexcept {};
+    meta_type_node (*type)(const meta_context &) noexcept {};
+    meta_type_node (*arg)(const meta_context &, const size_type) noexcept {};
 };
 
 struct meta_type_descriptor {
@@ -224,8 +224,8 @@ template<typename Type>
     if constexpr(is_complete_v<meta_template_traits<Type>>) {
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
-            &resolve_TODO<typename meta_template_traits<Type>::class_type>,
-            +[](const std::size_t index) noexcept { return meta_arg_node_TODO(typename meta_template_traits<Type>::args_type{}, index); }};
+            &resolve<typename meta_template_traits<Type>::class_type>,
+            +[](const meta_context &context, const std::size_t index) noexcept { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, context, index); }};
     }
 
     return node;
