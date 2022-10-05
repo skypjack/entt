@@ -926,7 +926,8 @@ class meta_type {
 
                 for(; pos < sz && args[pos]; ++pos) {
                     const auto type = args[pos].type();
-                    const auto other = curr->arg(pos);
+                    const auto &ctx_TODO = locator<meta_ctx>::value_or();
+                    const auto other = curr->arg(pos, ctx_TODO);
 
                     if(const auto &info = other.info(); info == type.info()) {
                         ++match;
@@ -1488,11 +1489,13 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return node->ret();
+    const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+    return node->ret(ctx_TODO);
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
-    return index < arity() ? node->arg(index) : meta_type{};
+    const auto &ctx_TODO = locator<meta_ctx>::value_or();
+    return index < arity() ? node->arg(index, ctx_TODO) : meta_type{};
 }
 
 /**

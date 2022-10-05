@@ -66,7 +66,7 @@ struct meta_ctor_node {
     using size_type = std::size_t;
 
     size_type arity{0u};
-    meta_type (*arg)(const size_type) noexcept {};
+    meta_type (*arg)(const size_type, const meta_ctx &) noexcept {};
     meta_any (*invoke)(meta_any *const){};
 };
 
@@ -91,8 +91,8 @@ struct meta_func_node {
 
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
-    meta_type_node (*ret)() noexcept {};
-    meta_type (*arg)(const size_type) noexcept {};
+    meta_type_node (*ret)(const meta_context &) noexcept {};
+    meta_type (*arg)(const size_type, const meta_ctx &) noexcept {};
     meta_any (*invoke)(meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next{};
     dense_map<id_type, meta_prop_node, identity> prop{};
