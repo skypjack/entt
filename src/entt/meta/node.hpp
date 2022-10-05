@@ -103,7 +103,7 @@ struct meta_template_node {
 
     size_type arity{0u};
     meta_type_node (*type)(const meta_context &) noexcept {};
-    meta_type_node (*arg)(const meta_context &, const size_type) noexcept {};
+    meta_type_node (*arg)(const size_type, const meta_context &) noexcept {};
 };
 
 struct meta_type_descriptor {
@@ -140,7 +140,7 @@ template<typename Type>
 }
 
 template<typename... Args>
-[[nodiscard]] auto meta_arg_node(type_list<Args...>, const meta_context &context, [[maybe_unused]] const std::size_t index) noexcept {
+[[nodiscard]] auto meta_arg_node(type_list<Args...>, [[maybe_unused]] const std::size_t index, const meta_context &context) noexcept {
     std::size_t pos{};
     meta_type_node (*value)(const meta_context &) noexcept = nullptr;
     ((value = (pos++ == index ? &resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
@@ -150,7 +150,7 @@ template<typename... Args>
 
 template<typename Args>
 [[nodiscard]] auto meta_arg_node_TODO(Args, const std::size_t index) noexcept {
-    return meta_arg_node(Args{}, meta_context::from(locator<meta_ctx>::value_or()), index);
+    return meta_arg_node(Args{}, index, meta_context::from(locator<meta_ctx>::value_or()));
 }
 
 [[nodiscard]] inline const void *try_cast(const meta_type_node &from, const meta_type_node &to, const void *instance) noexcept {
@@ -169,7 +169,7 @@ template<typename Args>
     return nullptr;
 }
 
-[[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
+[[nodiscard]] inline const meta_type_node *try_resolve(const type_info &info, const meta_context &context) noexcept {
     const auto it = context.value.find(info.hash());
     return it != context.value.end() ? &it->second : nullptr;
 }
@@ -178,7 +178,7 @@ template<typename Type>
 [[nodiscard]] meta_type_node resolve(const meta_context &context) noexcept {
     static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
 
-    if(auto *elem = try_resolve(context, type_id<Type>()); elem) {
+    if(auto *elem = try_resolve(type_id<Type>(), context); elem) {
         return *elem;
     }
 
@@ -225,7 +225,7 @@ template<typename Type>
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve<typename meta_template_traits<Type>::class_type>,
-            +[](const meta_context &context, const std::size_t index) noexcept { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, context, index); }};
+            +[](const std::size_t index, const meta_context &context) noexcept { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index, context); }};
     }
 
     return node;

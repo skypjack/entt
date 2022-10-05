@@ -1140,7 +1140,7 @@ public:
      */
     [[nodiscard]] inline meta_type template_arg(const size_type index) const noexcept {
         const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return index < template_arity() ? meta_type{node.templ.arg(ctx_TODO, index)} : meta_type{};
+        return index < template_arity() ? meta_type{node.templ.arg(index, ctx_TODO)} : meta_type{};
     }
 
     /**
