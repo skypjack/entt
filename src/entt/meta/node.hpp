@@ -122,7 +122,7 @@ struct meta_type_node {
     id_type id{};
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
-    meta_type_node (*remove_pointer)() noexcept {};
+    meta_type_node (*remove_pointer)(const meta_context &) noexcept {};
     meta_any (*default_constructor)(){};
     double (*conversion_helper)(void *, const void *){};
     meta_any (*from_void)(void *, const void *){};
@@ -192,7 +192,7 @@ template<typename Type>
             | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_meta_sequence_container : meta_traits::is_none)
             | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_meta_associative_container : meta_traits::is_none),
         size_of_v<Type>,
-        &resolve_TODO<std::remove_cv_t<std::remove_pointer_t<Type>>>};
+        &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>};
 
     if constexpr(std::is_default_constructible_v<Type>) {
         node.default_constructor = +[]() { return meta_any{std::in_place_type<Type>}; };

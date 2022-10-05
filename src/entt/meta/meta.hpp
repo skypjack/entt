@@ -1071,7 +1071,7 @@ public:
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const noexcept {
-        return node.info && (node.info->hash() != node.remove_pointer().info->hash());
+        return node.info && (node.info->hash() != remove_pointer().info().hash());
     }
 
     /**
@@ -1080,7 +1080,8 @@ public:
      * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const noexcept {
-        return node.remove_pointer();
+        const auto &ctx_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
+        return node.remove_pointer(ctx_TODO);
     }
 
     /**
