@@ -154,7 +154,7 @@ template<typename... Args>
     }
 
     if(from.details) {
-        const auto &context_TODO = meta_context::from(locator<meta_ctx>::value_or());
+        auto &&context_TODO = meta_context::from(locator<meta_ctx>::value_or());
 
         for(auto &&curr: from.details->base) {
             if(const void *elem = try_cast(curr.second.type(context_TODO), to, curr.second.cast(instance)); elem) {
