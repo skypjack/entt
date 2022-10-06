@@ -191,7 +191,7 @@ template<typename Type>
  * @return True in case of success, false otherwise.
  */
 template<typename Type, auto Data>
-[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value, const meta_ctx &ctx/*_TODO*/ = locator<meta_ctx>::value_or()) {
+[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
     if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
         if constexpr(std::is_member_function_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
             using descriptor = meta_function_helper_t<Type, decltype(Data)>;
@@ -235,7 +235,7 @@ template<typename Type, auto Data>
  * @return A meta any containing the value of the underlying variable.
  */
 template<typename Type, auto Data, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance, const meta_ctx &ctx/*_TODO*/ = locator<meta_ctx>::value_or()) {
+[[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
     if constexpr(std::is_member_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
         if constexpr(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>>>) {
             if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
@@ -325,10 +325,11 @@ template<typename Type, typename... Args, std::size_t... Index>
  * @param instance An opaque instance of the underlying type, if required.
  * @param candidate The actual object to _invoke_.
  * @param args Parameters to use to _invoke_ the object.
+ * @param ctx The context from which to search for meta types.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, typename Policy = as_is_t, typename Candidate>
-[[nodiscard]] meta_any meta_invoke(meta_handle instance, Candidate &&candidate, meta_any *const args) {
+[[nodiscard]] meta_any meta_invoke(meta_handle instance, Candidate &&candidate, meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
     return internal::meta_invoke<Type, Policy>(std::move(instance), std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
 }
 
@@ -339,10 +340,11 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
  * @tparam Policy Optional policy (no policy set by default).
  * @param instance An opaque instance of the underlying type, if required.
  * @param args Parameters to use to invoke the function.
+ * @param ctx The context from which to search for meta types.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_invoke(meta_handle instance, meta_any *const args) {
+[[nodiscard]] meta_any meta_invoke(meta_handle instance, meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
     return internal::meta_invoke<Type, Policy>(std::move(instance), Candidate, args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<decltype(Candidate)>>::args_type::size>{});
 }
 
@@ -351,10 +353,11 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
  * @tparam Type Actual type of the instance to construct.
  * @tparam Args Types of arguments expected.
  * @param args Parameters to use to construct the instance.
+ * @param ctx The context from which to search for meta types.
  * @return A meta any containing the new instance, if any.
  */
 template<typename Type, typename... Args>
-[[nodiscard]] meta_any meta_construct(meta_any *const args) {
+[[nodiscard]] meta_any meta_construct(meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
     return internal::meta_construct<Type, Args...>(args, std::index_sequence_for<Args...>{});
 }
 
@@ -363,12 +366,13 @@ template<typename Type, typename... Args>
  * @tparam Type Reflected type to which the object to _invoke_ is associated.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Candidate The type of the actual object to _invoke_.
- * @param args Parameters to use to _invoke_ the object.
  * @param candidate The actual object to _invoke_.
+ * @param args Parameters to use to _invoke_ the object.
+ * @param ctx The context from which to search for meta types.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, typename Policy = as_is_t, typename Candidate>
-[[nodiscard]] meta_any meta_construct(Candidate &&candidate, meta_any *const args) {
+[[nodiscard]] meta_any meta_construct(Candidate &&candidate, meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
     if constexpr(meta_function_helper_t<Type, Candidate>::is_static || std::is_class_v<std::remove_cv_t<std::remove_reference_t<Candidate>>>) {
         return internal::meta_invoke<Type, Policy>({}, std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
     } else {
@@ -382,10 +386,11 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
  * @param args Parameters to use to invoke the function.
+ * @param ctx The context from which to search for meta types.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_construct(meta_any *const args) {
+[[nodiscard]] meta_any meta_construct(meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
     return meta_construct<Type, Policy>(Candidate, args);
 }
 

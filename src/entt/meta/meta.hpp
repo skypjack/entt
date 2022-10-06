@@ -854,7 +854,8 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return sz == arity() ? node->invoke(std::move(instance), args) : meta_any{};
+        auto &&ctx_TODO = locator<meta_ctx>::value_or();
+        return sz == arity() ? node->invoke(std::move(instance), args, ctx_TODO) : meta_any{};
     }
 
     /**
@@ -1235,7 +1236,8 @@ public:
             });
 
             if(candidate) {
-                return candidate->invoke(args);
+                auto &&ctx_TODO = locator<meta_ctx>::value_or();
+                return candidate->invoke(args, ctx_TODO);
             }
         }
 
@@ -1300,7 +1302,8 @@ public:
                 });
 
                 if(candidate) {
-                    return candidate->invoke(std::move(instance), args);
+                    auto &&ctx_TODO = locator<meta_ctx>::value_or();
+                    return candidate->invoke(std::move(instance), args, ctx_TODO);
                 }
             }
         }
