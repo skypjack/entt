@@ -3,6 +3,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
@@ -86,7 +87,7 @@ TEST_F(MetaProp, ReRegistration) {
 
     SetUp();
 
-    auto &&node = entt::internal::resolve_TODO<base_1_t>();
+    auto &&node = entt::internal::resolve<base_1_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
     auto type = entt::resolve<base_1_t>();
 
     ASSERT_TRUE(node.details);

@@ -1,6 +1,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/node.hpp>
@@ -101,7 +102,7 @@ TEST_F(MetaDtor, AsRefConstruction) {
 TEST_F(MetaDtor, ReRegistration) {
     SetUp();
 
-    auto &&node = entt::internal::resolve_TODO<clazz_t>();
+    auto &&node = entt::internal::resolve<clazz_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
 
     ASSERT_NE(node.dtor.dtor, nullptr);
 

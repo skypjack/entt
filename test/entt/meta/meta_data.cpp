@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/node.hpp>
@@ -645,7 +646,7 @@ TEST_F(MetaData, ReRegistration) {
 
     SetUp();
 
-    auto &&node = entt::internal::resolve_TODO<base_t>();
+    auto &&node = entt::internal::resolve<base_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
     auto type = entt::resolve<base_t>();
 
     ASSERT_TRUE(node.details);

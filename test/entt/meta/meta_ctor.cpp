@@ -3,6 +3,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
@@ -205,7 +206,7 @@ TEST_F(MetaCtor, NonDefaultConstructibleType) {
 TEST_F(MetaCtor, ReRegistration) {
     SetUp();
 
-    auto &&node = entt::internal::resolve_TODO<double>();
+    auto &&node = entt::internal::resolve<double>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
 
     ASSERT_TRUE(node.details);
     ASSERT_FALSE(node.details->ctor.empty());
