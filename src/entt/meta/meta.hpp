@@ -1005,8 +1005,7 @@ public:
      * @param area The context from which to search for meta types.
      */
     meta_type(const internal::meta_base_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
-        : node{curr.type ? curr.type(internal::meta_context::from(area)) : internal::meta_type_node{}},
-          ctx{&area} {}
+        : meta_type{curr.type(internal::meta_context::from(area)), area} {}
 
     /**
      * @brief Returns the type info object of the underlying type.
@@ -1398,7 +1397,7 @@ public:
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(node.info == nullptr);
+        return !(ctx == nullptr);
     }
 
     /**
@@ -1426,7 +1425,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return node;
+    return node.info ? node : meta_type{};
 }
 
 template<typename... Args>
