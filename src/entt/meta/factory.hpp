@@ -11,7 +11,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
-#include "../locator/locator.hpp" // TODO
+#include "../locator/locator.hpp"
 #include "context.hpp"
 #include "meta.hpp"
 #include "node.hpp"
