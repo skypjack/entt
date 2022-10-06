@@ -524,13 +524,14 @@ private:
  * dedicated factory.
  *
  * @tparam Type Type to reflect.
+ * @param ctx The context into which to construct meta types.
  * @return A meta factory for the given type.
  */
 template<typename Type>
-[[nodiscard]] auto meta() noexcept {
+[[nodiscard]] auto meta(meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
     // make sure the type exists in the context before returning a factory
-    internal::meta_context::from(locator<meta_ctx>::value_or()).value.try_emplace(type_id<Type>().hash(), internal::resolve_TODO<Type>());
-    return meta_factory<Type>{};
+    internal::meta_context::from(ctx).value.try_emplace(type_id<Type>().hash(), internal::resolve_TODO<Type>());
+    return meta_factory<Type>{ctx};
 }
 
 /**
@@ -543,9 +544,10 @@ template<typename Type>
  * The type is also removed from the set of searchable types.
  *
  * @param id Unique identifier.
+ * @param ctx The context from which to reset meta types.
  */
-inline void meta_reset(const id_type id) noexcept {
-    auto &&context = internal::meta_context::from(locator<meta_ctx>::value_or());
+inline void meta_reset(const id_type id, meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+    auto &&context = internal::meta_context::from(ctx);
 
     for(auto it = context.value.begin(); it != context.value.end();) {
         if(it->second.id == id) {
@@ -562,19 +564,22 @@ inline void meta_reset(const id_type id) noexcept {
  * @sa meta_reset
  *
  * @tparam Type Type to reset.
+ * @param ctx The context from which to reset meta types.
  */
 template<typename Type>
-void meta_reset() noexcept {
-    internal::meta_context::from(locator<meta_ctx>::value_or()).value.erase(type_id<Type>().hash());
+void meta_reset(meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+    internal::meta_context::from(ctx).value.erase(type_id<Type>().hash());
 }
 
 /**
  * @brief Resets all meta types.
  *
  * @sa meta_reset
+ *
+ * @param ctx The context from which to reset meta types.
  */
-inline void meta_reset() noexcept {
-    internal::meta_context::from(locator<meta_ctx>::value_or()).value.clear();
+inline void meta_reset(meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+    internal::meta_context::from(ctx).value.clear();
 }
 
 } // namespace entt
