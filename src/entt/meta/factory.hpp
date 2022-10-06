@@ -529,8 +529,9 @@ private:
  */
 template<typename Type>
 [[nodiscard]] auto meta(meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+    auto &&context = internal::meta_context::from(ctx);
     // make sure the type exists in the context before returning a factory
-    internal::meta_context::from(ctx).value.try_emplace(type_id<Type>().hash(), internal::resolve_TODO<Type>());
+    context.value.try_emplace(type_id<Type>().hash(), internal::resolve<Type>(context));
     return meta_factory<Type>{ctx};
 }
 
