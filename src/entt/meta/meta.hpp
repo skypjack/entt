@@ -13,7 +13,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
-#include "../locator/locator.hpp" // TODO
+#include "../locator/locator.hpp"
 #include "adl_pointer.hpp"
 #include "context.hpp"
 #include "fwd.hpp"
