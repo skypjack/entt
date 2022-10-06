@@ -160,17 +160,16 @@ struct basic_meta_associative_container_traits {
 
 /**
  * @brief Meta sequence container traits for `std::vector`s of any type.
- * @tparam Type The type of elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Type, typename... Args>
-struct meta_sequence_container_traits<std::vector<Type, Args...>>
-    : internal::basic_meta_sequence_container_traits<std::vector<Type, Args...>> {};
+template<typename... Args>
+struct meta_sequence_container_traits<std::vector<Args...>>
+    : internal::basic_meta_sequence_container_traits<std::vector<Args...>> {};
 
 /**
  * @brief Meta sequence container traits for `std::array`s of any type.
- * @tparam Type The type of elements.
- * @tparam N The number of elements.
+ * @tparam Type Template arguments for the container.
+ * @tparam N Template arguments for the container.
  */
 template<typename Type, auto N>
 struct meta_sequence_container_traits<std::array<Type, N>>
@@ -178,80 +177,69 @@ struct meta_sequence_container_traits<std::array<Type, N>>
 
 /**
  * @brief Meta sequence container traits for `std::list`s of any type.
- * @tparam Type The type of elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Type, typename... Args>
-struct meta_sequence_container_traits<std::list<Type, Args...>>
-    : internal::basic_meta_sequence_container_traits<std::list<Type, Args...>> {};
+template<typename... Args>
+struct meta_sequence_container_traits<std::list<Args...>>
+    : internal::basic_meta_sequence_container_traits<std::list<Args...>> {};
 
 /**
  * @brief Meta sequence container traits for `std::deque`s of any type.
- * @tparam Type The type of elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Type, typename... Args>
-struct meta_sequence_container_traits<std::deque<Type, Args...>>
-    : internal::basic_meta_sequence_container_traits<std::deque<Type, Args...>> {};
+template<typename... Args>
+struct meta_sequence_container_traits<std::deque<Args...>>
+    : internal::basic_meta_sequence_container_traits<std::deque<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::map`s of any type.
- * @tparam Key The key type of elements.
- * @tparam Value The value type of elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits<std::map<Key, Value, Args...>>
-    : internal::basic_meta_associative_container_traits<std::map<Key, Value, Args...>> {};
+template<typename... Args>
+struct meta_associative_container_traits<std::map<Args...>>
+    : internal::basic_meta_associative_container_traits<std::map<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::unordered_map`s of any
  * type.
- * @tparam Key The key type of elements.
- * @tparam Value The value type of elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>>
-    : internal::basic_meta_associative_container_traits<std::unordered_map<Key, Value, Args...>> {};
+template<typename... Args>
+struct meta_associative_container_traits<std::unordered_map<Args...>>
+    : internal::basic_meta_associative_container_traits<std::unordered_map<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::set`s of any type.
- * @tparam Key The type of elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Key, typename... Args>
-struct meta_associative_container_traits<std::set<Key, Args...>>
-    : internal::basic_meta_associative_container_traits<std::set<Key, Args...>> {};
+template<typename... Args>
+struct meta_associative_container_traits<std::set<Args...>>
+    : internal::basic_meta_associative_container_traits<std::set<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::unordered_set`s of any
  * type.
- * @tparam Key The type of elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Key, typename... Args>
-struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
-    : internal::basic_meta_associative_container_traits<std::unordered_set<Key, Args...>> {};
+template<typename... Args>
+struct meta_associative_container_traits<std::unordered_set<Args...>>
+    : internal::basic_meta_associative_container_traits<std::unordered_set<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `dense_map`s of any type.
- * @tparam Key The key type of the elements.
- * @tparam Type The value type of the elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Key, typename Type, typename... Args>
-struct meta_associative_container_traits<dense_map<Key, Type, Args...>>
-    : internal::basic_meta_associative_container_traits<dense_map<Key, Type, Args...>> {};
+template<typename... Args>
+struct meta_associative_container_traits<dense_map<Args...>>
+    : internal::basic_meta_associative_container_traits<dense_map<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `dense_set`s of any type.
- * @tparam Type The value type of the elements.
- * @tparam Args Other arguments.
+ * @tparam Args Template arguments for the container.
  */
-template<typename Type, typename... Args>
-struct meta_associative_container_traits<dense_set<Type, Args...>>
-    : internal::basic_meta_associative_container_traits<dense_set<Type, Args...>> {};
+template<typename... Args>
+struct meta_associative_container_traits<dense_set<Args...>>
+    : internal::basic_meta_associative_container_traits<dense_set<Args...>> {};
 
 } // namespace entt
 
