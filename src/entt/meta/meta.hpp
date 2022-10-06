@@ -642,23 +642,24 @@ private:
 struct meta_prop {
     /*! @brief Default constructor. */
     meta_prop() noexcept
-        : node{} {}
+        : node{},
+          ctx{} {}
 
     /**
-     * @brief Constructs an instance from a given node.
+     * @brief Context aware constructor for meta objects.
      * @param curr The underlying node with which to construct the instance.
+     * @param area The context from which to search for meta types.
      */
-    meta_prop(const internal::meta_prop_node &curr) noexcept
-        : node{&curr} {}
+    meta_prop(const internal::meta_prop_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+        : node{&curr},
+          ctx{&area} {}
 
     /**
      * @brief Returns the stored value by copy.
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        auto &&ctx_TODO = locator<meta_ctx>::value_or();
-        auto &&context_TODO = internal::meta_context::from(ctx_TODO);
-        return node->value ? node->type(context_TODO).from_void(nullptr, node->value.get(), ctx_TODO) : meta_any{};
+        return node->value ? node->type(internal::meta_context::from(*ctx)).from_void(nullptr, node->value.get(), *ctx) : meta_any{};
     }
 
     /**
@@ -671,6 +672,7 @@ struct meta_prop {
 
 private:
     const internal::meta_prop_node *node;
+    const meta_ctx *ctx;
 };
 
 /*! @brief Opaque wrapper for data members. */
@@ -680,14 +682,17 @@ struct meta_data {
 
     /*! @brief Default constructor. */
     meta_data() noexcept
-        : node{} {}
+        : node{},
+          ctx{} {}
 
     /**
-     * @brief Constructs an instance from a given node.
+     * @brief Context aware constructor for meta objects.
      * @param curr The underlying node with which to construct the instance.
+     * @param area The context from which to search for meta types.
      */
-    meta_data(const internal::meta_data_node &curr) noexcept
-        : node{&curr} {}
+    meta_data(const internal::meta_data_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+        : node{&curr},
+          ctx{&area} {}
 
     /**
      * @brief Returns the number of setters available.
@@ -731,8 +736,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        auto &&ctx_TODO = locator<meta_ctx>::value_or();
-        return node->set && node->set(std::move(instance), std::forward<Type>(value), ctx_TODO);
+        return node->set && node->set(std::move(instance), std::forward<Type>(value), *ctx);
     }
 
     /**
@@ -745,8 +749,7 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        auto &&ctx_TODO = locator<meta_ctx>::value_or();
-        return node->get(std::move(instance), ctx_TODO);
+        return node->get(std::move(instance), *ctx);
     }
 
     /**
@@ -784,6 +787,7 @@ struct meta_data {
 
 private:
     const internal::meta_data_node *node;
+    const meta_ctx *ctx;
 };
 
 /*! @brief Opaque wrapper for member functions. */
@@ -793,14 +797,17 @@ struct meta_func {
 
     /*! @brief Default constructor. */
     meta_func() noexcept
-        : node{} {}
+        : node{},
+          ctx{} {}
 
     /**
-     * @brief Constructs an instance from a given node.
+     * @brief Context aware constructor for meta objects.
      * @param curr The underlying node with which to construct the instance.
+     * @param area The context from which to search for meta types.
      */
-    meta_func(const internal::meta_func_node &curr) noexcept
-        : node{&curr} {}
+    meta_func(const internal::meta_func_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+        : node{&curr},
+          ctx{&area} {}
 
     /**
      * @brief Returns the number of arguments accepted by a member function.
@@ -854,8 +861,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        auto &&ctx_TODO = locator<meta_ctx>::value_or();
-        return sz == arity() ? node->invoke(std::move(instance), args, ctx_TODO) : meta_any{};
+        return sz == arity() ? node->invoke(std::move(instance), args, *ctx) : meta_any{};
     }
 
     /**
@@ -907,6 +913,7 @@ struct meta_func {
 
 private:
     const internal::meta_func_node *node;
+    const meta_ctx *ctx;
 };
 
 /*! @brief Opaque wrapper for types. */
@@ -929,8 +936,7 @@ class meta_type {
                 size_type pos{};
 
                 for(; pos < sz && args[pos]; ++pos) {
-                    auto &&ctx_TODO = locator<meta_ctx>::value_or();
-                    const auto other = curr->arg(pos, ctx_TODO);
+                    const auto other = curr->arg(pos, *ctx);
                     const auto type = args[pos].type();
 
                     if(const auto &info = other.info(); info == type.info()) {
@@ -979,23 +985,28 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_type_node::size_type;
 
-    /**
-     * @brief Constructs an instance from a given node.
-     * @param curr The underlying node with which to construct the instance.
-     */
-    meta_type(const internal::meta_type_node &curr = {}) noexcept
-        : node{curr} {}
+    /*! @brief Default constructor. */
+    meta_type() noexcept
+        : node{},
+          ctx{} {}
 
     /**
-     * @brief Constructs an instance from a given base node.
-     * @param curr The base node with which to construct the instance.
+     * @brief Context aware constructor for meta objects.
+     * @param curr The underlying node with which to construct the instance.
+     * @param area The context from which to search for meta types.
      */
-    meta_type(const internal::meta_base_node &curr) noexcept
-        : meta_type{} {
-        if(auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or()); curr.type) {
-            node = curr.type(context_TODO);
-        }
-    }
+    meta_type(const internal::meta_type_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+        : node{curr},
+          ctx{&area} {}
+
+    /**
+     * @brief Context aware constructor for meta objects.
+     * @param curr The underlying node with which to construct the instance.
+     * @param area The context from which to search for meta types.
+     */
+    meta_type(const internal::meta_base_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+        : node{curr.type ? curr.type(internal::meta_context::from(area)) : internal::meta_type_node{}},
+          ctx{&area} {}
 
     /**
      * @brief Returns the type info object of the underlying type.
@@ -1084,8 +1095,7 @@ public:
      * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const noexcept {
-        auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return node.remove_pointer(context_TODO);
+        return node.remove_pointer(internal::meta_context::from(*ctx));
     }
 
     /**
@@ -1139,8 +1149,7 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const noexcept {
-        auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return node.templ.type ? meta_type{node.templ.type(context_TODO)} : meta_type{};
+        return node.templ.type ? meta_type{node.templ.type(internal::meta_context::from(*ctx))} : meta_type{};
     }
 
     /**
@@ -1149,8 +1158,7 @@ public:
      * @return The type of the i-th template argument of a type.
      */
     [[nodiscard]] inline meta_type template_arg(const size_type index) const noexcept {
-        auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return index < template_arity() ? meta_type{node.templ.arg(index, context_TODO)} : meta_type{};
+        return index < template_arity() ? meta_type{node.templ.arg(index, internal::meta_context::from(*ctx))} : meta_type{};
     }
 
     /**
@@ -1236,14 +1244,12 @@ public:
             });
 
             if(candidate) {
-                auto &&ctx_TODO = locator<meta_ctx>::value_or();
-                return candidate->invoke(args, ctx_TODO);
+                return candidate->invoke(args, *ctx);
             }
         }
 
         if(sz == 0u && node.default_constructor) {
-            auto &&ctx_TODO = locator<meta_ctx>::value_or();
-            return node.default_constructor(ctx_TODO);
+            return node.default_constructor(*ctx);
         }
 
         return {};
@@ -1270,14 +1276,12 @@ public:
      * @return A wrapper that references the given instance.
      */
     meta_any from_void(void *element) const {
-        auto &&ctx_TODO = locator<meta_ctx>::value_or();
-        return (element && node.from_void) ? node.from_void(element, nullptr, ctx_TODO) : meta_any{};
+        return (element && node.from_void) ? node.from_void(element, nullptr, *ctx) : meta_any{};
     }
 
     /*! @copydoc from_void */
     meta_any from_void(const void *element) const {
-        auto &&ctx_TODO = locator<meta_ctx>::value_or();
-        return (element && node.from_void) ? node.from_void(nullptr, element, ctx_TODO) : meta_any{};
+        return (element && node.from_void) ? node.from_void(nullptr, element, *ctx) : meta_any{};
     }
 
     /**
@@ -1302,8 +1306,7 @@ public:
                 });
 
                 if(candidate) {
-                    auto &&ctx_TODO = locator<meta_ctx>::value_or();
-                    return candidate->invoke(std::move(instance), args, ctx_TODO);
+                    return candidate->invoke(std::move(instance), args, *ctx);
                 }
             }
         }
@@ -1409,6 +1412,7 @@ public:
 
 private:
     internal::meta_type_node node;
+    const meta_ctx *ctx;
 };
 
 /**
@@ -1496,23 +1500,19 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-    return node->type(context_TODO);
+    return node->type(internal::meta_context::from(*ctx));
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
-    auto &&ctx_TODO = locator<meta_ctx>::value_or();
-    return index < arity() ? node->arg(index, ctx_TODO) : meta_type{};
+    return index < arity() ? node->arg(index, *ctx) : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-    return node->ret(context_TODO);
+    return node->ret(internal::meta_context::from(*ctx));
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
-    auto &&ctx_TODO = locator<meta_ctx>::value_or();
-    return index < arity() ? node->arg(index, ctx_TODO) : meta_type{};
+    return index < arity() ? node->arg(index, *ctx) : meta_type{};
 }
 
 /**
