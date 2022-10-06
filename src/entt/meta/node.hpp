@@ -148,16 +148,14 @@ template<typename... Args>
     return value(context);
 }
 
-[[nodiscard]] inline const void *try_cast(const meta_type_node &from, const meta_type_node &to, const void *instance) noexcept {
+[[nodiscard]] inline const void *try_cast(const meta_type_node &from, const meta_type_node &to, const void *instance, const meta_context &context) noexcept {
     if(from.info && to.info && *from.info == *to.info) {
         return instance;
     }
 
     if(from.details) {
-        auto &&context_TODO = meta_context::from(locator<meta_ctx>::value_or());
-
         for(auto &&curr: from.details->base) {
-            if(const void *elem = try_cast(curr.second.type(context_TODO), to, curr.second.cast(instance)); elem) {
+            if(const void *elem = try_cast(curr.second.type(context), to, curr.second.cast(instance), context); elem) {
                 return elem;
             }
         }
