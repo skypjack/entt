@@ -1053,13 +1053,21 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
-        return view<Type...>().template get<const Type...>(entt);
+        if constexpr(sizeof...(Type) == 1u) {
+            return (assure<std::remove_const_t<Type>>().get(entt), ...);
+        } else {
+            return std::forward_as_tuple(get<Type>(entt)...);
+        }
     }
 
     /*! @copydoc get */
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) {
-        return view<Type...>().template get<Type...>(entt);
+        if constexpr(sizeof...(Type) == 1u) {
+            return (const_cast<Type &>(std::as_const(*this).template get<Type>(entt)), ...);
+        } else {
+            return std::forward_as_tuple(get<Type>(entt)...);
+        }
     }
 
     /**

@@ -1894,9 +1894,11 @@ TEST(Registry, Constness) {
     static_assert((std::is_same_v<decltype(registry.emplace<int>({})), int &>));
     static_assert((std::is_same_v<decltype(registry.emplace<empty_type>({})), void>));
 
+    static_assert((std::is_same_v<decltype(registry.get<>({})), std::tuple<>>));
     static_assert((std::is_same_v<decltype(registry.get<int>({})), int &>));
     static_assert((std::is_same_v<decltype(registry.get<int, const char>({})), std::tuple<int &, const char &>>));
 
+    static_assert((std::is_same_v<decltype(registry.try_get<>({})), std::tuple<>>));
     static_assert((std::is_same_v<decltype(registry.try_get<int>({})), int *>));
     static_assert((std::is_same_v<decltype(registry.try_get<int, const char>({})), std::tuple<int *, const char *>>));
 
@@ -1906,9 +1908,11 @@ TEST(Registry, Constness) {
     static_assert((std::is_same_v<decltype(registry.ctx().find<int>()), int *>));
     static_assert((std::is_same_v<decltype(registry.ctx().find<const char>()), const char *>));
 
+    static_assert((std::is_same_v<decltype(std::as_const(registry).get<>({})), std::tuple<>>));
     static_assert((std::is_same_v<decltype(std::as_const(registry).get<int>({})), const int &>));
     static_assert((std::is_same_v<decltype(std::as_const(registry).get<int, const char>({})), std::tuple<const int &, const char &>>));
 
+    static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<>({})), std::tuple<>>));
     static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
     static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<int, const char>({})), std::tuple<const int *, const char *>>));
 
