@@ -908,7 +908,7 @@ public:
      * @param index An index of a bucket to access.
      * @return An iterator to the end of the given bucket.
      */
-    [[nodiscard]] const_local_iterator end([[maybe_unused]] const size_type index) const {
+    [[nodiscard]] const_local_iterator end(const size_type index) const {
         return cend(index);
     }
 
