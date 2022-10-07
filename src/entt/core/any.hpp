@@ -122,8 +122,9 @@ class basic_any {
 
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
+        info = &type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
+
         if constexpr(!std::is_void_v<Type>) {
-            info = &type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
             vtable = basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
@@ -160,10 +161,7 @@ public:
 
     /*! @brief Default constructor. */
     constexpr basic_any() noexcept
-        : instance{},
-          info{&type_id<void>()},
-          vtable{},
-          mode{policy::owner} {}
+        : basic_any{std::in_place_type<void>} {}
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
@@ -173,7 +171,10 @@ public:
      */
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, Args &&...args)
-        : basic_any{} {
+        : instance{},
+          info{},
+          vtable{},
+          mode{policy::owner} {
         initialize<Type>(std::forward<Args>(args)...);
     }
 
