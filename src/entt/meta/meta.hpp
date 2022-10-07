@@ -217,9 +217,7 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(Type &&value)
-        : storage{std::forward<Type>(value)},
-          node{internal::resolve<std::decay_t<Type>>()},
-          vtable{&basic_vtable<std::decay_t<Type>>} {}
+        : meta_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
 
     /**
      * @brief Copy constructor.
