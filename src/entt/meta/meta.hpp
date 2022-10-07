@@ -187,11 +187,6 @@ class meta_any {
         }
     }
 
-    meta_any(const meta_any &other, any ref) noexcept
-        : storage{std::move(ref)},
-          node{storage ? other.node : internal::meta_type_node{}},
-          vtable{storage ? other.vtable : &basic_vtable<void>} {}
-
 public:
     /*! @brief Default constructor. */
     meta_any() noexcept
@@ -528,12 +523,20 @@ public:
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() noexcept {
-        return meta_any{*this, storage.as_ref()};
+        meta_any other{};
+        other.storage = storage.as_ref();
+        other.node = storage ? node : other.node;
+        other.vtable = vtable;
+        return other;
     }
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
-        return meta_any{*this, storage.as_ref()};
+        meta_any other{};
+        other.storage = storage.as_ref();
+        other.node = storage ? node : other.node;
+        other.vtable = vtable;
+        return other;
     }
 
     /*! @copydoc any::owner */
