@@ -27,6 +27,20 @@ class sigh;
 /*! @brief Alias declaration for the most common use case. */
 using dispatcher = basic_dispatcher<>;
 
+/*! @brief Used to wrap a function or a member of a specified type. */
+template<auto>
+struct connect_arg_t {
+    /*! @brief Default constructor. */
+    explicit connect_arg_t() = default;
+};
+
+/**
+ * @brief Constant of type connect_arg_t used to disambiguate calls.
+ * @tparam Candidate Element to connect (likely a free or member function).
+ */
+template<auto Candidate>
+inline constexpr connect_arg_t<Candidate> connect_arg{};
+
 } // namespace entt
 
 #endif
