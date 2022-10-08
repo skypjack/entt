@@ -575,11 +575,15 @@ meta_any make_meta(Args &&...args) {
  * @brief Forwards its argument and avoids copies for lvalue references.
  * @tparam Type Type of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
+ * @param ctx The context from which to search for meta types.
  * @return A properly initialized and not necessarily owning wrapper.
  */
 template<typename Type>
-meta_any forward_as_meta(Type &&value) {
-    return meta_any{std::in_place_type<Type &&>, std::forward<Type>(value)};
+meta_any forward_as_meta(Type &&value, const meta_ctx &ctx = locator<meta_ctx>::value_or()) {
+    // TODO it would be great if we had value and context construction support for meta_any
+    meta_any any{ctx};
+    any.emplace<Type &&>(std::forward<Type>(value));
+    return any;
 }
 
 /**
