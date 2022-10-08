@@ -1238,9 +1238,9 @@ TEST_F(Any, MakeAny) {
 
 TEST_F(Any, ForwardAsAny) {
     int value = 42;
-    auto any = entt::forward_as_any(std::move(value));
     auto ref = entt::forward_as_any(value);
     auto cref = entt::forward_as_any(std::as_const(value));
+    auto any = entt::forward_as_any(std::move(value));
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(ref);
