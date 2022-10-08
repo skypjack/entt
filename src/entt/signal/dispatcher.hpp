@@ -131,7 +131,7 @@ class basic_dispatcher {
         auto &&ptr = pools.first()[id];
 
         if(!ptr) {
-            const auto &allocator = pools.second();
+            const auto &allocator = get_allocator();
             ptr = std::allocate_shared<handler_type<Type>>(allocator, allocator);
         }
 
