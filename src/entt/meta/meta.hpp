@@ -189,8 +189,9 @@ class meta_any {
 
 public:
     /*! @brief Default constructor. */
-    meta_any() noexcept
+    meta_any(const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
         : storage{},
+          ctx{&area},
           node{},
           vtable{&basic_vtable<void>} {}
 
@@ -203,7 +204,8 @@ public:
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          node{internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>()},
+          ctx{&locator<meta_ctx>::value_or()},
+          node{internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))},
           vtable{&basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>} {}
 
     /**
@@ -227,6 +229,7 @@ public:
      */
     meta_any(meta_any &&other) noexcept
         : storage{std::move(other.storage)},
+          ctx{other.ctx},
           node{std::exchange(other.node, internal::meta_type_node{})},
           vtable{std::exchange(other.vtable, &basic_vtable<void>)} {}
 
@@ -243,6 +246,7 @@ public:
     meta_any &operator=(const meta_any &other) {
         release();
         storage = other.storage;
+        ctx = other.ctx;
         node = other.node;
         vtable = other.vtable;
         return *this;
@@ -256,6 +260,7 @@ public:
     meta_any &operator=(meta_any &&other) noexcept {
         release();
         storage = std::move(other.storage);
+        ctx = other.ctx;
         node = std::exchange(other.node, internal::meta_type_node{});
         vtable = std::exchange(other.vtable, &basic_vtable<void>);
         return *this;
@@ -413,7 +418,7 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return {};
         } else {
-            return allow_cast(internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>());
+            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx)));
         }
     }
 
@@ -425,9 +430,9 @@ public:
     template<typename Type>
     bool allow_cast() {
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return allow_cast(internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>()) && (storage.data() != nullptr);
+            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))) && (storage.data() != nullptr);
         } else {
-            return allow_cast(internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>());
+            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx)));
         }
     }
 
@@ -436,7 +441,7 @@ public:
     void emplace(Args &&...args) {
         release();
         storage.emplace<Type>(std::forward<Args>(args)...);
-        node = internal::resolve_TODO<std::remove_cv_t<std::remove_reference_t<Type>>>();
+        node = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
         vtable = &basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
     }
 
@@ -546,6 +551,7 @@ public:
 
 private:
     any storage;
+    const meta_ctx *ctx;
     internal::meta_type_node node;
     vtable_type *vtable;
 };
@@ -1462,11 +1468,8 @@ bool meta_any::set(const id_type id, Type &&value) {
     }
 
     if(const auto *value = data(); node.details) {
-        auto &&ctx_TODO = locator<meta_ctx>::value_or();
-        auto &&context_TODO = internal::meta_context::from(ctx_TODO);
-
         for(auto &&curr: node.details->base) {
-            const auto &as_const = curr.second.type(context_TODO).from_void(nullptr, curr.second.cast(value), ctx_TODO);
+            const auto &as_const = curr.second.type(internal::meta_context::from(*ctx)).from_void(nullptr, curr.second.cast(value), *ctx);
 
             if(auto other = as_const.allow_cast(type); other) {
                 return other;
@@ -1474,7 +1477,7 @@ bool meta_any::set(const id_type id, Type &&value) {
         }
 
         if(auto it = node.details->conv.find(type.info().hash()); it != node.details->conv.cend()) {
-            return it->second.conv(data(), ctx_TODO);
+            return it->second.conv(data(), *ctx);
         }
     }
 
