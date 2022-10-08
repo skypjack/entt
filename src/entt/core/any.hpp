@@ -122,27 +122,26 @@ class basic_any {
 
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
-        using basic_type = std::remove_cv_t<std::remove_reference_t<Type>>;
-        info = &type_id<basic_type>();
+        info = &type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 
         if constexpr(!std::is_void_v<Type>) {
-            vtable = basic_vtable<basic_type>;
+            vtable = basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? policy::cref : policy::ref;
                 instance = (std::addressof(args), ...);
-            } else if constexpr(in_situ<basic_type>) {
-                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<basic_type>) {
-                    new(&storage) basic_type{std::forward<Args>(args)...};
+            } else if constexpr(in_situ<std::remove_const_t<std::remove_reference_t<Type>>>) {
+                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
+                    new(&storage) std::remove_cv_t<std::remove_reference_t<Type>>{std::forward<Args>(args)...};
                 } else {
-                    new(&storage) basic_type(std::forward<Args>(args)...);
+                    new(&storage) std::remove_cv_t<std::remove_reference_t<Type>>(std::forward<Args>(args)...);
                 }
             } else {
-                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<basic_type>) {
-                    instance = new basic_type{std::forward<Args>(args)...};
+                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
+                    instance = new std::remove_cv_t<std::remove_reference_t<Type>>{std::forward<Args>(args)...};
                 } else {
-                    instance = new basic_type(std::forward<Args>(args)...);
+                    instance = new std::remove_cv_t<std::remove_reference_t<Type>>(std::forward<Args>(args)...);
                 }
             }
         }
@@ -501,7 +500,7 @@ basic_any<Len, Align> make_any(Args &&...args) {
  */
 template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename Type>
 basic_any<Len, Align> forward_as_any(Type &&value) {
-    return basic_any<Len, Align>{std::in_place_type<Type>, std::forward<Type>(value)};
+    return basic_any<Len, Align>{std::in_place_type<Type &&>, std::forward<Type>(value)};
 }
 
 } // namespace entt

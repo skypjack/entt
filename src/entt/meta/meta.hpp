@@ -564,7 +564,7 @@ meta_any make_meta(Args &&...args) {
  */
 template<typename Type>
 meta_any forward_as_meta(Type &&value) {
-    return meta_any{std::in_place_type<Type>, std::forward<Type>(value)};
+    return meta_any{std::in_place_type<Type &&>, std::forward<Type>(value)};
 }
 
 /**
