@@ -190,8 +190,8 @@ public:
             internal::owner(*info, *ctx),
             type_id<conv_type>().hash(),
             internal::meta_conv_node{
-                +[](const void *instance, const meta_ctx &ctx /*_TODO*/) {
-                    return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance)));
+                +[](const void *instance, const meta_ctx &ctx) {
+                    return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance)), ctx);
                 }});
 
         bucket = nullptr;
@@ -215,8 +215,8 @@ public:
             internal::owner(*info, *ctx),
             type_id<conv_type>().hash(),
             internal::meta_conv_node{
-                +[](const void *instance, const meta_ctx &ctx /*_TODO*/) {
-                    return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)));
+                +[](const void *instance, const meta_ctx &ctx) {
+                    return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)), ctx);
                 }});
 
         bucket = nullptr;
