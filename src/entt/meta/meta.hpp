@@ -188,7 +188,10 @@ class meta_any {
     }
 
 public:
-    /*! @brief Default constructor. */
+    /**
+     * @brief Context aware constructor.
+     * @param area The context from which to search for meta types.
+     */
     meta_any(const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
         : storage{},
           ctx{&area},
