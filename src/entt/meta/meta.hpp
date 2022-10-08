@@ -655,7 +655,7 @@ struct meta_prop {
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_prop(const internal::meta_prop_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+    meta_prop(const internal::meta_prop_node &curr, const meta_ctx /* _TODO*/ &area = locator<meta_ctx>::value_or()) noexcept
         : node{&curr},
           ctx{&area} {}
 
@@ -695,7 +695,7 @@ struct meta_data {
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_data(const internal::meta_data_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+    meta_data(const internal::meta_data_node &curr, const meta_ctx /* _TODO*/ &area = locator<meta_ctx>::value_or()) noexcept
         : node{&curr},
           ctx{&area} {}
 
@@ -810,7 +810,7 @@ struct meta_func {
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_func(const internal::meta_func_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+    meta_func(const internal::meta_func_node &curr, const meta_ctx /* _TODO*/ &area = locator<meta_ctx>::value_or()) noexcept
         : node{&curr},
           ctx{&area} {}
 
@@ -1000,7 +1000,7 @@ public:
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_type(const internal::meta_type_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+    meta_type(const internal::meta_type_node &curr, const meta_ctx /* _TODO*/ &area = locator<meta_ctx>::value_or()) noexcept
         : node{curr},
           ctx{&area} {}
 
@@ -1009,7 +1009,7 @@ public:
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_type(const internal::meta_base_node &curr, const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+    meta_type(const internal::meta_base_node &curr, const meta_ctx &area /* _TODO*/ = locator<meta_ctx>::value_or()) noexcept
         : meta_type{curr.type(internal::meta_context::from(area)), area} {}
 
     /**
