@@ -427,7 +427,8 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return {};
         } else {
-            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx)));
+            auto target = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
+            return allow_cast({target, *ctx});
         }
     }
 
@@ -438,10 +439,12 @@ public:
      */
     template<typename Type>
     bool allow_cast() {
+        auto target = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
+
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))) && (storage.data() != nullptr);
+            return allow_cast({target, *ctx}) && (storage.data() != nullptr);
         } else {
-            return allow_cast(internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx)));
+            return allow_cast({target, *ctx});
         }
     }
 
@@ -1011,7 +1014,7 @@ public:
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_type(const internal::meta_type_node &curr, const meta_ctx /* _TODO*/ &area = locator<meta_ctx>::value_or()) noexcept
+    meta_type(const internal::meta_type_node &curr, const meta_ctx &area) noexcept
         : node{curr},
           ctx{&area} {}
 
@@ -1020,7 +1023,7 @@ public:
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_type(const internal::meta_base_node &curr, const meta_ctx &area /* _TODO*/ = locator<meta_ctx>::value_or()) noexcept
+    meta_type(const internal::meta_base_node &curr, const meta_ctx &area) noexcept
         : meta_type{curr.type(internal::meta_context::from(area)), area} {}
 
     /**
@@ -1110,7 +1113,7 @@ public:
      * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const noexcept {
-        return node.remove_pointer(internal::meta_context::from(*ctx));
+        return {node.remove_pointer(internal::meta_context::from(*ctx)), *ctx};
     }
 
     /**
@@ -1164,7 +1167,7 @@ public:
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const noexcept {
-        return node.templ.type ? meta_type{node.templ.type(internal::meta_context::from(*ctx))} : meta_type{};
+        return node.templ.type ? meta_type{node.templ.type(internal::meta_context::from(*ctx)), *ctx} : meta_type{};
     }
 
     /**
@@ -1173,7 +1176,7 @@ public:
      * @return The type of the i-th template argument of a type.
      */
     [[nodiscard]] inline meta_type template_arg(const size_type index) const noexcept {
-        return index < template_arity() ? meta_type{node.templ.arg(index, internal::meta_context::from(*ctx))} : meta_type{};
+        return index < template_arity() ? meta_type{node.templ.arg(index, internal::meta_context::from(*ctx)), *ctx} : meta_type{};
     }
 
     /**
@@ -1441,7 +1444,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return node.info ? node : meta_type{};
+    return node.info ? meta_type{node, *ctx} : meta_type{};
 }
 
 template<typename... Args>
@@ -1499,7 +1502,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 inline bool meta_any::assign(const meta_any &other) {
-    auto value = other.allow_cast(node);
+    auto value = other.allow_cast({node, *ctx});
     return value && storage.assign(std::move(value.storage));
 }
 
@@ -1512,7 +1515,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return node->type(internal::meta_context::from(*ctx));
+    return {node->type(internal::meta_context::from(*ctx)), *ctx};
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
@@ -1520,7 +1523,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return node->ret(internal::meta_context::from(*ctx));
+    return {node->ret(internal::meta_context::from(*ctx)), *ctx};
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
@@ -1710,7 +1713,8 @@ private:
  * @return The meta value type of the container.
  */
 [[nodiscard]] inline meta_type meta_sequence_container::value_type() const noexcept {
-    return value_type_node ? value_type_node() : meta_type{};
+    auto &&ctx_TODO = locator<meta_ctx>::value_or();
+    return value_type_node ? meta_type{value_type_node(), ctx_TODO} : meta_type{};
 }
 
 /**
@@ -1806,7 +1810,8 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @return The meta key type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::key_type() const noexcept {
-    return key_type_node ? key_type_node() : meta_type{};
+    auto &&ctx_TODO = locator<meta_ctx>::value_or();
+    return key_type_node ? meta_type{key_type_node(), ctx_TODO} : meta_type{};
 }
 
 /**
@@ -1814,12 +1819,14 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @return The meta mapped type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::mapped_type() const noexcept {
-    return mapped_type_node ? mapped_type_node() : meta_type{};
+    auto &&ctx_TODO = locator<meta_ctx>::value_or();
+    return mapped_type_node ? meta_type{mapped_type_node(), ctx_TODO} : meta_type{};
 }
 
 /*! @copydoc meta_sequence_container::value_type */
 [[nodiscard]] inline meta_type meta_associative_container::value_type() const noexcept {
-    return value_type_node ? value_type_node() : meta_type{};
+    auto &&ctx_TODO = locator<meta_ctx>::value_or();
+    return value_type_node ? meta_type{value_type_node(), ctx_TODO} : meta_type{};
 }
 
 /*! @copydoc meta_sequence_container::size */

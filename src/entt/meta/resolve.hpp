@@ -20,7 +20,7 @@ namespace entt {
 template<typename Type>
 [[nodiscard]] meta_type resolve(const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
     auto &&context = internal::meta_context::from(ctx);
-    return internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(context);
+    return {internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(context), ctx};
 }
 
 /**
@@ -58,7 +58,7 @@ template<typename Type>
 [[nodiscard]] inline meta_type resolve(const type_info &info, const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
     auto &&context = internal::meta_context::from(ctx);
     const auto *elem = internal::try_resolve(info, context);
-    return elem ? *elem : meta_type{};
+    return elem ? meta_type{*elem, ctx} : meta_type{};
 }
 
 } // namespace entt
