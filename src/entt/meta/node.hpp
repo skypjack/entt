@@ -193,7 +193,12 @@ template<typename Type>
         &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>};
 
     if constexpr(std::is_default_constructible_v<Type>) {
-        node.default_constructor = +[](const meta_ctx &ctx_TODO) { return meta_any{std::in_place_type<Type>}; };
+        node.default_constructor = +[](const meta_ctx &ctx) {
+            // TODO it would be great if we had value and context construction support for meta_any
+            meta_any elem{ctx};
+            elem.emplace<Type>();
+            return elem;
+        };
     }
 
     if constexpr(std::is_arithmetic_v<Type>) {
