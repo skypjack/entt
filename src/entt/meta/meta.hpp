@@ -706,7 +706,7 @@ struct meta_data {
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_data(const internal::meta_data_node &curr, const meta_ctx /* _TODO*/ &area = locator<meta_ctx>::value_or()) noexcept
+    meta_data(const internal::meta_data_node &curr, const meta_ctx &area) noexcept
         : node{&curr},
           ctx{&area} {}
 
@@ -1205,7 +1205,7 @@ public:
     [[nodiscard]] meta_data data(const id_type id) const {
         if(node.details) {
             if(const auto it = node.details->data.find(id); it != node.details->data.cend()) {
-                return it->second;
+                return meta_data{it->second, *ctx};
             }
         }
 
