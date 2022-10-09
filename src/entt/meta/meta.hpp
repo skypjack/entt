@@ -187,6 +187,12 @@ class meta_any {
         }
     }
 
+    meta_any(const meta_any &other, any ref, const meta_ctx &area) noexcept
+        : storage{std::move(ref)},
+          ctx{&area},
+          node{storage ? other.node : internal::meta_type_node{}},
+          vtable{storage ? other.vtable : &basic_vtable<void>} {}
+
 public:
     /**
      * @brief Context aware constructor.
@@ -531,20 +537,12 @@ public:
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() noexcept {
-        meta_any other{};
-        other.storage = storage.as_ref();
-        other.node = storage ? node : other.node;
-        other.vtable = vtable;
-        return other;
+        return meta_any{*this, storage.as_ref(), *ctx};
     }
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
-        meta_any other{};
-        other.storage = storage.as_ref();
-        other.node = storage ? node : other.node;
-        other.vtable = vtable;
-        return other;
+        return meta_any{*this, storage.as_ref(), *ctx};
     }
 
     /*! @copydoc any::owner */
