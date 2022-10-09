@@ -220,7 +220,7 @@ template<typename Type>
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve<typename meta_template_traits<Type>::class_type>,
-            +[](const std::size_t index, const meta_context &context) noexcept { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index, context); }};
+            +[](const std::size_t index, const meta_context &area) noexcept { return meta_arg_node(typename meta_template_traits<Type>::args_type{}, index, area); }};
     }
 
     return node;

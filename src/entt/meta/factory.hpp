@@ -104,7 +104,7 @@ class meta_factory {
                 Setter::size,
                 &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
                 &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
-                +[](meta_handle instance, meta_any value, const meta_ctx &ctx) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref(), ctx) || ...); },
+                +[](meta_handle instance, meta_any value, const meta_ctx &area) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref(), area) || ...); },
                 &meta_getter<Type, Getter, Policy>});
 
         bucket = &elem.prop;
@@ -190,8 +190,8 @@ public:
             internal::owner(*info, *ctx),
             type_id<conv_type>().hash(),
             internal::meta_conv_node{
-                +[](const void *instance, const meta_ctx &ctx) {
-                    return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance)), ctx);
+                +[](const void *instance, const meta_ctx &area) {
+                    return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance)), area);
                 }});
 
         bucket = nullptr;
@@ -215,8 +215,8 @@ public:
             internal::owner(*info, *ctx),
             type_id<conv_type>().hash(),
             internal::meta_conv_node{
-                +[](const void *instance, const meta_ctx &ctx) {
-                    return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)), ctx);
+                +[](const void *instance, const meta_ctx &area) {
+                    return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)), area);
                 }});
 
         bucket = nullptr;
