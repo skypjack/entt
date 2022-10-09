@@ -666,7 +666,7 @@ struct meta_prop {
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_prop(const internal::meta_prop_node &curr, const meta_ctx /* _TODO*/ &area = locator<meta_ctx>::value_or()) noexcept
+    meta_prop(const internal::meta_prop_node &curr, const meta_ctx &area) noexcept
         : node{&curr},
           ctx{&area} {}
 
@@ -790,7 +790,7 @@ struct meta_data {
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
         const auto it = node->prop.find(key);
-        return it != node->prop.cend() ? meta_prop{it->second} : meta_prop{};
+        return it != node->prop.cend() ? meta_prop{it->second, *ctx} : meta_prop{};
     }
 
     /**
@@ -908,7 +908,7 @@ struct meta_func {
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
         const auto it = node->prop.find(key);
-        return it != node->prop.cend() ? meta_prop{it->second} : meta_prop{};
+        return it != node->prop.cend() ? meta_prop{it->second, *ctx} : meta_prop{};
     }
 
     /**
@@ -1401,7 +1401,7 @@ public:
     [[nodiscard]] meta_prop prop(const id_type key) const {
         if(node.details) {
             if(const auto it = node.details->prop.find(key); it != node.details->prop.cend()) {
-                return it->second;
+                return meta_prop{it->second, *ctx};
             }
         }
 
