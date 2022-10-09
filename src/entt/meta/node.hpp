@@ -207,12 +207,11 @@ template<typename Type>
     }
 
     if constexpr(!std::is_same_v<Type, void> && !std::is_function_v<Type>) {
-        node.from_void = +[](void *element, const void *as_const, const meta_ctx &ctx_TODO) {
-            if(element) {
-                return meta_any{std::in_place_type<std::decay_t<Type> &>, *static_cast<std::decay_t<Type> *>(element)};
-            }
-
-            return meta_any{std::in_place_type<const std::decay_t<Type> &>, *static_cast<const std::decay_t<Type> *>(as_const)};
+        node.from_void = +[](void *element, const void *as_const, const meta_ctx &ctx) {
+            // TODO it would be great if we had value and context construction support for meta_any
+            meta_any elem{ctx};
+            element ? elem.emplace<std::decay_t<Type> &>(*static_cast<std::decay_t<Type> *>(element)) : elem.emplace<const std::decay_t<Type> &>(*static_cast<const std::decay_t<Type> *>(as_const));
+            return elem;
         };
     }
 
