@@ -349,8 +349,8 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
-        auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-        return static_cast<const Type *>(internal::try_cast(node, internal::resolve<std::remove_cv_t<Type>>(context_TODO), data(), context_TODO));
+        const auto other = internal::resolve<std::remove_cv_t<Type>>(internal::meta_context::from(*ctx));
+        return static_cast<const Type *>(internal::try_cast(node, other, data(), internal::meta_context::from(*ctx)));
     }
 
     /*! @copydoc try_cast */
@@ -359,8 +359,8 @@ public:
         if constexpr(std::is_const_v<Type>) {
             return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
         } else {
-            auto &&context_TODO = internal::meta_context::from(locator<meta_ctx>::value_or());
-            return static_cast<Type *>(const_cast<void *>(internal::try_cast(node, internal::resolve<Type>(context_TODO), data(), context_TODO)));
+            const auto other = internal::resolve<std::remove_cv_t<Type>>(internal::meta_context::from(*ctx));
+            return static_cast<Type *>(const_cast<void *>(internal::try_cast(node, other, data(), internal::meta_context::from(*ctx))));
         }
     }
 
