@@ -780,7 +780,7 @@ struct meta_data {
      * @return An iterable range to visit registered meta properties.
      */
     [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_data_node::prop)::const_iterator> prop() const noexcept {
-        return {node->prop.cbegin(), node->prop.cend()};
+        return {{node->prop.cbegin(), *ctx}, {node->prop.cend(), *ctx}};
     }
 
     /**
@@ -898,7 +898,7 @@ struct meta_func {
 
     /*! @copydoc meta_data::prop */
     [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_func_node::prop)::const_iterator> prop() const noexcept {
-        return {node->prop.cbegin(), node->prop.cend()};
+        return {{node->prop.cbegin(), *ctx}, {node->prop.cend(), *ctx}};
     }
 
     /**
@@ -1182,7 +1182,7 @@ public:
      */
     [[nodiscard]] meta_range<meta_type, typename decltype(internal::meta_type_descriptor::base)::const_iterator> base() const noexcept {
         using range_type = meta_range<meta_type, typename decltype(internal::meta_type_descriptor::base)::const_iterator>;
-        return node.details ? range_type{node.details->base.cbegin(), node.details->base.cend()} : range_type{};
+        return node.details ? range_type{{node.details->base.cbegin(), *ctx}, {node.details->base.cend(), *ctx}} : range_type{};
     }
 
     /**
@@ -1191,7 +1191,7 @@ public:
      */
     [[nodiscard]] meta_range<meta_data, typename decltype(internal::meta_type_descriptor::data)::const_iterator> data() const noexcept {
         using range_type = meta_range<meta_data, typename decltype(internal::meta_type_descriptor::data)::const_iterator>;
-        return node.details ? range_type{node.details->data.cbegin(), node.details->data.cend()} : range_type{};
+        return node.details ? range_type{{node.details->data.cbegin(), *ctx}, {node.details->data.cend(), *ctx}} : range_type{};
     }
 
     /**
@@ -1218,7 +1218,7 @@ public:
      */
     [[nodiscard]] meta_range<meta_func, typename decltype(internal::meta_type_descriptor::func)::const_iterator> func() const noexcept {
         using return_type = meta_range<meta_func, typename decltype(internal::meta_type_descriptor::func)::const_iterator>;
-        return node.details ? return_type{node.details->func.cbegin(), node.details->func.cend()} : return_type{};
+        return node.details ? return_type{{node.details->func.cbegin(), *ctx}, {node.details->func.cend(), *ctx}} : return_type{};
     }
 
     /**
@@ -1387,7 +1387,7 @@ public:
      */
     [[nodiscard]] meta_range<meta_prop, typename decltype(internal::meta_type_descriptor::prop)::const_iterator> prop() const noexcept {
         using range_type = meta_range<meta_prop, typename decltype(internal::meta_type_descriptor::prop)::const_iterator>;
-        return node.details ? range_type{node.details->prop.cbegin(), node.details->prop.cend()} : range_type{};
+        return node.details ? range_type{{node.details->prop.cbegin(), *ctx}, {node.details->prop.cend(), *ctx}} : range_type{};
     }
 
     /**

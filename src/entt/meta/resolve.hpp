@@ -30,7 +30,7 @@ template<typename Type>
  */
 [[nodiscard]] inline meta_range<meta_type, typename decltype(internal::meta_context::value)::const_iterator> resolve(const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
     auto &&context = internal::meta_context::from(ctx);
-    return {context.value.cbegin(), context.value.cend()};
+    return {{context.value.cbegin(), ctx}, {context.value.cend(), ctx}};
 }
 
 /**
