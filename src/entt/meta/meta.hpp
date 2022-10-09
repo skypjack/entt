@@ -821,7 +821,7 @@ struct meta_func {
      * @param curr The underlying node with which to construct the instance.
      * @param area The context from which to search for meta types.
      */
-    meta_func(const internal::meta_func_node &curr, const meta_ctx /* _TODO*/ &area = locator<meta_ctx>::value_or()) noexcept
+    meta_func(const internal::meta_func_node &curr, const meta_ctx &area) noexcept
         : node{&curr},
           ctx{&area} {}
 
@@ -916,7 +916,7 @@ struct meta_func {
      * @return The next overload of the given function, if any.
      */
     [[nodiscard]] meta_func next() const {
-        return node->next ? meta_func{*node->next} : meta_func{};
+        return node->next ? meta_func{*node->next, *ctx} : meta_func{};
     }
 
     /**
@@ -1234,7 +1234,7 @@ public:
     [[nodiscard]] meta_func func(const id_type id) const {
         if(node.details) {
             if(const auto it = node.details->func.find(id); it != node.details->func.cend()) {
-                return it->second;
+                return meta_func{it->second, *ctx};
             }
         }
 
