@@ -152,22 +152,35 @@ using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::t
  * @brief Wraps a value depending on the given policy.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Type Type of value to wrap.
+ * @param ctx The context from which to search for meta types.
  * @param value Value to wrap.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Policy = as_is_t, typename Type>
-meta_any meta_dispatch([[maybe_unused]] Type &&value) {
+meta_any meta_dispatch(const meta_ctx &ctx, [[maybe_unused]] Type &&value) {
     if constexpr(std::is_same_v<Policy, as_void_t>) {
-        return meta_any{std::in_place_type<void>};
+        return meta_any{ctx, std::in_place_type<void>};
     } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-        return meta_any{std::in_place_type<Type>, value};
+        return meta_any{ctx, std::in_place_type<Type>, value};
     } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
         static_assert(std::is_lvalue_reference_v<Type>, "Invalid type");
-        return meta_any{std::in_place_type<const std::remove_reference_t<Type> &>, std::as_const(value)};
+        return meta_any{ctx, std::in_place_type<const std::remove_reference_t<Type> &>, std::as_const(value)};
     } else {
         static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
-        return meta_any{std::forward<Type>(value)};
+        return meta_any{ctx, std::forward<Type>(value)};
     }
+}
+
+/**
+ * @brief Wraps a value depending on the given policy.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @tparam Type Type of value to wrap.
+ * @param value Value to wrap.
+ * @return A meta any containing the returned value, if any.
+ */
+template<typename Policy = as_is_t, typename Type>
+meta_any meta_dispatch(Type &&value) {
+    return meta_dispatch<Policy, Type>(locator<meta_ctx>::value_or(), std::forward<Type>(value));
 }
 
 /**
