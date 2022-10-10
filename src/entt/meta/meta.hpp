@@ -216,8 +216,19 @@ public:
      */
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&...args)
+        : meta_any{locator<meta_ctx>::value_or(), std::in_place_type<Type>, std::forward<Args>(args)...} {}
+
+    /**
+     * @brief Constructs a wrapper by directly initializing the new object.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Args Types of arguments to use to construct the new instance.
+     * @param area The context from which to search for meta types.
+     * @param args Parameters to use to construct the instance.
+     */
+    template<typename Type, typename... Args>
+    explicit meta_any(const meta_ctx &area, std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          ctx{&locator<meta_ctx>::value_or()},
+          ctx{&area},
           node{internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))},
           vtable{&basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>} {}
 
@@ -228,7 +239,17 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(Type &&value)
-        : meta_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
+        : meta_any{locator<meta_ctx>::value_or(), std::forward<Type>(value)} {}
+
+    /**
+     * @brief Constructs a wrapper from a given value.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param area The context from which to search for meta types.
+     * @param value An instance of an object to use to initialize the wrapper.
+     */
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
+    meta_any(const meta_ctx &area, Type &&value)
+        : meta_any{area, std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
 
     /**
      * @brief Copy constructor.
