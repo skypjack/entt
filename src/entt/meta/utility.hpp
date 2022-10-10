@@ -156,7 +156,7 @@ using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::t
  * @return A meta any containing the returned value, if any.
  */
 template<typename Policy = as_is_t, typename Type>
-meta_any meta_dispatch([[maybe_unused]] Type &&value) {
+std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_dispatch([[maybe_unused]] Type &&value) {
     if constexpr(std::is_same_v<Policy, as_void_t>) {
         return meta_any{std::in_place_type<void>};
     } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
@@ -165,7 +165,6 @@ meta_any meta_dispatch([[maybe_unused]] Type &&value) {
         static_assert(std::is_lvalue_reference_v<Type>, "Invalid type");
         return meta_any{std::in_place_type<const std::remove_reference_t<Type> &>, std::as_const(value)};
     } else {
-        static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
         return meta_any{std::forward<Type>(value)};
     }
 }
@@ -174,25 +173,37 @@ meta_any meta_dispatch([[maybe_unused]] Type &&value) {
  * @brief Returns the meta type of the i-th element of a list of arguments.
  * @tparam Type Type list of the actual types of arguments.
  * @param ctx The context from which to search for meta types.
+ * @param index The index of the element for which to return the meta type.
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
-[[nodiscard]] static meta_type meta_arg(const std::size_t index, const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+[[nodiscard]] static meta_type meta_arg(const meta_ctx &ctx, const std::size_t index) noexcept {
     auto &&context = internal::meta_context::from(ctx);
-    return {internal::meta_arg_node(Type{}, index, context), ctx};
+    return {ctx, internal::meta_arg_node(context, Type{}, index)};
+}
+
+/**
+ * @brief Returns the meta type of the i-th element of a list of arguments.
+ * @tparam Type Type list of the actual types of arguments.
+ * @param index The index of the element for which to return the meta type.
+ * @return The meta type of the i-th element of the list of arguments.
+ */
+template<typename Type>
+[[nodiscard]] static meta_type meta_arg(const std::size_t index) noexcept {
+    return meta_arg<Type>(locator<meta_ctx>::value_or(), index);
 }
 
 /**
  * @brief Sets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
  * @tparam Data The actual variable to set.
+ * @param ctx The context from which to search for meta types.
  * @param instance An opaque instance of the underlying type, if required.
  * @param value Parameter to use to set the variable.
- * @param ctx The context from which to search for meta types.
  * @return True in case of success, false otherwise.
  */
 template<typename Type, auto Data>
-[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
+[[nodiscard]] bool meta_setter(const meta_ctx &ctx /*_TODO*/, [[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
     if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
         if constexpr(std::is_member_function_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
             using descriptor = meta_function_helper_t<Type, decltype(Data)>;
@@ -227,16 +238,29 @@ template<typename Type, auto Data>
 }
 
 /**
+ * @brief Sets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to set.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @param value Parameter to use to set the variable.
+ * @return True in case of success, false otherwise.
+ */
+template<typename Type, auto Data>
+[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
+    return meta_setter<Type, Data>(locator<meta_ctx>::value_or(), std::move(instance), std::move(value));
+}
+
+/**
  * @brief Gets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
  * @tparam Data The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
- * @param instance An opaque instance of the underlying type, if required.
  * @param ctx The context from which to search for meta types.
+ * @param instance An opaque instance of the underlying type, if required.
  * @return A meta any containing the value of the underlying variable.
  */
 template<typename Type, auto Data, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_getter(const meta_ctx &ctx /*_TODO*/, [[maybe_unused]] meta_handle instance) {
     if constexpr(std::is_member_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
         if constexpr(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>>>) {
             if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
@@ -262,6 +286,19 @@ template<typename Type, auto Data, typename Policy = as_is_t>
     } else {
         return meta_dispatch<Policy>(Data);
     }
+}
+
+/**
+ * @brief Gets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to get.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @param instance An opaque instance of the underlying type, if required.
+ * @return A meta any containing the value of the underlying variable.
+ */
+template<typename Type, auto Data, typename Policy = as_is_t>
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_getter([[maybe_unused]] meta_handle instance) {
+    return meta_getter<Type, Data, Policy>(locator<meta_ctx>::value_or(), std::move(instance));
 }
 
 /**
@@ -323,15 +360,45 @@ template<typename Type, typename... Args, std::size_t... Index>
  * @tparam Type Reflected type to which the object to _invoke_ is associated.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Candidate The type of the actual object to _invoke_.
+ * @param ctx The context from which to search for meta types.
  * @param instance An opaque instance of the underlying type, if required.
  * @param candidate The actual object to _invoke_.
  * @param args Parameters to use to _invoke_ the object.
- * @param ctx The context from which to search for meta types.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, typename Policy = as_is_t, typename Candidate>
-[[nodiscard]] meta_any meta_invoke(meta_handle instance, Candidate &&candidate, meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_invoke(const meta_ctx &ctx, meta_handle instance, Candidate &&candidate, meta_any *const args) {
     return internal::meta_invoke<Type, Policy>(std::move(instance), std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
+}
+
+/**
+ * @brief Tries to _invoke_ an object given a list of erased parameters.
+ * @tparam Type Reflected type to which the object to _invoke_ is associated.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @tparam Candidate The type of the actual object to _invoke_.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @param candidate The actual object to _invoke_.
+ * @param args Parameters to use to _invoke_ the object.
+ * @return A meta any containing the returned value, if any.
+ */
+template<typename Type, typename Policy = as_is_t, typename Candidate>
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_invoke(meta_handle instance, Candidate &&candidate, meta_any *const args) {
+    return meta_invoke<Type, Policy>(locator<meta_ctx>::value_or(), std::move(instance), std::forward<Candidate>(candidate), args);
+}
+
+/**
+ * @brief Tries to invoke a function given a list of erased parameters.
+ * @tparam Type Reflected type to which the function is associated.
+ * @tparam Candidate The actual function to invoke.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @param ctx The context from which to search for meta types.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @param args Parameters to use to invoke the function.
+ * @return A meta any containing the returned value, if any.
+ */
+template<typename Type, auto Candidate, typename Policy = as_is_t>
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_invoke(const meta_ctx &ctx /*_TODO*/, meta_handle instance, meta_any *const args) {
+    return internal::meta_invoke<Type, Policy>(std::move(instance), Candidate, args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<decltype(Candidate)>>::args_type::size>{});
 }
 
 /**
@@ -341,12 +408,24 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
  * @tparam Policy Optional policy (no policy set by default).
  * @param instance An opaque instance of the underlying type, if required.
  * @param args Parameters to use to invoke the function.
- * @param ctx The context from which to search for meta types.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_invoke(meta_handle instance, meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
-    return internal::meta_invoke<Type, Policy>(std::move(instance), Candidate, args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<decltype(Candidate)>>::args_type::size>{});
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_invoke(meta_handle instance, meta_any *const args) {
+    return meta_invoke<Type, Candidate, Policy>(locator<meta_ctx>::value_or(), std::move(instance), args);
+}
+
+/**
+ * @brief Tries to construct an instance given a list of erased parameters.
+ * @tparam Type Actual type of the instance to construct.
+ * @tparam Args Types of arguments expected.
+ * @param ctx The context from which to search for meta types.
+ * @param args Parameters to use to construct the instance.
+ * @return A meta any containing the new instance, if any.
+ */
+template<typename Type, typename... Args>
+[[nodiscard]] meta_any meta_construct(const meta_ctx &ctx /*_TODO*/, meta_any *const args) {
+    return internal::meta_construct<Type, Args...>(args, std::index_sequence_for<Args...>{});
 }
 
 /**
@@ -354,12 +433,11 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
  * @tparam Type Actual type of the instance to construct.
  * @tparam Args Types of arguments expected.
  * @param args Parameters to use to construct the instance.
- * @param ctx The context from which to search for meta types.
  * @return A meta any containing the new instance, if any.
  */
 template<typename Type, typename... Args>
-[[nodiscard]] meta_any meta_construct(meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
-    return internal::meta_construct<Type, Args...>(args, std::index_sequence_for<Args...>{});
+[[nodiscard]] meta_any meta_construct(meta_any *const args) {
+    return meta_construct<Type, Args...>(locator<meta_ctx>::value_or(), args);
 }
 
 /**
@@ -367,13 +445,13 @@ template<typename Type, typename... Args>
  * @tparam Type Reflected type to which the object to _invoke_ is associated.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Candidate The type of the actual object to _invoke_.
+ * @param ctx The context from which to search for meta types.
  * @param candidate The actual object to _invoke_.
  * @param args Parameters to use to _invoke_ the object.
- * @param ctx The context from which to search for meta types.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, typename Policy = as_is_t, typename Candidate>
-[[nodiscard]] meta_any meta_construct(Candidate &&candidate, meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_construct(const meta_ctx &ctx /*_TODO*/, Candidate &&candidate, meta_any *const args) {
     if constexpr(meta_function_helper_t<Type, Candidate>::is_static || std::is_class_v<std::remove_cv_t<std::remove_reference_t<Candidate>>>) {
         return internal::meta_invoke<Type, Policy>({}, std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
     } else {
@@ -383,16 +461,43 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
 
 /**
  * @brief Tries to construct an instance given a list of erased parameters.
+ * @tparam Type Reflected type to which the object to _invoke_ is associated.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @tparam Candidate The type of the actual object to _invoke_.
+ * @param candidate The actual object to _invoke_.
+ * @param args Parameters to use to _invoke_ the object.
+ * @return A meta any containing the returned value, if any.
+ */
+template<typename Type, typename Policy = as_is_t, typename Candidate>
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_construct(Candidate &&candidate, meta_any *const args) {
+    return meta_construct<Type, Policy>(locator<meta_ctx>::value_or(), std::forward<Candidate>(candidate), args);
+}
+
+/**
+ * @brief Tries to construct an instance given a list of erased parameters.
+ * @tparam Type Reflected type to which the function is associated.
+ * @tparam Candidate The actual function to invoke.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @param ctx The context from which to search for meta types.
+ * @param args Parameters to use to invoke the function.
+ * @return A meta any containing the returned value, if any.
+ */
+template<typename Type, auto Candidate, typename Policy = as_is_t>
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_construct(const meta_ctx &ctx /*_TODO*/, meta_any *const args) {
+    return meta_construct<Type, Policy>(ctx, Candidate, args);
+}
+
+/**
+ * @brief Tries to construct an instance given a list of erased parameters.
  * @tparam Type Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
  * @param args Parameters to use to invoke the function.
- * @param ctx The context from which to search for meta types.
  * @return A meta any containing the returned value, if any.
  */
 template<typename Type, auto Candidate, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_construct(meta_any *const args, const meta_ctx &ctx /*_TODO*/ = locator<meta_ctx>::value_or()) {
-    return meta_construct<Type, Policy>(Candidate, args);
+[[nodiscard]] std::enable_if_t<std::is_base_of_v<meta_policy, Policy>, meta_any> meta_construct(meta_any *const args) {
+    return meta_construct<Type, Candidate, Policy>(locator<meta_ctx>::value_or(), args);
 }
 
 } // namespace entt

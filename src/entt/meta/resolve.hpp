@@ -18,9 +18,19 @@ namespace entt {
  * @return The meta type associated with the given type, if any.
  */
 template<typename Type>
-[[nodiscard]] meta_type resolve(const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+[[nodiscard]] meta_type resolve(const meta_ctx &ctx) noexcept {
     auto &&context = internal::meta_context::from(ctx);
-    return {internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(context), ctx};
+    return {ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(context)};
+}
+
+/**
+ * @brief Returns the meta type associated with a given type.
+ * @tparam Type Type to use to search for a meta type.
+ * @return The meta type associated with the given type, if any.
+ */
+template<typename Type>
+[[nodiscard]] meta_type resolve() noexcept {
+    return resolve<Type>(locator<meta_ctx>::value_or());
 }
 
 /**
@@ -28,18 +38,26 @@ template<typename Type>
  * @param ctx The context from which to search for meta types.
  * @return An iterable range to use to visit all meta types.
  */
-[[nodiscard]] inline meta_range<meta_type, typename decltype(internal::meta_context::value)::const_iterator> resolve(const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+[[nodiscard]] inline meta_range<meta_type, typename decltype(internal::meta_context::value)::const_iterator> resolve(const meta_ctx &ctx) noexcept {
     auto &&context = internal::meta_context::from(ctx);
-    return {{context.value.cbegin(), ctx}, {context.value.cend(), ctx}};
+    return {{ctx, context.value.cbegin()}, {ctx, context.value.cend()}};
+}
+
+/**
+ * @brief Returns a range to use to visit all meta types.
+ * @return An iterable range to use to visit all meta types.
+ */
+[[nodiscard]] inline meta_range<meta_type, typename decltype(internal::meta_context::value)::const_iterator> resolve() noexcept {
+    return resolve(locator<meta_ctx>::value_or());
 }
 
 /**
  * @brief Returns the meta type associated with a given identifier, if any.
- * @param id Unique identifier.
  * @param ctx The context from which to search for meta types.
+ * @param id Unique identifier.
  * @return The meta type associated with the given identifier, if any.
  */
-[[nodiscard]] inline meta_type resolve(const id_type id, const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+[[nodiscard]] inline meta_type resolve(const meta_ctx &ctx, const id_type id) noexcept {
     for(auto &&curr: resolve(ctx)) {
         if(curr.second.id() == id) {
             return curr.second;
@@ -50,15 +68,33 @@ template<typename Type>
 }
 
 /**
+ * @brief Returns the meta type associated with a given identifier, if any.
+ * @param id Unique identifier.
+ * @return The meta type associated with the given identifier, if any.
+ */
+[[nodiscard]] inline meta_type resolve(const id_type id) noexcept {
+    return resolve(locator<meta_ctx>::value_or(), id);
+}
+
+/**
  * @brief Returns the meta type associated with a given type info object.
- * @param info The type info object of the requested type.
  * @param ctx The context from which to search for meta types.
+ * @param info The type info object of the requested type.
  * @return The meta type associated with the given type info object, if any.
  */
-[[nodiscard]] inline meta_type resolve(const type_info &info, const meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+[[nodiscard]] inline meta_type resolve(const meta_ctx &ctx, const type_info &info) noexcept {
     auto &&context = internal::meta_context::from(ctx);
-    const auto *elem = internal::try_resolve(info, context);
-    return elem ? meta_type{*elem, ctx} : meta_type{};
+    const auto *elem = internal::try_resolve(context, info);
+    return elem ? meta_type{ctx, *elem} : meta_type{};
+}
+
+/**
+ * @brief Returns the meta type associated with a given type info object.
+ * @param info The type info object of the requested type.
+ * @return The meta type associated with the given type info object, if any.
+ */
+[[nodiscard]] inline meta_type resolve(const type_info &info) noexcept {
+    return resolve(locator<meta_ctx>::value_or(), info);
 }
 
 } // namespace entt

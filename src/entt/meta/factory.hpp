@@ -29,7 +29,7 @@ namespace entt {
 
 namespace internal {
 
-inline decltype(auto) owner(const type_info &info, meta_ctx &ctx) {
+inline decltype(auto) owner(meta_ctx &ctx, const type_info &info) {
     auto &&context = internal::meta_context::from(ctx);
     ENTT_ASSERT(context.value.contains(info.hash()), "Type not available");
     return context.value[info.hash()];
@@ -96,7 +96,7 @@ class meta_factory {
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         auto &&elem = internal::meta_extend(
-            internal::owner(*info, *ctx),
+            internal::owner(*ctx, *info),
             id,
             internal::meta_data_node{
                 /* this is never static */
@@ -104,7 +104,7 @@ class meta_factory {
                 Setter::size,
                 &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
                 &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
-                +[](meta_handle instance, meta_any value, const meta_ctx &area) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref(), area) || ...); },
+                +[](const meta_ctx &area, meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(area, *instance.operator->(), value.as_ref()) || ...); },
                 &meta_getter<Type, Getter, Policy>});
 
         bucket = &elem.prop;
@@ -123,7 +123,7 @@ public:
         : ctx{&area},
           bucket{},
           info{&type_id<Type>()} {
-        auto &&elem = internal::owner(*info, *ctx);
+        auto &&elem = internal::owner(*ctx, *info);
 
         if(!elem.details) {
             elem.details = std::make_shared<internal::meta_type_descriptor>();
@@ -138,8 +138,8 @@ public:
      * @return An extended meta factory for the given type.
      */
     auto type(const id_type id) noexcept {
-        auto &&elem = internal::owner(*info, *ctx);
-        ENTT_ASSERT(elem.id == id || !resolve(id, *ctx), "Duplicate identifier");
+        auto &&elem = internal::owner(*ctx, *info);
+        ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
         bucket = &elem.details->prop;
         elem.id = id;
         return *this;
@@ -158,7 +158,7 @@ public:
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
 
         internal::meta_extend(
-            internal::owner(*info, *ctx),
+            internal::owner(*ctx, *info),
             type_id<Base>().hash(),
             internal::meta_base_node{
                 &internal::resolve<Base>,
@@ -187,11 +187,11 @@ public:
         using conv_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
 
         internal::meta_extend(
-            internal::owner(*info, *ctx),
+            internal::owner(*ctx, *info),
             type_id<conv_type>().hash(),
             internal::meta_conv_node{
-                +[](const void *instance, const meta_ctx &area) {
-                    return forward_as_meta(std::invoke(Candidate, *static_cast<const Type *>(instance)), area);
+                +[](const meta_ctx &area, const void *instance) {
+                    return forward_as_meta(area, std::invoke(Candidate, *static_cast<const Type *>(instance)));
                 }});
 
         bucket = nullptr;
@@ -212,11 +212,11 @@ public:
         using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
 
         internal::meta_extend(
-            internal::owner(*info, *ctx),
+            internal::owner(*ctx, *info),
             type_id<conv_type>().hash(),
             internal::meta_conv_node{
-                +[](const void *instance, const meta_ctx &area) {
-                    return forward_as_meta(static_cast<To>(*static_cast<const Type *>(instance)), area);
+                +[](const meta_ctx &area, const void *instance) {
+                    return forward_as_meta(area, static_cast<To>(*static_cast<const Type *>(instance)));
                 }});
 
         bucket = nullptr;
@@ -239,11 +239,12 @@ public:
     template<auto Candidate, typename Policy = as_is_t>
     auto ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
+        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
 
         internal::meta_extend(
-            internal::owner(*info, *ctx),
+            internal::owner(*ctx, *info),
             type_id<typename descriptor::args_type>().hash(),
             internal::meta_ctor_node{
                 descriptor::args_type::size,
@@ -269,7 +270,7 @@ public:
         using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
 
         internal::meta_extend(
-            internal::owner(*info, *ctx),
+            internal::owner(*ctx, *info),
             type_id<typename descriptor::args_type>().hash(),
             internal::meta_ctor_node{
                 descriptor::args_type::size,
@@ -303,7 +304,7 @@ public:
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
 
         internal::meta_extend(
-            internal::owner(*info, *ctx),
+            internal::owner(*ctx, *info),
             internal::meta_dtor_node{
                 +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); }});
 
@@ -326,11 +327,13 @@ public:
      */
     template<auto Data, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
+        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
+
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
 
             auto &&elem = internal::meta_extend(
-                internal::owner(*info, *ctx),
+                internal::owner(*ctx, *info),
                 id,
                 internal::meta_data_node{
                     /* this is never static */
@@ -346,7 +349,7 @@ public:
             using data_type = std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>;
 
             auto &&elem = internal::meta_extend(
-                internal::owner(*info, *ctx),
+                internal::owner(*ctx, *info),
                 id,
                 internal::meta_data_node{
                     ((std::is_same_v<Type, std::remove_const_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
@@ -385,11 +388,12 @@ public:
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
+        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
             auto &&elem = internal::meta_extend(
-                internal::owner(*info, *ctx),
+                internal::owner(*ctx, *info),
                 id,
                 internal::meta_data_node{
                     /* this is never static */
@@ -405,7 +409,7 @@ public:
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
             auto &&elem = internal::meta_extend(
-                internal::owner(*info, *ctx),
+                internal::owner(*ctx, *info),
                 id,
                 internal::meta_data_node{
                     /* this is never static nor const */
@@ -441,6 +445,7 @@ public:
      */
     template<typename Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
+        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
         data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
         return *this;
     }
@@ -461,10 +466,11 @@ public:
     template<auto Candidate, typename Policy = as_is_t>
     auto func(const id_type id) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
+        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
         auto &&elem = internal::meta_extend(
-            internal::owner(*info, *ctx),
+            internal::owner(*ctx, *info),
             id,
             internal::meta_func_node{
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
@@ -528,11 +534,27 @@ private:
  * @return A meta factory for the given type.
  */
 template<typename Type>
-[[nodiscard]] auto meta(meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+[[nodiscard]] auto meta(meta_ctx &ctx) noexcept {
     auto &&context = internal::meta_context::from(ctx);
     // make sure the type exists in the context before returning a factory
     context.value.try_emplace(type_id<Type>().hash(), internal::resolve<Type>(context));
     return meta_factory<Type>{ctx};
+}
+
+/**
+ * @brief Utility function to use for reflection.
+ *
+ * This is the point from which everything starts.<br/>
+ * By invoking this function with a type that is not yet reflected, a meta type
+ * is created to which it will be possible to attach meta objects through a
+ * dedicated factory.
+ *
+ * @tparam Type Type to reflect.
+ * @return A meta factory for the given type.
+ */
+template<typename Type>
+[[nodiscard]] auto meta() noexcept {
+    return meta<Type>(locator<meta_ctx>::value_or());
 }
 
 /**
@@ -547,7 +569,7 @@ template<typename Type>
  * @param id Unique identifier.
  * @param ctx The context from which to reset meta types.
  */
-inline void meta_reset(const id_type id, meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+inline void meta_reset(meta_ctx &ctx, const id_type id) noexcept {
     auto &&context = internal::meta_context::from(ctx);
 
     for(auto it = context.value.begin(); it != context.value.end();) {
@@ -562,14 +584,41 @@ inline void meta_reset(const id_type id, meta_ctx &ctx = locator<meta_ctx>::valu
 /**
  * @brief Resets a type and all its parts.
  *
+ * Resets a type and all its data members, member functions and properties, as
+ * well as its constructors, destructors and conversion functions if any.<br/>
+ * Base classes aren't reset but the link between the two types is removed.
+ *
+ * The type is also removed from the set of searchable types.
+ *
+ * @param id Unique identifier.
+ */
+inline void meta_reset(const id_type id) noexcept {
+    meta_reset(locator<meta_ctx>::value_or(), id);
+}
+
+/**
+ * @brief Resets a type and all its parts.
+ *
  * @sa meta_reset
  *
  * @tparam Type Type to reset.
  * @param ctx The context from which to reset meta types.
  */
 template<typename Type>
-void meta_reset(meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+void meta_reset(meta_ctx &ctx) noexcept {
     internal::meta_context::from(ctx).value.erase(type_id<Type>().hash());
+}
+
+/**
+ * @brief Resets a type and all its parts.
+ *
+ * @sa meta_reset
+ *
+ * @tparam Type Type to reset.
+ */
+template<typename Type>
+void meta_reset() noexcept {
+    meta_reset<Type>(locator<meta_ctx>::value_or());
 }
 
 /**
@@ -579,8 +628,17 @@ void meta_reset(meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
  *
  * @param ctx The context from which to reset meta types.
  */
-inline void meta_reset(meta_ctx &ctx = locator<meta_ctx>::value_or()) noexcept {
+inline void meta_reset(meta_ctx &ctx) noexcept {
     internal::meta_context::from(ctx).value.clear();
+}
+
+/**
+ * @brief Resets all meta types.
+ *
+ * @sa meta_reset
+ */
+inline void meta_reset() noexcept {
+    meta_reset(locator<meta_ctx>::value_or());
 }
 
 } // namespace entt

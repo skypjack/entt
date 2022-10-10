@@ -29,7 +29,7 @@ struct meta_range_iterator final {
         : it{},
           ctx{} {}
 
-    meta_range_iterator(const It iter, const meta_ctx &area) noexcept
+    meta_range_iterator(const meta_ctx &area, const It iter) noexcept
         : it{iter},
           ctx{&area} {}
 
@@ -70,7 +70,7 @@ struct meta_range_iterator final {
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        return {it[value].first, Type{it[value].second, *ctx}};
+        return {it[value].first, Type{*ctx, it[value].second}};
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
@@ -78,7 +78,7 @@ struct meta_range_iterator final {
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return {it->first, Type{it->second, *ctx}};
+        return {it->first, Type{*ctx, it->second}};
     }
 
     template<typename... Args>
