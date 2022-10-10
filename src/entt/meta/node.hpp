@@ -173,10 +173,7 @@ template<typename Type>
 void meta_default_constructor([[maybe_unused]] meta_type_node &node) {
     if constexpr(std::is_default_constructible_v<Type>) {
         node.default_constructor = +[](const meta_ctx &ctx) {
-            // TODO it would be great if we had value and context construction support for meta_any
-            meta_any elem{meta_ctx_arg, ctx};
-            elem.emplace<Type>();
-            return elem;
+            return meta_any{ctx, std::in_place_type<Type>};
         };
     }
 }
@@ -198,10 +195,11 @@ template<typename Type>
 void meta_from_void([[maybe_unused]] meta_type_node &node) {
     if constexpr(!std::is_same_v<Type, void> && !std::is_function_v<Type>) {
         node.from_void = +[](const meta_ctx &ctx, void *element, const void *as_const) {
-            // TODO it would be great if we had value and context construction support for meta_any
-            meta_any elem{meta_ctx_arg, ctx};
-            element ? elem.emplace<std::decay_t<Type> &>(*static_cast<std::decay_t<Type> *>(element)) : elem.emplace<const std::decay_t<Type> &>(*static_cast<const std::decay_t<Type> *>(as_const));
-            return elem;
+            if(element) {
+                return meta_any{ctx, std::in_place_type<std::decay_t<Type> &>, *static_cast<std::decay_t<Type> *>(element)};
+            }
+
+            return meta_any{ctx, std::in_place_type<const std::decay_t<Type> &>, *static_cast<const std::decay_t<Type> *>(as_const)};
         };
     }
 }

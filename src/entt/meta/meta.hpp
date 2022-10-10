@@ -606,10 +606,7 @@ meta_any make_meta(Args &&...args) {
  */
 template<typename Type>
 meta_any forward_as_meta(const meta_ctx &ctx, Type &&value) {
-    // TODO it would be great if we had value and context construction support for meta_any
-    meta_any elem{meta_ctx_arg, ctx};
-    elem.emplace<Type &&>(std::forward<Type>(value));
-    return elem;
+    return meta_any{ctx, std::in_place_type<Type &&>, std::forward<Type>(value)};
 }
 
 /**
