@@ -239,7 +239,6 @@ public:
     template<auto Candidate, typename Policy = as_is_t>
     auto ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
-        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
 
@@ -327,8 +326,6 @@ public:
      */
     template<auto Data, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
-        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
-
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
 
@@ -388,7 +385,6 @@ public:
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
-        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
@@ -445,7 +441,6 @@ public:
      */
     template<typename Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
-        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
         data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
         return *this;
     }
@@ -466,7 +461,6 @@ public:
     template<auto Candidate, typename Policy = as_is_t>
     auto func(const id_type id) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
-        static_assert(std::is_base_of_v<meta_policy, Policy>, "Unknown policy type");
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
         auto &&elem = internal::meta_extend(

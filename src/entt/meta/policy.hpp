@@ -5,11 +5,8 @@
 
 namespace entt {
 
-/*! @brief Basic common class for meta policies. */
-struct meta_policy {};
-
 /*! @brief Empty class type used to request the _as ref_ policy. */
-struct as_ref_t final: meta_policy {
+struct as_ref_t final {
     /**
      * @cond TURN_OFF_DOXYGEN
      * Internal details not to be documented.
@@ -23,7 +20,7 @@ struct as_ref_t final: meta_policy {
 };
 
 /*! @brief Empty class type used to request the _as cref_ policy. */
-struct as_cref_t final: meta_policy {
+struct as_cref_t final {
     /**
      * @cond TURN_OFF_DOXYGEN
      * Internal details not to be documented.
@@ -37,7 +34,7 @@ struct as_cref_t final: meta_policy {
 };
 
 /*! @brief Empty class type used to request the _as-is_ policy. */
-struct as_is_t final: meta_policy {
+struct as_is_t final {
     /**
      * @cond TURN_OFF_DOXYGEN
      * Internal details not to be documented.
@@ -51,7 +48,7 @@ struct as_is_t final: meta_policy {
 };
 
 /*! @brief Empty class type used to request the _as void_ policy. */
-struct as_void_t final: meta_policy {
+struct as_void_t final {
     /**
      * @cond TURN_OFF_DOXYGEN
      * Internal details not to be documented.
