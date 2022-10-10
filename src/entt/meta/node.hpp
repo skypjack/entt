@@ -170,6 +170,43 @@ template<typename... Args>
 }
 
 template<typename Type>
+void meta_default_constructor([[maybe_unused]] meta_type_node &node) {
+    if constexpr(std::is_default_constructible_v<Type>) {
+        node.default_constructor = +[](const meta_ctx &ctx) {
+            // TODO it would be great if we had value and context construction support for meta_any
+            meta_any elem{ctx};
+            elem.emplace<Type>();
+            return elem;
+        };
+    }
+}
+
+template<typename Type>
+void meta_conversion_helper([[maybe_unused]] meta_type_node &node) {
+    if constexpr(std::is_arithmetic_v<Type>) {
+        node.conversion_helper = +[](void *bin, const void *value) {
+            return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(*static_cast<const double *>(value))) : static_cast<double>(*static_cast<const Type *>(value));
+        };
+    } else if constexpr(std::is_enum_v<Type>) {
+        node.conversion_helper = +[](void *bin, const void *value) {
+            return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(value)))) : static_cast<double>(*static_cast<const Type *>(value));
+        };
+    }
+}
+
+template<typename Type>
+void meta_from_void([[maybe_unused]] meta_type_node &node) {
+    if constexpr(!std::is_same_v<Type, void> && !std::is_function_v<Type>) {
+        node.from_void = +[](void *element, const void *as_const, const meta_ctx &ctx) {
+            // TODO it would be great if we had value and context construction support for meta_any
+            meta_any elem{ctx};
+            element ? elem.emplace<std::decay_t<Type> &>(*static_cast<std::decay_t<Type> *>(element)) : elem.emplace<const std::decay_t<Type> &>(*static_cast<const std::decay_t<Type> *>(as_const));
+            return elem;
+        };
+    }
+}
+
+template<typename Type>
 [[nodiscard]] meta_type_node resolve(const meta_context &context) noexcept {
     static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
 
@@ -192,33 +229,9 @@ template<typename Type>
         size_of_v<Type>,
         &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>};
 
-    if constexpr(std::is_default_constructible_v<Type>) {
-        node.default_constructor = +[](const meta_ctx &ctx) {
-            // TODO it would be great if we had value and context construction support for meta_any
-            meta_any elem{ctx};
-            elem.emplace<Type>();
-            return elem;
-        };
-    }
-
-    if constexpr(std::is_arithmetic_v<Type>) {
-        node.conversion_helper = +[](void *bin, const void *value) {
-            return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(*static_cast<const double *>(value))) : static_cast<double>(*static_cast<const Type *>(value));
-        };
-    } else if constexpr(std::is_enum_v<Type>) {
-        node.conversion_helper = +[](void *bin, const void *value) {
-            return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(value)))) : static_cast<double>(*static_cast<const Type *>(value));
-        };
-    }
-
-    if constexpr(!std::is_same_v<Type, void> && !std::is_function_v<Type>) {
-        node.from_void = +[](void *element, const void *as_const, const meta_ctx &ctx) {
-            // TODO it would be great if we had value and context construction support for meta_any
-            meta_any elem{ctx};
-            element ? elem.emplace<std::decay_t<Type> &>(*static_cast<std::decay_t<Type> *>(element)) : elem.emplace<const std::decay_t<Type> &>(*static_cast<const std::decay_t<Type> *>(as_const));
-            return elem;
-        };
-    }
+    meta_default_constructor<Type>(node);
+    meta_conversion_helper<Type>(node);
+    meta_from_void<Type>(node);
 
     if constexpr(is_complete_v<meta_template_traits<Type>>) {
         node.templ = meta_template_node{
