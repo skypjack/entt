@@ -384,35 +384,35 @@ public:
     /**
      * @brief Constructs an empty container with a given allocator and user
      * supplied minimal number of buckets.
-     * @param bucket_count Minimal number of buckets.
+     * @param cnt Minimal number of buckets.
      * @param allocator The allocator to use.
      */
-    dense_map(const size_type bucket_count, const allocator_type &allocator)
-        : dense_map{bucket_count, hasher{}, key_equal{}, allocator} {}
+    dense_map(const size_type cnt, const allocator_type &allocator)
+        : dense_map{cnt, hasher{}, key_equal{}, allocator} {}
 
     /**
      * @brief Constructs an empty container with a given allocator, hash
      * function and user supplied minimal number of buckets.
-     * @param bucket_count Minimal number of buckets.
+     * @param cnt Minimal number of buckets.
      * @param hash Hash function to use.
      * @param allocator The allocator to use.
      */
-    dense_map(const size_type bucket_count, const hasher &hash, const allocator_type &allocator)
-        : dense_map{bucket_count, hash, key_equal{}, allocator} {}
+    dense_map(const size_type cnt, const hasher &hash, const allocator_type &allocator)
+        : dense_map{cnt, hash, key_equal{}, allocator} {}
 
     /**
      * @brief Constructs an empty container with a given allocator, hash
      * function, compare function and user supplied minimal number of buckets.
-     * @param bucket_count Minimal number of buckets.
+     * @param cnt Minimal number of buckets.
      * @param hash Hash function to use.
      * @param equal Compare function to use.
      * @param allocator The allocator to use.
      */
-    explicit dense_map(const size_type bucket_count, const hasher &hash = hasher{}, const key_equal &equal = key_equal{}, const allocator_type &allocator = allocator_type{})
+    explicit dense_map(const size_type cnt, const hasher &hash = hasher{}, const key_equal &equal = key_equal{}, const allocator_type &allocator = allocator_type{})
         : sparse{allocator, hash},
           packed{allocator, equal},
           threshold{default_threshold} {
-        rehash(bucket_count);
+        rehash(cnt);
     }
 
     /*! @brief Default copy constructor. */
@@ -984,10 +984,10 @@ public:
     /**
      * @brief Reserves at least the specified number of buckets and regenerates
      * the hash table.
-     * @param count New number of buckets.
+     * @param cnt New number of buckets.
      */
-    void rehash(const size_type count) {
-        auto value = count > minimum_capacity ? count : minimum_capacity;
+    void rehash(const size_type cnt) {
+        auto value = cnt > minimum_capacity ? cnt : minimum_capacity;
         const auto cap = static_cast<size_type>(size() / max_load_factor());
         value = value > cap ? value : cap;
 
@@ -1008,11 +1008,11 @@ public:
     /**
      * @brief Reserves space for at least the specified number of elements and
      * regenerates the hash table.
-     * @param count New number of elements.
+     * @param cnt New number of elements.
      */
-    void reserve(const size_type count) {
-        packed.first().reserve(count);
-        rehash(static_cast<size_type>(std::ceil(count / max_load_factor())));
+    void reserve(const size_type cnt) {
+        packed.first().reserve(cnt);
+        rehash(static_cast<size_type>(std::ceil(cnt / max_load_factor())));
     }
 
     /**
