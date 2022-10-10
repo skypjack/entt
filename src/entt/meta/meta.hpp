@@ -628,9 +628,16 @@ meta_any forward_as_meta(Type &&value) {
  * Handles are used to generate references to actual objects when needed.
  */
 struct meta_handle {
-    /*! @brief Default constructor. */
-    meta_handle()
-        : any{} {}
+    /*! Default constructor. */
+    meta_handle() noexcept
+        : meta_handle{meta_ctx_arg, locator<meta_ctx>::value_or()} {}
+
+    /**
+     * @brief Context aware constructor.
+     * @param area The context from which to search for meta types.
+     */
+    meta_handle(meta_ctx_arg_t, const meta_ctx &area) noexcept
+        : any{meta_ctx_arg, area} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     meta_handle(const meta_handle &) = delete;
@@ -928,6 +935,7 @@ struct meta_func {
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&...args) const {
+        // TODO
         meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
         return invoke(std::move(instance), arguments, sizeof...(Args));
     }
@@ -1030,6 +1038,7 @@ class meta_type {
             }
         }
 
+        // TODO
         return {};
     }
 
@@ -1303,6 +1312,7 @@ public:
             return node.default_constructor(*ctx);
         }
 
+        // TODO
         return {};
     }
 
@@ -1317,6 +1327,7 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&...args) const {
+        // TODO
         meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
         return construct(arguments, sizeof...(Args));
     }
@@ -1378,6 +1389,7 @@ public:
      */
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
+        // TODO
         meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
         return invoke(id, std::move(instance), arguments, sizeof...(Args));
     }
@@ -1531,6 +1543,7 @@ bool meta_any::set(const id_type id, Type &&value) {
         return other;
     }
 
+    // TODO
     return {};
 }
 
@@ -1631,6 +1644,7 @@ public:
     }
 
     [[nodiscard]] reference operator*() const {
+        // TODO
         reference other;
         vtable(operation::deref, handle, 0, &other);
         return other;
@@ -1710,6 +1724,7 @@ public:
     }
 
     [[nodiscard]] reference operator*() const {
+        // TODO
         reference other;
         vtable(operation::deref, handle, &other);
         return other;
@@ -1889,6 +1904,7 @@ inline bool meta_associative_container::clear() {
  * @return A bool denoting whether the insertion took place.
  */
 inline bool meta_associative_container::insert(meta_any key, meta_any value = std::in_place_type<void>) {
+    // TODO
     return (insert_or_erase_fn(storage, key, value) != 0u);
 }
 
@@ -1898,6 +1914,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = st
  * @return A bool denoting whether the removal took place.
  */
 inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
+    // TODO
     return insert(std::move(key), {});
 }
 
