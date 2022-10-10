@@ -36,8 +36,12 @@ public:
     /*! @brief Meta iterator type. */
     using iterator = meta_iterator;
 
-    /*! @brief Default constructor. */
-    meta_sequence_container() noexcept = default;
+    /**
+     * @brief Context aware constructor.
+     * @param area The context from which to search for meta types.
+     */
+    meta_sequence_container(const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+        : ctx{&area} {}
 
     /**
      * @brief Rebinds a proxy object to a sequence container type.
@@ -46,7 +50,7 @@ public:
      */
     template<typename Type>
     void rebind(any instance) noexcept {
-        value_type_node = &internal::resolve_TODO<typename Type::value_type>;
+        value_type_node = &internal::resolve<typename Type::value_type>;
         size_fn = &meta_sequence_container_traits<Type>::size;
         resize_fn = &meta_sequence_container_traits<Type>::resize;
         iter_fn = &meta_sequence_container_traits<Type>::iter;
@@ -66,7 +70,8 @@ public:
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
-    internal::meta_type_node (*value_type_node)(){};
+    const meta_ctx *ctx{};
+    internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const any &) noexcept {};
     bool (*resize_fn)(any &, size_type){};
     iterator (*iter_fn)(any &, const bool){};
@@ -84,8 +89,12 @@ public:
     /*! @brief Meta iterator type. */
     using iterator = meta_iterator;
 
-    /*! @brief Default constructor. */
-    meta_associative_container() noexcept = default;
+    /**
+     * @brief Context aware constructor.
+     * @param area The context from which to search for meta types.
+     */
+    meta_associative_container(const meta_ctx &area = locator<meta_ctx>::value_or()) noexcept
+        : ctx{&area} {}
 
     /**
      * @brief Rebinds a proxy object to an associative container type.
@@ -95,12 +104,12 @@ public:
     template<typename Type>
     void rebind(any instance) noexcept {
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
-            mapped_type_node = &internal::resolve_TODO<typename Type::mapped_type>;
+            mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
 
         key_only_container = meta_associative_container_traits<Type>::key_only;
-        key_type_node = &internal::resolve_TODO<typename Type::key_type>;
-        value_type_node = &internal::resolve_TODO<typename Type::value_type>;
+        key_type_node = &internal::resolve<typename Type::key_type>;
+        value_type_node = &internal::resolve<typename Type::value_type>;
         size_fn = &meta_associative_container_traits<Type>::size;
         clear_fn = &meta_associative_container_traits<Type>::clear;
         iter_fn = &meta_associative_container_traits<Type>::iter;
@@ -123,10 +132,11 @@ public:
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
+    const meta_ctx *ctx{};
     bool key_only_container{};
-    internal::meta_type_node (*key_type_node)(){};
-    internal::meta_type_node (*mapped_type_node)(){};
-    internal::meta_type_node (*value_type_node)(){};
+    internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
+    internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
+    internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const any &) noexcept {};
     bool (*clear_fn)(any &){};
     iterator (*iter_fn)(any &, const bool){};
@@ -503,7 +513,7 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
         any detached = storage.as_ref();
-        meta_sequence_container proxy;
+        meta_sequence_container proxy{*ctx};
         vtable(operation::seq, detached, &proxy);
         return proxy;
     }
@@ -511,7 +521,7 @@ public:
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
         any detached = storage.as_ref();
-        meta_sequence_container proxy;
+        meta_sequence_container proxy{*ctx};
         vtable(operation::seq, detached, &proxy);
         return proxy;
     }
@@ -522,7 +532,7 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
         any detached = storage.as_ref();
-        meta_associative_container proxy;
+        meta_associative_container proxy{*ctx};
         vtable(operation::assoc, detached, &proxy);
         return proxy;
     }
@@ -530,7 +540,7 @@ public:
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
         any detached = storage.as_ref();
-        meta_associative_container proxy;
+        meta_associative_container proxy{*ctx};
         vtable(operation::assoc, detached, &proxy);
         return proxy;
     }
@@ -1761,8 +1771,7 @@ private:
  * @return The meta value type of the container.
  */
 [[nodiscard]] inline meta_type meta_sequence_container::value_type() const noexcept {
-    auto &&ctx_TODO = locator<meta_ctx>::value_or();
-    return value_type_node ? meta_type{ctx_TODO, value_type_node()} : meta_type{};
+    return value_type_node ? meta_type{*ctx, value_type_node(internal::meta_context::from(*ctx))} : meta_type{};
 }
 
 /**
@@ -1858,8 +1867,7 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @return The meta key type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::key_type() const noexcept {
-    auto &&ctx_TODO = locator<meta_ctx>::value_or();
-    return key_type_node ? meta_type{ctx_TODO, key_type_node()} : meta_type{};
+    return key_type_node ? meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))} : meta_type{};
 }
 
 /**
@@ -1867,14 +1875,12 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @return The meta mapped type of the a container.
  */
 [[nodiscard]] inline meta_type meta_associative_container::mapped_type() const noexcept {
-    auto &&ctx_TODO = locator<meta_ctx>::value_or();
-    return mapped_type_node ? meta_type{ctx_TODO, mapped_type_node()} : meta_type{};
+    return mapped_type_node ? meta_type{*ctx, mapped_type_node(internal::meta_context::from(*ctx))} : meta_type{};
 }
 
 /*! @copydoc meta_sequence_container::value_type */
 [[nodiscard]] inline meta_type meta_associative_container::value_type() const noexcept {
-    auto &&ctx_TODO = locator<meta_ctx>::value_or();
-    return value_type_node ? meta_type{ctx_TODO, value_type_node()} : meta_type{};
+    return value_type_node ? meta_type{*ctx, value_type_node(internal::meta_context::from(*ctx))} : meta_type{};
 }
 
 /*! @copydoc meta_sequence_container::size */
