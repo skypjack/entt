@@ -13,7 +13,6 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
-#include "../locator/locator.hpp" // TODO
 #include "context.hpp"
 #include "type_traits.hpp"
 
@@ -133,11 +132,6 @@ struct meta_type_node {
 
 template<typename Type>
 meta_type_node resolve(const meta_context &) noexcept;
-
-template<typename Type>
-[[nodiscard]] meta_type_node resolve_TODO() noexcept {
-    return resolve<Type>(meta_context::from(locator<meta_ctx>::value_or()));
-}
 
 template<typename... Args>
 [[nodiscard]] auto meta_arg_node(const meta_context &context, type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
