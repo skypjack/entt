@@ -1543,8 +1543,7 @@ bool meta_any::set(const id_type id, Type &&value) {
         return other;
     }
 
-    // TODO
-    return {};
+    return meta_any{meta_ctx_arg, *ctx};
 }
 
 inline bool meta_any::assign(const meta_any &other) {
