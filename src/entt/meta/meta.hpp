@@ -540,7 +540,7 @@ public:
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
     [[nodiscard]] meta_any operator*() const noexcept {
-        meta_any ret{};
+        meta_any ret{meta_ctx_arg, *ctx};
         vtable(operation::deref, storage, &ret);
         return ret;
     }
