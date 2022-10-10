@@ -104,7 +104,7 @@ class meta_factory {
                 Setter::size,
                 &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
                 &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
-                +[](const meta_ctx &area, meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(area, *instance.operator->(), value.as_ref()) || ...); },
+                +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
                 &meta_getter<Type, Getter, Policy>});
 
         bucket = &elem.prop;

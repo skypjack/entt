@@ -81,7 +81,7 @@ struct meta_data_node {
     size_type arity{0u};
     meta_type_node (*type)(const meta_context &) noexcept {};
     meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
-    bool (*set)(const meta_ctx &, meta_handle, meta_any){};
+    bool (*set)(meta_handle, meta_any){};
     meta_any (*get)(const meta_ctx &, meta_handle){};
     dense_map<id_type, meta_prop_node, identity> prop{};
 };

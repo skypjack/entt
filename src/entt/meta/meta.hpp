@@ -788,7 +788,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node->set && node->set(*ctx, std::move(instance), std::forward<Type>(value));
+        return node->set && node->set(std::move(instance), std::forward<Type>(value));
     }
 
     /**
