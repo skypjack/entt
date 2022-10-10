@@ -711,7 +711,7 @@ struct meta_prop {
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node->value ? node->type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, node->value.get()) : meta_any{};
+        return node->value ? node->type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, node->value.get()) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -913,7 +913,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return sz == arity() ? node->invoke(*ctx, std::move(instance), args) : meta_any{};
+        return sz == arity() ? node->invoke(*ctx, std::move(instance), args) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -1327,12 +1327,12 @@ public:
      * @return A wrapper that references the given instance.
      */
     meta_any from_void(void *element) const {
-        return (element && node.from_void) ? node.from_void(*ctx, element, nullptr) : meta_any{};
+        return (element && node.from_void) ? node.from_void(*ctx, element, nullptr) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /*! @copydoc from_void */
     meta_any from_void(const void *element) const {
-        return (element && node.from_void) ? node.from_void(*ctx, nullptr, element) : meta_any{};
+        return (element && node.from_void) ? node.from_void(*ctx, nullptr, element) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -1414,7 +1414,7 @@ public:
      */
     [[nodiscard]] meta_any get(const id_type id, meta_handle instance) const {
         const auto candidate = data(id);
-        return candidate ? candidate.get(std::move(instance)) : meta_any{};
+        return candidate ? candidate.get(std::move(instance)) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
