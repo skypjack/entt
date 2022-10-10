@@ -341,12 +341,12 @@ template<typename Type, typename Policy, typename Candidate, std::size_t... Inde
 }
 
 template<typename Type, typename... Args, std::size_t... Index>
-[[nodiscard]] meta_any meta_construct(meta_any *const args, std::index_sequence<Index...>) {
+[[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, meta_any *const args, std::index_sequence<Index...>) {
     if(((args + Index)->allow_cast<Args>() && ...)) {
-        return meta_any{std::in_place_type<Type>, (args + Index)->cast<Args>()...};
+        return meta_any{ctx, std::in_place_type<Type>, (args + Index)->cast<Args>()...};
     }
 
-    return meta_any{};
+    return meta_any{meta_ctx_arg, ctx};
 }
 
 } // namespace internal
@@ -425,8 +425,8 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
  * @return A meta any containing the new instance, if any.
  */
 template<typename Type, typename... Args>
-[[nodiscard]] meta_any meta_construct(const meta_ctx &ctx /*_TODO*/, meta_any *const args) {
-    return internal::meta_construct<Type, Args...>(args, std::index_sequence_for<Args...>{});
+[[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, meta_any *const args) {
+    return internal::meta_construct<Type, Args...>(ctx, args, std::index_sequence_for<Args...>{});
 }
 
 /**
