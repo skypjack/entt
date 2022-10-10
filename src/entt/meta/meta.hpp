@@ -196,13 +196,13 @@ class meta_any {
 public:
     /*! Default constructor. */
     meta_any() noexcept
-        : meta_any{locator<meta_ctx>::value_or()} {}
+        : meta_any{meta_ctx_arg, locator<meta_ctx>::value_or()} {}
 
     /**
      * @brief Context aware constructor.
      * @param area The context from which to search for meta types.
      */
-    meta_any(const meta_ctx &area) noexcept
+    meta_any(meta_ctx_arg_t, const meta_ctx &area) noexcept
         : storage{},
           ctx{&area},
           node{},
@@ -226,7 +226,7 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any> && !std::is_same_v<std::decay_t<Type>, meta_ctx>>>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(Type &&value)
         : meta_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
 
@@ -586,7 +586,7 @@ meta_any make_meta(Args &&...args) {
 template<typename Type>
 meta_any forward_as_meta(const meta_ctx &ctx, Type &&value) {
     // TODO it would be great if we had value and context construction support for meta_any
-    meta_any elem{ctx};
+    meta_any elem{meta_ctx_arg, ctx};
     elem.emplace<Type &&>(std::forward<Type>(value));
     return elem;
 }
