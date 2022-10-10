@@ -40,18 +40,19 @@ public:
     meta_sequence_container() noexcept = default;
 
     /**
-     * @brief Construct a proxy object for sequence containers.
+     * @brief Rebinds a proxy object to a sequence container type.
      * @tparam Type Type of container to wrap.
      * @param instance The container to wrap.
      */
     template<typename Type>
-    meta_sequence_container(std::in_place_type_t<Type>, any instance) noexcept
-        : value_type_node{&internal::resolve_TODO<typename Type::value_type>},
-          size_fn{&meta_sequence_container_traits<Type>::size},
-          resize_fn{&meta_sequence_container_traits<Type>::resize},
-          iter_fn{&meta_sequence_container_traits<Type>::iter},
-          insert_or_erase_fn{&meta_sequence_container_traits<Type>::insert_or_erase},
-          storage{std::move(instance)} {}
+    void rebind(any instance) noexcept {
+        value_type_node = &internal::resolve_TODO<typename Type::value_type>;
+        size_fn = &meta_sequence_container_traits<Type>::size;
+        resize_fn = &meta_sequence_container_traits<Type>::resize;
+        iter_fn = &meta_sequence_container_traits<Type>::iter;
+        insert_or_erase_fn = &meta_sequence_container_traits<Type>::insert_or_erase;
+        storage = std::move(instance);
+    }
 
     [[nodiscard]] inline meta_type value_type() const noexcept;
     [[nodiscard]] inline size_type size() const noexcept;
@@ -87,25 +88,25 @@ public:
     meta_associative_container() noexcept = default;
 
     /**
-     * @brief Construct a proxy object for associative containers.
+     * @brief Rebinds a proxy object to an associative container type.
      * @tparam Type Type of container to wrap.
      * @param instance The container to wrap.
      */
     template<typename Type>
-    meta_associative_container(std::in_place_type_t<Type>, any instance) noexcept
-        : key_only_container{meta_associative_container_traits<Type>::key_only},
-          key_type_node{&internal::resolve_TODO<typename Type::key_type>},
-          mapped_type_node{},
-          value_type_node{&internal::resolve_TODO<typename Type::value_type>},
-          size_fn{&meta_associative_container_traits<Type>::size},
-          clear_fn{&meta_associative_container_traits<Type>::clear},
-          iter_fn{&meta_associative_container_traits<Type>::iter},
-          insert_or_erase_fn{&meta_associative_container_traits<Type>::insert_or_erase},
-          find_fn{&meta_associative_container_traits<Type>::find},
-          storage{std::move(instance)} {
+    void rebind(any instance) noexcept {
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
             mapped_type_node = &internal::resolve_TODO<typename Type::mapped_type>;
         }
+
+        key_only_container = meta_associative_container_traits<Type>::key_only;
+        key_type_node = &internal::resolve_TODO<typename Type::key_type>;
+        value_type_node = &internal::resolve_TODO<typename Type::value_type>;
+        size_fn = &meta_associative_container_traits<Type>::size;
+        clear_fn = &meta_associative_container_traits<Type>::clear;
+        iter_fn = &meta_associative_container_traits<Type>::iter;
+        insert_or_erase_fn = &meta_associative_container_traits<Type>::insert_or_erase;
+        find_fn = &meta_associative_container_traits<Type>::find;
+        storage = std::move(instance);
     }
 
     [[nodiscard]] inline bool key_only() const noexcept;
@@ -169,12 +170,12 @@ class meta_any {
                 break;
             case operation::seq:
                 if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-                    *static_cast<meta_sequence_container *>(other) = {std::in_place_type<Type>, std::move(const_cast<any &>(value))};
+                    static_cast<meta_sequence_container *>(other)->rebind<Type>(std::move(const_cast<any &>(value)));
                 }
                 break;
             case operation::assoc:
                 if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-                    *static_cast<meta_associative_container *>(other) = {std::in_place_type<Type>, std::move(const_cast<any &>(value))};
+                    static_cast<meta_associative_container *>(other)->rebind<Type>(std::move(const_cast<any &>(value)));
                 }
                 break;
             }
