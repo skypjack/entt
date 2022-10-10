@@ -247,7 +247,7 @@ template<typename Type, auto Data>
  * @return True in case of success, false otherwise.
  */
 template<typename Type, auto Data>
-[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
+[[nodiscard]] bool meta_setter(meta_handle instance, meta_any value) {
     return meta_setter<Type, Data>(locator<meta_ctx>::value_or(), std::move(instance), std::move(value));
 }
 
@@ -298,7 +298,7 @@ template<typename Type, auto Data, typename Policy = as_is_t>
  * @return A meta any containing the value of the underlying variable.
  */
 template<typename Type, auto Data, typename Policy = as_is_t>
-[[nodiscard]] meta_any meta_getter([[maybe_unused]] meta_handle instance) {
+[[nodiscard]] meta_any meta_getter(meta_handle instance) {
     return meta_getter<Type, Data, Policy>(locator<meta_ctx>::value_or(), std::move(instance));
 }
 
