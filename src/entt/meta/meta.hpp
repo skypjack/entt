@@ -450,7 +450,7 @@ public:
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return {};
+            return meta_any{meta_ctx_arg, *ctx};
         } else {
             auto target = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
             return allow_cast({*ctx, target});
