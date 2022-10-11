@@ -126,6 +126,7 @@ public:
     inline bool clear();
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
+    inline bool insert(meta_any);
     inline bool insert(meta_any, meta_any);
     inline size_type erase(meta_any);
     [[nodiscard]] inline iterator find(meta_any);
@@ -1924,13 +1925,21 @@ inline bool meta_associative_container::clear() {
 }
 
 /**
- * @brief Inserts an element (a key/value pair) into a container.
+ * @brief Inserts a key only element into a container.
+ * @param key The key of the element to insert.
+ * @return A bool denoting whether the insertion took place.
+ */
+inline bool meta_associative_container::insert(meta_any key) {
+    return (insert_or_erase_fn(storage, key, meta_any{*ctx, std::in_place_type<void>}) != 0u);
+}
+
+/**
+ * @brief Inserts a key/value element into a container.
  * @param key The key of the element to insert.
  * @param value The value of the element to insert.
  * @return A bool denoting whether the insertion took place.
  */
-inline bool meta_associative_container::insert(meta_any key, meta_any value = std::in_place_type<void>) {
-    // TODO
+inline bool meta_associative_container::insert(meta_any key, meta_any value) {
     return (insert_or_erase_fn(storage, key, value) != 0u);
 }
 
@@ -1940,8 +1949,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = st
  * @return A bool denoting whether the removal took place.
  */
 inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
-    // TODO
-    return insert(std::move(key), {});
+    return insert(std::move(key), meta_any{meta_ctx_arg, *ctx});
 }
 
 /**
