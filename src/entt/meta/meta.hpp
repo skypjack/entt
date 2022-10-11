@@ -1328,8 +1328,7 @@ public:
             return node.default_constructor(*ctx);
         }
 
-        // TODO
-        return {};
+        return meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
