@@ -74,8 +74,8 @@ private:
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const any &) noexcept {};
     bool (*resize_fn)(any &, size_type){};
-    iterator (*iter_fn)(any &, const bool){};
-    iterator (*insert_or_erase_fn)(any &, const any &, meta_any &){};
+    iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
+    iterator (*insert_or_erase_fn)(const meta_ctx &, any &, const any &, meta_any &){};
     any storage{};
 };
 
@@ -1639,12 +1639,14 @@ public:
     using iterator_category = std::input_iterator_tag;
 
     constexpr meta_iterator() noexcept
-        : vtable{},
+        : ctx{},
+          vtable{},
           handle{} {}
 
     template<typename It>
-    explicit meta_iterator(It iter) noexcept
-        : vtable{&basic_vtable<It>},
+    explicit meta_iterator(const meta_ctx &area, It iter) noexcept
+        : ctx{&area},
+          vtable{&basic_vtable<It>},
           handle{std::move(iter)} {}
 
     meta_iterator &operator++() noexcept {
@@ -1670,8 +1672,7 @@ public:
     }
 
     [[nodiscard]] reference operator*() const {
-        // TODO
-        reference other;
+        reference other{meta_ctx_arg, *ctx};
         vtable(operation::deref, handle, 0, &other);
         return other;
     }
@@ -1693,6 +1694,7 @@ public:
     }
 
 private:
+    const meta_ctx *ctx;
     vtable_type *vtable;
     any handle;
 };
@@ -1820,7 +1822,7 @@ inline bool meta_sequence_container::clear() {
  * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
-    return iter_fn(storage, false);
+    return iter_fn(*ctx, storage, false);
 }
 
 /**
@@ -1828,7 +1830,7 @@ inline bool meta_sequence_container::clear() {
  * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
-    return iter_fn(storage, true);
+    return iter_fn(*ctx, storage, true);
 }
 
 /**
@@ -1838,7 +1840,7 @@ inline bool meta_sequence_container::clear() {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return insert_or_erase_fn(storage, it.handle, value);
+    return insert_or_erase_fn(*ctx, storage, it.handle, value);
 }
 
 /**
