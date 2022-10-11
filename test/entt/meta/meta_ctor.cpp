@@ -166,7 +166,7 @@ TEST_F(MetaCtor, FuncArithmeticConversion) {
 TEST_F(MetaCtor, FuncConstNonConstRefArgs) {
     int ivalue = 42;
     auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(ivalue));
-    auto other = entt::resolve<clazz_t>().construct(entt::make_meta<const int &>(ivalue));
+    auto other = entt::resolve<clazz_t>().construct(entt::forward_as_meta(std::as_const(ivalue)));
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);

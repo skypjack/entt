@@ -449,7 +449,7 @@ TEST_F(MetaFunc, ArgsByConstRef) {
     entt::meta_any any{2};
     int value = 3;
 
-    ASSERT_TRUE(func.invoke(instance, entt::make_meta<const int &>(value)));
+    ASSERT_TRUE(func.invoke(instance, entt::forward_as_meta(std::as_const(value))));
     ASSERT_EQ(func_t::value, 9);
 
     ASSERT_TRUE(func.invoke(instance, std::as_const(any).as_ref()));

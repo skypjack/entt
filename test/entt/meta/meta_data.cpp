@@ -342,11 +342,11 @@ TEST_F(MetaData, SetByRef) {
     int value{42};
 
     ASSERT_EQ(any.cast<clazz_t>().i, 0);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, entt::make_meta<int &>(value)));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, entt::forward_as_meta(value)));
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
 
     value = 3;
-    auto wrapper = entt::make_meta<int &>(value);
+    auto wrapper = entt::forward_as_meta(value);
 
     ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, wrapper.as_ref()));
     ASSERT_EQ(any.cast<clazz_t>().i, 3);
@@ -359,11 +359,11 @@ TEST_F(MetaData, SetByConstRef) {
     int value{42};
 
     ASSERT_EQ(any.cast<clazz_t>().i, 0);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, entt::make_meta<const int &>(value)));
+    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, entt::forward_as_meta(std::as_const(value))));
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
 
     value = 3;
-    auto wrapper = entt::make_meta<const int &>(value);
+    auto wrapper = entt::forward_as_meta(std::as_const(value));
 
     ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, wrapper.as_ref()));
     ASSERT_EQ(any.cast<clazz_t>().i, 3);

@@ -598,20 +598,6 @@ private:
 };
 
 /**
- * @brief Constructs a wrapper from a given type, passing it all arguments.
- * @tparam Type Type of object to use to initialize the wrapper.
- * @tparam Args Types of arguments to use to construct the new instance.
- * @param args Parameters to use to construct the instance.
- * @return A properly initialized wrapper for an object of the given type.
- */
-template<typename Type, typename... Args>
-meta_any make_meta(Args &&...args) {
-    return meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
-}
-
-// TODO context aware make_meta
-
-/**
  * @brief Forwards its argument and avoids copies for lvalue references.
  * @tparam Type Type of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.

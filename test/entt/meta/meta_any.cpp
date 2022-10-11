@@ -186,7 +186,7 @@ TEST_F(MetaAny, SBOAsRefConstruction) {
     ASSERT_NE(any, entt::meta_any{42});
     ASSERT_EQ(entt::meta_any{3}, any);
 
-    any = entt::make_meta<int &>(value);
+    any = entt::forward_as_meta(value);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -221,7 +221,7 @@ TEST_F(MetaAny, SBOAsConstRefConstruction) {
     ASSERT_NE(any, entt::meta_any{42});
     ASSERT_EQ(entt::meta_any{3}, any);
 
-    any = entt::make_meta<const int &>(value);
+    any = entt::forward_as_meta(std::as_const(value));
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
@@ -453,7 +453,7 @@ TEST_F(MetaAny, NoSBOAsRefConstruction) {
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
 
-    any = entt::make_meta<fat_t &>(instance);
+    any = entt::forward_as_meta(instance);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
@@ -486,7 +486,7 @@ TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
 
-    any = entt::make_meta<const fat_t &>(instance);
+    any = entt::forward_as_meta(std::as_const(instance));
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
@@ -1346,21 +1346,6 @@ TEST_F(MetaAny, SetGet) {
 
     ASSERT_FALSE(any.set("non_existent"_hs, 42));
     ASSERT_FALSE(any.get("non_existent"_hs));
-}
-
-TEST_F(MetaAny, MakeMeta) {
-    int value = 42;
-    auto any = entt::make_meta<int>(value);
-    auto ref = entt::make_meta<int &>(value);
-
-    ASSERT_TRUE(any);
-    ASSERT_TRUE(ref);
-
-    ASSERT_EQ(any.cast<const int &>(), 42);
-    ASSERT_EQ(ref.cast<const int &>(), 42);
-
-    ASSERT_NE(any.data(), &value);
-    ASSERT_EQ(ref.data(), &value);
 }
 
 TEST_F(MetaAny, ForwardAsMeta) {
