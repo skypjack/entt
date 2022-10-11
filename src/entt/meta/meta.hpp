@@ -659,20 +659,36 @@ struct meta_handle {
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
+     * @param value An instance of an object to use to initialize the handle.
+     */
+    meta_handle(meta_any &value) noexcept
+        : any{value.as_ref()} {}
+
+    /**
+     * @brief Creates a handle that points to an unmanaged object.
+     * @param value An instance of an object to use to initialize the handle.
+     */
+    meta_handle(const meta_any &value) noexcept
+        : any{value.as_ref()} {}
+
+    /**
+     * @brief Creates a handle that points to an unmanaged object.
+     * @tparam Type Type of object to use to initialize the handle.
+     * @param area The context from which to search for meta types.
+     * @param value An instance of an object to use to initialize the handle.
+     */
+    template<typename Type>
+    meta_handle(const meta_ctx &ctx, Type &value) noexcept
+        : any{ctx, std::in_place_type<Type &>, value} {}
+
+    /**
+     * @brief Creates a handle that points to an unmanaged object.
      * @tparam Type Type of object to use to initialize the handle.
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(Type &value) noexcept
-        : meta_handle{} {
-        if constexpr(std::is_same_v<std::decay_t<Type>, meta_any>) {
-            any = value.as_ref();
-        } else {
-            any.emplace<Type &>(value);
-        }
-    }
-
-    // TODO context aware constructor with value
+        : meta_handle{locator<meta_ctx>::value_or(), value} {}
 
     /**
      * @brief Returns false if a handle is invalid, true otherwise.
