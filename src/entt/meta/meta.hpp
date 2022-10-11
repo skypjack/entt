@@ -165,8 +165,7 @@ class meta_any {
             case operation::deref:
                 if constexpr(is_meta_pointer_like_v<Type>) {
                     if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
-                        // TODO
-                        *static_cast<meta_any *>(other) = any_cast<Type>(value);
+                        static_cast<meta_any *>(other)->emplace<Type>(any_cast<Type>(value));
                     } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
                         using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value)));
 
