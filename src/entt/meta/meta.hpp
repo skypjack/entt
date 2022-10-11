@@ -811,7 +811,6 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        // TODO propagate the context to the constructed value
         return node->set && node->set(std::move(instance), std::forward<Type>(value));
     }
 
@@ -952,7 +951,6 @@ struct meta_func {
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&...args) const {
-        // TODO
         meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
         return invoke(std::move(instance), arguments, sizeof...(Args));
     }
@@ -1342,7 +1340,6 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&...args) const {
-        // TODO
         meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
         return construct(arguments, sizeof...(Args));
     }
@@ -1410,7 +1407,6 @@ public:
      */
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
-        // TODO
         meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
         return invoke(id, std::move(instance), arguments, sizeof...(Args));
     }
@@ -1929,7 +1925,8 @@ inline bool meta_associative_container::clear() {
  * @return A bool denoting whether the insertion took place.
  */
 inline bool meta_associative_container::insert(meta_any key) {
-    return (insert_or_erase_fn(storage, key, meta_any{*ctx, std::in_place_type<void>}) != 0u);
+    meta_any value{*ctx, std::in_place_type<void>};
+    return (insert_or_erase_fn(storage, key, value) != 0u);
 }
 
 /**
