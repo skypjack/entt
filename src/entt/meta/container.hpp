@@ -114,15 +114,13 @@ struct basic_meta_associative_container_traits {
         return false;
     }
 
-    [[nodiscard]] static iterator iter(any &container, const bool as_end) {
-        // TODO
-
+    [[nodiscard]] static iterator iter(const meta_ctx &ctx, any &container, const bool as_end) {
         if(auto *const cont = any_cast<Type>(&container); cont) {
-            return iterator{std::bool_constant<key_only>{}, as_end ? cont->end() : cont->begin()};
+            return iterator{ctx, std::bool_constant<key_only>{}, as_end ? cont->end() : cont->begin()};
         }
 
         const auto &as_const = any_cast<const Type &>(container);
-        return iterator{std::bool_constant<key_only>{}, as_end ? as_const.end() : as_const.begin()};
+        return iterator{ctx, std::bool_constant<key_only>{}, as_end ? as_const.end() : as_const.begin()};
     }
 
     [[nodiscard]] static size_type insert_or_erase(any &container, meta_any &key, meta_any &value) {
@@ -141,15 +139,13 @@ struct basic_meta_associative_container_traits {
         return 0u;
     }
 
-    [[nodiscard]] static iterator find(any &container, meta_any &key) {
-        // TODO
-
+    [[nodiscard]] static iterator find(const meta_ctx &ctx, any &container, meta_any &key) {
         if(key.allow_cast<const typename Type::key_type &>()) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
-                return iterator{std::bool_constant<key_only>{}, cont->find(key.cast<const typename Type::key_type &>())};
+                return iterator{ctx, std::bool_constant<key_only>{}, cont->find(key.cast<const typename Type::key_type &>())};
             }
 
-            return iterator{std::bool_constant<key_only>{}, any_cast<const Type &>(container).find(key.cast<const typename Type::key_type &>())};
+            return iterator{ctx, std::bool_constant<key_only>{}, any_cast<const Type &>(container).find(key.cast<const typename Type::key_type &>())};
         }
 
         return iterator{};

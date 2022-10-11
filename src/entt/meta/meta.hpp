@@ -139,9 +139,9 @@ private:
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const any &) noexcept {};
     bool (*clear_fn)(any &){};
-    iterator (*iter_fn)(any &, const bool){};
+    iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
     size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &){};
-    iterator (*find_fn)(any &, meta_any &){};
+    iterator (*find_fn)(const meta_ctx &, any &, meta_any &){};
     any storage{};
 };
 
@@ -1733,12 +1733,14 @@ public:
     using iterator_category = std::input_iterator_tag;
 
     constexpr meta_iterator() noexcept
-        : vtable{},
+        : ctx{},
+          vtable{},
           handle{} {}
 
     template<bool KeyOnly, typename It>
-    meta_iterator(std::integral_constant<bool, KeyOnly>, It iter) noexcept
-        : vtable{&basic_vtable<KeyOnly, It>},
+    meta_iterator(const meta_ctx &area, std::integral_constant<bool, KeyOnly>, It iter) noexcept
+        : ctx{&area},
+          vtable{&basic_vtable<KeyOnly, It>},
           handle{std::move(iter)} {}
 
     meta_iterator &operator++() noexcept {
@@ -1752,8 +1754,7 @@ public:
     }
 
     [[nodiscard]] reference operator*() const {
-        // TODO
-        reference other;
+        reference other{{meta_ctx_arg, *ctx}, {meta_ctx_arg, *ctx}};
         vtable(operation::deref, handle, &other);
         return other;
     }
@@ -1775,6 +1776,7 @@ public:
     }
 
 private:
+    const meta_ctx *ctx;
     vtable_type *vtable;
     any handle;
 };
@@ -1913,12 +1915,12 @@ inline bool meta_associative_container::clear() {
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
-    return iter_fn(storage, false);
+    return iter_fn(*ctx, storage, false);
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
-    return iter_fn(storage, true);
+    return iter_fn(*ctx, storage, true);
 }
 
 /**
@@ -1948,7 +1950,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  * @return An iterator to the element with the given key, if any.
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
-    return find_fn(storage, key);
+    return find_fn(*ctx, storage, key);
 }
 
 /**
