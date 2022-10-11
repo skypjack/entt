@@ -64,7 +64,7 @@ template<typename Type>
         }
     }
 
-    return {};
+    return meta_type{};
 }
 
 /**

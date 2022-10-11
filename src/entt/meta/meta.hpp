@@ -164,6 +164,7 @@ class meta_any {
             case operation::deref:
                 if constexpr(is_meta_pointer_like_v<Type>) {
                     if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
+                        // TODO
                         *static_cast<meta_any *>(other) = any_cast<Type>(value);
                     } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
                         using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value)));
@@ -258,7 +259,7 @@ public:
      * @param area The context from which to search for meta types.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
+    template<typename Type>
     meta_any(const meta_ctx &area, Type &&value)
         : meta_any{area, std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
 
@@ -464,7 +465,7 @@ public:
             return meta_any{meta_ctx_arg, *ctx};
         } else {
             auto target = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
-            return allow_cast({*ctx, target});
+            return allow_cast(meta_type{*ctx, target});
         }
     }
 
@@ -478,9 +479,9 @@ public:
         auto target = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
 
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return allow_cast({*ctx, target}) && (storage.data() != nullptr);
+            return allow_cast(meta_type{*ctx, target}) && (storage.data() != nullptr);
         } else {
-            return allow_cast({*ctx, target});
+            return allow_cast(meta_type{*ctx, target});
         }
     }
 
@@ -608,6 +609,8 @@ meta_any make_meta(Args &&...args) {
     return meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
 }
 
+// TODO context aware make_meta
+
 /**
  * @brief Forwards its argument and avoids copies for lvalue references.
  * @tparam Type Type of argument to use to construct the new instance.
@@ -682,6 +685,8 @@ struct meta_handle {
             any.emplace<Type &>(value);
         }
     }
+
+    // TODO context aware constructor with value
 
     /**
      * @brief Returns false if a handle is invalid, true otherwise.
@@ -806,6 +811,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
+        // TODO propagate the context to the constructed value
         return node->set && node->set(std::move(instance), std::forward<Type>(value));
     }
 
@@ -1012,8 +1018,7 @@ class meta_type {
 
                     if(const auto &info = other.info(); info == type.info()) {
                         ++match;
-                    } else if(!((type.node.details && (type.node.details->base.contains(info.hash()) || type.node.details->conv.contains(info.hash())))
-                                || (type.node.conversion_helper && other.node.conversion_helper))) {
+                    } else if(!((type.node.details && (type.node.details->base.contains(info.hash()) || type.node.details->conv.contains(info.hash()))) || (type.node.conversion_helper && other.node.conversion_helper))) {
                         break;
                     }
                 }
@@ -1571,7 +1576,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return {*ctx, node->type(internal::meta_context::from(*ctx))};
+    return meta_type{*ctx, node->type(internal::meta_context::from(*ctx))};
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
@@ -1579,7 +1584,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return {*ctx, node->ret(internal::meta_context::from(*ctx))};
+    return meta_type{*ctx, node->ret(internal::meta_context::from(*ctx))};
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {

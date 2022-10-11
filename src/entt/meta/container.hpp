@@ -58,6 +58,8 @@ struct basic_meta_sequence_container_traits {
     }
 
     [[nodiscard]] static iterator iter(any &container, const bool as_end) {
+        // TODO
+
         if(auto *const cont = any_cast<Type>(&container); cont) {
             return iterator{as_end ? cont->end() : cont->begin()};
         }
@@ -67,6 +69,8 @@ struct basic_meta_sequence_container_traits {
     }
 
     [[nodiscard]] static iterator insert_or_erase([[maybe_unused]] any &container, [[maybe_unused]] const any &handle, [[maybe_unused]] meta_any &value) {
+        // TODO
+
         if constexpr(is_dynamic_sequence_container<Type>::value) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
                 typename Type::const_iterator it{};
@@ -114,6 +118,8 @@ struct basic_meta_associative_container_traits {
     }
 
     [[nodiscard]] static iterator iter(any &container, const bool as_end) {
+        // TODO
+
         if(auto *const cont = any_cast<Type>(&container); cont) {
             return iterator{std::bool_constant<key_only>{}, as_end ? cont->end() : cont->begin()};
         }
@@ -139,6 +145,8 @@ struct basic_meta_associative_container_traits {
     }
 
     [[nodiscard]] static iterator find(any &container, meta_any &key) {
+        // TODO
+
         if(key.allow_cast<const typename Type::key_type &>()) {
             if(auto *const cont = any_cast<Type>(&container); cont) {
                 return iterator{std::bool_constant<key_only>{}, cont->find(key.cast<const typename Type::key_type &>())};
