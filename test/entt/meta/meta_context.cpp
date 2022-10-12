@@ -233,7 +233,16 @@ TEST_F(MetaContext, MetaCtor) {
 TEST_F(MetaContext, MetaConv) {
     using namespace entt::literals;
 
-    // TODO
+    argument value{2};
+
+    auto global = entt::forward_as_meta(value);
+    auto local = entt::forward_as_meta(context, value);
+
+    ASSERT_TRUE(global.allow_cast<int>());
+    ASSERT_TRUE(local.allow_cast<int>());
+
+    ASSERT_EQ(global.cast<int>(), value.get());
+    ASSERT_EQ(local.cast<int>(), value.get_mul());
 }
 
 TEST_F(MetaContext, MetaDtor) {
@@ -279,6 +288,12 @@ TEST_F(MetaContext, MetaAny) {
 }
 
 TEST_F(MetaContext, MetaHandle) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, ForwardAsMeta) {
     using namespace entt::literals;
 
     // TODO
