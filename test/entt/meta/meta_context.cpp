@@ -60,6 +60,7 @@ class MetaContext: public ::testing::Test {
 
         entt::meta<clazz>()
             .type("foo"_hs)
+            .prop("prop"_hs, prop_value)
             .ctor<int>()
             .data<&clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
@@ -80,6 +81,7 @@ class MetaContext: public ::testing::Test {
 
         entt::meta<clazz>(context)
             .type("bar"_hs)
+            .prop("prop"_hs, prop_value)
             .base<base>()
             .ctor<char, int>()
             .dtor<&clazz::move_to_bucket>()
@@ -105,6 +107,7 @@ protected:
     static constexpr int global_marker = 1;
     static constexpr int local_marker = 42;
     static constexpr int bucket_value = 99;
+    static constexpr int prop_value = 3;
     entt::meta_ctx context{};
 };
 
@@ -273,7 +276,22 @@ TEST_F(MetaContext, MetaDtor) {
 }
 
 TEST_F(MetaContext, MetaProp) {
-    // TODO
+    using namespace entt::literals;
+
+    const auto global = entt::resolve<clazz>().prop("prop"_hs);
+    const auto local = entt::resolve<clazz>(context).prop("prop"_hs);
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(local);
+
+    ASSERT_EQ(global.value().type(), entt::resolve<int>());
+    ASSERT_EQ(local.value().type(), entt::resolve<int>(context));
+
+    ASSERT_EQ(global.value().cast<int>(), prop_value);
+    ASSERT_EQ(local.value().cast<int>(), prop_value);
+
+    ASSERT_EQ(global.value().type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.value().type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaTemplate) {
