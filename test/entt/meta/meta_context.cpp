@@ -3,7 +3,8 @@
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 
-struct clazz {};
+struct base {};
+struct clazz: base {};
 struct local_only {};
 
 struct MetaContext: ::testing::Test {
@@ -21,7 +22,8 @@ struct MetaContext: ::testing::Test {
             .type("quux"_hs);
 
         entt::meta<clazz>(context)
-            .type("bar"_hs);
+            .type("bar"_hs)
+            .base<base>();
     }
 
     void TearDown() override {
@@ -81,7 +83,19 @@ TEST_F(MetaContext, MetaType) {
 TEST_F(MetaContext, MetaBase) {
     using namespace entt::literals;
 
-    // TODO
+    const auto global = entt::resolve<clazz>();
+    const auto local = entt::resolve<clazz>(context);
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(local);
+
+    ASSERT_EQ((std::distance(global.base().cbegin(), global.base().cend())), 0);
+    ASSERT_EQ((std::distance(local.base().cbegin(), local.base().cend())), 1);
+
+    ASSERT_EQ(local.base().cbegin()->second.info(), entt::type_id<base>());
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<base>()));
+    ASSERT_FALSE(entt::resolve(context, entt::type_id<base>()));
 }
 
 TEST_F(MetaContext, MetaData) {
