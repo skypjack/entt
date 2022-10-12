@@ -61,6 +61,26 @@ struct as_void_t final {
      */
 };
 
+/**
+ * @brief Provides the member constant `value` to true if a type also is a meta
+ * policy, false otherwise.
+ * @tparam Type Type to check.
+ */
+template<typename Type>
+struct is_meta_policy
+    : std::disjunction<
+          std::is_same<Type, as_ref_t>,
+          std::is_same<Type, as_cref_t>,
+          std::is_same<Type, as_is_t>,
+          std::is_same<Type, as_void_t>> {};
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Type to check.
+ */
+template<typename Type>
+inline constexpr bool is_meta_policy_v = is_meta_policy<Type>::value;
+
 } // namespace entt
 
 #endif

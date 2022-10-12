@@ -274,7 +274,7 @@ public:
             internal::meta_ctor_node{
                 descriptor::args_type::size,
                 &meta_arg<typename descriptor::args_type>,
-                &meta_construct<Type, Args...>});
+                static_cast<decltype(internal::meta_ctor_node::invoke)>(&meta_construct<Type, Args...>)});
 
         bucket = nullptr;
         return *this;
