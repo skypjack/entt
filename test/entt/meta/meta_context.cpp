@@ -63,7 +63,19 @@ TEST_F(MetaContext, Resolve) {
 TEST_F(MetaContext, MetaType) {
     using namespace entt::literals;
 
-    // TODO
+    const auto global = entt::resolve<clazz>();
+    const auto local = entt::resolve<clazz>(context);
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(local);
+
+    ASSERT_NE(global, local);
+
+    ASSERT_EQ(global, entt::resolve("foo"_hs));
+    ASSERT_EQ(local, entt::resolve(context, "bar"_hs));
+
+    ASSERT_EQ(global.id(), "foo"_hs);
+    ASSERT_EQ(local.id(), "bar"_hs);
 }
 
 TEST_F(MetaContext, MetaBase) {

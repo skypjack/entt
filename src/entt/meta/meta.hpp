@@ -567,7 +567,7 @@ public:
 
     /*! @copydoc any::operator== */
     [[nodiscard]] bool operator==(const meta_any &other) const noexcept {
-        return (!node.info && !other.node.info) || (node.info && other.node.info && *node.info == *other.node.info && storage == other.storage);
+        return (ctx == other.ctx) && ((!node.info && !other.node.info) || (node.info && other.node.info && *node.info == *other.node.info && storage == other.storage));
     }
 
     /*! @copydoc any::operator!= */
@@ -1495,7 +1495,7 @@ public:
      * @return True if the objects refer to the same type, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_type &other) const noexcept {
-        return (!node.info && !other.node.info) || (node.info && other.node.info && *node.info == *other.node.info);
+        return (ctx == other.ctx) && ((!node.info && !other.node.info) || (node.info && other.node.info && *node.info == *other.node.info));
     }
 
 private:
