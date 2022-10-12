@@ -6,6 +6,14 @@
 struct base {};
 
 struct clazz: base {
+    int func(int v) {
+        return (value = v);
+    }
+
+    int cfunc(int v) const {
+        return v;
+    }
+
     int value{};
 };
 
@@ -42,7 +50,8 @@ struct MetaContext: ::testing::Test {
         entt::meta<clazz>()
             .type("foo"_hs)
             .data<&clazz::value>("value"_hs)
-            .data<&clazz::value>("rw"_hs);
+            .data<&clazz::value>("rw"_hs)
+            .func<&clazz::func>("func"_hs);
 
         // local context
 
@@ -59,7 +68,8 @@ struct MetaContext: ::testing::Test {
             .type("bar"_hs)
             .base<base>()
             .data<nullptr, &clazz::value>("value"_hs)
-            .data<&clazz::value>("rw"_hs);
+            .data<&clazz::value>("rw"_hs)
+            .func<&clazz::cfunc>("func"_hs);
     }
 
     void TearDown() override {
@@ -167,7 +177,31 @@ TEST_F(MetaContext, MetaData) {
 TEST_F(MetaContext, MetaFunc) {
     using namespace entt::literals;
 
-    // TODO
+    const auto global = entt::resolve<clazz>().func("func"_hs);
+    const auto local = entt::resolve<clazz>(context).func("func"_hs);
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(local);
+
+    ASSERT_FALSE(global.is_const());
+    ASSERT_TRUE(local.is_const());
+
+    ASSERT_EQ(global.arg(0).data("marker"_hs).get({}).cast<int>(), 1);
+    ASSERT_EQ(local.arg(0).data("marker"_hs).get({}).cast<int>(), 42);
+
+    ASSERT_EQ(global.ret().data("marker"_hs).get({}).cast<int>(), 1);
+    ASSERT_EQ(local.ret().data("marker"_hs).get({}).cast<int>(), 42);
+
+    clazz instance{};
+    const argument value{2};
+
+    ASSERT_NE(instance.value, value.get());
+    ASSERT_EQ(global.invoke(instance, value).cast<int>(), value.get());
+    ASSERT_EQ(instance.value, value.get());
+
+    ASSERT_NE(instance.value, value.get_mul());
+    ASSERT_EQ(local.invoke(entt::meta_handle{context, instance}, entt::meta_any{context, value}).cast<int>(), value.get_mul());
+    ASSERT_NE(instance.value, value.get_mul());
 }
 
 TEST_F(MetaContext, MetaCtor) {
