@@ -22,7 +22,12 @@ struct clazz: base {
         return v;
     }
 
+    static void move_to_bucket(const clazz &instance) {
+        bucket = instance.value;
+    }
+
     int value{};
+    static inline int bucket{};
 };
 
 struct local_only {};
@@ -43,11 +48,9 @@ private:
     int value{};
 };
 
-struct MetaContext: ::testing::Test {
-    void SetUp() override {
+class MetaContext: public ::testing::Test {
+    void init_global_context() {
         using namespace entt::literals;
-
-        // global context
 
         entt::meta<int>()
             .data<1>("marker"_hs);
@@ -61,8 +64,10 @@ struct MetaContext: ::testing::Test {
             .data<&clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::func>("func"_hs);
+    }
 
-        // local context
+    void init_local_context() {
+        using namespace entt::literals;
 
         entt::meta<int>(context)
             .data<42>("marker"_hs);
@@ -77,9 +82,18 @@ struct MetaContext: ::testing::Test {
             .type("bar"_hs)
             .base<base>()
             .ctor<char, int>()
+            .dtor<&clazz::move_to_bucket>()
             .data<nullptr, &clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::cfunc>("func"_hs);
+    }
+
+public:
+    void SetUp() override {
+        init_global_context();
+        init_local_context();
+
+        clazz::bucket = bucket_value;
     }
 
     void TearDown() override {
@@ -87,6 +101,8 @@ struct MetaContext: ::testing::Test {
         entt::meta_reset();
     }
 
+protected:
+    static constexpr int bucket_value = 42;
     entt::meta_ctx context{};
 };
 
@@ -248,7 +264,18 @@ TEST_F(MetaContext, MetaConv) {
 TEST_F(MetaContext, MetaDtor) {
     using namespace entt::literals;
 
-    // TODO
+    auto global = entt::resolve<clazz>().construct();
+    auto local = entt::resolve<clazz>(context).construct();
+
+    ASSERT_EQ(clazz::bucket, bucket_value);
+
+    global.reset();
+
+    ASSERT_EQ(clazz::bucket, bucket_value);
+
+    local.reset();
+
+    ASSERT_NE(clazz::bucket, bucket_value);
 }
 
 TEST_F(MetaContext, MetaProp) {
