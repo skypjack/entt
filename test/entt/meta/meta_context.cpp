@@ -153,8 +153,6 @@ TEST_F(MetaContext, MetaType) {
 }
 
 TEST_F(MetaContext, MetaBase) {
-    using namespace entt::literals;
-
     const auto global = entt::resolve<clazz>();
     const auto local = entt::resolve<clazz>(context);
 
@@ -231,8 +229,6 @@ TEST_F(MetaContext, MetaFunc) {
 }
 
 TEST_F(MetaContext, MetaCtor) {
-    using namespace entt::literals;
-
     const auto global = entt::resolve<clazz>();
     const auto local = entt::resolve<clazz>(context);
 
@@ -247,8 +243,6 @@ TEST_F(MetaContext, MetaCtor) {
 }
 
 TEST_F(MetaContext, MetaConv) {
-    using namespace entt::literals;
-
     argument value{2};
 
     auto global = entt::forward_as_meta(value);
@@ -262,8 +256,6 @@ TEST_F(MetaContext, MetaConv) {
 }
 
 TEST_F(MetaContext, MetaDtor) {
-    using namespace entt::literals;
-
     auto global = entt::resolve<clazz>().construct();
     auto local = entt::resolve<clazz>(context).construct();
 
@@ -279,55 +271,37 @@ TEST_F(MetaContext, MetaDtor) {
 }
 
 TEST_F(MetaContext, MetaProp) {
-    using namespace entt::literals;
-
     // TODO
 }
 
 TEST_F(MetaContext, MetaTemplate) {
-    using namespace entt::literals;
-
     // TODO
 }
 
 TEST_F(MetaContext, MetaPointer) {
-    using namespace entt::literals;
-
     // TODO
 }
 
 TEST_F(MetaContext, MetaAssociativeContainer) {
-    using namespace entt::literals;
-
     // TODO
 }
 
 TEST_F(MetaContext, MetaSequenceContainer) {
-    using namespace entt::literals;
-
     // TODO
 }
 
 TEST_F(MetaContext, MetaAny) {
-    using namespace entt::literals;
-
     // TODO
 }
 
 TEST_F(MetaContext, MetaHandle) {
-    using namespace entt::literals;
-
     // TODO
 }
 
 TEST_F(MetaContext, ForwardAsMeta) {
-    using namespace entt::literals;
-
     // TODO
 }
 
 TEST_F(MetaContext, ContextMix) {
-    using namespace entt::literals;
-
     // TODO
 }
