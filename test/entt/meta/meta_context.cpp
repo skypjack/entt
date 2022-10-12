@@ -6,6 +6,14 @@
 struct base {};
 
 struct clazz: base {
+    clazz() = default;
+
+    clazz(int)
+        : clazz{} {}
+
+    clazz(char, int)
+        : clazz{} {}
+
     int func(int v) {
         return (value = v);
     }
@@ -49,6 +57,7 @@ struct MetaContext: ::testing::Test {
 
         entt::meta<clazz>()
             .type("foo"_hs)
+            .ctor<int>()
             .data<&clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::func>("func"_hs);
@@ -67,6 +76,7 @@ struct MetaContext: ::testing::Test {
         entt::meta<clazz>(context)
             .type("bar"_hs)
             .base<base>()
+            .ctor<char, int>()
             .data<nullptr, &clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::cfunc>("func"_hs);
@@ -207,7 +217,17 @@ TEST_F(MetaContext, MetaFunc) {
 TEST_F(MetaContext, MetaCtor) {
     using namespace entt::literals;
 
-    // TODO
+    const auto global = entt::resolve<clazz>();
+    const auto local = entt::resolve<clazz>(context);
+
+    ASSERT_TRUE(global.construct());
+    ASSERT_TRUE(local.construct());
+
+    ASSERT_TRUE(global.construct(42));
+    ASSERT_FALSE(local.construct(42));
+
+    ASSERT_FALSE(global.construct('c', 42));
+    ASSERT_TRUE(local.construct('c', 42));
 }
 
 TEST_F(MetaContext, MetaConv) {
