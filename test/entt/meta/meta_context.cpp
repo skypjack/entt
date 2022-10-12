@@ -53,7 +53,7 @@ class MetaContext: public ::testing::Test {
         using namespace entt::literals;
 
         entt::meta<int>()
-            .data<1>("marker"_hs);
+            .data<global_marker>("marker"_hs);
 
         entt::meta<argument>()
             .conv<&argument::get>();
@@ -70,7 +70,7 @@ class MetaContext: public ::testing::Test {
         using namespace entt::literals;
 
         entt::meta<int>(context)
-            .data<42>("marker"_hs);
+            .data<local_marker>("marker"_hs);
 
         entt::meta<local_only>(context)
             .type("quux"_hs);
@@ -102,7 +102,9 @@ public:
     }
 
 protected:
-    static constexpr int bucket_value = 42;
+    static constexpr int global_marker = 1;
+    static constexpr int local_marker = 42;
+    static constexpr int bucket_value = 99;
     entt::meta_ctx context{};
 };
 
@@ -177,14 +179,14 @@ TEST_F(MetaContext, MetaData) {
     ASSERT_FALSE(global.is_const());
     ASSERT_TRUE(local.is_const());
 
-    ASSERT_EQ(global.type().data("marker"_hs).get({}).cast<int>(), 1);
-    ASSERT_EQ(local.type().data("marker"_hs).get({}).cast<int>(), 42);
+    ASSERT_EQ(global.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.type().data("marker"_hs).get({}).cast<int>(), local_marker);
 
     const auto grw = entt::resolve<clazz>().data("rw"_hs);
     const auto lrw = entt::resolve<clazz>(context).data("rw"_hs);
 
-    ASSERT_EQ(grw.arg(0).data("marker"_hs).get({}).cast<int>(), 1);
-    ASSERT_EQ(lrw.arg(0).data("marker"_hs).get({}).cast<int>(), 42);
+    ASSERT_EQ(grw.arg(0).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(lrw.arg(0).data("marker"_hs).get({}).cast<int>(), local_marker);
 
     clazz instance{};
     const argument value{2};
@@ -210,11 +212,11 @@ TEST_F(MetaContext, MetaFunc) {
     ASSERT_FALSE(global.is_const());
     ASSERT_TRUE(local.is_const());
 
-    ASSERT_EQ(global.arg(0).data("marker"_hs).get({}).cast<int>(), 1);
-    ASSERT_EQ(local.arg(0).data("marker"_hs).get({}).cast<int>(), 42);
+    ASSERT_EQ(global.arg(0).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.arg(0).data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ(global.ret().data("marker"_hs).get({}).cast<int>(), 1);
-    ASSERT_EQ(local.ret().data("marker"_hs).get({}).cast<int>(), 42);
+    ASSERT_EQ(global.ret().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.ret().data("marker"_hs).get({}).cast<int>(), local_marker);
 
     clazz instance{};
     const argument value{2};
@@ -235,11 +237,11 @@ TEST_F(MetaContext, MetaCtor) {
     ASSERT_TRUE(global.construct());
     ASSERT_TRUE(local.construct());
 
-    ASSERT_TRUE(global.construct(42));
-    ASSERT_FALSE(local.construct(42));
+    ASSERT_TRUE(global.construct(0));
+    ASSERT_FALSE(local.construct(0));
 
-    ASSERT_FALSE(global.construct('c', 42));
-    ASSERT_TRUE(local.construct('c', 42));
+    ASSERT_FALSE(global.construct('c', 0));
+    ASSERT_TRUE(local.construct('c', 0));
 }
 
 TEST_F(MetaContext, MetaConv) {
