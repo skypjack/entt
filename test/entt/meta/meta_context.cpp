@@ -59,3 +59,93 @@ TEST_F(MetaContext, Resolve) {
     ASSERT_EQ((std::distance(entt::resolve().cbegin(), entt::resolve().cend())), 1);
     ASSERT_EQ((std::distance(entt::resolve(context).cbegin(), entt::resolve(context).cend())), 2);
 }
+
+TEST_F(MetaContext, MetaType) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaBase) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaData) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaFunc) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaCtor) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaConv) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaDtor) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaProp) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaTemplate) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaPointer) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaAssociativeContainer) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaSequenceContainer) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaAny) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, MetaHandle) {
+    using namespace entt::literals;
+
+    // TODO
+}
+
+TEST_F(MetaContext, ContextMix) {
+    using namespace entt::literals;
+
+    // TODO
+}
