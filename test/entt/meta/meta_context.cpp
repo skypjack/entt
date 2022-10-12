@@ -2,6 +2,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
+#include <entt/meta/template.hpp>
 
 struct base {};
 
@@ -48,6 +49,9 @@ private:
     int value{};
 };
 
+template<typename...>
+struct template_clazz {};
+
 class MetaContext: public ::testing::Test {
     void init_global_context() {
         using namespace entt::literals;
@@ -65,6 +69,9 @@ class MetaContext: public ::testing::Test {
             .data<&clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::func>("func"_hs);
+
+        entt::meta<template_clazz<int>>()
+            .type("template"_hs);
     }
 
     void init_local_context() {
@@ -88,6 +95,9 @@ class MetaContext: public ::testing::Test {
             .data<nullptr, &clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::cfunc>("func"_hs);
+
+        entt::meta<template_clazz<int, char>>(context)
+            .type("template"_hs);
     }
 
 public:
@@ -135,8 +145,8 @@ TEST_F(MetaContext, Resolve) {
     ASSERT_FALSE(entt::resolve("quux"_hs));
     ASSERT_TRUE(entt::resolve(context, "quux"_hs));
 
-    ASSERT_EQ((std::distance(entt::resolve().cbegin(), entt::resolve().cend())), 3);
-    ASSERT_EQ((std::distance(entt::resolve(context).cbegin(), entt::resolve(context).cend())), 4);
+    ASSERT_EQ((std::distance(entt::resolve().cbegin(), entt::resolve().cend())), 4);
+    ASSERT_EQ((std::distance(entt::resolve(context).cbegin(), entt::resolve(context).cend())), 5);
 }
 
 TEST_F(MetaContext, MetaType) {
@@ -188,8 +198,8 @@ TEST_F(MetaContext, MetaData) {
     const auto grw = entt::resolve<clazz>().data("rw"_hs);
     const auto lrw = entt::resolve<clazz>(context).data("rw"_hs);
 
-    ASSERT_EQ(grw.arg(0).data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(lrw.arg(0).data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(grw.arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(lrw.arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 
     clazz instance{};
     const argument value{2};
@@ -215,8 +225,8 @@ TEST_F(MetaContext, MetaFunc) {
     ASSERT_FALSE(global.is_const());
     ASSERT_TRUE(local.is_const());
 
-    ASSERT_EQ(global.arg(0).data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(local.arg(0).data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(global.arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 
     ASSERT_EQ(global.ret().data("marker"_hs).get({}).cast<int>(), global_marker);
     ASSERT_EQ(local.ret().data("marker"_hs).get({}).cast<int>(), local_marker);
@@ -295,7 +305,23 @@ TEST_F(MetaContext, MetaProp) {
 }
 
 TEST_F(MetaContext, MetaTemplate) {
-    // TODO
+    using namespace entt::literals;
+
+    const auto global = entt::resolve("template"_hs);
+    const auto local = entt::resolve(context, "template"_hs);
+
+    ASSERT_TRUE(global.is_template_specialization());
+    ASSERT_TRUE(local.is_template_specialization());
+
+    ASSERT_EQ(global.template_arity(), 1u);
+    ASSERT_EQ(local.template_arity(), 2u);
+
+    ASSERT_EQ(global.template_arg(0u), entt::resolve<int>());
+    ASSERT_EQ(local.template_arg(0u), entt::resolve<int>(context));
+    ASSERT_EQ(local.template_arg(1u), entt::resolve<char>(context));
+
+    ASSERT_EQ(global.template_arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.template_arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaPointer) {
