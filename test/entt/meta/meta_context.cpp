@@ -4,8 +4,28 @@
 #include <entt/meta/factory.hpp>
 
 struct base {};
-struct clazz: base {};
+
+struct clazz: base {
+    int value{};
+};
+
 struct local_only {};
+
+struct argument {
+    argument(int val)
+        : value{val} {}
+
+    int get() const {
+        return value;
+    }
+
+    int get_mul() const {
+        return value * 2;
+    }
+
+private:
+    int value{};
+};
 
 struct MetaContext: ::testing::Test {
     void SetUp() override {
@@ -13,17 +33,33 @@ struct MetaContext: ::testing::Test {
 
         // global context
 
+        entt::meta<int>()
+            .data<1>("marker"_hs);
+
+        entt::meta<argument>()
+            .conv<&argument::get>();
+
         entt::meta<clazz>()
-            .type("foo"_hs);
+            .type("foo"_hs)
+            .data<&clazz::value>("value"_hs)
+            .data<&clazz::value>("rw"_hs);
 
         // local context
+
+        entt::meta<int>(context)
+            .data<42>("marker"_hs);
 
         entt::meta<local_only>(context)
             .type("quux"_hs);
 
+        entt::meta<argument>(context)
+            .conv<&argument::get_mul>();
+
         entt::meta<clazz>(context)
             .type("bar"_hs)
-            .base<base>();
+            .base<base>()
+            .data<nullptr, &clazz::value>("value"_hs)
+            .data<&clazz::value>("rw"_hs);
     }
 
     void TearDown() override {
@@ -58,8 +94,8 @@ TEST_F(MetaContext, Resolve) {
     ASSERT_FALSE(entt::resolve("quux"_hs));
     ASSERT_TRUE(entt::resolve(context, "quux"_hs));
 
-    ASSERT_EQ((std::distance(entt::resolve().cbegin(), entt::resolve().cend())), 1);
-    ASSERT_EQ((std::distance(entt::resolve(context).cbegin(), entt::resolve(context).cend())), 2);
+    ASSERT_EQ((std::distance(entt::resolve().cbegin(), entt::resolve().cend())), 3);
+    ASSERT_EQ((std::distance(entt::resolve(context).cbegin(), entt::resolve(context).cend())), 4);
 }
 
 TEST_F(MetaContext, MetaType) {
@@ -86,9 +122,6 @@ TEST_F(MetaContext, MetaBase) {
     const auto global = entt::resolve<clazz>();
     const auto local = entt::resolve<clazz>(context);
 
-    ASSERT_TRUE(global);
-    ASSERT_TRUE(local);
-
     ASSERT_EQ((std::distance(global.base().cbegin(), global.base().cend())), 0);
     ASSERT_EQ((std::distance(local.base().cbegin(), local.base().cend())), 1);
 
@@ -101,7 +134,34 @@ TEST_F(MetaContext, MetaBase) {
 TEST_F(MetaContext, MetaData) {
     using namespace entt::literals;
 
-    // TODO
+    const auto global = entt::resolve<clazz>().data("value"_hs);
+    const auto local = entt::resolve<clazz>(context).data("value"_hs);
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(local);
+
+    ASSERT_FALSE(global.is_const());
+    ASSERT_TRUE(local.is_const());
+
+    ASSERT_EQ(global.type().data("marker"_hs).get({}).cast<int>(), 1);
+    ASSERT_EQ(local.type().data("marker"_hs).get({}).cast<int>(), 42);
+
+    const auto grw = entt::resolve<clazz>().data("rw"_hs);
+    const auto lrw = entt::resolve<clazz>(context).data("rw"_hs);
+
+    ASSERT_EQ(grw.arg(0).data("marker"_hs).get({}).cast<int>(), 1);
+    ASSERT_EQ(lrw.arg(0).data("marker"_hs).get({}).cast<int>(), 42);
+
+    clazz instance{};
+    const argument value{2};
+
+    grw.set(instance, value);
+
+    ASSERT_EQ(instance.value, value.get());
+
+    lrw.set(entt::meta_handle{context, instance}, entt::meta_any{context, value});
+
+    ASSERT_EQ(instance.value, value.get_mul());
 }
 
 TEST_F(MetaContext, MetaFunc) {
