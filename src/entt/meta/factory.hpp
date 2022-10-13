@@ -266,15 +266,18 @@ public:
      */
     template<typename... Args>
     auto ctor() noexcept {
-        using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
+        // default constructor is already implicitly generated, no need for redundancy
+        if constexpr(sizeof...(Args) != 0u) {
+            using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
 
-        internal::meta_extend(
-            internal::owner(*ctx, *info),
-            type_id<typename descriptor::args_type>().hash(),
-            internal::meta_ctor_node{
-                descriptor::args_type::size,
-                &meta_arg<typename descriptor::args_type>,
-                static_cast<decltype(internal::meta_ctor_node::invoke)>(&meta_construct<Type, Args...>)});
+            internal::meta_extend(
+                internal::owner(*ctx, *info),
+                type_id<typename descriptor::args_type>().hash(),
+                internal::meta_ctor_node{
+                    descriptor::args_type::size,
+                    &meta_arg<typename descriptor::args_type>,
+                    &meta_construct<Type, Args...>});
+        }
 
         bucket = nullptr;
         return *this;
