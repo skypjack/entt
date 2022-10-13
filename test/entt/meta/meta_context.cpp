@@ -327,7 +327,21 @@ TEST_F(MetaContext, MetaTemplate) {
 }
 
 TEST_F(MetaContext, MetaPointer) {
-    // TODO
+    using namespace entt::literals;
+
+    int value = 42;
+
+    const entt::meta_any global{&value};
+    const entt::meta_any local{context, &value};
+
+    ASSERT_TRUE(global.type().is_pointer());
+    ASSERT_TRUE(local.type().is_pointer());
+
+    ASSERT_TRUE(global.type().is_pointer_like());
+    ASSERT_TRUE(local.type().is_pointer_like());
+
+    ASSERT_EQ((*global).type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ((*local).type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaAssociativeContainer) {
