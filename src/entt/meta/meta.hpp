@@ -639,24 +639,6 @@ struct meta_handle {
     meta_handle(meta_ctx_arg_t, const meta_ctx &area) noexcept
         : any{meta_ctx_arg, area} {}
 
-    /*! @brief Default copy constructor, deleted on purpose. */
-    meta_handle(const meta_handle &) = delete;
-
-    /*! @brief Default move constructor. */
-    meta_handle(meta_handle &&) = default;
-
-    /**
-     * @brief Default copy assignment operator, deleted on purpose.
-     * @return This meta handle.
-     */
-    meta_handle &operator=(const meta_handle &) = delete;
-
-    /**
-     * @brief Default move assignment operator.
-     * @return This meta handle.
-     */
-    meta_handle &operator=(meta_handle &&) = default;
-
     /**
      * @brief Creates a handle that points to an unmanaged object.
      * @param value An instance of an object to use to initialize the handle.
@@ -689,6 +671,24 @@ struct meta_handle {
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(Type &value) noexcept
         : meta_handle{locator<meta_ctx>::value_or(), value} {}
+
+    /*! @brief Default copy constructor, deleted on purpose. */
+    meta_handle(const meta_handle &) = delete;
+
+    /*! @brief Default move constructor. */
+    meta_handle(meta_handle &&) = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This meta handle.
+     */
+    meta_handle &operator=(const meta_handle &) = delete;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This meta handle.
+     */
+    meta_handle &operator=(meta_handle &&) = default;
 
     /**
      * @brief Returns false if a handle is invalid, true otherwise.
