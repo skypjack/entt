@@ -347,7 +347,30 @@ TEST_F(MetaContext, MetaPointer) {
 }
 
 TEST_F(MetaContext, MetaAssociativeContainer) {
-    // TODO
+    using namespace entt::literals;
+
+    std::unordered_map<int, int> map{{{0, 0}}};
+
+    auto global = entt::forward_as_meta(map).as_associative_container();
+    auto local = entt::forward_as_meta(context, map).as_associative_container();
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(local);
+
+    ASSERT_EQ(global.size(), 1u);
+    ASSERT_EQ(local.size(), 1u);
+
+    ASSERT_EQ(global.key_type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.key_type().data("marker"_hs).get({}).cast<int>(), local_marker);
+
+    ASSERT_EQ(global.mapped_type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.mapped_type().data("marker"_hs).get({}).cast<int>(), local_marker);
+
+    ASSERT_EQ((*global.begin()).first.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ((*local.begin()).first.type().data("marker"_hs).get({}).cast<int>(), local_marker);
+
+    ASSERT_EQ((*global.begin()).second.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ((*local.begin()).second.type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaSequenceContainer) {
@@ -372,7 +395,26 @@ TEST_F(MetaContext, MetaSequenceContainer) {
 }
 
 TEST_F(MetaContext, MetaAny) {
-    // TODO
+    using namespace entt::literals;
+
+    entt::meta_any global{42};
+    entt::meta_any ctx_value{context, 42};
+    entt::meta_any in_place{context, std::in_place_type<int>, 42};
+    entt::meta_any two_step_local{entt::meta_ctx_arg, context};
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(ctx_value);
+    ASSERT_TRUE(in_place);
+    ASSERT_FALSE(two_step_local);
+
+    two_step_local = 42;
+
+    ASSERT_TRUE(two_step_local);
+
+    ASSERT_EQ(global.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(ctx_value.type().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(in_place.type().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(two_step_local.type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaHandle) {
