@@ -418,7 +418,25 @@ TEST_F(MetaContext, MetaAny) {
 }
 
 TEST_F(MetaContext, MetaHandle) {
-    // TODO
+    using namespace entt::literals;
+
+    int value = 42;
+
+    entt::meta_handle global{value};
+    entt::meta_handle ctx_value{context, value};
+    entt::meta_handle two_step_local{entt::meta_ctx_arg, context};
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(ctx_value);
+    ASSERT_FALSE(two_step_local);
+
+    two_step_local->emplace<int &>(value);
+
+    ASSERT_TRUE(two_step_local);
+
+    ASSERT_EQ(global->type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(ctx_value->type().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(two_step_local->type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, ForwardAsMeta) {
