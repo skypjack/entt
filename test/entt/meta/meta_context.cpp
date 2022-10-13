@@ -1,3 +1,5 @@
+#include <unordered_map>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/container.hpp>
@@ -349,7 +351,24 @@ TEST_F(MetaContext, MetaAssociativeContainer) {
 }
 
 TEST_F(MetaContext, MetaSequenceContainer) {
-    // TODO
+    using namespace entt::literals;
+
+    std::vector<int> vec{0};
+
+    auto global = entt::forward_as_meta(vec).as_sequence_container();
+    auto local = entt::forward_as_meta(context, vec).as_sequence_container();
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(local);
+
+    ASSERT_EQ(global.size(), 1u);
+    ASSERT_EQ(local.size(), 1u);
+
+    ASSERT_EQ(global.value_type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.value_type().data("marker"_hs).get({}).cast<int>(), local_marker);
+
+    ASSERT_EQ((*global.begin()).type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ((*local.begin()).type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaAny) {
