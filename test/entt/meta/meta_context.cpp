@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/meta/container.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
+#include <entt/meta/pointer.hpp>
 #include <entt/meta/template.hpp>
 
 struct base {};
@@ -345,7 +347,16 @@ TEST_F(MetaContext, MetaHandle) {
 }
 
 TEST_F(MetaContext, ForwardAsMeta) {
-    // TODO
+    using namespace entt::literals;
+
+    const auto global = entt::forward_as_meta(42);
+    const auto local = entt::forward_as_meta(context, 42);
+
+    ASSERT_TRUE(global);
+    ASSERT_TRUE(local);
+
+    ASSERT_EQ(global.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, ContextMix) {
