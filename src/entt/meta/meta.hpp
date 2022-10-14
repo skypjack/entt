@@ -835,7 +835,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node->set && node->set(std::move(instance), std::forward<Type>(value));
+        return node->set && node->set(std::move(instance), meta_any{*ctx, std::forward<Type>(value)});
     }
 
     /**
@@ -975,7 +975,7 @@ struct meta_func {
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&...args) const {
-        meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
+        meta_any arguments[sizeof...(Args) + 1u]{{*ctx, std::forward<Args>(args)}...};
         return invoke(std::move(instance), arguments, sizeof...(Args));
     }
 
@@ -1364,7 +1364,7 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&...args) const {
-        meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
+        meta_any arguments[sizeof...(Args) + 1u]{{*ctx, std::forward<Args>(args)}...};
         return construct(arguments, sizeof...(Args));
     }
 
@@ -1431,7 +1431,7 @@ public:
      */
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
-        meta_any arguments[sizeof...(Args) + 1u]{std::forward<Args>(args)...};
+        meta_any arguments[sizeof...(Args) + 1u]{{*ctx, std::forward<Args>(args)}...}; // TODO
         return invoke(id, std::move(instance), arguments, sizeof...(Args));
     }
 

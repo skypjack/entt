@@ -13,11 +13,11 @@ struct base {};
 struct clazz: base {
     clazz() = default;
 
-    clazz(int)
-        : clazz{} {}
+    clazz(int v)
+        : value{v} {}
 
-    clazz(char, int)
-        : clazz{} {}
+    clazz(char, int v)
+        : value{v} {}
 
     int func(int v) {
         return (value = v);
@@ -169,6 +169,17 @@ TEST_F(MetaContext, MetaType) {
 
     ASSERT_EQ(global.id(), "foo"_hs);
     ASSERT_EQ(local.id(), "bar"_hs);
+
+    clazz instance{};
+    const argument value{2};
+
+    ASSERT_NE(instance.value, value.get());
+    ASSERT_EQ(global.invoke("func"_hs, instance, value).cast<int>(), value.get());
+    ASSERT_EQ(instance.value, value.get());
+
+    ASSERT_NE(instance.value, value.get_mul());
+    ASSERT_EQ(local.invoke("func"_hs, instance, value).cast<int>(), value.get_mul());
+    ASSERT_NE(instance.value, value.get_mul());
 }
 
 TEST_F(MetaContext, MetaBase) {
@@ -208,12 +219,12 @@ TEST_F(MetaContext, MetaData) {
     clazz instance{};
     const argument value{2};
 
-    grw.set(instance, value);
-
+    ASSERT_NE(instance.value, value.get());
+    ASSERT_TRUE(grw.set(instance, value));
     ASSERT_EQ(instance.value, value.get());
 
-    lrw.set(entt::meta_handle{context, instance}, entt::meta_any{context, value});
-
+    ASSERT_NE(instance.value, value.get_mul());
+    ASSERT_TRUE(lrw.set(instance, value));
     ASSERT_EQ(instance.value, value.get_mul());
 }
 
@@ -243,7 +254,7 @@ TEST_F(MetaContext, MetaFunc) {
     ASSERT_EQ(instance.value, value.get());
 
     ASSERT_NE(instance.value, value.get_mul());
-    ASSERT_EQ(local.invoke(entt::meta_handle{context, instance}, entt::meta_any{context, value}).cast<int>(), value.get_mul());
+    ASSERT_EQ(local.invoke(instance, value).cast<int>(), value.get_mul());
     ASSERT_NE(instance.value, value.get_mul());
 }
 
@@ -251,14 +262,30 @@ TEST_F(MetaContext, MetaCtor) {
     const auto global = entt::resolve<clazz>();
     const auto local = entt::resolve<clazz>(context);
 
-    ASSERT_TRUE(global.construct());
-    ASSERT_TRUE(local.construct());
+    auto any = global.construct();
+    auto other = local.construct();
 
-    ASSERT_TRUE(global.construct(0));
-    ASSERT_FALSE(local.construct(0));
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(other);
 
-    ASSERT_FALSE(global.construct('c', 0));
-    ASSERT_TRUE(local.construct('c', 0));
+    ASSERT_EQ(any.cast<const clazz &>().value, 0);
+    ASSERT_EQ(other.cast<const clazz &>().value, 0);
+
+    argument argument{2};
+
+    any = global.construct(argument);
+    other = local.construct(argument);
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(other);
+    ASSERT_EQ(any.cast<const clazz &>().value, 2);
+
+    any = global.construct('c', argument);
+    other = local.construct('c', argument);
+
+    ASSERT_FALSE(any);
+    ASSERT_TRUE(other);
+    ASSERT_EQ(other.cast<const clazz &>().value, 4);
 }
 
 TEST_F(MetaContext, MetaConv) {
