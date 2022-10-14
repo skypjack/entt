@@ -986,3 +986,38 @@ std::swap(context, other);
 
 This can be useful for testing purposes or to define multiple contexts with
 different meta objects to be used as appropriate.
+
+If _replacing_ the default context isn't enough, `EnTT` also offers the ability
+to use multiple and externally managed contexts with the runtime reflection
+system.<br/>
+For example, to create new meta types within a context other than the default
+one, simply pass it as an argument to the `meta` call:
+
+```cpp
+entt::meta_ctx context{};
+auto factory = entt::meta<my_type>(context).type("reflected_type"_hs);
+```
+
+By doing so, the new meta type won't be available in the default context but
+will be usable by passing around the new context when needed, such as when
+creating a new `meta_any` object:
+
+```cpp
+entt::meta_any any{context, std::in_place_type<my_type>};
+```
+
+Similarly, to search for meta types in a context other than the default one, it
+will be necessary to pass it to the `resolve` function:
+
+```cpp
+entt::meta_type type = entt::resolve(context, "reflected_type"_hs)
+```
+
+More generally, when using externally managed contexts, it's always required to
+provide the system with the context to use, at least at the _entry point_.<br/>
+For example, once the `meta_type` instant is obtained, it's no longer necessary
+to pass the context around as the meta type takes the information with it and
+eventually propagates it to all its parts.<br/>
+On the other hand, it's necessary to instruct the library on where meta types
+are to be fetched when `meta_any`s and `meta_handle`s are constructed, a factory
+created or a meta type resolved.
