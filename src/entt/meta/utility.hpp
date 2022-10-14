@@ -150,6 +150,11 @@ using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::t
 
 /**
  * @brief Wraps a value depending on the given policy.
+ *
+ * This function always returns a wrapped value in the requested context.<br/>
+ * Therefore, if the passed value is itself a wrapped object with a different
+ * context, it undergoes a rebinding to the requested context.
+ *
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Type Type of value to wrap.
  * @param ctx The context from which to search for meta types.
@@ -208,6 +213,11 @@ template<typename Type>
 
 /**
  * @brief Sets the value of a given variable.
+ *
+ * @warning
+ * The context of instances and arguments is not changed.<br/>
+ * Therefore, it's up to the caller to wrap any objects correctly.
+ *
  * @tparam Type Reflected type to which the variable is associated.
  * @tparam Data The actual variable to set.
  * @param instance An opaque instance of the underlying type, if required.
@@ -251,6 +261,11 @@ template<typename Type, auto Data>
 
 /**
  * @brief Gets the value of a given variable.
+ *
+ * @warning
+ * The context of instances and arguments is not changed.<br/>
+ * Therefore, it's up to the caller to wrap any objects correctly.
+ *
  * @tparam Type Reflected type to which the variable is associated.
  * @tparam Data The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
@@ -356,6 +371,11 @@ template<typename Type, typename... Args, std::size_t... Index>
 
 /**
  * @brief Tries to _invoke_ an object given a list of erased parameters.
+ *
+ * @warning
+ * The context of instances and arguments is not changed.<br/>
+ * Therefore, it's up to the caller to wrap any objects correctly.
+ *
  * @tparam Type Reflected type to which the object to _invoke_ is associated.
  * @tparam Policy Optional policy (no policy set by default).
  * @param ctx The context from which to search for meta types.
@@ -387,6 +407,11 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
 
 /**
  * @brief Tries to invoke a function given a list of erased parameters.
+ *
+ * @warning
+ * The context of instances and arguments is not changed.<br/>
+ * Therefore, it's up to the caller to wrap any objects correctly.
+ *
  * @tparam Type Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
@@ -416,6 +441,11 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
 
 /**
  * @brief Tries to construct an instance given a list of erased parameters.
+ *
+ * @warning
+ * The context of instances and arguments is not changed.<br/>
+ * Therefore, it's up to the caller to wrap any objects correctly.
+ *
  * @tparam Type Actual type of the instance to construct.
  * @tparam Args Types of arguments expected.
  * @param ctx The context from which to search for meta types.
@@ -441,6 +471,11 @@ template<typename Type, typename... Args>
 
 /**
  * @brief Tries to construct an instance given a list of erased parameters.
+ *
+ * @warning
+ * The context of instances and arguments is not changed.<br/>
+ * Therefore, it's up to the caller to wrap any objects correctly.
+ *
  * @tparam Type Reflected type to which the object to _invoke_ is associated.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Candidate The type of the actual object to _invoke_.
@@ -474,6 +509,11 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
 
 /**
  * @brief Tries to construct an instance given a list of erased parameters.
+ *
+ * @warning
+ * The context of instances and arguments is not changed.<br/>
+ * Therefore, it's up to the caller to wrap any objects correctly.
+ *
  * @tparam Type Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
