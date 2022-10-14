@@ -1337,11 +1337,7 @@ public:
      */
     [[nodiscard]] meta_any construct(meta_any *const args, const size_type sz) const {
         if(node.details) {
-            const auto *candidate = lookup(args, sz, false, [first = node.details->ctor.cbegin(), last = node.details->ctor.cend()]() mutable {
-                return first == last ? nullptr : &(first++)->second;
-            });
-
-            if(candidate) {
+            if(const auto *candidate = lookup(args, sz, false, [first = node.details->ctor.cbegin(), last = node.details->ctor.cend()]() mutable { return first == last ? nullptr : &(first++)->second; }); candidate) {
                 return candidate->invoke(*ctx, args);
             }
         }
@@ -1399,11 +1395,7 @@ public:
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
         if(node.details) {
             if(auto it = node.details->func.find(id); it != node.details->func.cend()) {
-                const auto *candidate = lookup(args, sz, (instance->data() == nullptr), [curr = &it->second]() mutable {
-                    return curr ? std::exchange(curr, curr->next.get()) : nullptr;
-                });
-
-                if(candidate) {
+                if(const auto *candidate = lookup(args, sz, (instance->data() == nullptr), [curr = &it->second]() mutable { return curr ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
                     return candidate->invoke(*ctx, std::move(instance), args);
                 }
             }
