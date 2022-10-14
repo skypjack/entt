@@ -8,16 +8,29 @@
 #include <entt/meta/pointer.hpp>
 #include <entt/meta/template.hpp>
 
-struct base {};
+struct base {
+    base() = default;
+
+    base(char v)
+        : value{v} {}
+
+    char get() const {
+        return value;
+    }
+
+    char value;
+};
 
 struct clazz: base {
     clazz() = default;
 
     clazz(int v)
-        : value{v} {}
+        : base{},
+          value{v} {}
 
-    clazz(char, int v)
-        : value{v} {}
+    clazz(char c, int v)
+        : base{c},
+          value{v} {}
 
     int func(int v) {
         return (value = v);
@@ -90,6 +103,10 @@ class MetaContext: public ::testing::Test {
         entt::meta<argument>(context)
             .conv<&argument::get_mul>();
 
+        entt::meta<base>(context)
+            .data<&base::value>("char"_hs)
+            .func<&base::get>("get"_hs);
+
         entt::meta<clazz>(context)
             .type("bar"_hs)
             .prop("prop"_hs, prop_value)
@@ -150,7 +167,7 @@ TEST_F(MetaContext, Resolve) {
     ASSERT_TRUE(entt::resolve(context, "quux"_hs));
 
     ASSERT_EQ((std::distance(entt::resolve().cbegin(), entt::resolve().cend())), 4);
-    ASSERT_EQ((std::distance(entt::resolve(context).cbegin(), entt::resolve(context).cend())), 5);
+    ASSERT_EQ((std::distance(entt::resolve(context).cbegin(), entt::resolve(context).cend())), 6);
 }
 
 TEST_F(MetaContext, MetaType) {
@@ -170,7 +187,7 @@ TEST_F(MetaContext, MetaType) {
     ASSERT_EQ(global.id(), "foo"_hs);
     ASSERT_EQ(local.id(), "bar"_hs);
 
-    clazz instance{};
+    clazz instance{'c', 99};
     const argument value{2};
 
     ASSERT_NE(instance.value, value.get());
@@ -180,6 +197,9 @@ TEST_F(MetaContext, MetaType) {
     ASSERT_NE(instance.value, value.get_mul());
     ASSERT_EQ(local.invoke("func"_hs, instance, value).cast<int>(), value.get_mul());
     ASSERT_NE(instance.value, value.get_mul());
+
+    ASSERT_FALSE(global.invoke("get"_hs, instance));
+    ASSERT_EQ(local.invoke("get"_hs, instance).cast<char>(), 'c');
 }
 
 TEST_F(MetaContext, MetaBase) {
@@ -192,70 +212,75 @@ TEST_F(MetaContext, MetaBase) {
     ASSERT_EQ(local.base().cbegin()->second.info(), entt::type_id<base>());
 
     ASSERT_FALSE(entt::resolve(entt::type_id<base>()));
-    ASSERT_FALSE(entt::resolve(context, entt::type_id<base>()));
+    ASSERT_TRUE(entt::resolve(context, entt::type_id<base>()));
 }
 
 TEST_F(MetaContext, MetaData) {
     using namespace entt::literals;
 
-    const auto global = entt::resolve<clazz>().data("value"_hs);
-    const auto local = entt::resolve<clazz>(context).data("value"_hs);
+    const auto global = entt::resolve<clazz>();
+    const auto local = entt::resolve<clazz>(context);
 
-    ASSERT_TRUE(global);
-    ASSERT_TRUE(local);
+    ASSERT_TRUE(global.data("value"_hs));
+    ASSERT_TRUE(local.data("value"_hs));
 
-    ASSERT_FALSE(global.is_const());
-    ASSERT_TRUE(local.is_const());
+    ASSERT_FALSE(global.data("value"_hs).is_const());
+    ASSERT_TRUE(local.data("value"_hs).is_const());
 
-    ASSERT_EQ(global.type().data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(local.type().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(global.data("value"_hs).type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.data("value"_hs).type().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    const auto grw = entt::resolve<clazz>().data("rw"_hs);
-    const auto lrw = entt::resolve<clazz>(context).data("rw"_hs);
+    ASSERT_EQ(global.data("rw"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.data("rw"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ(grw.arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(lrw.arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
-
-    clazz instance{};
+    clazz instance{'c', 99};
     const argument value{2};
 
     ASSERT_NE(instance.value, value.get());
-    ASSERT_TRUE(grw.set(instance, value));
+    ASSERT_TRUE(global.data("rw"_hs).set(instance, value));
     ASSERT_EQ(instance.value, value.get());
 
     ASSERT_NE(instance.value, value.get_mul());
-    ASSERT_TRUE(lrw.set(instance, value));
+    ASSERT_TRUE(local.data("rw"_hs).set(instance, value));
     ASSERT_EQ(instance.value, value.get_mul());
+
+    ASSERT_FALSE(global.data("char"_hs));
+    ASSERT_EQ(local.data("char"_hs).get(instance).cast<char>(), 'c');
+    ASSERT_TRUE(local.data("char"_hs).set(instance, 'x'));
+    ASSERT_EQ(instance.base::value, 'x');
 }
 
 TEST_F(MetaContext, MetaFunc) {
     using namespace entt::literals;
 
-    const auto global = entt::resolve<clazz>().func("func"_hs);
-    const auto local = entt::resolve<clazz>(context).func("func"_hs);
+    const auto global = entt::resolve<clazz>();
+    const auto local = entt::resolve<clazz>(context);
 
-    ASSERT_TRUE(global);
-    ASSERT_TRUE(local);
+    ASSERT_TRUE(global.func("func"_hs));
+    ASSERT_TRUE(local.func("func"_hs));
 
-    ASSERT_FALSE(global.is_const());
-    ASSERT_TRUE(local.is_const());
+    ASSERT_FALSE(global.func("func"_hs).is_const());
+    ASSERT_TRUE(local.func("func"_hs).is_const());
 
-    ASSERT_EQ(global.arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(local.arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(global.func("func"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.func("func"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ(global.ret().data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(local.ret().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(global.func("func"_hs).ret().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.func("func"_hs).ret().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    clazz instance{};
+    clazz instance{'c', 99};
     const argument value{2};
 
     ASSERT_NE(instance.value, value.get());
-    ASSERT_EQ(global.invoke(instance, value).cast<int>(), value.get());
+    ASSERT_EQ(global.func("func"_hs).invoke(instance, value).cast<int>(), value.get());
     ASSERT_EQ(instance.value, value.get());
 
     ASSERT_NE(instance.value, value.get_mul());
-    ASSERT_EQ(local.invoke(instance, value).cast<int>(), value.get_mul());
+    ASSERT_EQ(local.func("func"_hs).invoke(instance, value).cast<int>(), value.get_mul());
     ASSERT_NE(instance.value, value.get_mul());
+
+    ASSERT_FALSE(global.func("get"_hs));
+    ASSERT_EQ(local.func("get"_hs).invoke(instance).cast<char>(), 'c');
 }
 
 TEST_F(MetaContext, MetaCtor) {
@@ -319,20 +344,20 @@ TEST_F(MetaContext, MetaDtor) {
 TEST_F(MetaContext, MetaProp) {
     using namespace entt::literals;
 
-    const auto global = entt::resolve<clazz>().prop("prop"_hs);
-    const auto local = entt::resolve<clazz>(context).prop("prop"_hs);
+    const auto global = entt::resolve<clazz>();
+    const auto local = entt::resolve<clazz>(context);
 
-    ASSERT_TRUE(global);
-    ASSERT_TRUE(local);
+    ASSERT_TRUE(global.prop("prop"_hs));
+    ASSERT_TRUE(local.prop("prop"_hs));
 
-    ASSERT_EQ(global.value().type(), entt::resolve<int>());
-    ASSERT_EQ(local.value().type(), entt::resolve<int>(context));
+    ASSERT_EQ(global.prop("prop"_hs).value().type(), entt::resolve<int>());
+    ASSERT_EQ(local.prop("prop"_hs).value().type(), entt::resolve<int>(context));
 
-    ASSERT_EQ(global.value().cast<int>(), prop_value);
-    ASSERT_EQ(local.value().cast<int>(), prop_value);
+    ASSERT_EQ(global.prop("prop"_hs).value().cast<int>(), prop_value);
+    ASSERT_EQ(local.prop("prop"_hs).value().cast<int>(), prop_value);
 
-    ASSERT_EQ(global.value().type().data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(local.value().type().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(global.prop("prop"_hs).value().type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.prop("prop"_hs).value().type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaTemplate) {

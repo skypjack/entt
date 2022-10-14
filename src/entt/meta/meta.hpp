@@ -681,7 +681,7 @@ struct meta_handle {
      * @param area The context from which to search for meta types.
      * @param value An instance of an object to use to initialize the handle.
      */
-    template<typename Type>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(const meta_ctx &ctx, Type &value) noexcept
         : any{ctx, std::in_place_type<Type &>, value} {}
 
@@ -693,6 +693,22 @@ struct meta_handle {
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(Type &value) noexcept
         : meta_handle{locator<meta_ctx>::value_or(), value} {}
+
+    /**
+     * @brief Context aware copy constructor.
+     * @param area The context from which to search for meta types.
+     * @param other The instance to copy from.
+     */
+    meta_handle(const meta_ctx &area, const meta_handle &other)
+        : any{area, other.any} {}
+
+    /**
+     * @brief Context aware move constructor.
+     * @param area The context from which to search for meta types.
+     * @param other The instance to move from.
+     */
+    meta_handle(const meta_ctx &area, meta_handle &&other)
+        : any{area, std::move(other.any)} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     meta_handle(const meta_handle &) = delete;
@@ -835,7 +851,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node->set && node->set(std::move(instance), meta_any{*ctx, std::forward<Type>(value)});
+        return node->set && node->set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
     }
 
     /**
@@ -848,7 +864,7 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node->get(*ctx, std::move(instance));
+        return node->get(*ctx, meta_handle{*ctx, std::move(instance)});
     }
 
     /**
@@ -954,6 +970,10 @@ struct meta_func {
      * It must be possible to cast the instance to the parent type of the member
      * function.
      *
+     * @warning
+     * The context of instances and arguments is not changed.<br/>
+     * Therefore, it's up to the caller to wrap any objects correctly.
+     *
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
      * @param sz Number of parameters to use to invoke the function.
@@ -976,7 +996,7 @@ struct meta_func {
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&...args) const {
         meta_any arguments[sizeof...(Args) + 1u]{{*ctx, std::forward<Args>(args)}...};
-        return invoke(std::move(instance), arguments, sizeof...(Args));
+        return invoke(meta_handle{*ctx, std::move(instance)}, arguments, sizeof...(Args));
     }
 
     /*! @copydoc meta_data::prop */
@@ -1331,6 +1351,10 @@ public:
      * possible. Otherwise, an empty and thus invalid wrapper is returned.<br/>
      * If suitable, the implicitly generated default constructor is used.
      *
+     * @warning
+     * The context of instances and arguments is not changed.<br/>
+     * Therefore, it's up to the caller to wrap any objects correctly.
+     *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
      * @return A wrapper containing the new instance, if any.
@@ -1384,6 +1408,10 @@ public:
      * It must be possible to cast the instance to the parent type of the member
      * function.
      *
+     * @warning
+     * The context of instances and arguments is not changed.<br/>
+     * Therefore, it's up to the caller to wrap any objects correctly.
+     *
      * @sa meta_func::invoke
      *
      * @param id Unique identifier.
@@ -1423,8 +1451,8 @@ public:
      */
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
-        meta_any arguments[sizeof...(Args) + 1u]{{*ctx, std::forward<Args>(args)}...}; // TODO
-        return invoke(id, std::move(instance), arguments, sizeof...(Args));
+        meta_any arguments[sizeof...(Args) + 1u]{{*ctx, std::forward<Args>(args)}...};
+        return invoke(id, meta_handle{*ctx, std::move(instance)}, arguments, sizeof...(Args));
     }
 
     /**
