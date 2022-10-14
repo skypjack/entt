@@ -376,10 +376,6 @@ public:
 
     /**
      * @brief Sets the value of a given variable.
-     *
-     * The type of the value is such that a cast or conversion to the type of
-     * the variable is possible. Otherwise, invoking the setter does nothing.
-     *
      * @tparam Type Type of value to assign.
      * @param id Unique identifier.
      * @param value Parameter to use to set the underlying variable.
@@ -422,8 +418,6 @@ public:
 
     /**
      * @brief Tries to cast an instance to a given type.
-     *
-     * The type of the instance must be such that the cast is possible.
      *
      * @warning
      * Attempting to perform an invalid cast results is undefined behavior.
@@ -835,12 +829,6 @@ struct meta_data {
 
     /**
      * @brief Sets the value of a given variable.
-     *
-     * It must be possible to cast the instance to the parent type of the data
-     * member.<br/>
-     * The type of the value is such that a cast or conversion to the type of
-     * the variable is possible. Otherwise, invoking the setter does nothing.
-     *
      * @tparam Type Type of value to assign.
      * @param instance An opaque instance of the underlying type.
      * @param value Parameter to use to set the underlying variable.
@@ -853,10 +841,6 @@ struct meta_data {
 
     /**
      * @brief Gets the value of a given variable.
-     *
-     * It must be possible to cast the instance to the parent type of the data
-     * member.
-     *
      * @param instance An opaque instance of the underlying type.
      * @return A wrapper containing the value of the underlying variable.
      */
@@ -880,7 +864,7 @@ struct meta_data {
     }
 
     /**
-     * @brief Lookup function for registered meta properties.
+     * @brief Lookup utility for meta properties.
      * @param key The key to use to search for a property.
      * @return The registered meta property for the given key, if any.
      */
@@ -961,12 +945,6 @@ struct meta_func {
     /**
      * @brief Invokes the underlying function, if possible.
      *
-     * To invoke a member function, the parameters must be such that a cast or
-     * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid wrapper is returned.<br/>
-     * It must be possible to cast the instance to the parent type of the member
-     * function.
-     *
      * @warning
      * The context of the arguments is **not** changed.<br/>
      * It's up to the caller to bind them to the right context(s).
@@ -985,7 +963,7 @@ struct meta_func {
      * @tparam Args Types of arguments to use to invoke the function.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
-     * @return A wrapper containing the new instance, if any.
+     * @return A wrapper containing the returned value, if any.
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&...args) const {
@@ -999,7 +977,7 @@ struct meta_func {
     }
 
     /**
-     * @brief Lookup function for registered meta properties.
+     * @brief Lookup utility for meta properties.
      * @param key The key to use to search for a property.
      * @return The registered meta property for the given key, if any.
      */
@@ -1277,10 +1255,7 @@ public:
     }
 
     /**
-     * @brief Lookup function for registered meta data.
-     *
-     * Registered meta data of base classes will also be visited.
-     *
+     * @brief Lookup utility for meta data (bases are also visited).
      * @param id Unique identifier.
      * @return The registered meta data for the given identifier, if any.
      */
@@ -1310,11 +1285,10 @@ public:
     }
 
     /**
-     * @brief Lookup function for registered meta functions.
+     * @brief Lookup utility for meta functions (bases are also visited).
      *
-     * Registered meta functions of base classes will also be visited.<br/>
      * In case of overloaded functions, the first one with the required
-     * identifier will be returned.
+     * identifier is returned.
      *
      * @param id Unique identifier.
      * @return The registered meta function for the given identifier, if any.
@@ -1338,8 +1312,6 @@ public:
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * Parameters are such that a cast or conversion to the required types is
-     * possible. Otherwise, an empty and thus invalid wrapper is returned.<br/>
      * If suitable, the implicitly generated default constructor is used.
      *
      * @warning
@@ -1393,9 +1365,6 @@ public:
     /**
      * @brief Invokes a function given an identifier, if possible.
      *
-     * It must be possible to cast the instance to the parent type of the member
-     * function.
-     *
      * @warning
      * The context of the arguments is **not** changed.<br/>
      * It's up to the caller to bind them to the right context(s).
@@ -1431,7 +1400,7 @@ public:
      * @tparam Args Types of arguments to use to invoke the function.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
-     * @return A wrapper containing the new instance, if any.
+     * @return A wrapper containing the returned value, if any.
      */
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
@@ -1441,12 +1410,6 @@ public:
 
     /**
      * @brief Sets the value of a given variable.
-     *
-     * It must be possible to cast the instance to the parent type of the data
-     * member.<br/>
-     * The type of the value is such that a cast or conversion to the type of
-     * the variable is possible. Otherwise, invoking the setter does nothing.
-     *
      * @tparam Type Type of value to assign.
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
@@ -1461,10 +1424,6 @@ public:
 
     /**
      * @brief Gets the value of a given variable.
-     *
-     * It must be possible to cast the instance to the parent type of the data
-     * member.
-     *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
      * @return A wrapper containing the value of the underlying variable.
@@ -1484,10 +1443,7 @@ public:
     }
 
     /**
-     * @brief Lookup function for meta properties.
-     *
-     * Properties of base classes are also visited.
-     *
+     * @brief Lookup utility for meta properties (bases are also visited).
      * @param key The key to use to search for a property.
      * @return The registered meta property for the given key, if any.
      */
