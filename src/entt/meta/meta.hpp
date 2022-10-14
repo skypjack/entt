@@ -259,9 +259,31 @@ public:
      * @param area The context from which to search for meta types.
      * @param value An instance of an object to use to initialize the wrapper.
      */
-    template<typename Type>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
     meta_any(const meta_ctx &area, Type &&value)
         : meta_any{area, std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
+
+    /**
+     * @brief Context aware copy constructor.
+     * @param area The context from which to search for meta types.
+     * @param other The instance to copy from.
+     */
+    meta_any(const meta_ctx &area, const meta_any &other)
+        : meta_any{other} {
+        ctx = &area;
+        node = node.resolve ? node.resolve(internal::meta_context::from(*ctx)) : node;
+    }
+
+    /**
+     * @brief Context aware move constructor.
+     * @param area The context from which to search for meta types.
+     * @param other The instance to move from.
+     */
+    meta_any(const meta_ctx &area, meta_any &&other)
+        : meta_any{std::move(other)} {
+        ctx = &area;
+        node = node.resolve ? node.resolve(internal::meta_context::from(*ctx)) : node;
+    }
 
     /**
      * @brief Copy constructor.

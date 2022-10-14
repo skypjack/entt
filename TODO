@@ -12,6 +12,7 @@ DOC:
 * update entity doc when the storage based model is in place
 
 TODO (high prio):
+* remove_const_t vs remove_cv_t
 * remove the static storage from the const assure in the registry
 
 WIP:

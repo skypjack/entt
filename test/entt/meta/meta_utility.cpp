@@ -77,6 +77,39 @@ TEST_F(MetaUtility, MetaDispatch) {
     ASSERT_EQ(as_cref.cast<int>(), 42);
 }
 
+TEST_F(MetaUtility, MetaDispatchMetaAny) {
+    entt::meta_any any{42};
+
+    auto from_any = entt::meta_dispatch(any);
+    auto from_const_any = entt::meta_dispatch(std::as_const(any));
+
+    ASSERT_EQ(from_any.type(), entt::resolve<int>());
+    ASSERT_EQ(from_const_any.type(), entt::resolve<int>());
+
+    ASSERT_NE(from_any.try_cast<int>(), nullptr);
+    ASSERT_NE(from_const_any.try_cast<int>(), nullptr);
+
+    ASSERT_EQ(from_any.cast<int>(), 42);
+    ASSERT_EQ(from_const_any.cast<int>(), 42);
+}
+
+TEST_F(MetaUtility, MetaDispatchMetaAnyAsRef) {
+    entt::meta_any any{42};
+
+    auto from_any = entt::meta_dispatch(any.as_ref());
+    auto from_const_any = entt::meta_dispatch(std::as_const(any).as_ref());
+
+    ASSERT_EQ(from_any.type(), entt::resolve<int>());
+    ASSERT_EQ(from_const_any.type(), entt::resolve<int>());
+
+    ASSERT_NE(from_any.try_cast<int>(), nullptr);
+    ASSERT_EQ(from_const_any.try_cast<int>(), nullptr);
+    ASSERT_NE(from_const_any.try_cast<const int>(), nullptr);
+
+    ASSERT_EQ(from_any.cast<int>(), 42);
+    ASSERT_EQ(from_const_any.cast<int>(), 42);
+}
+
 TEST_F(MetaUtility, MetaArg) {
     ASSERT_EQ((entt::meta_arg<entt::type_list<int, char>>(0u)), entt::resolve<int>());
     ASSERT_EQ((entt::meta_arg<entt::type_list<int, char>>(1u)), entt::resolve<char>());
