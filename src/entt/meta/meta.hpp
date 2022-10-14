@@ -968,8 +968,8 @@ struct meta_func {
      * function.
      *
      * @warning
-     * The context of instances and arguments is not changed.<br/>
-     * Therefore, it's up to the caller to wrap any objects correctly.
+     * The context of the arguments is **not** changed.<br/>
+     * It's up to the caller to bind them to the right context(s).
      *
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
@@ -977,7 +977,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return sz == arity() ? node->invoke(*ctx, std::move(instance), args) : meta_any{meta_ctx_arg, *ctx};
+        return sz == arity() ? node->invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -1343,8 +1343,8 @@ public:
      * If suitable, the implicitly generated default constructor is used.
      *
      * @warning
-     * The context of instances and arguments is not changed.<br/>
-     * Therefore, it's up to the caller to wrap any objects correctly.
+     * The context of the arguments is **not** changed.<br/>
+     * It's up to the caller to bind them to the right context(s).
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
@@ -1397,8 +1397,8 @@ public:
      * function.
      *
      * @warning
-     * The context of instances and arguments is not changed.<br/>
-     * Therefore, it's up to the caller to wrap any objects correctly.
+     * The context of the arguments is **not** changed.<br/>
+     * It's up to the caller to bind them to the right context(s).
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
@@ -1410,7 +1410,7 @@ public:
         if(node.details) {
             if(auto it = node.details->func.find(id); it != node.details->func.cend()) {
                 if(const auto *candidate = lookup(args, sz, (instance->data() == nullptr), [curr = &it->second]() mutable { return curr ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
-                    return candidate->invoke(*ctx, std::move(instance), args);
+                    return candidate->invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args);
                 }
             }
         }
