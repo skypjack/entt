@@ -362,9 +362,6 @@ public:
 
     /**
      * @brief Invokes the underlying function, if possible.
-     *
-     * @sa meta_func::invoke
-     *
      * @tparam Args Types of arguments to use to invoke the function.
      * @param id Unique identifier.
      * @param args Parameters to use to invoke the function.
@@ -985,9 +982,6 @@ struct meta_func {
 
     /**
      * @copybrief invoke
-     *
-     * @sa invoke
-     *
      * @tparam Args Types of arguments to use to invoke the function.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
@@ -1249,9 +1243,6 @@ public:
 
     /**
      * @brief Returns a tag for the class template of the underlying type.
-     *
-     * @sa meta_class_template_tag
-     *
      * @return The tag for the class template of the underlying type.
      */
     [[nodiscard]] inline meta_type template_type() const noexcept {
@@ -1375,9 +1366,6 @@ public:
 
     /**
      * @copybrief construct
-     *
-     * @sa construct
-     *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.
      * @return A wrapper containing the new instance, if any.
@@ -1412,8 +1400,6 @@ public:
      * The context of instances and arguments is not changed.<br/>
      * Therefore, it's up to the caller to wrap any objects correctly.
      *
-     * @sa meta_func::invoke
-     *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
@@ -1440,8 +1426,6 @@ public:
 
     /**
      * @copybrief invoke
-     *
-     * @sa invoke
      *
      * @param id Unique identifier.
      * @tparam Args Types of arguments to use to invoke the function.
