@@ -69,6 +69,7 @@
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem>node</ExpandedItem>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_handle">
@@ -76,15 +77,22 @@
 	</Type>
 	<Type Name="entt::meta_associative_container">
 		<DisplayString>{ storage }</DisplayString>
+		<Expand>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+		</Expand>
 	</Type>
 	<Type Name="entt::meta_sequence_container">
 		<DisplayString>{ storage }</DisplayString>
+		<Expand>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+		</Expand>
 	</Type>
 	<Type Name="entt::meta_data">
 		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_func">
@@ -92,6 +100,7 @@
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_prop">
@@ -99,12 +108,14 @@
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_type">
 		<DisplayString>{ node }</DisplayString>
 		<Expand>
 			<ExpandedItem>node</ExpandedItem>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
 </AutoVisualizer>
