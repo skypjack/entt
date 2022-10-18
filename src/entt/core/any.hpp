@@ -351,6 +351,8 @@ public:
             vtable(operation::destroy, *this, nullptr);
         }
 
+        // unnecessary but it helps to detect nasty bugs
+        ENTT_ASSERT(!(instance = nullptr), "");
         info = &type_id<void>();
         vtable = nullptr;
         mode = policy::owner;
