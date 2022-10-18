@@ -117,8 +117,9 @@ TEST_F(MetaBase, SetGetWithMutatingThis) {
 
 TEST_F(MetaBase, ConvWithMutatingThis) {
     entt::meta_any any{derived_t{}};
+    auto &&ref = any.cast<derived_t &>();
     auto as_cref = std::as_const(any).as_ref();
-    any.cast<derived_t &>().value_2 = 42;
+    ref.value_2 = 42;
 
     auto conv = std::as_const(any).allow_cast<int>();
     auto from_cref = std::as_const(as_cref).allow_cast<int>();
@@ -128,10 +129,11 @@ TEST_F(MetaBase, ConvWithMutatingThis) {
     ASSERT_EQ(conv.cast<int>(), 42);
     ASSERT_EQ(from_cref.cast<int>(), 42);
 
-    ASSERT_TRUE(any.allow_cast<int>());
     ASSERT_TRUE(as_cref.allow_cast<int>());
-    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_TRUE(any.allow_cast<int>());
+
     ASSERT_EQ(as_cref.cast<int>(), 42);
+    ASSERT_EQ(any.cast<int>(), 42);
 }
 
 TEST_F(MetaBase, OpaqueConvWithMutatingThis) {
@@ -147,10 +149,11 @@ TEST_F(MetaBase, OpaqueConvWithMutatingThis) {
     ASSERT_EQ(conv.cast<int>(), 42);
     ASSERT_EQ(from_cref.cast<int>(), 42);
 
-    ASSERT_TRUE(any.allow_cast(entt::resolve<int>()));
     ASSERT_TRUE(as_cref.allow_cast(entt::resolve<int>()));
-    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_TRUE(any.allow_cast(entt::resolve<int>()));
+
     ASSERT_EQ(as_cref.cast<int>(), 42);
+    ASSERT_EQ(any.cast<int>(), 42);
 }
 
 TEST_F(MetaBase, AssignWithMutatingThis) {
