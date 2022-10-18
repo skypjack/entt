@@ -1528,16 +1528,16 @@ bool meta_any::set(const id_type id, Type &&value) {
     }
 
     if(const auto *value = data(); node.details) {
+        if(auto it = node.details->conv.find(type.info().hash()); it != node.details->conv.cend()) {
+            return it->second.conv(*ctx, data());
+        }
+
         for(auto &&curr: node.details->base) {
             const auto &as_const = curr.second.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.second.cast(value));
 
             if(auto other = as_const.allow_cast(type); other) {
                 return other;
             }
-        }
-
-        if(auto it = node.details->conv.find(type.info().hash()); it != node.details->conv.cend()) {
-            return it->second.conv(*ctx, data());
         }
     }
 
