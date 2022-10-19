@@ -551,7 +551,7 @@ struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Typ
 
 /*! @copydoc is_iterator */
 template<typename Type>
-struct is_iterator<Type, std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_pointer_t<Type>>, void>>>
+struct is_iterator<Type, std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_pointer_t<Type>>, void>>>
     : internal::has_iterator_category<Type> {};
 
 /**
@@ -639,7 +639,7 @@ template<typename Type>
 }
 
 template<typename Type>
-[[nodiscard]] constexpr std::enable_if_t<is_complete_v<std::tuple_size<std::remove_const_t<Type>>>, bool> maybe_equality_comparable(choice_t<2>) {
+[[nodiscard]] constexpr std::enable_if_t<is_complete_v<std::tuple_size<std::remove_cv_t<Type>>>, bool> maybe_equality_comparable(choice_t<2>) {
     if constexpr(has_tuple_size_value<Type>::value) {
         return unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
     } else {

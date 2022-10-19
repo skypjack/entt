@@ -131,7 +131,7 @@ class basic_any {
                 static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? policy::cref : policy::ref;
                 instance = (std::addressof(args), ...);
-            } else if constexpr(in_situ<std::remove_const_t<std::remove_reference_t<Type>>>) {
+            } else if constexpr(in_situ<std::remove_cv_t<std::remove_reference_t<Type>>>) {
                 if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
                     new(&storage) std::remove_cv_t<std::remove_reference_t<Type>>{std::forward<Args>(args)...};
                 } else {
