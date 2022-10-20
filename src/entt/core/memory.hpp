@@ -60,7 +60,7 @@ constexpr void propagate_on_container_move_assignment([[maybe_unused]] Allocator
  */
 template<typename Allocator>
 constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[maybe_unused]] Allocator &rhs) noexcept {
-    ENTT_ASSERT(std::allocator_traits<Allocator>::propagate_on_container_swap::value || lhs == rhs, "Cannot swap the containers");
+    ENTT_CONSTEXPR_ASSERT(std::allocator_traits<Allocator>::propagate_on_container_swap::value || lhs == rhs, "Cannot swap the containers");
 
     if constexpr(std::allocator_traits<Allocator>::propagate_on_container_swap::value) {
         using std::swap;
@@ -83,7 +83,7 @@ constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[ma
  * @return The smallest power of two greater than or equal to the given value.
  */
 [[nodiscard]] inline constexpr std::size_t next_power_of_two(const std::size_t value) noexcept {
-    ENTT_ASSERT(value < (std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)), "Numeric limits exceeded");
+    ENTT_CONSTEXPR_ASSERT(value < (std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)), "Numeric limits exceeded");
     std::size_t curr = value - (value != 0u);
 
     for(int next = 1; next < std::numeric_limits<std::size_t>::digits; next = next * 2) {
@@ -100,7 +100,7 @@ constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[ma
  * @return The common remainder.
  */
 [[nodiscard]] inline constexpr std::size_t fast_mod(const std::size_t value, const std::size_t mod) noexcept {
-    ENTT_ASSERT(is_power_of_two(mod), "Value must be a power of two");
+    ENTT_CONSTEXPR_ASSERT(is_power_of_two(mod), "Value must be a power of two");
     return value & (mod - 1u);
 }
 
