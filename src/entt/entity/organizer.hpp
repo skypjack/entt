@@ -25,8 +25,8 @@ namespace internal {
 template<typename>
 struct is_view: std::false_type {};
 
-template<typename... Get, typename... Exclude>
-struct is_view<basic_view<get_t<Get...>, exclude_t<Exclude...>>>: std::true_type {};
+template<typename... Args>
+struct is_view<basic_view<Args...>>: std::true_type {};
 
 template<typename Type>
 inline constexpr bool is_view_v = is_view<Type>::value;
