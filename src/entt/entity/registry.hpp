@@ -17,6 +17,7 @@
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
+#include "../core/memory.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
@@ -265,7 +266,12 @@ class basic_registry {
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
         static_assert(!std::disjunction_v<std::bool_constant<component_traits<Owned>::in_place_delete>...>, "Groups do not support in-place delete");
-        std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t> current{};
+        using value_type = std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t>;
+        value_type current{};
+
+        template<typename... Args>
+        group_handler(Args &&...args)
+            : current{std::forward<Args>(args)...} {}
 
         template<typename Type>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
@@ -301,7 +307,7 @@ class basic_registry {
 
     struct group_data {
         std::size_t size;
-        std::unique_ptr<void, void (*)(void *)> group;
+        std::shared_ptr<void> group;
         bool (*owned)(const id_type) noexcept;
         bool (*get)(const id_type) noexcept;
         bool (*exclude)(const id_type) noexcept;
@@ -1322,7 +1328,7 @@ public:
         } else {
             group_data candidate = {
                 size,
-                {new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); }},
+                std::apply([this](auto &&...args) { return std::allocate_shared<handler_type>(get_allocator(), std::forward<decltype(args)>(args)...); }, uses_allocator_construction_args<typename handler_type::value_type>(get_allocator())),
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
