@@ -733,7 +733,7 @@ public:
      */
     version_type release(const entity_type entt, const version_type version) {
         ENTT_ASSERT(valid(entt), "Invalid identifier");
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return (curr.second->current(entt) == entity_traits::to_version(entt::tombstone)); }), "Non-orphan entity");
+        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return (curr.second->current(entt) == entity_traits::to_version(tombstone)); }), "Non-orphan entity");
         return release_entity(entt, version);
     }
 
@@ -1328,7 +1328,7 @@ public:
         } else {
             group_data candidate = {
                 size,
-                std::apply([this](auto &&...args) { return std::allocate_shared<handler_type>(get_allocator(), std::forward<decltype(args)>(args)...); }, uses_allocator_construction_args<typename handler_type::value_type>(get_allocator())),
+                std::apply([this](auto &&...args) { return std::allocate_shared<handler_type>(get_allocator(), std::forward<decltype(args)>(args)...); }, entt::uses_allocator_construction_args<typename handler_type::value_type>(get_allocator())),
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
