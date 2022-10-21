@@ -30,6 +30,12 @@ TEST(PoccaPocmaAndPocs, Functionalities) {
     entt::propagate_on_container_swap(lhs, rhs);
 }
 
+ENTT_DEBUG_TEST(PoccaPocmaAndPocsDeathTest, Functionalities) {
+    using pocs = std::false_type;
+    test::basic_test_allocator<int, pocs> lhs, rhs;
+    ASSERT_DEATH(entt::propagate_on_container_swap(lhs, rhs), "");
+}
+
 TEST(IsPowerOfTwo, Functionalities) {
     // constexpr-ness guaranteed
     constexpr auto zero_is_power_of_two = entt::is_power_of_two(0u);

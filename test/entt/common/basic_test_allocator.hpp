@@ -6,13 +6,13 @@
 
 namespace test {
 
-template<typename Type>
+template<typename Type, typename Pocs = std::true_type>
 struct basic_test_allocator: std::allocator<Type> {
     // basic pocca/pocma/pocs allocator
 
     using base = std::allocator<Type>;
     using propagate_on_container_copy_assignment = std::true_type;
-    using propagate_on_container_swap = std::true_type;
+    using propagate_on_container_swap = Pocs;
 
     using std::allocator<Type>::allocator;
 
@@ -20,6 +20,10 @@ struct basic_test_allocator: std::allocator<Type> {
         // necessary to avoid call suppression
         base::operator=(other);
         return *this;
+    }
+
+    bool operator==(const basic_test_allocator &other) {
+        return (this == &other);
     }
 };
 
