@@ -37,10 +37,7 @@ ENTT_DEBUG_TEST(PoccaPocmaAndPocsDeathTest, Functionalities) {
 }
 
 TEST(IsPowerOfTwo, Functionalities) {
-    // constexpr-ness guaranteed
-    constexpr auto zero_is_power_of_two = entt::is_power_of_two(0u);
-
-    ASSERT_FALSE(zero_is_power_of_two);
+    ASSERT_FALSE(entt::is_power_of_two(0u));
     ASSERT_TRUE(entt::is_power_of_two(1u));
     ASSERT_TRUE(entt::is_power_of_two(2u));
     ASSERT_TRUE(entt::is_power_of_two(4u));
@@ -50,10 +47,7 @@ TEST(IsPowerOfTwo, Functionalities) {
 }
 
 TEST(NextPowerOfTwo, Functionalities) {
-    // constexpr-ness guaranteed
-    constexpr auto next_power_of_two_of_zero = entt::next_power_of_two(0u);
-
-    ASSERT_EQ(next_power_of_two_of_zero, 1u);
+    ASSERT_EQ(entt::next_power_of_two(0u), 1u);
     ASSERT_EQ(entt::next_power_of_two(1u), 1u);
     ASSERT_EQ(entt::next_power_of_two(2u), 2u);
     ASSERT_EQ(entt::next_power_of_two(3u), 4u);
@@ -69,10 +63,7 @@ ENTT_DEBUG_TEST(NextPowerOfTwoDeathTest, Functionalities) {
 }
 
 TEST(FastMod, Functionalities) {
-    // constexpr-ness guaranteed
-    constexpr auto fast_mod_of_zero = entt::fast_mod(0u, 8u);
-
-    ASSERT_EQ(fast_mod_of_zero, 0u);
+    ASSERT_EQ(entt::fast_mod(0u, 8u), 0u);
     ASSERT_EQ(entt::fast_mod(7u, 8u), 7u);
     ASSERT_EQ(entt::fast_mod(8u, 8u), 0u);
 }
