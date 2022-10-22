@@ -13,6 +13,7 @@
   * [ENTT_SPARSE_PAGE](#entt_sparse_page)
   * [ENTT_PACKED_PAGE](#entt_packed_page)
   * [ENTT_ASSERT](#entt_assert)
+    * [ENTT_ASSERT_CONSTEXPR](#entt_assert_constexpr)
     * [ENTT_DISABLE_ASSERT](#entt_disable_assert)
   * [ENTT_NO_ETO](#entt_no_eto)
   * [ENTT_STANDARD_CPP](#entt_standard_cpp)
@@ -85,6 +86,14 @@ if not used correctly.<br/>
 To get around this, the library relies on a lot of asserts for the purpose of
 detecting errors in debug builds. By default, it uses `assert` internally. Users
 are allowed to overwrite its behavior by setting this variable.
+
+### ENTT_ASSERT_CONSTEXPR
+
+Usually, an assert within a `constexpr` function isn't a big deal. However, in
+case of customizations, it might be useful to differentiate.<br/>
+For this purpose, `EnTT` introduces an admittedly badly named variable to make
+the job easier in this regard. By default, this variable forwards its arguments
+to `ENTT_ASSERT`.
 
 ### ENTT_DISABLE_ASSERT
 
