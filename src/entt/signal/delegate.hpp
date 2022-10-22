@@ -218,6 +218,7 @@ public:
      * @param payload User defined arbitrary data.
      */
     void connect(function_type *function, const void *payload = nullptr) noexcept {
+        ENTT_ASSERT(function != nullptr, "Uninitialized function pointer");
         instance = payload;
         fn = function;
     }
