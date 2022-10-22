@@ -16,7 +16,7 @@ namespace entt {
  * @param value A value that may or may not be a power of two.
  * @return True if the value is a power of two, false otherwise.
  */
-[[nodiscard]] inline bool is_power_of_two(const std::size_t value) noexcept {
+[[nodiscard]] inline constexpr bool is_power_of_two(const std::size_t value) noexcept {
     return value && ((value & (value - 1)) == 0);
 }
 
@@ -25,8 +25,8 @@ namespace entt {
  * @param value The value to use.
  * @return The smallest power of two greater than or equal to the given value.
  */
-[[nodiscard]] inline std::size_t next_power_of_two(const std::size_t value) noexcept {
-    ENTT_ASSERT(value < (std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)), "Numeric limits exceeded");
+[[nodiscard]] inline constexpr std::size_t next_power_of_two(const std::size_t value) noexcept {
+    ENTT_ASSERT_CONSTEXPR(value < (std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)), "Numeric limits exceeded");
     std::size_t curr = value - (value != 0u);
 
     for(int next = 1; next < std::numeric_limits<std::size_t>::digits; next = next * 2) {
@@ -42,8 +42,8 @@ namespace entt {
  * @param mod _Modulus_, it must be a power of two.
  * @return The common remainder.
  */
-[[nodiscard]] inline std::size_t fast_mod(const std::size_t value, const std::size_t mod) noexcept {
-    ENTT_ASSERT(is_power_of_two(mod), "Value must be a power of two");
+[[nodiscard]] inline constexpr std::size_t fast_mod(const std::size_t value, const std::size_t mod) noexcept {
+    ENTT_ASSERT_CONSTEXPR(is_power_of_two(mod), "Value must be a power of two");
     return value & (mod - 1u);
 }
 
@@ -100,7 +100,7 @@ constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[ma
         using std::swap;
         swap(lhs, rhs);
     } else {
-        ENTT_ASSERT(lhs == rhs, "Cannot swap the containers");
+        ENTT_ASSERT_CONSTEXPR(lhs == rhs, "Cannot swap the containers");
     }
 }
 
