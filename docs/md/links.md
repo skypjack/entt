@@ -215,6 +215,9 @@ I hope this list can grow much more in the future:
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
   * [EnTT Entity Component System Gaming Library](https://gamefromscratch.com/entt-entity-component-system-gaming-library/):
     `EnTT` on GameFromScratch.com.
+  * [Custom C++ server for UE5](https://youtu.be/fbXZVNCOvjM) optimized for
+    MMO(RPG)s and its [follow-up](https://youtu.be/yGlZeopx2hU) episode about
+    player bots and full external ECS: a series definitely worth looking at.
 
 * Any Other Business:
   * [ArcGIS Runtime SDKs](https://developers.arcgis.com/arcgis-runtime/) by
