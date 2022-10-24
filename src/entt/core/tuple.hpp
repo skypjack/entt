@@ -8,6 +8,41 @@
 namespace entt {
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+template<typename>
+struct is_tuple_impl: std::false_type {};
+
+template<typename... Args>
+struct is_tuple_impl<std::tuple<Args...>>: std::true_type {};
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is a
+ * tuple, false otherwise.
+ * @tparam Type The type to test.
+ */
+template<typename Type>
+struct is_tuple: internal::is_tuple_impl<std::remove_cv_t<Type>> {};
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type The type to test.
+ */
+template<typename Type>
+inline constexpr bool is_tuple_v = is_tuple<Type>::value;
+
+/**
  * @brief Utility function to unwrap tuples of a single element.
  * @tparam Type Tuple type of any sizes.
  * @param value A tuple object of the given type.

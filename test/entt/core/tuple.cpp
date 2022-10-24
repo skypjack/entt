@@ -2,6 +2,13 @@
 #include <gtest/gtest.h>
 #include <entt/core/tuple.hpp>
 
+TEST(Tuple, IsTuple) {
+    static_assert(!entt::is_tuple_v<int>);
+    static_assert(entt::is_tuple_v<std::tuple<>>);
+    static_assert(entt::is_tuple_v<std::tuple<int>>);
+    static_assert(entt::is_tuple_v<std::tuple<int, char>>);
+}
+
 TEST(Tuple, UnwrapTuple) {
     auto single = std::make_tuple(42);
     auto multi = std::make_tuple(42, 'c');
