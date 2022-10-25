@@ -24,8 +24,9 @@
 
 # Introduction
 
-`EnTT` doesn't offer many hooks for customization but it certainly offers
-some.<br/>
+`EnTT` has become almost completely customizable over time, in many
+respects. These variables are just one of the many ways to customize how it
+works.<br/>
 In the vast majority of cases, users will have no interest in changing the
 default parameters. For all other cases, the list of possible configurations
 with which it's possible to adjust the behavior of the library at runtime can be
@@ -90,7 +91,7 @@ are allowed to overwrite its behavior by setting this variable.
 ### ENTT_ASSERT_CONSTEXPR
 
 Usually, an assert within a `constexpr` function isn't a big deal. However, in
-case of customizations, it might be useful to differentiate.<br/>
+case of extreme customizations, it might be useful to differentiate.<br/>
 For this purpose, `EnTT` introduces an admittedly badly named variable to make
 the job easier in this regard. By default, this variable forwards its arguments
 to `ENTT_ASSERT`.
@@ -98,15 +99,15 @@ to `ENTT_ASSERT`.
 ### ENTT_DISABLE_ASSERT
 
 Assertions may in turn affect performance to an extent when enabled. Whether
-`ENTT_ASSERT` is redefined or not, all asserts can be disabled at once by means
-of this definition.<br/>
-Note that `ENTT_DISABLE_ASSERT` takes precedence over the redefinition of
-`ENTT_ASSERT` and is therefore meant to disable all controls no matter what.
+`ENTT_ASSERT` and `ENTT_ASSERT_CONSTEXPR` are redefined or not, all asserts can
+be disabled at once by means of this definition.<br/>
+Note that `ENTT_DISABLE_ASSERT` takes precedence over the redefinition of the
+other variables and is therefore meant to disable all controls no matter what.
 
 ## ENTT_NO_ETO
 
 In order to reduce memory consumption and increase performance, empty types are
-never stored by the ECS module of `EnTT`.<br/>
+never instantiated nor stored by the ECS module of `EnTT`.<br/>
 Use this variable to treat these types like all others and therefore to create a
 dedicated storage for them.
 
