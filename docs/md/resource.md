@@ -144,12 +144,12 @@ entt::resource_cache<my_resource, my_loader> cache{};
 
 Under the hood, a cache is nothing more than a map where the key value has type
 `entt::id_type` while the mapped value is whatever type its loader returns.<br/>
-For this reason, it offers most of the functionality a user would expect from a
-map, such as `empty` or `size` and so on. Similarly, it's an iterable type that
-also supports indexing by resource id:
+For this reason, it offers most of the functionalities a user would expect from
+a map, such as `empty` or `size` and so on. Similarly, it's an iterable type
+that also supports indexing by resource id:
 
 ```cpp
-for(entt::resource<my_resource> curr: cache) {
+for(auto [id, res]: cache) {
     // ...
 }
 
@@ -175,7 +175,7 @@ auto ret = cache.load("resource/id"_hs);
 const bool loaded = ret.second;
 
 // takes the resource handle pointed to by the returned iterator
-entt::resource<my_resource> res = *ret.first;
+entt::resource<my_resource> res = ret.first->second;
 ```
 
 Note that the hashed string is used for convenience in the example above.<br/>
