@@ -16,17 +16,17 @@
 
 # Introduction
 
-Resource management is usually one of the most critical part of a software like
-a game. Solutions are often tuned to the particular application. There exist
-several approaches and all of them are perfectly fine as long as they fit the
+Resource management is usually one of the most critical parts of a game.
+Solutions are often tuned to the particular application. There exist several
+approaches and all of them are perfectly fine as long as they fit the
 requirements of the piece of software in which they are used.<br/>
 Examples are loading everything on start, loading on request, predictive
 loading, and so on.
 
 `EnTT` doesn't pretend to offer a _one-fits-all_ solution for the different
 cases.<br/>
-Instead, the library offers a minimal, general purpose resource cache that might
-be useful in many cases.
+Instead, the library comes with a minimal, general purpose resource cache that
+might be useful in many cases.
 
 # The resource, the loader and the cache
 
@@ -66,8 +66,8 @@ using my_cache = entt::resource_cache<my_resource, my_loader>;
 my_cache cache{};
 ```
 
-The cache is meant to be used to create different caches for different types of
-resources and to manage each one independently in the most appropriate way.<br/>
+The class is designed to create different caches for different resource types
+and to manage each one independently in the most appropriate way.<br/>
 As a (very) trivial example, audio tracks can survive in most of the scenes of
 an application while meshes can be associated with a single scene only, then
 discarded when a player leaves it.
@@ -75,22 +75,22 @@ discarded when a player leaves it.
 ## Resource handle
 
 Resources aren't returned directly to the caller. Instead, they are wrapped in a
-_resource handle_ identified by the `entt::resource` class template.<br/>
+_resource handle_, an instance of the `entt::resource` class template.<br/>
 For those who know the _flyweight design pattern_ already, that's exactly what
 it is. To all others, this is the time to brush up on some notions instead.
 
 A shared pointer could have been used as a resource handle. In fact, the default
-handle mostly maps the interface of its standard counterpart and only adds a few
-things to it.<br/>
-However, the handle in `EnTT` is designed as a standalone class template named
-`resource`. It boils down to the fact that specializing a class in the standard
-is often undefined behavior while having the ability to specialize the handle
-for one, more or all resource types could help over time.
+implementation mostly maps the interface of its standard counterpart and only
+adds a few things on top of it.<br/>
+However, the handle in `EnTT` is designed as a standalone class template. This
+is due to the fact that specializing a class in the standard library is often
+undefined behavior while having the ability to specialize the handle for one,
+more or all resource types could help over time.
 
 ## Loaders
 
-A loader is a class that is responsible for _loading_ the resources.<br/>
-By default, it's just a callable object which forwards its arguments to the
+A loader is responsible for _loading_ resources (quite obviously).<br/>
+By default, it's just a callable object that forwards its arguments to the
 resource itself. That is, a _passthrough type_. All the work is demanded to the
 constructor(s) of the resource itself.<br/>
 Loaders also are fully customizable as expected.
@@ -104,7 +104,7 @@ When using the default handle, it expects a resource type which is convertible
 to or suitable for constructing an `std::shared_ptr<Type>` (where `Type` is the
 actual resource type).<br/>
 In other terms, the loader should return shared pointers to the given resource
-type. However, it isn't mandatory. Users can easily get around this constraint
+type. However, this isn't mandatory. Users can easily get around this constraint
 by specializing both the handle and the loader.
 
 A cache forwards all its arguments to the loader if required. This means that
@@ -136,7 +136,7 @@ This makes the whole loading logic quite flexible and easy to extend over time.
 ## The cache class
 
 The cache is the class that is asked to _connect the dots_.<br/>
-It loads the resources, store them aside and returns handles as needed:
+It loads the resources, stores them aside and returns handles as needed:
 
 ```cpp
 entt::resource_cache<my_resource, my_loader> cache{};
@@ -159,9 +159,9 @@ if(entt::resource<my_resource> res = cache["resource/id"_hs]; res) {
 ```
 
 Please, refer to the inline documentation for all the details about the other
-functions (for example `contains` or `erase`).
+functions (such as `contains` or `erase`).
 
-Set aside the part of the API that this class shares with a map, it also adds
+Set aside the part of the API that this class _shares_ with a map, it also adds
 something on top of it in order to address the most common requirements of a
 resource cache.<br/>
 In particular, it doesn't have an `emplace` member function which is replaced by
@@ -182,9 +182,8 @@ Note that the hashed string is used for convenience in the example above.<br/>
 Resource identifiers are nothing more than integral values. Therefore, plain
 numbers as well as non-class enum value are accepted.
 
-Moreover, it's worth mentioning that both the iterators of a cache and its
-indexing operators return resource handles rather than instances of the mapped
-type.<br/>
+It's worth mentioning that the iterators of a cache as well as its indexing
+operators return resource handles rather than instances of the mapped type.<br/>
 Since the cache has no control over the loader and a resource isn't required to
 also be convertible to bool, these handles can be invalid. This usually means an
 error in the user logic but it may also be an _expected_ event.<br/>
