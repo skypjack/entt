@@ -352,7 +352,7 @@ public:
         }
 
         // unnecessary but it helps to detect nasty bugs
-        ENTT_ASSERT(!(instance = nullptr), "");
+        ENTT_ASSERT((instance = nullptr) == nullptr, "");
         info = &type_id<void>();
         vtable = nullptr;
         mode = policy::owner;
