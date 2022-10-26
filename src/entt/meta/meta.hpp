@@ -664,7 +664,7 @@ struct meta_handle {
     /**
      * @brief Creates a handle that points to an unmanaged object.
      * @tparam Type Type of object to use to initialize the handle.
-     * @param area The context from which to search for meta types.
+     * @param ctx The context from which to search for meta types.
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
