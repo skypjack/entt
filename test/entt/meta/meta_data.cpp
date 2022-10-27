@@ -79,7 +79,7 @@ struct multi_setter_t {
         : value{0} {}
 
     void from_double(double val) {
-        value = val;
+        value = static_cast<int>(val);
     }
 
     void from_string(const char *val) {
