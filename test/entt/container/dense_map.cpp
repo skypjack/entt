@@ -1159,7 +1159,7 @@ TEST(DenseMap, Reserve) {
     map.reserve(minimum_bucket_count);
 
     ASSERT_EQ(map.bucket_count(), 2 * minimum_bucket_count);
-    ASSERT_EQ(map.bucket_count(), entt::next_power_of_two(std::ceil(minimum_bucket_count / map.max_load_factor())));
+    ASSERT_EQ(map.bucket_count(), entt::next_power_of_two(static_cast<std::size_t>(std::ceil(minimum_bucket_count / map.max_load_factor()))));
 }
 
 TEST(DenseMap, ThrowingAllocator) {
