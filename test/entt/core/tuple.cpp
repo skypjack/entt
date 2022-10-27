@@ -34,5 +34,5 @@ TEST(Tuple, UnwrapTuple) {
 TEST(Tuple, ForwardApply) {
     ASSERT_EQ(entt::forward_apply{[](auto &&...args) { return sizeof...(args); }}(std::make_tuple()), 0u);
     ASSERT_EQ(entt::forward_apply{[](int i) { return i; }}(std::make_tuple(42)), 42);
-    ASSERT_EQ(entt::forward_apply{[](auto... args) { return (args + ...); }}(std::make_tuple('a', 1u)), 'b');
+    ASSERT_EQ(entt::forward_apply{[](auto... args) { return (args + ...); }}(std::make_tuple('a', 1)), 'b');
 }
