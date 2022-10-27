@@ -237,7 +237,7 @@ class dense_set {
 
     template<typename Other>
     [[nodiscard]] std::size_t value_to_bucket(const Other &value) const noexcept {
-        return fast_mod(sparse.second()(value), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(value)), bucket_count());
     }
 
     template<typename Other>
