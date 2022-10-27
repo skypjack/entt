@@ -322,13 +322,13 @@ TEST(ResourceCache, Erase) {
     entt::resource_cache<std::size_t> cache;
 
     for(std::size_t next{}, last = resource_count + 1u; next < last; ++next) {
-        cache.load(next, next);
+        cache.load(static_cast<entt::id_type>(next), next);
     }
 
     ASSERT_EQ(cache.size(), resource_count + 1u);
 
     for(std::size_t next{}, last = resource_count + 1u; next < last; ++next) {
-        ASSERT_TRUE(cache.contains(next));
+        ASSERT_TRUE(cache.contains(static_cast<entt::id_type>(next)));
     }
 
     auto it = cache.erase(++cache.begin());
@@ -346,16 +346,16 @@ TEST(ResourceCache, Erase) {
 
     for(std::size_t next{}, last = resource_count + 1u; next < last; ++next) {
         if(next == 1u || next == 8u || next == 6u) {
-            ASSERT_FALSE(cache.contains(next));
+            ASSERT_FALSE(cache.contains(static_cast<entt::id_type>(next)));
         } else {
-            ASSERT_TRUE(cache.contains(next));
+            ASSERT_TRUE(cache.contains(static_cast<entt::id_type>(next)));
         }
     }
 
     cache.erase(cache.begin(), cache.end());
 
     for(std::size_t next{}, last = resource_count + 1u; next < last; ++next) {
-        ASSERT_FALSE(cache.contains(next));
+        ASSERT_FALSE(cache.contains(static_cast<entt::id_type>(next)));
     }
 
     ASSERT_EQ(cache.size(), 0u);
