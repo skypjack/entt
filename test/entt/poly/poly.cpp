@@ -18,7 +18,7 @@ struct common_type: Base {
     }
 
     int get() const {
-        return entt::poly_call<2>(*this);
+        return static_cast<int>(entt::poly_call<2>(*this));
     }
 
     void decr() {
@@ -26,11 +26,11 @@ struct common_type: Base {
     }
 
     int mul(int v) const {
-        return entt::poly_call<4>(*this, v);
+        return static_cast<int>(entt::poly_call<4>(*this, v));
     }
 
     int rand() const {
-        return entt::poly_call<5>(*this);
+        return static_cast<int>(entt::poly_call<5>(*this));
     }
 };
 
