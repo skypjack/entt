@@ -24,9 +24,9 @@ TEST(Flow, Constructors) {
     ASSERT_EQ(flow.size(), 0u);
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(other[0u], 0);
-    ASSERT_EQ(other[1u], 3);
-    ASSERT_EQ(other[2u], 99);
+    ASSERT_EQ(other[0u], 0u);
+    ASSERT_EQ(other[1u], 3u);
+    ASSERT_EQ(other[2u], 99u);
 }
 
 TEST(Flow, Copy) {
@@ -41,9 +41,9 @@ TEST(Flow, Copy) {
     ASSERT_EQ(flow.size(), 3u);
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(other[0u], 0);
-    ASSERT_EQ(other[1u], 3);
-    ASSERT_EQ(other[2u], 99);
+    ASSERT_EQ(other[0u], 0u);
+    ASSERT_EQ(other[1u], 3u);
+    ASSERT_EQ(other[2u], 99u);
 
     flow.bind(1);
     other.bind(2);
@@ -53,10 +53,10 @@ TEST(Flow, Copy) {
     ASSERT_EQ(other.size(), 4u);
     ASSERT_EQ(flow.size(), 4u);
 
-    ASSERT_EQ(other[0u], 0);
-    ASSERT_EQ(other[1u], 3);
-    ASSERT_EQ(other[2u], 99);
-    ASSERT_EQ(other[3u], 1);
+    ASSERT_EQ(other[0u], 0u);
+    ASSERT_EQ(other[1u], 3u);
+    ASSERT_EQ(other[2u], 99u);
+    ASSERT_EQ(other[3u], 1u);
 }
 
 TEST(Flow, Move) {
@@ -71,9 +71,9 @@ TEST(Flow, Move) {
     ASSERT_EQ(flow.size(), 0u);
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(other[0u], 0);
-    ASSERT_EQ(other[1u], 3);
-    ASSERT_EQ(other[2u], 99);
+    ASSERT_EQ(other[0u], 0u);
+    ASSERT_EQ(other[1u], 3u);
+    ASSERT_EQ(other[2u], 99u);
 
     flow = {};
     flow.bind(1);
@@ -84,7 +84,7 @@ TEST(Flow, Move) {
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(flow.size(), 0u);
 
-    ASSERT_EQ(other[0u], 1);
+    ASSERT_EQ(other[0u], 1u);
 }
 
 TEST(Flow, Swap) {
@@ -95,13 +95,13 @@ TEST(Flow, Swap) {
 
     ASSERT_EQ(other.size(), 0u);
     ASSERT_EQ(flow.size(), 1u);
-    ASSERT_EQ(flow[0u], 7);
+    ASSERT_EQ(flow[0u], 7u);
 
     flow.swap(other);
 
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(flow.size(), 0u);
-    ASSERT_EQ(other[0u], 7);
+    ASSERT_EQ(other[0u], 7u);
 }
 
 TEST(Flow, Clear) {
@@ -111,8 +111,8 @@ TEST(Flow, Clear) {
     flow.bind(99);
 
     ASSERT_EQ(flow.size(), 2u);
-    ASSERT_EQ(flow[0u], 0);
-    ASSERT_EQ(flow[1u], 99);
+    ASSERT_EQ(flow[0u], 0u);
+    ASSERT_EQ(flow[1u], 99u);
 
     flow.clear();
 
