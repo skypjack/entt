@@ -187,10 +187,10 @@ TEST(NonOwningGroup, Each) {
     auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
 
     registry.emplace<int>(entity[0u], 0);
-    registry.emplace<char>(entity[0u], 0);
+    registry.emplace<char>(entity[0u], static_cast<char>(0));
 
     registry.emplace<int>(entity[1u], 1);
-    registry.emplace<char>(entity[1u], 1);
+    registry.emplace<char>(entity[1u], static_cast<char>(1));
 
     auto iterable = group.each();
     auto citerable = cgroup.each();
@@ -203,14 +203,14 @@ TEST(NonOwningGroup, Each) {
 
     ASSERT_EQ((it++, ++it), iterable.end());
 
-    group.each([expected = 1u](auto entt, int &ivalue, char &cvalue) mutable {
-        ASSERT_EQ(entt::to_integral(entt), expected);
+    group.each([expected = 1](auto entt, int &ivalue, char &cvalue) mutable {
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), expected);
         ASSERT_EQ(ivalue, expected);
         ASSERT_EQ(cvalue, expected);
         --expected;
     });
 
-    cgroup.each([expected = 1u](const int &ivalue, const char &cvalue) mutable {
+    cgroup.each([expected = 1](const int &ivalue, const char &cvalue) mutable {
         ASSERT_EQ(ivalue, expected);
         ASSERT_EQ(cvalue, expected);
         --expected;
@@ -224,8 +224,8 @@ TEST(NonOwningGroup, Each) {
 
     // do not use iterable, make sure an iterable group works when created from a temporary
     for(auto [entt, ivalue, cvalue]: registry.group(entt::get<int, char>).each()) {
-        ASSERT_EQ(entt::to_integral(entt), ivalue);
-        ASSERT_EQ(entt::to_integral(entt), cvalue);
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), ivalue);
+        ASSERT_EQ(static_cast<char>(entt::to_integral(entt)), cvalue);
     }
 }
 
@@ -831,10 +831,10 @@ TEST(OwningGroup, Each) {
     auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
 
     registry.emplace<int>(entity[0u], 0);
-    registry.emplace<char>(entity[0u], 0);
+    registry.emplace<char>(entity[0u], static_cast<char>(0));
 
     registry.emplace<int>(entity[1u], 1);
-    registry.emplace<char>(entity[1u], 1);
+    registry.emplace<char>(entity[1u], static_cast<char>(1));
 
     auto iterable = group.each();
     auto citerable = cgroup.each();
@@ -847,14 +847,14 @@ TEST(OwningGroup, Each) {
 
     ASSERT_EQ((it++, ++it), iterable.end());
 
-    group.each([expected = 1u](auto entt, int &ivalue, char &cvalue) mutable {
-        ASSERT_EQ(entt::to_integral(entt), expected);
+    group.each([expected = 1](auto entt, int &ivalue, char &cvalue) mutable {
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), expected);
         ASSERT_EQ(ivalue, expected);
         ASSERT_EQ(cvalue, expected);
         --expected;
     });
 
-    cgroup.each([expected = 1u](const int &ivalue, const char &cvalue) mutable {
+    cgroup.each([expected = 1](const int &ivalue, const char &cvalue) mutable {
         ASSERT_EQ(ivalue, expected);
         ASSERT_EQ(cvalue, expected);
         --expected;
@@ -868,8 +868,8 @@ TEST(OwningGroup, Each) {
 
     // do not use iterable, make sure an iterable group works when created from a temporary
     for(auto [entt, ivalue, cvalue]: registry.group<int>(entt::get<char>).each()) {
-        ASSERT_EQ(entt::to_integral(entt), ivalue);
-        ASSERT_EQ(entt::to_integral(entt), cvalue);
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), ivalue);
+        ASSERT_EQ(static_cast<char>(entt::to_integral(entt)), cvalue);
     }
 }
 
@@ -1403,7 +1403,7 @@ TEST(OwningGroup, SwappingValuesIsAllowed) {
 
     // thanks to @andranik3949 for pointing out this missing test
     registry.view<const boxed_int>().each([](const auto entity, const auto &value) {
-        ASSERT_EQ(entt::to_integral(entity), value.value);
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entity)), value.value);
     });
 }
 

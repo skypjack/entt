@@ -2009,7 +2009,7 @@ TEST(Registry, ScramblingPoolsIsAllowed) {
 
     // thanks to @andranik3949 for pointing out this missing test
     registry.view<const int>().each([](const auto entity, const auto &value) {
-        ASSERT_EQ(entt::to_integral(entity), value);
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entity)), value);
     });
 }
 

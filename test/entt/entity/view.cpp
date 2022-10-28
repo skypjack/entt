@@ -200,13 +200,13 @@ TEST(SingleComponentView, Each) {
 
     ASSERT_EQ((it++, ++it), iterable.end());
 
-    view.each([expected = 1u](auto entt, int &value) mutable {
-        ASSERT_EQ(entt::to_integral(entt), expected);
+    view.each([expected = 1](auto entt, int &value) mutable {
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), expected);
         ASSERT_EQ(value, expected);
         --expected;
     });
 
-    cview.each([expected = 1u](const int &value) mutable {
+    cview.each([expected = 1](const int &value) mutable {
         ASSERT_EQ(value, expected);
         --expected;
     });
@@ -219,7 +219,7 @@ TEST(SingleComponentView, Each) {
 
     // do not use iterable, make sure an iterable view works when created from a temporary
     for(auto [entt, value]: view.each()) {
-        ASSERT_EQ(entt::to_integral(entt), value);
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), value);
     }
 }
 
@@ -705,10 +705,10 @@ TEST(MultiComponentView, Each) {
     auto cview = std::as_const(registry).view<const int, const char>();
 
     registry.emplace<int>(entity[0u], 0);
-    registry.emplace<char>(entity[0u], 0);
+    registry.emplace<char>(entity[0u], static_cast<char>(0));
 
     registry.emplace<int>(entity[1u], 1);
-    registry.emplace<char>(entity[1u], 1);
+    registry.emplace<char>(entity[1u], static_cast<char>(1));
 
     auto iterable = view.each();
     auto citerable = cview.each();
@@ -721,14 +721,14 @@ TEST(MultiComponentView, Each) {
 
     ASSERT_EQ((it++, ++it), iterable.end());
 
-    view.each([expected = 1u](auto entt, int &ivalue, char &cvalue) mutable {
-        ASSERT_EQ(entt::to_integral(entt), expected);
+    view.each([expected = 1](auto entt, int &ivalue, char &cvalue) mutable {
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), expected);
         ASSERT_EQ(ivalue, expected);
         ASSERT_EQ(cvalue, expected);
         --expected;
     });
 
-    cview.each([expected = 1u](const int &ivalue, const char &cvalue) mutable {
+    cview.each([expected = 1](const int &ivalue, const char &cvalue) mutable {
         ASSERT_EQ(ivalue, expected);
         ASSERT_EQ(cvalue, expected);
         --expected;
@@ -742,8 +742,8 @@ TEST(MultiComponentView, Each) {
 
     // do not use iterable, make sure an iterable view works when created from a temporary
     for(auto [entt, ivalue, cvalue]: registry.view<int, char>().each()) {
-        ASSERT_EQ(entt::to_integral(entt), ivalue);
-        ASSERT_EQ(entt::to_integral(entt), cvalue);
+        ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), ivalue);
+        ASSERT_EQ(static_cast<char>(entt::to_integral(entt)), cvalue);
     }
 }
 

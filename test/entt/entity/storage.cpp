@@ -513,8 +513,8 @@ TEST(Storage, Remove) {
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 2);
 
-    ASSERT_EQ(pool.remove(entities[2u]), 1u);
-    ASSERT_EQ(pool.remove(entities[2u]), 0u);
+    ASSERT_TRUE(pool.remove(entities[2u]));
+    ASSERT_FALSE(pool.remove(entities[2u]));
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entities[0u], 0);
@@ -575,9 +575,9 @@ TEST(Storage, StableRemove) {
     ASSERT_EQ(pool.begin()->value, 2);
     ASSERT_EQ(pool.index(entities[2u]), 2u);
 
-    ASSERT_EQ(pool.remove(entities[2u]), 1u);
-    ASSERT_EQ(pool.remove(entities[2u]), 0u);
-    ASSERT_EQ(pool.remove(entities[2u]), 0u);
+    ASSERT_TRUE(pool.remove(entities[2u]));
+    ASSERT_FALSE(pool.remove(entities[2u]));
+    ASSERT_FALSE(pool.remove(entities[2u]));
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 3u);
     ASSERT_FALSE(pool.contains(entities[0u]));
@@ -610,11 +610,11 @@ TEST(Storage, StableRemove) {
     pool.emplace(entities[1u], stable_type{2});
     pool.emplace(entities[2u], stable_type{1});
 
-    ASSERT_EQ(pool.remove(entities[2u]), 1u);
-    ASSERT_EQ(pool.remove(entities[2u]), 0u);
+    ASSERT_TRUE(pool.remove(entities[2u]));
+    ASSERT_FALSE(pool.remove(entities[2u]));
 
-    ASSERT_EQ(pool.remove(entities[0u]), 1u);
-    ASSERT_EQ(pool.remove(entities[1u]), 1u);
+    ASSERT_TRUE(pool.remove(entities[0u]));
+    ASSERT_TRUE(pool.remove(entities[1u]));
     ASSERT_EQ(pool.remove(entities, entities + 2u), 0u);
 
     ASSERT_EQ(pool.size(), 3u);

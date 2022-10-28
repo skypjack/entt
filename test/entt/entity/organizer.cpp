@@ -20,7 +20,7 @@ struct clazz {
     static void ro_int_char_with_payload(clazz &, entt::view<entt::get_t<const int, const char>>) {}
 };
 
-void to_args_integrity(entt::view<entt::get_t<int>> view, std::size_t &value, entt::registry &registry) {
+void to_args_integrity(entt::view<entt::get_t<int>> view, std::size_t &value, entt::registry &) {
     value = view.size();
 }
 
