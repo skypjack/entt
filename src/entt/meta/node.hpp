@@ -136,7 +136,7 @@ meta_type_node resolve(const meta_context &) noexcept;
 
 template<typename... Args>
 [[nodiscard]] auto meta_arg_node(const meta_context &context, type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
-    std::size_t pos{};
+    [[maybe_unused]] std::size_t pos{};
     meta_type_node (*value)(const meta_context &) noexcept = nullptr;
     ((value = (pos++ == index ? &resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
     ENTT_ASSERT(value != nullptr, "Out of bounds");
