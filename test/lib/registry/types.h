@@ -3,12 +3,12 @@
 
 #include <entt/core/attribute.h>
 
-struct ENTT_API position {
+struct position {
     int x;
     int y;
 };
 
-struct ENTT_API velocity {
+struct velocity {
     double dx;
     double dy;
 };

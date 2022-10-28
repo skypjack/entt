@@ -3,10 +3,10 @@
 
 #include <entt/core/attribute.h>
 
-struct ENTT_API message {
+struct message {
     int payload;
 };
 
-struct ENTT_API event {};
+struct event {};
 
 #endif
