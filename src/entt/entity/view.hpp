@@ -268,11 +268,11 @@ public:
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
      * @param value The storage for the types to iterate.
-     * @param exclude The storage for the types used to filter the view.
+     * @param excl The storage for the types used to filter the view.
      */
-    basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> exclude = {}) noexcept
+    basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> excl = {}) noexcept
         : pools{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, value)},
-          filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, exclude)},
+          filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, excl)},
           view{std::apply([](const base_type *first, const auto *...other) { ((first = other->size() < first->size() ? other : first), ...); return first; }, pools)} {}
 
     /**
