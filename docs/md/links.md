@@ -168,6 +168,8 @@ I hope this list can grow much more in the future:
     engine based on `SDL2` and `EnTT`.
   * [Ducktape](https://github.com/DucktapeEngine/Ducktape): an open source C++
     2D & 3D game engine that focuses on being fast and powerful.
+  * [The Worst Engine](https://github.com/Parasik72/TWE): a game engine based on
+    OpenGL.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
