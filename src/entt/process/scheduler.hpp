@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "fwd.hpp"
 #include "process.hpp"
 
 namespace entt {
@@ -38,11 +39,11 @@ namespace entt {
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta>
-class scheduler {
+class basic_scheduler {
     struct process_handler {
         using instance_type = std::unique_ptr<void, void (*)(void *)>;
-        using update_fn_type = bool(scheduler &, std::size_t, Delta, void *);
-        using abort_fn_type = void(scheduler &, std::size_t, bool);
+        using update_fn_type = bool(basic_scheduler &, std::size_t, Delta, void *);
+        using abort_fn_type = void(basic_scheduler &, std::size_t, bool);
         using next_type = std::unique_ptr<process_handler>;
 
         instance_type instance;
@@ -58,8 +59,8 @@ class scheduler {
         template<typename Proc, typename... Args>
         continuation then(Args &&...args) {
             static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
-            auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
-            handler->next.reset(new process_handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr});
+            auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &basic_scheduler::deleter<Proc>};
+            handler->next.reset(new process_handler{std::move(proc), &basic_scheduler::update<Proc>, &basic_scheduler::abort<Proc>, nullptr});
             handler = handler->next.get();
             return *this;
         }
@@ -74,7 +75,7 @@ class scheduler {
     };
 
     template<typename Proc>
-    [[nodiscard]] static bool update(scheduler &owner, std::size_t pos, const Delta delta, void *data) {
+    [[nodiscard]] static bool update(basic_scheduler &owner, std::size_t pos, const Delta delta, void *data) {
         auto *process = static_cast<Proc *>(owner.handlers[pos].instance.get());
         process->tick(delta, data);
 
@@ -94,7 +95,7 @@ class scheduler {
     }
 
     template<typename Proc>
-    static void abort(scheduler &owner, std::size_t pos, const bool immediately) {
+    static void abort(basic_scheduler &owner, std::size_t pos, const bool immediately) {
         static_cast<Proc *>(owner.handlers[pos].instance.get())->abort(immediately);
     }
 
@@ -105,17 +106,19 @@ class scheduler {
 
 public:
     /*! @brief Unsigned integer type. */
+    using delta_type = Delta;
+    /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
 
     /*! @brief Default constructor. */
-    scheduler()
+    basic_scheduler()
         : handlers{} {}
 
     /*! @brief Default move constructor. */
-    scheduler(scheduler &&) = default;
+    basic_scheduler(basic_scheduler &&) = default;
 
     /*! @brief Default move assignment operator. @return This scheduler. */
-    scheduler &operator=(scheduler &&) = default;
+    basic_scheduler &operator=(basic_scheduler &&) = default;
 
     /**
      * @brief Number of processes currently scheduled.
@@ -171,8 +174,8 @@ public:
     template<typename Proc, typename... Args>
     auto attach(Args &&...args) {
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
-        auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
-        auto &&ref = handlers.emplace_back(process_handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr});
+        auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &basic_scheduler::deleter<Proc>};
+        auto &&ref = handlers.emplace_back(process_handler{std::move(proc), &basic_scheduler::update<Proc>, &basic_scheduler::abort<Proc>, nullptr});
         // forces the process to exit the uninitialized state
         ref.update(*this, handlers.size() - 1u, {}, nullptr);
         return continuation{&handlers.back()};
@@ -246,7 +249,7 @@ public:
      * @param delta Elapsed time.
      * @param data Optional data.
      */
-    void update(const Delta delta, void *data = nullptr) {
+    void update(const delta_type delta, void *data = nullptr) {
         for(auto pos = handlers.size(); pos; --pos) {
             const auto curr = pos - 1u;
 

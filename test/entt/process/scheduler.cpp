@@ -4,7 +4,7 @@
 #include <entt/process/process.hpp>
 #include <entt/process/scheduler.hpp>
 
-struct foo_process: entt::process<foo_process, int> {
+struct foo_process: entt::process<foo_process, entt::scheduler::delta_type> {
     foo_process(std::function<void()> upd, std::function<void()> abort)
         : on_update{upd}, on_aborted{abort} {}
 
@@ -20,7 +20,7 @@ struct foo_process: entt::process<foo_process, int> {
     std::function<void()> on_aborted;
 };
 
-struct succeeded_process: entt::process<succeeded_process, int> {
+struct succeeded_process: entt::process<succeeded_process, entt::scheduler::delta_type> {
     void update(delta_type, void *) {
         ++invoked;
         succeed();
@@ -29,7 +29,7 @@ struct succeeded_process: entt::process<succeeded_process, int> {
     static inline unsigned int invoked;
 };
 
-struct failed_process: entt::process<failed_process, int> {
+struct failed_process: entt::process<failed_process, entt::scheduler::delta_type> {
     void update(delta_type, void *) {
         ++invoked;
         fail();
@@ -46,7 +46,7 @@ struct Scheduler: ::testing::Test {
 };
 
 TEST_F(Scheduler, Functionalities) {
-    entt::scheduler<int> scheduler{};
+    entt::scheduler scheduler{};
 
     bool updated = false;
     bool aborted = false;
@@ -77,7 +77,7 @@ TEST_F(Scheduler, Functionalities) {
 }
 
 TEST_F(Scheduler, Then) {
-    entt::scheduler<int> scheduler;
+    entt::scheduler scheduler;
 
     // failing process with successor
     scheduler.attach<succeeded_process>()
@@ -106,7 +106,7 @@ TEST_F(Scheduler, Then) {
 }
 
 TEST_F(Scheduler, Functor) {
-    entt::scheduler<int> scheduler;
+    entt::scheduler scheduler;
 
     bool first_functor = false;
     bool second_functor = false;
@@ -135,7 +135,7 @@ TEST_F(Scheduler, Functor) {
 }
 
 TEST_F(Scheduler, SpawningProcess) {
-    entt::scheduler<int> scheduler;
+    entt::scheduler scheduler;
 
     scheduler.attach([&scheduler](auto, void *, auto resolve, auto) {
         scheduler.attach<succeeded_process>().then<failed_process>();
