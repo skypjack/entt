@@ -19,14 +19,12 @@
 general and on GNU/Linux when default visibility was set to hidden. The
 limitation was mainly due to a custom utility used to assign unique, sequential
 identifiers with different types.<br/>
-Fortunately, nowadays using `EnTT` across boundaries is much easier.
+Fortunately, nowadays `EnTT` works smoothly across boundaries.
 
 ## Smooth until proven otherwise
 
 Many classes in `EnTT` make extensive use of type erasure for their purposes.
-This isn't a problem on itself (in fact, it's the basis of an API so convenient
-to use). However, a way is needed to recognize the objects whose type has been
-erased on the other side of a boundary.<br/>
+This raises the need to identify objects whose type has been erased.<br/>
 The `type_hash` class template is how identifiers are generated and thus made
 available to the rest of the library. In general, this class doesn't arouse much
 interest. The only exception is when a conflict between identifiers occurs
@@ -36,13 +34,13 @@ The section dedicated to `type_info` contains all the details to get around the
 issue in a concise and elegant way. Please refer to the specific documentation.
 
 When working with linked libraries, compile definitions `ENTT_API_EXPORT` and
-`ENTT_API_IMPORT` can be used where there is a need to import or export symbols,
-so as to make everything work nicely across boundaries.<br/>
+`ENTT_API_IMPORT` are to import or export symbols, so as to make everything work
+nicely across boundaries.<br/>
 On the other hand, everything should run smoothly when working with plugins or
 shared libraries that don't export any symbols.
 
-For anyone who needs more details, the test suite contains multiple examples
-covering the most common cases (see the `lib` directory for all details).<br/>
+For those who need more details, the test suite contains many examples covering
+the most common cases (see the `lib` directory for all details).<br/>
 It goes without saying that it's impossible to cover **all** possible cases.
 However, what is offered should hopefully serve as a basis for all of them.
 
@@ -70,8 +68,8 @@ entt::locator<entt::meta_ctx>::reset(handle);
 
 From now on, both spaces refer to the same context and on it are attached all
 new meta types, no matter where they are created.<br/>
-Note that resetting the main context doesn't also propagate changes across
-boundaries. In other words, resetting a context results in the decoupling of the
+Note that _replacing_ the main context doesn't also propagate changes across
+boundaries. In other words, replacing a context results in the decoupling of the
 two sides and therefore a divergence in the contents.
 
 ## Memory Management
