@@ -485,8 +485,8 @@ public:
     }
 
 private:
-    base_type *const handler;
-    const std::tuple<Get *...> pools;
+    base_type *handler;
+    std::tuple<Get *...> pools;
 };
 
 /**
@@ -843,8 +843,8 @@ public:
     }
 
 private:
-    const std::tuple<Owned *..., Get *...> pools;
-    const size_type *const length;
+    std::tuple<Owned *..., Get *...> pools;
+    const size_type *length;
 };
 
 } // namespace entt
