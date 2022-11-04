@@ -21,7 +21,7 @@ difficult to do better (although it's very easy to do worse, as many examples
 available online demonstrate).<br/>
 `EnTT` doesn't try in any way to replace what is offered by the standard. Quite
 the opposite, given the widespread use that is made of standard containers.<br/>
-However, the library also tries to fill a gap in features and functionality by
+However, the library also tries to fill a gap in features and functionalities by
 making available some containers initially developed for internal use.
 
 This section of the library is likely to grow larger over time. However, for the
@@ -40,7 +40,7 @@ The implementation is based on _sparse sets_ and each bucket is identified by an
 implicit list within the packed array itself.
 
 The interface is very close to its counterpart in the standard library, that is,
-`std::unordered_map`.<br/>
+the `std::unordered_map` class.<br/>
 However, both local and non-local iterators returned by a dense map belong to
 the input iterator category although they respectively model the concepts of a
 _forward iterator_ type and a _random access iterator_ type.<br/>
@@ -63,5 +63,5 @@ The implementation is based on _sparse sets_ and each bucket is identified by an
 implicit list within the packed array itself.
 
 The interface is in all respects similar to its counterpart in the standard
-library, that is, `std::unordered_set`.<br/>
+library, that is, the `std::unordered_set` class.<br/>
 Therefore, there is no need to go into the API description.
