@@ -153,11 +153,13 @@ public:
     /**
      * @brief Constructs a group from a set of storage classes.
      * @param ref The actual entities to iterate.
-     * @param gpool Storage types to iterate _observed_ by the group.
+     * @param gpool The storage for the _observed_ types to iterate.
+     * @param epool The storage for the types used to filter the group.
      */
-    basic_group(basic_common_type &ref, Get &...gpool) noexcept
+    basic_group(basic_common_type &ref, Get &...gpool, Exclude &...epool) noexcept
         : handler{&ref},
-          pools{&gpool...} {}
+          pools{&gpool...},
+          filter{&epool...} {}
 
     /**
      * @brief Returns a const reference to the underlying handler.
@@ -487,6 +489,7 @@ public:
 private:
     base_type *handler;
     std::tuple<Get *...> pools;
+    std::tuple<Exclude *...> filter;
 };
 
 /**
@@ -549,11 +552,13 @@ public:
     /**
      * @brief Constructs a group from a set of storage classes.
      * @param extent The actual number of entities to iterate.
-     * @param opool Storage types to iterate _owned_ by the group.
-     * @param gpool Storage types to iterate _observed_ by the group.
+     * @param opool The storage for the _owned_ types to iterate.
+     * @param gpool The storage for the _observed_ types to iterate.
+     * @param epool The storage for the types used to filter the group.
      */
-    basic_group(const std::size_t &extent, Owned &...opool, Get &...gpool) noexcept
+    basic_group(const std::size_t &extent, Owned &...opool, Get &...gpool, Exclude &...epool) noexcept
         : pools{&opool..., &gpool...},
+          filter{&epool...},
           length{&extent} {}
 
     /**
@@ -844,6 +849,7 @@ public:
 
 private:
     std::tuple<Owned *..., Get *...> pools;
+    std::tuple<Exclude *...> filter;
     const size_type *length;
 };
 
