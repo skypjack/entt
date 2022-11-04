@@ -23,15 +23,15 @@
 
 `EnTT` doesn't aim to offer everything one needs to work with graphs. Therefore,
 anyone looking for this in the _graph_ submodule will be disappointed.<br/>
-Quite the opposite is true. This submodule is minimal and contains only the data
-structures and algorithms strictly necessary for the development of some tools
-such as the _flow builder_.
+Quite the opposite is true though. This submodule is minimal and contains only
+the data structures and algorithms strictly necessary for the development of
+some tools such as the _flow builder_.
 
 # Data structures
 
 As anticipated in the introduction, the aim isn't to offer all possible data
 structures suitable for representing and working with graphs. Many will likely
-be added or refined over time, however I want to discourage anyone expecting
+be added or refined over time. However I want to discourage anyone expecting
 tight scheduling on the subject.<br/>
 The data structures presented in this section are mainly useful for the
 development and support of some tools which are also part of the same submodule.
@@ -49,7 +49,7 @@ The `directed_tag` type _creates_ the graph as directed. There is also an
 `undirected_tag` counterpart which creates it as undirected.<br/>
 The interface deviates slightly from the typical double indexing of C and offers
 an API that is perhaps more familiar to a C++ programmer. Therefore, the access
-and modification of an element will take place via the `contains`, `insert` and
+and modification of an element takes place via the `contains`, `insert` and
 `erase` functions rather than a double call to an `operator[]`:
 
 ```cpp
@@ -60,14 +60,14 @@ if(adjacency_matrix.contains(0u, 1u)) {
 }
 ```
 
-Both `insert` and` erase` are idempotent functions which have no effect if the
+Both `insert` and` erase` are _idempotent_ functions which have no effect if the
 element already exists or has already been deleted.<br/>
 The first one returns an `std::pair` containing the iterator to the element and
-a boolean value indicating whether the element has been inserted or was already
-present. The second one instead returns the number of deleted elements (0 or 1).
+a boolean value indicating whether the element was newly inserted or not. The
+second one returns the number of deleted elements (0 or 1).
 
-An adjacency matrix must be initialized with the number of elements (vertices)
-when constructing it but can also be resized later using the `resize` function:
+An adjacency matrix is initialized with the number of elements (vertices) when
+constructing it but can also be resized later using the `resize` function:
 
 ```cpp
 entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
@@ -82,8 +82,8 @@ for(auto &&vertex: adjacency_matrix.vertices()) {
 }
 ```
 
-Note that the same result can be obtained with the following snippet, since the
-vertices are unsigned integral values:
+The same result is obtained with the following snippet, since the vertices are
+plain unsigned integral values:
 
 ```cpp
 for(auto last = adjacency_matrix.size(), pos = {}; pos < last; ++pos) {
@@ -93,8 +93,8 @@ for(auto last = adjacency_matrix.size(), pos = {}; pos < last; ++pos) {
 
 As for visiting the edges, a few functions are available.<br/>
 When the purpose is to visit all the edges of a given adjacency matrix, the
-`edges` function returns an iterable object that can be used to get them as
-pairs of vertices:
+`edges` function returns an iterable object that is used to get them as pairs of
+vertices:
 
 ```cpp
 for(auto [lhs, rhs]: adjacency_matrix.edges()) {
@@ -102,8 +102,8 @@ for(auto [lhs, rhs]: adjacency_matrix.edges()) {
 }
 ```
 
-On the other hand, if the goal is to visit all the in- or out-edges of a given
-vertex, the `in_edges` and `out_edges` functions are meant for that:
+If the goal is to visit all the in- or out-edges of a given vertex instead, the
+`in_edges` and `out_edges` functions are meant for that:
 
 ```cpp
 for(auto [lhs, rhs]: adjacency_matrix.out_edges(3u)) {
@@ -111,11 +111,11 @@ for(auto [lhs, rhs]: adjacency_matrix.out_edges(3u)) {
 }
 ```
 
-As might be expected, these functions expect the vertex to visit (that is, to
-return the in- or out-edges for) as an argument.<br/>
+Both the functions expect the vertex to visit (that is, to return the in- or
+out-edges for) as an argument.<br/>
 Finally, the adjacency matrix is an allocator-aware container and offers most of
-the functionality one would expect from this type of containers, such as `clear`
-or 'get_allocator` and so on.
+the functionalities one would expect from this type of containers, such as
+`clear` or 'get_allocator` and so on.
 
 ## Graphviz dot language
 
@@ -129,19 +129,19 @@ std::ostringstream output{};
 entt::dot(output, adjacency_matrix);
 ```
 
-However, there is also the option of providing a callback to which the vertices
-are passed and which can be used to add (`dot`) properties to the output from
-time to time:
+It's also possible to provide a callback to which the vertices are passed and
+which can be used to add (`dot`) properties to the output as needed:
 
 ```cpp
 std::ostringstream output{};
+
 entt::dot(output, adjacency_matrix, [](auto &output, auto vertex) {
     out << "label=\"v\"" << vertex << ",shape=\"box\"";
 });
 ```
 
 This second mode is particularly convenient when the user wants to associate
-data managed externally to the graph being converted.
+externally managed data to the graph being converted.
 
 # Flow builder
 
@@ -155,42 +155,42 @@ specified.<br/>
 Most of the functions in the API also return the flow builder itself, according
 to what is the common sense API when it comes to builder classes.
 
-Once all tasks have been registered and resources assigned to them, an execution
-graph in the form of an adjacency matrix is returned to the user.<br/>
+Once all tasks are registered and resources assigned to them, an execution graph
+in the form of an adjacency matrix is returned to the user.<br/>
 This graph contains all the tasks assigned to the flow builder in the form of
-_vertices_. The _vertex_ itself can be used as an index to get the identifier
-passed during registration.
+_vertices_. The _vertex_ itself is used as an index to get the identifier passed
+during registration.
 
 ## Tasks and resources
 
 Although these terms are used extensively in the documentation, the flow builder
 has no real concept of tasks and resources.<br/>
 This class works mainly with _identifiers_, that is, values of type `id_type`.
-That is, both tasks and resources are identified by integral values.<br/>
+In other terms, both tasks and resources are identified by integral values.<br/>
 This allows not to couple the class itself to the rest of the library or to any
 particular data structure. On the other hand, it requires the user to keep track
 of the association between identifiers and operations or actual data.
 
-Once a flow builder has been created (which requires no constructor arguments),
-the first thing to do is to bind a task. This will indicate to the builder who
-intends to consume the resources that will be specified immediately after:
+Once a flow builder is created (which requires no constructor arguments), the
+first thing to do is to bind a task. This tells to the builder _who_ intends to
+consume the resources that are specified immediately after:
 
 ```cpp
 entt::flow builder{};
 builder.bind("task_1"_hs);
 ```
 
-Note that the example uses the `EnTT` hashed string to generate an identifier
-for the task.<br/>
-Indeed, the use of `id_type` as an identifier type is not by accident. In fact,
+The example uses the `EnTT` hashed string to generate an identifier for the
+task.<br/>
+Indeed, the use of `id_type` as an identifier type isn't by accident. In fact,
 it matches well with the internal hashed string class. Moreover, it's also the
 same type returned by the hash function of the internal RTTI system, in case the
 user wants to rely on that.<br/>
 However, being an integral value, it leaves the user full freedom to rely on his
-own tools if he deems it necessary.
+own tools if necessary.
 
-Once a task has been associated with the flow builder, it can be assigned
-read-only or read-write resources, as appropriate:
+Once a task is associated with the flow builder, it's also assigned read-only or
+read-write resources as appropriate:
 
 ```cpp
 builder
@@ -203,7 +203,7 @@ builder
 
 As mentioned, many functions return the builder itself and it's therefore easy
 to concatenate the different calls.<br/>
-Also in the case of resources, these are identified by numeric values of type
+Also in the case of resources, they are identified by numeric values of type
 `id_type`. As above, the choice is not entirely random. This goes well with the
 tools offered by the library while leaving room for maximum flexibility.
 
@@ -217,10 +217,10 @@ before or after another task.<br/>
 In fact, the order of _registration_ on the resources also determines the order
 in which the tasks are processed during the generation of the execution graph.
 
-However, there is a way to force the execution order of two processes.<br/>
+However, there is a way to _force_ the execution order of two processes.<br/>
 Briefly, since accessing a resource in opposite modes requires sequential rather
-than parallel scheduling, it's possible to make use of fake resources to force
-the order execution:
+than parallel scheduling, it's possible to make use of fake resources to rule on
+the execution order:
 
 ```cpp
 builder
@@ -235,10 +235,10 @@ builder
         .ro("fake"_hs)
 ```
 
-This snippet forces the execution of `task_2` and `task_3` **after** `task_1`.
-This is due to the fact that the latter sets a read-write requirement on a fake
+This snippet forces the execution of `task_1` **before** `task_2` and `task_3`.
+This is due to the fact that the former sets a read-write requirement on a fake
 resource that the other tasks also want to access in read-only mode.<br/>
-Similarly, it's possible to force a task to run after a certain group:
+Similarly, it's possible to force a task to run **after** a certain group:
 
 ```cpp
 builder
@@ -261,7 +261,7 @@ others tasks.
 
 Sometimes it's useful to assign the role of _sync point_ to a node.<br/>
 Whether it accesses new resources or is simply a watershed, the procedure for
-assigning this role to a vertex is always the same: first it's tied to the flow
+assigning this role to a vertex is always the same. First it's tied to the flow
 builder, then the `sync` function is invoked:
 
 ```cpp
@@ -283,7 +283,7 @@ all specified constraints to return the best scheduling for the vertices:
 entt::adjacency_matrix<entt::directed_tag> graph = builder.graph();
 ```
 
-The search for the main vertices, that is those without in-edges, is usually the
+Searching for the main vertices (that is, those without in-edges) is usually the
 first thing required:
 
 ```cpp
@@ -294,6 +294,6 @@ for(auto &&vertex: graph) {
 }
 ```
 
-Starting from them, using the other functions appropriately (such as `out_edges`
-to retrieve the children of a given task or `edges` to access their identifiers)
-it will be possible to instantiate an execution graph.
+Then it's possible to instantiate an execution graph by means of other functions
+such as `out_edges` to retrieve the children of a given task or `edges` to get
+the identifiers.
