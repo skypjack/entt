@@ -70,19 +70,19 @@ private:
 struct a_component {};
 
 struct another_component {
-    int key;
-    int value;
+    int key{};
+    int value{};
 };
 
 struct what_a_component {
-    entt::entity bar;
-    std::vector<entt::entity> quux;
+    entt::entity bar{};
+    std::vector<entt::entity> quux{};
 };
 
 struct map_component {
-    std::map<entt::entity, int> keys;
-    std::map<int, entt::entity> values;
-    std::map<entt::entity, entt::entity> both;
+    std::map<entt::entity, int> keys{};
+    std::map<int, entt::entity> values{};
+    std::map<entt::entity, entt::entity> both{};
 };
 
 TEST(Snapshot, Dump) {
