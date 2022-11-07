@@ -51,7 +51,9 @@ function(SETUP_TARGET TARGET_NAME)
         target_compile_options(
             ${TARGET_NAME}
             PRIVATE
-                /EHsc /W1 /wd4996 /w14800
+                # vs2017 emits too many false positives for my tastes
+                $<IF:$<EQUAL:${MSVC_TOOLSET_VERSION},141>, /W1, /W4>
+                /EHsc /wd4324 /wd4996
                 $<$<CONFIG:Debug>:/Od>
                 $<$<CONFIG:Release>:/O2>
         )
