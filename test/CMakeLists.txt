@@ -53,6 +53,8 @@ function(SETUP_TARGET TARGET_NAME)
             PRIVATE
                 # vs2017 emits too many false positives for my tastes
                 $<IF:$<EQUAL:${MSVC_TOOLSET_VERSION},141>, /W1, /W4>
+                # clang-cl goes a little wrong with some warnings instead
+                $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wno-deprecated-declarations -Wno-ignored-qualifiers -Wno-unknown-warning-option -Wno-exceptions -Wno-unused-local-typedef -Wno-unused-private-field>
                 /EHsc /wd4324 /wd4996
                 $<$<CONFIG:Debug>:/Od>
                 $<$<CONFIG:Release>:/O2>
