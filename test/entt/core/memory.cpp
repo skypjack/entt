@@ -24,6 +24,10 @@ TEST(ToAddress, Functionalities) {
 
 TEST(PoccaPocmaAndPocs, Functionalities) {
     test::basic_test_allocator<int> lhs, rhs;
+
+    // code coverage purposes
+    ASSERT_FALSE(lhs == rhs);
+
     // honestly, I don't even know how one is supposed to test such a thing :)
     entt::propagate_on_container_copy_assignment(lhs, rhs);
     entt::propagate_on_container_move_assignment(lhs, rhs);
