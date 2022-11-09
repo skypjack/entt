@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['poly_5fbase_3c_20basic_5fpoly_20_3e_1168',['poly_base&lt; basic_poly &gt;',['../classentt_1_1basic__poly.html#a4f532417307014ab3c9eb0070beaf7fc',1,'entt::basic_poly']]]
+  ['resource_0',['resource',['../classentt_1_1resource.html#a10dac526a08b422e1767d8fa1cfd8dd3',1,'entt::resource']]]
 ];

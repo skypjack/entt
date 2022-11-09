@@ -1,9 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,205,159,261"/>
-<area shape="rect" id="node2" href="$structentt_1_1meta__associative__container__traits_3_01dense__map_3_01Key_00_01Type_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for dense_maps of any type." alt="" coords="218,5,414,61"/>
-<area shape="rect" id="node3" href="$structentt_1_1meta__associative__container__traits_3_01dense__set_3_01Type_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for dense_sets of any type." alt="" coords="233,85,399,141"/>
-<area shape="rect" id="node4" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::maps of any type." alt="" coords="215,165,417,221"/>
-<area shape="rect" id="node5" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1set_3_01Key_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::sets of any type." alt="" coords="239,245,393,301"/>
-<area shape="rect" id="node6" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1unordered__map_3_01Key_00_01Value_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::unordered_maps of any type." alt="" coords="217,326,415,397"/>
-<area shape="rect" id="node7" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1unordered__set_3_01Key_00_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::unordered_sets of any type." alt="" coords="207,421,425,477"/>
+<area shape="rect" id="node1" href="$structentt_1_1meta__function__descriptor__traits.html" title=" " alt="" coords="5,5,232,120"/>
+<area shape="rect" id="node2" href="$structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_01Class_1_1_5_01_4.html" title="Meta function descriptor." alt="" coords="280,35,435,91"/>
 </map>

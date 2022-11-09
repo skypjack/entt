@@ -1,28 +1,4 @@
 var searchData=
 [
-  ['tombstone_5ft_712',['tombstone_t',['../structentt_1_1tombstone__t.html',1,'entt']]],
-  ['tuple_5felement_3c_20index_2c_20entt_3a_3acompressed_5fpair_3c_20first_2c_20second_20_3e_20_3e_713',['tuple_element&lt; Index, entt::compressed_pair&lt; First, Second &gt; &gt;',['../structstd_1_1tuple__element_3_01Index_00_01entt_1_1compressed__pair_3_01First_00_01Second_01_4_01_4.html',1,'std']]],
-  ['tuple_5fsize_3c_20entt_3a_3acompressed_5fpair_3c_20first_2c_20second_20_3e_20_3e_714',['tuple_size&lt; entt::compressed_pair&lt; First, Second &gt; &gt;',['../structstd_1_1tuple__size_3_01entt_1_1compressed__pair_3_01First_00_01Second_01_4_01_4.html',1,'std']]],
-  ['type_5fhash_715',['type_hash',['../structentt_1_1type__hash.html',1,'entt']]],
-  ['type_5fidentity_716',['type_identity',['../structentt_1_1type__identity.html',1,'entt']]],
-  ['type_5findex_717',['type_index',['../structentt_1_1type__index.html',1,'entt']]],
-  ['type_5finfo_718',['type_info',['../structentt_1_1type__info.html',1,'entt']]],
-  ['type_5flist_719',['type_list',['../structentt_1_1type__list.html',1,'entt']]],
-  ['type_5flist_3c_20type_2e_2e_2e_20_3e_720',['type_list&lt; Type... &gt;',['../structentt_1_1type__list.html',1,'entt']]],
-  ['type_5flist_5fcat_721',['type_list_cat',['../structentt_1_1type__list__cat.html',1,'entt']]],
-  ['type_5flist_5fcat_3c_20type_5flist_3c_20type_2e_2e_2e_20_3e_20_3e_722',['type_list_cat&lt; type_list&lt; Type... &gt; &gt;',['../structentt_1_1type__list__cat_3_01type__list_3_01Type_8_8_8_01_4_01_4.html',1,'entt']]],
-  ['type_5flist_5fcat_3c_20type_5flist_3c_20type_2e_2e_2e_20_3e_2c_20type_5flist_3c_20other_2e_2e_2e_20_3e_2c_20list_2e_2e_2e_20_3e_723',['type_list_cat&lt; type_list&lt; Type... &gt;, type_list&lt; Other... &gt;, List... &gt;',['../structentt_1_1type__list__cat_3_01type__list_3_01Type_8_8_8_01_4_00_01type__list_3_01Other_8_8_8_01_4_00_01List_8_8_8_01_4.html',1,'entt']]],
-  ['type_5flist_5fcat_3c_3e_724',['type_list_cat&lt;&gt;',['../structentt_1_1type__list__cat_3_4.html',1,'entt']]],
-  ['type_5flist_5fcontains_725',['type_list_contains',['../structentt_1_1type__list__contains.html',1,'entt']]],
-  ['type_5flist_5fcontains_3c_20type_5flist_3c_20type_2e_2e_2e_20_3e_2c_20other_20_3e_726',['type_list_contains&lt; type_list&lt; Type... &gt;, Other &gt;',['../structentt_1_1type__list__contains_3_01type__list_3_01Type_8_8_8_01_4_00_01Other_01_4.html',1,'entt']]],
-  ['type_5flist_5fdiff_727',['type_list_diff',['../structentt_1_1type__list__diff.html',1,'entt']]],
-  ['type_5flist_5fdiff_3c_20type_5flist_3c_20type_2e_2e_2e_20_3e_2c_20type_5flist_3c_20other_2e_2e_2e_20_3e_20_3e_728',['type_list_diff&lt; type_list&lt; Type... &gt;, type_list&lt; Other... &gt; &gt;',['../structentt_1_1type__list__diff_3_01type__list_3_01Type_8_8_8_01_4_00_01type__list_3_01Other_8_8_8_01_4_01_4.html',1,'entt']]],
-  ['type_5flist_5felement_729',['type_list_element',['../structentt_1_1type__list__element.html',1,'entt']]],
-  ['type_5flist_5felement_3c_200u_2c_20type_5flist_3c_20type_2c_20other_2e_2e_2e_20_3e_20_3e_730',['type_list_element&lt; 0u, type_list&lt; Type, Other... &gt; &gt;',['../structentt_1_1type__list__element_3_010u_00_01type__list_3_01Type_00_01Other_8_8_8_01_4_01_4.html',1,'entt']]],
-  ['type_5flist_5felement_3c_20index_20_2d_201u_2c_20type_5flist_3c_20other_2e_2e_2e_20_3e_20_3e_731',['type_list_element&lt; Index - 1u, type_list&lt; Other... &gt; &gt;',['../structentt_1_1type__list__element.html',1,'entt']]],
-  ['type_5flist_5felement_3c_20index_2c_20type_5flist_3c_20type_2c_20other_2e_2e_2e_20_3e_20_3e_732',['type_list_element&lt; Index, type_list&lt; Type, Other... &gt; &gt;',['../structentt_1_1type__list__element_3_01Index_00_01type__list_3_01Type_00_01Other_8_8_8_01_4_01_4.html',1,'entt']]],
-  ['type_5flist_5funique_733',['type_list_unique',['../structentt_1_1type__list__unique.html',1,'entt']]],
-  ['type_5flist_5funique_3c_20type_5flist_3c_20type_2c_20other_2e_2e_2e_20_3e_20_3e_734',['type_list_unique&lt; type_list&lt; Type, Other... &gt; &gt;',['../structentt_1_1type__list__unique_3_01type__list_3_01Type_00_01Other_8_8_8_01_4_01_4.html',1,'entt']]],
-  ['type_5flist_5funique_3c_20type_5flist_3c_3e_20_3e_735',['type_list_unique&lt; type_list&lt;&gt; &gt;',['../structentt_1_1type__list__unique_3_01type__list_3_4_01_4.html',1,'entt']]],
-  ['type_5fname_736',['type_name',['../structentt_1_1type__name.html',1,'entt']]]
+  ['undirected_5ftag_0',['undirected_tag',['../structentt_1_1undirected__tag.html',1,'entt']]]
 ];

@@ -1,4 +1,4 @@
-<map id="entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;" name="entt::basic_storage&lt; Entity, Type, Allocator, typename &gt;">
+<map id="entt::basic_storage&lt; Type, Entity, Allocator, typename &gt;" name="entt::basic_storage&lt; Type, Entity, Allocator, typename &gt;">
 <area shape="rect" id="node1" title="Basic storage implementation." alt="" coords="244,13,411,69"/>
 <area shape="rect" id="node2" href="$classentt_1_1basic__sparse__set.html" title=" " alt="" coords="5,5,196,76"/>
 </map>
