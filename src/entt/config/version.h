@@ -4,7 +4,7 @@
 #include "macro.h"
 
 #define ENTT_VERSION_MAJOR 3
-#define ENTT_VERSION_MINOR 11
+#define ENTT_VERSION_MINOR 12
 #define ENTT_VERSION_PATCH 0
 
 #define ENTT_VERSION \
