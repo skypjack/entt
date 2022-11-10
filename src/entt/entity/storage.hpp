@@ -475,7 +475,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return allocator_type{packed.second()};
+        return packed.second();
     }
 
     /**
