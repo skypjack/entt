@@ -165,11 +165,6 @@ class registry_context {
 
 public:
     template<typename Type, typename... Args>
-    [[deprecated("Use ::emplace_as instead")]] Type &emplace_hint(const id_type id, Args &&...args) {
-        return emplace_as<Type>(id, std::forward<Args>(args)...);
-    }
-
-    template<typename Type, typename... Args>
     Type &emplace_as(const id_type id, Args &&...args) {
         return any_cast<Type &>(ctx.try_emplace(id, std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
     }
@@ -193,16 +188,6 @@ public:
     bool erase(const id_type id = type_id<Type>().hash()) {
         const auto it = ctx.find(id);
         return it != ctx.end() && it->second.type() == type_id<Type>() ? (ctx.erase(it), true) : false;
-    }
-
-    template<typename Type>
-    [[deprecated("Use ::get instead")]] [[nodiscard]] const Type &at(const id_type id = type_id<Type>().hash()) const {
-        return get<Type>(id);
-    }
-
-    template<typename Type>
-    [[deprecated("Use ::get instead")]] [[nodiscard]] Type &at(const id_type id = type_id<Type>().hash()) {
-        return get<Type>(id);
     }
 
     template<typename Type>

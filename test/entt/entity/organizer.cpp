@@ -428,5 +428,5 @@ TEST(Organizer, ToArgsIntegrity) {
     auto graph = organizer.graph();
     graph[0u].callback()(graph[0u].data(), registry);
 
-    ASSERT_EQ(registry.ctx().at<std::size_t>(), 0u);
+    ASSERT_EQ(registry.ctx().get<std::size_t>(), 0u);
 }

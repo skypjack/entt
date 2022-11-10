@@ -126,8 +126,8 @@ TEST(Registry, Context) {
 
     ASSERT_EQ(ctx.emplace<const int>(0), 42);
     ASSERT_EQ(ctx.find<const int>(), cctx.find<int>());
-    ASSERT_EQ(ctx.at<int>(), cctx.at<const int>());
-    ASSERT_EQ(ctx.at<int>(), 42);
+    ASSERT_EQ(ctx.get<int>(), cctx.get<const int>());
+    ASSERT_EQ(ctx.get<int>(), 42);
 
     ASSERT_EQ(ctx.find<double>(), nullptr);
     ASSERT_EQ(cctx.find<double>(), nullptr);
@@ -139,8 +139,8 @@ TEST(Registry, Context) {
 
     ASSERT_EQ(ctx.insert_or_assign<const int>(0), 0);
     ASSERT_EQ(ctx.find<const int>(), cctx.find<int>());
-    ASSERT_EQ(ctx.at<int>(), cctx.at<const int>());
-    ASSERT_EQ(ctx.at<int>(), 0);
+    ASSERT_EQ(ctx.get<int>(), cctx.get<const int>());
+    ASSERT_EQ(ctx.get<int>(), 0);
 }
 
 TEST(Registry, ContextHint) {
