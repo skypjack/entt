@@ -37,11 +37,9 @@ class basic_snapshot {
         const auto view = reg->template view<const Component>();
         archive(typename entity_traits::entity_type(sz));
 
-        while(first != last) {
-            const auto entt = *(first++);
-
-            if(reg->template all_of<Component>(entt)) {
-                std::apply(archive, std::tuple_cat(std::make_tuple(entt), view.get(entt)));
+        for(auto it = first; it != last; ++it) {
+            if(reg->template all_of<Component>(*it)) {
+                std::apply(archive, std::tuple_cat(std::make_tuple(*it), view.get(*it)));
             }
         }
     }
@@ -49,11 +47,9 @@ class basic_snapshot {
     template<typename... Component, typename Archive, typename It, std::size_t... Index>
     void component(Archive &archive, It first, It last, std::index_sequence<Index...>) const {
         std::array<std::size_t, sizeof...(Index)> size{};
-        auto begin = first;
 
-        while(begin != last) {
-            const auto entt = *(begin++);
-            ((reg->template all_of<Component>(entt) ? ++size[Index] : 0u), ...);
+        for(auto it = first; it != last; ++it) {
+            ((reg->template all_of<Component>(*it) ? ++size[Index] : 0u), ...);
         }
 
         (get<Component>(archive, size[Index], first, last), ...);
