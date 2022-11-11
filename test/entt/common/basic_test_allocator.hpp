@@ -22,7 +22,7 @@ struct basic_test_allocator: std::allocator<Type> {
         return *this;
     }
 
-    bool operator==(const basic_test_allocator &other) {
+    bool operator==(const basic_test_allocator &other) const {
         return (this == &other);
     }
 };
