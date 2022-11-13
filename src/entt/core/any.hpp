@@ -428,7 +428,7 @@ private:
  * @return The element converted to the requested type.
  */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(const basic_any<Len, Align> &data) noexcept {
+[[nodiscard]] Type any_cast(const basic_any<Len, Align> &data) noexcept {
     const auto *const instance = any_cast<std::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
     return static_cast<Type>(*instance);
@@ -436,7 +436,7 @@ Type any_cast(const basic_any<Len, Align> &data) noexcept {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(basic_any<Len, Align> &data) noexcept {
+[[nodiscard]] Type any_cast(basic_any<Len, Align> &data) noexcept {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto *const instance = any_cast<std::remove_reference_t<const Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
@@ -445,7 +445,7 @@ Type any_cast(basic_any<Len, Align> &data) noexcept {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type any_cast(basic_any<Len, Align> &&data) noexcept {
+[[nodiscard]] Type any_cast(basic_any<Len, Align> &&data) noexcept {
     if constexpr(std::is_copy_constructible_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
         if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(std::move(*instance));
@@ -461,14 +461,14 @@ Type any_cast(basic_any<Len, Align> &&data) noexcept {
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
+[[nodiscard]] const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
     const auto &info = type_id<std::remove_cv_t<Type>>();
     return static_cast<const Type *>(data->data(info));
 }
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-Type *any_cast(basic_any<Len, Align> *data) noexcept {
+[[nodiscard]] Type *any_cast(basic_any<Len, Align> *data) noexcept {
     if constexpr(std::is_const_v<Type>) {
         // last attempt to make wrappers for const references return their values
         return any_cast<Type>(&std::as_const(*data));
@@ -488,7 +488,7 @@ Type *any_cast(basic_any<Len, Align> *data) noexcept {
  * @return A properly initialized wrapper for an object of the given type.
  */
 template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename... Args>
-basic_any<Len, Align> make_any(Args &&...args) {
+[[nodiscard]] basic_any<Len, Align> make_any(Args &&...args) {
     return basic_any<Len, Align>{std::in_place_type<Type>, std::forward<Args>(args)...};
 }
 
@@ -501,7 +501,7 @@ basic_any<Len, Align> make_any(Args &&...args) {
  * @return A properly initialized and not necessarily owning wrapper.
  */
 template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename Type>
-basic_any<Len, Align> forward_as_any(Type &&value) {
+[[nodiscard]] basic_any<Len, Align> forward_as_any(Type &&value) {
     return basic_any<Len, Align>{std::in_place_type<Type &&>, std::forward<Type>(value)};
 }
 
