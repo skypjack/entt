@@ -179,7 +179,9 @@ public:
      * @param allocator The allocator to use.
      */
     basic_dispatcher(basic_dispatcher &&other, const allocator_type &allocator) noexcept
-        : pools{container_type{std::move(other.pools.first()), allocator}, allocator} {}
+        : pools{container_type{std::move(other.pools.first()), allocator}, allocator} {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || pools.second() == other.pools.second(), "Copying a dispatcher is not allowed");
+    }
 
     /**
      * @brief Move assignment operator.
@@ -187,6 +189,8 @@ public:
      * @return This dispatcher.
      */
     basic_dispatcher &operator=(basic_dispatcher &&other) noexcept {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || pools.second() == other.pools.second(), "Copying a dispatcher is not allowed");
+
         pools = std::move(other.pools);
         return *this;
     }
