@@ -21,8 +21,8 @@ struct meta_type_node;
 struct meta_context {
     dense_map<id_type, meta_type_node, identity> value{};
 
-    static inline meta_context &from(meta_ctx &ctx);
-    static inline const meta_context &from(const meta_ctx &ctx);
+    [[nodiscard]] static inline meta_context &from(meta_ctx &ctx);
+    [[nodiscard]] static inline const meta_context &from(const meta_ctx &ctx);
 };
 
 } // namespace internal
@@ -49,11 +49,11 @@ class meta_ctx: private internal::meta_context {
  * Internal details not to be documented.
  */
 
-inline internal::meta_context &internal::meta_context::from(meta_ctx &ctx) {
+[[nodiscard]] inline internal::meta_context &internal::meta_context::from(meta_ctx &ctx) {
     return ctx;
 }
 
-inline const internal::meta_context &internal::meta_context::from(const meta_ctx &ctx) {
+[[nodiscard]] inline const internal::meta_context &internal::meta_context::from(const meta_ctx &ctx) {
     return ctx;
 }
 

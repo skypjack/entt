@@ -613,7 +613,7 @@ private:
  * @return A properly initialized and not necessarily owning wrapper.
  */
 template<typename Type>
-meta_any forward_as_meta(const meta_ctx &ctx, Type &&value) {
+[[nodiscard]] meta_any forward_as_meta(const meta_ctx &ctx, Type &&value) {
     return meta_any{ctx, std::in_place_type<Type &&>, std::forward<Type>(value)};
 }
 
@@ -624,7 +624,7 @@ meta_any forward_as_meta(const meta_ctx &ctx, Type &&value) {
  * @return A properly initialized and not necessarily owning wrapper.
  */
 template<typename Type>
-meta_any forward_as_meta(Type &&value) {
+[[nodiscard]] meta_any forward_as_meta(Type &&value) {
     return forward_as_meta(locator<meta_ctx>::value_or(), std::forward<Type>(value));
 }
 
@@ -1348,12 +1348,12 @@ public:
      * @param element A valid pointer to an element of the underlying type.
      * @return A wrapper that references the given instance.
      */
-    meta_any from_void(void *element) const {
+    [[nodiscard]] meta_any from_void(void *element) const {
         return (element && node.from_void) ? node.from_void(*ctx, element, nullptr) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /*! @copydoc from_void */
-    meta_any from_void(const void *element) const {
+    [[nodiscard]] meta_any from_void(const void *element) const {
         return (element && node.from_void) ? node.from_void(*ctx, nullptr, element) : meta_any{meta_ctx_arg, *ctx};
     }
 
