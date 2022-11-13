@@ -398,6 +398,8 @@ public:
           epool{std::move(other.epool)},
           pools{std::move(other.pools)},
           groups{std::move(other.groups)} {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || epool.get_allocator() == other.epool.get_allocator(), "Copying a registry is not allowed");
+
         rebind();
     }
 
@@ -407,6 +409,8 @@ public:
      * @return This registry.
      */
     basic_registry &operator=(basic_registry &&other) noexcept {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || epool.get_allocator() == other.epool.get_allocator(), "Copying a registry is not allowed");
+
         vars = std::move(other.vars);
         free_list = std::move(other.free_list);
         epool = std::move(other.epool);
