@@ -190,14 +190,14 @@ public:
     template<typename Func>
     void collect(Func func, Args... args) const {
         for(auto &&call: calls) {
-            if constexpr(std::is_void_v<Ret>) {
+            if constexpr(std::is_void_v<Ret> || !std::is_invocable_v<Func, Ret>) {
+                call(args...);
+
                 if constexpr(std::is_invocable_r_v<bool, Func>) {
-                    call(args...);
                     if(func()) {
                         break;
                     }
                 } else {
-                    call(args...);
                     func();
                 }
             } else {
