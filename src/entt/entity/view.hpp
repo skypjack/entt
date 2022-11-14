@@ -194,7 +194,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     friend class basic_view;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
 
     [[nodiscard]] auto opaque_check_set() const noexcept {
         std::array<const base_type *, sizeof...(Get) - 1u> other{};
@@ -330,7 +330,13 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<Index>(pools);
+        static constexpr auto offset = sizeof...(Get);
+
+        if constexpr(Index < offset) {
+            return *std::get<Index>(pools);
+        } else {
+            return *std::get<Index - offset>(filter);
+        }
     }
 
     /**

@@ -465,8 +465,10 @@ TEST(SingleComponentView, Storage) {
     static_assert(std::is_same_v<decltype(view.storage()), entt::storage_type_t<int> &>);
     static_assert(std::is_same_v<decltype(view.storage<0u>()), entt::storage_type_t<int> &>);
     static_assert(std::is_same_v<decltype(view.storage<int>()), entt::storage_type_t<int> &>);
+    static_assert(std::is_same_v<decltype(view.storage<const int>()), entt::storage_type_t<int> &>);
     static_assert(std::is_same_v<decltype(cview.storage()), const entt::storage_type_t<char> &>);
     static_assert(std::is_same_v<decltype(cview.storage<0u>()), const entt::storage_type_t<char> &>);
+    static_assert(std::is_same_v<decltype(cview.storage<char>()), const entt::storage_type_t<char> &>);
     static_assert(std::is_same_v<decltype(cview.storage<const char>()), const entt::storage_type_t<char> &>);
 
     ASSERT_EQ(view.size(), 0u);
@@ -1266,25 +1268,56 @@ TEST(View, Pipe) {
 TEST(MultiComponentView, Storage) {
     entt::registry registry;
     const auto entity = registry.create();
-    const auto view = registry.view<int, const char>();
+    const auto view = registry.view<int, const char>(entt::exclude<double, const float>);
 
     static_assert(std::is_same_v<decltype(view.storage<0u>()), entt::storage_type_t<int> &>);
     static_assert(std::is_same_v<decltype(view.storage<int>()), entt::storage_type_t<int> &>);
+    static_assert(std::is_same_v<decltype(view.storage<const int>()), entt::storage_type_t<int> &>);
     static_assert(std::is_same_v<decltype(view.storage<1u>()), const entt::storage_type_t<char> &>);
+    static_assert(std::is_same_v<decltype(view.storage<char>()), const entt::storage_type_t<char> &>);
     static_assert(std::is_same_v<decltype(view.storage<const char>()), const entt::storage_type_t<char> &>);
+    static_assert(std::is_same_v<decltype(view.storage<2u>()), entt::storage_type_t<double> &>);
+    static_assert(std::is_same_v<decltype(view.storage<double>()), entt::storage_type_t<double> &>);
+    static_assert(std::is_same_v<decltype(view.storage<const double>()), entt::storage_type_t<double> &>);
+    static_assert(std::is_same_v<decltype(view.storage<3u>()), const entt::storage_type_t<float> &>);
+    static_assert(std::is_same_v<decltype(view.storage<float>()), const entt::storage_type_t<float> &>);
+    static_assert(std::is_same_v<decltype(view.storage<const float>()), const entt::storage_type_t<float> &>);
 
     ASSERT_EQ(view.size_hint(), 0u);
 
     view.storage<int>().emplace(entity);
+    view.storage<double>().emplace(entity);
     registry.emplace<char>(entity);
+    registry.emplace<float>(entity);
 
     ASSERT_EQ(view.size_hint(), 1u);
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.storage<int>().contains(entity));
     ASSERT_TRUE(view.storage<const char>().contains(entity));
+    ASSERT_TRUE(view.storage<double>().contains(entity));
+    ASSERT_TRUE(view.storage<const float>().contains(entity));
+    ASSERT_TRUE((registry.all_of<int, char, double, float>(entity)));
+
+    view.storage<double>().erase(entity);
+    registry.erase<float>(entity);
+
+    ASSERT_EQ(view.size_hint(), 1u);
+    ASSERT_NE(view.begin(), view.end());
+    ASSERT_TRUE(view.storage<const int>().contains(entity));
+    ASSERT_TRUE(view.storage<char>().contains(entity));
+    ASSERT_FALSE(view.storage<const double>().contains(entity));
+    ASSERT_FALSE(view.storage<float>().contains(entity));
     ASSERT_TRUE((registry.all_of<int, char>(entity)));
+    ASSERT_FALSE((registry.any_of<double, float>(entity)));
 
     view.storage<0u>().erase(entity);
 
     ASSERT_EQ(view.size_hint(), 0u);
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_FALSE(view.storage<0u>().contains(entity));
     ASSERT_TRUE(view.storage<1u>().contains(entity));
-    ASSERT_FALSE((registry.all_of<int, char>(entity)));
+    ASSERT_FALSE(view.storage<2u>().contains(entity));
+    ASSERT_FALSE(view.storage<3u>().contains(entity));
+    ASSERT_TRUE((registry.all_of<char>(entity)));
+    ASSERT_FALSE((registry.any_of<int, double, float>(entity)));
 }
