@@ -130,7 +130,7 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -186,7 +186,13 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<Index>(pools);
+        static constexpr auto offset = sizeof...(Get);
+
+        if constexpr(Index < offset) {
+            return *std::get<Index>(pools);
+        } else {
+            return *std::get<Index - offset>(filter);
+        }
     }
 
     /**
@@ -529,7 +535,7 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     using basic_common_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type..., typename Exclude::value_type...>>;
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -578,7 +584,13 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<Index>(pools);
+        static constexpr auto offset = sizeof...(Owned) + sizeof...(Get);
+
+        if constexpr(Index < offset) {
+            return *std::get<Index>(pools);
+        } else {
+            return *std::get<Index - offset>(filter);
+        }
     }
 
     /**

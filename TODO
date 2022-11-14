@@ -16,7 +16,6 @@ TODO (high prio):
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
-* add storage getter for filters to views and groups
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
 * basic_storage::bind for cross-registry setups (see and remove todo from entity_copy.cpp)
 * process scheduler: reviews, use free lists internally
