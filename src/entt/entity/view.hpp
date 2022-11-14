@@ -330,7 +330,7 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] decltype(auto) storage() const noexcept {
-        static constexpr auto offset = sizeof...(Get);
+        constexpr auto offset = sizeof...(Get);
 
         if constexpr(Index < offset) {
             return *std::get<Index>(pools);
