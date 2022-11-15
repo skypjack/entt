@@ -157,12 +157,15 @@ template<typename ILhs, typename IRhs>
     return !(lhs < rhs);
 }
 
+template<typename Allocator>
 class registry_context {
-    using key_type = id_type;
-    using mapped_type = basic_any<0u>;
-    using container_type = dense_map<key_type, mapped_type, identity>;
+    using alloc_traits = typename std::allocator_traits<Allocator>;
+    using allocator_type = typename alloc_traits::template rebind_alloc<std::pair<const id_type, basic_any<0u>>>;
 
 public:
+    explicit registry_context(const allocator_type &allocator)
+        : ctx{allocator} {}
+
     template<typename Type, typename... Args>
     Type &emplace_as(const id_type id, Args &&...args) {
         return any_cast<Type &>(ctx.try_emplace(id, std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
@@ -218,7 +221,7 @@ public:
     }
 
 private:
-    container_type ctx;
+    dense_map<id_type, basic_any<0u>, identity, std::equal_to<id_type>, allocator_type> ctx;
 };
 
 } // namespace internal
@@ -361,7 +364,7 @@ public:
     /*! @brief Common type among all storage types. */
     using base_type = basic_common_type;
     /*! @brief Context type. */
-    using context = internal::registry_context;
+    using context = internal::registry_context<allocator_type>;
 
     /*! @brief Default constructor. */
     basic_registry()
@@ -380,7 +383,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_registry(const size_type count, const allocator_type &allocator = allocator_type{})
-        : vars{},
+        : vars{allocator},
           free_list{tombstone},
           epool{allocator},
           pools{allocator},
