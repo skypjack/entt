@@ -9,6 +9,7 @@
 * [Delegate](#delegate)
   * [Runtime arguments](#runtime-arguments)
   * [Lambda support](#lambda-support)
+  * [Raw access](#raw-access)
 * [Signals](#signals)
 * [Event dispatcher](#event-dispatcher)
   * [Named queues](#named-queues)
@@ -230,6 +231,24 @@ delegate.connect([](const void *ptr, int value) {
 As above, the first parameter (`const void *`) isn't part of the function type
 of the delegate and is used to dispatch arbitrary user data back and forth. In
 other terms, the function type of the delegate above is `int(int)`.
+
+## Raw access
+
+While not recommended, a delegate also allows direct access to the stored
+callable function target and underlying data, if any.<br/>
+This makes it possible to bypass the behavior of the delegate itself and force
+calls on different instances:
+
+```cpp
+my_struct other;
+delegate.target(&other, 42);
+```
+
+It goes without saying that this type of approach is **very** risky, especially
+since there is no way of knowing whether the contained function was originally a
+member function of some class, a free function or a lambda.<br/>
+Another possible (and meaningful) use of this feature is that of identifying a
+particular delegate through its descriptive _traits_ instead.
 
 # Signals
 
