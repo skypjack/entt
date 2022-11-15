@@ -190,6 +190,8 @@ TEST(Delegate, Comparison) {
     rhs.connect<&delegate_functor::operator()>(functor);
 
     ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, functor}));
+    ASSERT_EQ(lhs.target(), rhs.target());
+    ASSERT_EQ(lhs.data(), rhs.data());
     ASSERT_FALSE(lhs != rhs);
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
@@ -197,6 +199,7 @@ TEST(Delegate, Comparison) {
     lhs.connect<&delegate_functor::operator()>(other);
 
     ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, other}));
+    ASSERT_EQ(lhs.target(), rhs.target());
     ASSERT_NE(lhs.data(), rhs.data());
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
@@ -205,6 +208,8 @@ TEST(Delegate, Comparison) {
     lhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val) * val; }, &functor);
 
     ASSERT_NE(lhs, (entt::delegate<int(int)>{[](const void *, int val) { return val + val; }, &functor}));
+    ASSERT_NE(lhs.target(), rhs.target());
+    ASSERT_EQ(lhs.data(), rhs.data());
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);

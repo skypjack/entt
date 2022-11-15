@@ -234,6 +234,14 @@ public:
     }
 
     /**
+     * @brief Returns a pointer to the stored callable function target, if any.
+     * @return An opaque pointer to the stored callable function target.
+     */
+    [[nodiscard]] function_type *target() const noexcept {
+        return fn;
+    }
+
+    /**
      * @brief Returns the instance or the payload linked to a delegate, if any.
      * @return An opaque pointer to the underlying data.
      */
