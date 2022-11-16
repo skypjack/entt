@@ -315,7 +315,7 @@ public:
 
     /**
      * @brief Returns the storage for a given component type.
-     * @tparam Comp Type of component of which to return the storage.
+     * @tparam Type Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
     template<typename Type>
