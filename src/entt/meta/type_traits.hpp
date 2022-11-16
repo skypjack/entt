@@ -30,7 +30,6 @@ struct meta_associative_container_traits;
 /**
  * @brief Provides the member constant `value` to true if a given type is a
  * pointer-like type from the point of view of the meta system, false otherwise.
- * @tparam Type Potentially pointer-like type.
  */
 template<typename>
 struct is_meta_pointer_like: std::false_type {};
