@@ -106,7 +106,7 @@ constexpr void propagate_on_container_swap([[maybe_unused]] Allocator &lhs, [[ma
 
 /**
  * @brief Deleter for allocator-aware unique pointers (waiting for C++20).
- * @tparam Args Types of arguments to use to construct the object.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Allocator>
 struct allocation_deleter: private Allocator {
