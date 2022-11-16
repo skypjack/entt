@@ -55,7 +55,6 @@ using type_identity_t = typename type_identity<Type>::type;
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
  * @tparam Type The type of which to return the size.
- * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
 struct size_of: std::integral_constant<std::size_t, 0u> {};
