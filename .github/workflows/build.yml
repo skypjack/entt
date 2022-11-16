@@ -18,6 +18,8 @@ jobs:
             exe: g++-9
           - pkg: g++-10
             exe: g++-10
+          - pkg: g++-11
+            exe: g++-11
           - pkg: clang-8
             exe: clang++-8
           - pkg: clang-9
