@@ -1398,7 +1398,7 @@ public:
 
     /**
      * @brief Checks whether the given components belong to any group.
-     * @tparam Component Types of components in which one is interested.
+     * @tparam Type Types of components in which one is interested.
      * @return True if the pools of the given components are _free_, false
      * otherwise.
      */
