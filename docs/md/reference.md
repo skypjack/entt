@@ -40,6 +40,7 @@ I hope this list can grow much more in the future:
     Component System framework.
   * [Svelto.ECS](https://github.com/sebas77/Svelto.ECS): a very interesting
     platform agnostic and table based ECS framework.
+  * [Arch](https://github.com/genaray/Arch): a simple, fast, 'unity entities' inspired archetype ECS with optional multithreading. 
 
 * Go:
   * [gecs](https://github.com/tutumagi/gecs): a sparse sets based ECS inspired 
