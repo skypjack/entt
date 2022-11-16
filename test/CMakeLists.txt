@@ -62,7 +62,7 @@ function(SETUP_TARGET TARGET_NAME)
                     -Wno-unused-local-typedef
                     -Wno-unused-private-field
                 >
-                # documentation diagnostic on also for clang-cl
+                # documentation diagnostic turned on for clang-cl only
                 $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wdocumentation>
                 /EHsc /wd4324 /wd4996
                 $<$<CONFIG:Debug>:/Od>
@@ -73,7 +73,6 @@ function(SETUP_TARGET TARGET_NAME)
             ${TARGET_NAME}
             PRIVATE
                 -pedantic -fvisibility=hidden -Wall -Wshadow -Wno-deprecated-declarations
-                $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wdocumentation>
                 $<$<CONFIG:Debug>:-O0 -g>
                 $<$<CONFIG:Release>:-O2>
         )
