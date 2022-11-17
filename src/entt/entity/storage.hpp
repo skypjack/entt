@@ -898,44 +898,6 @@ public:
     }
 };
 
-/**
- * @brief Provides a common way to define storage types.
- * @tparam Type Storage value type.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity, typename Allocator, typename>
-struct storage_type {
-    /*! @brief Type-to-storage conversion result. */
-    using type = sigh_storage_mixin<basic_storage<Type, Entity, Allocator>>;
-};
-
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_type_t = typename storage_type<Args...>::type;
-
-/**
- * Type-to-storage conversion utility that preserves constness.
- * @tparam Type Storage value type, eventually const.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity, typename Allocator>
-struct storage_for {
-    /*! @brief Type-to-storage conversion result. */
-    using type = constness_as_t<storage_type_t<std::remove_const_t<Type>, Entity, Allocator>, Type>;
-};
-
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_for_t = typename storage_for<Args...>::type;
-
 } // namespace entt
 
 #endif
