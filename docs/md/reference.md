@@ -34,6 +34,8 @@ I hope this list can grow much more in the future:
     solution between an ECS and dynamic mixins.
 
 * C#
+  * [Arch](https://github.com/genaray/Arch): a simple, fast and _unity entities_
+    inspired archetype ECS with optional multithreading. 
   * [Entitas](https://github.com/sschmid/Entitas-CSharp): the ECS framework for
     C# and Unity, where _reactive systems_ were invented.
   * [LeoECS](https://github.com/Leopotam/ecs): simple lightweight C# Entity
