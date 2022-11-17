@@ -170,6 +170,9 @@ I hope this list can grow much more in the future:
     2D & 3D game engine that focuses on being fast and powerful.
   * [The Worst Engine](https://github.com/Parasik72/TWE): a game engine based on
     OpenGL.
+  * [Ecsact](https://ecsact.dev/): a language aimed at describing ECS, with a
+    [runtime implementation](https://github.com/ecsact-dev/ecsact_rt_entt) based
+    on `EnTT`.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
