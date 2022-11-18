@@ -9,7 +9,6 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
-#include "../core/compressed_pair.hpp"
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_info.hpp"
@@ -241,29 +240,29 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     static constexpr bool is_pinned_type_v = !(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>);
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
-        return packed.first()[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
+        return packed[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
     }
 
     auto assure_at_least(const std::size_t pos) {
-        auto &&container = packed.first();
         const auto idx = pos / comp_traits::page_size;
 
-        if(!(idx < container.size())) {
-            auto curr = container.size();
-            container.resize(idx + 1u, nullptr);
+        if(!(idx < packed.size())) {
+            auto curr = packed.size();
+            allocator_type page_allocator{get_allocator()};
+            packed.resize(idx + 1u, nullptr);
 
             ENTT_TRY {
-                for(const auto last = container.size(); curr < last; ++curr) {
-                    container[curr] = alloc_traits::allocate(packed.second(), comp_traits::page_size);
+                for(const auto last = packed.size(); curr < last; ++curr) {
+                    packed[curr] = alloc_traits::allocate(page_allocator, comp_traits::page_size);
                 }
             }
             ENTT_CATCH {
-                container.resize(curr);
+                packed.resize(curr);
                 ENTT_THROW;
             }
         }
 
-        return container[idx] + fast_mod(pos, comp_traits::page_size);
+        return packed[idx] + fast_mod(pos, comp_traits::page_size);
     }
 
     template<typename... Args>
@@ -272,7 +271,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
         ENTT_TRY {
             auto elem = assure_at_least(static_cast<size_type>(it.index()));
-            entt::uninitialized_construct_using_allocator(to_address(elem), packed.second(), std::forward<Args>(args)...);
+            entt::uninitialized_construct_using_allocator(to_address(elem), get_allocator(), std::forward<Args>(args)...);
         }
         ENTT_CATCH {
             base_type::pop(it, it + 1u);
@@ -293,15 +292,14 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             }
         }
 
-        auto &&container = packed.first();
-        auto page_allocator{packed.second()};
+        allocator_type page_allocator{get_allocator()};
         const auto from = (sz + comp_traits::page_size - 1u) / comp_traits::page_size;
 
-        for(auto pos = from, last = container.size(); pos < last; ++pos) {
-            alloc_traits::deallocate(page_allocator, container[pos], comp_traits::page_size);
+        for(auto pos = from, last = packed.size(); pos < last; ++pos) {
+            alloc_traits::deallocate(page_allocator, packed[pos], comp_traits::page_size);
         }
 
-        container.resize(from);
+        packed.resize(from);
     }
 
 private:
@@ -325,7 +323,7 @@ private:
 
         if constexpr(!is_pinned_type_v) {
             auto &elem = element_at(from);
-            entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), packed.second(), std::move(elem));
+            entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), get_allocator(), std::move(elem));
             std::destroy_at(std::addressof(elem));
         }
     }
@@ -418,7 +416,7 @@ public:
      */
     explicit basic_storage(const allocator_type &allocator)
         : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete}, allocator},
-          packed{container_type{allocator}, allocator} {}
+          packed{allocator} {}
 
     /**
      * @brief Move constructor.
@@ -435,8 +433,8 @@ public:
      */
     basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
         : base_type{std::move(other), allocator},
-          packed{container_type{std::move(other.packed.first()), allocator}, allocator} {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.second() == other.packed.second(), "Copying a storage is not allowed");
+          packed{std::move(other.packed), allocator} {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a storage is not allowed");
     }
 
     /*! @brief Default destructor. */
@@ -450,12 +448,11 @@ public:
      * @return This storage.
      */
     basic_storage &operator=(basic_storage &&other) noexcept {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.second() == other.packed.second(), "Copying a storage is not allowed");
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a storage is not allowed");
 
         shrink_to_size(0u);
         base_type::operator=(std::move(other));
-        packed.first() = std::move(other.packed.first());
-        propagate_on_container_move_assignment(packed.second(), other.packed.second());
+        packed = std::move(other.packed);
         return *this;
     }
 
@@ -466,8 +463,7 @@ public:
     void swap(basic_storage &other) {
         using std::swap;
         underlying_type::swap(other);
-        propagate_on_container_swap(packed.second(), other.packed.second());
-        swap(packed.first(), other.packed.first());
+        swap(packed, other.packed);
     }
 
     /**
@@ -475,7 +471,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return packed.second();
+        return packed.get_allocator();
     }
 
     /**
@@ -499,7 +495,7 @@ public:
      * @return Capacity of the storage.
      */
     [[nodiscard]] size_type capacity() const noexcept override {
-        return packed.first().size() * comp_traits::page_size;
+        return packed.size() * comp_traits::page_size;
     }
 
     /*! @brief Requests the removal of unused capacity. */
@@ -513,12 +509,12 @@ public:
      * @return A pointer to the array of objects.
      */
     [[nodiscard]] const_pointer raw() const noexcept {
-        return packed.first().data();
+        return packed.data();
     }
 
     /*! @copydoc raw */
     [[nodiscard]] pointer raw() noexcept {
-        return packed.first().data();
+        return packed.data();
     }
 
     /**
@@ -531,7 +527,7 @@ public:
      */
     [[nodiscard]] const_iterator cbegin() const noexcept {
         const auto pos = static_cast<typename iterator::difference_type>(base_type::size());
-        return const_iterator{&packed.first(), pos};
+        return const_iterator{&packed, pos};
     }
 
     /*! @copydoc cbegin */
@@ -542,7 +538,7 @@ public:
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() noexcept {
         const auto pos = static_cast<typename iterator::difference_type>(base_type::size());
-        return iterator{&packed.first(), pos};
+        return iterator{&packed, pos};
     }
 
     /**
@@ -556,7 +552,7 @@ public:
      * internal array.
      */
     [[nodiscard]] const_iterator cend() const noexcept {
-        return const_iterator{&packed.first(), {}};
+        return const_iterator{&packed, {}};
     }
 
     /*! @copydoc cend */
@@ -566,7 +562,7 @@ public:
 
     /*! @copydoc end */
     [[nodiscard]] iterator end() noexcept {
-        return iterator{&packed.first(), {}};
+        return iterator{&packed, {}};
     }
 
     /**
@@ -744,7 +740,7 @@ public:
     }
 
 private:
-    compressed_pair<container_type, allocator_type> packed;
+    container_type packed;
 };
 
 /*! @copydoc basic_storage */
