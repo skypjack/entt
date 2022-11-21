@@ -199,7 +199,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_construct(Args &&...args) {
-        this->registry().on_construct<Type>().connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template on_construct<Type>().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
 
@@ -212,7 +212,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_update(Args &&...args) {
-        this->registry().on_update<Type>().connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template on_update<Type>().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
 
@@ -225,7 +225,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_destroy(Args &&...args) {
-        this->registry().on_destroy<Type>().connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template on_destroy<Type>().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
 };
