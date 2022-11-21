@@ -16,6 +16,10 @@ struct stable_type {
     int value;
 };
 
+void sigh_callback(int &value) {
+    ++value;
+}
+
 TEST(Helper, AsView) {
     entt::registry registry;
     const entt::registry cregistry;
@@ -123,4 +127,26 @@ TEST(Helper, ToEntityStableType) {
 
     ASSERT_EQ(entt::to_entity(registry, stable_type{42}), null);
     ASSERT_EQ(entt::to_entity(registry, value), null);
+}
+
+TEST(Helper, SighHelper) {
+    entt::registry registry{};
+    const auto entt = registry.create();
+    entt::sigh_helper helper{registry};
+    int counter{};
+
+    ASSERT_EQ(&helper.registry(), &registry);
+
+    helper.with<int>()
+        .on_construct<&sigh_callback>(counter)
+        .on_update<&sigh_callback>(counter)
+        .on_destroy<&sigh_callback>(counter);
+
+    ASSERT_EQ(counter, 0);
+
+    registry.emplace<int>(entt, 42);
+    registry.replace<int>(entt, 0);
+    registry.erase<int>(entt);
+
+    ASSERT_EQ(counter, 3);
 }
