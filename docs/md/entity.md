@@ -23,6 +23,7 @@
     * [To entity](#to-entity)
     * [Dependencies](#dependencies)
     * [Invoke](#invoke)
+    * [Connection helper](#connection-helper)
     * [Handle](#handle)
     * [Organizer](#organizer)
   * [Context variables](#context-variables)
@@ -710,6 +711,23 @@ registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
 
 All it does is pick up the _right_ component for the received entity and invoke
 the requested method, passing on the arguments if necessary.
+
+### Connection helper
+
+Connecting signals can quickly become cumbersome.<br/>
+This utility aims to simplify the process by grouping the calls:
+
+```cpp
+entt::sigh_helper{registry}
+    .with<position>()
+        .on_construct<&a_listener>()
+        .on_destroy<&another_listener>()
+    .with<velocity>()
+        .on_update<yet_another_listener>();
+```
+
+Obviously, it doesn't make the code disappear but it should at least reduce it
+in the most complex cases.
 
 ### Handle
 
