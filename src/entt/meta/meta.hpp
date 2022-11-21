@@ -963,7 +963,7 @@ struct meta_func {
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&...args) const {
         meta_any arguments[sizeof...(Args) + 1u]{{*ctx, std::forward<Args>(args)}...};
-        return invoke(meta_handle{*ctx, std::move(instance)}, arguments, sizeof...(Args));
+        return invoke(std::move(instance), arguments, sizeof...(Args));
     }
 
     /*! @copydoc meta_data::prop */
@@ -1400,7 +1400,7 @@ public:
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
         meta_any arguments[sizeof...(Args) + 1u]{{*ctx, std::forward<Args>(args)}...};
-        return invoke(id, meta_handle{*ctx, std::move(instance)}, arguments, sizeof...(Args));
+        return invoke(id, std::move(instance), arguments, sizeof...(Args));
     }
 
     /**
