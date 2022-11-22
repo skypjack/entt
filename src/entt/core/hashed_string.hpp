@@ -67,7 +67,7 @@ struct basic_hashed_string {
 template<typename Char>
 class basic_hashed_string: internal::basic_hashed_string<Char> {
     using base_type = internal::basic_hashed_string<Char>;
-    using hs_traits = internal::fnv1a_traits<id_type>;
+    using traits_type = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -79,10 +79,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str) noexcept {
-        base_type base{str, 0u, hs_traits::offset};
+        base_type base{str, 0u, traits_type::offset};
 
         for(; str[base.length]; ++base.length) {
-            base.hash = (base.hash ^ static_cast<hs_traits::type>(str[base.length])) * hs_traits::prime;
+            base.hash = (base.hash ^ static_cast<traits_type::type>(str[base.length])) * traits_type::prime;
         }
 
         return base;
@@ -90,10 +90,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str, const std::size_t len) noexcept {
-        base_type base{str, len, hs_traits::offset};
+        base_type base{str, len, traits_type::offset};
 
         for(size_type pos{}; pos < len; ++pos) {
-            base.hash = (base.hash ^ static_cast<hs_traits::type>(str[pos])) * hs_traits::prime;
+            base.hash = (base.hash ^ static_cast<traits_type::type>(str[pos])) * traits_type::prime;
         }
 
         return base;
