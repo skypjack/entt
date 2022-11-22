@@ -116,38 +116,38 @@ private:
     difference_type offset;
 };
 
-template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
     return rhs.index() - lhs.index();
 }
 
-template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator==(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator==(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
     return lhs.index() == rhs.index();
 }
 
-template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator!=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator!=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
-template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator<(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
     return lhs.index() > rhs.index();
 }
 
-template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator>(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
     return lhs.index() < rhs.index();
 }
 
-template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator<=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator<=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
-template<typename CLhs, typename CRhs>
-[[nodiscard]] constexpr bool operator>=(const storage_iterator<CLhs> &lhs, const storage_iterator<CRhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator>=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -190,20 +190,20 @@ public:
         return {*std::get<It>(it), *std::get<Other>(it)...};
     }
 
-    template<typename... CLhs, typename... CRhs>
-    friend constexpr bool operator==(const extended_storage_iterator<CLhs...> &, const extended_storage_iterator<CRhs...> &) noexcept;
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const extended_storage_iterator<Lhs...> &, const extended_storage_iterator<Rhs...> &) noexcept;
 
 private:
     std::tuple<It, Other...> it;
 };
 
-template<typename... CLhs, typename... CRhs>
-[[nodiscard]] constexpr bool operator==(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
     return std::get<0>(lhs.it) == std::get<0>(rhs.it);
 }
 
-template<typename... CLhs, typename... CRhs>
-[[nodiscard]] constexpr bool operator!=(const extended_storage_iterator<CLhs...> &lhs, const extended_storage_iterator<CRhs...> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator!=(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
