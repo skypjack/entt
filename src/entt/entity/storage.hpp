@@ -27,13 +27,12 @@ namespace entt {
 
 namespace internal {
 
-template<typename Container>
+template<typename Container, typename Size>
 class storage_iterator final {
-    friend storage_iterator<const Container>;
+    friend storage_iterator<const Container, Size>;
 
     using container_type = std::remove_const_t<Container>;
     using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
-    using comp_traits = component_traits<std::remove_pointer_t<typename container_type::value_type>>;
 
     using iterator_traits = std::iterator_traits<std::conditional_t<
         std::is_const_v<Container>,
@@ -54,7 +53,7 @@ public:
           offset{idx} {}
 
     template<bool Const = std::is_const_v<Container>, typename = std::enable_if_t<Const>>
-    constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) noexcept
+    constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>, Size> &other) noexcept
         : storage_iterator{other.packed, other.offset} {}
 
     constexpr storage_iterator &operator++() noexcept {
@@ -95,12 +94,12 @@ public:
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         const auto pos = index() - value;
-        return (*packed)[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
+        return (*packed)[pos / Size::value][fast_mod(pos, Size::value)];
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
         const auto pos = index();
-        return (*packed)[pos / comp_traits::page_size] + fast_mod(pos, comp_traits::page_size);
+        return (*packed)[pos / Size::value] + fast_mod(pos, Size::value);
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
@@ -116,38 +115,38 @@ private:
     difference_type offset;
 };
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
     return rhs.index() - lhs.index();
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator==(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator==(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
     return lhs.index() == rhs.index();
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator!=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator!=(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
     return lhs.index() > rhs.index();
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
     return lhs.index() < rhs.index();
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator<=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator<=(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator>=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator>=(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -394,9 +393,9 @@ public:
     /*! @brief Constant pointer type to contained elements. */
     using const_pointer = typename alloc_traits::template rebind_traits<typename alloc_traits::const_pointer>::const_pointer;
     /*! @brief Random access iterator type. */
-    using iterator = internal::storage_iterator<container_type>;
+    using iterator = internal::storage_iterator<container_type, std::integral_constant<std::size_t, comp_traits::page_size>>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = internal::storage_iterator<const container_type>;
+    using const_iterator = internal::storage_iterator<const container_type, std::integral_constant<std::size_t, comp_traits::page_size>>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
