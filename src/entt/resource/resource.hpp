@@ -180,7 +180,7 @@ template<typename Res, typename Other>
  * @tparam Other Type of resource managed by the second handle.
  * @param lhs A valid handle.
  * @param rhs A valid handle.
- * @return False if both handles refer to the same registry, true otherwise.
+ * @return False if both handles refer to the same resource, true otherwise.
  */
 template<typename Res, typename Other>
 [[nodiscard]] bool operator!=(const resource<Res> &lhs, const resource<Other> &rhs) noexcept {
