@@ -17,7 +17,7 @@ struct identity {
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
-    template<class Type>
+    template<typename Type>
     [[nodiscard]] constexpr Type &&operator()(Type &&value) const noexcept {
         return std::forward<Type>(value);
     }
@@ -50,7 +50,7 @@ template<typename Func>
  * @brief Helper type for visitors.
  * @tparam Func Types of function objects.
  */
-template<class... Func>
+template<typename... Func>
 struct overloaded: Func... {
     using Func::operator()...;
 };
@@ -59,14 +59,14 @@ struct overloaded: Func... {
  * @brief Deduction guide.
  * @tparam Func Types of function objects.
  */
-template<class... Func>
+template<typename... Func>
 overloaded(Func...) -> overloaded<Func...>;
 
 /**
  * @brief Basic implementation of a y-combinator.
  * @tparam Func Type of a potentially recursive function.
  */
-template<class Func>
+template<typename Func>
 struct y_combinator {
     /**
      * @brief Constructs a y-combinator from a given function.
@@ -81,13 +81,13 @@ struct y_combinator {
      * @param args Parameters to use to invoke the underlying function.
      * @return Return value of the underlying function, if any.
      */
-    template<class... Args>
+    template<typename... Args>
     constexpr decltype(auto) operator()(Args &&...args) const noexcept(std::is_nothrow_invocable_v<Func, const y_combinator &, Args...>) {
         return func(*this, std::forward<Args>(args)...);
     }
 
     /*! @copydoc operator()() */
-    template<class... Args>
+    template<typename... Args>
     constexpr decltype(auto) operator()(Args &&...args) noexcept(std::is_nothrow_invocable_v<Func, y_combinator &, Args...>) {
         return func(*this, std::forward<Args>(args)...);
     }

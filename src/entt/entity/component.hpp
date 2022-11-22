@@ -56,7 +56,7 @@ struct component_traits {
  * @brief Helper variable template.
  * @tparam Type Type of component.
  */
-template<class Type>
+template<typename Type>
 inline constexpr bool ignore_as_empty_v = (std::is_void_v<Type> || component_traits<Type>::page_size == 0u);
 
 } // namespace entt

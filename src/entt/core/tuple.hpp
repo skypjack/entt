@@ -69,7 +69,7 @@ struct forward_apply: private Func {
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
-    template<class... Args>
+    template<typename... Args>
     constexpr forward_apply(Args &&...args) noexcept(std::is_nothrow_constructible_v<Func, Args...>)
         : Func{std::forward<Args>(args)...} {}
 
@@ -79,13 +79,13 @@ struct forward_apply: private Func {
      * @param args Parameters to forward to the underlying function.
      * @return Return value of the underlying function, if any.
      */
-    template<class Type>
+    template<typename Type>
     constexpr decltype(auto) operator()(Type &&args) noexcept(noexcept(std::apply(std::declval<Func &>(), args))) {
         return std::apply(static_cast<Func &>(*this), std::forward<Type>(args));
     }
 
     /*! @copydoc operator()() */
-    template<class Type>
+    template<typename Type>
     constexpr decltype(auto) operator()(Type &&args) const noexcept(noexcept(std::apply(std::declval<const Func &>(), args))) {
         return std::apply(static_cast<const Func &>(*this), std::forward<Type>(args));
     }

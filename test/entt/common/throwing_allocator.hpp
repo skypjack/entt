@@ -25,14 +25,14 @@ public:
     using propagate_on_container_swap = std::true_type;
     using exception_type = test_exception;
 
-    template<class Other>
+    template<typename Other>
     struct rebind {
         using other = throwing_allocator<Other>;
     };
 
     throwing_allocator() = default;
 
-    template<class Other>
+    template<typename Other>
     throwing_allocator(const throwing_allocator<Other> &other)
         : base{other} {}
 

@@ -838,7 +838,7 @@ public:
     }
 
     /*! @copydoc equal_range */
-    template<class Other>
+    template<typename Other>
     [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<const_iterator, const_iterator>>>
     equal_range(const Other &key) const {
         const auto it = find(key);

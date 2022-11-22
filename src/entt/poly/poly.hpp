@@ -19,7 +19,7 @@ struct poly_inspector {
      * @brief Generic conversion operator (definition only).
      * @tparam Type Type to which conversion is requested.
      */
-    template<class Type>
+    template<typename Type>
     operator Type &&() const;
 
     /**
