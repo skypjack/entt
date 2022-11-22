@@ -167,8 +167,8 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
-        using entity_traits = entt_traits<Entity>;
-        return entity_traits::combine(entity_traits::reserved, entity_traits::reserved);
+        using traits_type = entt_traits<Entity>;
+        return traits_type::combine(traits_type::reserved, traits_type::reserved);
     }
 
     /**
@@ -197,8 +197,8 @@ struct null_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
-        using entity_traits = entt_traits<Entity>;
-        return entity_traits::to_entity(entity) == entity_traits::to_entity(*this);
+        using traits_type = entt_traits<Entity>;
+        return traits_type::to_entity(entity) == traits_type::to_entity(*this);
     }
 
     /**
@@ -246,8 +246,8 @@ struct tombstone_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
-        using entity_traits = entt_traits<Entity>;
-        return entity_traits::combine(entity_traits::reserved, entity_traits::reserved);
+        using traits_type = entt_traits<Entity>;
+        return traits_type::combine(traits_type::reserved, traits_type::reserved);
     }
 
     /**
@@ -276,8 +276,8 @@ struct tombstone_t {
      */
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
-        using entity_traits = entt_traits<Entity>;
-        return entity_traits::to_version(entity) == entity_traits::to_version(*this);
+        using traits_type = entt_traits<Entity>;
+        return traits_type::to_version(entity) == traits_type::to_version(*this);
     }
 
     /**
