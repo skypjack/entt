@@ -233,7 +233,7 @@ private:
 
 /**
  * @brief Fast and reliable entity-component system.
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Allocator>

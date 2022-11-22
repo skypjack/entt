@@ -226,7 +226,7 @@ template<typename... CLhs, typename... CRhs>
  * normally available for non-empty types will not be available for empty ones.
  *
  * @tparam Type Type of objects assigned to the entities.
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Type, typename Entity, typename Allocator, typename>

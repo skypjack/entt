@@ -141,7 +141,7 @@ struct basic_handle {
 
     /**
      * @brief Constructs a const handle from a non-const one.
-     * @tparam Other A valid entity type (see entt_traits for more details).
+     * @tparam Other A valid entity type.
      * @tparam Args Scope of the handle to construct.
      * @return A const handle referring to the same registry and the same
      * entity.

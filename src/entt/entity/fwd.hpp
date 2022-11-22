@@ -23,7 +23,7 @@ class sigh_storage_mixin;
 /**
  * @brief Provides a common way to define storage types.
  * @tparam Type Storage value type.
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Type, typename Entity = entity, typename Allocator = std::allocator<Type>, typename = void>
@@ -42,7 +42,7 @@ using storage_type_t = typename storage_type<Args...>::type;
 /**
  * Type-to-storage conversion utility that preserves constness.
  * @tparam Type Storage value type, eventually const.
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Type, typename Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>>

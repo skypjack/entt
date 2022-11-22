@@ -167,7 +167,7 @@ enum class deletion_policy : std::uint8_t {
  * no guarantees that entities are returned in the insertion order when iterate
  * a sparse set. Do not make assumption on the order in any case.
  *
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Allocator>
