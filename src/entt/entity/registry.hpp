@@ -20,7 +20,6 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
-#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
@@ -241,7 +240,6 @@ class basic_registry {
     using alloc_traits = typename std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     using basic_common_type = basic_sparse_set<Entity, Allocator>;
-    using entity_traits = entt_traits<Entity>;
 
     template<typename Type>
     using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
@@ -252,7 +250,7 @@ class basic_registry {
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-        static_assert(!std::disjunction_v<std::bool_constant<component_traits<Owned>::in_place_delete>...>, "Groups do not support in-place delete");
+        static_assert(!std::disjunction_v<std::bool_constant<storage_for_type<Owned>::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
         using value_type = std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t>;
         value_type current{};
 
@@ -328,21 +326,21 @@ class basic_registry {
     }
 
     auto generate_identifier(const std::size_t pos) noexcept {
-        ENTT_ASSERT(pos < entity_traits::to_entity(null), "No entities available");
-        return entity_traits::combine(static_cast<typename entity_traits::entity_type>(pos), {});
+        ENTT_ASSERT(pos < traits_type::to_entity(null), "No entities available");
+        return traits_type::combine(static_cast<typename traits_type::entity_type>(pos), {});
     }
 
     auto recycle_identifier() noexcept {
         ENTT_ASSERT(free_list != null, "No entities available");
-        const auto curr = entity_traits::to_entity(free_list);
-        free_list = entity_traits::combine(entity_traits::to_integral(epool[curr]), tombstone);
-        return (epool[curr] = entity_traits::combine(curr, entity_traits::to_integral(epool[curr])));
+        const auto curr = traits_type::to_entity(free_list);
+        free_list = traits_type::combine(traits_type::to_integral(epool[curr]), tombstone);
+        return (epool[curr] = traits_type::combine(curr, traits_type::to_integral(epool[curr])));
     }
 
-    auto release_entity(const Entity entt, const typename entity_traits::version_type version) {
-        const typename entity_traits::version_type vers = version + (version == entity_traits::to_version(tombstone));
-        epool[entity_traits::to_entity(entt)] = entity_traits::construct(entity_traits::to_integral(free_list), vers);
-        free_list = entity_traits::combine(entity_traits::to_integral(entt), tombstone);
+    auto release_entity(const Entity entt, const typename entt_traits<Entity>::version_type version) {
+        const typename traits_type::version_type vers = version + (version == traits_type::to_version(tombstone));
+        epool[traits_type::to_entity(entt)] = traits_type::construct(traits_type::to_integral(free_list), vers);
+        free_list = traits_type::combine(traits_type::to_integral(entt), tombstone);
         return vers;
     }
 
@@ -353,12 +351,14 @@ class basic_registry {
     }
 
 public:
+    /*! @brief Entity traits. */
+    using traits_type = entt_traits<Entity>;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Underlying version type. */
-    using version_type = typename entity_traits::version_type;
+    using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
@@ -528,7 +528,7 @@ public:
         auto sz = epool.size();
 
         for(auto curr = free_list; curr != null; --sz) {
-            curr = epool[entity_traits::to_entity(curr)];
+            curr = epool[traits_type::to_entity(curr)];
         }
 
         return sz;
@@ -593,7 +593,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entt) const {
-        const auto pos = size_type(entity_traits::to_entity(entt));
+        const auto pos = size_type(traits_type::to_entity(entt));
         return (pos < epool.size() && epool[pos] == entt);
     }
 
@@ -604,8 +604,8 @@ public:
      * version otherwise.
      */
     [[nodiscard]] version_type current(const entity_type entt) const {
-        const auto pos = size_type(entity_traits::to_entity(entt));
-        return entity_traits::to_version(pos < epool.size() ? epool[pos] : tombstone);
+        const auto pos = size_type(traits_type::to_entity(entt));
+        return traits_type::to_version(pos < epool.size() ? epool[pos] : tombstone);
     }
 
     /**
@@ -630,7 +630,7 @@ public:
 
         if(hint == null || hint == tombstone) {
             return create();
-        } else if(const auto req = entity_traits::to_entity(hint); !(req < length)) {
+        } else if(const auto req = traits_type::to_entity(hint); !(req < length)) {
             epool.resize(size_type(req) + 1u, null);
 
             for(auto pos = length; pos < req; ++pos) {
@@ -638,12 +638,12 @@ public:
             }
 
             return (epool[req] = hint);
-        } else if(const auto curr = entity_traits::to_entity(epool[req]); req == curr) {
+        } else if(const auto curr = traits_type::to_entity(epool[req]); req == curr) {
             return create();
         } else {
             auto *it = &free_list;
-            for(; entity_traits::to_entity(*it) != req; it = &epool[entity_traits::to_entity(*it)]) {}
-            *it = entity_traits::combine(curr, entity_traits::to_integral(*it));
+            for(; traits_type::to_entity(*it) != req; it = &epool[traits_type::to_entity(*it)]) {}
+            *it = traits_type::combine(curr, traits_type::to_integral(*it));
             return (epool[req] = hint);
         }
     }
@@ -707,7 +707,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type release(const entity_type entt) {
-        return release(entt, static_cast<version_type>(entity_traits::to_version(entt) + 1u));
+        return release(entt, static_cast<version_type>(traits_type::to_version(entt) + 1u));
     }
 
     /**
@@ -724,7 +724,7 @@ public:
      */
     version_type release(const entity_type entt, const version_type version) {
         ENTT_ASSERT(valid(entt), "Invalid identifier");
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return (curr.second->current(entt) == entity_traits::to_version(tombstone)); }), "Non-orphan entity");
+        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return (curr.second->current(entt) == traits_type::to_version(tombstone)); }), "Non-orphan entity");
         return release_entity(entt, version);
     }
 
@@ -758,7 +758,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entt) {
-        return destroy(entt, static_cast<version_type>(entity_traits::to_version(entt) + 1u));
+        return destroy(entt, static_cast<version_type>(traits_type::to_version(entt) + 1u));
     }
 
     /**
@@ -1160,7 +1160,7 @@ public:
             }
         } else {
             for(auto pos = epool.size(); pos; --pos) {
-                if(const auto entity = epool[pos - 1]; entity_traits::to_entity(entity) == (pos - 1)) {
+                if(const auto entity = epool[pos - 1]; traits_type::to_entity(entity) == (pos - 1)) {
                     func(entity);
                 }
             }
