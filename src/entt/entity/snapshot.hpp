@@ -11,7 +11,6 @@
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/type_traits.hpp"
-#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "view.hpp"
@@ -30,12 +29,12 @@ namespace entt {
  */
 template<typename Registry>
 class basic_snapshot {
-    using entity_traits = entt_traits<typename Registry::entity_type>;
+    using traits_type = typename Registry::traits_type;
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
         const auto view = reg->template view<const Component>();
-        archive(typename entity_traits::entity_type(sz));
+        archive(typename traits_type::entity_type(sz));
 
         for(auto it = first; it != last; ++it) {
             if(reg->template all_of<Component>(*it)) {
@@ -88,7 +87,7 @@ public:
     const basic_snapshot &entities(Archive &archive) const {
         const auto sz = reg->size();
 
-        archive(typename entity_traits::entity_type(sz + 1u));
+        archive(typename traits_type::entity_type(sz + 1u));
         archive(reg->released());
 
         for(auto first = reg->data(), last = first + sz; first != last; ++first) {
@@ -157,11 +156,11 @@ private:
  */
 template<typename Registry>
 class basic_snapshot_loader {
-    using entity_traits = entt_traits<typename Registry::entity_type>;
+    using traits_type = typename Registry::traits_type;
 
     template<typename Component, typename Archive>
     void assign(Archive &archive) const {
-        typename entity_traits::entity_type length{};
+        typename traits_type::entity_type length{};
         entity_type entt;
 
         archive(length);
@@ -219,7 +218,7 @@ public:
      */
     template<typename Archive>
     const basic_snapshot_loader &entities(Archive &archive) const {
-        typename entity_traits::entity_type length{};
+        typename traits_type::entity_type length{};
 
         archive(length);
         std::vector<entity_type> all(length);
@@ -294,7 +293,7 @@ private:
  */
 template<typename Registry>
 class basic_continuous_loader {
-    using entity_traits = entt_traits<typename Registry::entity_type>;
+    using traits_type = typename Registry::traits_type;
 
     void destroy(typename Registry::entity_type entt) {
         if(const auto it = remloc.find(entt); it == remloc.cend()) {
@@ -378,7 +377,7 @@ class basic_continuous_loader {
 
     template<typename Component, typename Archive, typename... Other, typename... Member>
     void assign(Archive &archive, [[maybe_unused]] Member Other::*...member) {
-        typename entity_traits::entity_type length{};
+        typename traits_type::entity_type length{};
         entity_type entt;
 
         archive(length);
@@ -432,7 +431,7 @@ public:
      */
     template<typename Archive>
     basic_continuous_loader &entities(Archive &archive) {
-        typename entity_traits::entity_type length{};
+        typename traits_type::entity_type length{};
         entity_type entt{};
 
         archive(length);
@@ -442,7 +441,7 @@ public:
         for(std::size_t pos{}, last = length - 1u; pos < last; ++pos) {
             archive(entt);
 
-            if(const auto entity = entity_traits::to_entity(entt); entity == pos) {
+            if(const auto entity = traits_type::to_entity(entt); entity == pos) {
                 restore(entt);
             } else {
                 destroy(entt);
