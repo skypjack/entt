@@ -234,16 +234,15 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
-    using comp_traits = component_traits<Type>;
 
     static constexpr bool is_pinned_type_v = !(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>);
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
-        return packed[pos / comp_traits::page_size][fast_mod(pos, comp_traits::page_size)];
+        return packed[pos / traits_type::page_size][fast_mod(pos, traits_type::page_size)];
     }
 
     auto assure_at_least(const std::size_t pos) {
-        const auto idx = pos / comp_traits::page_size;
+        const auto idx = pos / traits_type::page_size;
 
         if(!(idx < packed.size())) {
             auto curr = packed.size();
@@ -252,7 +251,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
             ENTT_TRY {
                 for(const auto last = packed.size(); curr < last; ++curr) {
-                    packed[curr] = alloc_traits::allocate(page_allocator, comp_traits::page_size);
+                    packed[curr] = alloc_traits::allocate(page_allocator, traits_type::page_size);
                 }
             }
             ENTT_CATCH {
@@ -261,7 +260,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             }
         }
 
-        return packed[idx] + fast_mod(pos, comp_traits::page_size);
+        return packed[idx] + fast_mod(pos, traits_type::page_size);
     }
 
     template<typename... Args>
@@ -282,7 +281,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
     void shrink_to_size(const std::size_t sz) {
         for(auto pos = sz, length = base_type::size(); pos < length; ++pos) {
-            if constexpr(comp_traits::in_place_delete) {
+            if constexpr(traits_type::in_place_delete) {
                 if(base_type::at(pos) != tombstone) {
                     std::destroy_at(std::addressof(element_at(pos)));
                 }
@@ -292,10 +291,10 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         }
 
         allocator_type page_allocator{get_allocator()};
-        const auto from = (sz + comp_traits::page_size - 1u) / comp_traits::page_size;
+        const auto from = (sz + traits_type::page_size - 1u) / traits_type::page_size;
 
         for(auto pos = from, last = packed.size(); pos < last; ++pos) {
-            alloc_traits::deallocate(page_allocator, packed[pos], comp_traits::page_size);
+            alloc_traits::deallocate(page_allocator, packed[pos], traits_type::page_size);
         }
 
         packed.resize(from);
@@ -341,7 +340,7 @@ protected:
             // cannot use first.index() because it would break with cross iterators
             auto &elem = element_at(base_type::index(*first));
 
-            if constexpr(comp_traits::in_place_delete) {
+            if constexpr(traits_type::in_place_delete) {
                 base_type::in_place_pop(first);
                 std::destroy_at(std::addressof(elem));
             } else {
@@ -380,6 +379,8 @@ protected:
 public:
     /*! @brief Base type. */
     using base_type = underlying_type;
+    /*! @brief Component traits. */
+    using traits_type = component_traits<Type>;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
@@ -393,9 +394,9 @@ public:
     /*! @brief Constant pointer type to contained elements. */
     using const_pointer = typename alloc_traits::template rebind_traits<typename alloc_traits::const_pointer>::const_pointer;
     /*! @brief Random access iterator type. */
-    using iterator = internal::storage_iterator<container_type, std::integral_constant<std::size_t, comp_traits::page_size>>;
+    using iterator = internal::storage_iterator<container_type, std::integral_constant<size_type, traits_type::page_size>>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = internal::storage_iterator<const container_type, std::integral_constant<std::size_t, comp_traits::page_size>>;
+    using const_iterator = internal::storage_iterator<const container_type, std::integral_constant<size_type, traits_type::page_size>>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
@@ -414,7 +415,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete}, allocator},
+        : base_type{type_id<value_type>(), deletion_policy{traits_type::in_place_delete}, allocator},
           packed{allocator} {}
 
     /**
@@ -494,7 +495,7 @@ public:
      * @return Capacity of the storage.
      */
     [[nodiscard]] size_type capacity() const noexcept override {
-        return packed.size() * comp_traits::page_size;
+        return packed.size() * traits_type::page_size;
     }
 
     /*! @brief Requests the removal of unused capacity. */
@@ -749,11 +750,12 @@ class basic_storage<Type, Entity, Allocator, std::enable_if_t<ignore_as_empty_v<
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
-    using comp_traits = component_traits<Type>;
 
 public:
     /*! @brief Base type. */
     using base_type = underlying_type;
+    /*! @brief Component traits. */
+    using traits_type = component_traits<Type>;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
@@ -776,7 +778,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<value_type>(), deletion_policy{comp_traits::in_place_delete}, allocator} {}
+        : base_type{type_id<value_type>(), deletion_policy{traits_type::in_place_delete}, allocator} {}
 
     /**
      * @brief Move constructor.
