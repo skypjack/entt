@@ -165,7 +165,7 @@ class basic_snapshot_loader {
 
         archive(length);
 
-        if constexpr(ignore_as_empty_v<Component>) {
+        if constexpr(std::is_empty_v<Component>) {
             while(length--) {
                 archive(entt);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
@@ -382,7 +382,7 @@ class basic_continuous_loader {
 
         archive(length);
 
-        if constexpr(ignore_as_empty_v<Component>) {
+        if constexpr(std::is_empty_v<Component>) {
             while(length--) {
                 archive(entt);
                 restore(entt);

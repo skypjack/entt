@@ -28,7 +28,7 @@ template<typename It, typename... Owned, typename... Get>
 class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     template<typename Type>
     auto index_to_element([[maybe_unused]] Type &cpool) const {
-        if constexpr(ignore_as_empty_v<typename Type::value_type>) {
+        if constexpr(Type::traits_type::page_size == 0u) {
             return std::make_tuple();
         } else {
             return std::forward_as_tuple(cpool.rbegin()[it.index()]);

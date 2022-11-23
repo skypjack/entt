@@ -803,7 +803,7 @@ public:
             for(const auto pack: each()) {
                 std::apply(func, pack);
             }
-        } else if constexpr(ignore_as_empty_v<typename Get::value_type>) {
+        } else if constexpr(Get::traits_type::page_size == 0u) {
             for(size_type pos{}, last = size(); pos < last; ++pos) {
                 func();
             }

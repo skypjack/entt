@@ -17,12 +17,18 @@ namespace internal {
 template<typename Type, typename = void>
 struct in_place_delete: std::bool_constant<!(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>)> {};
 
+template<>
+struct in_place_delete<void>: std::false_type {};
+
 template<typename Type>
 struct in_place_delete<Type, std::enable_if_t<Type::in_place_delete>>
     : std::true_type {};
 
 template<typename Type, typename = void>
 struct page_size: std::integral_constant<std::size_t, !std::is_empty_v<ENTT_ETO_TYPE(Type)> * ENTT_PACKED_PAGE> {};
+
+template<>
+struct page_size<void>: std::integral_constant<std::size_t, 0u> {};
 
 template<typename Type>
 struct page_size<Type, std::enable_if_t<std::is_convertible_v<decltype(Type::page_size), std::size_t>>>
@@ -51,13 +57,6 @@ struct component_traits {
     /*! @brief Page size, default is `ENTT_PACKED_PAGE` for non-empty types. */
     static constexpr std::size_t page_size = internal::page_size<Type>::value;
 };
-
-/**
- * @brief Helper variable template.
- * @tparam Type Type of component.
- */
-template<typename Type>
-inline constexpr bool ignore_as_empty_v = (std::is_void_v<Type> || component_traits<Type>::page_size == 0u);
 
 } // namespace entt
 
