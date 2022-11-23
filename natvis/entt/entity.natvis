@@ -3,8 +3,8 @@
 	<Type Name="entt::basic_registry&lt;*&gt;">
 		<Intrinsic Name="pools_size" Expression="pools.packed.first_base::value.size()"/>
 		<Intrinsic Name="vars_size" Expression="vars.ctx.packed.first_base::value.size()"/>
-		<Intrinsic Name="to_entity" Expression="*((entity_traits::entity_type *)&amp;entity) &amp; entity_traits::entity_mask">
-			<Parameter Name="entity" Type="entity_traits::value_type &amp;"/>
+		<Intrinsic Name="to_entity" Expression="*((traits_type::entity_type *)&amp;entity) &amp; traits_type::entity_mask">
+			<Parameter Name="entity" Type="traits_type::value_type &amp;"/>
 		</Intrinsic>
 		<DisplayString>{{ size={ epool.size() } }}</DisplayString>
 		<Expand>
@@ -26,12 +26,12 @@
 				</Expand>
 			</Synthetic>
 			<Synthetic Name="[destroyed]" ExcludeView="simple">
-				<DisplayString>{ to_entity(free_list) != entity_traits::entity_mask }</DisplayString>
+				<DisplayString>{ to_entity(free_list) != traits_type::entity_mask }</DisplayString>
 				<Expand>
 					<CustomListItems>
 						<Variable Name="it" InitialValue="to_entity(free_list)" />
 						<Loop>
-							<Break Condition="it == entity_traits::entity_mask"/>
+							<Break Condition="it == traits_type::entity_mask"/>
 							<Item Name="[{ it }]">epool[it]</Item>
 							<Exec>it = to_entity(epool[it])</Exec>
 						</Loop>
@@ -69,20 +69,20 @@
 			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
 			<Item Name="[policy]">mode,en</Item>
 			<Synthetic Name="[sparse]">
-				<DisplayString>{ sparse.size() * entity_traits::page_size }</DisplayString>
+				<DisplayString>{ sparse.size() * traits_type::page_size }</DisplayString>
 				<Expand>
 					<ExpandedItem IncludeView="simple">sparse,view(simple)</ExpandedItem>
 					<CustomListItems ExcludeView="simple">
 						<Variable Name="pos" InitialValue="0"/>
 						<Variable Name="page" InitialValue="0"/>
 						<Variable Name="offset" InitialValue="0"/>
-						<Variable Name="last" InitialValue="sparse.size() * entity_traits::page_size"/>
+						<Variable Name="last" InitialValue="sparse.size() * traits_type::page_size"/>
 						<Loop>
 							<Break Condition="pos == last"/>
-							<Exec>page = pos / entity_traits::page_size</Exec>
-							<Exec>offset = pos &amp; (entity_traits::page_size - 1)</Exec>
-							<If Condition="sparse[page] &amp;&amp; (*((entity_traits::entity_type *)&amp;sparse[page][offset]) &lt; ~entity_traits::entity_mask)">
-								<Item Name="[{ pos }]">*((entity_traits::entity_type *)&amp;sparse[page][offset]) &amp; entity_traits::entity_mask</Item>
+							<Exec>page = pos / traits_type::page_size</Exec>
+							<Exec>offset = pos &amp; (traits_type::page_size - 1)</Exec>
+							<If Condition="sparse[page] &amp;&amp; (*((traits_type::entity_type *)&amp;sparse[page][offset]) &lt; ~traits_type::entity_mask)">
+								<Item Name="[{ pos }]">*((traits_type::entity_type *)&amp;sparse[page][offset]) &amp; traits_type::entity_mask</Item>
 							</If>
 							<Exec>++pos</Exec>
 						</Loop>
@@ -98,7 +98,7 @@
 						<Variable Name="last" InitialValue="packed.size()"/>
 						<Loop>
 							<Break Condition="pos == last"/>
-							<If Condition="*((entity_traits::entity_type *)&amp;packed[pos]) &lt; ~entity_traits::entity_mask">
+							<If Condition="*((traits_type::entity_type *)&amp;packed[pos]) &lt; ~traits_type::entity_mask">
 								<Item Name="[{ pos }]">packed[pos]</Item>
 							</If>
 							<Exec>++pos</Exec>
@@ -111,8 +111,8 @@
 	<Type Name="entt::basic_storage&lt;*&gt;">
 		<DisplayString>{{ size={ base_type::packed.size() }, type={ base_type::info->alias,na } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" Optional="true" ExcludeView="simple">packed.first_base::value.capacity() * comp_traits::page_size</Item>
-			<Item Name="[page size]" Optional="true" ExcludeView="simple">comp_traits::page_size</Item>
+			<Item Name="[capacity]" Optional="true" ExcludeView="simple">packed.first_base::value.capacity() * traits_type::page_size</Item>
+			<Item Name="[page size]" Optional="true" ExcludeView="simple">traits_type::page_size</Item>
 			<Item Name="[base]" ExcludeView="simple">(base_type*)this,nand</Item>
 			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)nand</Item>
 			<!-- having SFINAE-like techniques in natvis is priceless :) -->
@@ -121,8 +121,8 @@
 				<Variable Name="last" InitialValue="base_type::packed.size()"/>
 				<Loop>
 					<Break Condition="pos == last"/>
-					<If Condition="*((base_type::entity_traits::entity_type *)&amp;base_type::packed[pos]) &lt; ~base_type::entity_traits::entity_mask">
-						<Item Name="[{ pos }:{ base_type::packed[pos] }]">packed.first_base::value[pos / comp_traits::page_size][pos &amp; (comp_traits::page_size - 1)]</Item>
+					<If Condition="*((base_type::traits_type::entity_type *)&amp;base_type::packed[pos]) &lt; ~base_type::traits_type::entity_mask">
+						<Item Name="[{ pos }:{ base_type::packed[pos] }]">packed.first_base::value[pos / traits_type::page_size][pos &amp; (traits_type::page_size - 1)]</Item>
 					</If>
 					<Exec>++pos</Exec>
 				</Loop>
