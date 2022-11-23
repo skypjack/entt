@@ -12,7 +12,7 @@ DOC:
 * update entity doc when the storage based model is in place
 
 TODO (high prio):
-* make component_traits depend on the entity type
+* check natvis files (periodically :)
 * remove the static storage from the const assure in the registry
 
 WIP:

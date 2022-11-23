@@ -990,9 +990,9 @@ The non-specialized version of this class contains the following members:
 * `page_size`: `Type::page_size` if present, `ENTT_PACKED_PAGE` for non-empty
   types and 0 otherwise.
 
-Where `Type` is any type of component. All properties can be customized by
-specializing the above class and defining all its members, or by adding only
-those of interest to a component definition:
+Where `Type` is any type of component. Properties are customized by specializing
+the above class and defining its members, or by adding only those of interest to
+a component definition:
 
 ```cpp
 struct transform {
@@ -1001,10 +1001,27 @@ struct transform {
 };
 ```
 
-The `component_traits` class template will take care of correctly extracting the
-properties from the supplied type to pass them to the rest of the library.<br/>
-In the case of a direct specialization, the class is also _sfinae-friendly_. It
-supports single and multi type specializations as well as feature-based ones.
+The `component_traits` class template takes care of _extracting_ the properties
+from the supplied type.<br/>
+Plus, it's _sfinae-friendly_ and also supports feature-based specialization:
+
+```cpp
+template<typename Type>
+struct entt::component_traits<Type, std::enable_if_t<Type::never_instantiate_me, entt::entity>> {
+    using type = Type;
+    static constexpr auto in_place_delete = false;
+    static constexpr auto page_size = 0u;
+};
+```
+
+The second template parameter isn't used directly by this class and could be any
+type actually.<br/>
+However, quite often the library provides an entity type as a parameter, such as
+when a storage retrieves component traits for its value type. This also makes it
+possible to create specializations based on the entity type, if needed.<br/>
+If in doubt, it's recommended to use the chosen entity type, avoid passing the
+parameter (since it has a default) or use a more generic type to _extend_ the
+specialization to all entity types.
 
 ## Pointer stability
 

@@ -380,7 +380,7 @@ public:
     /*! @brief Base type. */
     using base_type = underlying_type;
     /*! @brief Component traits. */
-    using traits_type = component_traits<Type>;
+    using traits_type = component_traits<Type, Entity>;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
@@ -745,7 +745,7 @@ private:
 
 /*! @copydoc basic_storage */
 template<typename Type, typename Entity, typename Allocator>
-class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<Type>::page_size == 0u>>
+class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<Type, Entity>::page_size == 0u>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
@@ -755,7 +755,7 @@ public:
     /*! @brief Base type. */
     using base_type = underlying_type;
     /*! @brief Component traits. */
-    using traits_type = component_traits<Type>;
+    using traits_type = component_traits<Type, Entity>;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
