@@ -124,9 +124,10 @@ public:
 
     /*! @brief Clears the flow builder. */
     void clear() noexcept {
-        index.first() = sync_on = {};
+        index.first() = {};
         vertices.clear();
         deps.clear();
+        sync_on = {};
     }
 
     /**
