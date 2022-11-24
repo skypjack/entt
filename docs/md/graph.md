@@ -210,6 +210,80 @@ tools offered by the library while leaving room for maximum flexibility.
 Finally, both the `ro` and` rw` functions also offer an overload that accepts a
 pair of iterators, so that one can pass a range of resources in one go.
 
+### Rebinding
+
+The `flow` class is resource based rather than task based. This means that graph
+generation is driven by resources and not by the order of _appearance_ of tasks
+during flow definition.<br/>
+Although this concept is particularly important, it's almost irrelevant for the
+vast majority of cases. However, it becomes relevant when _rebinding_ resources
+or tasks.
+
+In fact, nothing prevents rebinding elements to a flow.<br/>
+However, the behavior changes slightly from case to case and has some nuances
+that it's worth knowing about.
+
+Directly rebinding a resource without the task being replaced trivially results
+in the task's access mode for that resource being updated:
+
+```cpp
+builder.bind("task"_hs).rw("resource"_hs).ro("resource"_hs)
+```
+
+In this case, the resource is accessed in read-only mode, regardless of the
+first call to `rw`.<br/>
+Behind the scenes, the call doesn't actually _replace_ the previous one but is
+queued after it instead, overwriting it when generating the graph. Thus, a large
+number of resource rebindings may even impact processing times (very difficult
+to observe but theoretically possible).
+
+Rebinding resources and also combining it with changes to tasks has far more
+implications instead.<br/>
+As mentioned, graph generation takes place starting from resources and not from
+tasks. Therefore, the result may not be as expected:
+
+```cpp
+builder
+    .bind("task_1"_hs)
+        .ro("resource"_hs)
+    .bind("task_2"_hs)
+        .ro("resource"_hs)
+    .bind("task_1"_hs)
+        .rw("resource"_hs);
+```
+
+What happens here is that the resource first _sees_ a read-only access request
+from the first task, then a read-write request from the second task and finally
+a new read-only request from the first task.<br/>
+Although this definition would probably be counted as an error, the resulting
+graph may be unexpected. This in fact consists of a single edge outgoing from
+the second task and directed to the first task.<br/>
+To intuitively understand what happens, it's enough to think of the fact that a
+task never has an edge pointing to itself.
+
+While not obvious, this approach has its pros and cons like any other solution.
+For example, creating loops is actually simple in the context of resource-based
+graph generations:
+
+```cpp
+builder
+    .bind("task_1"_hs)
+        .rw("resource"_hs)
+    .bind("task_2"_hs)
+        .rw("resource"_hs)
+    .bind("task_1"_hs)
+        .rw("resource"_hs);
+```
+
+As expected, this definition leads to the creation of two edges that define a
+loop between the two tasks.
+
+As a general rule, rebinding resources and tasks is highly discouraged because
+it could lead to subtle bugs if users don't know what they're doing.<br/>
+However, once the mechanisms of resource-based graph generation are understood,
+it can offer to the expert user a flexibility and a range of possibilities
+otherwise inaccessible.
+
 ## Fake resources and order of execution
 
 The flow builder doesn't offer the ability to specify when a task should execute
