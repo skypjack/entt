@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/graph/flow.hpp>
+#include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 
 TEST(Flow, Constructors) {
@@ -268,6 +269,57 @@ TEST(Flow, Sync) {
     ASSERT_EQ(*it++, std::make_pair(std::size_t{2u}, std::size_t{3u}));
     ASSERT_EQ(*it++, std::make_pair(std::size_t{3u}, std::size_t{4u}));
     ASSERT_EQ(it, last);
+}
+
+ENTT_DEBUG_TEST(FlowDeathTest, NoBind) {
+    entt::flow flow{};
+
+    ASSERT_DEATH(flow.ro(42), "");
+    ASSERT_DEATH(flow.rw(42), "");
+
+    flow.bind(0);
+
+    ASSERT_NO_FATAL_FAILURE(flow.ro(1));
+    ASSERT_NO_FATAL_FAILURE(flow.rw(2));
+}
+
+TEST(Flow, DirectRebind) {
+    entt::flow flow{};
+    flow.bind(0).ro(10).rw(10).bind(1).ro(10);
+    auto graph = flow.graph();
+
+    ASSERT_EQ(flow.size(), 2u);
+    ASSERT_EQ(flow.size(), graph.size());
+    ASSERT_NE(graph.edges().cbegin(), graph.edges().cend());
+
+    ASSERT_TRUE(graph.contains(0u, 1u));
+    ASSERT_FALSE(graph.contains(1u, 0u));
+}
+
+TEST(Flow, DeferredRebind) {
+    entt::flow flow{};
+    flow.bind(0).ro(10).bind(1).ro(10).bind(0).rw(10);
+    auto graph = flow.graph();
+
+    ASSERT_EQ(flow.size(), 2u);
+    ASSERT_EQ(flow.size(), graph.size());
+    ASSERT_NE(graph.edges().cbegin(), graph.edges().cend());
+
+    ASSERT_FALSE(graph.contains(0u, 1u));
+    ASSERT_TRUE(graph.contains(1u, 0u));
+}
+
+TEST(Flow, Loop) {
+    entt::flow flow{};
+    flow.bind(0).rw(10).bind(1).ro(10).bind(0).rw(10);
+    auto graph = flow.graph();
+
+    ASSERT_EQ(flow.size(), 2u);
+    ASSERT_EQ(flow.size(), graph.size());
+    ASSERT_NE(graph.edges().cbegin(), graph.edges().cend());
+
+    ASSERT_TRUE(graph.contains(0u, 1u));
+    ASSERT_TRUE(graph.contains(1u, 0u));
 }
 
 TEST(Flow, ThrowingAllocator) {
