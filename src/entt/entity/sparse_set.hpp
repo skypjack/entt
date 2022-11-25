@@ -256,7 +256,7 @@ protected:
     void in_place_pop(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatched");
         const auto entt = traits_type::to_entity(std::exchange(sparse_ref(*it), null));
-        packed[static_cast<size_type>(entt)] = std::exchange(free_list, traits_type::combine(entt, traits_type::reserved));
+        packed[static_cast<size_type>(entt)] = std::exchange(free_list, traits_type::combine(entt, tombstone));
     }
 
 protected:
@@ -792,7 +792,7 @@ public:
 
                 const auto entity = static_cast<typename traits_type::entity_type>(to);
                 sparse_ref(packed[to]) = traits_type::combine(entity, traits_type::to_integral(packed[to]));
-                *it = traits_type::combine(static_cast<typename traits_type::entity_type>(from), traits_type::reserved);
+                *it = traits_type::combine(static_cast<typename traits_type::entity_type>(from), tombstone);
                 for(; from && packed[from - 1u] == tombstone; --from) {}
             }
         }
