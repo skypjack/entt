@@ -95,14 +95,15 @@ struct radix_sort {
     template<typename It, typename Getter = identity>
     void operator()(It first, It last, Getter getter = Getter{}) const {
         if(first < last) {
-            static constexpr auto mask = (1 << Bit) - 1;
-            static constexpr auto buckets = 1 << Bit;
-            static constexpr auto passes = N / Bit;
+            constexpr auto passes = N / Bit;
 
             using value_type = typename std::iterator_traits<It>::value_type;
             std::vector<value_type> aux(std::distance(first, last));
 
             auto part = [getter = std::move(getter)](auto from, auto to, auto out, auto start) {
+                constexpr auto mask = (1 << Bit) - 1;
+                constexpr auto buckets = 1 << Bit;
+
                 std::size_t index[buckets]{};
                 std::size_t count[buckets]{};
 
