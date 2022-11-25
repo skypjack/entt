@@ -318,7 +318,7 @@ TEST(ResourceCache, Load) {
 }
 
 TEST(ResourceCache, Erase) {
-    static constexpr std::size_t resource_count = 8u;
+    constexpr std::size_t resource_count = 8u;
     entt::resource_cache<std::size_t> cache;
 
     for(std::size_t next{}, last = resource_count + 1u; next < last; ++next) {

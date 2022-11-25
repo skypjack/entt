@@ -1678,9 +1678,9 @@ ENTT_DEBUG_TEST(StorageDeathTest, PinnedComponent) {
 }
 
 TEST(Storage, UpdateFromDestructor) {
-    static constexpr auto size = 10u;
-
     auto test = [](const auto target) {
+        constexpr auto size = 10u;
+
         entt::storage<update_from_destructor> pool;
 
         for(std::size_t next{}; next < size; ++next) {
@@ -1703,8 +1703,8 @@ TEST(Storage, UpdateFromDestructor) {
         }
     };
 
-    test(entt::entity(size - 1u));
-    test(entt::entity(size - 2u));
+    test(entt::entity{9u});
+    test(entt::entity{8u});
     test(entt::entity{0u});
 }
 

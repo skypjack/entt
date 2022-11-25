@@ -1411,7 +1411,7 @@ TEST_F(Any, SBOVsZeroedSBOSize) {
 }
 
 TEST_F(Any, SboAlignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+    constexpr auto alignment = alignof(over_aligned);
     entt::basic_any<alignment, alignment> sbo[2] = {over_aligned{}, over_aligned{}};
     const auto *data = sbo[0].data();
 
@@ -1427,7 +1427,7 @@ TEST_F(Any, SboAlignment) {
 }
 
 TEST_F(Any, NoSboAlignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+    constexpr auto alignment = alignof(over_aligned);
     entt::basic_any<alignment> nosbo[2] = {over_aligned{}, over_aligned{}};
     const auto *data = nosbo[0].data();
 

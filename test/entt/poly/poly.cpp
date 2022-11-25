@@ -385,7 +385,7 @@ TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
 }
 
 TYPED_TEST(Poly, SboAlignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+    constexpr auto alignment = alignof(over_aligned);
     typename TestFixture::template type<alignment, alignment> sbo[2]{over_aligned{}, over_aligned{}};
     const auto *data = sbo[0].data();
 
@@ -401,7 +401,7 @@ TYPED_TEST(Poly, SboAlignment) {
 }
 
 TYPED_TEST(Poly, NoSboAlignment) {
-    static constexpr auto alignment = alignof(over_aligned);
+    constexpr auto alignment = alignof(over_aligned);
     typename TestFixture::template type<alignment> nosbo[2]{over_aligned{}, over_aligned{}};
     const auto *data = nosbo[0].data();
 

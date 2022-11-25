@@ -98,7 +98,7 @@ TEST(DenseSet, Functionalities) {
 }
 
 TEST(DenseSet, Constructors) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<int> set;
 
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
@@ -357,7 +357,7 @@ TEST(DenseSet, Insert) {
 }
 
 TEST(DenseSet, InsertRehash) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
 
     ASSERT_EQ(set.size(), 0u);
@@ -388,7 +388,7 @@ TEST(DenseSet, InsertRehash) {
 }
 
 TEST(DenseSet, InsertSameBucket) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
 
     for(std::size_t next{}; next < minimum_bucket_count; ++next) {
@@ -451,7 +451,7 @@ TEST(DenseSet, Emplace) {
 }
 
 TEST(DenseSet, EmplaceRehash) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
 
     ASSERT_EQ(set.size(), 0u);
@@ -483,7 +483,7 @@ TEST(DenseSet, EmplaceRehash) {
 }
 
 TEST(DenseSet, EmplaceSameBucket) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
 
     for(std::size_t next{}; next < minimum_bucket_count; ++next) {
@@ -503,7 +503,7 @@ TEST(DenseSet, EmplaceSameBucket) {
 }
 
 TEST(DenseSet, Erase) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
 
     for(std::size_t next{}, last = minimum_bucket_count + 1u; next < last; ++next) {
@@ -553,7 +553,7 @@ TEST(DenseSet, Erase) {
 }
 
 TEST(DenseSet, EraseWithMovableKeyValue) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::string> set;
 
     set.emplace("0");
@@ -570,7 +570,7 @@ TEST(DenseSet, EraseWithMovableKeyValue) {
 }
 
 TEST(DenseSet, EraseFromBucket) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
 
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
@@ -721,7 +721,7 @@ TEST(DenseSet, LocalIterator) {
     static_assert(std::is_same_v<iterator::pointer, const std::size_t *>);
     static_assert(std::is_same_v<iterator::reference, const std::size_t &>);
 
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
     set.emplace(3u);
     set.emplace(3u + minimum_bucket_count);
@@ -749,7 +749,7 @@ TEST(DenseSet, ConstLocalIterator) {
     static_assert(std::is_same_v<iterator::pointer, const std::size_t *>);
     static_assert(std::is_same_v<iterator::reference, const std::size_t &>);
 
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
     set.emplace(3u);
     set.emplace(3u + minimum_bucket_count);
@@ -790,7 +790,7 @@ TEST(DenseSet, LocalIteratorConversion) {
 }
 
 TEST(DenseSet, Rehash) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, entt::identity> set;
     set.emplace(32u);
 
@@ -865,7 +865,7 @@ TEST(DenseSet, Rehash) {
 }
 
 TEST(DenseSet, Reserve) {
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<int> set;
 
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
@@ -885,7 +885,7 @@ TEST(DenseSet, ThrowingAllocator) {
     using packed_allocator = test::throwing_allocator<std::pair<std::size_t, std::size_t>>;
     using packed_exception = typename packed_allocator::exception_type;
 
-    static constexpr std::size_t minimum_bucket_count = 8u;
+    constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<std::size_t, std::hash<std::size_t>, std::equal_to<std::size_t>, allocator> set{};
 
     packed_allocator::trigger_on_allocate = true;
