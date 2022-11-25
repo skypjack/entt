@@ -69,8 +69,6 @@ public:
     using entity_type = typename base_type::entity_type;
     /*! @brief Underlying version type. */
     using version_type = typename base_type::version_type;
-    /*! @brief Reserved identifier. */
-    static constexpr entity_type reserved = base_type::entity_mask | (base_type::version_mask << base_type::entity_shift);
     /*! @brief Page size, default is `ENTT_SPARSE_PAGE`. */
     static constexpr auto page_size = ENTT_SPARSE_PAGE;
 
@@ -111,7 +109,7 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type construct(const entity_type entity, const version_type version) noexcept {
+    [[nodiscard]] static constexpr value_type construct(const entity_type entity = base_type::entity_mask, const version_type version = base_type::version_mask) noexcept {
         return value_type{(entity & base_type::entity_mask) | (static_cast<entity_type>(version) << base_type::entity_shift)};
     }
 
@@ -168,7 +166,8 @@ struct null_t {
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
-        return traits_type::combine(traits_type::reserved, traits_type::reserved);
+        constexpr auto value = traits_type::construct();
+        return value;
     }
 
     /**
@@ -247,7 +246,8 @@ struct tombstone_t {
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
-        return traits_type::combine(traits_type::reserved, traits_type::reserved);
+        constexpr auto value = traits_type::construct();
+        return value;
     }
 
     /**
