@@ -126,7 +126,7 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
 template<typename Registry, typename Component>
 typename Registry::entity_type to_entity(const Registry &reg, const Component &instance) {
     const auto &storage = reg.template storage<Component>();
-    static constexpr auto page_size = std::remove_const_t<std::remove_reference_t<decltype(storage)>>::traits_type::page_size;
+    constexpr auto page_size = std::remove_const_t<std::remove_reference_t<decltype(storage)>>::traits_type::page_size;
     const typename Registry::base_type &base = storage;
     const auto *addr = std::addressof(instance);
 
