@@ -70,7 +70,7 @@ public:
     /*! @brief Underlying version type. */
     using version_type = typename base_type::version_type;
     /*! @brief Page size, default is `ENTT_SPARSE_PAGE`. */
-    static constexpr auto page_size = ENTT_SPARSE_PAGE;
+    static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 
     /**
      * @brief Converts an entity to its underlying type.
