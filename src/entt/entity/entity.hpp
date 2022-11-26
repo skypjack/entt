@@ -63,8 +63,8 @@ class entt_traits: internal::entt_traits<Type> {
     using base_type = internal::entt_traits<Type>;
 
 public:
-    /*! @brief Value type. */
-    using value_type = Type;
+    /*! @brief Entity type. */
+    using type = Type;
     /*! @brief Underlying entity type. */
     using entity_type = typename base_type::entity_type;
     /*! @brief Underlying version type. */
@@ -77,7 +77,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the given value.
      */
-    [[nodiscard]] static constexpr entity_type to_integral(const value_type value) noexcept {
+    [[nodiscard]] static constexpr entity_type to_integral(const type value) noexcept {
         return static_cast<entity_type>(value);
     }
 
@@ -86,7 +86,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the entity part.
      */
-    [[nodiscard]] static constexpr entity_type to_entity(const value_type value) noexcept {
+    [[nodiscard]] static constexpr entity_type to_entity(const type value) noexcept {
         return (to_integral(value) & base_type::entity_mask);
     }
 
@@ -95,7 +95,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the version part.
      */
-    [[nodiscard]] static constexpr version_type to_version(const value_type value) noexcept {
+    [[nodiscard]] static constexpr version_type to_version(const type value) noexcept {
         return (to_integral(value) >> base_type::entity_shift);
     }
 
@@ -109,8 +109,8 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type construct(const entity_type entity = base_type::entity_mask, const version_type version = base_type::version_mask) noexcept {
-        return value_type{(entity & base_type::entity_mask) | (static_cast<entity_type>(version) << base_type::entity_shift)};
+    [[nodiscard]] static constexpr type construct(const entity_type entity = base_type::entity_mask, const version_type version = base_type::version_mask) noexcept {
+        return type{(entity & base_type::entity_mask) | (static_cast<entity_type>(version) << base_type::entity_shift)};
     }
 
     /**
@@ -123,9 +123,9 @@ public:
      * @param rhs The identifier from which to take the version part.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr value_type combine(const entity_type lhs, const entity_type rhs) noexcept {
+    [[nodiscard]] static constexpr type combine(const entity_type lhs, const entity_type rhs) noexcept {
         constexpr auto mask = (base_type::version_mask << base_type::entity_shift);
-        return value_type{(lhs & base_type::entity_mask) | (rhs & mask)};
+        return type{(lhs & base_type::entity_mask) | (rhs & mask)};
     }
 };
 

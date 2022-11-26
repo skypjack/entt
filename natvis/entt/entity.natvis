@@ -4,7 +4,7 @@
 		<Intrinsic Name="pools_size" Expression="pools.packed.first_base::value.size()"/>
 		<Intrinsic Name="vars_size" Expression="vars.ctx.packed.first_base::value.size()"/>
 		<Intrinsic Name="to_entity" Expression="*((traits_type::entity_type *)&amp;entity) &amp; traits_type::entity_mask">
-			<Parameter Name="entity" Type="traits_type::value_type &amp;"/>
+			<Parameter Name="entity" Type="traits_type::type &amp;"/>
 		</Intrinsic>
 		<DisplayString>{{ size={ epool.size() } }}</DisplayString>
 		<Expand>
