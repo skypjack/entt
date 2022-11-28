@@ -15,6 +15,7 @@
 * [Pools](#pools)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
+    * [Listeners disconnection](#listeners-disconnection)
     * [They call me Reactive System](#they-call-me-reactive-system)
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
@@ -421,6 +422,22 @@ features it offers.<br/>
 There are many useful but less known functionalities that aren't described here,
 such as the connection objects or the possibility to attach listeners with a
 list of parameters that is shorter than that of the signal itself.
+
+### Listeners disconnection
+
+The destruction order of the storage classes and therefore the disconnection of
+the listeners is completely random.<br/>
+There are no guarantees today and while a logic is easily discerned, it's not
+guaranteed that it will remain so in the future.
+
+For example, a listener getting disconnected after a component is discarded as a
+result of pool destruction is most likely a recipe for problems.<br/>
+Rather, it's advisable to invoke the `clear` function of the registry before
+destroying it. This forces the deletion of all components and entities without
+ever discarding the pools.<br/>
+As a result, a listener that wants to access components, entities, or pools can
+safely do so against a still valid registry, while checking for the existence of
+the various elements as appropriate.
 
 ### They call me Reactive System
 
