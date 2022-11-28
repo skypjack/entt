@@ -16,35 +16,47 @@ namespace entt {
 
 namespace internal {
 
+// waiting for C++20 (and std::popcount)
+template<typename Type>
+static constexpr int popcount(Type value) noexcept {
+    return value ? (int(value & 1) + popcount(value >> 1)) : 0;
+}
+
 template<typename, typename = void>
 struct entt_traits;
 
 template<typename Type>
 struct entt_traits<Type, std::enable_if_t<std::is_enum_v<Type>>>
-    : entt_traits<std::underlying_type_t<Type>> {};
+    : entt_traits<std::underlying_type_t<Type>> {
+    using type = Type;
+};
 
 template<typename Type>
 struct entt_traits<Type, std::enable_if_t<std::is_class_v<Type>>>
-    : entt_traits<typename Type::entity_type> {};
+    : entt_traits<typename Type::entity_type> {
+    using type = Type;
+};
 
 template<>
 struct entt_traits<std::uint32_t> {
+    using type = std::uint32_t;
+
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
 
     static constexpr entity_type entity_mask = 0xFFFFF;
     static constexpr entity_type version_mask = 0xFFF;
-    static constexpr std::size_t entity_shift = 20u;
 };
 
 template<>
 struct entt_traits<std::uint64_t> {
+    using type = std::uint64_t;
+
     using entity_type = std::uint64_t;
     using version_type = std::uint32_t;
 
     static constexpr entity_type entity_mask = 0xFFFFFFFF;
     static constexpr entity_type version_mask = 0xFFFFFFFF;
-    static constexpr std::size_t entity_shift = 32u;
 };
 
 } // namespace internal
@@ -55,22 +67,20 @@ struct entt_traits<std::uint64_t> {
  */
 
 /**
- * @brief Entity traits.
- * @tparam Type Type of identifier.
+ * @brief Common basic entity traits implementation.
+ * @tparam Traits Actual entity traits to use.
  */
-template<typename Type>
-class entt_traits: internal::entt_traits<Type> {
-    using base_type = internal::entt_traits<Type>;
+template<typename Traits>
+class basic_entt_traits {
+    static constexpr auto entity_shift = internal::popcount(Traits::entity_mask);
 
 public:
     /*! @brief Entity type. */
-    using type = Type;
+    using type = typename Traits::type;
     /*! @brief Underlying entity type. */
-    using entity_type = typename base_type::entity_type;
+    using entity_type = typename Traits::entity_type;
     /*! @brief Underlying version type. */
-    using version_type = typename base_type::version_type;
-    /*! @brief Page size, default is `ENTT_SPARSE_PAGE`. */
-    static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
+    using version_type = typename Traits::version_type;
 
     /**
      * @brief Converts an entity to its underlying type.
@@ -87,7 +97,7 @@ public:
      * @return The integral representation of the entity part.
      */
     [[nodiscard]] static constexpr entity_type to_entity(const type value) noexcept {
-        return (to_integral(value) & base_type::entity_mask);
+        return (to_integral(value) & Traits::entity_mask);
     }
 
     /**
@@ -96,7 +106,7 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const type value) noexcept {
-        return (to_integral(value) >> base_type::entity_shift);
+        return (to_integral(value) >> entity_shift);
     }
 
     /**
@@ -109,8 +119,8 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr type construct(const entity_type entity = base_type::entity_mask, const version_type version = base_type::version_mask) noexcept {
-        return type{(entity & base_type::entity_mask) | (static_cast<entity_type>(version) << base_type::entity_shift)};
+    [[nodiscard]] static constexpr type construct(const entity_type entity = Traits::entity_mask, const version_type version = Traits::version_mask) noexcept {
+        return type{(entity & Traits::entity_mask) | (static_cast<entity_type>(version) << entity_shift)};
     }
 
     /**
@@ -124,9 +134,19 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr type combine(const entity_type lhs, const entity_type rhs) noexcept {
-        constexpr auto mask = (base_type::version_mask << base_type::entity_shift);
-        return type{(lhs & base_type::entity_mask) | (rhs & mask)};
+        constexpr auto mask = (Traits::version_mask << entity_shift);
+        return type{(lhs & Traits::entity_mask) | (rhs & mask)};
     }
+};
+
+/**
+ * @brief Entity traits.
+ * @tparam Type Type of identifier.
+ */
+template<typename Type>
+struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
+    /*! @brief Page size, default is `ENTT_SPARSE_PAGE`. */
+    static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
 /**
