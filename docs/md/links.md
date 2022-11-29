@@ -173,6 +173,9 @@ I hope this list can grow much more in the future:
   * [Ecsact](https://ecsact.dev/): a language aimed at describing ECS, with a
     [runtime implementation](https://github.com/ecsact-dev/ecsact_rt_entt) based
     on `EnTT`.
+  * [AGE (Arc Game Engine)](https://github.com/MohitSethi99/ArcGameEngine): an
+    open-source engine for building 2D & 3D real-time rendering and interactive
+    contents.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
