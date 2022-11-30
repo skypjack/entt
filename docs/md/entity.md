@@ -43,8 +43,8 @@
     * [One example to rule them all](#one-example-to-rule-them-all)
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
-    * [Iteration order](#iteration-order)
     * [View pack](#view-pack)
+    * [Iteration order](#iteration-order)
     * [Runtime views](#runtime-views)
   * [Groups](#groups)
     * [Full-owning groups](#full-owning-groups)
@@ -1112,8 +1112,8 @@ if(entt::type_id<velocity>() == base.type()) {
 ```
 
 Furthermore, all features rely on internal functions that forward the calls to
-the mixins. The latter can then make use of any information, which can be set
-via `bind`:
+the mixins. The latter can then make use of any information, which is set via
+`bind`:
 
 ```cpp
 base.bind(entt::forward_as_any(registry));
@@ -1192,8 +1192,8 @@ _reach_ manually created ones:
 registry.destroy(entity);
 ```
 
-Finally, a storage of this type can be used with any view (which also accepts
-multiple storages of the same type, if necessary):
+Finally, a storage of this type works with any view (which also accepts multiple
+storages of the same type, if necessary):
 
 ```cpp
 // direct initialization
@@ -1415,27 +1415,17 @@ everything back to the registry with different loaders.
 
 # Views and Groups
 
-First of all, it's worth answering a question: why views and groups?<br/>
-Briefly, they're a good tool to enforce single responsibility. A system that has
-access to a registry can create and destroy entities, as well as assign and
-remove components. On the other side, a system that has access to a view or a
-group can only iterate, read and update entities and components.<br/>
-It is a subtle difference that can help designing a better software sometimes.
-
-More in details:
-
-* Views are a non-intrusive tool to access entities and components without
-  affecting other functionalities or increasing the memory consumption.
-
-* Groups are an intrusive tool that allows to reach higher performance along
-  critical paths but has also a price to pay for that.
+Views are a non-intrusive tool for working with entities and components without
+affecting other functionalities or increasing memory consumption.<br/>
+Groups are an intrusive tool to use to improve performance along critical paths
+but which also has a price to pay for that.
 
 There are mainly two kinds of views: _compile-time_ (also known as `view`) and
 runtime (also known as `runtime_view`).<br/>
-The former requires a compile-time list of component types and can make several
-optimizations because of that. The latter can be constructed at runtime instead
-using numerical type identifiers and are a bit slower to iterate.<br/>
-In both cases, creating and destroying a view isn't expensive at all since they
+The former requires a compile-time list of component (or storage) types and can
+make several optimizations because of that. The latter is constructed at runtime
+using numerical type identifiers instead and is a bit slower to iterate.<br/>
+In both cases, creating and destroying views isn't expensive at all since they
 don't have any type of initialization.
 
 Groups come in three different flavors: _full-owning groups_, _partial-owning
@@ -1444,39 +1434,33 @@ performance.<br/>
 Groups can literally _own_ one or more component types. They are allowed to
 rearrange pools so as to speed up iterations. Roughly speaking: the more
 components a group owns, the faster it is to iterate them.<br/>
-A given component can belong to multiple groups only if they are _nested_, so
-users have to define groups carefully to get the best out of them.
+A given component can belong to multiple groups only if they are _nested_. Users
+have to define groups carefully to get the best out of them.
 
 ## Views
 
-A view behaves differently if it's constructed for a single component or if it
-has been created to iterate multiple components. Even the API is slightly
-different in the two cases.
+Single type views and multi type views behave differently and also have slightly
+different APIs.
 
-Single type views are specialized to give a boost in terms of performance in all
-the situations. This kind of views can access the underlying data structures
-directly and avoid superfluous checks. There is nothing as fast as a single type
-view. In fact, they walk through a packed (actually paged) array of components
-and return them one at a time.<br/>
-Views also offer a bunch of functionalities to get the number of entities and
-components they are going to return. It's also possible to ask a view if it
-contains a given entity.<br/>
+Single type views are specialized to give a performance boost in all cases.
+There is nothing as fast as a single type view. They just walk through packed
+(actually paged) arrays of elements and return them directly.<br/>
+This kind of views also allow to get the exact number of elements they are going
+to return.<br/>
 Refer to the inline documentation for all the details.
 
-Multi type views iterate entities that have at least all the given components in
-their bags. During construction, these views look at the number of entities
-available for each component and pick up a reference to the smallest set of
-candidates in order to speed up iterations.<br/>
-They offer fewer functionalities than single type views. In particular, a multi
-type view exposes utility functions to get the estimated number of entities it
-is going to return and to know if it contains a given entity.<br/>
+Multi type views iterate entities that have at least all the given components.
+During construction, they look at the number of elements available in each pool
+and use the smallest set in order to speed up iterations.<br/>
+This kind of views only allow to get the estimated number of elements they are
+going to return.<br/>
 Refer to the inline documentation for all the details.
 
-There is no need to store views aside as they are extremely cheap to construct.
-In fact, this is even discouraged when creating a view from a const registry.
-Since all storage are lazily initialized, they may not exist when the view is
-built. Therefore, the view itself will refer to an empty _placeholder_ and will
-never be re-assigned the actual storage.<br/>
+Storing aside views isn't required as they are extremely cheap to construct. In
+fact, this is even discouraged when creating a view from a const registry. Since
+all storage are lazily initialized, they may not exist when the view is created.
+Therefore, the view can refer to empty _placeholders_ and is never re-assigned
+the actual storage.<br/>
 In all cases, views return newly created and correctly initialized iterators for
 the storage they refer to when `begin` or `end` are invoked.
 
@@ -1539,8 +1523,8 @@ any case.
 
 As a side note, in the case of single type views, `get` accepts but doesn't
 strictly require a template parameter, since the type is implicitly defined.
-However, when the type isn't specified, for consistency with the multi type
-view, the instance will be returned using a tuple:
+However, when the type isn't specified, the instance is returned using a tuple
+for consistency with multi type views:
 
 ```cpp
 auto view = registry.view<const renderable>();
@@ -1554,10 +1538,31 @@ for(auto entity: view) {
 **Note**: prefer the `get` member function of a view instead of that of a
 registry during iterations to get the types iterated by the view itself.
 
+### View pack
+
+Views are combined with each other to create new and more specific queries.<br/>
+The type returned when combining multiple views together is itself a view, more
+in general a multi component one.
+
+Combining different views tries to mimic C++20 ranges:
+
+```cpp
+auto view = registry.view<position>();
+auto other = registry.view<velocity>();
+
+auto pack = view | other;
+```
+
+The constness of the types is preserved and their order depends on the order in
+which the views are combined. For example, the pack above returns an instance of
+`position` first and then one of `velocity`.<br/>
+Since combining views generates views, a chain can be of arbitrary length and
+the above type order rules apply sequentially.
+
 ### Iteration order
 
 By default, a view is iterated along the pool that contains the smallest number
-of components.<br/>
+of elements.<br/>
 For example, if the registry contains fewer `velocity`s than it contains
 `position`s, then the order of the elements returned by the following view
 depends on how the `velocity` components are arranged in their pool:
@@ -1594,39 +1599,14 @@ Unfortunately, multi type views don't offer reverse iterators. Therefore, in
 this case it's a must to implement this functionality manually or to use single
 type views to lead the iteration.
 
-### View pack
-
-Views are combined with each other to create new and more specific types.<br/>
-The type returned when combining multiple views together is itself a view, more
-in general a multi component one.
-
-Combining different views tries to mimic C++20 ranges:
-
-```cpp
-auto view = registry.view<position>();
-auto other = registry.view<velocity>();
-
-auto pack = view | other;
-```
-
-The constness of the types is preserved and their order depends on the order in
-which the views are combined. Therefore, the pack in the example above will
-return an instance of `position` first and then one of `velocity`.<br/>
-Since combining views generates views, a chain can be of arbitrary length and
-the above type order rules apply sequentially.
-
 ### Runtime views
 
-Runtime views iterate entities that have at least all the given components in
-their bags. During construction, these views look at the number of entities
-available for each component and pick up a reference to the smallest set of
-candidates in order to speed up iterations.<br/>
+Multi type views iterate entities that have at least all the given components.
+During construction, they look at the number of elements available in each pool
+and use the smallest set in order to speed up iterations.<br/>
 They offer more or less the same functionalities of a multi type view. However,
 they don't expose a `get` member function and users should refer to the registry
-that generated the view to access components. In particular, a runtime view
-exposes utility functions to get the estimated number of entities it is going to
-return and to know whether it's empty or not. It's also possible to ask a
-runtime view if it contains a given entity.<br/>
+that generated the view to access components.<br/>
 Refer to the inline documentation for all the details.
 
 Runtime views are pretty cheap to construct and should not be stored aside in
@@ -1671,7 +1651,7 @@ useful in this regard.
 Groups are meant to iterate multiple components at once and to offer a faster
 alternative to multi type views.<br/>
 Groups overcome the performance of the other tools available but require to get
-the ownership of components. This sets some constraints on the pools. On the
+the ownership of components. This sets some constraints on their pools. On the
 other hand, groups aren't an automatism that increases memory consumption,
 affects functionalities and tries to optimize iterations for all the possible
 combinations of components. Users can decide when to pay for groups and to what
@@ -1691,24 +1671,19 @@ avoided as long as possible.
 All groups affect to an extent the creation and destruction of their components.
 This is due to the fact that they must _observe_ changes in the pools of
 interest and arrange data _correctly_ when needed for the types they own.<br/>
-That being said, the way groups operate is beyond the scope of this document.
-However, it's unlikely that users will be able to appreciate the impact of
-groups on the other functionalities of a registry.
-
-Groups offer a bunch of functionalities to get the number of entities and
-components they are going to return. It's also possible to ask a group if it
-contains a given entity.<br/>
+In all cases, a group allows to get the exact number of elements it's going to
+return.<br/>
 Refer to the inline documentation for all the details.
 
-There is no need to store groups aside for they are extremely cheap to create,
-even though valid groups can be copied without problems and reused freely.<br/>
+Storing aside groups isn't required as they are extremely cheap to create, even
+though valid groups can be copied without problems and reused freely.<br/>
 A group performs an initialization step the very first time it's requested and
 this could be quite costly. To avoid it, consider creating the group when no
 components have been assigned yet. If the registry is empty, preparation is
 extremely fast. Groups also return newly created and correctly initialized
 iterators whenever `begin` or `end` are invoked.
 
-To iterate groups, either use them in a range-for loop:
+To iterate a group, either use it in a range-for loop:
 
 ```cpp
 auto group = registry.group<position>(entt::get<velocity, renderable>);
@@ -1756,9 +1731,10 @@ registry during iterations to get the types iterated by the group itself.
 
 A full-owning group is the fastest tool a user can expect to use to iterate
 multiple components at once. It iterates all the components directly, no
-indirection required. This type of groups performs more or less as if users are
-accessing sequentially a bunch of packed arrays of components all sorted
-identically, with no jumps nor branches.
+indirection required.<br/>
+This type of groups performs more or less as if users are accessing sequentially
+a bunch of packed arrays of components all sorted identically, with no jumps nor
+branches.
 
 A full-owning group is created as:
 
@@ -1776,15 +1752,15 @@ Once created, the group gets the ownership of all the components specified in
 the template parameter list and arranges their pools as needed.
 
 Sorting owned components is no longer allowed once the group has been created.
-However, full-owning groups can be sorted by means of their `sort` member
-functions. Sorting a full-owning group affects all its instances.
+However, full-owning groups are sorted using their `sort` member functions.
+Sorting a full-owning group affects all its instances.
 
 ### Partial-owning groups
 
 A partial-owning group works similarly to a full-owning group for the components
-it owns, but relies on indirection to get components owned by other groups. This
-isn't as fast as a full-owning group, but it's already much faster than views
-when there are only one or two free components to retrieve (the most common
+it owns, but relies on indirection to get components owned by other groups.<br/>
+This isn't as fast as a full-owning group, but it's already much faster than a
+view when there are only one or two free components to retrieve (the most common
 cases likely). In the worst case, it's not slower than views anyway.
 
 A partial-owning group is created as:
@@ -1804,15 +1780,15 @@ the template parameter list and arranges their pools as needed. The ownership of
 the types provided via `entt::get` doesn't pass to the group instead.
 
 Sorting owned components is no longer allowed once the group has been created.
-However, partial-owning groups can be sorted by means of their `sort` member
-functions. Sorting a partial-owning group affects all its instances.
+However, partial-owning groups are sorted using their `sort` member functions.
+Sorting a partial-owning group affects all its instances.
 
 ### Non-owning groups
 
 Non-owning groups are usually fast enough, for sure faster than views and well
 suited for most of the cases. However, they require custom data structures to
-work properly and they increase memory consumption. As a rule of thumb, users
-should avoid using non-owning groups, if possible.
+work properly and they increase memory consumption.<br/>
+As a rule of thumb, users should avoid using non-owning groups, if possible.
 
 A non-owning group is created as:
 
@@ -1830,8 +1806,8 @@ The group doesn't receive the ownership of any type of component in this
 case. This type of groups is therefore the least performing in general, but also
 the only one that can be used in any situation to slightly improve performance.
 
-Non-owning groups can be sorted by means of their `sort` member functions.
-Sorting a non-owning group affects all its instances.
+Non-owning groups are sorted using their `sort` member functions. Sorting a
+non-owning group affects all its instances.
 
 ### Nested groups
 
@@ -1853,8 +1829,7 @@ Two nested groups are such that they own at least one component type and the lis
 of component types involved by one of them is contained entirely in that of the
 other. More specifically, this applies independently to all component lists used
 to define a group.<br/>
-Therefore, the rules for defining whether two or more groups are nested can be
-summarized as:
+Therefore, the rules for defining whether two or more groups are nested is:
 
 * One of the groups involves one or more additional component types with respect
   to the other, whether they are owned, observed or excluded.
@@ -1863,8 +1838,8 @@ summarized as:
   contains entirely that of the others. This also applies to the list of
   observed and excluded components.
 
-It means that nested groups _extend_ their parents by adding more conditions in
-the form of new components.
+This means that nested groups _extend_ their parents by adding more conditions
+in the form of new components.
 
 As mentioned, the components don't necessarily have to be all _owned_ so that
 two groups can be considered nested. The following definitions are fully valid:
@@ -1888,12 +1863,10 @@ They are treated as if users were defining the following groups:
 Where `not_rotation` is an empty tag present only when `rotation` is not.
 
 Because of this, to define a new group that is more restrictive than an existing
-one, it's enough to take the list of component types of the latter and extend it
-by adding new component types either owned, observed or excluded, without any
-precautions depending on the case.<br/>
-The opposite is also true. To define a _larger_ group, it will be enough to take
-an existing one and remove _constraints_ from it, in whatever form they are
-expressed.<br/>
+one, it's enough to extend the component list of another group by adding new
+types that are either owned, observed or excluded.<br/>
+The opposite is also true. To define a _larger_ group, it's enough to remove
+_constraints_ from its parent.<br/>
 Note that the greater the number of component types involved by a group, the
 more restrictive it is.
 
@@ -1911,7 +1884,7 @@ less restrictive ones and ordering the latter would invalidate the former.<br/>
 However, given a family of nested groups, it's still possible to sort the most
 restrictive of them. To prevent users from having to remember which of their
 groups is the most restrictive, the registry class offers the `sortable` member
-function to know if a group can be sorted or not.
+function to know if a group supports sorting it or not.
 
 ## Types: const, non-const and all in between
 
@@ -1919,8 +1892,8 @@ The `registry` class offers two overloads when it comes to constructing views
 and groups: a const version and a non-const one. The former accepts only const
 types as template parameters, the latter accepts both const and non-const types
 instead.<br/>
-It means that views and groups can be constructed from a const registry and they
-propagate the constness of the registry to the types involved. As an example:
+It means that views and groups generated by a const registry also propagate the
+constness to the types involved. As an example:
 
 ```cpp
 entt::view<const position, const velocity> view = std::as_const(registry).view<const position, const velocity>();
@@ -1932,7 +1905,7 @@ Consider the following definition for a non-const view instead:
 entt::view<position, const velocity> view = registry.view<position, const velocity>();
 ```
 
-In the example above, `view` can be used to access either read-only or writable
+In the example above, `view` is used to access either read-only or writable
 `position` components while `velocity` components are read-only in all
 cases.<br/>
 Similarly, these statements are all valid:
@@ -1946,7 +1919,7 @@ std::tuple<const position &, const velocity &> ctup = view.get<const position, c
 ```
 
 It's not possible to get non-const references to `velocity` components from the
-same view instead and these will result in compilation errors:
+same view instead. Therefore, these result in compilation errors:
 
 ```cpp
 velocity &cpos = view.get<velocity>(entity);
@@ -1998,7 +1971,7 @@ registry.each([&registry](auto entity) {
 
 In general, iterating all entities can result in poor performance. It should not
 be done frequently to avoid the risk of a performance hit.<br/>
-However, it can be convenient when initializing an editor or to reclaim pending
+However, it's convenient when initializing an editor or to reclaim pending
 identifiers.
 
 ## What is allowed and what is not
@@ -2065,16 +2038,16 @@ nature and the scope of the groups, it isn't something in which it will happen
 to come across probably, but it's good to know it anyway.
 
 First of all, it must be said that creating components while iterating a group
-isn't a problem at all and can be done freely as it happens with the views. The
-same applies to the destruction of components and entities, for which the rules
+isn't a problem at all and is done freely as it happens with the views. The same
+applies to the destruction of components and entities, for which the rules
 mentioned above apply.
 
-The additional limitation pops out instead when a given component that is owned
-by a group is iterated outside of it. In this case, adding components that are
-part of the group itself may invalidate the iterators. There are no further
+The additional limitation arises instead when a given component that is owned by
+a group is iterated outside of it. In this case, adding components that are part
+of the group itself may invalidate the iterators. There are no further
 limitations to the destruction of components and entities.<br/>
-Fortunately, this isn't always true. In fact, it almost never is and this
-happens only under certain conditions. In particular:
+Fortunately, this isn't always true. In fact, it almost never is and only
+happens under certain conditions. In particular:
 
 * Iterating a type of component that is part of a group with a single type view
   and adding to an entity all the components required to get it into the group
@@ -2105,8 +2078,8 @@ mentioning.
 
 When an empty type is detected, it's not instantiated by default. Therefore,
 only the entities to which it's assigned are made available. There doesn't exist
-a way to _get_ empty types from a registry. Views and groups will never return
-their instances (for example, during a call to `each`).<br/>
+a way to _get_ empty types from a registry. Views and groups never return their
+instances (for example, during a call to `each`).<br/>
 On the other hand, iterations are faster because only the entities to which the
 type is assigned are considered. Moreover, less memory is used, mainly because
 there doesn't exist any instance of the component, no matter how many entities
@@ -2131,8 +2104,8 @@ a set of components and modify the same set concurrently. However:
 
 * As long as a thread iterates the entities that have the component `X` or
   assign and removes that component from a set of entities, another thread can
-  safely do the same with components `Y` and `Z` and everything will work like a
-  charm. As a trivial example, users can freely execute the rendering system and
+  safely do the same with components `Y` and `Z` and everything work like just
+  fine. As a trivial example, users can freely execute the rendering system and
   iterate the renderable entities while updating a physic component concurrently
   on a separate thread.
 
@@ -2153,9 +2126,9 @@ are completely responsible for synchronization whether required. On the other
 hand, they could get away with it without having to resort to particular
 expedients.
 
-Finally, `EnTT` can be configured via a few compile-time definitions to make
-some of its parts implicitly thread-safe, roughly speaking only the ones that
-really make sense and can't be turned around.<br/>
+Finally, `EnTT` is configured via a few compile-time definitions to make some of
+its parts implicitly thread-safe, roughly speaking only the ones that really
+make sense and can't be turned around.<br/>
 In particular, when multiple instances of objects referencing the type index
 generator (such as the `registry` class) are used in different threads, then it
 might be useful to define `ENTT_USE_ATOMIC`.<br/>
@@ -2169,7 +2142,7 @@ they meet at least the requirements of forward iterators.<br/>
 In other terms, they are suitable for use with the parallel algorithms of the
 standard library. If it's not clear, this is a great thing.
 
-As an example, this kind of iterators can be used in combination with
+As an example, this kind of iterators are used in combination with
 `std::for_each` and `std::execution::par` to parallelize the visit and therefore
 the update of the components returned by a view or a group, as long as the
 constraints previously discussed are respected:
@@ -2196,7 +2169,7 @@ should even benefit from it further.
 
 ## Const registry
 
-A const registry is also fully thread safe. This means that it won't be able to
+A const registry is also fully thread safe. This means that it's not able to
 lazily initialize a missing storage when a view is generated.<br/>
 The reason for this is easy to explain. To avoid requiring types to be
 _announced_ in advance, a registry lazily creates the storage objects for the
@@ -2220,8 +2193,8 @@ Calling the `storage` method is equivalent to _announcing_ the existence of a
 particular storage, to avoid running into problems. For those interested, there
 are also alternative approaches, such as a single threaded tick for the registry
 warm-up, but these are not always applicable.<br/>
-In this case, no placeholders will be used since all storage exist. In other
-words, views never risk becoming _invalid_.
+In this case, no placeholders are used since all storage exist. In other words,
+views never risk becoming _invalid_.
 
 # Beyond this document
 
