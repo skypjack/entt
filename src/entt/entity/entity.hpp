@@ -72,7 +72,9 @@ struct entt_traits<std::uint64_t> {
  */
 template<typename Traits>
 class basic_entt_traits {
-    static constexpr auto entity_shift = internal::popcount(Traits::entity_mask);
+    static constexpr auto length = internal::popcount(Traits::entity_mask);
+    static_assert(Traits::entity_mask && ((1 << length) == (Traits::entity_mask + 1)), "Invalid entity mask");
+    static_assert((1 << internal::popcount(Traits::version_mask)) == (Traits::version_mask + 1), "Invalid version mask");
 
 public:
     /*! @brief Entity type. */
@@ -111,7 +113,7 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const type value) noexcept {
-        return (to_integral(value) >> entity_shift);
+        return (to_integral(value) >> length);
     }
 
     /**
@@ -125,7 +127,7 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr type construct(const entity_type entity, const version_type version) noexcept {
-        return type{(entity & entity_mask) | (static_cast<entity_type>(version) << entity_shift)};
+        return type{(entity & entity_mask) | (static_cast<entity_type>(version) << length)};
     }
 
     /**
@@ -139,7 +141,7 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr type combine(const entity_type lhs, const entity_type rhs) noexcept {
-        constexpr auto mask = (version_mask << entity_shift);
+        constexpr auto mask = (version_mask << length);
         return type{(lhs & entity_mask) | (rhs & mask)};
     }
 };
