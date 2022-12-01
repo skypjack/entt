@@ -82,6 +82,11 @@ public:
     /*! @brief Underlying version type. */
     using version_type = typename Traits::version_type;
 
+    /*! @brief Entity mask size. */
+    static constexpr entity_type entity_mask = Traits::entity_mask;
+    /*! @brief Version mask size */
+    static constexpr entity_type version_mask = Traits::version_mask;
+
     /**
      * @brief Converts an entity to its underlying type.
      * @param value The value to convert.
@@ -97,7 +102,7 @@ public:
      * @return The integral representation of the entity part.
      */
     [[nodiscard]] static constexpr entity_type to_entity(const type value) noexcept {
-        return (to_integral(value) & Traits::entity_mask);
+        return (to_integral(value) & entity_mask);
     }
 
     /**
@@ -119,8 +124,8 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr type construct(const entity_type entity = Traits::entity_mask, const version_type version = Traits::version_mask) noexcept {
-        return type{(entity & Traits::entity_mask) | (static_cast<entity_type>(version) << entity_shift)};
+    [[nodiscard]] static constexpr type construct(const entity_type entity, const version_type version) noexcept {
+        return type{(entity & entity_mask) | (static_cast<entity_type>(version) << entity_shift)};
     }
 
     /**
@@ -134,8 +139,8 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr type combine(const entity_type lhs, const entity_type rhs) noexcept {
-        constexpr auto mask = (Traits::version_mask << entity_shift);
-        return type{(lhs & Traits::entity_mask) | (rhs & mask)};
+        constexpr auto mask = (version_mask << entity_shift);
+        return type{(lhs & entity_mask) | (rhs & mask)};
     }
 };
 
@@ -186,7 +191,7 @@ struct null_t {
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
-        constexpr auto value = traits_type::construct();
+        constexpr auto value = traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
         return value;
     }
 
@@ -266,7 +271,7 @@ struct tombstone_t {
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
-        constexpr auto value = traits_type::construct();
+        constexpr auto value = traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
         return value;
     }
 
