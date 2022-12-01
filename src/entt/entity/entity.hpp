@@ -28,18 +28,18 @@ struct entt_traits;
 template<typename Type>
 struct entt_traits<Type, std::enable_if_t<std::is_enum_v<Type>>>
     : entt_traits<std::underlying_type_t<Type>> {
-    using type = Type;
+    using value_type = Type;
 };
 
 template<typename Type>
 struct entt_traits<Type, std::enable_if_t<std::is_class_v<Type>>>
     : entt_traits<typename Type::entity_type> {
-    using type = Type;
+    using value_type = Type;
 };
 
 template<>
 struct entt_traits<std::uint32_t> {
-    using type = std::uint32_t;
+    using value_type = std::uint32_t;
 
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
@@ -50,7 +50,7 @@ struct entt_traits<std::uint32_t> {
 
 template<>
 struct entt_traits<std::uint64_t> {
-    using type = std::uint64_t;
+    using value_type = std::uint64_t;
 
     using entity_type = std::uint64_t;
     using version_type = std::uint32_t;
@@ -78,8 +78,8 @@ class basic_entt_traits {
     static_assert((typename Traits::entity_type{1} << internal::popcount(Traits::version_mask)) == (Traits::version_mask + 1), "Invalid version mask");
 
 public:
-    /*! @brief Entity type. */
-    using type = typename Traits::type;
+    /*! @brief Value type. */
+    using value_type = typename Traits::value_type;
     /*! @brief Underlying entity type. */
     using entity_type = typename Traits::entity_type;
     /*! @brief Underlying version type. */
@@ -95,7 +95,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the given value.
      */
-    [[nodiscard]] static constexpr entity_type to_integral(const type value) noexcept {
+    [[nodiscard]] static constexpr entity_type to_integral(const value_type value) noexcept {
         return static_cast<entity_type>(value);
     }
 
@@ -104,7 +104,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the entity part.
      */
-    [[nodiscard]] static constexpr entity_type to_entity(const type value) noexcept {
+    [[nodiscard]] static constexpr entity_type to_entity(const value_type value) noexcept {
         return (to_integral(value) & entity_mask);
     }
 
@@ -113,7 +113,7 @@ public:
      * @param value The value to convert.
      * @return The integral representation of the version part.
      */
-    [[nodiscard]] static constexpr version_type to_version(const type value) noexcept {
+    [[nodiscard]] static constexpr version_type to_version(const value_type value) noexcept {
         return (to_integral(value) >> length);
     }
 
@@ -127,8 +127,8 @@ public:
      * @param version The version part of the identifier.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr type construct(const entity_type entity, const version_type version) noexcept {
-        return type{(entity & entity_mask) | (static_cast<entity_type>(version) << length)};
+    [[nodiscard]] static constexpr value_type construct(const entity_type entity, const version_type version) noexcept {
+        return value_type{(entity & entity_mask) | (static_cast<entity_type>(version) << length)};
     }
 
     /**
@@ -141,9 +141,9 @@ public:
      * @param rhs The identifier from which to take the version part.
      * @return A properly constructed identifier.
      */
-    [[nodiscard]] static constexpr type combine(const entity_type lhs, const entity_type rhs) noexcept {
+    [[nodiscard]] static constexpr value_type combine(const entity_type lhs, const entity_type rhs) noexcept {
         constexpr auto mask = (version_mask << length);
-        return type{(lhs & entity_mask) | (rhs & mask)};
+        return value_type{(lhs & entity_mask) | (rhs & mask)};
     }
 };
 
