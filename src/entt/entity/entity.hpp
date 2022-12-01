@@ -153,6 +153,8 @@ public:
  */
 template<typename Type>
 struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
+    /*! @brief Base type. */
+    using base_type = basic_entt_traits<internal::entt_traits<Type>>;
     /*! @brief Page size, default is `ENTT_SPARSE_PAGE`. */
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
