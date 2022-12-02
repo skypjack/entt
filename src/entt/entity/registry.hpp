@@ -304,7 +304,15 @@ class basic_registry {
         auto &cpool = pools[id];
 
         if(!cpool) {
-            cpool = std::allocate_shared<storage_for_type<std::remove_const_t<Type>>>(get_allocator(), get_allocator());
+            using alloc_type = storage_for_type<std::remove_const_t<Type>>::allocator_type;
+
+            if constexpr(std::is_same_v<Type, void> && !std::is_constructible_v<alloc_type, allocator_type>) {
+                // std::allocator<void> has no cross constructors (waiting for C++20)
+                cpool = std::allocate_shared<storage_for_type<std::remove_const_t<Type>>>(get_allocator(), alloc_type{});
+            } else {
+                cpool = std::allocate_shared<storage_for_type<std::remove_const_t<Type>>>(get_allocator(), get_allocator());
+            }
+
             cpool->bind(forward_as_any(*this));
         }
 
