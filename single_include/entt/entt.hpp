@@ -19,7 +19,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -123,7 +123,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -165,7 +165,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -287,7 +287,7 @@
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -2955,7 +2955,7 @@ class dense_map {
 
     template<typename Other>
     [[nodiscard]] std::size_t key_to_bucket(const Other &key) const noexcept {
-        return fast_mod(sparse.second()(key), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 
     template<typename Other>
@@ -3986,7 +3986,7 @@ class dense_set {
 
     template<typename Other>
     [[nodiscard]] std::size_t value_to_bucket(const Other &value) const noexcept {
-        return fast_mod(sparse.second()(value), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(value)), bucket_count());
     }
 
     template<typename Other>
@@ -4912,7 +4912,7 @@ struct radix_sort {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -9682,7 +9682,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -9867,7 +9867,7 @@ inline constexpr bool ignore_as_empty_v = (std::is_void_v<Type> || component_tra
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -10764,14 +10764,46 @@ class basic_sparse_set;
 template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
 class basic_storage;
 
-template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
-struct storage_type;
-
-template<typename Type, typename = entity, typename = std::allocator<std::remove_const_t<Type>>>
-struct storage_for;
-
 template<typename Type>
 class sigh_storage_mixin;
+
+/**
+ * @brief Provides a common way to define storage types.
+ * @tparam Type Storage value type.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ */
+template<typename Type, typename Entity = entity, typename Allocator = std::allocator<Type>, typename = void>
+struct storage_type {
+    /*! @brief Type-to-storage conversion result. */
+    using type = sigh_storage_mixin<basic_storage<Type, Entity, Allocator>>;
+};
+
+/**
+ * @brief Helper type.
+ * @tparam Args Arguments to forward.
+ */
+template<typename... Args>
+using storage_type_t = typename storage_type<Args...>::type;
+
+/**
+ * Type-to-storage conversion utility that preserves constness.
+ * @tparam Type Storage value type, eventually const.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ */
+template<typename Type, typename Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>>
+struct storage_for {
+    /*! @brief Type-to-storage conversion result. */
+    using type = constness_as_t<storage_type_t<std::remove_const_t<Type>, Entity, Allocator>, Type>;
+};
+
+/**
+ * @brief Helper type.
+ * @tparam Args Arguments to forward.
+ */
+template<typename... Args>
+using storage_for_t = typename storage_for<Args...>::type;
 
 template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_registry;
@@ -16041,7 +16073,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -16155,7 +16187,7 @@ struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<I
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -18508,7 +18540,7 @@ protected:
      * @param force_back Force back insertion.
      * @return Iterator pointing to the emplaced element.
      */
-    basic_iterator try_emplace([[maybe_unused]] const Entity entt, const bool force_back, const void *value) override {
+    basic_iterator try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] const bool force_back, const void *value) override {
         if(value) {
             if constexpr(std::is_copy_constructible_v<value_type>) {
                 return emplace_element(entt, force_back, *static_cast<const value_type *>(value));
@@ -19042,44 +19074,6 @@ public:
     }
 };
 
-/**
- * @brief Provides a common way to define storage types.
- * @tparam Type Storage value type.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity, typename Allocator, typename>
-struct storage_type {
-    /*! @brief Type-to-storage conversion result. */
-    using type = sigh_storage_mixin<basic_storage<Type, Entity, Allocator>>;
-};
-
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_type_t = typename storage_type<Args...>::type;
-
-/**
- * Type-to-storage conversion utility that preserves constness.
- * @tparam Type Storage value type, eventually const.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity, typename Allocator>
-struct storage_for {
-    /*! @brief Type-to-storage conversion result. */
-    using type = constness_as_t<storage_type_t<std::remove_const_t<Type>, Entity, Allocator>, Type>;
-};
-
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_for_t = typename storage_for<Args...>::type;
-
 } // namespace entt
 
 #endif
@@ -19100,7 +19094,7 @@ class extended_group_iterator;
 template<typename It, typename... Owned, typename... Get>
 class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     template<typename Type>
-    auto index_to_element(Type &cpool) const {
+    auto index_to_element([[maybe_unused]] Type &cpool) const {
         if constexpr(ignore_as_empty_v<typename Type::value_type>) {
             return std::make_tuple();
         } else {
@@ -20691,7 +20685,7 @@ class extended_group_iterator;
 template<typename It, typename... Owned, typename... Get>
 class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     template<typename Type>
-    auto index_to_element(Type &cpool) const {
+    auto index_to_element([[maybe_unused]] Type &cpool) const {
         if constexpr(ignore_as_empty_v<typename Type::value_type>) {
             return std::make_tuple();
         } else {
@@ -21793,11 +21787,11 @@ public:
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
      * @param value The storage for the types to iterate.
-     * @param exclude The storage for the types used to filter the view.
+     * @param excl The storage for the types used to filter the view.
      */
-    basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> exclude = {}) noexcept
+    basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> excl = {}) noexcept
         : pools{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, value)},
-          filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, exclude)},
+          filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, excl)},
           view{std::apply([](const base_type *first, const auto *...other) { ((first = other->size() < first->size() ? other : first), ...); return first; }, pools)} {}
 
     /**
@@ -23101,7 +23095,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -23417,7 +23411,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -23926,7 +23920,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -24048,7 +24042,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -26716,7 +26710,7 @@ class dense_map {
 
     template<typename Other>
     [[nodiscard]] std::size_t key_to_bucket(const Other &key) const noexcept {
-        return fast_mod(sparse.second()(key), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 
     template<typename Other>
@@ -27747,7 +27741,7 @@ class dense_set {
 
     template<typename Other>
     [[nodiscard]] std::size_t value_to_bucket(const Other &value) const noexcept {
-        return fast_mod(sparse.second()(value), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(value)), bucket_count());
     }
 
     template<typename Other>
@@ -30840,7 +30834,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -30962,7 +30956,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -33630,7 +33624,7 @@ class dense_map {
 
     template<typename Other>
     [[nodiscard]] std::size_t key_to_bucket(const Other &key) const noexcept {
-        return fast_mod(sparse.second()(key), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 
     template<typename Other>
@@ -38226,7 +38220,7 @@ protected:
      * @param force_back Force back insertion.
      * @return Iterator pointing to the emplaced element.
      */
-    basic_iterator try_emplace([[maybe_unused]] const Entity entt, const bool force_back, const void *value) override {
+    basic_iterator try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] const bool force_back, const void *value) override {
         if(value) {
             if constexpr(std::is_copy_constructible_v<value_type>) {
                 return emplace_element(entt, force_back, *static_cast<const value_type *>(value));
@@ -38760,44 +38754,6 @@ public:
     }
 };
 
-/**
- * @brief Provides a common way to define storage types.
- * @tparam Type Storage value type.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity, typename Allocator, typename>
-struct storage_type {
-    /*! @brief Type-to-storage conversion result. */
-    using type = sigh_storage_mixin<basic_storage<Type, Entity, Allocator>>;
-};
-
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_type_t = typename storage_type<Args...>::type;
-
-/**
- * Type-to-storage conversion utility that preserves constness.
- * @tparam Type Storage value type, eventually const.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity, typename Allocator>
-struct storage_for {
-    /*! @brief Type-to-storage conversion result. */
-    using type = constness_as_t<storage_type_t<std::remove_const_t<Type>, Entity, Allocator>, Type>;
-};
-
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_for_t = typename storage_for<Args...>::type;
-
 } // namespace entt
 
 #endif
@@ -39323,11 +39279,11 @@ public:
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
      * @param value The storage for the types to iterate.
-     * @param exclude The storage for the types used to filter the view.
+     * @param excl The storage for the types used to filter the view.
      */
-    basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> exclude = {}) noexcept
+    basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> excl = {}) noexcept
         : pools{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, value)},
-          filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, exclude)},
+          filter{std::apply([](auto &...curr) { return std::make_tuple(&curr...); }, excl)},
           view{std::apply([](const base_type *first, const auto *...other) { ((first = other->size() < first->size() ? other : first), ...); return first; }, pools)} {}
 
     /**
@@ -39945,7 +39901,7 @@ basic_view(std::tuple<Get &...>, std::tuple<Exclude &...> = {}) -> basic_view<ge
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -40261,7 +40217,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -40831,7 +40787,7 @@ void dot(std::ostream &out, const Graph &graph) {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -40953,7 +40909,7 @@ void dot(std::ostream &out, const Graph &graph) {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -43621,7 +43577,7 @@ class dense_map {
 
     template<typename Other>
     [[nodiscard]] std::size_t key_to_bucket(const Other &key) const noexcept {
-        return fast_mod(sparse.second()(key), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 
     template<typename Other>
@@ -44652,7 +44608,7 @@ class dense_set {
 
     template<typename Other>
     [[nodiscard]] std::size_t value_to_bucket(const Other &value) const noexcept {
-        return fast_mod(sparse.second()(value), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(value)), bucket_count());
     }
 
     template<typename Other>
@@ -47168,7 +47124,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -47469,7 +47425,7 @@ struct adl_meta_pointer_like {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -47591,7 +47547,7 @@ struct adl_meta_pointer_like {
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -50259,7 +50215,7 @@ class dense_map {
 
     template<typename Other>
     [[nodiscard]] std::size_t key_to_bucket(const Other &key) const noexcept {
-        return fast_mod(sparse.second()(key), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 
     template<typename Other>
@@ -51290,7 +51246,7 @@ class dense_set {
 
     template<typename Other>
     [[nodiscard]] std::size_t value_to_bucket(const Other &value) const noexcept {
-        return fast_mod(sparse.second()(value), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(value)), bucket_count());
     }
 
     template<typename Other>
@@ -51978,7 +51934,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -52274,7 +52230,7 @@ inline const internal::meta_context &internal::meta_context::from(const meta_ctx
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -55673,7 +55629,7 @@ using nth_argument_t = typename nth_argument<Index, Candidate>::type;
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -56285,7 +56241,7 @@ meta_type_node resolve(const meta_context &) noexcept;
 
 template<typename... Args>
 [[nodiscard]] auto meta_arg_node(const meta_context &context, type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
-    std::size_t pos{};
+    [[maybe_unused]] std::size_t pos{};
     meta_type_node (*value)(const meta_context &) noexcept = nullptr;
     ((value = (pos++ == index ? &resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
     ENTT_ASSERT(value != nullptr, "Out of bounds");
@@ -62282,7 +62238,7 @@ meta_type_node resolve(const meta_context &) noexcept;
 
 template<typename... Args>
 [[nodiscard]] auto meta_arg_node(const meta_context &context, type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
-    std::size_t pos{};
+    [[maybe_unused]] std::size_t pos{};
     meta_type_node (*value)(const meta_context &) noexcept = nullptr;
     ((value = (pos++ == index ? &resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
     ENTT_ASSERT(value != nullptr, "Out of bounds");
@@ -63524,7 +63480,7 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -68003,7 +67959,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -68125,7 +68081,7 @@ private:
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -70793,7 +70749,7 @@ class dense_map {
 
     template<typename Other>
     [[nodiscard]] std::size_t key_to_bucket(const Other &key) const noexcept {
-        return fast_mod(sparse.second()(key), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 
     template<typename Other>
@@ -71615,7 +71571,7 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -74097,7 +74053,7 @@ template<typename Res, typename Other>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -74211,7 +74167,7 @@ template<typename Res, typename Other>
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -75474,7 +75430,7 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -75596,7 +75552,7 @@ delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 11
-#define ENTT_VERSION_PATCH 0
+#define ENTT_VERSION_PATCH 1
 
 #define ENTT_VERSION \
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
@@ -78264,7 +78220,7 @@ class dense_map {
 
     template<typename Other>
     [[nodiscard]] std::size_t key_to_bucket(const Other &key) const noexcept {
-        return fast_mod(sparse.second()(key), bucket_count());
+        return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 
     template<typename Other>
