@@ -107,7 +107,7 @@ TEST(Snapshot, Dump) {
     registry.destroy(e1);
     auto v1 = registry.current(e1);
 
-    using storage_type = std::tuple<
+    using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<int>,
@@ -116,9 +116,9 @@ TEST(Snapshot, Dump) {
         std::queue<a_component>,
         std::queue<another_component>>;
 
-    storage_type storage;
-    output_archive<storage_type> output{storage};
-    input_archive<storage_type> input{storage};
+    archive_type storage;
+    output_archive<archive_type> output{storage};
+    input_archive<archive_type> input{storage};
 
     entt::snapshot{registry}.entities(output).component<int, char, double, a_component, another_component>(output);
     registry.clear();
@@ -171,16 +171,16 @@ TEST(Snapshot, Partial) {
     registry.destroy(e1);
     auto v1 = registry.current(e1);
 
-    using storage_type = std::tuple<
+    using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<int>,
         std::queue<char>,
         std::queue<double>>;
 
-    storage_type storage;
-    output_archive<storage_type> output{storage};
-    input_archive<storage_type> input{storage};
+    archive_type storage;
+    output_archive<archive_type> output{storage};
+    input_archive<archive_type> input{storage};
 
     entt::snapshot{registry}.entities(output).component<char, int>(output);
     registry.clear();
@@ -235,15 +235,15 @@ TEST(Snapshot, Iterator) {
         }
     }
 
-    using storage_type = std::tuple<
+    using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<another_component>,
         std::queue<int>>;
 
-    storage_type storage;
-    output_archive<storage_type> output{storage};
-    input_archive<storage_type> input{storage};
+    archive_type storage;
+    output_archive<archive_type> output{storage};
+    input_archive<archive_type> input{storage};
 
     const auto view = registry.view<a_component>();
     const auto size = view.size();
@@ -270,7 +270,7 @@ TEST(Snapshot, Continuous) {
     std::vector<entt::entity> entities;
     entt::entity entity;
 
-    using storage_type = std::tuple<
+    using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<another_component>,
@@ -279,9 +279,9 @@ TEST(Snapshot, Continuous) {
         std::queue<int>,
         std::queue<double>>;
 
-    storage_type storage;
-    output_archive<storage_type> output{storage};
-    input_archive<storage_type> input{storage};
+    archive_type storage;
+    output_archive<archive_type> output{storage};
+    input_archive<archive_type> input{storage};
 
     for(int i = 0; i < 10; ++i) {
         static_cast<void>(src.create());
@@ -509,13 +509,13 @@ TEST(Snapshot, MoreOnShrink) {
 
     entt::continuous_loader loader{dst};
 
-    using storage_type = std::tuple<
+    using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>>;
 
-    storage_type storage;
-    output_archive<storage_type> output{storage};
-    input_archive<storage_type> input{storage};
+    archive_type storage;
+    output_archive<archive_type> output{storage};
+    input_archive<archive_type> input{storage};
 
     auto entity = src.create();
     entt::snapshot{src}.entities(output);
@@ -536,15 +536,15 @@ TEST(Snapshot, SyncDataMembers) {
 
     entt::continuous_loader loader{dst};
 
-    using storage_type = std::tuple<
+    using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<what_a_component>,
         std::queue<map_component>>;
 
-    storage_type storage;
-    output_archive<storage_type> output{storage};
-    input_archive<storage_type> input{storage};
+    archive_type storage;
+    output_archive<archive_type> output{storage};
+    input_archive<archive_type> input{storage};
 
     static_cast<void>(src.create());
     static_cast<void>(src.create());
