@@ -1918,16 +1918,10 @@ TEST(Storage, UsesAllocatorConstruction) {
 
 TEST(Storage, StorageType) {
     // just a bunch of static asserts to avoid regressions
+    static_assert(std::is_same_v<entt::storage_type_t<const double, entt::entity>, const entt::sigh_storage_mixin<entt::basic_storage<double, entt::entity>>>);
     static_assert(std::is_same_v<entt::storage_type_t<char, entt::entity>, entt::sigh_storage_mixin<entt::basic_storage<char, entt::entity>>>);
+    static_assert(std::is_same_v<entt::storage_type_t<const bool>, const entt::sigh_storage_mixin<entt::storage<bool>>>);
     static_assert(std::is_same_v<entt::storage_type_t<int>, entt::sigh_storage_mixin<entt::storage<int>>>);
-}
-
-TEST(Storage, StorageFor) {
-    // just a bunch of static asserts to avoid regressions
-    static_assert(std::is_same_v<entt::storage_for_t<const double, entt::entity>, const entt::sigh_storage_mixin<entt::basic_storage<double, entt::entity>>>);
-    static_assert(std::is_same_v<entt::storage_for_t<char, entt::entity>, entt::sigh_storage_mixin<entt::basic_storage<char, entt::entity>>>);
-    static_assert(std::is_same_v<entt::storage_for_t<const bool>, const entt::sigh_storage_mixin<entt::storage<bool>>>);
-    static_assert(std::is_same_v<entt::storage_for_t<int>, entt::sigh_storage_mixin<entt::storage<int>>>);
 }
 
 #endif

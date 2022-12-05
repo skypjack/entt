@@ -242,7 +242,7 @@ class basic_registry {
     using basic_common_type = basic_sparse_set<Entity, Allocator>;
 
     template<typename Type>
-    using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
+    using storage_for = typename storage_type<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
 
     template<typename...>
     struct group_handler;
@@ -250,7 +250,7 @@ class basic_registry {
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-        static_assert(!std::disjunction_v<std::bool_constant<storage_for_type<Owned>::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
+        static_assert(!std::disjunction_v<std::bool_constant<storage_for<Owned>::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
         using value_type = std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t>;
         value_type current{};
 
@@ -262,7 +262,7 @@ class basic_registry {
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
             [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
 
-            const auto is_valid = ((std::is_same_v<Type, Owned> || std::get<storage_for_type<Owned> &>(cpools).contains(entt)) && ...)
+            const auto is_valid = ((std::is_same_v<Type, Owned> || std::get<storage_for<Owned> &>(cpools).contains(entt)) && ...)
                                   && ((std::is_same_v<Type, Get> || owner.assure<Get>().contains(entt)) && ...)
                                   && ((std::is_same_v<Type, Exclude> || !owner.assure<Exclude>().contains(entt)) && ...);
 
@@ -273,7 +273,7 @@ class basic_registry {
             } else {
                 if(is_valid && !(std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = current++;
-                    (std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt), ...);
+                    (std::get<storage_for<Owned> &>(cpools).swap_elements(std::get<storage_for<Owned> &>(cpools).data()[pos], entt), ...);
                 }
             }
         }
@@ -284,7 +284,7 @@ class basic_registry {
             } else {
                 if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = --current;
-                    (std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt), ...);
+                    (std::get<storage_for<Owned> &>(cpools).swap_elements(std::get<storage_for<Owned> &>(cpools).data()[pos], entt), ...);
                 }
             }
         }
@@ -304,20 +304,20 @@ class basic_registry {
         auto &cpool = pools[id];
 
         if(!cpool) {
-            using alloc_type = typename storage_for_type<std::remove_const_t<Type>>::allocator_type;
+            using alloc_type = typename storage_for<std::remove_const_t<Type>>::allocator_type;
 
             if constexpr(std::is_same_v<Type, void> && !std::is_constructible_v<alloc_type, allocator_type>) {
                 // std::allocator<void> has no cross constructors (waiting for C++20)
-                cpool = std::allocate_shared<storage_for_type<std::remove_const_t<Type>>>(get_allocator(), alloc_type{});
+                cpool = std::allocate_shared<storage_for<std::remove_const_t<Type>>>(get_allocator(), alloc_type{});
             } else {
-                cpool = std::allocate_shared<storage_for_type<std::remove_const_t<Type>>>(get_allocator(), get_allocator());
+                cpool = std::allocate_shared<storage_for<std::remove_const_t<Type>>>(get_allocator(), get_allocator());
             }
 
             cpool->bind(forward_as_any(*this));
         }
 
         ENTT_ASSERT(cpool->type() == type_id<Type>(), "Unexpected type");
-        return static_cast<storage_for_type<Type> &>(*cpool);
+        return static_cast<storage_for<Type> &>(*cpool);
     }
 
     template<typename Type>
@@ -326,10 +326,10 @@ class basic_registry {
 
         if(const auto it = pools.find(id); it != pools.cend()) {
             ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
-            return static_cast<const storage_for_type<Type> &>(*it->second);
+            return static_cast<const storage_for<Type> &>(*it->second);
         }
 
-        static storage_for_type<Type> placeholder{};
+        static storage_for<Type> placeholder{};
         return placeholder;
     }
 
@@ -1267,14 +1267,14 @@ public:
      * @return A newly created view.
      */
     template<typename Type, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_view<get_t<storage_for_type<const Type>, storage_for_type<const Other>...>, exclude_t<storage_for_type<const Exclude>...>>
+    [[nodiscard]] basic_view<get_t<storage_for<const Type>, storage_for<const Other>...>, exclude_t<storage_for<const Exclude>...>>
     view(exclude_t<Exclude...> = {}) const {
         return {assure<std::remove_const_t<Type>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
 
     /*! @copydoc view */
     template<typename Type, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_view<get_t<storage_for_type<Type>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
+    [[nodiscard]] basic_view<get_t<storage_for<Type>, storage_for<Other>...>, exclude_t<storage_for<Exclude>...>>
     view(exclude_t<Exclude...> = {}) {
         return {assure<std::remove_const_t<Type>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
@@ -1304,7 +1304,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
+    [[nodiscard]] basic_group<owned_t<storage_for<Owned>...>, get_t<storage_for<Get>...>, exclude_t<storage_for<Exclude>...>>
     group(get_t<Get...> = {}, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only groups are not supported");
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
@@ -1382,12 +1382,12 @@ public:
             }
         }
 
-        return {handler->current, std::get<storage_for_type<std::remove_const_t<Owned>> &>(cpools)..., std::get<storage_for_type<std::remove_const_t<Get>> &>(cpools)..., assure<std::remove_const_t<Exclude>>()...};
+        return {handler->current, std::get<storage_for<std::remove_const_t<Owned>> &>(cpools)..., std::get<storage_for<std::remove_const_t<Get>> &>(cpools)..., assure<std::remove_const_t<Exclude>>()...};
     }
 
     /*! @copydoc group */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>
+    [[nodiscard]] basic_group<owned_t<storage_for<const Owned>...>, get_t<storage_for<const Get>...>, exclude_t<storage_for<const Exclude>...>>
     group_if_exists(get_t<Get...> = {}, exclude_t<Exclude...> = {}) const {
         auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
             return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))

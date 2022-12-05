@@ -52,7 +52,7 @@ TEST(Helper, Invoke) {
 TEST(Helper, ToEntity) {
     entt::registry registry;
     const entt::entity null = entt::null;
-    constexpr auto page_size = entt::storage_for_t<int>::traits_type::page_size;
+    constexpr auto page_size = entt::storage_type_t<int>::traits_type::page_size;
     const int value = 42;
 
     ASSERT_EQ(entt::to_entity(registry, 42), null);
@@ -92,7 +92,7 @@ TEST(Helper, ToEntity) {
 TEST(Helper, ToEntityStableType) {
     entt::registry registry;
     const entt::entity null = entt::null;
-    constexpr auto page_size = entt::storage_for_t<stable_type>::traits_type::page_size;
+    constexpr auto page_size = entt::storage_type_t<stable_type>::traits_type::page_size;
     const stable_type value{42};
 
     ASSERT_EQ(entt::to_entity(registry, stable_type{42}), null);

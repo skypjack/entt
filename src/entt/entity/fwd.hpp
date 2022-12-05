@@ -29,10 +29,17 @@ class sigh_storage_mixin;
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, typename Entity = entity, typename Allocator = std::allocator<Type>, typename = void>
+template<typename Type, typename Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>, typename = void>
 struct storage_type {
     /*! @brief Type-to-storage conversion result. */
     using type = sigh_storage_mixin<basic_storage<Type, Entity, Allocator>>;
+};
+
+/*! @copydoc storage_type */
+template<typename Type, typename Entity, typename Allocator>
+struct storage_type<const Type, Entity, Allocator> {
+    /*! @brief Type-to-storage conversion result. */
+    using type = const typename storage_type<Type, Entity, Allocator>::type;
 };
 
 /**
@@ -41,25 +48,6 @@ struct storage_type {
  */
 template<typename... Args>
 using storage_type_t = typename storage_type<Args...>::type;
-
-/**
- * Type-to-storage conversion utility that preserves constness.
- * @tparam Type Storage value type, eventually const.
- * @tparam Entity A valid entity type.
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>>
-struct storage_for {
-    /*! @brief Type-to-storage conversion result. */
-    using type = constness_as_t<storage_type_t<std::remove_const_t<Type>, Entity, Allocator>, Type>;
-};
-
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_for_t = typename storage_for<Args...>::type;
 
 template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_registry;
@@ -187,7 +175,7 @@ using continuous_loader = basic_continuous_loader<registry>;
  * @tparam Exclude Types of storage used to filter the view.
  */
 template<typename Get, typename Exclude = exclude_t<>>
-using view = basic_view<type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
+using view = basic_view<type_list_transform_t<Get, storage_type>, type_list_transform_t<Exclude, storage_type>>;
 
 /*! @brief Alias declaration for the most common use case. */
 using runtime_view = basic_runtime_view<sparse_set>;
@@ -202,7 +190,7 @@ using const_runtime_view = basic_runtime_view<const sparse_set>;
  * @tparam Exclude Types of storage used to filter the group.
  */
 template<typename Owned, typename Get, typename Exclude>
-using group = basic_group<type_list_transform_t<Owned, storage_for>, type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
+using group = basic_group<type_list_transform_t<Owned, storage_type>, type_list_transform_t<Get, storage_type>, type_list_transform_t<Exclude, storage_type>>;
 
 } // namespace entt
 
