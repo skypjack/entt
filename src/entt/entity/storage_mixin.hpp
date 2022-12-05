@@ -28,7 +28,7 @@ class sigh_storage_mixin final: public Type {
     using sigh_type = sigh<void(basic_registry_type &, const typename Type::entity_type), typename Type::allocator_type>;
     using basic_iterator = typename Type::basic_iterator;
 
-    void pop(basic_iterator first, basic_iterator last) override {
+    void pop(basic_iterator first, basic_iterator last) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
 
         for(; first != last; ++first) {
