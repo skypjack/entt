@@ -39,7 +39,7 @@ class sigh_storage_mixin final: public Type {
         }
     }
 
-    basic_iterator try_emplace(const typename basic_registry_type::entity_type entt, const bool force_back, const void *value) final {
+    basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::try_emplace(entt, force_back, value);
         construction.publish(*owner, entt);
