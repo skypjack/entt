@@ -50,6 +50,8 @@
 #    define ENTT_ASSERT_CONSTEXPR(condition, msg) ENTT_ASSERT(condition, msg)
 #endif
 
+#define ENTT_FAIL(msg) ENTT_ASSERT(false, msg);
+
 #ifdef ENTT_NO_ETO
 #    define ENTT_ETO_TYPE(Type) void
 #else
