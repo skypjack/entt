@@ -462,7 +462,7 @@ public:
      */
     void swap(basic_storage &other) {
         using std::swap;
-        underlying_type::swap(other);
+        base_type::swap(other);
         swap(packed, other.packed);
     }
 
@@ -749,11 +749,10 @@ class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<T
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
 
 public:
     /*! @brief Base type. */
-    using base_type = underlying_type;
+    using base_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     /*! @brief Component traits. */
     using traits_type = component_traits<Type, Entity>;
     /*! @brief Allocator type. */
