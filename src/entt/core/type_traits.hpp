@@ -658,6 +658,10 @@ template<typename Type>
 struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
     : std::bool_constant<internal::maybe_equality_comparable<Type>(choice<2>)> {};
 
+/*! @copydoc is_equality_comparable */
+template<typename Type, auto N>
+struct is_equality_comparable<Type[N]>: std::false_type {};
+
 /**
  * @brief Helper variable template.
  * @tparam Type The type to test.

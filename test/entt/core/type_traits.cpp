@@ -183,6 +183,7 @@ TEST(IsEqualityComparable, Functionalities) {
     static_assert(entt::is_equality_comparable_v<std::vector<not_comparable>::iterator>);
     static_assert(entt::is_equality_comparable_v<nlohmann_json_like>);
 
+    static_assert(!entt::is_equality_comparable_v<int[3u]>);
     static_assert(!entt::is_equality_comparable_v<not_comparable>);
     static_assert(!entt::is_equality_comparable_v<const not_comparable>);
     static_assert(!entt::is_equality_comparable_v<std::vector<not_comparable>>);
