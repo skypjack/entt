@@ -425,8 +425,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
-               && std::apply([entt](const auto *...curr) { return (!curr->contains(entt) && ...); }, filter);
+        return std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools) && !reject(entt);
     }
 
     /**
