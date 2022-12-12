@@ -23,13 +23,6 @@ namespace entt {
 
 namespace internal {
 
-template<typename Type, typename... Other>
-std::enable_if_t<(std::is_same_v<Type, Other> && ...), const Type *>
-pick_best(const Type *first, const Other *...other) noexcept {
-    ((first = other->size() < first->size() ? other : first), ...);
-    return first;
-}
-
 template<typename... Args, typename Type, std::size_t N>
 auto filter_as_tuple(const std::array<const Type *, N> &filter) noexcept {
     return std::apply([](const auto *...curr) { return std::make_tuple(static_cast<Args *>(const_cast<constness_as_t<Type, Args> *>(curr))...); }, filter);
@@ -271,7 +264,9 @@ public:
     basic_view(Get &...value, Exclude &...exclude) noexcept
         : pools{&value...},
           filter{&exclude...},
-          view{internal::pick_best(static_cast<const base_type *>(&value)...)} {}
+          view{std::get<0>(pools)} {
+        ((view = value.size() < view->size() ? &value : view), ...);
+    }
 
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
