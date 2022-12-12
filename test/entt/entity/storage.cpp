@@ -1364,6 +1364,50 @@ TEST(Storage, Raw) {
     ASSERT_EQ(pool.raw()[0u][2u], 9);
 }
 
+TEST(Storage, SwapElements) {
+    entt::storage<int> pool;
+
+    pool.emplace(entt::entity{3}, 3);
+    pool.emplace(entt::entity{12}, 6);
+    pool.emplace(entt::entity{42}, 9);
+
+    pool.erase(entt::entity{12});
+
+    ASSERT_EQ(pool.get(entt::entity{3}), 3);
+    ASSERT_EQ(pool.get(entt::entity{42}), 9);
+    ASSERT_EQ(pool.index(entt::entity{3}), 0u);
+    ASSERT_EQ(pool.index(entt::entity{42}), 1u);
+
+    pool.swap_elements(entt::entity{3}, entt::entity{42});
+
+    ASSERT_EQ(pool.get(entt::entity{3}), 3);
+    ASSERT_EQ(pool.get(entt::entity{42}), 9);
+    ASSERT_EQ(pool.index(entt::entity{3}), 1u);
+    ASSERT_EQ(pool.index(entt::entity{42}), 0u);
+}
+
+TEST(Storage, StableSwapElements) {
+    entt::storage<stable_type> pool;
+
+    pool.emplace(entt::entity{3}, 3);
+    pool.emplace(entt::entity{12}, 6);
+    pool.emplace(entt::entity{42}, 9);
+
+    pool.erase(entt::entity{12});
+
+    ASSERT_EQ(pool.get(entt::entity{3}).value, 3);
+    ASSERT_EQ(pool.get(entt::entity{42}).value, 9);
+    ASSERT_EQ(pool.index(entt::entity{3}), 0u);
+    ASSERT_EQ(pool.index(entt::entity{42}), 2u);
+
+    pool.swap_elements(entt::entity{3}, entt::entity{42});
+
+    ASSERT_EQ(pool.get(entt::entity{3}).value, 3);
+    ASSERT_EQ(pool.get(entt::entity{42}).value, 9);
+    ASSERT_EQ(pool.index(entt::entity{3}), 2u);
+    ASSERT_EQ(pool.index(entt::entity{42}), 0u);
+}
+
 TEST(Storage, SortOrdered) {
     entt::storage<boxed_int> pool;
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};

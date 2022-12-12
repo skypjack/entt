@@ -305,24 +305,23 @@ private:
         return std::addressof(element_at(pos));
     }
 
-    void swap_at([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) final {
-        // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
-        ENTT_ASSERT((lhs + 1u) && !is_pinned_type_v, "Pinned type");
-
-        if constexpr(!is_pinned_type_v) {
-            using std::swap;
-            swap(element_at(lhs), element_at(rhs));
-        }
-    }
-
-    void move_element([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) final {
+    void swap_at([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) final {
         // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
         ENTT_ASSERT((from + 1u) && !is_pinned_type_v, "Pinned type");
 
         if constexpr(!is_pinned_type_v) {
             auto &elem = element_at(from);
-            entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), get_allocator(), std::move(elem));
-            std::destroy_at(std::addressof(elem));
+
+            if constexpr(traits_type::in_place_delete) {
+                if(base_type::operator[](to) == tombstone) {
+                    entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), get_allocator(), std::move(elem));
+                    std::destroy_at(std::addressof(elem));
+                    return;
+                }
+            }
+
+            using std::swap;
+            swap(elem, element_at(to));
         }
     }
 

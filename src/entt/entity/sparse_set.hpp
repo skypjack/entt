@@ -226,7 +226,6 @@ private:
     }
 
     virtual void swap_at(const std::size_t, const std::size_t) {}
-    virtual void move_element(const std::size_t, const std::size_t) {}
 
 protected:
     /*! @brief Random access iterator type. */
@@ -785,7 +784,7 @@ public:
         for(auto *it = &free_list; *it != null && from; it = std::addressof(packed[traits_type::to_entity(*it)])) {
             if(const size_type to = traits_type::to_entity(*it); to < from) {
                 --from;
-                move_element(from, to);
+                swap_at(from, to);
 
                 using std::swap;
                 swap(packed[from], packed[to]);
@@ -825,6 +824,7 @@ public:
 
         // basic no-leak guarantee (with invalid state) if swapping throws
         swap_at(static_cast<size_type>(from), static_cast<size_type>(to));
+
         entt = traits_type::combine(to, traits_type::to_integral(packed[from]));
         other = traits_type::combine(from, traits_type::to_integral(packed[to]));
 
