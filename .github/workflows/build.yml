@@ -9,29 +9,50 @@ jobs:
 
     strategy:
       matrix:
+        os: [ubuntu-latest, ubuntu-20.04]
         compiler:
-          - pkg: g++-7
-            exe: g++-7
-          - pkg: g++-8
-            exe: g++-8
-          - pkg: g++-9
-            exe: g++-9
-          - pkg: g++-10
-            exe: g++-10
-          - pkg: g++-11
-            exe: g++-11
-          - pkg: clang-8
-            exe: clang++-8
-          - pkg: clang-9
-            exe: clang++-9
-          - pkg: clang-10
-            exe: clang++-10
-          - pkg: clang-11
-            exe: clang++-11
-          - pkg: clang-12
-            exe: clang++-12
+          - { pkg: g++-7, exe: g++-7 }
+          - { pkg: g++-8, exe: g++-8 }
+          - { pkg: g++-9, exe: g++-9 }
+          - { pkg: g++-10, exe: g++-10 }
+          - { pkg: g++-11, exe: g++-11 }
+          - { pkg: g++-12, exe: g++-12 }
+          - { pkg: clang-8, exe: clang++-8 }
+          - { pkg: clang-9, exe: clang++-9 }
+          - { pkg: clang-10, exe: clang++-10 }
+          - { pkg: clang-11, exe: clang++-11 }
+          - { pkg: clang-12, exe: clang++-12 }
+          - { pkg: clang-13, exe: clang++-13 }
+          - { pkg: clang-14, exe: clang++-14 }
+        exclude:
+          - os: ubuntu-latest
+            compiler: { pkg: g++-7, exe: g++-7 }
+          - os: ubuntu-latest
+            compiler: { pkg: g++-8, exe: g++-8 }
+          - os: ubuntu-latest
+            compiler: { pkg: g++-9, exe: g++-9 }
+          - os: ubuntu-latest
+            compiler: { pkg: clang-8, exe: clang++-8 }
+          - os: ubuntu-latest
+            compiler: { pkg: clang-9, exe: clang++-9 }
+          - os: ubuntu-latest
+            compiler: { pkg: clang-10, exe: clang++-10 }
+          - os: ubuntu-latest
+            compiler: { pkg: clang-11, exe: clang++-11 }
+          - os: ubuntu-20.04
+            compiler: { pkg: g++-10, exe: g++-10 }
+          - os: ubuntu-20.04
+            compiler: { pkg: g++-11, exe: g++-11 }
+          - os: ubuntu-20.04
+            compiler: { pkg: g++-12, exe: g++-12 }
+          - os: ubuntu-20.04
+            compiler: { pkg: clang-12, exe: clang++-12 }
+          - os: ubuntu-20.04
+            compiler: { pkg: clang-13, exe: clang++-13 }
+          - os: ubuntu-20.04
+            compiler: { pkg: clang-14, exe: clang++-14 }
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v3
@@ -45,32 +66,6 @@ jobs:
         CXX: ${{ matrix.compiler.exe }}
       run: |
         cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
-        make -j4
-    - name: Run tests
-      working-directory: build
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 30 -C Debug -j4
-
-  linux-extra:
-    timeout-minutes: 15
-
-    strategy:
-      matrix:
-        compiler: [g++, clang++]
-        id_type: ["std::uint32_t", "std::uint64_t"]
-        cxx_std: [cxx_std_17, cxx_std_20]
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Compile tests
-      working-directory: build
-      env:
-        CXX: ${{ matrix.compiler }}
-      run: |
-        cmake -DENTT_BUILD_TESTING=ON -DENTT_CXX_STD=${{ matrix.cxx_std }} -DENTT_ID_TYPE=${{ matrix.id_type }} ..
         make -j4
     - name: Run tests
       working-directory: build
@@ -107,29 +102,6 @@ jobs:
         CTEST_OUTPUT_ON_FAILURE: 1
       run: ctest --timeout 30 -C Debug -j4
 
-  windows-extra:
-    timeout-minutes: 15
-
-    strategy:
-      matrix:
-        id_type: ["std::uint32_t", "std::uint64_t"]
-        cxx_std: [cxx_std_17, cxx_std_20]
-
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Compile tests
-      working-directory: build
-      run: |
-        cmake -DENTT_BUILD_TESTING=ON -DENTT_CXX_STD=${{ matrix.cxx_std }} -DENTT_ID_TYPE=${{ matrix.id_type }} ..
-        cmake --build . -j 4
-    - name: Run tests
-      working-directory: build
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 30 -C Debug -j4
-
   macos:
     timeout-minutes: 15
     runs-on: macOS-latest
@@ -147,15 +119,16 @@ jobs:
         CTEST_OUTPUT_ON_FAILURE: 1
       run: ctest --timeout 30 -C Debug -j4
 
-  macos-extra:
+  extra:
     timeout-minutes: 15
 
     strategy:
       matrix:
+        os: [windows-latest, macOS-latest, ubuntu-latest]
         id_type: ["std::uint32_t", "std::uint64_t"]
         cxx_std: [cxx_std_17, cxx_std_20]
 
-    runs-on: macOS-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v3
@@ -163,7 +136,7 @@ jobs:
       working-directory: build
       run: |
         cmake -DENTT_BUILD_TESTING=ON -DENTT_CXX_STD=${{ matrix.cxx_std }} -DENTT_ID_TYPE=${{ matrix.id_type }} ..
-        make -j4
+        cmake --build . -j 4
     - name: Run tests
       working-directory: build
       env:
