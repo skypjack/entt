@@ -11,46 +11,46 @@ jobs:
       matrix:
         os: [ubuntu-latest, ubuntu-20.04]
         compiler:
-          - { pkg: g++-7, exe: g++-7 }
-          - { pkg: g++-8, exe: g++-8 }
-          - { pkg: g++-9, exe: g++-9 }
-          - { pkg: g++-10, exe: g++-10 }
-          - { pkg: g++-11, exe: g++-11 }
-          - { pkg: g++-12, exe: g++-12 }
-          - { pkg: clang-8, exe: clang++-8 }
-          - { pkg: clang-9, exe: clang++-9 }
-          - { pkg: clang-10, exe: clang++-10 }
-          - { pkg: clang-11, exe: clang++-11 }
-          - { pkg: clang-12, exe: clang++-12 }
-          - { pkg: clang-13, exe: clang++-13 }
-          - { pkg: clang-14, exe: clang++-14 }
+          - { pkg: g++, exe: 'g++', version: 7 }
+          - { pkg: g++, exe: 'g++', version: 8 }
+          - { pkg: g++, exe: 'g++', version: 9 }
+          - { pkg: g++, exe: 'g++', version: 10 }
+          - { pkg: g++, exe: 'g++', version: 11 }
+          - { pkg: g++, exe: 'g++', version: 12 }
+          - { pkg: clang, exe: 'clang++', version: 8 }
+          - { pkg: clang, exe: 'clang++', version: 9 }
+          - { pkg: clang, exe: 'clang++', version: 10 }
+          - { pkg: clang, exe: 'clang++', version: 11 }
+          - { pkg: clang, exe: 'clang++', version: 12 }
+          - { pkg: clang, exe: 'clang++', version: 13 }
+          - { pkg: clang, exe: 'clang++', version: 14 }
         exclude:
           - os: ubuntu-latest
-            compiler: { pkg: g++-7, exe: g++-7 }
+            compiler: { pkg: g++, exe: 'g++', version: 7 }
           - os: ubuntu-latest
-            compiler: { pkg: g++-8, exe: g++-8 }
+            compiler: { pkg: g++, exe: 'g++', version: 8 }
           - os: ubuntu-latest
-            compiler: { pkg: g++-9, exe: g++-9 }
+            compiler: { pkg: g++, exe: 'g++', version: 9 }
           - os: ubuntu-latest
-            compiler: { pkg: clang-8, exe: clang++-8 }
+            compiler: { pkg: clang, exe: 'clang++', version: 8 }
           - os: ubuntu-latest
-            compiler: { pkg: clang-9, exe: clang++-9 }
+            compiler: { pkg: clang, exe: 'clang++', version: 9 }
           - os: ubuntu-latest
-            compiler: { pkg: clang-10, exe: clang++-10 }
+            compiler: { pkg: clang, exe: 'clang++', version: 10 }
           - os: ubuntu-latest
-            compiler: { pkg: clang-11, exe: clang++-11 }
+            compiler: { pkg: clang, exe: 'clang++', version: 11 }
           - os: ubuntu-20.04
-            compiler: { pkg: g++-10, exe: g++-10 }
+            compiler: { pkg: g++, exe: 'g++', version: 10 }
           - os: ubuntu-20.04
-            compiler: { pkg: g++-11, exe: g++-11 }
+            compiler: { pkg: g++, exe: 'g++', version: 11 }
           - os: ubuntu-20.04
-            compiler: { pkg: g++-12, exe: g++-12 }
+            compiler: { pkg: g++, exe: 'g++', version: 12 }
           - os: ubuntu-20.04
-            compiler: { pkg: clang-12, exe: clang++-12 }
+            compiler: { pkg: clang, exe: 'clang++', version: 12 }
           - os: ubuntu-20.04
-            compiler: { pkg: clang-13, exe: clang++-13 }
+            compiler: { pkg: clang, exe: 'clang++', version: 13 }
           - os: ubuntu-20.04
-            compiler: { pkg: clang-14, exe: clang++-14 }
+            compiler: { pkg: clang, exe: 'clang++', version: 14 }
 
     runs-on: ${{ matrix.os }}
 
@@ -59,11 +59,11 @@ jobs:
     - name: Install compiler
       run: |
         sudo apt update
-        sudo apt install -y ${{ matrix.compiler.pkg }}
+        sudo apt install -y ${{ matrix.compiler.pkg }}-${{ matrix.compiler.version }}
     - name: Compile tests
       working-directory: build
       env:
-        CXX: ${{ matrix.compiler.exe }}
+        CXX: ${{ matrix.compiler.exe }}-${{ matrix.compiler.version }}
       run: |
         cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
         make -j4
