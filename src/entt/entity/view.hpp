@@ -11,8 +11,6 @@
 #include "../core/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
-#include "sparse_set.hpp"
-#include "storage.hpp"
 
 namespace entt {
 

@@ -25,6 +25,7 @@
 #include "group.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
+#include "storage_mixin.hpp"
 #include "view.hpp"
 
 namespace entt {
