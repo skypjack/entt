@@ -13,7 +13,7 @@ struct entt::storage_type<Type, Entity> {
 template<typename Entity>
 struct entt::storage_type<char, Entity> {
     // ... unless it's char, because yes.
-    using type = sigh_storage_mixin<basic_storage<char, Entity>>;
+    using type = sigh_mixin<basic_storage<char, Entity>>;
 };
 
 template<typename, typename, typename = void>

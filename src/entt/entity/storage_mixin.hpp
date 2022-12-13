@@ -23,7 +23,7 @@ namespace entt {
  * @tparam Type The type of the underlying storage.
  */
 template<typename Type>
-class sigh_storage_mixin final: public Type {
+class sigh_mixin final: public Type {
     using basic_registry_type = basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>;
     using sigh_type = sigh<void(basic_registry_type &, const typename Type::entity_type), typename Type::allocator_type>;
     using basic_iterator = typename Type::basic_iterator;
@@ -55,14 +55,14 @@ public:
     using registry_type = basic_registry_type;
 
     /*! @brief Default constructor. */
-    sigh_storage_mixin()
-        : sigh_storage_mixin{allocator_type{}} {}
+    sigh_mixin()
+        : sigh_mixin{allocator_type{}} {}
 
     /**
      * @brief Constructs an empty storage with a given allocator.
      * @param allocator The allocator to use.
      */
-    explicit sigh_storage_mixin(const allocator_type &allocator)
+    explicit sigh_mixin(const allocator_type &allocator)
         : Type{allocator},
           owner{},
           construction{allocator},
@@ -73,7 +73,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    sigh_storage_mixin(sigh_storage_mixin &&other) noexcept
+    sigh_mixin(sigh_mixin &&other) noexcept
         : Type{std::move(other)},
           owner{other.owner},
           construction{std::move(other.construction)},
@@ -85,7 +85,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    sigh_storage_mixin(sigh_storage_mixin &&other, const allocator_type &allocator) noexcept
+    sigh_mixin(sigh_mixin &&other, const allocator_type &allocator) noexcept
         : Type{std::move(other), allocator},
           owner{other.owner},
           construction{std::move(other.construction), allocator},
@@ -97,7 +97,7 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    sigh_storage_mixin &operator=(sigh_storage_mixin &&other) noexcept {
+    sigh_mixin &operator=(sigh_mixin &&other) noexcept {
         Type::operator=(std::move(other));
         owner = other.owner;
         construction = std::move(other.construction);
@@ -110,7 +110,7 @@ public:
      * @brief Exchanges the contents with those of a given storage.
      * @param other Storage to exchange the content with.
      */
-    void swap(sigh_storage_mixin &other) {
+    void swap(sigh_mixin &other) {
         using std::swap;
         Type::swap(other);
         swap(owner, other.owner);

@@ -21,7 +21,7 @@ template<typename Type, typename = entity, typename = std::allocator<Type>, type
 class basic_storage;
 
 template<typename Type>
-class sigh_storage_mixin;
+class sigh_mixin;
 
 /**
  * @brief Provides a common way to define storage types.
@@ -32,7 +32,7 @@ class sigh_storage_mixin;
 template<typename Type, typename Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>, typename = void>
 struct storage_type {
     /*! @brief Type-to-storage conversion result. */
-    using type = sigh_storage_mixin<basic_storage<Type, Entity, Allocator>>;
+    using type = sigh_mixin<basic_storage<Type, Entity, Allocator>>;
 };
 
 /*! @copydoc storage_type */
