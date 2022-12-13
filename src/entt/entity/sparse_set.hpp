@@ -949,8 +949,8 @@ public:
             }
         }
 
-        free_list = tombstone;
-        packed.clear();
+        // swap-only sets support
+        compact();
     }
 
     /**
