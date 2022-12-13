@@ -158,7 +158,7 @@ template<typename Lhs, typename Rhs>
 
 template<typename Allocator>
 class registry_context {
-    using alloc_traits = typename std::allocator_traits<Allocator>;
+    using alloc_traits = std::allocator_traits<Allocator>;
     using allocator_type = typename alloc_traits::template rebind_alloc<std::pair<const id_type, basic_any<0u>>>;
 
 public:
@@ -237,7 +237,7 @@ private:
  */
 template<typename Entity, typename Allocator>
 class basic_registry {
-    using alloc_traits = typename std::allocator_traits<Allocator>;
+    using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     using basic_common_type = basic_sparse_set<Entity, Allocator>;
 
