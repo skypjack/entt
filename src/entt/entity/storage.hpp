@@ -231,8 +231,9 @@ template<typename Type, typename Entity, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
+    using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
+    using underlying_iterator = typename underlying_type::basic_iterator;
 
     static constexpr bool is_pinned_type_v = !(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>);
 
@@ -325,15 +326,12 @@ private:
     }
 
 protected:
-    /*! @brief Random access iterator type. */
-    using basic_iterator = typename underlying_type::basic_iterator;
-
     /**
      * @brief Erases entities from a sparse set.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    void pop(basic_iterator first, basic_iterator last) override {
+    void pop(underlying_iterator first, underlying_iterator last) override {
         for(; first != last; ++first) {
             // cannot use first.index() because it would break with cross iterators
             auto &elem = element_at(base_type::index(*first));
@@ -358,7 +356,7 @@ protected:
      * @param force_back Force back insertion.
      * @return Iterator pointing to the emplaced element.
      */
-    basic_iterator try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] const bool force_back, const void *value) override {
+    underlying_iterator try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] const bool force_back, const void *value) override {
         if(value) {
             if constexpr(std::is_copy_constructible_v<value_type>) {
                 return emplace_element(entt, force_back, *static_cast<const value_type *>(value));
