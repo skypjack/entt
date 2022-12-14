@@ -26,9 +26,9 @@ template<typename Type>
 class sigh_mixin final: public Type {
     using basic_registry_type = basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>;
     using sigh_type = sigh<void(basic_registry_type &, const typename Type::entity_type), typename Type::allocator_type>;
-    using basic_iterator = typename Type::basic_iterator;
+    using underlying_iterator = typename Type::base_type::basic_iterator;
 
-    void pop(basic_iterator first, basic_iterator last) final {
+    void pop(underlying_iterator first, underlying_iterator last) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
 
         for(; first != last; ++first) {
@@ -39,7 +39,7 @@ class sigh_mixin final: public Type {
         }
     }
 
-    basic_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
+    underlying_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::try_emplace(entt, force_back, value);
         construction.publish(*owner, entt);
