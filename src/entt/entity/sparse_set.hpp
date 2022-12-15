@@ -225,11 +225,27 @@ private:
         return nullptr;
     }
 
-    virtual void swap_at(const std::size_t, const std::size_t) {}
+    virtual void swap_or_move(const std::size_t, const std::size_t) {}
 
 protected:
     /*! @brief Random access iterator type. */
     using basic_iterator = internal::sparse_set_iterator<packed_container_type>;
+
+    /**
+     * @brief Swaps two items at specific locations.
+     * @param lhs A position to move from.
+     * @param rhs The other position to move from.
+     */
+    void swap_at(const std::size_t lhs, const std::size_t rhs) {
+        const auto entity = static_cast<typename traits_type::entity_type>(lhs);
+        const auto other = static_cast<typename traits_type::entity_type>(rhs);
+
+        sparse_ref(packed[lhs]) = traits_type::combine(other, traits_type::to_integral(packed[lhs]));
+        sparse_ref(packed[rhs]) = traits_type::combine(entity, traits_type::to_integral(packed[rhs]));
+
+        using std::swap;
+        swap(packed[lhs], packed[rhs]);
+    }
 
     /**
      * @brief Erases an entity from a sparse set.
@@ -784,13 +800,12 @@ public:
         for(auto *it = &free_list; *it != null && from; it = std::addressof(packed[traits_type::to_entity(*it)])) {
             if(const size_type to = traits_type::to_entity(*it); to < from) {
                 --from;
-                swap_at(from, to);
+                swap_or_move(from, to);
 
-                using std::swap;
-                swap(packed[from], packed[to]);
-
+                packed[to] = std::exchange(packed[from], tombstone);
                 const auto entity = static_cast<typename traits_type::entity_type>(to);
                 sparse_ref(packed[to]) = traits_type::combine(entity, traits_type::to_integral(packed[to]));
+
                 *it = traits_type::combine(static_cast<typename traits_type::entity_type>(from), tombstone);
                 for(; from && packed[from - 1u] == tombstone; --from) {}
             }
@@ -814,22 +829,12 @@ public:
      * @param rhs A valid identifier.
      */
     void swap_elements(const entity_type lhs, const entity_type rhs) {
-        ENTT_ASSERT(contains(lhs) && contains(rhs), "Set does not contain entities");
+        const auto from = index(lhs);
+        const auto to = index(rhs);
 
-        auto &entt = sparse_ref(lhs);
-        auto &other = sparse_ref(rhs);
-
-        const auto from = traits_type::to_entity(entt);
-        const auto to = traits_type::to_entity(other);
-
-        // basic no-leak guarantee (with invalid state) if swapping throws
-        swap_at(static_cast<size_type>(from), static_cast<size_type>(to));
-
-        entt = traits_type::combine(to, traits_type::to_integral(packed[from]));
-        other = traits_type::combine(from, traits_type::to_integral(packed[to]));
-
-        using std::swap;
-        swap(packed[from], packed[to]);
+        // basic no-leak guarantee if swapping throws
+        swap_or_move(from, to);
+        swap_at(from, to);
     }
 
     /**
@@ -877,7 +882,7 @@ public:
                 const auto idx = index(packed[next]);
                 const auto entt = packed[curr];
 
-                swap_at(next, idx);
+                swap_or_move(next, idx);
                 const auto entity = static_cast<typename traits_type::entity_type>(curr);
                 sparse_ref(entt) = traits_type::combine(entity, traits_type::to_integral(packed[curr]));
                 curr = std::exchange(next, idx);

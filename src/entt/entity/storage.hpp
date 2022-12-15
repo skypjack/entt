@@ -305,7 +305,7 @@ private:
         return std::addressof(element_at(pos));
     }
 
-    void swap_at([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) override {
+    void swap_or_move([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) override {
         // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
         ENTT_ASSERT((from + 1u) && !is_pinned_type_v, "Pinned type");
 
