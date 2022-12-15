@@ -1167,7 +1167,7 @@ the object associated with an entity through an opaque pointer:
 const void *instance = base.get(entity);
 ```
 
-Similarly, the non-specialized `emplace` function accepts an optional opaque
+Similarly, the non-specialized `push` function accepts an optional opaque
 pointer and behaves differently depending on the case:
 
 * When the pointer is null, the function tries to default-construct an instance
@@ -1184,7 +1184,7 @@ them by copy if needed:
 // create a copy of an entity component by component
 for(auto &&curr: registry.storage()) {
     if(auto &storage = curr.second; storage.contains(src)) {
-        storage.emplace(dst, storage.get(src));
+        storage.push(dst, storage.get(src));
     }
 }
 ```
@@ -1212,7 +1212,7 @@ own API for them. However, there is still no limit to the possibilities of use:
 auto &&other = registry.storage<velocity>("other"_hs);
 
 registry.emplace<velocity>(entity);
-storage.emplace(entity);
+storage.push(entity);
 ```
 
 Anything that can be done via the registry interface can also be done directly

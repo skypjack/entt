@@ -28,7 +28,7 @@ TEST(Example, EntityCopy) {
     for(auto [id, storage]: registry.storage()) {
         // discard the custom storage because why not, this is just an example after all
         if(id != "custom"_hs && storage.contains(src)) {
-            storage.emplace(dst, storage.get(src));
+            storage.push(dst, storage.get(src));
         }
     }
 
@@ -67,7 +67,7 @@ TEST(Example, DifferentRegistryTypes) {
 
     for(auto [id, storage]: src.storage()) {
         if(auto *other = dst.storage(id); other && storage.contains(entity)) {
-            other->emplace(copy, storage.get(entity));
+            other->push(copy, storage.get(entity));
         }
     }
 

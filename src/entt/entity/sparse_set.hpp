@@ -689,7 +689,7 @@ public:
      * @return Iterator pointing to the emplaced element in case of success, the
      * `end()` iterator otherwise.
      */
-    iterator emplace(const entity_type entt, const void *value = nullptr) {
+    iterator push(const entity_type entt, const void *value = nullptr) {
         return try_emplace(entt, false, value);
     }
 

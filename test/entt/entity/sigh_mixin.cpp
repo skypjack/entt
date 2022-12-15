@@ -44,7 +44,7 @@ TEST(SighMixin, GenericType) {
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
-    ASSERT_NE(base.emplace(entities[0u]), base.end());
+    ASSERT_NE(base.push(entities[0u]), base.end());
 
     pool.emplace(entities[1u]);
 
@@ -109,7 +109,7 @@ TEST(SighMixin, StableType) {
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
-    ASSERT_NE(base.emplace(entities[0u]), base.end());
+    ASSERT_NE(base.push(entities[0u]), base.end());
 
     pool.emplace(entities[1u]);
 
@@ -174,7 +174,7 @@ TEST(SighMixin, EmptyType) {
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
-    ASSERT_NE(base.emplace(entities[0u]), base.end());
+    ASSERT_NE(base.push(entities[0u]), base.end());
 
     pool.emplace(entities[1u]);
 
@@ -239,7 +239,7 @@ TEST(SighMixin, NonDefaultConstructibleType) {
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
-    ASSERT_EQ(base.emplace(entities[0u]), base.end());
+    ASSERT_EQ(base.push(entities[0u]), base.end());
 
     pool.emplace(entities[1u], 3);
 
@@ -512,7 +512,7 @@ TEST(SighMixin, ThrowingAllocator) {
 
         test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
 
-        ASSERT_THROW(base.emplace(entt::entity{0}), test::throwing_allocator<entt::entity>::exception_type);
+        ASSERT_THROW(base.push(entt::entity{0}), test::throwing_allocator<entt::entity>::exception_type);
         ASSERT_FALSE(base.contains(entt::entity{0}));
         ASSERT_TRUE(base.empty());
 
