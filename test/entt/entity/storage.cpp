@@ -676,7 +676,7 @@ TEST(Storage, TypeFromBase) {
 
     base.erase(entities[0u]);
 
-    ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
+    ASSERT_NE(base.push(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
@@ -711,7 +711,7 @@ TEST(Storage, EmptyTypeFromBase) {
 
     base.erase(entities[0u]);
 
-    ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
+    ASSERT_NE(base.push(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_EQ(pool.size(), 3u);
     ASSERT_TRUE(pool.contains(entities[0u]));
@@ -721,7 +721,7 @@ TEST(Storage, EmptyTypeFromBase) {
 
     base.erase(std::begin(entities), std::end(entities));
 
-    ASSERT_NE(base.insert(std::rbegin(entities), std::rend(entities)), base.end());
+    ASSERT_NE(base.push(std::rbegin(entities), std::rend(entities)), base.end());
 
     ASSERT_EQ(pool.size(), 5u);
     ASSERT_TRUE(pool.contains(entities[0u]));
@@ -769,7 +769,7 @@ TEST(Storage, NonDefaultConstructibleTypeFromBase) {
     ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(pool.contains(entities[0u]));
 
-    ASSERT_EQ(base.insert(std::begin(entities), std::end(entities)), base.end());
+    ASSERT_EQ(base.push(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
@@ -808,7 +808,7 @@ TEST(Storage, NonCopyConstructibleTypeFromBase) {
     ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(pool.contains(entities[0u]));
 
-    ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
+    ASSERT_NE(base.push(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));

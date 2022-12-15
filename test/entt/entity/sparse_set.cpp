@@ -291,38 +291,14 @@ TEST(SparseSet, Push) {
     ASSERT_EQ(set.index(entities[1u]), 0u);
 }
 
-ENTT_DEBUG_TEST(SparseSetDeathTest, Push) {
-    entt::sparse_set set{entt::deletion_policy::in_place};
-    set.push(entt::entity{42});
-
-    ASSERT_DEATH(set.push(entt::entity{42}), "");
-}
-
-TEST(SparseSet, PushOutOfBounds) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
-    entt::sparse_set set{entt::deletion_policy::in_place};
-    entt::entity entities[2u]{entt::entity{0}, entt::entity{traits_type::page_size}};
-
-    ASSERT_NE(set.push(entities[0u]), set.end());
-    ASSERT_EQ(set.extent(), traits_type::page_size);
-    ASSERT_EQ(set.index(entities[0u]), 0u);
-
-    set.erase(entities[0u]);
-
-    ASSERT_NE(set.push(entities[1u]), set.end());
-    ASSERT_EQ(set.extent(), 2u * traits_type::page_size);
-    ASSERT_EQ(set.index(entities[1u]), 0u);
-}
-
-TEST(SparseSet, Insert) {
+TEST(SparseSet, PushRange) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
     set.push(entt::entity{12});
 
-    ASSERT_EQ(set.insert(std::end(entities), std::end(entities)), set.end());
-    ASSERT_NE(set.insert(std::begin(entities), std::end(entities)), set.end());
+    ASSERT_EQ(set.push(std::end(entities), std::end(entities)), set.end());
+    ASSERT_NE(set.push(std::begin(entities), std::end(entities)), set.end());
 
     set.push(entt::entity{24});
 
@@ -346,7 +322,7 @@ TEST(SparseSet, Insert) {
 
     set.erase(std::begin(entities), std::end(entities));
 
-    ASSERT_NE(set.insert(std::rbegin(entities), std::rend(entities)), set.end());
+    ASSERT_NE(set.push(std::rbegin(entities), std::rend(entities)), set.end());
 
     ASSERT_EQ(set.size(), 6u);
     ASSERT_EQ(set.at(4u), entities[1u]);
@@ -355,12 +331,38 @@ TEST(SparseSet, Insert) {
     ASSERT_EQ(set.index(entities[1u]), 4u);
 }
 
+ENTT_DEBUG_TEST(SparseSetDeathTest, Push) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+    entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
+    set.push(entt::entity{42});
+
+    ASSERT_DEATH(set.push(entt::entity{42}), "");
+    ASSERT_DEATH(set.push(std::begin(entities), std::end(entities)), "");
+}
+
+TEST(SparseSet, PushOutOfBounds) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::sparse_set set{entt::deletion_policy::in_place};
+    entt::entity entities[2u]{entt::entity{0}, entt::entity{traits_type::page_size}};
+
+    ASSERT_NE(set.push(entities[0u]), set.end());
+    ASSERT_EQ(set.extent(), traits_type::page_size);
+    ASSERT_EQ(set.index(entities[0u]), 0u);
+
+    set.erase(entities[0u]);
+
+    ASSERT_NE(set.push(entities[1u]), set.end());
+    ASSERT_EQ(set.extent(), 2u * traits_type::page_size);
+    ASSERT_EQ(set.index(entities[1u]), 0u);
+}
+
 TEST(SparseSet, Bump) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::sparse_set set;
     entt::entity entities[3u]{entt::entity{3}, entt::entity{42}, traits_type::construct(9, 3)};
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(set.current(entities[0u]), 0u);
     ASSERT_EQ(set.current(entities[1u]), 0u);
@@ -396,7 +398,7 @@ TEST(SparseSet, Erase) {
     ASSERT_EQ(set.policy(), entt::deletion_policy::swap_and_pop);
     ASSERT_TRUE(set.empty());
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     set.erase(set.begin(), set.end());
 
     ASSERT_TRUE(set.empty());
@@ -404,7 +406,7 @@ TEST(SparseSet, Erase) {
     ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     set.erase(entities, entities + 2u);
 
     ASSERT_FALSE(set.empty());
@@ -418,7 +420,7 @@ TEST(SparseSet, Erase) {
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     std::swap(entities[1u], entities[2u]);
     set.erase(entities, entities + 2u);
 
@@ -442,7 +444,7 @@ TEST(SparseSet, CrossErase) {
     entt::sparse_set other;
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     other.push(entities[1u]);
     set.erase(other.begin(), other.end());
 
@@ -580,7 +582,7 @@ TEST(SparseSet, CrossStableErase) {
     entt::sparse_set other{entt::deletion_policy::in_place};
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     other.push(entities[1u]);
     set.erase(other.begin(), other.end());
 
@@ -603,7 +605,7 @@ TEST(SparseSet, Remove) {
 
     ASSERT_TRUE(set.empty());
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(set.remove(set.begin(), set.end()), 3u);
     ASSERT_TRUE(set.empty());
@@ -611,7 +613,7 @@ TEST(SparseSet, Remove) {
     ASSERT_EQ(set.current(entities[1u]), traits_type::to_version(entt::tombstone));
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(set.remove(entities, entities + 2u), 2u);
     ASSERT_FALSE(set.empty());
@@ -625,7 +627,7 @@ TEST(SparseSet, Remove) {
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
 
-    set.insert(entities, entities + 2u);
+    set.push(entities, entities + 2u);
 
     ASSERT_EQ(set.remove(std::begin(entities), std::end(entities)), 2u);
     ASSERT_EQ(set.current(entities[0u]), traits_type::to_version(entt::tombstone));
@@ -633,7 +635,7 @@ TEST(SparseSet, Remove) {
     ASSERT_EQ(set.current(entities[2u]), traits_type::to_version(entt::tombstone));
     ASSERT_TRUE(set.empty());
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     std::swap(entities[1u], entities[2u]);
 
     ASSERT_EQ(set.remove(entities, entities + 2u), 2u);
@@ -651,7 +653,7 @@ TEST(SparseSet, CrossRemove) {
     entt::sparse_set other;
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     other.push(entities[1u]);
     set.remove(other.begin(), other.end());
 
@@ -795,7 +797,7 @@ TEST(SparseSet, CrossStableRemove) {
     entt::sparse_set other{entt::deletion_policy::in_place};
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     other.push(entities[1u]);
     set.remove(other.begin(), other.end());
 
@@ -1086,7 +1088,7 @@ TEST(SparseSet, SortOrdered) {
     entt::sparse_set set;
     entt::entity entities[5u]{entt::entity{42}, entt::entity{12}, entt::entity{9}, entt::entity{7}, entt::entity{3}};
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     set.sort(std::less{});
 
     ASSERT_TRUE(std::equal(std::rbegin(entities), std::rend(entities), set.begin(), set.end()));
@@ -1096,7 +1098,7 @@ TEST(SparseSet, SortReverse) {
     entt::sparse_set set;
     entt::entity entities[5u]{entt::entity{3}, entt::entity{7}, entt::entity{9}, entt::entity{12}, entt::entity{42}};
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     set.sort(std::less{});
 
     ASSERT_TRUE(std::equal(std::begin(entities), std::end(entities), set.begin(), set.end()));
@@ -1106,7 +1108,7 @@ TEST(SparseSet, SortUnordered) {
     entt::sparse_set set;
     entt::entity entities[5u]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     set.sort(std::less{});
 
     auto begin = set.begin();
@@ -1124,7 +1126,7 @@ TEST(SparseSet, SortRange) {
     entt::sparse_set set{entt::deletion_policy::in_place};
     entt::entity entities[5u]{entt::entity{7}, entt::entity{9}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
 
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     set.erase(entities[0u]);
 
     ASSERT_EQ(set.size(), 5u);
@@ -1139,7 +1141,7 @@ TEST(SparseSet, SortRange) {
 
     set.clear();
     set.compact();
-    set.insert(std::begin(entities), std::end(entities));
+    set.push(std::begin(entities), std::end(entities));
     set.sort_n(0u, std::less{});
 
     ASSERT_TRUE(std::equal(std::rbegin(entities), std::rend(entities), set.begin(), set.end()));
@@ -1179,7 +1181,7 @@ TEST(SparseSet, RespectDisjoint) {
     entt::sparse_set rhs;
 
     entt::entity lhs_entities[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities));
+    lhs.push(std::begin(lhs_entities), std::end(lhs_entities));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
 
@@ -1193,10 +1195,10 @@ TEST(SparseSet, RespectOverlap) {
     entt::sparse_set rhs;
 
     entt::entity lhs_entities[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities));
+    lhs.push(std::begin(lhs_entities), std::end(lhs_entities));
 
     entt::entity rhs_entities[1u]{entt::entity{12}};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities));
+    rhs.push(std::begin(rhs_entities), std::end(rhs_entities));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
@@ -1217,10 +1219,10 @@ TEST(SparseSet, RespectOrdered) {
     entt::sparse_set rhs;
 
     entt::entity lhs_entities[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities));
+    lhs.push(std::begin(lhs_entities), std::end(lhs_entities));
 
     entt::entity rhs_entities[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities));
+    rhs.push(std::begin(rhs_entities), std::end(rhs_entities));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
@@ -1235,10 +1237,10 @@ TEST(SparseSet, RespectReverse) {
     entt::sparse_set rhs;
 
     entt::entity lhs_entities[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities));
+    lhs.push(std::begin(lhs_entities), std::end(lhs_entities));
 
     entt::entity rhs_entities[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities));
+    rhs.push(std::begin(rhs_entities), std::end(rhs_entities));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
@@ -1262,10 +1264,10 @@ TEST(SparseSet, RespectUnordered) {
     entt::sparse_set rhs;
 
     entt::entity lhs_entities[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities));
+    lhs.push(std::begin(lhs_entities), std::end(lhs_entities));
 
     entt::entity rhs_entities[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities));
+    rhs.push(std::begin(rhs_entities), std::end(rhs_entities));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
@@ -1291,10 +1293,10 @@ TEST(SparseSet, RespectInvalid) {
     entt::sparse_set rhs;
 
     entt::entity lhs_entities[3u]{entt::entity{1}, entt::entity{2}, traits_type::construct(3, 1)};
-    lhs.insert(std::begin(lhs_entities), std::end(lhs_entities));
+    lhs.push(std::begin(lhs_entities), std::end(lhs_entities));
 
     entt::entity rhs_entities[3u]{entt::entity{2}, entt::entity{1}, traits_type::construct(3, 2)};
-    rhs.insert(std::begin(rhs_entities), std::end(rhs_entities));
+    rhs.push(std::begin(rhs_entities), std::end(rhs_entities));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
@@ -1412,7 +1414,7 @@ TEST(SparseSet, ThrowingAllocator) {
     entt::entity entities[2u]{entt::entity{1}, entt::entity{traits_type::page_size}};
     test::throwing_allocator<entt::entity>::trigger_after_allocate = true;
 
-    ASSERT_THROW(set.insert(std::begin(entities), std::end(entities)), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_THROW(set.push(std::begin(entities), std::end(entities)), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
     ASSERT_TRUE(set.contains(entt::entity{0}));
     ASSERT_TRUE(set.contains(entt::entity{1}));

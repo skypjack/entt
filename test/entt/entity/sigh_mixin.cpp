@@ -62,7 +62,7 @@ TEST(SighMixin, GenericType) {
     ASSERT_EQ(on_destroy.value, 2);
     ASSERT_TRUE(pool.empty());
 
-    ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
+    ASSERT_NE(base.push(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_EQ(pool.get(entities[0u]), 0);
     ASSERT_EQ(pool.get(entities[1u]), 0);
@@ -127,7 +127,7 @@ TEST(SighMixin, StableType) {
     ASSERT_EQ(on_destroy.value, 2);
     ASSERT_FALSE(pool.empty());
 
-    ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
+    ASSERT_NE(base.push(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_EQ(pool.get(entities[0u]).value, 0);
     ASSERT_EQ(pool.get(entities[1u]).value, 0);
@@ -192,7 +192,7 @@ TEST(SighMixin, EmptyType) {
     ASSERT_EQ(on_destroy.value, 2);
     ASSERT_TRUE(pool.empty());
 
-    ASSERT_NE(base.insert(std::begin(entities), std::end(entities)), base.end());
+    ASSERT_NE(base.push(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
@@ -258,7 +258,7 @@ TEST(SighMixin, NonDefaultConstructibleType) {
     ASSERT_EQ(on_destroy.value, 1);
     ASSERT_TRUE(pool.empty());
 
-    ASSERT_EQ(base.insert(std::begin(entities), std::end(entities)), base.end());
+    ASSERT_EQ(base.push(std::begin(entities), std::end(entities)), base.end());
 
     ASSERT_FALSE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
