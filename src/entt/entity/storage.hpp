@@ -327,7 +327,7 @@ private:
 
 protected:
     /**
-     * @brief Erases entities from a sparse set.
+     * @brief Erases entities from a storage.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
