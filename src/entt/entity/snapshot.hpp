@@ -170,7 +170,7 @@ class basic_snapshot_loader {
                 archive(entt);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
                 ENTT_ASSERT(entity == entt, "Entity not available for use");
-                reg->template emplace<Component>(entt);
+                reg->template emplace<Component>(entity);
             }
         } else {
             Component instance;
@@ -179,7 +179,7 @@ class basic_snapshot_loader {
                 archive(entt, instance);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
                 ENTT_ASSERT(entity == entt, "Entity not available for use");
-                reg->template emplace<Component>(entt, std::move(instance));
+                reg->template emplace<Component>(entity, std::move(instance));
             }
         }
     }
