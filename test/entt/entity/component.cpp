@@ -29,13 +29,6 @@ struct entt::component_traits<traits_based> {
     static constexpr auto page_size = 8u;
 };
 
-template<>
-struct entt::component_traits<traits_based, void> {
-    using type = traits_based;
-    static constexpr auto in_place_delete = true;
-    static constexpr auto page_size = 16u;
-};
-
 TEST(Component, VoidType) {
     using traits_type = entt::component_traits<void>;
 
@@ -76,11 +69,4 @@ TEST(Component, TraitsBased) {
 
     static_assert(!traits_type::in_place_delete);
     static_assert(traits_type::page_size == 8u);
-}
-
-TEST(Component, TraitsBasedTagged) {
-    using traits_type = entt::component_traits<traits_based, void>;
-
-    static_assert(traits_type::in_place_delete);
-    static_assert(traits_type::page_size == 16u);
 }

@@ -11,9 +11,6 @@ namespace entt {
 /*! @brief Default entity identifier. */
 enum class entity : id_type {};
 
-template<typename, typename = entity>
-struct component_traits;
-
 template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 

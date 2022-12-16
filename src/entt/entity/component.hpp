@@ -46,7 +46,7 @@ struct page_size<Type, std::enable_if_t<std::is_convertible_v<decltype(Type::pag
  * @brief Common way to access various properties of components.
  * @tparam Type Type of component.
  */
-template<typename Type, typename>
+template<typename Type, typename = void>
 struct component_traits {
     static_assert(std::is_same_v<std::decay_t<Type>, Type>, "Unsupported type");
 
