@@ -264,9 +264,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     template<typename... Args>
-    auto emplace_element(const Entity entt, const bool force_back, Args &&...args) {
-        const auto it = base_type::try_emplace(entt, force_back);
-
+    void emplace_element(const underlying_iterator it, Args &&...args) {
         ENTT_TRY {
             auto elem = assure_at_least(static_cast<size_type>(it.index()));
             entt::uninitialized_construct_using_allocator(to_address(elem), get_allocator(), std::forward<Args>(args)...);
@@ -275,8 +273,6 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
             base_type::pop(it, it + 1u);
             ENTT_THROW;
         }
-
-        return it;
     }
 
     void shrink_to_size(const std::size_t sz) {
@@ -350,23 +346,39 @@ protected:
     }
 
     /**
-     * @brief Assigns an entity to a storage.
-     * @param entt A valid identifier.
+     * @brief Assigns one or more entities to a sparse set.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
      * @param value Optional opaque value.
-     * @param force_back Force back insertion.
-     * @return Iterator pointing to the emplaced element.
+     * @return Iterator pointing to the emplaced elements.
      */
-    underlying_iterator try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] const bool force_back, const void *value) override {
+    underlying_iterator try_insert(underlying_iterator first, underlying_iterator last, const void *value = nullptr) override {
         if(value) {
             if constexpr(std::is_copy_constructible_v<value_type>) {
-                return emplace_element(entt, force_back, *static_cast<const value_type *>(value));
+                ENTT_ASSERT(std::next(first) == last, "Opaque emplace does not support ranges");
+                emplace_element(first, *static_cast<const value_type *>(value));
+                return first;
             } else {
+                base_type::pop(first, last);
                 return base_type::end();
             }
         } else {
             if constexpr(std::is_default_constructible_v<value_type>) {
-                return emplace_element(entt, force_back);
+                const auto placeholder = first;
+
+                ENTT_TRY {
+                    for(; first != last; ++first) {
+                        emplace_element(first);
+                    }
+
+                    return placeholder;
+                }
+                ENTT_CATCH {
+                    base_type::pop(++first, last);
+                    ENTT_THROW;
+                }
             } else {
+                base_type::pop(first, last);
                 return base_type::end();
             }
         }
@@ -655,13 +667,15 @@ public:
      */
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
+        const auto it = base_type::try_emplace(entt, false);
+
         if constexpr(std::is_aggregate_v<value_type>) {
-            const auto it = emplace_element(entt, false, Type{std::forward<Args>(args)...});
-            return element_at(static_cast<size_type>(it.index()));
+            emplace_element(it, Type{std::forward<Args>(args)...});
         } else {
-            const auto it = emplace_element(entt, false, std::forward<Args>(args)...);
-            return element_at(static_cast<size_type>(it.index()));
+            emplace_element(it, std::forward<Args>(args)...);
         }
+
+        return element_at(static_cast<size_type>(it.index()));
     }
 
     /**
@@ -695,7 +709,8 @@ public:
     template<typename It>
     void insert(It first, It last, const value_type &value = {}) {
         for(; first != last; ++first) {
-            emplace_element(*first, true, value);
+            const auto it = base_type::try_emplace(*first, true);
+            emplace_element(it, value);
         }
     }
 
@@ -714,7 +729,8 @@ public:
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, value_type>>>
     void insert(EIt first, EIt last, CIt from) {
         for(; first != last; ++first, ++from) {
-            emplace_element(*first, true, *from);
+            const auto it = base_type::try_emplace(*first, true);
+            emplace_element(it, *from);
         }
     }
 

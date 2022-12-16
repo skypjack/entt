@@ -274,6 +274,27 @@ protected:
         packed[static_cast<size_type>(entt)] = std::exchange(free_list, traits_type::combine(entt, tombstone));
     }
 
+    /**
+     * @brief Assigns an entity to a sparse set.
+     * @param entt A valid identifier.
+     * @param force_back Force back insertion.
+     * @return Iterator pointing to the emplaced element.
+     */
+    basic_iterator try_emplace(const Entity entt, const bool force_back) {
+        ENTT_ASSERT(!contains(entt), "Set already contains entity");
+
+        if(auto &elem = assure_at_least(entt); free_list == null || force_back) {
+            packed.push_back(entt);
+            elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
+            return begin();
+        } else {
+            const auto pos = static_cast<size_type>(traits_type::to_entity(free_list));
+            elem = traits_type::combine(traits_type::to_integral(free_list), traits_type::to_integral(entt));
+            free_list = std::exchange(packed[pos], entt);
+            return --(end() - pos);
+        }
+    }
+
 protected:
     /**
      * @brief Erases entities from a sparse set.
@@ -293,24 +314,14 @@ protected:
     }
 
     /**
-     * @brief Assigns an entity to a sparse set.
-     * @param entt A valid identifier.
-     * @param force_back Force back insertion.
-     * @return Iterator pointing to the emplaced element.
+     * @brief Assigns one or more entities to a sparse set.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param value Optional opaque value.
+     * @return Iterator pointing to the emplaced elements.
      */
-    virtual basic_iterator try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
-        ENTT_ASSERT(!contains(entt), "Set already contains entity");
-
-        if(auto &elem = assure_at_least(entt); free_list == null || force_back) {
-            packed.push_back(entt);
-            elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
-            return begin();
-        } else {
-            const auto pos = static_cast<size_type>(traits_type::to_entity(free_list));
-            elem = traits_type::combine(traits_type::to_integral(free_list), traits_type::to_integral(entt));
-            free_list = std::exchange(packed[pos], entt);
-            return --(end() - pos);
-        }
+    virtual basic_iterator try_insert(basic_iterator first, [[maybe_unused]] basic_iterator last, [[maybe_unused]] const void *value) {
+        return first;
     }
 
 public:
@@ -690,7 +701,8 @@ public:
      * `end()` iterator otherwise.
      */
     iterator push(const entity_type entt, const void *value = nullptr) {
-        return try_emplace(entt, false, value);
+        const auto it = try_emplace(entt, false);
+        return try_insert(it, it + 1u, value);
     }
 
     /**
@@ -708,11 +720,27 @@ public:
      */
     template<typename It>
     iterator push(It first, It last) {
-        for(auto it = first; it != last; ++it) {
-            try_emplace(*it, true);
+        if(first == last) {
+            return end();
         }
 
-        return first == last ? end() : find(*first);
+        const auto to = begin();
+        auto from = to;
+
+        ENTT_TRY {
+            for(; first != last; ++first) {
+                from = try_emplace(*first, true);
+            }
+        }
+        ENTT_CATCH {
+            for(; from != to; ++from) {
+                swap_and_pop(from);
+            }
+
+            ENTT_THROW;
+        }
+
+        return try_insert(from, to, nullptr);
     }
 
     /**

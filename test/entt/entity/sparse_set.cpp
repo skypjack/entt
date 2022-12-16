@@ -1417,10 +1417,10 @@ TEST(SparseSet, ThrowingAllocator) {
     ASSERT_THROW(set.push(std::begin(entities), std::end(entities)), test::throwing_allocator<entt::entity>::exception_type);
     ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
     ASSERT_TRUE(set.contains(entt::entity{0}));
-    ASSERT_TRUE(set.contains(entt::entity{1}));
+    ASSERT_FALSE(set.contains(entt::entity{1}));
     ASSERT_FALSE(set.contains(entt::entity{traits_type::page_size}));
     ASSERT_EQ(set.capacity(), 2u);
-    ASSERT_EQ(set.size(), 2u);
+    ASSERT_EQ(set.size(), 1u);
 
     set.push(entities[1u]);
 
