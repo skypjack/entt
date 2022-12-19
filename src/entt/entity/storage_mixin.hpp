@@ -39,15 +39,10 @@ class sigh_mixin final: public Type {
         }
     }
 
-    underlying_iterator try_insert(underlying_iterator first, underlying_iterator last, const void *value = nullptr) override {
+    underlying_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        const auto entt = *first;
-
-        for(; first != last; ++first) {
-            Type::try_insert(first, first + 1u, value);
-            construction.publish(*owner, *first);
-        }
-
+        Type::try_emplace(entt, force_back, value);
+        construction.publish(*owner, entt);
         return Type::find(entt);
     }
 
