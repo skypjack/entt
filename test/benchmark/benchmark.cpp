@@ -230,15 +230,12 @@ TEST(Benchmark, Recycle) {
     std::cout << "Recycling 1000000 entities" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-
-    registry.each([&registry](auto entity) {
-        registry.destroy(entity);
-    });
+    registry.destroy(entities.begin(), entities.end());
 
     timer timer;
 
     for(auto next = entities.size(); next; --next) {
-        static_cast<void>(registry.create());
+        entities[next] = registry.create();
     }
 
     timer.elapsed();
@@ -251,10 +248,7 @@ TEST(Benchmark, RecycleMany) {
     std::cout << "Recycling 1000000 entities" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-
-    registry.each([&registry](auto entity) {
-        registry.destroy(entity);
-    });
+    registry.destroy(entities.begin(), entities.end());
 
     timer timer;
     registry.create(entities.begin(), entities.end());
