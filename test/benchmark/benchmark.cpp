@@ -19,7 +19,9 @@ struct stable_position: position {
 };
 
 template<auto>
-struct comp { int x; };
+struct comp {
+    int x;
+};
 
 struct timer final {
     timer()
@@ -54,10 +56,21 @@ void pathological(Func func) {
 
     for(auto i = 0; i < 10; ++i) {
         registry.each([i = 0, &registry](const auto entity) mutable {
-            if(!(++i % 7)) { registry.remove<position>(entity); }
-            if(!(++i % 11)) { registry.remove<velocity>(entity); }
-            if(!(++i % 13)) { registry.remove<comp<0>>(entity); }
-            if(!(++i % 17)) { registry.destroy(entity); }
+            if(!(++i % 7)) {
+                registry.remove<position>(entity);
+            }
+
+            if(!(++i % 11)) {
+                registry.remove<velocity>(entity);
+            }
+
+            if(!(++i % 13)) {
+                registry.remove<comp<0>>(entity);
+            }
+
+            if(!(++i % 17)) {
+                registry.destroy(entity);
+            }
         });
 
         for(std::uint64_t j = 0; j < 50000L; j++) {
@@ -279,20 +292,6 @@ TEST(Benchmark, DestroyMany) {
 
     timer timer;
     registry.destroy(view.begin(), view.end());
-    timer.elapsed();
-}
-
-TEST(Benchmark, DestroyManyFastPath) {
-    entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
-
-    std::cout << "Destroying 1000000 entities at once, fast path" << std::endl;
-
-    registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
-
-    timer timer;
-    registry.destroy(entities.begin(), entities.end());
     timer.elapsed();
 }
 
