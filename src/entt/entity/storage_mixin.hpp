@@ -41,9 +41,13 @@ class sigh_mixin final: public Type {
 
     underlying_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        Type::try_emplace(entt, force_back, value);
-        construction.publish(*owner, entt);
-        return Type::find(entt);
+        const auto it = Type::try_emplace(entt, force_back, value);
+
+        if(it != base_type::end()) {
+            construction.publish(*owner, *it);
+        }
+
+        return it;
     }
 
 public:
