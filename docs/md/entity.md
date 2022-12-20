@@ -15,7 +15,6 @@
 * [Storage](#storage)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
-    * [Intent versus outcome](#intent-versus-outcome)
     * [Listeners disconnection](#listeners-disconnection)
     * [They call me Reactive System](#they-call-me-reactive-system)
   * [Sorting: is it possible?](#sorting-is-it-possible)
@@ -409,38 +408,6 @@ features it offers.<br/>
 There are many useful but less known functionalities that aren't described here,
 such as the connection objects or the possibility to attach listeners with a
 list of parameters that is shorter than that of the signal itself.
-
-### Intent versus outcome
-
-The basic implementation of signal support (offered via storage mixin) doesn't
-account for the fact that _opaque_ creation or copying of components can fail if
-their types aren't default constructible or copyable.<br/>
-The mixin sends a signal to the listeners whenever the _intention_ to build a
-component is manifested and after this operation has occurred, even in the event
-of failure.
-
-Opaque creation and copying occurs when the caller interacts with a storage via
-its base class, without actually knowing what type of component it's working
-with:
-
-```cpp
-using namespace entt::literals;
-auto *storage = registry.storage("velocity"_hs);
-
-if(storage && (storage->emplace(entity) != storage->end())) {
-    // ...
-}
-```
-
-In this case, the operation may fail at runtime rather than compile-time and
-therefore the entity ends up without the desired component.<br/>
-The user can detect the error immediately by checking the returned iterator.
-However, the signal is sent anyway.
-
-In general, users should make component types default constructible and copyable
-regardless.<br/>
-However, it's useful to be aware of this eventuality in the event of errors and
-to act accordingly.
 
 ### Listeners disconnection
 
