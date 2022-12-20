@@ -43,7 +43,7 @@ class sigh_mixin final: public Type {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         const auto it = Type::try_emplace(entt, force_back, value);
 
-        if(it != base_type::end()) {
+        if(it != Type::base_type::end()) {
             construction.publish(*owner, *it);
         }
 
