@@ -6,7 +6,7 @@
 [![Build Status](https://github.com/skypjack/entt/workflows/build/badge.svg)](https://github.com/skypjack/entt/actions)
 [![Coverage](https://codecov.io/gh/skypjack/entt/branch/master/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
 [![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/zxW73f)
-[![Documentation](https://img.shields.io/badge/docs-docsforge-blue)](http://entt.docsforge.com/)
+[![Documentation](https://img.shields.io/badge/docs-doxygen-blue)](https://skypjack.github.io/entt/)
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Discord channel](https://img.shields.io/discord/707607951396962417?logo=discord)](https://discord.gg/5BjPWBd)
 [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/skypjack)
@@ -343,8 +343,8 @@ The documentation is based on [doxygen](http://www.doxygen.nl/). To build it:
     $ cmake .. -DENTT_BUILD_DOCS=ON
     $ make
 
-The API reference will be created in HTML format within the directory
-`build/docs/html`. To navigate it with your favorite browser:
+The API reference is created in HTML format in the `build/docs/html` directory.
+To navigate it with your favorite browser:
 
     $ cd build
     $ your_favorite_browser docs/html/index.html
@@ -353,10 +353,7 @@ The API reference will be created in HTML format within the directory
 @cond TURN_OFF_DOXYGEN
 -->
 The same version is also available [online](https://skypjack.github.io/entt/)
-for the latest release, that is the last stable tag. If you are looking for
-something more pleasing to the eye, consider reading the nice-looking version
-available on [docsforge](https://entt.docsforge.com/): same documentation, much
-more pleasant to read.<br/>
+for the latest release, that is the last stable tag.<br/>
 Moreover, there exists a [wiki](https://github.com/skypjack/entt/wiki) dedicated
 to the project where users can find all related documentation pages.
 <!--
@@ -366,9 +363,8 @@ to the project where users can find all related documentation pages.
 # Tests
 
 To compile and run the tests, `EnTT` requires *googletest*.<br/>
-`cmake` will download and compile the library before compiling anything else.
-In order to build the tests, set the `CMake` option `ENTT_BUILD_TESTING` to
-`ON`.
+`cmake` downloads and compiles the library before compiling anything else. In
+order to build the tests, set the `CMake` option `ENTT_BUILD_TESTING` to `ON`.
 
 To build the most basic set of tests:
 
