@@ -23,9 +23,9 @@
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
+#include "mixin.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
-#include "storage_mixin.hpp"
 #include "view.hpp"
 
 namespace entt {

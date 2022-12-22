@@ -1,5 +1,5 @@
-#ifndef ENTT_ENTITY_STORAGE_MIXIN_HPP
-#define ENTT_ENTITY_STORAGE_MIXIN_HPP
+#ifndef ENTT_ENTITY_MIXIN_HPP
+#define ENTT_ENTITY_MIXIN_HPP
 
 #include <utility>
 #include "../config/config.h"

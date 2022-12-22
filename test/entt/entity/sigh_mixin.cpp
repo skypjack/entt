@@ -1,8 +1,8 @@
 #include <iterator>
 #include <gtest/gtest.h>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
-#include <entt/entity/storage_mixin.hpp>
 #include "../common/throwing_allocator.hpp"
 #include "../common/throwing_type.hpp"
 

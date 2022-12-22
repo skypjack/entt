@@ -143,6 +143,7 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/group.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/handle.hpp>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/mixin.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/helper.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/observer.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/organizer.hpp>
@@ -151,7 +152,6 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/snapshot.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/sparse_set.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/storage.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/storage_mixin.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/view.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/adjacency_matrix.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/dot.hpp>
