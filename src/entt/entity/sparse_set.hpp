@@ -357,14 +357,14 @@ public:
     /**
      * @brief Constructs an empty container with the given value type, policy
      * and allocator.
-     * @param value Returned value type, if any.
+     * @param elem Returned value type, if any.
      * @param pol Type of deletion policy.
      * @param allocator The allocator to use (possibly default-constructed).
      */
-    explicit basic_sparse_set(const type_info &value, deletion_policy pol = deletion_policy::swap_and_pop, const allocator_type &allocator = {})
+    explicit basic_sparse_set(const type_info &elem, deletion_policy pol = deletion_policy::swap_and_pop, const allocator_type &allocator = {})
         : sparse{allocator},
           packed{allocator},
-          info{&value},
+          info{&elem},
           free_list{tombstone},
           mode{pol} {}
 
@@ -668,13 +668,13 @@ public:
      * @param entt A valid identifier.
      * @return An opaque pointer to the element assigned to the entity, if any.
      */
-    [[nodiscard]] const void *get(const entity_type entt) const noexcept {
+    [[nodiscard]] const void *value(const entity_type entt) const noexcept {
         return get_at(index(entt));
     }
 
-    /*! @copydoc get */
-    [[nodiscard]] void *get(const entity_type entt) noexcept {
-        return const_cast<void *>(std::as_const(*this).get(entt));
+    /*! @copydoc value */
+    [[nodiscard]] void *value(const entity_type entt) noexcept {
+        return const_cast<void *>(std::as_const(*this).value(entt));
     }
 
     /**
@@ -685,12 +685,12 @@ public:
      * results in undefined behavior.
      *
      * @param entt A valid identifier.
-     * @param value Optional opaque value to forward to mixins, if any.
+     * @param elem Optional opaque element to forward to mixins, if any.
      * @return Iterator pointing to the emplaced element in case of success, the
      * `end()` iterator otherwise.
      */
-    iterator push(const entity_type entt, const void *value = nullptr) {
-        return try_emplace(entt, false, value);
+    iterator push(const entity_type entt, const void *elem = nullptr) {
+        return try_emplace(entt, false, elem);
     }
 
     /**

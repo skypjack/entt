@@ -1110,10 +1110,10 @@ passed to it every time.
 Alongside these more specific things, there are also a couple of functions
 designed to address some common requirements such as copying an entity.<br/>
 In particular, the base class behind a storage offers the possibility to _take_
-the object associated with an entity through an opaque pointer:
+the value associated with an entity through an opaque pointer:
 
 ```cpp
-const void *instance = base.get(entity);
+const void *instance = base.value(entity);
 ```
 
 Similarly, the non-specialized `push` function accepts an optional opaque
@@ -1133,7 +1133,7 @@ them by copy if needed:
 // create a copy of an entity component by component
 for(auto &&curr: registry.storage()) {
     if(auto &storage = curr.second; storage.contains(src)) {
-        storage.push(dst, storage.get(src));
+        storage.push(dst, storage.value(src));
     }
 }
 ```

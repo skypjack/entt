@@ -671,7 +671,7 @@ TEST(Storage, TypeFromBase) {
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
-    ASSERT_EQ(base.get(entities[0u]), &pool.get(entities[0u]));
+    ASSERT_EQ(base.value(entities[0u]), &pool.get(entities[0u]));
     ASSERT_EQ(pool.get(entities[0u]), 42);
 
     base.erase(entities[0u]);
@@ -706,7 +706,7 @@ TEST(Storage, EmptyTypeFromBase) {
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
-    ASSERT_EQ(base.get(entities[0u]), nullptr);
+    ASSERT_EQ(base.value(entities[0u]), nullptr);
     ASSERT_EQ(base.index(entities[0u]), 0u);
 
     base.erase(entities[0u]);
