@@ -83,8 +83,8 @@ TEST(BasicHandle, Destruction) {
     ASSERT_FALSE(handle);
     ASSERT_FALSE(handle.valid());
     ASSERT_NE(handle.registry(), nullptr);
-    ASSERT_EQ(handle.entity(), entity);
     ASSERT_EQ(registry.current(entity), typename entt::registry::version_type{});
+    ASSERT_EQ(handle.entity(), entt::entity{entt::null});
 
     handle = entt::handle{registry, registry.create()};
 
@@ -98,8 +98,8 @@ TEST(BasicHandle, Destruction) {
     ASSERT_FALSE(handle);
     ASSERT_FALSE(handle.valid());
     ASSERT_NE(handle.registry(), nullptr);
-    ASSERT_EQ(handle.entity(), entity);
     ASSERT_NE(registry.current(entity), typename entt::registry::version_type{});
+    ASSERT_EQ(handle.entity(), entt::entity{entt::null});
 }
 
 TEST(BasicHandle, Comparison) {
