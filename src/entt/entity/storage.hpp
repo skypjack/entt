@@ -375,16 +375,16 @@ protected:
 public:
     /*! @brief Base type. */
     using base_type = underlying_type;
-    /*! @brief Component traits. */
-    using traits_type = component_traits<Type>;
-    /*! @brief Allocator type. */
-    using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
+    /*! @brief Component traits. */
+    using traits_type = component_traits<value_type>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Pointer type to contained elements. */
     using pointer = typename container_type::pointer;
     /*! @brief Constant pointer type to contained elements. */
@@ -749,16 +749,16 @@ class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<T
 public:
     /*! @brief Base type. */
     using base_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
-    /*! @brief Component traits. */
-    using traits_type = component_traits<Type>;
-    /*! @brief Allocator type. */
-    using allocator_type = Allocator;
     /*! @brief Type of the objects assigned to entities. */
     using value_type = Type;
+    /*! @brief Component traits. */
+    using traits_type = component_traits<value_type>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Extended iterable storage proxy. */
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
     /*! @brief Constant extended iterable storage proxy. */

@@ -316,14 +316,14 @@ protected:
 public:
     /*! @brief Entity traits. */
     using traits_type = entt_traits<Entity>;
-    /*! @brief Allocator type. */
-    using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename traits_type::value_type;
     /*! @brief Underlying version type. */
     using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Pointer type to contained entities. */
     using pointer = typename packed_container_type::const_pointer;
     /*! @brief Random access iterator type. */
