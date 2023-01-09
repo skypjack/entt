@@ -144,17 +144,17 @@ TEST(Benchmark, CreateManyWithComponents) {
 TEST(Benchmark, Erase) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
-    auto view = registry.view<int>();
+    auto view = registry.view<position>();
 
     std::cout << "Erasing 1000000 components from their entities" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
 
     timer timer;
 
     for(auto entity: view) {
-        registry.erase<int>(entity);
+        registry.erase<position>(entity);
     }
 
     timer.elapsed();
@@ -163,32 +163,32 @@ TEST(Benchmark, Erase) {
 TEST(Benchmark, EraseMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
-    auto view = registry.view<int>();
+    auto view = registry.view<position>();
 
     std::cout << "Erasing 1000000 components from their entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
 
     timer timer;
-    registry.erase<int>(view.begin(), view.end());
+    registry.erase<position>(view.begin(), view.end());
     timer.elapsed();
 }
 
 TEST(Benchmark, Remove) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
-    auto view = registry.view<int>();
+    auto view = registry.view<position>();
 
     std::cout << "Removing 1000000 components from their entities" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
 
     timer timer;
 
     for(auto entity: view) {
-        registry.remove<int>(entity);
+        registry.remove<position>(entity);
     }
 
     timer.elapsed();
@@ -197,15 +197,15 @@ TEST(Benchmark, Remove) {
 TEST(Benchmark, RemoveMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
-    auto view = registry.view<int>();
+    auto view = registry.view<position>();
 
     std::cout << "Removing 1000000 components from their entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
 
     timer timer;
-    registry.remove<int>(view.begin(), view.end());
+    registry.remove<position>(view.begin(), view.end());
     timer.elapsed();
 }
 
@@ -216,10 +216,10 @@ TEST(Benchmark, Clear) {
     std::cout << "Clearing 1000000 components from their entities" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
 
     timer timer;
-    registry.clear<int>();
+    registry.clear<position>();
     timer.elapsed();
 }
 
@@ -258,12 +258,12 @@ TEST(Benchmark, RecycleMany) {
 TEST(Benchmark, Destroy) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
-    auto view = registry.view<int>();
+    auto view = registry.view<position>();
 
     std::cout << "Destroying 1000000 entities" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
 
     timer timer;
 
@@ -277,12 +277,12 @@ TEST(Benchmark, Destroy) {
 TEST(Benchmark, DestroyMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
-    auto view = registry.view<int>();
+    auto view = registry.view<position>();
 
     std::cout << "Destroying 1000000 entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
-    registry.insert<int>(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
 
     timer timer;
     registry.destroy(view.begin(), view.end());
@@ -304,10 +304,10 @@ TEST(Benchmark, IterateSingleComponent1M) {
     });
 }
 
-TEST(Benchmark, IterateSingleComponentTombstonePolicy1M) {
+TEST(Benchmark, IterateSingleStableComponent1M) {
     entt::registry registry;
 
-    std::cout << "Iterating over 1000000 entities, one component, tombstone policy" << std::endl;
+    std::cout << "Iterating over 1000000 entities, one stable component" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
         const auto entity = registry.create();
@@ -353,10 +353,10 @@ TEST(Benchmark, IterateTwoComponents1M) {
     });
 }
 
-TEST(Benchmark, IterateTombstonePolicyTwoComponentsTombstonePolicy1M) {
+TEST(Benchmark, IterateTwoStableComponents1M) {
     entt::registry registry;
 
-    std::cout << "Iterating over 1000000 entities, two components, tombstone policy" << std::endl;
+    std::cout << "Iterating over 1000000 entities, two stable components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
         const auto entity = registry.create();
@@ -541,10 +541,10 @@ TEST(Benchmark, IterateThreeComponents1M) {
     });
 }
 
-TEST(Benchmark, IterateThreeComponentsTombstonePolicy1M) {
+TEST(Benchmark, IterateThreeStableComponents1M) {
     entt::registry registry;
 
-    std::cout << "Iterating over 1000000 entities, three components, tombstone policy" << std::endl;
+    std::cout << "Iterating over 1000000 entities, three stable components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
         const auto entity = registry.create();
@@ -746,10 +746,10 @@ TEST(Benchmark, IterateFiveComponents1M) {
     });
 }
 
-TEST(Benchmark, IterateFiveComponentsTombstonePolicy1M) {
+TEST(Benchmark, IterateFiveStableComponents1M) {
     entt::registry registry;
 
-    std::cout << "Iterating over 1000000 entities, five components, tombstone policy" << std::endl;
+    std::cout << "Iterating over 1000000 entities, five stable components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
         const auto entity = registry.create();
