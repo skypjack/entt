@@ -223,6 +223,20 @@ TEST(Benchmark, Clear) {
     timer.elapsed();
 }
 
+TEST(Benchmark, ClearStable) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Clearing 1000000 stable components from their entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<stable_position>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.clear<stable_position>();
+    timer.elapsed();
+}
+
 TEST(Benchmark, Recycle) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
