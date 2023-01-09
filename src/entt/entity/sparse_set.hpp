@@ -189,6 +189,10 @@ class basic_sparse_set {
         return sparse[pos / traits_type::page_size][fast_mod(pos, traits_type::page_size)];
     }
 
+    [[nodiscard]] auto to_iterator(const Entity entt) const {
+        return --(end() - index(entt));
+    }
+
     [[nodiscard]] auto &assure_at_least(const Entity entt) {
         const auto pos = static_cast<size_type>(traits_type::to_entity(entt));
         const auto page = pos / traits_type::page_size;
@@ -597,7 +601,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? --(end() - index(entt)) : end();
+        return contains(entt) ? to_iterator(entt) : end();
     }
 
     /**
@@ -741,7 +745,7 @@ public:
      * @param entt A valid identifier.
      */
     void erase(const entity_type entt) {
-        const auto it = --(end() - index(entt));
+        const auto it = to_iterator(entt);
         pop(it, it + 1u);
     }
 
