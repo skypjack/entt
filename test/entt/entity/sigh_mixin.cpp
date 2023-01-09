@@ -41,6 +41,17 @@ TEST(SighMixin, GenericType) {
     counter on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
+
+    ASSERT_TRUE(pool.empty());
+
+    pool.insert(entities, entities + 1u);
+    pool.erase(entities[0u]);
+
+    ASSERT_TRUE(pool.empty());
+
+    ASSERT_EQ(on_construct.value, 0);
+    ASSERT_EQ(on_destroy.value, 0);
+
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
