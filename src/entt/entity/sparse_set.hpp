@@ -294,6 +294,7 @@ protected:
 
     /*! @brief Erases all entities of a sparse set. */
     virtual void clear_all() {
+        release_sparse_pages();
         sparse.clear();
         packed.clear();
         free_list = tombstone;
