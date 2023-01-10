@@ -88,6 +88,10 @@ struct sparse_set_iterator final {
         return *operator->();
     }
 
+    [[nodiscard]] constexpr pointer data() const noexcept {
+        return packed ? packed->data() : nullptr;
+    }
+
     [[nodiscard]] constexpr difference_type index() const noexcept {
         return offset - 1;
     }

@@ -927,8 +927,15 @@ TEST(SparseSet, Iterator) {
 
     iterator end{set.begin()};
     iterator begin{};
+
+    ASSERT_EQ(end.data(), set.data());
+    ASSERT_EQ(begin.data(), nullptr);
+
     begin = set.end();
     std::swap(begin, end);
+
+    ASSERT_EQ(end.data(), set.data());
+    ASSERT_EQ(begin.data(), set.data());
 
     ASSERT_EQ(begin, set.cbegin());
     ASSERT_EQ(end, set.cend());
