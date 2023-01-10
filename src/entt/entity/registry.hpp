@@ -700,7 +700,7 @@ public:
     template<typename It>
     void assign(It first, It last, const entity_type destroyed) {
         ENTT_ASSERT(!alive(), "Entities still alive");
-        epool.assign(first, last);
+        epool.assign(std::move(first), std::move(last));
         free_list = destroyed;
     }
 
@@ -839,7 +839,7 @@ public:
      */
     template<typename Type, typename It>
     void insert(It first, It last, const Type &value = {}) {
-        assure<Type>().insert(first, last, value);
+        assure<Type>().insert(std::move(first), std::move(last), value);
     }
 
     /**
