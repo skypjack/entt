@@ -5,6 +5,7 @@
 #include "../config/config.h"
 #include "../core/any.hpp"
 #include "../signal/sigh.hpp"
+#include "entity.hpp"
 #include "fwd.hpp"
 
 namespace entt {
