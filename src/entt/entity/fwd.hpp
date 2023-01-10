@@ -1,6 +1,7 @@
 #ifndef ENTT_ENTITY_FWD_HPP
 #define ENTT_ENTITY_FWD_HPP
 
+#include <cstdint>
 #include <memory>
 #include <type_traits>
 #include "../core/fwd.hpp"
@@ -10,6 +11,14 @@ namespace entt {
 
 /*! @brief Default entity identifier. */
 enum class entity : id_type {};
+
+/*! @brief Storage deletion policy. */
+enum class deletion_policy : std::uint8_t {
+    /*! @brief Swap-and-pop deletion policy. */
+    swap_and_pop = 0u,
+    /*! @brief In-place deletion policy. */
+    in_place = 1u
+};
 
 template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
