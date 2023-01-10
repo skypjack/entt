@@ -975,7 +975,9 @@ public:
 
     /*! @brief Clears a sparse set. */
     void clear() {
-        empty() || (clear_all(), true);
+        if(!empty()) {
+            clear_all();
+        }
     }
 
     /**
