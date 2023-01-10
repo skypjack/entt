@@ -16,6 +16,8 @@ TODO (high prio):
 * remove the static storage from the const assure in the registry
 * use sparse set iterator ::data to optimize range functionalities in the mixins and the registry (exploit the zero-check model)
 * can pass is_packed to clear_all to further optimize it in the derived classes
+* can add and hide-override pop_back to further optimize clearing a sparse set
+* maybe avoid clearing pages during a clear_all (for backward compatibility)?
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
