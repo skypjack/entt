@@ -300,6 +300,13 @@ protected:
         }
     }
 
+    /*! @brief Erases all entities of a sparse set. */
+    virtual void clear_all() {
+        sparse.clear();
+        packed.clear();
+        free_list = tombstone;
+    }
+
     /**
      * @brief Assigns an entity to a sparse set.
      * @param entt A valid identifier.
@@ -968,19 +975,7 @@ public:
 
     /*! @brief Clears a sparse set. */
     void clear() {
-        if(const auto last = end(); free_list == null) {
-            pop(begin(), last);
-        } else {
-            for(auto &&entity: *this) {
-                // tombstone filter on itself
-                if(const auto it = find(entity); it != last) {
-                    pop(it, it + 1u);
-                }
-            }
-        }
-
-        // swap-only sets support
-        compact();
+        empty() || (clear_all(), true);
     }
 
     /**
