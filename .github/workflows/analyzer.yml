@@ -39,17 +39,23 @@ jobs:
         git clone https://github.com/include-what-you-use/include-what-you-use.git --branch $IWYU --depth 1
         mkdir include-what-you-use/build
         cd include-what-you-use/build
-        cmake -DCMAKE_C_COMPILER=clang-$LLVM -DCMAKE_CXX_COMPILER=clang++-$LLVM -DCMAKE_INSTALL_PREFIX=./ ..
+        cmake -DCMAKE_C_COMPILER=clang-$LLVM \
+              -DCMAKE_CXX_COMPILER=clang++-$LLVM \
+              -DCMAKE_INSTALL_PREFIX=./ \
+              ..
         make -j4
         bin/include-what-you-use --version
     - name: Compile tests
       working-directory: build
       run: |
         export PATH=$PATH:${GITHUB_WORKSPACE}/build/include-what-you-use/build/bin
-        cmake -DENTT_BUILD_TESTING=ON \
+        cmake -DCMAKE_C_COMPILER=clang-$LLVM \
+              -DCMAKE_CXX_COMPILER=clang++-$LLVM \
+              -DENTT_BUILD_TESTING=ON \
               -DENTT_BUILD_BENCHMARK=ON \
               -DENTT_BUILD_EXAMPLE=ON \
               -DENTT_BUILD_LIB=ON \
               -DENTT_BUILD_SNAPSHOT=ON \
-              -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-Xiwyu;--mapping_file=${GITHUB_WORKSPACE}/entt.imp;-Xiwyu;--no_fwd_decls;-Xiwyu;--verbose=1" ..
+              -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-Xiwyu;--mapping_file=${GITHUB_WORKSPACE}/entt.imp;-Xiwyu;--no_fwd_decls;-Xiwyu;--verbose=1" \
+              ..
         make -j4
