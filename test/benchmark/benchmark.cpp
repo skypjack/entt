@@ -350,6 +350,22 @@ TEST(Benchmark, DestroyMany) {
     timer.elapsed();
 }
 
+TEST(Benchmark, DestroyManyMulti) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+    auto view = registry.view<position>();
+
+    std::cout << "Destroying 1000000 entities at once, multiple components" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
+    registry.insert<velocity>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.destroy(view.begin(), view.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, IterateSingleComponent1M) {
     entt::registry registry;
 
