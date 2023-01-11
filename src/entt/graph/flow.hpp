@@ -32,6 +32,7 @@ class basic_flow {
     using task_container_type = dense_set<id_type, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<id_type>>;
     using ro_rw_container_type = std::vector<std::pair<std::size_t, bool>, typename alloc_traits::template rebind_alloc<std::pair<std::size_t, bool>>>;
     using deps_container_type = dense_map<id_type, ro_rw_container_type, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, ro_rw_container_type>>>;
+    using adjacency_matrix_type = adjacency_matrix<directed_tag, typename alloc_traits::template rebind_alloc<std::size_t>>;
 
     void emplace(const id_type res, const bool is_rw) {
         ENTT_ASSERT(index.first() < vertices.size(), "Invalid node");
@@ -43,6 +44,76 @@ class basic_flow {
         deps[res].emplace_back(index.first(), is_rw);
     }
 
+    void setup_graph(adjacency_matrix_type &matrix) const {
+        for(const auto &elem: deps) {
+            const auto last = elem.second.cend();
+            auto it = elem.second.cbegin();
+
+            while(it != last) {
+                if(it->second) {
+                    // rw item
+                    if(auto curr = it++; it != last) {
+                        if(it->second) {
+                            matrix.insert(curr->first, it->first);
+                        } else if(const auto next = std::find_if(it, last, [](const auto &value) { return value.second; }); next != last) {
+                            for(; it != next; ++it) {
+                                matrix.insert(curr->first, it->first);
+                                matrix.insert(it->first, next->first);
+                            }
+                        } else {
+                            for(; it != next; ++it) {
+                                matrix.insert(curr->first, it->first);
+                            }
+                        }
+                    }
+                } else {
+                    // ro item (first iteration only)
+                    if(const auto next = std::find_if(it, last, [](const auto &value) { return value.second; }); next != last) {
+                        for(; it != next; ++it) {
+                            matrix.insert(it->first, next->first);
+                        }
+                    } else {
+                        it = last;
+                    }
+                }
+            }
+        }
+    }
+
+    void transitive_closure(adjacency_matrix_type &matrix) const {
+        const auto length = matrix.size();
+
+        for(std::size_t vk{}; vk < length; ++vk) {
+            for(std::size_t vi{}; vi < length; ++vi) {
+                for(std::size_t vj{}; vj < length; ++vj) {
+                    if(matrix.contains(vi, vk) && matrix.contains(vk, vj)) {
+                        matrix.insert(vi, vj);
+                    }
+                }
+            }
+        }
+    }
+
+    void transitive_reduction(adjacency_matrix_type &matrix) const {
+        const auto length = matrix.size();
+
+        for(std::size_t vert{}; vert < length; ++vert) {
+            matrix.erase(vert, vert);
+        }
+
+        for(std::size_t vj{}; vj < length; ++vj) {
+            for(std::size_t vi{}; vi < length; ++vi) {
+                if(matrix.contains(vi, vj)) {
+                    for(std::size_t vk{}; vk < length; ++vk) {
+                        if(matrix.contains(vj, vk)) {
+                            matrix.erase(vi, vk);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
@@ -50,6 +121,8 @@ public:
     using size_type = std::size_t;
     /*! @brief Iterable task list. */
     using iterable = iterable_adaptor<typename task_container_type::const_iterator>;
+    /*! @brief Adjacency matrix type. */
+    using graph_type = adjacency_matrix_type;
 
     /*! @brief Default constructor. */
     basic_flow()
@@ -246,72 +319,12 @@ public:
      * @brief Generates a task graph for the current content.
      * @return The adjacency matrix of the task graph.
      */
-    [[nodiscard]] adjacency_matrix<directed_tag> graph() const {
-        const auto length = vertices.size();
-        adjacency_matrix<directed_tag> matrix{length};
+    [[nodiscard]] graph_type graph() const {
+        graph_type matrix{vertices.size(), get_allocator()};
 
-        // creates the adjacency matrix
-        for(const auto &elem: deps) {
-            const auto last = elem.second.cend();
-            auto it = elem.second.cbegin();
-
-            while(it != last) {
-                if(it->second) {
-                    // rw item
-                    if(auto curr = it++; it != last) {
-                        if(it->second) {
-                            matrix.insert(curr->first, it->first);
-                        } else if(const auto next = std::find_if(it, last, [](const auto &value) { return value.second; }); next != last) {
-                            for(; it != next; ++it) {
-                                matrix.insert(curr->first, it->first);
-                                matrix.insert(it->first, next->first);
-                            }
-                        } else {
-                            for(; it != next; ++it) {
-                                matrix.insert(curr->first, it->first);
-                            }
-                        }
-                    }
-                } else {
-                    // ro item (first iteration only)
-                    if(const auto next = std::find_if(it, last, [](const auto &value) { return value.second; }); next != last) {
-                        for(; it != next; ++it) {
-                            matrix.insert(it->first, next->first);
-                        }
-                    } else {
-                        it = last;
-                    }
-                }
-            }
-        }
-
-        // computes the transitive closure
-        for(std::size_t vk{}; vk < length; ++vk) {
-            for(std::size_t vi{}; vi < length; ++vi) {
-                for(std::size_t vj{}; vj < length; ++vj) {
-                    if(matrix.contains(vi, vk) && matrix.contains(vk, vj)) {
-                        matrix.insert(vi, vj);
-                    }
-                }
-            }
-        }
-
-        // applies the transitive reduction
-        for(std::size_t vert{}; vert < length; ++vert) {
-            matrix.erase(vert, vert);
-        }
-
-        for(std::size_t vj{}; vj < length; ++vj) {
-            for(std::size_t vi{}; vi < length; ++vi) {
-                if(matrix.contains(vi, vj)) {
-                    for(std::size_t vk{}; vk < length; ++vk) {
-                        if(matrix.contains(vj, vk)) {
-                            matrix.erase(vi, vk);
-                        }
-                    }
-                }
-            }
-        }
+        setup_graph(matrix);
+        transitive_closure(matrix);
+        transitive_reduction(matrix);
 
         return matrix;
     }
