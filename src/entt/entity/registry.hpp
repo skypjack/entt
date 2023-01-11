@@ -998,11 +998,24 @@ public:
      */
     template<typename Type, typename... Other, typename It>
     void erase(It first, It last) {
-        if constexpr(sizeof...(Other) == 0u) {
-            assure<Type>().erase(std::move(first), std::move(last));
+        constexpr size_type len = sizeof...(Other) + 1u;
+        basic_common_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
+
+        if constexpr(std::is_same_v<It, typename basic_common_type::iterator>) {
+            for(size_type pos{}; pos < len; ++pos) {
+                if(cpools[pos]->data() == first.data()) {
+                    std::swap(cpools[pos], cpools[len - 1u]);
+                }
+
+                cpools[pos]->erase(first, last);
+            }
         } else {
-            for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
-                std::apply([entt = *first](auto &...curr) { (curr.erase(entt), ...); }, cpools);
+            for(; first != last; ++first) {
+                const auto entt = *first;
+
+                for(size_type pos{}; pos < len; ++pos) {
+                    cpools[pos]->erase(entt);
+                }
             }
         }
     }
