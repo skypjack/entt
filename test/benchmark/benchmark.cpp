@@ -180,7 +180,7 @@ TEST(Benchmark, EraseManyMulti) {
     std::vector<entt::entity> entities(1000000);
     auto view = registry.view<position>();
 
-    std::cout << "Erasing 1000000 components from their entities at once" << std::endl;
+    std::cout << "Erasing 1000000 components per type from their entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
@@ -230,7 +230,7 @@ TEST(Benchmark, RemoveManyMulti) {
     std::vector<entt::entity> entities(1000000);
     auto view = registry.view<position>();
 
-    std::cout << "Removing 1000000 components from their entities at once" << std::endl;
+    std::cout << "Removing 1000000 components per type from their entities at once" << std::endl;
 
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
@@ -259,7 +259,7 @@ TEST(Benchmark, ClearMulti) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Clearing 1000000 components from their entities" << std::endl;
+    std::cout << "Clearing 1000000 components per type from their entities" << std::endl;
 
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
