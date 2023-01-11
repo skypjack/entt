@@ -13,7 +13,7 @@ jobs:
     - name: Compile tests
       working-directory: build
       env:
-        CXXFLAGS: "--coverage -fno-inline"
+        CXXFLAGS: "--coverage -fno-elide-constructors -fno-inline -fno-default-inline"
         CXX: g++
       run: |
         cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
