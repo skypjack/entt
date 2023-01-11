@@ -801,8 +801,31 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        for(; first != last; ++first) {
-            destroy(*first);
+        if constexpr(std::is_same_v<It, typename basic_common_type::iterator>) {
+            basic_common_type *owner = nullptr;
+
+            for(size_type pos = pools.size(); pos; --pos) {
+                if(pools.begin()[pos - 1u].second->data() == first.data()) {
+                    owner = pools.begin()[pos - 1u].second.get();
+                } else {
+                    pools.begin()[pos - 1u].second->remove(first, last);
+                }
+            }
+
+            if(owner) {
+                // waiting to further/completely optimize this with the entity storage
+                for(; first != last; ++first) {
+                    const auto entt = *first;
+                    owner->remove(entt);
+                    release(entt);
+                }
+            } else {
+                release(std::move(first), std::move(last));
+            }
+        } else {
+            for(; first != last; ++first) {
+                destroy(*first);
+            }
         }
     }
 
