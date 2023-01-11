@@ -49,11 +49,11 @@ class sigh_mixin final: public Type {
             ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
 
             if(Type::policy() == deletion_policy::swap_and_pop) {
-                for(const auto entt: static_cast<typename Type::base_type &>(*this)) {
+                for(auto &&entt: static_cast<typename Type::base_type &>(*this)) {
                     destruction.publish(*owner, entt);
                 }
             } else {
-                for(const auto entt: static_cast<typename Type::base_type &>(*this)) {
+                for(auto &&entt: static_cast<typename Type::base_type &>(*this)) {
                     if(entt != tombstone) {
                         destruction.publish(*owner, entt);
                     }
