@@ -54,11 +54,11 @@ public:
           pools{},
           filter{} {}
 
-    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Get> all_of, std::array<const Type *, Exclude> none_of) noexcept
+    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
         : it{curr},
           last{to},
-          pools{all_of},
-          filter{none_of} {
+          pools{value},
+          filter{excl} {
         while(it != last && !valid()) {
             ++it;
         }
@@ -114,9 +114,9 @@ struct extended_view_iterator final {
         : it{},
           pools{} {}
 
-    extended_view_iterator(It from, std::tuple<Type *...> storage)
+    extended_view_iterator(It from, std::tuple<Type *...> value)
         : it{from},
-          pools{storage} {}
+          pools{value} {}
 
     extended_view_iterator &operator++() noexcept {
         return ++it, *this;
@@ -257,11 +257,11 @@ public:
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
      * @param value The storage for the types to iterate.
-     * @param exclude The storage for the types used to filter the view.
+     * @param excl The storage for the types used to filter the view.
      */
-    basic_view(Get &...value, Exclude &...exclude) noexcept
+    basic_view(Get &...value, Exclude &...excl) noexcept
         : pools{&value...},
-          filter{&exclude...},
+          filter{&excl...},
           view{std::get<0>(pools)} {
         ((view = value.size() < view->size() ? &value : view), ...);
     }
@@ -574,18 +574,18 @@ public:
 
     /**
      * @brief Constructs a single-type view from a storage class.
-     * @param ref The storage for the type to iterate.
+     * @param value The storage for the type to iterate.
      */
-    basic_view(Get &ref) noexcept
-        : pools{&ref},
+    basic_view(Get &value) noexcept
+        : pools{&value},
           filter{} {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
-     * @param ref The storage for the type to iterate.
+     * @param value The storage for the type to iterate.
      */
-    basic_view(std::tuple<Get &> ref, std::tuple<> = {}) noexcept
-        : basic_view{std::get<0>(ref)} {}
+    basic_view(std::tuple<Get &> value, std::tuple<> = {}) noexcept
+        : basic_view{std::get<0>(value)} {}
 
     /**
      * @brief Returns the leading storage of a view.
