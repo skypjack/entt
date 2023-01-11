@@ -175,6 +175,22 @@ TEST(Benchmark, EraseMany) {
     timer.elapsed();
 }
 
+TEST(Benchmark, EraseManyMulti) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+    auto view = registry.view<position>();
+
+    std::cout << "Erasing 1000000 components from their entities at once" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
+    registry.insert<velocity>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.erase<position, velocity>(view.begin(), view.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, Remove) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
@@ -209,6 +225,22 @@ TEST(Benchmark, RemoveMany) {
     timer.elapsed();
 }
 
+TEST(Benchmark, RemoveManyMulti) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+    auto view = registry.view<position>();
+
+    std::cout << "Removing 1000000 components from their entities at once" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
+    registry.insert<velocity>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.remove<position, velocity>(view.begin(), view.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, Clear) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
@@ -220,6 +252,21 @@ TEST(Benchmark, Clear) {
 
     timer timer;
     registry.clear<position>();
+    timer.elapsed();
+}
+
+TEST(Benchmark, ClearMulti) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Clearing 1000000 components from their entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
+    registry.insert<velocity>(entities.begin(), entities.end());
+
+    timer timer;
+    registry.clear<position, velocity>();
     timer.elapsed();
 }
 
