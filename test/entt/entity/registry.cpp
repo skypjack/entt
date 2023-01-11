@@ -666,7 +666,7 @@ ENTT_DEBUG_TEST(RegistryDeathTest, DestroyVersion) {
     ASSERT_DEATH(registry.destroy(entity, 3), "");
 }
 
-TEST(Registry, RangeDestroy) {
+TEST(Registry, DestroyRange) {
     entt::registry registry;
     const auto iview = registry.view<int>();
     const auto icview = registry.view<int, char>();
@@ -721,6 +721,24 @@ TEST(Registry, RangeDestroy) {
     ASSERT_FALSE(registry.valid(entities[0u]));
     ASSERT_FALSE(registry.valid(entities[1u]));
     ASSERT_FALSE(registry.valid(entities[2u]));
+    ASSERT_EQ(registry.storage<int>().size(), 0u);
+
+    entt::sparse_set managed{};
+
+    registry.create(std::begin(entities), std::end(entities));
+    managed.push(std::begin(entities), std::end(entities));
+    registry.insert<int>(managed.begin(), managed.end());
+
+    ASSERT_TRUE(registry.valid(managed[0u]));
+    ASSERT_TRUE(registry.valid(managed[1u]));
+    ASSERT_TRUE(registry.valid(managed[2u]));
+    ASSERT_EQ(registry.storage<int>().size(), 3u);
+
+    registry.destroy(managed.begin(), managed.end());
+
+    ASSERT_FALSE(registry.valid(managed[0u]));
+    ASSERT_FALSE(registry.valid(managed[1u]));
+    ASSERT_FALSE(registry.valid(managed[2u]));
     ASSERT_EQ(registry.storage<int>().size(), 0u);
 }
 
@@ -792,7 +810,7 @@ ENTT_DEBUG_TEST(RegistryDeathTest, ReleaseVersion) {
     ASSERT_DEATH(registry.release(entity, 3), "");
 }
 
-TEST(Registry, RangeRelease) {
+TEST(Registry, ReleaseRange) {
     entt::registry registry;
     entt::entity entities[3u];
 
@@ -1576,6 +1594,17 @@ TEST(Registry, Erase) {
     ASSERT_EQ(registry.storage<char>().size(), 0u);
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 
+    registry.insert<int>(std::begin(entities) + 1, std::end(entities) - 1u);
+    registry.insert<char>(std::begin(entities) + 1, std::end(entities) - 1u);
+
+    ASSERT_EQ(registry.storage<int>().size(), 1u);
+    ASSERT_EQ(registry.storage<char>().size(), 1u);
+
+    registry.erase<int, char>(iview.begin(), iview.end());
+
+    ASSERT_EQ(registry.storage<int>().size(), 0u);
+    ASSERT_EQ(registry.storage<char>().size(), 0u);
+
     registry.insert<int>(std::begin(entities), std::end(entities));
     registry.insert<char>(std::begin(entities), std::end(entities));
 
@@ -1688,6 +1717,18 @@ TEST(Registry, Remove) {
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
     ASSERT_EQ(registry.storage<double>().size(), 1u);
+
+    registry.insert<int>(std::begin(entities) + 1, std::end(entities) - 1u);
+    registry.insert<char>(std::begin(entities) + 1, std::end(entities) - 1u);
+
+    ASSERT_EQ(registry.storage<int>().size(), 1u);
+    ASSERT_EQ(registry.storage<char>().size(), 1u);
+
+    registry.remove<int, char>(iview.begin(), iview.end());
+    registry.remove<int, char>(iview.begin(), iview.end());
+
+    ASSERT_EQ(registry.storage<int>().size(), 0u);
+    ASSERT_EQ(registry.storage<char>().size(), 0u);
 
     registry.insert<int>(std::begin(entities), std::end(entities));
     registry.insert<char>(std::begin(entities), std::end(entities));
