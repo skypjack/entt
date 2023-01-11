@@ -8,8 +8,7 @@ struct service {
 };
 
 struct userdata {
-    using node_type = typename entt::locator<service>::node_type;
-    node_type handle;
+    typename entt::locator<service>::node_type handle;
     int value;
 };
 
