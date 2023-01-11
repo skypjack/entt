@@ -18,6 +18,7 @@ TODO (high prio):
 * can pass is_packed to clear_all to further optimize it in the derived classes
 * can add and hide-override pop_back to further optimize clearing a sparse set
 * maybe avoid clearing pages during a clear_all (for backward compatibility)?
+* review using std::swap usage, there are some mistakes here and there
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
