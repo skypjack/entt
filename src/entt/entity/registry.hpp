@@ -801,8 +801,8 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        if constexpr(std::is_same_v<It, typename basic_common_type::iterator>) {
-            basic_common_type *owner = nullptr;
+        if constexpr(std::is_same_v<It, typename base_type::iterator>) {
+            base_type *owner = nullptr;
 
             for(size_type pos = pools.size(); pos; --pos) {
                 if(pools.begin()[pos - 1u].second->data() == first.data()) {
@@ -983,9 +983,9 @@ public:
 
         if constexpr(sizeof...(Other) == 0u) {
             count += assure<Type>().remove(std::move(first), std::move(last));
-        } else if constexpr(std::is_same_v<It, typename basic_common_type::iterator>) {
+        } else if constexpr(std::is_same_v<It, typename base_type::iterator>) {
             constexpr size_type len = sizeof...(Other) + 1u;
-            basic_common_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
+            base_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
 
             for(size_type pos{}; pos < len; ++pos) {
                 if(cpools[pos]->data() == first.data()) {
@@ -1034,9 +1034,9 @@ public:
     void erase(It first, It last) {
         if constexpr(sizeof...(Other) == 0u) {
             assure<Type>().erase(std::move(first), std::move(last));
-        } else if constexpr(std::is_same_v<It, typename basic_common_type::iterator>) {
+        } else if constexpr(std::is_same_v<It, typename base_type::iterator>) {
             constexpr size_type len = sizeof...(Other) + 1u;
-            basic_common_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
+            base_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
 
             for(size_type pos{}; pos < len; ++pos) {
                 if(cpools[pos]->data() == first.data()) {
