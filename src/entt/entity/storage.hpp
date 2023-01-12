@@ -351,7 +351,7 @@ protected:
 
     /*! @brief Erases all entities of a storage. */
     void clear_all() override {
-        for(auto first = base_type::begin(); first.index() > 0; ++first) {
+        for(auto first = base_type::begin(); !(first.index() < 0); ++first) {
             const auto idx = static_cast<size_type>(first.index());
 
             if constexpr(traits_type::in_place_delete) {
