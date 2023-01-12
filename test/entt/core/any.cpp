@@ -54,6 +54,7 @@ struct not_copyable {
 
 struct not_movable {
     not_movable() = default;
+
     not_movable(const not_movable &) = default;
     not_movable(not_movable &&) = delete;
 

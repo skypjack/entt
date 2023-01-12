@@ -74,9 +74,6 @@ struct create_from_constructor {
         }
     }
 
-    create_from_constructor(create_from_constructor &&other) noexcept = default;
-    create_from_constructor &operator=(create_from_constructor &&other) noexcept = default;
-
     entt::entity child;
 };
 
