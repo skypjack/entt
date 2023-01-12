@@ -350,22 +350,22 @@ protected:
     }
 
     /*! @brief Erases all entities of a storage. */
-    void clear_all() override {
+    void pop_all() override {
         for(auto first = base_type::begin(); !(first.index() < 0); ++first) {
-            const auto idx = static_cast<size_type>(first.index());
-
             if constexpr(traits_type::in_place_delete) {
                 if(*first != tombstone) {
                     base_type::in_place_pop(first);
-                    std::destroy_at(std::addressof(element_at(idx)));
+                    std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
                 }
             } else {
                 base_type::swap_and_pop(first);
-                std::destroy_at(std::addressof(element_at(idx)));
+                std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
             }
         }
 
-        base_type::clear_all();
+        if constexpr(traits_type::in_place_delete) {
+            base_type::fast_compact();
+        }
     }
 
     /**

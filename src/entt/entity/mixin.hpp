@@ -44,7 +44,7 @@ class sigh_mixin final: public Type {
         }
     }
 
-    void clear_all() final {
+    void pop_all() final {
         if(!destruction.empty()) {
             ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
 
@@ -61,7 +61,7 @@ class sigh_mixin final: public Type {
             }
         }
 
-        Type::clear_all();
+        Type::pop_all();
     }
 
     underlying_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {

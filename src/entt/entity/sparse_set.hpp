@@ -274,6 +274,13 @@ protected:
         packed[static_cast<size_type>(entt)] = std::exchange(free_list, traits_type::combine(entt, tombstone));
     }
 
+    /*! @brief Compact function for empty sparse sets. */
+    void fast_compact() {
+        ENTT_ASSERT((compact(), size()) == 0u, "Non-empty set");
+        packed.clear();
+        free_list = tombstone;
+    }
+
 protected:
     /**
      * @brief Erases entities from a sparse set.
@@ -293,11 +300,20 @@ protected:
     }
 
     /*! @brief Erases all entities of a sparse set. */
-    virtual void clear_all() {
-        release_sparse_pages();
-        sparse.clear();
-        packed.clear();
-        free_list = tombstone;
+    virtual void pop_all() {
+        if(mode == deletion_policy::swap_and_pop) {
+            for(auto first = begin(); !(first.index() < 0); ++first) {
+                swap_and_pop(first);
+            }
+        } else {
+            for(auto first = begin(); !(first.index() < 0); ++first) {
+                if(*first != tombstone) {
+                    in_place_pop(first);
+                }
+            }
+
+            fast_compact();
+        }
     }
 
     /**
@@ -817,7 +833,7 @@ public:
         return count;
     }
 
-    /*! @brief Removes all tombstones from the packed array of a sparse set. */
+    /*! @brief Removes all tombstones from a sparse set. */
     void compact() {
         size_type from = packed.size();
         for(; from && packed[from - 1u] == tombstone; --from) {}
@@ -968,9 +984,7 @@ public:
 
     /*! @brief Clears a sparse set. */
     void clear() {
-        if(!empty()) {
-            clear_all();
-        }
+        pop_all();
     }
 
     /**
