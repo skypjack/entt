@@ -301,19 +301,19 @@ protected:
 
     /*! @brief Erases all entities of a sparse set. */
     virtual void pop_all() {
-        if(mode == deletion_policy::swap_and_pop) {
+        if(const auto prev = std::exchange(free_list, tombstone); prev == null) {
             for(auto first = begin(); !(first.index() < 0); ++first) {
-                swap_and_pop(first);
+                sparse_ref(*first) = null;
             }
         } else {
             for(auto first = begin(); !(first.index() < 0); ++first) {
                 if(*first != tombstone) {
-                    in_place_pop(first);
+                    sparse_ref(*first) = null;
                 }
             }
-
-            fast_compact();
         }
+
+        packed.clear();
     }
 
     /**
