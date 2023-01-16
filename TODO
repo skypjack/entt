@@ -14,8 +14,6 @@ DOC:
 TODO (high prio):
 * check natvis files (periodically :)
 * remove the static storage from the const assure in the registry
-* use sparse set iterator ::data to optimize range functionalities in the mixins and the registry (exploit the zero-check model)
-* can pass is_packed to clear_all to further optimize it in the derived classes
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
