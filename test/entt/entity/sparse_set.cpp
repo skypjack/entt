@@ -26,6 +26,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_EQ(set.capacity(), 42u);
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_TRUE(set.contiguous());
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.contains(entt::entity{0}));
@@ -40,6 +41,7 @@ TEST(SparseSet, Functionalities) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
+    ASSERT_TRUE(set.contiguous());
     ASSERT_NE(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.contains(entt::entity{0}));
@@ -54,6 +56,7 @@ TEST(SparseSet, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_TRUE(set.contiguous());
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.contains(entt::entity{0}));
@@ -73,6 +76,7 @@ TEST(SparseSet, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_TRUE(set.contiguous());
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.contains(entt::entity{0}));
@@ -913,6 +917,64 @@ TEST(SparseSet, Clear) {
     ASSERT_EQ(set.find(entt::entity{3}), set.end());
     ASSERT_EQ(set.find(entt::entity{42}), set.end());
     ASSERT_EQ(set.find(entt::entity{9}), set.end());
+}
+
+TEST(SparseSet, Contiguous) {
+    entt::sparse_set swap_and_pop{entt::deletion_policy::swap_and_pop};
+    entt::sparse_set in_place{entt::deletion_policy::in_place};
+
+    const entt::entity entity{42};
+    const entt::entity other{3};
+
+    ASSERT_TRUE(swap_and_pop.contiguous());
+    ASSERT_TRUE(in_place.contiguous());
+
+    swap_and_pop.push(entity);
+    in_place.push(entity);
+
+    swap_and_pop.push(other);
+    in_place.push(other);
+
+    ASSERT_TRUE(swap_and_pop.contiguous());
+    ASSERT_TRUE(in_place.contiguous());
+
+    swap_and_pop.erase(entity);
+    in_place.erase(entity);
+
+    ASSERT_TRUE(swap_and_pop.contiguous());
+    ASSERT_FALSE(in_place.contiguous());
+
+    swap_and_pop.push(entity);
+    in_place.push(entity);
+
+    ASSERT_TRUE(swap_and_pop.contiguous());
+    ASSERT_TRUE(in_place.contiguous());
+
+    swap_and_pop.erase(other);
+    in_place.erase(other);
+
+    ASSERT_TRUE(swap_and_pop.contiguous());
+    ASSERT_FALSE(in_place.contiguous());
+
+    in_place.compact();
+
+    ASSERT_TRUE(swap_and_pop.contiguous());
+    ASSERT_TRUE(in_place.contiguous());
+
+    swap_and_pop.push(other);
+    in_place.push(other);
+
+    swap_and_pop.erase(entity);
+    in_place.erase(entity);
+
+    ASSERT_TRUE(swap_and_pop.contiguous());
+    ASSERT_FALSE(in_place.contiguous());
+
+    swap_and_pop.clear();
+    in_place.clear();
+
+    ASSERT_TRUE(swap_and_pop.contiguous());
+    ASSERT_TRUE(in_place.contiguous());
 }
 
 TEST(SparseSet, Iterator) {
