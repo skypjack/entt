@@ -570,7 +570,8 @@ public:
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() noexcept
         : pools{},
-          filter{} {}
+          filter{},
+          view{} {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
@@ -578,7 +579,8 @@ public:
      */
     basic_view(Get &value) noexcept
         : pools{&value},
-          filter{} {}
+          filter{},
+          view{&value} {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
@@ -592,7 +594,7 @@ public:
      * @return The leading storage of the view.
      */
     [[nodiscard]] const base_type &handle() const noexcept {
-        return storage();
+        return *view;
     }
 
     /**
@@ -735,7 +737,7 @@ public:
      * @return True if the view is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return std::get<0>(pools) != nullptr;
+        return view != nullptr;
     }
 
     /**
@@ -843,6 +845,7 @@ public:
 private:
     std::tuple<Get *> pools;
     std::array<const base_type *, 0u> filter;
+    const base_type *view;
 };
 
 /**
