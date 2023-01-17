@@ -80,14 +80,6 @@ int test_function() {
     return 42;
 }
 
-struct not_copyable_t {
-    not_copyable_t() = default;
-    not_copyable_t(const not_copyable_t &) = delete;
-    not_copyable_t(not_copyable_t &&) = default;
-    not_copyable_t &operator=(const not_copyable_t &) = delete;
-    not_copyable_t &operator=(not_copyable_t &&) = default;
-};
-
 TEST(MetaPointerLike, DereferenceOperatorInvalidType) {
     int value = 0;
     entt::meta_any any{value};
@@ -213,16 +205,16 @@ TEST(MetaPointerLike, DereferenceOperatorSmartPointer) {
 }
 
 TEST(MetaPointerLike, PointerToConstMoveOnlyType) {
-    const not_copyable_t instance;
+    const std::unique_ptr<int> instance;
     entt::meta_any any{&instance};
     auto deref = *any;
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(deref);
 
-    ASSERT_EQ(deref.try_cast<not_copyable_t>(), nullptr);
-    ASSERT_NE(deref.try_cast<const not_copyable_t>(), nullptr);
-    ASSERT_EQ(&deref.cast<const not_copyable_t &>(), &instance);
+    ASSERT_EQ(deref.try_cast<std::unique_ptr<int>>(), nullptr);
+    ASSERT_NE(deref.try_cast<const std::unique_ptr<int>>(), nullptr);
+    ASSERT_EQ(&deref.cast<const std::unique_ptr<int> &>(), &instance);
 }
 
 TEST(MetaPointerLike, AsRef) {
