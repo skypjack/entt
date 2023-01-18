@@ -11,9 +11,7 @@ TEST(Lib, Locator) {
 
     ASSERT_EQ(entt::locator<service>::value().value, 42);
 
-    userdata ud{};
-    ud.handle = entt::locator<service>::handle();
-    ud.value = 3;
+    userdata ud{entt::locator<service>::handle(), 3};
 
     cr_plugin ctx;
     ctx.userdata = &ud;

@@ -14,8 +14,7 @@ TEST(Lib, Meta) {
 
     ASSERT_FALSE(entt::resolve("position"_hs));
 
-    userdata ud{};
-    ud.ctx = entt::locator<entt::meta_ctx>::handle();
+    userdata ud{entt::locator<entt::meta_ctx>::handle(), entt::meta_any{}};
 
     cr_plugin ctx;
     ctx.userdata = &ud;

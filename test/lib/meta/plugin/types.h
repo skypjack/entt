@@ -2,7 +2,8 @@
 #define ENTT_LIB_META_PLUGIN_TYPES_H
 
 #include <entt/locator/locator.hpp>
-#include <entt/meta/meta.hpp>
+
+class meta_ctx;
 
 struct userdata {
     entt::locator<entt::meta_ctx>::node_type ctx;
