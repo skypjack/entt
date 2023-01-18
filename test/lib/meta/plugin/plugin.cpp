@@ -4,6 +4,7 @@
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
+#include "../common/types.h"
 #include "types.h"
 
 position create_position(int x, int y) {

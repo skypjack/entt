@@ -1,5 +1,5 @@
-#ifndef ENTT_LIB_REGISTRY_PLUGIN_TYPES_H
-#define ENTT_LIB_REGISTRY_PLUGIN_TYPES_H
+#ifndef ENTT_LIB_META_COMMON_TYPES_H
+#define ENTT_LIB_META_COMMON_TYPES_H
 
 struct position {
     int x;

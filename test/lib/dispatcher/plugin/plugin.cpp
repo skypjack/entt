@@ -1,6 +1,6 @@
 #include <cr.h>
 #include <entt/signal/dispatcher.hpp>
-#include "types.h"
+#include "../common/types.h"
 
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
     switch(operation) {

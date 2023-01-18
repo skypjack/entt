@@ -1,5 +1,6 @@
 #include <cr.h>
 #include <entt/locator/locator.hpp>
+#include "../common/types.h"
 #include "types.h"
 
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {

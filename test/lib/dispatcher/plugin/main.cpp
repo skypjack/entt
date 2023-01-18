@@ -4,7 +4,7 @@
 #include <cr.h>
 #include <entt/signal/dispatcher.hpp>
 #include <entt/signal/sigh.hpp>
-#include "types.h"
+#include "../common/types.h"
 
 struct listener {
     void on(message msg) {

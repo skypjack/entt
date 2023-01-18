@@ -2,7 +2,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
-#include "types.h"
+#include "../common/types.h"
 
 position create_position(int x, int y) {
     return position{x, y};

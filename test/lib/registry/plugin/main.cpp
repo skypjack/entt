@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <cr.h>
 #include <entt/entity/registry.hpp>
-#include "types.h"
+#include "../common/types.h"
 
 TEST(Lib, Registry) {
     entt::registry registry;

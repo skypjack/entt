@@ -1,6 +1,6 @@
 #include <entt/core/attribute.h>
 #include <entt/entity/registry.hpp>
-#include "types.h"
+#include "../common/types.h"
 
 ENTT_API void update_position(entt::registry &registry) {
     registry.view<position, velocity>().each([](auto &pos, auto &vel) {

@@ -1,5 +1,5 @@
 #include <entt/core/attribute.h>
-#include "types.h"
+#include "../common/types.h"
 
 ENTT_API void emit(test_emitter &emitter) {
     emitter.publish(event{});

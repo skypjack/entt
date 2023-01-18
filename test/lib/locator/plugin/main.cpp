@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <cr.h>
 #include <entt/locator/locator.hpp>
+#include "../common/types.h"
 #include "types.h"
 
 TEST(Lib, Locator) {

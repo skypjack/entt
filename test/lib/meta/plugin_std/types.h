@@ -1,5 +1,5 @@
-#ifndef ENTT_LIB_META_PLUGIN_TYPES_STD_H
-#define ENTT_LIB_META_PLUGIN_TYPES_STD_H
+#ifndef ENTT_LIB_META_PLUGIN_STD_TYPES_H
+#define ENTT_LIB_META_PLUGIN_STD_TYPES_H
 
 #include <type_traits>
 #include <entt/core/hashed_string.hpp>
@@ -17,15 +17,8 @@ struct custom_type_hash;
         } \
     }
 
-struct position {
-    int x;
-    int y;
-};
-
-struct velocity {
-    double dx;
-    double dy;
-};
+struct position;
+struct velocity;
 
 struct userdata {
     entt::locator<entt::meta_ctx>::node_type ctx;

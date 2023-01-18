@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <cr.h>
-#include "types.h"
+#include "../common/types.h"
 
 TEST(Lib, Emitter) {
     test_emitter emitter;

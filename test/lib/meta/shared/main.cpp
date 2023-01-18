@@ -4,7 +4,7 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
-#include "types.h"
+#include "../common/types.h"
 
 ENTT_API void share(entt::locator<entt::meta_ctx>::node_type);
 ENTT_API void set_up();

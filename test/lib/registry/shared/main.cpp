@@ -2,7 +2,7 @@
 #include <entt/core/attribute.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
-#include "types.h"
+#include "../common/types.h"
 
 ENTT_API void update_position(entt::registry &);
 ENTT_API void emplace_velocity(entt::registry &);

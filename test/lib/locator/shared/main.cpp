@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/attribute.h>
 #include <entt/locator/locator.hpp>
-#include "types.h"
+#include "../common/types.h"
 
 ENTT_API void set_up(const entt::locator<service>::node_type &);
 ENTT_API void use_service(int);
