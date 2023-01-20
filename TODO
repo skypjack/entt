@@ -14,6 +14,7 @@ DOC:
 TODO (high prio):
 * check natvis files (periodically :)
 * remove the static storage from the const assure in the registry
+* pop_if to improve further destroying entities (drastically)
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
