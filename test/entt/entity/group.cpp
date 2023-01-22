@@ -201,7 +201,9 @@ TEST(NonOwningGroup, Each) {
 
     auto it = iterable.begin();
 
+    ASSERT_EQ(it.base(), group.begin());
     ASSERT_EQ((it++, ++it), iterable.end());
+    ASSERT_EQ(it.base(), group.end());
 
     group.each([expected = 1](auto entt, int &ivalue, char &cvalue) mutable {
         ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), expected);
@@ -875,7 +877,9 @@ TEST(OwningGroup, Each) {
 
     auto it = iterable.begin();
 
+    ASSERT_EQ(it.base(), group.begin());
     ASSERT_EQ((it++, ++it), iterable.end());
+    ASSERT_EQ(it.base(), group.end());
 
     group.each([expected = 1](auto entt, int &ivalue, char &cvalue) mutable {
         ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), expected);

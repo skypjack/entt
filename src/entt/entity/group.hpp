@@ -36,6 +36,7 @@ class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     }
 
 public:
+    using iterator_type = It;
     using difference_type = std::ptrdiff_t;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Owned>().get_as_tuple({})..., std::declval<Get>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
@@ -65,6 +66,10 @@ public:
 
     [[nodiscard]] pointer operator->() const noexcept {
         return operator*();
+    }
+
+    constexpr iterator_type base() const noexcept {
+        return it;
     }
 
     template<typename... Lhs, typename... Rhs>
