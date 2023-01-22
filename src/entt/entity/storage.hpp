@@ -155,6 +155,7 @@ class extended_storage_iterator final {
     friend class extended_storage_iterator;
 
 public:
+    using iterator_type = It;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::forward_as_tuple(*std::declval<Other>()...)));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
@@ -186,6 +187,10 @@ public:
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
         return {*std::get<It>(it), *std::get<Other>(it)...};
+    }
+
+    constexpr iterator_type base() const noexcept {
+        return std::get<It>(it);
     }
 
     template<typename... Lhs, typename... Rhs>
