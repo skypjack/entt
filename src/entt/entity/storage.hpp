@@ -189,7 +189,7 @@ public:
         return {*std::get<It>(it), *std::get<Other>(it)...};
     }
 
-    constexpr iterator_type base() const noexcept {
+    [[nodiscard]] constexpr iterator_type base() const noexcept {
         return std::get<It>(it);
     }
 

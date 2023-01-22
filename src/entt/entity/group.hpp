@@ -68,7 +68,7 @@ public:
         return operator*();
     }
 
-    constexpr iterator_type base() const noexcept {
+    [[nodiscard]] constexpr iterator_type base() const noexcept {
         return it;
     }
 
