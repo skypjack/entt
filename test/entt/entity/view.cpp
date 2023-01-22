@@ -198,7 +198,9 @@ TEST(SingleComponentView, Each) {
 
     auto it = iterable.begin();
 
+    ASSERT_EQ(it.base(), view.begin());
     ASSERT_EQ((it++, ++it), iterable.end());
+    ASSERT_EQ(it.base(), view.end());
 
     view.each([expected = 1](auto entt, int &value) mutable {
         ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), expected);
@@ -721,7 +723,9 @@ TEST(MultiComponentView, Each) {
 
     auto it = iterable.begin();
 
+    ASSERT_EQ(it.base(), view.begin());
     ASSERT_EQ((it++, ++it), iterable.end());
+    ASSERT_EQ(it.base(), view.end());
 
     view.each([expected = 1](auto entt, int &ivalue, char &cvalue) mutable {
         ASSERT_EQ(static_cast<int>(entt::to_integral(entt)), expected);

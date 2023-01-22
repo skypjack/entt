@@ -104,6 +104,7 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 
 template<typename It, typename... Type>
 struct extended_view_iterator final {
+    using iterator_type = It;
     using difference_type = std::ptrdiff_t;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Type>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
@@ -133,6 +134,10 @@ struct extended_view_iterator final {
 
     [[nodiscard]] pointer operator->() const noexcept {
         return operator*();
+    }
+
+    constexpr iterator_type base() const noexcept {
+        return it;
     }
 
     template<typename... Lhs, typename... Rhs>
