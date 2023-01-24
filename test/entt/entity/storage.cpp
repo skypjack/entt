@@ -1978,6 +1978,8 @@ TEST(Storage, UsesAllocatorConstruction) {
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 }
 
+#endif
+
 TEST(Storage, StorageType) {
     // just a bunch of static asserts to avoid regressions
     static_assert(std::is_same_v<entt::storage_type_t<char, entt::entity>, entt::sigh_mixin<entt::basic_storage<char, entt::entity>>>);
@@ -1991,5 +1993,3 @@ TEST(Storage, StorageFor) {
     static_assert(std::is_same_v<entt::storage_for_t<const bool>, const entt::sigh_mixin<entt::storage<bool>>>);
     static_assert(std::is_same_v<entt::storage_for_t<int>, entt::sigh_mixin<entt::storage<int>>>);
 }
-
-#endif
