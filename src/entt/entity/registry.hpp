@@ -305,7 +305,7 @@ class basic_registry {
     template<typename Type>
     [[nodiscard]] auto &assure(const id_type id = type_hash<Type>::value()) {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
-        auto &cpool = pools[id];
+        auto &cpool = pools.first()[id];
 
         if(!cpool) {
             using alloc_type = typename storage_for_type<std::remove_const_t<Type>>::allocator_type;
@@ -328,7 +328,7 @@ class basic_registry {
     [[nodiscard]] const auto &assure(const id_type id = type_hash<Type>::value()) const {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
 
-        if(const auto it = pools.find(id); it != pools.cend()) {
+        if(const auto it = pools.first().find(id); it != pools.first().cend()) {
             ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
             return static_cast<const storage_for_type<Type> &>(*it->second);
         }
@@ -357,7 +357,7 @@ class basic_registry {
     }
 
     void rebind() {
-        for(auto &&curr: pools) {
+        for(auto &&curr: pools.first()) {
             curr.second->bind(forward_as_any(*this));
         }
     }
@@ -398,9 +398,9 @@ public:
         : vars{allocator},
           free_list{tombstone},
           epool{allocator},
-          pools{allocator},
+          pools{allocator, allocator},
           groups{allocator} {
-        pools.reserve(count);
+        pools.first().reserve(count);
     }
 
     /**
@@ -458,7 +458,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return epool.get_allocator();
+        return pools.second();
     }
 
     /**
@@ -470,12 +470,12 @@ public:
      * @return An iterable object to use to _visit_ the registry.
      */
     [[nodiscard]] auto storage() noexcept {
-        return iterable_adaptor{internal::registry_storage_iterator{pools.begin()}, internal::registry_storage_iterator{pools.end()}};
+        return iterable_adaptor{internal::registry_storage_iterator{pools.first().begin()}, internal::registry_storage_iterator{pools.first().end()}};
     }
 
     /*! @copydoc storage */
     [[nodiscard]] auto storage() const noexcept {
-        return iterable_adaptor{internal::registry_storage_iterator{pools.cbegin()}, internal::registry_storage_iterator{pools.cend()}};
+        return iterable_adaptor{internal::registry_storage_iterator{pools.first().cbegin()}, internal::registry_storage_iterator{pools.first().cend()}};
     }
 
     /**
@@ -493,8 +493,8 @@ public:
      * @return A pointer to the storage if it exists, a null pointer otherwise.
      */
     [[nodiscard]] const base_type *storage(const id_type id) const {
-        const auto it = pools.find(id);
-        return it == pools.cend() ? nullptr : it->second.get();
+        const auto it = pools.first().find(id);
+        return it == pools.first().cend() ? nullptr : it->second.get();
     }
 
     /**
@@ -736,7 +736,7 @@ public:
      */
     version_type release(const entity_type entt, const version_type version) {
         ENTT_ASSERT(valid(entt), "Invalid identifier");
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return (curr.second->current(entt) == traits_type::to_version(tombstone)); }), "Non-orphan entity");
+        ENTT_ASSERT(std::all_of(pools.first().cbegin(), pools.first().cend(), [entt](auto &&curr) { return (curr.second->current(entt) == traits_type::to_version(tombstone)); }), "Non-orphan entity");
         return release_entity(entt, version);
     }
 
@@ -786,8 +786,8 @@ public:
      * @return The version actually assigned to the entity.
      */
     version_type destroy(const entity_type entt, const version_type version) {
-        for(size_type pos = pools.size(); pos; --pos) {
-            pools.begin()[pos - 1u].second->remove(entt);
+        for(size_type pos = pools.first().size(); pos; --pos) {
+            pools.first().begin()[pos - 1u].second->remove(entt);
         }
 
         return release(entt, version);
@@ -807,11 +807,11 @@ public:
         if constexpr(std::is_same_v<It, typename base_type::iterator>) {
             base_type *owner = nullptr;
 
-            for(size_type pos = pools.size(); pos; --pos) {
-                if(pools.begin()[pos - 1u].second->data() == first.data()) {
-                    owner = pools.begin()[pos - 1u].second.get();
+            for(size_type pos = pools.first().size(); pos; --pos) {
+                if(pools.first().begin()[pos - 1u].second->data() == first.data()) {
+                    owner = pools.first().begin()[pos - 1u].second.get();
                 } else {
-                    pools.begin()[pos - 1u].second->remove(first, last);
+                    pools.first().begin()[pos - 1u].second->remove(first, last);
                 }
             }
 
@@ -1063,7 +1063,7 @@ public:
     template<typename... Type>
     void compact() {
         if constexpr(sizeof...(Type) == 0) {
-            for(auto &&curr: pools) {
+            for(auto &&curr: pools.first()) {
                 curr.second->compact();
             }
         } else {
@@ -1185,7 +1185,7 @@ public:
     template<typename... Type>
     void clear() {
         if constexpr(sizeof...(Type) == 0) {
-            for(auto &&curr: pools) {
+            for(auto &&curr: pools.first()) {
                 curr.second->clear();
             }
 
@@ -1230,7 +1230,7 @@ public:
      * @return True if the entity has no components assigned, false otherwise.
      */
     [[nodiscard]] bool orphan(const entity_type entt) const {
-        return std::none_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return curr.second->contains(entt); });
+        return std::none_of(pools.first().cbegin(), pools.first().cend(), [entt](auto &&curr) { return curr.second->contains(entt); });
     }
 
     /**
@@ -1568,7 +1568,7 @@ private:
     context vars;
     entity_type free_list;
     std::vector<entity_type, allocator_type> epool;
-    container_type pools;
+    compressed_pair<container_type, allocator_type> pools;
     std::vector<group_data, typename alloc_traits::template rebind_alloc<group_data>> groups;
 };
 
