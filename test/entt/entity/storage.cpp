@@ -1215,7 +1215,6 @@ TEST(Storage, Iterable) {
     using iterator = typename entt::storage<boxed_int>::iterable::iterator;
 
     static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity, boxed_int &>>);
-    static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity, boxed_int &>>);
     static_assert(std::is_same_v<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity, boxed_int &>>>);
     static_assert(std::is_same_v<typename iterator::reference, typename iterator::value_type>);
 
@@ -1259,7 +1258,6 @@ TEST(Storage, Iterable) {
 TEST(Storage, ConstIterable) {
     using iterator = typename entt::storage<boxed_int>::const_iterable::iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity, const boxed_int &>>);
     static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity, const boxed_int &>>);
     static_assert(std::is_same_v<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity, const boxed_int &>>>);
     static_assert(std::is_same_v<typename iterator::reference, typename iterator::value_type>);
