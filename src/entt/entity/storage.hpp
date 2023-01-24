@@ -914,6 +914,250 @@ public:
     }
 };
 
+/**
+ * @brief Swap-only entity storage specialization.
+ * @tparam Entity A valid entity type.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ */
+template<typename Entity, typename Allocator>
+class basic_storage<Entity, Entity, Allocator>
+    : public basic_sparse_set<Entity, Allocator> {
+    using alloc_traits = std::allocator_traits<Allocator>;
+    static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
+    using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
+    using underlying_iterator = typename underlying_type::basic_iterator;
+    using local_traits_type = entt_traits<Entity>;
+
+    auto next(const std::size_t pos) const noexcept {
+        ENTT_ASSERT(pos < local_traits_type::to_entity(null), "Invalid element");
+        return local_traits_type::combine(static_cast<typename local_traits_type::entity_type>(pos), {});
+    }
+
+private:
+    void swap_or_move([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) override {
+        ENTT_ASSERT(((lhs < length) + (rhs < length)) != 1u, "Cross swapping is not supported");
+    }
+
+protected:
+    /**
+     * @brief Erases entities from a storage.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    void pop(underlying_iterator first, underlying_iterator last) override {
+        for(; first != last; ++first) {
+            if(const auto pos = base_type::index(*first); pos < length) {
+                const auto vers = local_traits_type::to_version(*first) + 1;
+                base_type::bump(local_traits_type::construct(local_traits_type::to_entity(*first), static_cast<typename local_traits_type::version_type>(vers + (vers == local_traits_type::to_version(tombstone)))));
+                (pos == --length) || (base_type::swap_at(pos, length), true);
+            }
+        }
+    }
+
+    /*! @brief Erases all entities of a sparse set. */
+    void pop_all() override {
+        for(; length; --length) {
+            const auto entt = base_type::operator[](length - 1u);
+            const auto vers = local_traits_type::to_version(entt) + 1;
+            base_type::bump(local_traits_type::construct(local_traits_type::to_entity(entt), static_cast<typename local_traits_type::version_type>(vers + (vers == local_traits_type::to_version(tombstone)))));
+        }
+    }
+
+    /**
+     * @brief Assigns an entity to a storage.
+     * @param hint A valid identifier.
+     * @return Iterator pointing to the emplaced element.
+     */
+    underlying_iterator try_emplace(const Entity hint, const bool, const void *) override {
+        return base_type::find(spawn(hint));
+    }
+
+public:
+    /*! @brief Base type. */
+    using base_type = basic_sparse_set<Entity, Allocator>;
+    /*! @brief Type of the objects assigned to entities. */
+    using value_type = void;
+    /*! @brief Component traits. */
+    using traits_type = component_traits<void>;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = Entity;
+    /*! @brief Unsigned integer type. */
+    using size_type = std::size_t;
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
+    /*! @brief Extended iterable storage proxy. */
+    using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
+    /*! @brief Constant extended iterable storage proxy. */
+    using const_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_iterator>>;
+
+    /*! @brief Default constructor. */
+    basic_storage()
+        : basic_storage{allocator_type{}} {
+    }
+
+    /**
+     * @brief Constructs an empty container with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_storage(const allocator_type &allocator)
+        : base_type{type_id<void>(), deletion_policy::swap_and_pop, allocator},
+          length{} {}
+
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    basic_storage(basic_storage &&other) noexcept
+        : base_type{std::move(other)},
+          length{std::exchange(other.length, size_type{})} {}
+
+    /**
+     * @brief Allocator-extended move constructor.
+     * @param other The instance to move from.
+     * @param allocator The allocator to use.
+     */
+    basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
+        : base_type{std::move(other), allocator},
+          length{std::exchange(other.length, size_type{})} {}
+
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to move from.
+     * @return This storage.
+     */
+    basic_storage &operator=(basic_storage &&other) noexcept {
+        base_type::operator=(std::move(other));
+        length = std::exchange(other.length, size_type{});
+        return *this;
+    }
+
+    /**
+     * @brief Exchanges the contents with those of a given storage.
+     * @param other Storage to exchange the content with.
+     */
+    void swap(basic_storage &other) {
+        using std::swap;
+        base_type::swap(other);
+        swap(length, other.length);
+    }
+
+    /**
+     * @brief Creates a new identifier or recycles a destroyed one.
+     * @return A valid identifier.
+     */
+    entity_type spawn() {
+        if(length == base_type::size()) {
+            return *base_type::try_emplace(next(length++), true);
+        }
+
+        return base_type::operator[](length++);
+    }
+
+    /**
+     * @brief Creates a new identifier or recycles a destroyed one.
+     *
+     * If the requested identifier isn't in use, the suggested one is used.
+     * Otherwise, a new identifier is returned.
+     *
+     * @param hint Required identifier.
+     * @return A valid identifier.
+     */
+    entity_type spawn(const entity_type hint) {
+        if(hint == null || hint == tombstone) {
+            return spawn();
+        } else if(const auto curr = local_traits_type::construct(local_traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
+            const auto pos = static_cast<size_type>(local_traits_type::to_entity(hint));
+
+            while(!(pos < base_type::size())) {
+                base_type::try_emplace(next(base_type::size()), true);
+            }
+
+            base_type::swap_at(pos, length++);
+        } else if(const auto idx = base_type::index(curr); idx < length) {
+            return spawn();
+        } else {
+            base_type::swap_at(idx, length++);
+        }
+
+        base_type::bump(hint);
+
+        return hint;
+    }
+
+    /**
+     * @brief Assigns each element in a range an identifier.
+     * @tparam It Type of mutable forward iterator.
+     * @param first An iterator to the first element of the range to generate.
+     * @param last An iterator past the last element of the range to generate.
+     */
+    template<typename It>
+    void spawn(It first, It last) {
+        for(const auto sz = base_type::size(); first != last && length != sz; ++first, ++length) {
+            *first = base_type::operator[](length);
+        }
+
+        for(; first != last; ++first) {
+            *first = *base_type::try_emplace(next(length++), true);
+        }
+    }
+
+    /**
+     * @brief Makes all elements in a range contiguous.
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range to pack.
+     * @param last An iterator past the last element of the range to pack.
+     * @return The number of elements within the newly created range.
+     */
+    template<typename It>
+    typename size_type pack(It first, It last) {
+        size_type next = length;
+
+        for(; first != last; ++first, --next) {
+            const auto pos = base_type::index(*first);
+            ENTT_ASSERT(pos < length, "Invalid element");
+            base_type::swap_at(pos, static_cast<size_type>(next - 1u));
+        }
+
+        return (length - next);
+    }
+
+    /**
+     * @brief Returns an iterable object to use to _visit_ a storage.
+     *
+     * The iterable object returns a tuple that contains the current entity.
+     *
+     * @return An iterable object to use to _visit_ the storage.
+     */
+    [[nodiscard]] iterable each() noexcept {
+        return {internal::extended_storage_iterator{base_type::end() - length}, internal::extended_storage_iterator{base_type::end()}};
+    }
+
+    /*! @copydoc each */
+    [[nodiscard]] const_iterable each() const noexcept {
+        return {internal::extended_storage_iterator{base_type::cend() - length}, internal::extended_storage_iterator{base_type::cend()}};
+    }
+
+    /**
+     * @brief Returns the number of elements considered still in use.
+     * @return The number of elements considered still in use.
+     */
+    [[nodiscard]] size_type in_use() const noexcept {
+        return length;
+    }
+
+    /**
+     * @brief Sets the number of elements considered still in use.
+     * @param len The number of elements considered still in use.
+     */
+    void in_use(const size_type len) noexcept {
+        ENTT_ASSERT(!(len > base_type::size()), "Invalid length");
+        length = len;
+    }
+
+private:
+    size_type length;
+};
+
 } // namespace entt
 
 #endif
