@@ -1109,7 +1109,7 @@ public:
      * @return The number of elements within the newly created range.
      */
     template<typename It>
-    typename size_type pack(It first, It last) {
+    size_type pack(It first, It last) {
         size_type next = length;
 
         for(; first != last; ++first, --next) {
