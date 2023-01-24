@@ -238,9 +238,12 @@ private:
  */
 template<typename Entity, typename Allocator>
 class basic_registry {
+    using basic_common_type = basic_sparse_set<Entity, Allocator>;
+
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
-    using basic_common_type = basic_sparse_set<Entity, Allocator>;
+    // std::shared_ptr because of its type erased allocator which is useful here
+    using container_type = dense_map<id_type, std::shared_ptr<basic_common_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<basic_common_type>>>>;
 
     template<typename Type>
     using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
@@ -1565,8 +1568,7 @@ private:
     context vars;
     entity_type free_list;
     std::vector<entity_type, allocator_type> epool;
-    // std::shared_ptr because of its type erased allocator which is useful here
-    dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>> pools;
+    container_type pools;
     std::vector<group_data, typename alloc_traits::template rebind_alloc<group_data>> groups;
 };
 
