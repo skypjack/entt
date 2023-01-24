@@ -320,7 +320,7 @@ class basic_registry {
             cpool->bind(forward_as_any(*this));
         }
 
-        ENTT_ASSERT(cpool->type() == type_id<Type>(), "Unexpected type");
+        ENTT_ASSERT((cpool->type() == type_id<std::conditional_t<std::is_same_v<Type, entity_type>, void, Type>>()), "Unexpected type");
         return static_cast<storage_for_type<Type> &>(*cpool);
     }
 
@@ -329,7 +329,7 @@ class basic_registry {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
 
         if(const auto it = pools.first().find(id); it != pools.first().cend()) {
-            ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
+            ENTT_ASSERT((it->second->type() == type_id<std::conditional_t<std::is_same_v<Type, entity_type>, void, Type>>()), "Unexpected type");
             return static_cast<const storage_for_type<Type> &>(*it->second);
         }
 
