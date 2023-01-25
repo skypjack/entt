@@ -248,6 +248,52 @@ public:
     }
 
     /**
+     * @brief Creates a new identifier or recycles a destroyed one.
+     * @return A valid identifier.
+     */
+    entity_type spawn() {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        const auto entt = Type::spawn();
+        construction.publish(*owner, entt);
+        return entt;
+    }
+
+    /**
+     * @brief Creates a new identifier or recycles a destroyed one.
+     *
+     * If the requested identifier isn't in use, the suggested one is used.
+     * Otherwise, a new identifier is returned.
+     *
+     * @param hint Required identifier.
+     * @return A valid identifier.
+     */
+    entity_type spawn(const entity_type hint) {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        const auto entt = Type::spawn(hint);
+        construction.publish(*owner, entt);
+        return entt;
+    }
+
+    /**
+     * @brief Assigns each element in a range an identifier.
+     * @tparam It Type of mutable forward iterator.
+     * @param first An iterator to the first element of the range to generate.
+     * @param last An iterator past the last element of the range to generate.
+     */
+    template<typename It>
+    void spawn(It first, It last) {
+        Type::spawn(first, last);
+
+        if(!construction.empty()) {
+            ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+
+            for(; first != last; ++first) {
+                construction.publish(*owner, *first);
+            }
+        }
+    }
+
+    /**
      * @brief Forwards variables to derived classes, if any.
      * @param value A variable wrapped in an opaque container.
      */
