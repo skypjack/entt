@@ -463,6 +463,75 @@ TEST(SighMixin, EmptyEachStorage) {
     ASSERT_EQ(on_destroy.value, 0);
 }
 
+TEST(SighMixin, StorageEntity) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::sigh_mixin<entt::storage<entt::entity>> pool;
+    entt::registry registry;
+
+    counter on_construct{};
+    counter on_destroy{};
+
+    pool.bind(entt::forward_as_any(registry));
+    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
+
+    pool.push(entt::entity{1});
+
+    ASSERT_EQ(on_construct.value, 1);
+    ASSERT_EQ(on_destroy.value, 0);
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.in_use(), 1u);
+
+    pool.erase(entt::entity{1});
+
+    ASSERT_EQ(on_construct.value, 1);
+    ASSERT_EQ(on_destroy.value, 1);
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.in_use(), 0u);
+
+    pool.push(traits_type::construct(0, 2));
+    pool.push(traits_type::construct(2, 1));
+
+    ASSERT_TRUE(pool.contains(traits_type::construct(0, 2)));
+    ASSERT_TRUE(pool.contains(traits_type::construct(1, 1)));
+    ASSERT_TRUE(pool.contains(traits_type::construct(2, 1)));
+
+    ASSERT_EQ(on_construct.value, 3);
+    ASSERT_EQ(on_destroy.value, 1);
+    ASSERT_EQ(pool.size(), 3u);
+    ASSERT_EQ(pool.in_use(), 2u);
+
+    pool.clear();
+
+    ASSERT_TRUE(pool.contains(traits_type::construct(0, 3)));
+    ASSERT_TRUE(pool.contains(traits_type::construct(1, 1)));
+    ASSERT_TRUE(pool.contains(traits_type::construct(2, 2)));
+
+    ASSERT_EQ(on_construct.value, 3);
+    ASSERT_EQ(on_destroy.value, 3);
+    ASSERT_EQ(pool.size(), 3u);
+    ASSERT_EQ(pool.in_use(), 0u);
+
+    pool.spawn();
+    pool.spawn(entt::entity{0});
+
+    entt::entity entities[1u]{};
+    pool.spawn(entities, entities + 1u);
+
+    ASSERT_EQ(on_construct.value, 6);
+    ASSERT_EQ(on_destroy.value, 3);
+    ASSERT_EQ(pool.size(), 3u);
+    ASSERT_EQ(pool.in_use(), 3u);
+
+    pool.clear();
+
+    ASSERT_EQ(on_construct.value, 6);
+    ASSERT_EQ(on_destroy.value, 6);
+    ASSERT_EQ(pool.size(), 3u);
+    ASSERT_EQ(pool.in_use(), 0u);
+}
+
 TEST(SighMixin, CustomAllocator) {
     auto test = [](auto pool, auto alloc) {
         using registry_type = typename decltype(pool)::registry_type;
