@@ -48,10 +48,10 @@ class sigh_mixin final: public Type {
         if(!destruction.empty()) {
             ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
 
-            const auto iterable = Type::each();
-            const auto last = iterable.end().base();
+            const auto view = Type::each();
+            const auto last = view.end().base();
 
-            for(auto first = iterable.begin().base(); first != last; ++first) {
+            for(auto first = view.begin().base(); first != last; ++first) {
                 if constexpr(Type::traits_type::in_place_delete) {
                     if(const auto entt = *first; entt != tombstone) {
                         destruction.publish(*owner, entt);
