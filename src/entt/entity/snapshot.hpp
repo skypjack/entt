@@ -85,7 +85,7 @@ public:
      */
     template<typename Archive>
     const basic_snapshot &entities(Archive &archive) const {
-        const auto sz = static_cast<typename traits_type::entity_type> (reg->size());
+        const auto sz = static_cast<typename traits_type::entity_type>(reg->size());
         const auto released = static_cast<typename traits_type::entity_type>(reg->released());
 
         archive(sz);
@@ -438,18 +438,19 @@ public:
         typename traits_type::entity_type released{};
 
         archive(length);
-        // discards the number of destroyed entities
         archive(released);
 
-        for(std::size_t pos{}; pos < length; ++pos) {
-            entity_type entt{entt::null};
-            archive(entt);
+        entity_type entt{entt::null};
+        std::size_t pos{};
 
-            if(const auto entity = traits_type::to_entity(entt); entity == pos) {
-                restore(entt);
-            } else {
-                destroy(entt);
-            }
+        for(const auto last = length - released; pos < last; ++pos) {
+            archive(entt);
+            restore(entt);
+        }
+
+        for(; pos < length; ++pos) {
+            archive(entt);
+            destroy(entt);
         }
 
         return *this;
