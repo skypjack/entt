@@ -34,7 +34,7 @@ class basic_snapshot {
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
         const auto view = reg->template view<const Component>();
-        archive(typename traits_type::entity_type(sz));
+        archive(static_cast<typename traits_type::entity_type>(sz));
 
         for(auto it = first; it != last; ++it) {
             if(reg->template all_of<Component>(*it)) {
@@ -85,10 +85,11 @@ public:
      */
     template<typename Archive>
     const basic_snapshot &entities(Archive &archive) const {
-        const auto sz = reg->size();
+        const auto sz = static_cast<typename traits_type::entity_type> (reg->size());
+        const auto released = static_cast<typename traits_type::entity_type>(reg->released());
 
         archive(sz);
-        archive(reg->released());
+        archive(released);
 
         for(auto first = reg->data(), last = first + sz; first != last; ++first) {
             archive(*first);
@@ -218,8 +219,8 @@ public:
      */
     template<typename Archive>
     const basic_snapshot_loader &entities(Archive &archive) const {
-        typename registry_type::size_type length{};
-        typename registry_type::size_type released{};
+        typename traits_type::entity_type length{};
+        typename traits_type::entity_type released{};
 
         archive(length);
         archive(released);
@@ -433,8 +434,8 @@ public:
      */
     template<typename Archive>
     basic_continuous_loader &entities(Archive &archive) {
-        typename registry_type::size_type length{};
-        typename registry_type::size_type released{};
+        typename traits_type::entity_type length{};
+        typename traits_type::entity_type released{};
 
         archive(length);
         // discards the number of destroyed entities
