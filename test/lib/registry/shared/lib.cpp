@@ -2,6 +2,8 @@
 #include <entt/entity/registry.hpp>
 #include "../common/types.h"
 
+template class entt::basic_registry<entt::entity>;
+
 ENTT_API void update_position(entt::registry &registry) {
     registry.view<position, velocity>().each([](auto &pos, auto &vel) {
         pos.x += static_cast<int>(16 * vel.dx);

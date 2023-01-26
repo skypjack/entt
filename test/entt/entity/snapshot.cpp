@@ -96,6 +96,7 @@ TEST(Snapshot, Dump) {
     using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
+        std::queue<std::size_t>,
         std::queue<int>,
         std::queue<char>,
         std::queue<double>,
@@ -160,6 +161,7 @@ TEST(Snapshot, Partial) {
     using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
+        std::queue<std::size_t>,
         std::queue<int>,
         std::queue<char>,
         std::queue<double>>;
@@ -224,6 +226,7 @@ TEST(Snapshot, Iterator) {
     using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
+        std::queue<std::size_t>,
         std::queue<another_component>,
         std::queue<int>>;
 
@@ -259,6 +262,7 @@ TEST(Snapshot, Continuous) {
     using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
+        std::queue<std::size_t>,
         std::queue<another_component>,
         std::queue<what_a_component>,
         std::queue<map_component>,
@@ -497,7 +501,8 @@ TEST(Snapshot, MoreOnShrink) {
 
     using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
-        std::queue<entt::entity>>;
+        std::queue<entt::entity>,
+        std::queue<std::size_t>>;
 
     archive_type storage;
     output_archive<archive_type> output{storage};
@@ -525,6 +530,7 @@ TEST(Snapshot, SyncDataMembers) {
     using archive_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
+        std::queue<std::size_t>,
         std::queue<what_a_component>,
         std::queue<map_component>>;
 

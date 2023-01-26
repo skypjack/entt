@@ -87,7 +87,7 @@ public:
     const basic_snapshot &entities(Archive &archive) const {
         const auto sz = reg->size();
 
-        archive(typename traits_type::entity_type(sz + 1u));
+        archive(sz);
         archive(reg->released());
 
         for(auto first = reg->data(), last = first + sz; first != last; ++first) {
@@ -218,16 +218,18 @@ public:
      */
     template<typename Archive>
     const basic_snapshot_loader &entities(Archive &archive) const {
-        typename traits_type::entity_type length{};
+        typename registry_type::size_type length{};
+        typename registry_type::size_type released{};
 
         archive(length);
+        archive(released);
         std::vector<entity_type> all(length);
 
         for(std::size_t pos{}; pos < length; ++pos) {
             archive(all[pos]);
         }
 
-        reg->assign(++all.cbegin(), all.cend(), all[0u]);
+        reg->assign(all.cbegin(), all.cend(), released);
 
         return *this;
     }
@@ -431,14 +433,15 @@ public:
      */
     template<typename Archive>
     basic_continuous_loader &entities(Archive &archive) {
-        typename traits_type::entity_type length{};
-        entity_type entt{};
+        typename registry_type::size_type length{};
+        typename registry_type::size_type released{};
 
         archive(length);
-        // discards the head of the list of destroyed entities
-        archive(entt);
+        // discards the number of destroyed entities
+        archive(released);
 
-        for(std::size_t pos{}, last = length - 1u; pos < last; ++pos) {
+        for(std::size_t pos{}; pos < length; ++pos) {
+            entity_type entt{entt::null};
             archive(entt);
 
             if(const auto entity = traits_type::to_entity(entt); entity == pos) {

@@ -376,13 +376,12 @@ TEST(Registry, Functionalities) {
 TEST(Registry, Constructors) {
     entt::registry registry;
     entt::registry other{42};
-    const entt::entity entity = entt::tombstone;
 
     ASSERT_TRUE(registry.empty());
     ASSERT_TRUE(other.empty());
 
-    ASSERT_EQ(registry.released(), entity);
-    ASSERT_EQ(other.released(), entity);
+    ASSERT_EQ(registry.released(), 0u);
+    ASSERT_EQ(other.released(), 0u);
 }
 
 TEST(Registry, Move) {
@@ -486,6 +485,8 @@ TEST(Registry, Identifiers) {
 }
 
 TEST(Registry, Data) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::registry registry;
 
     ASSERT_EQ(std::as_const(registry).data(), nullptr);
@@ -497,8 +498,8 @@ TEST(Registry, Data) {
     const auto other = registry.create();
     registry.release(entity);
 
-    ASSERT_NE(*std::as_const(registry).data(), entity);
-    ASSERT_EQ(*(std::as_const(registry).data() + 1u), other);
+    ASSERT_EQ(*std::as_const(registry).data(), other);
+    ASSERT_EQ(*(std::as_const(registry).data() + 1u), traits_type::construct(traits_type::to_entity(entity), 1));
 }
 
 TEST(Registry, CreateManyEntitiesAtOnce) {
@@ -560,8 +561,9 @@ TEST(Registry, CreateWithHint) {
     auto e3 = registry.create(entt::entity{3});
     auto e2 = registry.create(entt::entity{3});
 
-    ASSERT_EQ(e2, entt::entity{2});
-    ASSERT_FALSE(registry.valid(entt::entity{1}));
+    ASSERT_EQ(e2, entt::entity{1});
+    ASSERT_TRUE(registry.valid(entt::entity{0}));
+    ASSERT_TRUE(registry.valid(entt::entity{2}));
     ASSERT_EQ(e3, entt::entity{3});
 
     registry.release(e2);
@@ -572,10 +574,10 @@ TEST(Registry, CreateWithHint) {
     e2 = registry.create();
     auto e1 = registry.create(entt::entity{2});
 
-    ASSERT_EQ(traits_type::to_entity(e2), 2u);
+    ASSERT_EQ(traits_type::to_entity(e2), 1u);
     ASSERT_EQ(traits_type::to_version(e2), 1u);
 
-    ASSERT_EQ(traits_type::to_entity(e1), 1u);
+    ASSERT_EQ(traits_type::to_entity(e1), 2u);
     ASSERT_EQ(traits_type::to_version(e1), 0u);
 
     registry.release(e1);
