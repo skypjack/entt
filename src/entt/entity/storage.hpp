@@ -949,7 +949,10 @@ protected:
             if(const auto pos = base_type::index(*first); pos < length) {
                 const auto vers = local_traits_type::to_version(*first) + 1;
                 base_type::bump(local_traits_type::construct(local_traits_type::to_entity(*first), static_cast<typename local_traits_type::version_type>(vers + (vers == local_traits_type::to_version(tombstone)))));
-                (pos == --length) || (base_type::swap_at(pos, length), true);
+
+                if (pos != --length) {
+                    base_type::swap_at(pos, length);
+                }
             }
         }
     }
