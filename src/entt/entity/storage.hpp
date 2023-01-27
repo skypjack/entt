@@ -928,7 +928,7 @@ class basic_storage<Entity, Entity, Allocator>
     using underlying_iterator = typename underlying_type::basic_iterator;
     using local_traits_type = entt_traits<Entity>;
 
-    auto next(const std::size_t pos) const noexcept {
+    auto entity_at(const std::size_t pos) const noexcept {
         ENTT_ASSERT(pos < local_traits_type::to_entity(null), "Invalid element");
         return local_traits_type::combine(static_cast<typename local_traits_type::entity_type>(pos), {});
     }
@@ -947,8 +947,7 @@ protected:
     void pop(underlying_iterator first, underlying_iterator last) override {
         for(; first != last; ++first) {
             if(const auto pos = base_type::index(*first); pos < length) {
-                const auto vers = local_traits_type::to_version(*first) + 1;
-                base_type::bump(local_traits_type::construct(local_traits_type::to_entity(*first), static_cast<typename local_traits_type::version_type>(vers + (vers == local_traits_type::to_version(tombstone)))));
+                base_type::bump(local_traits_type::next(*first));
 
                 if (pos != --length) {
                     base_type::swap_at(pos, length);
@@ -960,9 +959,7 @@ protected:
     /*! @brief Erases all entities of a sparse set. */
     void pop_all() override {
         for(; length; --length) {
-            const auto entt = base_type::operator[](length - 1u);
-            const auto vers = local_traits_type::to_version(entt) + 1;
-            base_type::bump(local_traits_type::construct(local_traits_type::to_entity(entt), static_cast<typename local_traits_type::version_type>(vers + (vers == local_traits_type::to_version(tombstone)))));
+            base_type::bump(local_traits_type::next(base_type::operator[](length - 1u)));
         }
     }
 
@@ -1050,7 +1047,7 @@ public:
      */
     entity_type spawn() {
         if(length == base_type::size()) {
-            return *base_type::try_emplace(next(length++), true);
+            return *base_type::try_emplace(entity_at(length++), true);
         }
 
         return base_type::operator[](length++);
@@ -1072,7 +1069,7 @@ public:
             const auto pos = static_cast<size_type>(local_traits_type::to_entity(hint));
 
             while(!(pos < base_type::size())) {
-                base_type::try_emplace(next(base_type::size()), true);
+                base_type::try_emplace(entity_at(base_type::size()), true);
             }
 
             base_type::swap_at(pos, length++);
@@ -1100,7 +1097,7 @@ public:
         }
 
         for(; first != last; ++first) {
-            *first = *base_type::try_emplace(next(length++), true);
+            *first = *base_type::try_emplace(entity_at(length++), true);
         }
     }
 
@@ -1113,15 +1110,15 @@ public:
      */
     template<typename It>
     size_type pack(It first, It last) {
-        size_type next = length;
+        size_type len = length;
 
-        for(; first != last; ++first, --next) {
+        for(; first != last; ++first, --len) {
             const auto pos = base_type::index(*first);
             ENTT_ASSERT(pos < length, "Invalid element");
-            base_type::swap_at(pos, static_cast<size_type>(next - 1u));
+            base_type::swap_at(pos, static_cast<size_type>(len - 1u));
         }
 
-        return (length - next);
+        return (length - len);
     }
 
     /**
