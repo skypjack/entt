@@ -118,6 +118,16 @@ public:
     }
 
     /**
+     * @brief Returns the successor of a given identifier.
+     * @param value The identifier of which to return the successor.
+     * @return The successor of the given identifier.
+     */
+    [[nodiscard]] static constexpr value_type next(const value_type value) noexcept {
+        const auto vers = to_version(value) + 1;
+        return construct(to_entity(value), static_cast<version_type>(vers + (vers == version_mask)));
+    }
+
+    /**
      * @brief Constructs an identifier from its parts.
      *
      * If the version part is not provided, a tombstone is returned.<br/>

@@ -29,6 +29,12 @@ TEST(Entity, Traits) {
 
     ASSERT_EQ(traits_type::combine(entt::tombstone, entt::null), tombstone);
     ASSERT_EQ(traits_type::combine(entt::null, entt::tombstone), null);
+
+    ASSERT_EQ(traits_type::next(entity), traits_type::construct(entt::to_integral(entity), entt::to_version(entity) + 1u));
+    ASSERT_EQ(traits_type::next(other), traits_type::construct(entt::to_integral(other), entt::to_version(other) + 1u));
+
+    ASSERT_EQ(traits_type::next(entt::tombstone), traits_type::construct(entt::null, {}));
+    ASSERT_EQ(traits_type::next(entt::null), traits_type::construct(entt::null, {}));
 }
 
 TEST(Entity, Null) {
