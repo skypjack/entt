@@ -17,14 +17,12 @@ TODO (high prio):
 * make the entity storage available to the end user
 * pop_if to improve further destroying entities (drastically)
 * natvis specialization for entity storage (length and validity)
-* next version traits scoped function
 * improve sigh mixin for entity storage (split basic + entt/entt spec)
 * doc: exclude only views, storage entity, bump entities
 * deprecate/remove registry reserve, capacity, empty, data, destroyed, release and so on
-* force check entity storage position within the registry
 * simplify assert in registry::release, use orphan instead or refine it (they're close already)
+* prepare to turn sparse set begin/end into virtual functions
 * refine views and groups to use scoped iterators from entity storage and the like
-* turn spawn-with-iter into a spawn(N) -> iter to first element
 * test exclude-only views
 
 WIP:
