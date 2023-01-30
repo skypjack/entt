@@ -348,7 +348,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const noexcept {
-        return view->size();
+        return handle().size();
     }
 
     /**
@@ -360,7 +360,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return iterator{view->begin(), view->end(), opaque_check_set(), filter};
+        return iterator{handle().begin(), handle().end(), opaque_check_set(), filter};
     }
 
     /**
@@ -373,7 +373,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return iterator{view->end(), view->end(), opaque_check_set(), filter};
+        return iterator{handle().end(), handle().end(), opaque_check_set(), filter};
     }
 
     /**
@@ -392,9 +392,9 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const noexcept {
-        auto it = view->rbegin();
-        for(const auto last = view->rend(); it != last && !contains(*it); ++it) {}
-        return it == view->rend() ? null : *it;
+        auto it = handle().rbegin();
+        for(const auto last = handle().rend(); it != last && !contains(*it); ++it) {}
+        return it == handle().rend() ? null : *it;
     }
 
     /**
@@ -404,7 +404,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{view->find(entt), view->end(), opaque_check_set(), filter} : end();
+        return contains(entt) ? iterator{handle().find(entt), handle().end(), opaque_check_set(), filter} : end();
     }
 
     /**
