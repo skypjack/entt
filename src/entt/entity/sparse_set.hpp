@@ -978,14 +978,14 @@ public:
         const auto to = other.end();
         auto from = other.begin();
 
-        for(size_type pos = packed.size() - 1; pos && from != to; ++from) {
-            if(contains(*from)) {
-                if(*from != packed[pos]) {
+        for(auto it = begin(); it.index() && from != to; ++from) {
+            if(const auto curr = *from; contains(curr)) {
+                if(const auto entt = *it; entt != curr) {
                     // basic no-leak guarantee (with invalid state) if swapping throws
-                    swap_elements(packed[pos], *from);
+                    swap_elements(entt, curr);
                 }
 
-                --pos;
+                ++it;
             }
         }
     }
