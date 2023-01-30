@@ -660,7 +660,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type release(const entity_type entt) {
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return (curr.second->current(entt) == traits_type::to_version(tombstone)); }), "Non-orphan entity");
+        ENTT_ASSERT(orphan(entt), "Non-orphan entity");
         entities.erase(entt);
         return entities.current(entt);
     }
