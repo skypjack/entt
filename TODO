@@ -20,9 +20,8 @@ TODO (high prio):
 * improve sigh mixin for entity storage (split basic + entt/entt spec)
 * doc: exclude only views, storage entity, bump entities
 * deprecate/remove registry reserve, capacity, empty, data, destroyed, release and so on
-* prepare to turn sparse set begin/end into virtual functions
 * refine views and groups to use scoped iterators from entity storage and the like
-* use sparse_set free_list to replace entity storage length and return narrow iterators
+* use entity as value_type for entity storage, define begin/end as scoped iterators
 * test exclude-only views
 
 WIP:

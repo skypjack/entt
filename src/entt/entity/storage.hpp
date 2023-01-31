@@ -949,7 +949,7 @@ protected:
             if(const auto pos = base_type::index(*first); pos < length) {
                 base_type::bump(local_traits_type::next(*first));
 
-                if (pos != --length) {
+                if(pos != --length) {
                     base_type::swap_at(pos, length);
                 }
             }
@@ -1029,6 +1029,34 @@ public:
         base_type::operator=(std::move(other));
         length = std::exchange(other.length, size_type{});
         return *this;
+    }
+
+    /**
+     * @brief Returns the object assigned to an entity, that is `void`.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.
+     *
+     * @param entt A valid identifier.
+     */
+    void get([[maybe_unused]] const entity_type entt) const noexcept {
+        ENTT_ASSERT(base_type::index(entt) < length, "The requested entity is not a live one");
+    }
+
+    /**
+     * @brief Returns an empty tuple.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.
+     *
+     * @param entt A valid identifier.
+     * @return Returns an empty tuple.
+     */
+    [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const noexcept {
+        ENTT_ASSERT(base_type::index(entt) < length, "The requested entity is not a live one");
+        return std::tuple{};
     }
 
     /**
@@ -1122,22 +1150,6 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to use to _visit_ a storage.
-     *
-     * The iterable object returns a tuple that contains the current entity.
-     *
-     * @return An iterable object to use to _visit_ the storage.
-     */
-    [[nodiscard]] iterable each() noexcept {
-        return {internal::extended_storage_iterator{base_type::end() - length}, internal::extended_storage_iterator{base_type::end()}};
-    }
-
-    /*! @copydoc each */
-    [[nodiscard]] const_iterable each() const noexcept {
-        return {internal::extended_storage_iterator{base_type::cend() - length}, internal::extended_storage_iterator{base_type::cend()}};
-    }
-
-    /**
      * @brief Returns the number of elements considered still in use.
      * @return The number of elements considered still in use.
      */
@@ -1152,6 +1164,22 @@ public:
     void in_use(const size_type len) noexcept {
         ENTT_ASSERT(!(len > base_type::size()), "Invalid length");
         length = len;
+    }
+
+    /**
+     * @brief Returns an iterable object to use to _visit_ a storage.
+     *
+     * The iterable object returns a tuple that contains the current entity.
+     *
+     * @return An iterable object to use to _visit_ the storage.
+     */
+    [[nodiscard]] iterable each() noexcept {
+        return {internal::extended_storage_iterator{base_type::end() - length}, internal::extended_storage_iterator{base_type::end()}};
+    }
+
+    /*! @copydoc each */
+    [[nodiscard]] const_iterable each() const noexcept {
+        return {internal::extended_storage_iterator{base_type::cend() - length}, internal::extended_storage_iterator{base_type::cend()}};
     }
 
 private:

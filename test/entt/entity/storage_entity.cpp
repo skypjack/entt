@@ -33,11 +33,30 @@ TEST(StorageEntity, Functionalities) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.in_use(), 1u);
 
+    ASSERT_NO_THROW(pool.get(entities[0u]));
+    ASSERT_EQ(pool.get_as_tuple(entities[0u]), std::tuple<>{});
+
     pool.erase(entities[0u]);
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.in_use(), 0u);
+}
+
+ENTT_DEBUG_TEST(StorageEntityDeathTest, Get) {
+    entt::storage<entt::entity> pool;
+    pool.spawn(entt::entity{99});
+
+    ASSERT_DEATH(pool.get(entt::entity{3}), "");
+    ASSERT_DEATH([[maybe_unused]] auto tup = pool.get_as_tuple(entt::entity{3}), "");
+
+    ASSERT_NO_THROW(pool.get(entt::entity{99}));
+    ASSERT_NO_THROW([[maybe_unused]] auto tup = pool.get_as_tuple(entt::entity{99}));
+
+    pool.erase(entt::entity{99});
+
+    ASSERT_DEATH(pool.get(entt::entity{99}), "");
+    ASSERT_DEATH([[maybe_unused]] auto tup = pool.get_as_tuple(entt::entity{99}), "");
 }
 
 TEST(StorageEntity, Move) {
