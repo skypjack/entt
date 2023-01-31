@@ -282,6 +282,17 @@ TEST(Storage, EmptyType) {
 
     ASSERT_TRUE(pool.contains(entt::entity{99}));
     ASSERT_FALSE(other.contains(entt::entity{99}));
+
+    ASSERT_NO_THROW(pool.get(entt::entity{99}));
+    ASSERT_EQ(pool.get_as_tuple(entt::entity{99}), std::tuple<>{});
+}
+
+ENTT_DEBUG_TEST(StorageDeathTest, EmptyType) {
+    entt::storage<empty_stable_type> pool;
+    pool.emplace(entt::entity{99});
+
+    ASSERT_DEATH(pool.get(entt::entity{3}), "");
+    ASSERT_DEATH([[maybe_unused]] auto tup = pool.get_as_tuple(entt::entity{3}), "");
 }
 
 TEST(Storage, Insert) {
