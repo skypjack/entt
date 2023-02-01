@@ -113,6 +113,7 @@
 		<Expand>
 			<Item Name="[capacity]" Optional="true" ExcludeView="simple">payload.capacity() * traits_type::page_size</Item>
 			<Item Name="[page size]" Optional="true" ExcludeView="simple">traits_type::page_size</Item>
+			<Item Name="[length]" Optional="true" ExcludeView="simple">length</Item>
 			<Item Name="[base]" ExcludeView="simple">(base_type*)this,nand</Item>
 			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)nand</Item>
 			<!-- having SFINAE-like techniques in natvis is priceless :) -->
