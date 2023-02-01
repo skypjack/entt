@@ -111,18 +111,18 @@
 	<Type Name="entt::basic_storage&lt;*&gt;">
 		<DisplayString>{{ size={ base_type::packed.size() }, type={ base_type::info->alias,na } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" Optional="true" ExcludeView="simple">packed.first_base::value.capacity() * traits_type::page_size</Item>
+			<Item Name="[capacity]" Optional="true" ExcludeView="simple">payload.capacity() * traits_type::page_size</Item>
 			<Item Name="[page size]" Optional="true" ExcludeView="simple">traits_type::page_size</Item>
 			<Item Name="[base]" ExcludeView="simple">(base_type*)this,nand</Item>
 			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)nand</Item>
 			<!-- having SFINAE-like techniques in natvis is priceless :) -->
-			<CustomListItems Condition="packed.first_base::value.size() != 0" Optional="true">
+			<CustomListItems Condition="payload.size() != 0" Optional="true">
 				<Variable Name="pos" InitialValue="0" />
 				<Variable Name="last" InitialValue="base_type::packed.size()"/>
 				<Loop>
 					<Break Condition="pos == last"/>
 					<If Condition="*((base_type::traits_type::entity_type *)&amp;base_type::packed[pos]) &lt; ~base_type::traits_type::entity_mask">
-						<Item Name="[{ pos }:{ base_type::packed[pos] }]">packed.first_base::value[pos / traits_type::page_size][pos &amp; (traits_type::page_size - 1)]</Item>
+						<Item Name="[{ pos }:{ base_type::packed[pos] }]">payload[pos / traits_type::page_size][pos &amp; (traits_type::page_size - 1)]</Item>
 					</If>
 					<Exec>++pos</Exec>
 				</Loop>
