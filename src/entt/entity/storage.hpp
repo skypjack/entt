@@ -367,10 +367,6 @@ protected:
                 std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
             }
         }
-
-        if constexpr(traits_type::in_place_delete) {
-            base_type::fast_compact();
-        }
     }
 
     /**

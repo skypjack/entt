@@ -20,7 +20,6 @@ TODO (high prio):
 * doc: exclude only views, storage entity, bump entities
 * deprecate/remove registry reserve, capacity, empty, data, destroyed, release and so on
 * test exclude-only views
-* drop fast_compact, make clear do clear for real :)
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
