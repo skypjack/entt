@@ -1114,7 +1114,8 @@ public:
                 pools.begin()[pos - 1u].second->clear();
             }
 
-            entities.clear();
+            auto iterable = entities.each();
+            entities.erase(iterable.begin().base(), iterable.end().base());
         } else {
             (assure<Type>().clear(), ...);
         }

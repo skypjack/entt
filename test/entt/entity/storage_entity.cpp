@@ -104,12 +104,10 @@ TEST(StorageEntity, Move) {
 
     other.clear();
 
-    ASSERT_EQ(other.size(), 2u);
+    ASSERT_EQ(other.size(), 0u);
     ASSERT_EQ(other.in_use(), 0u);
 
-    ASSERT_EQ(*other.push(entt::null), traits_type::construct(1, 1));
     ASSERT_EQ(*other.push(entt::null), entt::entity{0});
-    ASSERT_EQ(*other.push(entt::null), entt::entity{2});
 }
 
 TEST(StorageEntity, Swap) {
@@ -142,14 +140,12 @@ TEST(StorageEntity, Swap) {
     pool.clear();
     other.clear();
 
-    ASSERT_EQ(pool.size(), 3u);
-    ASSERT_EQ(other.size(), 2u);
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_EQ(other.size(), 0u);
     ASSERT_EQ(pool.in_use(), 0u);
     ASSERT_EQ(other.in_use(), 0u);
 
-    ASSERT_EQ(*other.push(entt::null), traits_type::construct(1, 1));
     ASSERT_EQ(*other.push(entt::null), entt::entity{0});
-    ASSERT_EQ(*other.push(entt::null), entt::entity{2});
 }
 
 TEST(StorageEntity, Push) {
@@ -444,6 +440,6 @@ TEST(StorageEntity, CustomAllocator) {
 
     pool.clear();
 
-    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(pool.in_use(), 0u);
 }

@@ -504,14 +504,11 @@ TEST(SighMixin, StorageEntity) {
 
     pool.clear();
 
-    ASSERT_TRUE(pool.contains(traits_type::construct(0, 3)));
-    ASSERT_TRUE(pool.contains(traits_type::construct(1, 1)));
-    ASSERT_TRUE(pool.contains(traits_type::construct(2, 2)));
+    ASSERT_EQ(pool.size(), 0u);
+    ASSERT_EQ(pool.in_use(), 0u);
 
     ASSERT_EQ(on_construct.value, 3);
     ASSERT_EQ(on_destroy.value, 3);
-    ASSERT_EQ(pool.size(), 3u);
-    ASSERT_EQ(pool.in_use(), 0u);
 
     pool.spawn();
     pool.spawn(entt::entity{0});
@@ -526,9 +523,7 @@ TEST(SighMixin, StorageEntity) {
 
     pool.clear();
 
-    ASSERT_EQ(on_construct.value, 6);
-    ASSERT_EQ(on_destroy.value, 6);
-    ASSERT_EQ(pool.size(), 3u);
+    ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(pool.in_use(), 0u);
 }
 

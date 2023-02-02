@@ -958,9 +958,8 @@ protected:
 
     /*! @brief Erases all entities of a sparse set. */
     void pop_all() override {
-        for(; length; --length) {
-            base_type::bump(local_traits_type::next(base_type::operator[](length - 1u)));
-        }
+        length = 0u;
+        base_type::pop_all();
     }
 
     /**
