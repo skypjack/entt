@@ -75,7 +75,7 @@ public:
 
     template<typename... Args>
     void enqueue(Args &&...args) {
-        if constexpr(std::is_aggregate_v<Type>) {
+        if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<Type>) {
             events.push_back(Type{std::forward<Args>(args)...});
         } else {
             events.emplace_back(std::forward<Args>(args)...);
