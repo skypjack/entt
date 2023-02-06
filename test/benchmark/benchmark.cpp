@@ -36,16 +36,24 @@ private:
     std::chrono::time_point<std::chrono::system_clock> start;
 };
 
+template<typename Func, typename... Args>
+void generic_with(Func func) {
+    timer timer;
+    func();
+    timer.elapsed();
+}
+
 template<typename Iterable, typename Func>
-void generic(Iterable &&iterable, Func func) {
+void iterate_with(Iterable &&iterable, Func func) {
     timer timer;
     std::forward<Iterable>(iterable).each(func);
     timer.elapsed();
 }
 
 template<typename Func>
-void pathological(Func func) {
+void pathological_with(Func func) {
     entt::registry registry;
+    auto view = func(registry);
 
     for(std::uint64_t i = 0; i < 500000L; i++) {
         const auto entity = registry.create();
@@ -82,7 +90,7 @@ void pathological(Func func) {
     }
 
     timer timer;
-    func(registry).each([](auto &...comp) { ((comp.x = {}), ...); });
+    view.each([](auto &...comp) { ((comp.x = {}), ...); });
     timer.elapsed();
 }
 
@@ -91,13 +99,11 @@ TEST(Benchmark, Create) {
 
     std::cout << "Creating 1000000 entities" << std::endl;
 
-    timer timer;
-
-    for(std::uint64_t i = 0; i < 1000000L; i++) {
-        static_cast<void>(registry.create());
-    }
-
-    timer.elapsed();
+    generic_with([&]() {
+        for(std::uint64_t i = 0; i < 1000000L; i++) {
+            static_cast<void>(registry.create());
+        }
+    });
 }
 
 TEST(Benchmark, CreateMany) {
@@ -106,9 +112,9 @@ TEST(Benchmark, CreateMany) {
 
     std::cout << "Creating 1000000 entities at once" << std::endl;
 
-    timer timer;
-    registry.create(entities.begin(), entities.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.create(entities.begin(), entities.end());
+    });
 }
 
 TEST(Benchmark, CreateManyAndEmplaceComponents) {
@@ -117,15 +123,14 @@ TEST(Benchmark, CreateManyAndEmplaceComponents) {
 
     std::cout << "Creating 1000000 entities at once and emplace components" << std::endl;
 
-    timer timer;
-    registry.create(entities.begin(), entities.end());
+    generic_with([&]() {
+        registry.create(entities.begin(), entities.end());
 
-    for(const auto entity: entities) {
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-    }
-
-    timer.elapsed();
+        for(const auto entity: entities) {
+            registry.emplace<position>(entity);
+            registry.emplace<velocity>(entity);
+        }
+    });
 }
 
 TEST(Benchmark, CreateManyWithComponents) {
@@ -134,11 +139,11 @@ TEST(Benchmark, CreateManyWithComponents) {
 
     std::cout << "Creating 1000000 entities at once with components" << std::endl;
 
-    timer timer;
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
-    registry.insert<velocity>(entities.begin(), entities.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.create(entities.begin(), entities.end());
+        registry.insert<position>(entities.begin(), entities.end());
+        registry.insert<velocity>(entities.begin(), entities.end());
+    });
 }
 
 TEST(Benchmark, Erase) {
@@ -151,13 +156,11 @@ TEST(Benchmark, Erase) {
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
 
-    timer timer;
-
-    for(auto entity: view) {
-        registry.erase<position>(entity);
-    }
-
-    timer.elapsed();
+    generic_with([&]() {
+        for(auto entity: view) {
+            registry.erase<position>(entity);
+        }
+    });
 }
 
 TEST(Benchmark, EraseMany) {
@@ -170,9 +173,9 @@ TEST(Benchmark, EraseMany) {
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.erase<position>(view.begin(), view.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.erase<position>(view.begin(), view.end());
+    });
 }
 
 TEST(Benchmark, EraseManyMulti) {
@@ -186,9 +189,9 @@ TEST(Benchmark, EraseManyMulti) {
     registry.insert<position>(entities.begin(), entities.end());
     registry.insert<velocity>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.erase<position, velocity>(view.begin(), view.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.erase<position, velocity>(view.begin(), view.end());
+    });
 }
 
 TEST(Benchmark, Remove) {
@@ -201,13 +204,11 @@ TEST(Benchmark, Remove) {
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
 
-    timer timer;
-
-    for(auto entity: view) {
-        registry.remove<position>(entity);
-    }
-
-    timer.elapsed();
+    generic_with([&]() {
+        for(auto entity: view) {
+            registry.remove<position>(entity);
+        }
+    });
 }
 
 TEST(Benchmark, RemoveMany) {
@@ -220,9 +221,9 @@ TEST(Benchmark, RemoveMany) {
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.remove<position>(view.begin(), view.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.remove<position>(view.begin(), view.end());
+    });
 }
 
 TEST(Benchmark, RemoveManyMulti) {
@@ -236,9 +237,9 @@ TEST(Benchmark, RemoveManyMulti) {
     registry.insert<position>(entities.begin(), entities.end());
     registry.insert<velocity>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.remove<position, velocity>(view.begin(), view.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.remove<position, velocity>(view.begin(), view.end());
+    });
 }
 
 TEST(Benchmark, Clear) {
@@ -250,9 +251,9 @@ TEST(Benchmark, Clear) {
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.clear<position>();
-    timer.elapsed();
+    generic_with([&]() {
+        registry.clear<position>();
+    });
 }
 
 TEST(Benchmark, ClearMulti) {
@@ -265,9 +266,9 @@ TEST(Benchmark, ClearMulti) {
     registry.insert<position>(entities.begin(), entities.end());
     registry.insert<velocity>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.clear<position, velocity>();
-    timer.elapsed();
+    generic_with([&]() {
+        registry.clear<position, velocity>();
+    });
 }
 
 TEST(Benchmark, ClearStable) {
@@ -279,9 +280,9 @@ TEST(Benchmark, ClearStable) {
     registry.create(entities.begin(), entities.end());
     registry.insert<stable_position>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.clear<stable_position>();
-    timer.elapsed();
+    generic_with([&]() {
+        registry.clear<stable_position>();
+    });
 }
 
 TEST(Benchmark, Recycle) {
@@ -293,13 +294,11 @@ TEST(Benchmark, Recycle) {
     registry.create(entities.begin(), entities.end());
     registry.destroy(entities.begin(), entities.end());
 
-    timer timer;
-
-    for(auto next = entities.size(); next; --next) {
-        entities[next] = registry.create();
-    }
-
-    timer.elapsed();
+    generic_with([&]() {
+        for(auto next = entities.size(); next; --next) {
+            entities[next] = registry.create();
+        }
+    });
 }
 
 TEST(Benchmark, RecycleMany) {
@@ -311,9 +310,9 @@ TEST(Benchmark, RecycleMany) {
     registry.create(entities.begin(), entities.end());
     registry.destroy(entities.begin(), entities.end());
 
-    timer timer;
-    registry.create(entities.begin(), entities.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.create(entities.begin(), entities.end());
+    });
 }
 
 TEST(Benchmark, Destroy) {
@@ -326,13 +325,11 @@ TEST(Benchmark, Destroy) {
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
 
-    timer timer;
-
-    for(auto entity: view) {
-        registry.destroy(entity);
-    }
-
-    timer.elapsed();
+    generic_with([&]() {
+        for(auto entity: view) {
+            registry.destroy(entity);
+        }
+    });
 }
 
 TEST(Benchmark, DestroyMany) {
@@ -345,9 +342,9 @@ TEST(Benchmark, DestroyMany) {
     registry.create(entities.begin(), entities.end());
     registry.insert<position>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.destroy(view.begin(), view.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.destroy(view.begin(), view.end());
+    });
 }
 
 TEST(Benchmark, DestroyManyMulti) {
@@ -361,9 +358,9 @@ TEST(Benchmark, DestroyManyMulti) {
     registry.insert<position>(entities.begin(), entities.end());
     registry.insert<velocity>(entities.begin(), entities.end());
 
-    timer timer;
-    registry.destroy(view.begin(), view.end());
-    timer.elapsed();
+    generic_with([&]() {
+        registry.destroy(view.begin(), view.end());
+    });
 }
 
 TEST(Benchmark, IterateSingleComponent1M) {
@@ -376,7 +373,7 @@ TEST(Benchmark, IterateSingleComponent1M) {
         registry.emplace<position>(entity);
     }
 
-    generic(registry.view<position>(), [](auto &...comp) {
+    iterate_with(registry.view<position>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -391,7 +388,7 @@ TEST(Benchmark, IterateSingleStableComponent1M) {
         registry.emplace<stable_position>(entity);
     }
 
-    generic(registry.view<stable_position>(), [](auto &...comp) {
+    iterate_with(registry.view<stable_position>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -409,7 +406,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
     entt::runtime_view view{};
     view.iterate(registry.storage<position>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
     });
 }
@@ -425,7 +422,7 @@ TEST(Benchmark, IterateTwoComponents1M) {
         registry.emplace<velocity>(entity);
     }
 
-    generic(registry.view<position, velocity>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -441,7 +438,7 @@ TEST(Benchmark, IterateTwoStableComponents1M) {
         registry.emplace<velocity>(entity);
     }
 
-    generic(registry.view<stable_position, velocity>(), [](auto &...comp) {
+    iterate_with(registry.view<stable_position, velocity>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -460,7 +457,7 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
         }
     }
 
-    generic(registry.view<position, velocity>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -479,7 +476,7 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
         }
     }
 
-    generic(registry.view<position, velocity>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -495,7 +492,7 @@ TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
         registry.emplace<velocity>(entity);
     }
 
-    generic(registry.group<>(entt::get<position, velocity>), [](auto &...comp) {
+    iterate_with(registry.group<>(entt::get<position, velocity>), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -511,7 +508,7 @@ TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
         registry.emplace<velocity>(entity);
     }
 
-    generic(registry.group<position, velocity>(), [](auto &...comp) {
+    iterate_with(registry.group<position, velocity>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -527,7 +524,7 @@ TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
         registry.emplace<velocity>(entity);
     }
 
-    generic(registry.group<position>(entt::get<velocity>), [](auto &...comp) {
+    iterate_with(registry.group<position>(entt::get<velocity>), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -547,7 +544,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
     });
@@ -571,7 +568,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
     });
@@ -595,7 +592,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
     });
@@ -613,7 +610,7 @@ TEST(Benchmark, IterateThreeComponents1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    generic(registry.view<position, velocity, comp<0>>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity, comp<0>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -630,7 +627,7 @@ TEST(Benchmark, IterateThreeStableComponents1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    generic(registry.view<stable_position, velocity, comp<0>>(), [](auto &...comp) {
+    iterate_with(registry.view<stable_position, velocity, comp<0>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -650,7 +647,7 @@ TEST(Benchmark, IterateThreeComponents1MHalf) {
         }
     }
 
-    generic(registry.view<position, velocity, comp<0>>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity, comp<0>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -670,7 +667,7 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
         }
     }
 
-    generic(registry.view<position, velocity, comp<0>>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity, comp<0>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -687,7 +684,7 @@ TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    generic(registry.group<>(entt::get<position, velocity, comp<0>>), [](auto &...comp) {
+    iterate_with(registry.group<>(entt::get<position, velocity, comp<0>>), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -704,7 +701,7 @@ TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    generic(registry.group<position, velocity, comp<0>>(), [](auto &...comp) {
+    iterate_with(registry.group<position, velocity, comp<0>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -721,7 +718,7 @@ TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    generic(registry.group<position, velocity>(entt::get<comp<0>>), [](auto &...comp) {
+    iterate_with(registry.group<position, velocity>(entt::get<comp<0>>), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -743,7 +740,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -770,7 +767,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -797,7 +794,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -818,7 +815,7 @@ TEST(Benchmark, IterateFiveComponents1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    generic(registry.view<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -837,7 +834,7 @@ TEST(Benchmark, IterateFiveStableComponents1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    generic(registry.view<stable_position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
+    iterate_with(registry.view<stable_position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -859,7 +856,7 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
         }
     }
 
-    generic(registry.view<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -881,7 +878,7 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
         }
     }
 
-    generic(registry.view<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
+    iterate_with(registry.view<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -900,7 +897,7 @@ TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    generic(registry.group<>(entt::get<position, velocity, comp<0>, comp<1>, comp<2>>), [](auto &...comp) {
+    iterate_with(registry.group<>(entt::get<position, velocity, comp<0>, comp<1>, comp<2>>), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -919,7 +916,7 @@ TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    generic(registry.group<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
+    iterate_with(registry.group<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -938,7 +935,7 @@ TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    generic(registry.group<position, velocity, comp<0>, comp<1>>(entt::get<comp<2>>), [](auto &...comp) {
+    iterate_with(registry.group<position, velocity, comp<0>, comp<1>>(entt::get<comp<2>>), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -957,7 +954,7 @@ TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    generic(registry.group<position, velocity, comp<0>>(entt::get<comp<1>, comp<2>>), [](auto &...comp) {
+    iterate_with(registry.group<position, velocity, comp<0>>(entt::get<comp<1>, comp<2>>), [](auto &...comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -983,7 +980,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -1016,7 +1013,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -1049,7 +1046,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    generic(view, [&registry](auto entity) {
+    iterate_with(view, [&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -1060,22 +1057,22 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
 
 TEST(Benchmark, IteratePathological) {
     std::cout << "Pathological case" << std::endl;
-    pathological([](auto &registry) { return registry.template view<position, velocity, comp<0>>(); });
+    pathological_with([](auto &registry) { return registry.template view<position, velocity, comp<0>>(); });
 }
 
 TEST(Benchmark, IteratePathologicalNonOwningGroup) {
     std::cout << "Pathological case (non-owning group)" << std::endl;
-    pathological([](auto &registry) { return registry.template group<>(entt::get<position, velocity, comp<0>>); });
+    pathological_with([](auto &registry) { return registry.template group<>(entt::get<position, velocity, comp<0>>); });
 }
 
 TEST(Benchmark, IteratePathologicalFullOwningGroup) {
     std::cout << "Pathological case (full-owning group)" << std::endl;
-    pathological([](auto &registry) { return registry.template group<position, velocity, comp<0>>(); });
+    pathological_with([](auto &registry) { return registry.template group<position, velocity, comp<0>>(); });
 }
 
 TEST(Benchmark, IteratePathologicalPartialOwningGroup) {
     std::cout << "Pathological case (partial-owning group)" << std::endl;
-    pathological([](auto &registry) { return registry.template group<position, velocity>(entt::get<comp<0>>); });
+    pathological_with([](auto &registry) { return registry.template group<position, velocity>(entt::get<comp<0>>); });
 }
 
 TEST(Benchmark, SortSingle) {
@@ -1088,9 +1085,9 @@ TEST(Benchmark, SortSingle) {
         registry.emplace<position>(entity, i, i);
     }
 
-    timer timer;
-    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x < rhs.x && lhs.y < rhs.y; });
-    timer.elapsed();
+    generic_with([&]() {
+        registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x < rhs.x && lhs.y < rhs.y; });
+    });
 }
 
 TEST(Benchmark, SortMulti) {
@@ -1106,9 +1103,9 @@ TEST(Benchmark, SortMulti) {
 
     registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x < rhs.x && lhs.y < rhs.y; });
 
-    timer timer;
-    registry.sort<velocity, position>();
-    timer.elapsed();
+    generic_with([&]() {
+        registry.sort<velocity, position>();
+    });
 }
 
 TEST(Benchmark, AlmostSortedStdSort) {
@@ -1132,9 +1129,9 @@ TEST(Benchmark, AlmostSortedStdSort) {
         registry.emplace<position>(entity, 50000 * i, 50000 * i);
     }
 
-    timer timer;
-    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x > rhs.x && lhs.y > rhs.y; });
-    timer.elapsed();
+    generic_with([&]() {
+        registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x > rhs.x && lhs.y > rhs.y; });
+    });
 }
 
 TEST(Benchmark, AlmostSortedInsertionSort) {
@@ -1158,7 +1155,7 @@ TEST(Benchmark, AlmostSortedInsertionSort) {
         registry.emplace<position>(entity, 50000 * i, 50000 * i);
     }
 
-    timer timer;
-    registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x > rhs.x && lhs.y > rhs.y; }, entt::insertion_sort{});
-    timer.elapsed();
+    generic_with([&]() {
+        registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x > rhs.x && lhs.y > rhs.y; }, entt::insertion_sort{});
+    });
 }
