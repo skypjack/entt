@@ -363,6 +363,68 @@ TEST(Benchmark, DestroyManyMulti) {
     });
 }
 
+TEST(Benchmark, GetFromRegistry) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
+
+    generic_with([&]() {
+        for(auto entity: entities) {
+            registry.get<position>(entity).x = 0u;
+        }
+    });
+}
+
+TEST(Benchmark, GetFromRegistryMulti) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
+    registry.insert<velocity>(entities.begin(), entities.end());
+
+    generic_with([&]() {
+        for(auto entity: entities) {
+            registry.get<position>(entity).x = 0u;
+            registry.get<velocity>(entity).y = 0u;
+        }
+    });
+}
+
+TEST(Benchmark, GetFromView) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+    auto view = registry.view<position>();
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
+
+    generic_with([&]() {
+        for(auto entity: entities) {
+            view.get<position>(entity).x = 0u;
+        }
+    });
+}
+
+TEST(Benchmark, GetFromViewMulti) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+    auto view = registry.view<position, velocity>();
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<position>(entities.begin(), entities.end());
+    registry.insert<velocity>(entities.begin(), entities.end());
+
+    generic_with([&]() {
+        for(auto entity: entities) {
+            view.get<position>(entity).x = 0u;
+            view.get<velocity>(entity).y = 0u;
+        }
+    });
+}
+
 TEST(Benchmark, IterateSingleComponent1M) {
     entt::registry registry;
 
