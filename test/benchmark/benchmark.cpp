@@ -406,7 +406,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
     entt::runtime_view view{};
     view.iterate(registry.storage<position>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
     });
 }
@@ -544,7 +544,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
     });
@@ -568,7 +568,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
     });
@@ -592,7 +592,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
     });
@@ -740,7 +740,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -767,7 +767,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -794,7 +794,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -980,7 +980,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -1013,7 +1013,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
@@ -1046,7 +1046,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    iterate_with(view, [&registry](auto entity) {
+    iterate_with(view, [&](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
         registry.get<comp<0>>(entity).x = {};
