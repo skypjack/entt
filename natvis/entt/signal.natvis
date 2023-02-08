@@ -8,7 +8,7 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_dispatcher&lt;*&gt;">
-		<Intrinsic Name="size" Expression="pools.first_base::value.packed.first_base::value.size()"/>
+		<Intrinsic Name="size" Expression="pools.first_base::value.size()"/>
 		<DisplayString>{{ size={ size() } }}</DisplayString>
 		<Expand>
 			<Synthetic Name="[pools]">
