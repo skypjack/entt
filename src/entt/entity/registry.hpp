@@ -338,7 +338,7 @@ class basic_registry {
     }
 
     void rebind() {
-        entities.bind(forward_as_any(*this));
+        entities->bind(forward_as_any(*this));
 
         for(auto &&curr: pools) {
             curr.second->bind(forward_as_any(*this));
@@ -380,7 +380,7 @@ public:
     basic_registry(const size_type count, const allocator_type &allocator = allocator_type{})
         : vars{allocator},
           pools{allocator},
-          entities{allocator},
+          entities{std::allocate_shared<storage_for_type<entity_type>>(allocator, allocator)},
           groups{allocator} {
         pools.reserve(count);
         rebind();
@@ -506,7 +506,7 @@ public:
      * @return Number of entities created so far.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return entities.size();
+        return entities->size();
     }
 
     /**
@@ -514,7 +514,7 @@ public:
      * @return Number of entities still in use.
      */
     [[nodiscard]] size_type alive() const {
-        return entities.in_use();
+        return entities->in_use();
     }
 
     /**
@@ -522,7 +522,7 @@ public:
      * @param cap Desired capacity.
      */
     void reserve(const size_type cap) {
-        entities.reserve(cap);
+        entities->reserve(cap);
     }
 
     /**
@@ -531,7 +531,7 @@ public:
      * @return Capacity of the registry.
      */
     [[nodiscard]] size_type capacity() const noexcept {
-        return entities.capacity();
+        return entities->capacity();
     }
 
     /**
@@ -555,7 +555,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type *data() const noexcept {
-        return entities.data();
+        return entities->data();
     }
 
     /**
@@ -563,7 +563,7 @@ public:
      * @return The number of released entities.
      */
     [[nodiscard]] size_type released() const noexcept {
-        return (entities.size() - entities.in_use());
+        return (entities->size() - entities->in_use());
     }
 
     /**
@@ -572,7 +572,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entt) const {
-        return entities.contains(entt);
+        return entities->contains(entt);
     }
 
     /**
@@ -582,7 +582,7 @@ public:
      * version otherwise.
      */
     [[nodiscard]] version_type current(const entity_type entt) const {
-        return entities.current(entt);
+        return entities->current(entt);
     }
 
     /**
@@ -590,7 +590,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
-        return entities.spawn();
+        return entities->spawn();
     }
 
     /**
@@ -603,7 +603,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
-        return entities.spawn(hint);
+        return entities->spawn(hint);
     }
 
     /**
@@ -617,7 +617,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        entities.spawn(std::move(first), std::move(last));
+        entities->spawn(std::move(first), std::move(last));
     }
 
     /**
@@ -639,9 +639,9 @@ public:
      */
     template<typename It>
     void assign(It first, It last, const size_type destroyed) {
-        ENTT_ASSERT(!entities.in_use(), "Non-empty registry");
-        entities.push(first, last);
-        entities.in_use(entities.size() - destroyed);
+        ENTT_ASSERT(!entities->in_use(), "Non-empty registry");
+        entities->push(first, last);
+        entities->in_use(entities->size() - destroyed);
     }
 
     /**
@@ -657,8 +657,8 @@ public:
      */
     version_type release(const entity_type entt) {
         ENTT_ASSERT(orphan(entt), "Non-orphan entity");
-        entities.erase(entt);
-        return entities.current(entt);
+        entities->erase(entt);
+        return entities->current(entt);
     }
 
     /**
@@ -676,7 +676,7 @@ public:
     version_type release(const entity_type entt, const version_type version) {
         release(entt);
         const auto vers = static_cast<version_type>(version + (version == traits_type::to_version(tombstone)));
-        entities.bump(traits_type::construct(traits_type::to_entity(entt), vers));
+        entities->bump(traits_type::construct(traits_type::to_entity(entt), vers));
         return vers;
     }
 
@@ -691,7 +691,7 @@ public:
      */
     template<typename It>
     void release(It first, It last) {
-        entities.erase(std::move(first), std::move(last));
+        entities->erase(std::move(first), std::move(last));
     }
 
     /**
@@ -742,15 +742,15 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        const auto len = entities.pack(first, last);
-        auto from = entities.each().cbegin().base();
+        const auto len = entities->pack(first, last);
+        auto from = entities->each().cbegin().base();
         const auto to = from + len;
 
         for(size_type pos = pools.size(); pos; --pos) {
             pools.begin()[pos - 1u].second->remove(from, to);
         }
 
-        entities.erase(from, to);
+        entities->erase(from, to);
     }
 
     /**
@@ -1110,8 +1110,8 @@ public:
                 pools.begin()[pos - 1u].second->clear();
             }
 
-            auto iterable = entities.each();
-            entities.erase(iterable.begin().base(), iterable.end().base());
+            auto iterable = entities->each();
+            entities->erase(iterable.begin().base(), iterable.end().base());
         } else {
             (assure<Type>().clear(), ...);
         }
@@ -1133,7 +1133,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        for(auto [entt]: entities.each()) {
+        for(auto [entt]: entities->each()) {
             func(entt);
         }
     }
@@ -1481,7 +1481,7 @@ public:
 private:
     context vars;
     container_type pools;
-    storage_for_type<entity_type> entities;
+    std::shared_ptr<storage_for_type<entity_type>> entities;
     std::vector<group_data, typename alloc_traits::template rebind_alloc<group_data>> groups;
 };
 

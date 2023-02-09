@@ -6,7 +6,7 @@
 		</Intrinsic>
 		<DisplayString>{{ pools={ pools.size() } }}</DisplayString>
 		<Expand>
-			<Item Name="[entities]">entities</Item>
+			<Item Name="[entities]">*entities</Item>
 			<Synthetic Name="[pools]">
 				<DisplayString>{ pools.size() }</DisplayString>
 				<Expand>
