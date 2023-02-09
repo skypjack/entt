@@ -395,8 +395,6 @@ public:
           pools{std::move(other.pools)},
           entities{std::move(other.entities)},
           groups{std::move(other.groups)} {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a registry is not allowed");
-
         rebind();
     }
 
@@ -406,8 +404,6 @@ public:
      * @return This registry.
      */
     basic_registry &operator=(basic_registry &&other) noexcept {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a registry is not allowed");
-
         vars = std::move(other.vars);
         pools = std::move(other.pools);
         entities = std::move(other.entities);
@@ -439,7 +435,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return entities.get_allocator();
+        return pools.get_allocator();
     }
 
     /**
