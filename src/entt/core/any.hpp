@@ -59,7 +59,7 @@ class basic_any {
     };
 
     template<typename Type>
-    static constexpr bool in_situ = Len && alignof(Type) <= Align && sizeof(Type) <= Len &&std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ = Len && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
     static const void *basic_vtable(const operation op, const basic_any &value, const void *other) {
@@ -122,26 +122,27 @@ class basic_any {
 
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
-        info = &type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
+        using plain_type = std::remove_cv_t<std::remove_reference_t<Type>>;
+        info = &type_id<plain_type>();
 
         if constexpr(!std::is_void_v<Type>) {
-            vtable = basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
+            vtable = basic_vtable<plain_type>;
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? policy::cref : policy::ref;
                 instance = (std::addressof(args), ...);
-            } else if constexpr(in_situ<std::remove_cv_t<std::remove_reference_t<Type>>>) {
-                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
-                    new(&storage) std::remove_cv_t<std::remove_reference_t<Type>>{std::forward<Args>(args)...};
+            } else if constexpr(in_situ<plain_type>) {
+                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<plain_type>) {
+                    new(&storage) plain_type{std::forward<Args>(args)...};
                 } else {
-                    new(&storage) std::remove_cv_t<std::remove_reference_t<Type>>(std::forward<Args>(args)...);
+                    new(&storage) plain_type(std::forward<Args>(args)...);
                 }
             } else {
-                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
-                    instance = new std::remove_cv_t<std::remove_reference_t<Type>>{std::forward<Args>(args)...};
+                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<plain_type>) {
+                    instance = new plain_type{std::forward<Args>(args)...};
                 } else {
-                    instance = new std::remove_cv_t<std::remove_reference_t<Type>>(std::forward<Args>(args)...);
+                    instance = new plain_type(std::forward<Args>(args)...);
                 }
             }
         }
