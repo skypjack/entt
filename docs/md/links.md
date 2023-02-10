@@ -176,6 +176,8 @@ I hope this list can grow much more in the future:
   * [AGE (Arc Game Engine)](https://github.com/MohitSethi99/ArcGameEngine): an
     open-source engine for building 2D & 3D real-time rendering and interactive
     contents.
+  * [Kengine](https://github.com/phisko/kengine): the _Koala engine_ is a game
+    engine entirely implemented as an entity-component-ystem.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
