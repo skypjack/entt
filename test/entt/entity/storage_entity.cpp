@@ -8,7 +8,7 @@
 TEST(StorageEntity, TypeAndPolicy) {
     entt::storage<entt::entity> pool;
 
-    ASSERT_EQ(pool.type(), entt::type_id<void>());
+    ASSERT_EQ(pool.type(), entt::type_id<entt::entity>());
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
 }
 

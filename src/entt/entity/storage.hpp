@@ -971,7 +971,7 @@ public:
     /*! @brief Base type. */
     using base_type = basic_sparse_set<Entity, Allocator>;
     /*! @brief Type of the objects assigned to entities. */
-    using value_type = void;
+    using value_type = Entity;
     /*! @brief Component traits. */
     using traits_type = component_traits<void>;
     /*! @brief Underlying entity identifier. */
@@ -995,7 +995,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<void>(), deletion_policy::swap_and_pop, allocator},
+        : base_type{type_id<value_type>(), deletion_policy::swap_and_pop, allocator},
           length{} {}
 
     /**
