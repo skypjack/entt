@@ -129,17 +129,17 @@ class basic_any {
             vtable = basic_vtable<plain_type>;
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
-                static_assert(sizeof...(Args) == 1u && (std::is_lvalue_reference_v<Args> && ...), "Invalid arguments");
+                static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? policy::cref : policy::ref;
                 instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<plain_type>) {
-                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<plain_type>) {
+                if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
                     new(&storage) plain_type{std::forward<Args>(args)...};
                 } else {
                     new(&storage) plain_type(std::forward<Args>(args)...);
                 }
             } else {
-                if constexpr(sizeof...(Args) != 0u && std::is_aggregate_v<plain_type>) {
+                if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
                     instance = new plain_type{std::forward<Args>(args)...};
                 } else {
                     instance = new plain_type(std::forward<Args>(args)...);
