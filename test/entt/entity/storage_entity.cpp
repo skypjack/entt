@@ -60,8 +60,6 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, Get) {
 }
 
 TEST(StorageEntity, Move) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::storage<entt::entity> pool;
 
     pool.push(entt::entity{1});
@@ -111,8 +109,6 @@ TEST(StorageEntity, Move) {
 }
 
 TEST(StorageEntity, Swap) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::storage<entt::entity> pool;
     entt::storage<entt::entity> other;
 
