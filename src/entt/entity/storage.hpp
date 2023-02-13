@@ -973,7 +973,7 @@ public:
     /*! @brief Type of the objects assigned to entities. */
     using value_type = Entity;
     /*! @brief Component traits. */
-    using traits_type = component_traits<void>;
+    using traits_type = component_traits<value_type>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
