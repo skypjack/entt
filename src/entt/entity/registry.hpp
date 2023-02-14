@@ -338,8 +338,6 @@ class basic_registry {
     }
 
     void rebind() {
-        entities->bind(forward_as_any(*this));
-
         for(auto &&curr: pools) {
             curr.second->bind(forward_as_any(*this));
         }
@@ -347,11 +345,11 @@ class basic_registry {
 
 public:
     /*! @brief Entity traits. */
-    using traits_type = entt_traits<Entity>;
+    using traits_type = typename basic_common_type::traits_type;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = typename traits_type::value_type;
     /*! @brief Underlying version type. */
     using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
@@ -380,7 +378,7 @@ public:
     basic_registry(const size_type count, const allocator_type &allocator = allocator_type{})
         : vars{allocator},
           pools{allocator},
-          entities{std::allocate_shared<storage_for_type<entity_type>>(allocator, allocator)},
+          shortcut{&assure<entity_type>()},
           groups{allocator} {
         pools.reserve(count);
         rebind();
@@ -393,7 +391,7 @@ public:
     basic_registry(basic_registry &&other) noexcept
         : vars{std::move(other.vars)},
           pools{std::move(other.pools)},
-          entities{std::move(other.entities)},
+          shortcut{std::move(other.shortcut)},
           groups{std::move(other.groups)} {
         rebind();
     }
@@ -406,7 +404,7 @@ public:
     basic_registry &operator=(basic_registry &&other) noexcept {
         vars = std::move(other.vars);
         pools = std::move(other.pools);
-        entities = std::move(other.entities);
+        shortcut = std::move(other.shortcut);
         groups = std::move(other.groups);
 
         rebind();
@@ -423,7 +421,7 @@ public:
 
         swap(vars, other.vars);
         swap(pools, other.pools);
-        swap(entities, other.entities);
+        swap(shortcut, other.shortcut);
         swap(groups, other.groups);
 
         rebind();
@@ -506,7 +504,7 @@ public:
      * @return Number of entities created so far.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return entities->size();
+        return shortcut->size();
     }
 
     /**
@@ -514,7 +512,7 @@ public:
      * @return Number of entities still in use.
      */
     [[nodiscard]] size_type alive() const {
-        return entities->in_use();
+        return shortcut->in_use();
     }
 
     /**
@@ -522,7 +520,7 @@ public:
      * @param cap Desired capacity.
      */
     void reserve(const size_type cap) {
-        entities->reserve(cap);
+        shortcut->reserve(cap);
     }
 
     /**
@@ -531,7 +529,7 @@ public:
      * @return Capacity of the registry.
      */
     [[nodiscard]] size_type capacity() const noexcept {
-        return entities->capacity();
+        return shortcut->capacity();
     }
 
     /**
@@ -555,7 +553,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type *data() const noexcept {
-        return entities->data();
+        return shortcut->data();
     }
 
     /**
@@ -563,7 +561,7 @@ public:
      * @return The number of released entities.
      */
     [[nodiscard]] size_type released() const noexcept {
-        return (entities->size() - entities->in_use());
+        return (shortcut->size() - shortcut->in_use());
     }
 
     /**
@@ -572,7 +570,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entt) const {
-        return entities->contains(entt);
+        return shortcut->contains(entt);
     }
 
     /**
@@ -582,7 +580,7 @@ public:
      * version otherwise.
      */
     [[nodiscard]] version_type current(const entity_type entt) const {
-        return entities->current(entt);
+        return shortcut->current(entt);
     }
 
     /**
@@ -590,7 +588,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
-        return entities->spawn();
+        return shortcut->spawn();
     }
 
     /**
@@ -603,7 +601,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
-        return entities->spawn(hint);
+        return shortcut->spawn(hint);
     }
 
     /**
@@ -617,7 +615,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        entities->spawn(std::move(first), std::move(last));
+        shortcut->spawn(std::move(first), std::move(last));
     }
 
     /**
@@ -639,9 +637,9 @@ public:
      */
     template<typename It>
     void assign(It first, It last, const size_type destroyed) {
-        ENTT_ASSERT(!entities->in_use(), "Non-empty registry");
-        entities->push(first, last);
-        entities->in_use(entities->size() - destroyed);
+        ENTT_ASSERT(!shortcut->in_use(), "Non-empty registry");
+        shortcut->push(first, last);
+        shortcut->in_use(shortcut->size() - destroyed);
     }
 
     /**
@@ -657,8 +655,8 @@ public:
      */
     version_type release(const entity_type entt) {
         ENTT_ASSERT(orphan(entt), "Non-orphan entity");
-        entities->erase(entt);
-        return entities->current(entt);
+        shortcut->erase(entt);
+        return shortcut->current(entt);
     }
 
     /**
@@ -674,9 +672,10 @@ public:
      * @return The version actually assigned to the entity.
      */
     version_type release(const entity_type entt, const version_type version) {
-        release(entt);
+        ENTT_ASSERT(orphan(entt), "Non-orphan entity");
         const auto vers = static_cast<version_type>(version + (version == traits_type::to_version(tombstone)));
-        entities->bump(traits_type::construct(traits_type::to_entity(entt), vers));
+        shortcut->erase(entt);
+        shortcut->bump(traits_type::construct(traits_type::to_entity(entt), vers));
         return vers;
     }
 
@@ -691,7 +690,8 @@ public:
      */
     template<typename It>
     void release(It first, It last) {
-        entities->erase(std::move(first), std::move(last));
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return orphan(entt); }), "Non-orphan entity");
+        shortcut->erase(std::move(first), std::move(last));
     }
 
     /**
@@ -724,8 +724,10 @@ public:
      * @return The version actually assigned to the entity.
      */
     version_type destroy(const entity_type entt, const version_type version) {
-        for(size_type pos = pools.size(); pos; --pos) {
-            pools.begin()[pos - 1u].second->remove(entt);
+        ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
+
+        for(size_type pos = pools.size() - 1u; pos; --pos) {
+            pools.begin()[pos].second->remove(entt);
         }
 
         return release(entt, version);
@@ -742,15 +744,17 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        const auto len = entities->pack(first, last);
-        auto from = entities->each().cbegin().base();
+        ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
+
+        const auto len = shortcut->pack(first, last);
+        auto from = shortcut->each().cbegin().base();
         const auto to = from + len;
 
-        for(size_type pos = pools.size(); pos; --pos) {
-            pools.begin()[pos - 1u].second->remove(from, to);
+        for(size_type pos = pools.size() - 1u; pos; --pos) {
+            pools.begin()[pos].second->remove(from, to);
         }
 
-        entities->erase(from, to);
+        release(from, to);
     }
 
     /**
@@ -1106,12 +1110,14 @@ public:
     template<typename... Type>
     void clear() {
         if constexpr(sizeof...(Type) == 0) {
-            for(size_type pos = pools.size(); pos; --pos) {
-                pools.begin()[pos - 1u].second->clear();
+            ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
+
+            for(size_type pos = pools.size() - 1u; pos; --pos) {
+                pools.begin()[pos].second->clear();
             }
 
-            auto iterable = entities->each();
-            entities->erase(iterable.begin().base(), iterable.end().base());
+            auto iterable = shortcut->each();
+            shortcut->erase(iterable.begin().base(), iterable.end().base());
         } else {
             (assure<Type>().clear(), ...);
         }
@@ -1133,7 +1139,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        for(auto [entt]: entities->each()) {
+        for(auto [entt]: shortcut->each()) {
             func(entt);
         }
     }
@@ -1144,7 +1150,7 @@ public:
      * @return True if the entity has no components assigned, false otherwise.
      */
     [[nodiscard]] bool orphan(const entity_type entt) const {
-        return std::none_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return curr.second->contains(entt); });
+        return std::none_of(++pools.cbegin(), pools.cend(), [entt](auto &&curr) { return curr.second->contains(entt); });
     }
 
     /**
@@ -1481,7 +1487,7 @@ public:
 private:
     context vars;
     container_type pools;
-    std::shared_ptr<storage_for_type<entity_type>> entities;
+    storage_for_type<entity_type> *shortcut;
     std::vector<group_data, typename alloc_traits::template rebind_alloc<group_data>> groups;
 };
 

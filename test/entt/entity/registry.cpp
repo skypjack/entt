@@ -2116,23 +2116,22 @@ TEST(Registry, Storage) {
     auto &storage = registry.storage<int>("int"_hs);
     storage.emplace(entity);
 
-    for(auto [id, pool]: registry.storage()) {
-        static_assert(std::is_same_v<decltype(pool), entt::sparse_set &>);
-        static_assert(std::is_same_v<decltype(id), entt::id_type>);
+    auto it = ++registry.storage().begin();
+    auto cit = std::as_const(registry).storage().begin();
 
-        ASSERT_TRUE(pool.contains(entity));
-        ASSERT_EQ(std::addressof(storage), std::addressof(pool));
-        ASSERT_EQ(id, "int"_hs);
-    }
+    static_assert(std::is_same_v<decltype(it->first), entt::id_type>);
+    static_assert(std::is_same_v<decltype(it->second), entt::sparse_set &>);
 
-    for(auto &&curr: std::as_const(registry).storage()) {
-        static_assert(std::is_same_v<decltype(curr.second), const entt::sparse_set &>);
-        static_assert(std::is_same_v<decltype(curr.first), entt::id_type>);
+    static_assert(std::is_same_v<decltype(cit->first), entt::id_type>);
+    static_assert(std::is_same_v<decltype(cit->second), const entt::sparse_set &>);
 
-        ASSERT_TRUE(curr.second.contains(entity));
-        ASSERT_EQ(std::addressof(storage), std::addressof(curr.second));
-        ASSERT_EQ(curr.first, "int"_hs);
-    }
+    ASSERT_TRUE(it->second.contains(entity));
+    ASSERT_EQ(std::addressof(storage), std::addressof(it->second));
+    ASSERT_EQ(it->first, "int"_hs);
+
+    ASSERT_TRUE(cit->second.contains(entity));
+    ASSERT_NE(std::addressof(storage), std::addressof(cit->second));
+    ASSERT_EQ(cit->first, entt::type_id<entt::entity>().hash());
 }
 
 TEST(Registry, VoidType) {
@@ -2154,7 +2153,6 @@ TEST(Registry, VoidType) {
 TEST(Registry, RegistryStorageIterator) {
     entt::registry registry;
     const auto entity = registry.create();
-    registry.emplace<int>(entity);
 
     auto test = [entity](auto iterable) {
         auto end{iterable.begin()};
@@ -2193,7 +2191,7 @@ TEST(Registry, RegistryStorageIterator) {
         ASSERT_GT(end, begin);
         ASSERT_GE(end, iterable.end());
 
-        ASSERT_EQ(begin[0u].first, entt::type_id<int>().hash());
+        ASSERT_EQ(begin[0u].first, entt::type_id<entt::entity>().hash());
         ASSERT_TRUE(begin[0u].second.contains(entity));
     };
 
@@ -2209,7 +2207,6 @@ TEST(Registry, RegistryStorageIterator) {
 TEST(Registry, RegistryStorageIteratorConversion) {
     entt::registry registry;
     const auto entity = registry.create();
-    registry.emplace<int>(entity);
 
     auto proxy = registry.storage();
     auto cproxy = std::as_const(registry).storage();
@@ -2220,8 +2217,8 @@ TEST(Registry, RegistryStorageIteratorConversion) {
     static_assert(std::is_same_v<decltype(*it), std::pair<entt::id_type, entt::sparse_set &>>);
     static_assert(std::is_same_v<decltype(*cit), std::pair<entt::id_type, const entt::sparse_set &>>);
 
-    ASSERT_EQ(it->first, entt::type_id<int>().hash());
-    ASSERT_EQ((*it).second.type(), entt::type_id<int>());
+    ASSERT_EQ(it->first, entt::type_id<entt::entity>().hash());
+    ASSERT_EQ((*it).second.type(), entt::type_id<entt::entity>());
     ASSERT_EQ(it->first, cit->first);
     ASSERT_EQ((*it).second.type(), (*cit).second.type());
 
