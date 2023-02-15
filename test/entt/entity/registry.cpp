@@ -2206,7 +2206,6 @@ TEST(Registry, RegistryStorageIterator) {
 
 TEST(Registry, RegistryStorageIteratorConversion) {
     entt::registry registry;
-    const auto entity = registry.create();
 
     auto proxy = registry.storage();
     auto cproxy = std::as_const(registry).storage();
