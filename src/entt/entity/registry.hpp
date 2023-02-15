@@ -503,7 +503,7 @@ public:
      * @brief Returns the number of entities created so far.
      * @return Number of entities created so far.
      */
-    [[nodiscard]] size_type size() const noexcept {
+    [[deprecated("use .storage<Entity>().size() instead")]] [[nodiscard]] size_type size() const noexcept {
         return shortcut->size();
     }
 
@@ -511,7 +511,7 @@ public:
      * @brief Returns the number of entities still in use.
      * @return Number of entities still in use.
      */
-    [[nodiscard]] size_type alive() const {
+    [[deprecated("use .storage<Entity>().in_use() instead")]] [[nodiscard]] size_type alive() const {
         return shortcut->in_use();
     }
 
@@ -519,7 +519,7 @@ public:
      * @brief Increases the capacity (number of entities) of the registry.
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) {
+    [[deprecated("use .storage<Entity>().reserve(cap) instead")]] void reserve(const size_type cap) {
         shortcut->reserve(cap);
     }
 
@@ -528,7 +528,7 @@ public:
      * allocated space for.
      * @return Capacity of the registry.
      */
-    [[nodiscard]] size_type capacity() const noexcept {
+    [[deprecated("use .storage<Entity>().capacity() instead")]] [[nodiscard]] size_type capacity() const noexcept {
         return shortcut->capacity();
     }
 
@@ -536,7 +536,7 @@ public:
      * @brief Checks whether the registry is empty (no entities still in use).
      * @return True if the registry is empty, false otherwise.
      */
-    [[nodiscard]] bool empty() const {
+    [[deprecated("use .storage<Entity>().in_use() instead")]] [[nodiscard]] bool empty() const {
         return !alive();
     }
 
@@ -552,7 +552,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    [[nodiscard]] const entity_type *data() const noexcept {
+    [[deprecated("use .storage<Entity>().data() instead")]] [[nodiscard]] const entity_type *data() const noexcept {
         return shortcut->data();
     }
 
@@ -560,7 +560,7 @@ public:
      * @brief Returns the number of released entities.
      * @return The number of released entities.
      */
-    [[nodiscard]] size_type released() const noexcept {
+    [[deprecated("use .storage<Entity>().size() and .storage<Entity>().in_use() instead")]] [[nodiscard]] size_type released() const noexcept {
         return (shortcut->size() - shortcut->in_use());
     }
 
