@@ -673,13 +673,9 @@ public:
      */
     version_type release(const entity_type entt, const version_type version) {
         ENTT_ASSERT(orphan(entt), "Non-orphan entity");
-        auto elem = traits_type::construct(traits_type::to_entity(entt), version);
-        elem = (elem == tombstone) ? traits_type::next(elem) : elem;
-
         shortcut->erase(entt);
-        shortcut->bump(elem);
-
-        return traits_type::to_version(elem);
+        const auto elem = traits_type::construct(traits_type::to_entity(entt), version);
+        return shortcut->bump((elem == tombstone) ? traits_type::next(elem) : elem);
     }
 
     /**
