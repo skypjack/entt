@@ -724,12 +724,14 @@ public:
      */
     version_type destroy(const entity_type entt, const version_type version) {
         ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
+        ENTT_ASSERT(shortcut->contains(entt), "Invalid entity");
 
-        for(size_type pos = pools.size() - 1u; pos; --pos) {
-            pools.begin()[pos].second->remove(entt);
+        for(size_type pos = pools.size(); pos; --pos) {
+            pools.begin()[pos - 1u].second->remove(entt);
         }
 
-        return release(entt, version);
+        const auto elem = traits_type::construct(traits_type::to_entity(entt), version);
+        return shortcut->bump((elem == tombstone) ? traits_type::next(elem) : elem);
     }
 
     /**
@@ -744,16 +746,12 @@ public:
     template<typename It>
     void destroy(It first, It last) {
         ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
+        const auto from = shortcut->each().cbegin().base();
+        const auto to = from + shortcut->pack(first, last);
 
-        const auto len = shortcut->pack(first, last);
-        auto from = shortcut->each().cbegin().base();
-        const auto to = from + len;
-
-        for(size_type pos = pools.size() - 1u; pos; --pos) {
-            pools.begin()[pos].second->remove(from, to);
+        for(size_type pos = pools.size(); pos; --pos) {
+            pools.begin()[pos - 1u].second->remove(from, to);
         }
-
-        release(from, to);
     }
 
     /**
