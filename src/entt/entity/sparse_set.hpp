@@ -748,12 +748,14 @@ public:
      * sparse set results in undefined behavior.
      *
      * @param entt A valid identifier.
+     * @return The version of the given identifier.
      */
-    void bump(const entity_type entt) {
+    version_type bump(const entity_type entt) {
         auto &entity = sparse_ref(entt);
         ENTT_ASSERT(entt != tombstone && entity != null, "Cannot set the required version");
         entity = traits_type::combine(traits_type::to_integral(entity), traits_type::to_integral(entt));
         packed[static_cast<size_type>(traits_type::to_entity(entity))] = entt;
+        return traits_type::to_version(entt);
     }
 
     /**

@@ -372,9 +372,9 @@ TEST(SparseSet, Bump) {
     ASSERT_EQ(set.current(entities[1u]), 0u);
     ASSERT_EQ(set.current(entities[2u]), 3u);
 
-    set.bump(entities[0u]);
-    set.bump(traits_type::construct(traits_type::to_entity(entities[1u]), 1));
-    set.bump(traits_type::construct(traits_type::to_entity(entities[2u]), 0));
+    ASSERT_EQ(set.bump(entities[0u]), 0u);
+    ASSERT_EQ(set.bump(traits_type::construct(traits_type::to_entity(entities[1u]), 1)), 1u);
+    ASSERT_EQ(set.bump(traits_type::construct(traits_type::to_entity(entities[2u]), 0)), 0u);
 
     ASSERT_EQ(set.current(entities[0u]), 0u);
     ASSERT_EQ(set.current(entities[1u]), 1u);
