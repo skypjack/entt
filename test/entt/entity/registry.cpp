@@ -499,7 +499,7 @@ TEST(Registry, Data) {
     registry.release(entity);
 
     ASSERT_EQ(*std::as_const(registry).data(), other);
-    ASSERT_EQ(*(std::as_const(registry).data() + 1u), traits_type::construct(traits_type::to_entity(entity), 1));
+    ASSERT_EQ(*(std::as_const(registry).data() + 1u), traits_type::next(entity));
 }
 
 TEST(Registry, CreateManyEntitiesAtOnce) {

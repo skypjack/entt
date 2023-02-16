@@ -673,10 +673,13 @@ public:
      */
     version_type release(const entity_type entt, const version_type version) {
         ENTT_ASSERT(orphan(entt), "Non-orphan entity");
-        const auto vers = static_cast<version_type>(version + (version == traits_type::to_version(tombstone)));
+        auto elem = traits_type::construct(traits_type::to_entity(entt), version);
+        elem = (elem == tombstone) ? traits_type::next(elem) : elem;
+
         shortcut->erase(entt);
-        shortcut->bump(traits_type::construct(traits_type::to_entity(entt), vers));
-        return vers;
+        shortcut->bump(elem);
+
+        return traits_type::to_version(elem);
     }
 
     /**
@@ -708,7 +711,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entt) {
-        return destroy(entt, static_cast<version_type>(traits_type::to_version(entt) + 1u));
+        return destroy(entt, traits_type::to_version(traits_type::next(entt)));
     }
 
     /**
