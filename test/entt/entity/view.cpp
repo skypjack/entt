@@ -1233,42 +1233,6 @@ TEST(MultiComponentView, SameComponentTypes) {
     ASSERT_EQ(&view.use<1u>().handle(), &other);
 }
 
-TEST(View, Pipe) {
-    entt::registry registry;
-    const auto entity = registry.create();
-    const auto other = registry.create();
-
-    registry.emplace<int>(entity);
-    registry.emplace<char>(entity);
-    registry.emplace<double>(entity);
-    registry.emplace<empty_type>(entity);
-
-    registry.emplace<int>(other);
-    registry.emplace<char>(other);
-    registry.emplace<stable_type>(other);
-
-    const auto view1 = registry.view<int>(entt::exclude<const double>);
-    const auto view2 = registry.view<const char>(entt::exclude<float>);
-    const auto view3 = registry.view<empty_type>();
-    const auto view4 = registry.view<stable_type>();
-
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<char>>, entt::exclude_t<const entt::storage_type_t<double>, entt::storage_type_t<float>>>, decltype(view1 | view2)>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<char>, entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<float>, const entt::storage_type_t<double>>>, decltype(view2 | view1)>);
-    static_assert(std::is_same_v<decltype((view3 | view2) | view1), decltype(view3 | (view2 | view1))>);
-
-    ASSERT_FALSE((view1 | view2).contains(entity));
-    ASSERT_TRUE((view1 | view2).contains(other));
-
-    ASSERT_TRUE((view3 | view2).contains(entity));
-    ASSERT_FALSE((view3 | view2).contains(other));
-
-    ASSERT_FALSE((view1 | view2 | view3).contains(entity));
-    ASSERT_FALSE((view1 | view2 | view3).contains(other));
-
-    ASSERT_FALSE((view1 | view4 | view2).contains(entity));
-    ASSERT_TRUE((view1 | view4 | view2).contains(other));
-}
-
 TEST(MultiComponentView, Storage) {
     entt::registry registry;
     const auto entity = registry.create();
@@ -1324,4 +1288,40 @@ TEST(MultiComponentView, Storage) {
     ASSERT_FALSE(view.storage<3u>().contains(entity));
     ASSERT_TRUE((registry.all_of<char>(entity)));
     ASSERT_FALSE((registry.any_of<int, double, float>(entity)));
+}
+
+TEST(View, Pipe) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    const auto other = registry.create();
+
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+    registry.emplace<double>(entity);
+    registry.emplace<empty_type>(entity);
+
+    registry.emplace<int>(other);
+    registry.emplace<char>(other);
+    registry.emplace<stable_type>(other);
+
+    const auto view1 = registry.view<int>(entt::exclude<const double>);
+    const auto view2 = registry.view<const char>(entt::exclude<float>);
+    const auto view3 = registry.view<empty_type>();
+    const auto view4 = registry.view<stable_type>();
+
+    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<char>>, entt::exclude_t<const entt::storage_type_t<double>, entt::storage_type_t<float>>>, decltype(view1 | view2)>);
+    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<char>, entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<float>, const entt::storage_type_t<double>>>, decltype(view2 | view1)>);
+    static_assert(std::is_same_v<decltype((view3 | view2) | view1), decltype(view3 | (view2 | view1))>);
+
+    ASSERT_FALSE((view1 | view2).contains(entity));
+    ASSERT_TRUE((view1 | view2).contains(other));
+
+    ASSERT_TRUE((view3 | view2).contains(entity));
+    ASSERT_FALSE((view3 | view2).contains(other));
+
+    ASSERT_FALSE((view1 | view2 | view3).contains(entity));
+    ASSERT_FALSE((view1 | view2 | view3).contains(other));
+
+    ASSERT_FALSE((view1 | view4 | view2).contains(entity));
+    ASSERT_TRUE((view1 | view4 | view2).contains(other));
 }
