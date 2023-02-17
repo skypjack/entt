@@ -952,9 +952,9 @@ TEST(Registry, View) {
     entt::registry registry;
     entt::entity entities[3u];
 
-    auto mview = registry.view<int, char>();
     auto iview = registry.view<int>();
     auto cview = registry.view<char>();
+    auto mview = registry.view<int, char>();
     auto fview = registry.view<int>(entt::exclude<char>);
 
     registry.create(std::begin(entities), std::end(entities));
@@ -969,6 +969,12 @@ TEST(Registry, View) {
 
     ASSERT_EQ(iview.size(), 3u);
     ASSERT_EQ(cview.size(), 2u);
+
+    ASSERT_EQ(mview.size_hint(), 3u);
+    ASSERT_EQ(fview.size_hint(), 3u);
+
+    ASSERT_EQ(mview.refresh().size_hint(), 2u);
+    ASSERT_EQ(fview.refresh().size_hint(), 3u);
 
     ASSERT_NE(mview.begin(), mview.end());
     ASSERT_NE(fview.begin(), fview.end());
