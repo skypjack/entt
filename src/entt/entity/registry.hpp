@@ -653,7 +653,7 @@ public:
      * @param entt A valid identifier.
      * @return The version of the recycled entity.
      */
-    version_type release(const entity_type entt) {
+    [[deprecated("use .orphan(entt) and .storage<Entity>().erase(entt) instead")]] version_type release(const entity_type entt) {
         ENTT_ASSERT(orphan(entt), "Non-orphan entity");
         shortcut->erase(entt);
         return shortcut->current(entt);
@@ -671,7 +671,7 @@ public:
      * @param version A desired version upon destruction.
      * @return The version actually assigned to the entity.
      */
-    version_type release(const entity_type entt, const version_type version) {
+    [[deprecated("use .orphan(entt), then .storage<Entity>().erase(entt)/.bump(next) instead")]] version_type release(const entity_type entt, const version_type version) {
         ENTT_ASSERT(orphan(entt), "Non-orphan entity");
         shortcut->erase(entt);
         const auto elem = traits_type::construct(traits_type::to_entity(entt), version);
@@ -688,7 +688,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void release(It first, It last) {
+    [[deprecated("use .orphan(entt) and .storage<Entity>().erase(first, last) instead")]] void release(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return orphan(entt); }), "Non-orphan entity");
         shortcut->erase(std::move(first), std::move(last));
     }
