@@ -17,8 +17,9 @@ TODO (high prio):
 * pop_if to improve further destroying entities (drastically)
 * improve sigh mixin for entity storage (split basic + entt/entt spec)
 * doc: exclude only views, storage entity, bump entities
-* deprecate/remove registry reserve, capacity, empty, data, destroyed, release and so on
 * registry::destroy avoid pack if entity storage iterators already
+* registry: replace destroy with a drop-all method that doesn't care about validity
+* registry: review assign mechanism, maybe it's worth to drop it
 * test signals on entity creation/destruction/update
 * test exclude-only views
 
