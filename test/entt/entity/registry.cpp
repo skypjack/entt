@@ -950,10 +950,12 @@ TEST(Registry, Orphans) {
 
 TEST(Registry, View) {
     entt::registry registry;
+    entt::entity entities[3u];
+
     auto mview = registry.view<int, char>();
     auto iview = registry.view<int>();
     auto cview = registry.view<char>();
-    entt::entity entities[3u];
+    auto fview = registry.view<int>(entt::exclude<char>);
 
     registry.create(std::begin(entities), std::end(entities));
 
@@ -968,10 +970,20 @@ TEST(Registry, View) {
     ASSERT_EQ(iview.size(), 3u);
     ASSERT_EQ(cview.size(), 2u);
 
-    std::size_t cnt{};
-    mview.each([&cnt](auto...) { ++cnt; });
+    ASSERT_NE(mview.begin(), mview.end());
+    ASSERT_NE(fview.begin(), fview.end());
 
-    ASSERT_EQ(cnt, 2u);
+    ASSERT_EQ(std::distance(mview.begin(), mview.end()), 2);
+    ASSERT_EQ(std::distance(fview.begin(), fview.end()), 1);
+
+    mview.each([&entities, first = true](auto entity, auto &&...) mutable {
+        ASSERT_EQ(entity, entities[2u * first]);
+        first = false;
+    });
+
+    fview.each([&entities](auto entity, auto &&...) {
+        ASSERT_EQ(entity, entities[1u]);
+    });
 }
 
 TEST(Registry, NonOwningGroupInitOnFirstUse) {
