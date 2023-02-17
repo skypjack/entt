@@ -21,7 +21,7 @@ TODO (high prio):
 * registry: replace destroy with a drop-all method that doesn't care about validity
 * registry: review assign mechanism, maybe it's worth to drop it
 * test signals on entity creation/destruction/update
-* test exclude-only views
+* entity storage: clear the difference between iterator and each based iteration (see exclude-only view test)
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
@@ -29,7 +29,6 @@ WIP:
 * basic_storage::bind for cross-registry setups (see and remove todo from entity_copy.cpp)
 * process scheduler: reviews, use free lists internally
 * dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
-* entity-only and exclude-only views (both solved with entity storage and storage<void>)
 * custom allocators all over (registry, ...)
 * add test for maximum number of entities reached
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views

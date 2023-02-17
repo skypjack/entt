@@ -992,6 +992,32 @@ TEST(Registry, View) {
     });
 }
 
+TEST(Registry, ExcludeOnlyView) {
+    entt::registry registry;
+    entt::entity entities[4u];
+
+    auto view = registry.view<entt::entity>(entt::exclude<int>);
+
+    registry.create(std::begin(entities), std::end(entities));
+
+    registry.emplace<int>(entities[0u], 0);
+    registry.emplace<int>(entities[2u], 0);
+    registry.emplace<int>(entities[3u], 0);
+
+    registry.destroy(entities[3u]);
+
+    ASSERT_EQ(view.size_hint(), 4u);
+    ASSERT_NE(view.begin(), view.end());
+
+    // returns all matching identifiers, both in-use and available ones
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 2);
+
+    // skips available identifiers automatically, only returns in-use elements
+    view.each([&entities](auto entity, auto &&...) {
+        ASSERT_EQ(entity, entities[1u]);
+    });
+}
+
 TEST(Registry, NonOwningGroupInitOnFirstUse) {
     entt::registry registry;
     entt::entity entities[3u];
