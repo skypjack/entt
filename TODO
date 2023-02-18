@@ -16,12 +16,10 @@ TODO (high prio):
 * remove the static storage from the const assure in the registry
 * pop_if to improve further destroying entities (drastically)
 * improve sigh mixin for entity storage (split basic + entt/entt spec)
-* doc: exclude only views, storage entity, bump entities
+* doc: exclude only views, storage entity (and diff between iterator and each based iteration), bump entities, signals on entity creation/destruction
 * registry::destroy avoid pack if entity storage iterators already
 * registry: replace destroy with a drop-all method that doesn't care about validity
 * registry: review assign mechanism, maybe it's worth to drop it
-* test signals on entity creation/destruction/update
-* entity storage: clear the difference between iterator and each based iteration (see exclude-only view test)
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives

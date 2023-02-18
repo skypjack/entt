@@ -1541,6 +1541,46 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.last, entities[0u]);
 }
 
+TEST(Registry, SignalsOnEntity) {
+    entt::registry registry;
+    listener listener;
+
+    registry.on_construct<entt::entity>().connect<&listener::incr>(listener);
+
+    entt::entity entity = registry.create();
+    entt::entity other = registry.create();
+
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_EQ(listener.last, other);
+
+    registry.destroy(other);
+    registry.destroy(entity);
+
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_EQ(listener.last, other);
+
+    registry.on_construct<entt::entity>().disconnect<&listener::incr>(listener);
+
+    other = registry.create();
+    entity = registry.create();
+
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_NE(listener.last, entity);
+    ASSERT_NE(listener.last, other);
+
+    registry.on_destroy<entt::entity>().connect<&listener::decr>(listener);
+
+    registry.destroy(entity);
+
+    ASSERT_EQ(listener.counter, 1);
+    ASSERT_EQ(listener.last, entity);
+
+    registry.storage<entt::entity>().erase(other);
+
+    ASSERT_EQ(listener.counter, 0);
+    ASSERT_EQ(listener.last, other);
+}
+
 TEST(Registry, SignalWhenDestroying) {
     entt::registry registry;
     const auto entity = registry.create();
