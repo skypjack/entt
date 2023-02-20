@@ -588,7 +588,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
-        return shortcut->spawn();
+        return shortcut->emplace();
     }
 
     /**
@@ -601,7 +601,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
-        return shortcut->spawn(hint);
+        return shortcut->emplace(hint);
     }
 
     /**
@@ -615,7 +615,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        shortcut->spawn(std::move(first), std::move(last));
+        shortcut->insert(std::move(first), std::move(last));
     }
 
     /**

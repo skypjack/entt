@@ -510,11 +510,11 @@ TEST(SighMixin, StorageEntity) {
     ASSERT_EQ(on_construct.value, 3);
     ASSERT_EQ(on_destroy.value, 3);
 
-    pool.spawn();
-    pool.spawn(entt::entity{0});
+    pool.emplace();
+    pool.emplace(entt::entity{0});
 
     entt::entity entities[1u]{};
-    pool.spawn(entities, entities + 1u);
+    pool.insert(entities, entities + 1u);
 
     ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 3);

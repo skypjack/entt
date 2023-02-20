@@ -192,18 +192,46 @@ public:
     }
 
     /**
-     * @brief Assigns entities to a storage.
-     * @tparam Args Types of arguments to use to construct the object.
-     * @param entt A valid identifier.
-     * @param args Parameters to use to initialize the object.
-     * @return A reference to the newly created object.
+     * @brief Emplace elements into a storage.
+     *
+     * The behavior of this operation depends on the underlying storage type
+     * (for example, components vs entities).<br/>
+     * Refer to the specific documentation for more details.
+     *
+     * @return A return value as returned by the underlying storage.
+     */
+    auto emplace() {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        const auto entt = Type::emplace();
+        construction.publish(*owner, entt);
+        return entt;
+    }
+
+    /**
+     * @brief Emplace elements into a storage.
+     *
+     * The behavior of this operation depends on the underlying storage type
+     * (for example, components vs entities).<br/>
+     * Refer to the specific documentation for more details.
+     *
+     * @tparam Args Types of arguments to forward to the underlying storage.
+     * @param hint A valid identifier.
+     * @param args Parameters to forward to the underlying storage.
+     * @return A return value as returned by the underlying storage.
      */
     template<typename... Args>
-    decltype(auto) emplace(const entity_type entt, Args &&...args) {
+    decltype(auto) emplace(const entity_type hint, Args &&...args) {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        Type::emplace(entt, std::forward<Args>(args)...);
-        construction.publish(*owner, entt);
-        return this->get(entt);
+
+        if constexpr(std::is_same_v<typename Type::value_type, typename Type::entity_type>) {
+            const auto entt = Type::emplace(hint, std::forward<Args>(args)...);
+            construction.publish(*owner, entt);
+            return entt;
+        } else {
+            Type::emplace(hint, std::forward<Args>(args)...);
+            construction.publish(*owner, hint);
+            return this->get(hint);
+        }
     }
 
     /**
@@ -222,64 +250,21 @@ public:
     }
 
     /**
-     * @brief Assigns entities to a storage.
-     * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the objects assigned
-     * to the entities.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the objects assigned to the
-     * entities.
+     * @brief Emplace elements into a storage.
+     *
+     * The behavior of this operation depends on the underlying storage type
+     * (for example, components vs entities).<br/>
+     * Refer to the specific documentation for more details.
+     *
+     * @tparam It Iterator type (as required by the underlying storage type).
+     * @tparam Args Types of arguments to forward to the underlying storage.
+     * @param first An iterator to the first element of the range.
+     * @param last An iterator past the last element of the range.
+     * @param args Parameters to use to forward to the underlying storage.
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...args) {
         Type::insert(first, last, std::forward<Args>(args)...);
-
-        if(!construction.empty()) {
-            ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-
-            for(; first != last; ++first) {
-                construction.publish(*owner, *first);
-            }
-        }
-    }
-
-    /**
-     * @brief Creates a new identifier or recycles a destroyed one.
-     * @return A valid identifier.
-     */
-    entity_type spawn() {
-        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        const auto entt = Type::spawn();
-        construction.publish(*owner, entt);
-        return entt;
-    }
-
-    /**
-     * @brief Creates a new identifier or recycles a destroyed one.
-     *
-     * If the requested identifier isn't in use, the suggested one is used.
-     * Otherwise, a new identifier is returned.
-     *
-     * @param hint Required identifier.
-     * @return A valid identifier.
-     */
-    entity_type spawn(const entity_type hint) {
-        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        const auto entt = Type::spawn(hint);
-        construction.publish(*owner, entt);
-        return entt;
-    }
-
-    /**
-     * @brief Assigns each element in a range an identifier.
-     * @tparam It Type of mutable forward iterator.
-     * @param first An iterator to the first element of the range to generate.
-     * @param last An iterator past the last element of the range to generate.
-     */
-    template<typename It>
-    void spawn(It first, It last) {
-        Type::spawn(first, last);
 
         if(!construction.empty()) {
             ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");

@@ -964,7 +964,7 @@ protected:
      * @return Iterator pointing to the emplaced element.
      */
     underlying_iterator try_emplace(const Entity hint, const bool, const void *) override {
-        return base_type::find(spawn(hint));
+        return base_type::find(emplace(hint));
     }
 
 public:
@@ -1068,7 +1068,7 @@ public:
      * @brief Creates a new identifier or recycles a destroyed one.
      * @return A valid identifier.
      */
-    entity_type spawn() {
+    entity_type emplace() {
         if(length == base_type::size()) {
             return *base_type::try_emplace(entity_at(length++), true);
         }
@@ -1085,9 +1085,9 @@ public:
      * @param hint Required identifier.
      * @return A valid identifier.
      */
-    entity_type spawn(const entity_type hint) {
+    entity_type emplace(const entity_type hint) {
         if(hint == null || hint == tombstone) {
-            return spawn();
+            return emplace();
         } else if(const auto curr = local_traits_type::construct(local_traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
             const auto pos = static_cast<size_type>(local_traits_type::to_entity(hint));
 
@@ -1097,7 +1097,7 @@ public:
 
             base_type::swap_at(pos, length++);
         } else if(const auto idx = base_type::index(curr); idx < length) {
-            return spawn();
+            return emplace();
         } else {
             base_type::swap_at(idx, length++);
         }
@@ -1114,7 +1114,7 @@ public:
      * @param last An iterator past the last element of the range to generate.
      */
     template<typename It>
-    void spawn(It first, It last) {
+    void insert(It first, It last) {
         for(const auto sz = base_type::size(); first != last && length != sz; ++first, ++length) {
             *first = base_type::operator[](length);
         }
