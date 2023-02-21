@@ -711,12 +711,15 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the object to construct.
+     * @return Iterator pointing to the first entity inserted, if any.
      */
     template<typename It>
-    void insert(It first, It last, const value_type &value = {}) {
+    typename base_type::iterator insert(It first, It last, const value_type &value = {}) {
         for(; first != last; ++first) {
             emplace_element(*first, true, value);
         }
+
+        return base_type::begin();
     }
 
     /**
@@ -730,12 +733,15 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of objects.
+     * @return Iterator pointing to the first entity inserted, if any.
      */
     template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, value_type>>>
-    void insert(EIt first, EIt last, CIt from) {
+    typename base_type::iterator insert(EIt first, EIt last, CIt from) {
         for(; first != last; ++first, ++from) {
             emplace_element(*first, true, *from);
         }
+
+        return base_type::begin();
     }
 
     /**
@@ -885,12 +891,15 @@ public:
      * @tparam Args Types of optional arguments.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @return Iterator pointing to the first entity inserted, if any.
      */
     template<typename It, typename... Args>
-    void insert(It first, It last, Args &&...) {
+    typename base_type::iterator insert(It first, It last, Args &&...) {
         for(; first != last; ++first) {
             base_type::try_emplace(*first, true);
         }
+
+        return base_type::begin();
     }
 
     /**
@@ -1112,9 +1121,10 @@ public:
      * @tparam It Type of mutable forward iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
+     * @return Iterator pointing to the first entity inserted, if any.
      */
     template<typename It>
-    void insert(It first, It last) {
+    typename base_type::iterator insert(It first, It last) {
         for(const auto sz = base_type::size(); first != last && length != sz; ++first, ++length) {
             *first = base_type::operator[](length);
         }
@@ -1122,6 +1132,8 @@ public:
         for(; first != last; ++first) {
             *first = *base_type::try_emplace(entity_at(length++), true);
         }
+
+        return (base_type::end() - length);
     }
 
     /**

@@ -222,6 +222,44 @@ TEST(StorageEntity, Emplace) {
     ASSERT_EQ(entities[1u], entt::entity{8});
 }
 
+TEST(StorageEntity, Insert) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::storage<entt::entity> pool;
+    entt::entity entities[2u]{};
+    typename entt::sparse_set::iterator it{};
+    const entt::sparse_set &base = pool;
+
+    it = pool.insert(std::begin(entities), std::end(entities));
+
+    ASSERT_EQ(it, base.cbegin());
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_TRUE(pool.contains(entities[1u]));
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.in_use(), 2u);
+
+    pool.erase(std::begin(entities), std::end(entities));
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.in_use(), 0u);
+
+    it = pool.insert(entities, entities + 1u);
+
+    ASSERT_NE(it, base.cbegin());
+    ASSERT_EQ(it, base.cbegin() + 1u);
+
+    ASSERT_TRUE(pool.contains(entities[0u]));
+    ASSERT_FALSE(pool.contains(entities[1u]));
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.in_use(), 1u);
+}
+
 TEST(StorageEntity, Pack) {
     entt::storage<entt::entity> pool;
     entt::entity entities[3u]{entt::entity{1}, entt::entity{3}, entt::entity{42}};
