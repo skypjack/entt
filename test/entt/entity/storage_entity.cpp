@@ -227,12 +227,9 @@ TEST(StorageEntity, Insert) {
 
     entt::storage<entt::entity> pool;
     entt::entity entities[2u]{};
-    typename entt::sparse_set::iterator it{};
     const entt::sparse_set &base = pool;
 
-    it = pool.insert(std::begin(entities), std::end(entities));
-
-    ASSERT_EQ(it, base.cbegin());
+    pool.insert(std::begin(entities), std::end(entities));
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_TRUE(pool.contains(entities[1u]));
@@ -247,10 +244,7 @@ TEST(StorageEntity, Insert) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.in_use(), 0u);
 
-    it = pool.insert(entities, entities + 1u);
-
-    ASSERT_NE(it, base.cbegin());
-    ASSERT_EQ(it, base.cbegin() + 1u);
+    pool.insert(entities, entities + 1u);
 
     ASSERT_TRUE(pool.contains(entities[0u]));
     ASSERT_FALSE(pool.contains(entities[1u]));
