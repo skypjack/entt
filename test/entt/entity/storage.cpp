@@ -328,6 +328,8 @@ TEST_F(Storage, Insert) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.get(entities[0u]).value, 99);
     ASSERT_EQ(pool.get(entities[1u]).value, 99);
+    ASSERT_EQ(it++->value, 99);
+    ASSERT_EQ(it->value, 99);
 
     pool.erase(std::begin(entities), std::end(entities));
     const stable_type values[2u] = {stable_type{42}, stable_type{3}};
@@ -342,6 +344,8 @@ TEST_F(Storage, Insert) {
     ASSERT_EQ(pool.index(entities[1u]), 2u);
     ASSERT_EQ(pool.get(entities[0u]).value, 3);
     ASSERT_EQ(pool.get(entities[1u]).value, 42);
+    ASSERT_EQ(it++->value, 3);
+    ASSERT_EQ(it->value, 42);
 }
 
 TEST_F(Storage, InsertEmptyType) {

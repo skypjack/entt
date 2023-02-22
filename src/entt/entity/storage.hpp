@@ -711,7 +711,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the object to construct.
-     * @return Iterator pointing to the first element inserted, if any.
+     * @return Iterator pointing to the last element inserted, if any.
      */
     template<typename It>
     iterator insert(It first, It last, const value_type &value = {}) {
