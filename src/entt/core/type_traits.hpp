@@ -296,7 +296,8 @@ struct type_list_contains;
  * @tparam Other Type to look for.
  */
 template<typename... Type, typename Other>
-struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
+struct type_list_contains<type_list<Type...>, Other>
+    : std::bool_constant<(std::is_same_v<Type, Other> || ...)> {};
 
 /**
  * @brief Helper variable template.
@@ -567,7 +568,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
  */
 template<typename Type>
 struct is_ebco_eligible
-    : std::conjunction<std::is_empty<Type>, std::negation<std::is_final<Type>>> {};
+    : std::bool_constant<std::is_empty_v<Type> && !std::is_final_v<Type>> {};
 
 /**
  * @brief Helper variable template.
