@@ -68,11 +68,7 @@ struct as_void_t final {
  */
 template<typename Type>
 struct is_meta_policy
-    : std::disjunction<
-          std::is_same<Type, as_ref_t>,
-          std::is_same<Type, as_cref_t>,
-          std::is_same<Type, as_is_t>,
-          std::is_same<Type, as_void_t>> {};
+    : std::bool_constant<std::is_same_v<Type, as_ref_t> || std::is_same_v<Type, as_cref_t> || std::is_same_v<Type, as_is_t> || std::is_same_v<Type, as_void_t>> {};
 
 /**
  * @brief Helper variable template.
