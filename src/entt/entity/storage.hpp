@@ -1118,7 +1118,6 @@ public:
      * @tparam It Type of mutable forward iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
-     * @return Iterator pointing to the first entity inserted, if any.
      */
     template<typename It>
     void insert(It first, It last) {
