@@ -1,6 +1,7 @@
 #ifndef ENTT_ENTITY_MIXIN_HPP
 #define ENTT_ENTITY_MIXIN_HPP
 
+#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/any.hpp"
