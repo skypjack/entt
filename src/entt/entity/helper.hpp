@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
@@ -27,7 +28,7 @@ public:
     /*! @brief Type of registry to convert. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<typename registry_type::entity_type>;
+    using entity_type = typename registry_type::entity_type;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -70,7 +71,7 @@ public:
     /*! @brief Type of registry to convert. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<typename registry_type::entity_type>;
+    using entity_type = typename registry_type::entity_type;
 
     /**
      * @brief Constructs a converter for a given registry.
