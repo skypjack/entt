@@ -36,19 +36,19 @@ namespace internal {
 }
 
 inline meta_base_node &meta_extend(internal::meta_type_node &parent, const id_type id, meta_base_node node) {
-    return parent.details->base.insert_or_assign(id, std::move(node)).first->second;
+    return parent.details->base.insert_or_assign(id, node).first->second;
 }
 
 inline meta_conv_node &meta_extend(internal::meta_type_node &parent, const id_type id, meta_conv_node node) {
-    return parent.details->conv.insert_or_assign(id, std::move(node)).first->second;
+    return parent.details->conv.insert_or_assign(id, node).first->second;
 }
 
 inline meta_ctor_node &meta_extend(internal::meta_type_node &parent, const id_type id, meta_ctor_node node) {
-    return parent.details->ctor.insert_or_assign(id, std::move(node)).first->second;
+    return parent.details->ctor.insert_or_assign(id, node).first->second;
 }
 
 inline meta_dtor_node &meta_extend(internal::meta_type_node &parent, meta_dtor_node node) {
-    return (parent.dtor = std::move(node));
+    return (parent.dtor = node);
 }
 
 inline meta_data_node &meta_extend(internal::meta_type_node &parent, const id_type id, meta_data_node node) {

@@ -1634,7 +1634,7 @@ public:
     explicit meta_iterator(const meta_ctx &area, It iter) noexcept
         : ctx{&area},
           vtable{&basic_vtable<It>},
-          handle{std::move(iter)} {}
+          handle{iter} {}
 
     meta_iterator &operator++() noexcept {
         vtable(operation::incr, handle, 1, nullptr);
@@ -1728,7 +1728,7 @@ public:
     meta_iterator(const meta_ctx &area, std::integral_constant<bool, KeyOnly>, It iter) noexcept
         : ctx{&area},
           vtable{&basic_vtable<KeyOnly, It>},
-          handle{std::move(iter)} {}
+          handle{iter} {}
 
     meta_iterator &operator++() noexcept {
         vtable(operation::incr, handle, nullptr);
@@ -1838,7 +1838,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(iterato
  * @return A possibly invalid iterator following the last removed element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
-    return insert(std::move(it), {});
+    return insert(it, {});
 }
 
 /**
