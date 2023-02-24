@@ -26,7 +26,7 @@ namespace entt {
 
 namespace internal {
 
-template<typename Container, typename Size>
+template<typename Container, std::size_t Size>
 class storage_iterator final {
     friend storage_iterator<const Container, Size>;
 
@@ -93,12 +93,12 @@ public:
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         const auto pos = index() - value;
-        return (*payload)[pos / Size::value][fast_mod(pos, Size::value)];
+        return (*payload)[pos / Size][fast_mod(pos, Size)];
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
         const auto pos = index();
-        return (*payload)[pos / Size::value] + fast_mod(pos, Size::value);
+        return (*payload)[pos / Size] + fast_mod(pos, Size);
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
@@ -114,38 +114,38 @@ private:
     difference_type offset;
 };
 
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
+template<typename Lhs, typename Rhs, std::size_t Size>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs, Size> &lhs, const storage_iterator<Rhs, Size> &rhs) noexcept {
     return rhs.index() - lhs.index();
 }
 
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator==(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
+template<typename Lhs, typename Rhs, std::size_t Size>
+[[nodiscard]] constexpr bool operator==(const storage_iterator<Lhs, Size> &lhs, const storage_iterator<Rhs, Size> &rhs) noexcept {
     return lhs.index() == rhs.index();
 }
 
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator!=(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
+template<typename Lhs, typename Rhs, std::size_t Size>
+[[nodiscard]] constexpr bool operator!=(const storage_iterator<Lhs, Size> &lhs, const storage_iterator<Rhs, Size> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
+template<typename Lhs, typename Rhs, std::size_t Size>
+[[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs, Size> &lhs, const storage_iterator<Rhs, Size> &rhs) noexcept {
     return lhs.index() > rhs.index();
 }
 
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
+template<typename Lhs, typename Rhs, std::size_t Size>
+[[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs, Size> &lhs, const storage_iterator<Rhs, Size> &rhs) noexcept {
     return lhs.index() < rhs.index();
 }
 
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator<=(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
+template<typename Lhs, typename Rhs, std::size_t Size>
+[[nodiscard]] constexpr bool operator<=(const storage_iterator<Lhs, Size> &lhs, const storage_iterator<Rhs, Size> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator>=(const storage_iterator<Lhs...> &lhs, const storage_iterator<Rhs...> &rhs) noexcept {
+template<typename Lhs, typename Rhs, std::size_t Size>
+[[nodiscard]] constexpr bool operator>=(const storage_iterator<Lhs, Size> &lhs, const storage_iterator<Rhs, Size> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -410,9 +410,9 @@ public:
     /*! @brief Constant pointer type to contained elements. */
     using const_pointer = typename alloc_traits::template rebind_traits<typename alloc_traits::const_pointer>::const_pointer;
     /*! @brief Random access iterator type. */
-    using iterator = internal::storage_iterator<container_type, std::integral_constant<size_type, traits_type::page_size>>;
+    using iterator = internal::storage_iterator<container_type, traits_type::page_size>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = internal::storage_iterator<const container_type, std::integral_constant<size_type, traits_type::page_size>>;
+    using const_iterator = internal::storage_iterator<const container_type, traits_type::page_size>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
