@@ -168,7 +168,8 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) const {
-        for(auto &&call: std::as_const(calls)) {
+        for(int i=0; i<calls.size(); i++) {
+            auto&& call = calls[i];
             call(args...);
         }
     }
