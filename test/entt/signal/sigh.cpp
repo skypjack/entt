@@ -71,6 +71,15 @@ struct const_nonconst_noexcept {
     mutable int cnt{0};
 };
 
+struct release_inside_invocation {
+  void f(entt::connection& c) {
+    c.release();
+    value++;
+  }
+
+  int value{0};
+};
+
 TEST_F(SigH, Lifetime) {
     using signal = entt::sigh<void(void)>;
 
@@ -574,4 +583,17 @@ TEST_F(SigH, CustomAllocator) {
 
     ASSERT_TRUE(copy.empty());
     ASSERT_TRUE(move.empty());
+}
+
+TEST_F(SigH, ReleaseConnectionInsideInvocation) {
+    entt::sigh<void(entt::connection&)> sigh;
+    entt::sink sink{sigh};
+
+    release_inside_invocation instance;
+
+    entt::connection c = sink.connect<&release_inside_invocation::f>(instance);
+    sigh.publish(c); // Fires here, disconnects
+    sigh.publish(c); // Nothing to fire, no change.
+    // On some compilers (i.e. clang), a range-based for loop in the publish method will cause a "vector iterator past end" error, while not on others (MSVC)
+    ASSERT_EQ(instance.value, 1);
 }
