@@ -72,12 +72,26 @@ struct const_nonconst_noexcept {
 };
 
 struct release_inside_invocation {
-  void f(entt::connection& c) {
+  void handler_release(entt::connection& c) {
     c.release();
     value++;
   }
 
   int value{0};
+};
+
+struct connect_inside_invocation {
+	entt::sigh<void()> signal;
+
+	void handler_connect() {
+		entt::sink{signal}.connect<&connect_inside_invocation::handler_other>(this);
+	}
+
+	void handler_other() {
+		handler_other_invoked = true;
+	}
+
+	bool handler_other_invoked = false;
 };
 
 TEST_F(SigH, Lifetime) {
@@ -591,9 +605,16 @@ TEST_F(SigH, ReleaseConnectionInsideInvocation) {
 
     release_inside_invocation instance;
 
-    entt::connection c = sink.connect<&release_inside_invocation::f>(instance);
-    sigh.publish(c); // Fires here, disconnects
-    sigh.publish(c); // Nothing to fire, no change.
+    entt::connection c = sink.connect<&release_inside_invocation::handler_release>(instance);
+    sigh.publish(c); // Fires here, disconnects, increments
+    sigh.publish(c); // Should be nothing to fire, no change
     // On some compilers (i.e. clang), a range-based for loop in the publish method will cause a "vector iterator past end" error, while not on others (MSVC)
     ASSERT_EQ(instance.value, 1);
+}
+
+TEST_F(SigH, ConnectInsideInvocation) {
+	connect_inside_invocation instance;
+	entt::sink{instance.signal}.connect<&connect_inside_invocation::handler_connect>(instance);
+	instance.signal.publish();
+	ASSERT_FALSE(instance.handler_other_invoked);
 }

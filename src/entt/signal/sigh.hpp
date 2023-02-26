@@ -168,8 +168,8 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) const {
-        for(int i=0; i<calls.size(); i++) {
-            auto&& call = calls[i];
+        container_type callsCopy = calls; // Copy allows for calls to be changed inside of the loop without causing any undefined behavior
+        for (auto &&call: callsCopy) {
             call(args...);
         }
     }
