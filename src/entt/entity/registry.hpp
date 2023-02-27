@@ -1373,18 +1373,15 @@ public:
 
             handler = static_cast<handler_type *>(candidate.handler.get());
 
-            const void *maybe_valid_if = nullptr;
-            const void *discard_if = nullptr;
-
             groups.push_back(std::move(candidate));
 
-            on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
+            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
 
-            on_destroy<std::remove_const_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler);
-            (on_destroy<std::remove_const_t<Other>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::discard_if>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::discard_if>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::discard_if>(*handler), ...);
 
             for(const auto entity: view<Get, Other...>(exclude<Exclude...>)) {
                 handler->current.push(entity);
