@@ -561,15 +561,15 @@ public:
 
     /**
      * @brief Constructs a group from a set of storage classes.
-     * @param extent The actual number of entities to iterate.
+     * @param len The actual number of entities to iterate.
      * @param opool The storage for the _owned_ types to iterate.
      * @param gpool The storage for the _observed_ types to iterate.
      * @param epool The storage for the types used to filter the group.
      */
-    basic_group(const std::size_t &extent, Owned &...opool, Get &...gpool, Exclude &...epool) noexcept
+    basic_group(const std::size_t &len, Owned &...opool, Get &...gpool, Exclude &...epool) noexcept
         : pools{&opool..., &gpool...},
           filter{&epool...},
-          length{&extent} {}
+          length{&len} {}
 
     /**
      * @brief Returns the storage for a given component type.
