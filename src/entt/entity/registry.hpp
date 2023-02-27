@@ -1221,12 +1221,6 @@ public:
 
     /**
      * @brief Returns a view for the given components.
-     *
-     * Views are created on the fly and share with the registry its internal
-     * data structures. Feel free to discard them after the use.<br/>
-     * Creating and destroying a view is an incredibly cheap operation. As a
-     * rule of thumb, storing a view should never be an option.
-     *
      * @tparam Type Type of component used to construct the view.
      * @tparam Other Other types of components used to construct the view.
      * @tparam Exclude Types of components used to filter the view.
@@ -1248,19 +1242,7 @@ public:
     /**
      * @brief Returns a group for the given components.
      *
-     * Groups are created on the fly and share with the registry its internal
-     * data structures. Feel free to discard them after the use.<br/>
-     * Creating and destroying a group is an incredibly cheap operation. As a
-     * rule of thumb, storing a group should never be an option.
-     *
-     * Groups support exclusion lists and can own types of components. The more
-     * types are owned by a group, the faster it is to iterate entities and
-     * components.<br/>
-     * However, groups also affect some features of the registry such as the
-     * creation and destruction of components.
-     *
-     * @note
-     * Pools of components that are owned by a group cannot be sorted anymore.
+     * Group owned component pools can no longer be sorted.<br/>
      * The group takes the ownership of the pools and arrange components so as
      * to iterate them as fast as possible.
      *
