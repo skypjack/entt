@@ -1247,25 +1247,23 @@ public:
      * to iterate them as fast as possible.
      *
      * @tparam Owned Type of storage _owned_ by the group.
-     * @tparam Get Type of storage _observed_ by the group.
-     * @tparam Exclude Type of storage used to filter the group.
+     * @tparam Other Other types of storage _owned_ by the group.
+     * @tparam Get Type of storage _observed_ by the group, if any.
+     * @tparam Exclude Type of storage used to filter the group, if any.
      * @return A newly created group.
      */
-    template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
+    template<typename Owned, typename... Other, typename... Get, typename... Exclude>
+    [[nodiscard]] basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get...> = {}, exclude_t<Exclude...> = {}) {
-        static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only groups are not supported");
-        static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
+        using handler_type = group_handler<exclude_t<std::remove_const_t<Exclude>...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>, std::remove_const_t<Other>...>;
 
-        using handler_type = group_handler<exclude_t<std::remove_const_t<Exclude>...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
-
-        const auto cpools = std::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...);
-        constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
+        const auto cpools = std::forward_as_tuple(assure<std::remove_const_t<Owned>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Get>>()...);
+        constexpr auto size = 1u + sizeof...(Other) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
         auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
             return gdata.size == size
-                   && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
+                   && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ... && gdata.owned(type_hash<std::remove_const_t<Other>>::value()))
                    && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
                    && (gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()) && ...);
         });
@@ -1276,7 +1274,7 @@ public:
             group_data candidate = {
                 size,
                 std::apply([this](auto &&...args) { return std::allocate_shared<handler_type>(get_allocator(), std::forward<decltype(args)>(args)...); }, entt::uses_allocator_construction_args<typename handler_type::value_type>(get_allocator())),
-                []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ... || (ctype == type_hash<std::remove_const_t<Other>>::value())); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
             };
@@ -1286,51 +1284,108 @@ public:
             const void *maybe_valid_if = nullptr;
             const void *discard_if = nullptr;
 
-            if constexpr(sizeof...(Owned) == 0) {
-                groups.push_back(std::move(candidate));
-            } else {
-                [[maybe_unused]] auto has_conflict = [size](const auto &gdata) {
-                    const auto overlapping = (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
-                    const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()));
-                    return !overlapping || ((sz == size) || (sz == gdata.size));
-                };
+            [[maybe_unused]] auto has_conflict = [size](const auto &gdata) {
+                const auto overlapping = (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value()));
+                const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()));
+                return !overlapping || ((sz == size) || (sz == gdata.size));
+            };
 
-                ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), std::move(has_conflict)), "Conflicting groups");
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), std::move(has_conflict)), "Conflicting groups");
 
-                const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-                    return !(0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value())) || (size > gdata.size);
-                });
+            const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
+                return !(gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value())) || (size > gdata.size);
+            });
 
-                const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &gdata) {
-                    return (0u + ... + gdata.owned(type_hash<std::remove_const_t<Owned>>::value()));
-                });
+            const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &gdata) {
+                return (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value()));
+            });
 
-                maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
-                discard_if = (prev == groups.crend() ? discard_if : prev->group.get());
-                groups.insert(next, std::move(candidate));
-            }
+            maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
+            discard_if = (prev == groups.crend() ? discard_if : prev->group.get());
+            groups.insert(next, std::move(candidate));
 
-            (on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Owned>>>(*handler), ...);
+            on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Owned>>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(*handler), ...);
             (on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler), ...);
             (on_destroy<std::remove_const_t<Exclude>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
 
-            (on_destroy<std::remove_const_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            on_destroy<std::remove_const_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
             (on_destroy<std::remove_const_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
             (on_construct<std::remove_const_t<Exclude>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
 
-            if constexpr(sizeof...(Owned) == 0) {
-                for(const auto entity: view<Owned..., Get...>(exclude<Exclude...>)) {
-                    handler->current.push(entity);
-                }
-            } else {
-                // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-                for(auto *first = std::get<0>(cpools).data(), *last = first + std::get<0>(cpools).size(); first != last; ++first) {
-                    handler->template maybe_valid_if<type_list_element_t<0, type_list<std::remove_const_t<Owned>...>>>(*this, *first);
-                }
+            // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
+            for(auto *first = std::get<0>(cpools).data(), *last = first + std::get<0>(cpools).size(); first != last; ++first) {
+                handler->template maybe_valid_if<Owned>(*this, *first);
             }
         }
 
-        return {handler->current, std::get<storage_for_type<std::remove_const_t<Owned>> &>(cpools)..., std::get<storage_for_type<std::remove_const_t<Get>> &>(cpools)..., assure<std::remove_const_t<Exclude>>()...};
+        return {
+            handler->current,
+            std::get<storage_for_type<std::remove_const_t<Owned>> &>(cpools),
+            std::get<storage_for_type<std::remove_const_t<Other>> &>(cpools)...,
+            std::get<storage_for_type<std::remove_const_t<Get>> &>(cpools)...,
+            assure<std::remove_const_t<Exclude>>()...};
+    }
+
+    /**
+     * @brief Returns a group for the given components.
+     * @tparam Get Type of storage _observed_ by the group.
+     * @tparam Other Other types of storage _observed_ by the group.
+     * @tparam Exclude Type of storage used to filter the group.
+     * @return A newly created group.
+     */
+    template<typename Get, typename... Other, typename... Exclude>
+    [[nodiscard]] basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
+    group(get_t<Get, Other...>, exclude_t<Exclude...> = {}) {
+        using handler_type = group_handler<exclude_t<std::remove_const_t<Exclude>...>, get_t<std::remove_const_t<Get>, std::remove_const_t<Other>...>>;
+
+        const auto cpools = std::forward_as_tuple(assure<std::remove_const_t<Get>>(), assure<std::remove_const_t<Other>>()...);
+        constexpr auto size = 1u + sizeof...(Other) + sizeof...(Exclude);
+        handler_type *handler = nullptr;
+
+        auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
+            return gdata.size == size
+                   && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ... && gdata.get(type_hash<std::remove_const_t<Other>>::value()))
+                   && (gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()) && ...);
+        });
+
+        if(it != groups.cend()) {
+            handler = static_cast<handler_type *>(it->group.get());
+        } else {
+            group_data candidate = {
+                size,
+                std::apply([this](auto &&...args) { return std::allocate_shared<handler_type>(get_allocator(), std::forward<decltype(args)>(args)...); }, entt::uses_allocator_construction_args<typename handler_type::value_type>(get_allocator())),
+                []([[maybe_unused]] const id_type ctype) noexcept { return false; },
+                []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ... || (ctype == type_hash<std::remove_const_t<Other>>::value())); },
+                []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
+            };
+
+            handler = static_cast<handler_type *>(candidate.group.get());
+
+            const void *maybe_valid_if = nullptr;
+            const void *discard_if = nullptr;
+
+            groups.push_back(std::move(candidate));
+
+            on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
+
+            on_destroy<std::remove_const_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+
+            for(const auto entity: view<Get, Other...>(exclude<Exclude...>)) {
+                handler->current.push(entity);
+            }
+        }
+
+        return {
+            handler->current,
+            std::get<storage_for_type<std::remove_const_t<Get>> &>(cpools),
+            std::get<storage_for_type<std::remove_const_t<Other>> &>(cpools)...,
+            assure<std::remove_const_t<Exclude>>()...};
     }
 
     /*! @copydoc group */

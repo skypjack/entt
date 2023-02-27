@@ -1026,7 +1026,7 @@ TEST(Registry, NonOwningGroupInitOnFirstUse) {
     registry.emplace<char>(entities[2u], 'c');
 
     std::size_t cnt{};
-    auto group = registry.group<>(entt::get<int, char>);
+    auto group = registry.group(entt::get<int, char>);
     group.each([&cnt](auto...) { ++cnt; });
 
     ASSERT_FALSE((registry.owned<int, char>()));
@@ -1036,7 +1036,7 @@ TEST(Registry, NonOwningGroupInitOnFirstUse) {
 TEST(Registry, NonOwningGroupInitOnEmplace) {
     entt::registry registry;
     entt::entity entities[3u];
-    auto group = registry.group<>(entt::get<int, char>);
+    auto group = registry.group(entt::get<int, char>);
 
     registry.create(std::begin(entities), std::end(entities));
     registry.insert<int>(std::begin(entities), std::end(entities), 0);
@@ -1159,7 +1159,7 @@ TEST(Registry, CleanViewAfterRemoveAndClear) {
 
 TEST(Registry, CleanNonOwningGroupViewAfterRemoveAndClear) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<int, char>);
+    auto group = registry.group(entt::get<int, char>);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
@@ -1916,7 +1916,7 @@ TEST(Registry, NonOwningGroupInterleaved) {
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
 
-    const auto group = registry.group<>(entt::get<int, char>);
+    const auto group = registry.group(entt::get<int, char>);
 
     entity = registry.create();
     registry.emplace<int>(entity);
@@ -1970,7 +1970,7 @@ TEST(Registry, PartialOwningGroupInterleaved) {
 
 TEST(Registry, NonOwningGroupSortInterleaved) {
     entt::registry registry;
-    const auto group = registry.group<>(entt::get<int, char>);
+    const auto group = registry.group(entt::get<int, char>);
 
     const auto e0 = registry.create();
     registry.emplace<int>(e0, 0);
