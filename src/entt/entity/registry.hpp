@@ -251,12 +251,39 @@ class basic_registry {
     template<typename...>
     struct group_handler;
 
-    template<typename... Exclude, typename... Get, typename... Owned>
-    struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
+    template<typename... Exclude, typename... Get, typename Owned, typename... Other>
+    struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned, Other...> {
         // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-        static_assert(!std::disjunction_v<std::bool_constant<storage_for_type<Owned>::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
-        using value_type = std::conditional_t<sizeof...(Owned) == 0, basic_common_type, std::size_t>;
-        value_type current{};
+        static_assert(!std::disjunction_v<std::bool_constant<storage_for_type<Owned>::traits_type::in_place_delete>, std::bool_constant<storage_for_type<Other>::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
+        std::size_t current{};
+
+        template<typename Type>
+        static void maybe_valid_if(group_handler &handler, basic_registry &owner, const Entity entt) {
+            [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.storage<Owned>(), owner.storage<Other>()...);
+
+            const auto is_valid = ((std::is_same_v<Type, Owned> || std::get<storage_for_type<Owned> &>(cpools).contains(entt)) && ... && (std::is_same_v<Type, Other> || std::get<storage_for_type<Other> &>(cpools).contains(entt)))
+                                  && ((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ...)
+                                  && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...);
+
+            if(is_valid && !(std::get<0>(cpools).index(entt) < handler.current)) {
+                const auto pos = handler.current++;
+                std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt);
+                (std::get<storage_for_type<Other> &>(cpools).swap_elements(std::get<storage_for_type<Other> &>(cpools).data()[pos], entt), ...);
+            }
+        }
+
+        static void discard_if(group_handler &handler, [[maybe_unused]] basic_registry &owner, const Entity entt) {
+            if(const auto cpools = std::forward_as_tuple(owner.storage<Owned>(), owner.storage<Other>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < handler.current)) {
+                const auto pos = --handler.current;
+                std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt);
+                (std::get<storage_for_type<Other> &>(cpools).swap_elements(std::get<storage_for_type<Other> &>(cpools).data()[pos], entt), ...);
+            }
+        }
+    };
+
+    template<typename... Exclude, typename Get, typename... Other>
+    struct group_handler<exclude_t<Exclude...>, get_t<Get, Other...>> {
+        basic_common_type current{};
 
         template<typename... Args>
         group_handler(Args &&...args)
@@ -264,33 +291,16 @@ class basic_registry {
 
         template<typename Type>
         static void maybe_valid_if(group_handler &handler, basic_registry &owner, const Entity entt) {
-            [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.storage<Owned>()...);
-
-            const auto is_valid = ((std::is_same_v<Type, Owned> || std::get<storage_for_type<Owned> &>(cpools).contains(entt)) && ...)
-                                  && ((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ...)
+            const auto is_valid = ((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ... && (std::is_same_v<Type, Other> || owner.storage<Other>().contains(entt)))
                                   && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...);
 
-            if constexpr(sizeof...(Owned) == 0) {
-                if(is_valid && !handler.current.contains(entt)) {
-                    handler.current.push(entt);
-                }
-            } else {
-                if(is_valid && !(std::get<0>(cpools).index(entt) < handler.current)) {
-                    const auto pos = handler.current++;
-                    (std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt), ...);
-                }
+            if(is_valid && !handler.current.contains(entt)) {
+                handler.current.push(entt);
             }
         }
 
         static void discard_if(group_handler &handler, [[maybe_unused]] basic_registry &owner, const Entity entt) {
-            if constexpr(sizeof...(Owned) == 0) {
-                handler.current.remove(entt);
-            } else {
-                if(const auto cpools = std::forward_as_tuple(owner.storage<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < handler.current)) {
-                    const auto pos = --handler.current;
-                    (std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt), ...);
-                }
-            }
+            handler.current.remove(entt);
         }
     };
 
@@ -1273,7 +1283,7 @@ public:
         } else {
             group_data candidate = {
                 size,
-                std::apply([this](auto &&...args) { return std::allocate_shared<handler_type>(get_allocator(), std::forward<decltype(args)>(args)...); }, entt::uses_allocator_construction_args<typename handler_type::value_type>(get_allocator())),
+                std::allocate_shared<handler_type>(get_allocator()),
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ... || (ctype == type_hash<std::remove_const_t<Other>>::value())); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
@@ -1355,7 +1365,7 @@ public:
         } else {
             group_data candidate = {
                 size,
-                std::apply([this](auto &&...args) { return std::allocate_shared<handler_type>(get_allocator(), std::forward<decltype(args)>(args)...); }, entt::uses_allocator_construction_args<typename handler_type::value_type>(get_allocator())),
+                std::allocate_shared<handler_type>(get_allocator(), get_allocator()),
                 []([[maybe_unused]] const id_type ctype) noexcept { return false; },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ... || (ctype == type_hash<std::remove_const_t<Other>>::value())); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
