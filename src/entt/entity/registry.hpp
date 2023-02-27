@@ -306,7 +306,7 @@ class basic_registry {
 
     struct group_data {
         std::size_t size;
-        std::shared_ptr<void> group;
+        std::shared_ptr<void> handler;
         bool (*owned)(const id_type) noexcept;
         bool (*get)(const id_type) noexcept;
         bool (*exclude)(const id_type) noexcept;
@@ -1279,7 +1279,7 @@ public:
         });
 
         if(it != groups.cend()) {
-            handler = static_cast<handler_type *>(it->group.get());
+            handler = static_cast<handler_type *>(it->handler.get());
         } else {
             group_data candidate = {
                 size,
@@ -1289,7 +1289,7 @@ public:
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
             };
 
-            handler = static_cast<handler_type *>(candidate.group.get());
+            handler = static_cast<handler_type *>(candidate.handler.get());
 
             const void *maybe_valid_if = nullptr;
             const void *discard_if = nullptr;
@@ -1310,8 +1310,8 @@ public:
                 return (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value()));
             });
 
-            maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
-            discard_if = (prev == groups.crend() ? discard_if : prev->group.get());
+            maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->handler.get());
+            discard_if = (prev == groups.crend() ? discard_if : prev->handler.get());
             groups.insert(next, std::move(candidate));
 
             on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Owned>>>(*handler);
@@ -1361,7 +1361,7 @@ public:
         });
 
         if(it != groups.cend()) {
-            handler = static_cast<handler_type *>(it->group.get());
+            handler = static_cast<handler_type *>(it->handler.get());
         } else {
             group_data candidate = {
                 size,
@@ -1371,7 +1371,7 @@ public:
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Exclude>>::value()) || ...); },
             };
 
-            handler = static_cast<handler_type *>(candidate.group.get());
+            handler = static_cast<handler_type *>(candidate.handler.get());
 
             const void *maybe_valid_if = nullptr;
             const void *discard_if = nullptr;
@@ -1413,7 +1413,7 @@ public:
             return {};
         } else {
             using handler_type = group_handler<exclude_t<std::remove_const_t<Exclude>...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
-            return {static_cast<handler_type *>(it->group.get())->current, assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
+            return {static_cast<handler_type *>(it->handler.get())->current, assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
         }
     }
 
