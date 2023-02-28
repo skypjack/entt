@@ -259,7 +259,7 @@ class basic_registry {
 
         template<typename Type>
         static void maybe_valid_if(group_handler &handler, basic_registry &owner, const Entity entt) {
-            [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.storage<Owned>(), owner.storage<Other>()...);
+            const auto cpools = std::forward_as_tuple(owner.storage<Owned>(), owner.storage<Other>()...);
 
             const auto is_valid = ((std::is_same_v<Type, Owned> || std::get<storage_for_type<Owned> &>(cpools).contains(entt)) && ... && (std::is_same_v<Type, Other> || std::get<storage_for_type<Other> &>(cpools).contains(entt)))
                                   && ((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ...)
@@ -272,7 +272,7 @@ class basic_registry {
             }
         }
 
-        static void discard_if(group_handler &handler, [[maybe_unused]] basic_registry &owner, const Entity entt) {
+        static void discard_if(group_handler &handler, basic_registry &owner, const Entity entt) {
             if(const auto cpools = std::forward_as_tuple(owner.storage<Owned>(), owner.storage<Other>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < handler.current)) {
                 const auto pos = --handler.current;
                 std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt);
@@ -290,17 +290,16 @@ class basic_registry {
             : current{std::forward<Args>(args)...} {}
 
         template<typename Type>
-        static void maybe_valid_if(group_handler &handler, basic_registry &owner, const Entity entt) {
-            const auto is_valid = ((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ... && (std::is_same_v<Type, Other> || owner.storage<Other>().contains(entt)))
-                                  && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...);
-
-            if(is_valid && !handler.current.contains(entt)) {
-                handler.current.push(entt);
+        static void maybe_valid_if(basic_common_type &set, basic_registry &owner, const Entity entt) {
+            if(!set.contains(entt)) {
+                if(((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ... && (std::is_same_v<Type, Other> || owner.storage<Other>().contains(entt))) && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...)) {
+                    set.push(entt);
+                }
             }
         }
 
-        static void discard_if(group_handler &handler, [[maybe_unused]] basic_registry &owner, const Entity entt) {
-            handler.current.remove(entt);
+        static void discard_if(basic_common_type &set, [[maybe_unused]] basic_registry &owner, const Entity entt) {
+            set.remove(entt);
         }
     };
 
@@ -1375,13 +1374,13 @@ public:
 
             groups.push_back(std::move(candidate));
 
-            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
+            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(handler->current);
+            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(handler->current), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(handler->current), ...);
 
-            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::discard_if>(*handler);
-            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::discard_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::discard_if>(*handler), ...);
+            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::discard_if>(handler->current);
+            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::discard_if>(handler->current), ...);
+            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::discard_if>(handler->current), ...);
 
             for(const auto entity: view<Get, Other...>(exclude<Exclude...>)) {
                 handler->current.push(entity);
