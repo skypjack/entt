@@ -259,24 +259,23 @@ class basic_registry {
 
         template<typename Type>
         static void maybe_valid_if(group_handler &handler, basic_registry &owner, const Entity entt) {
-            const auto cpools = std::forward_as_tuple(owner.storage<Owned>(), owner.storage<Other>()...);
+            if(auto &cpool = owner.storage<Owned>(); (std::is_same_v<Type, Owned> || cpool.contains(entt)) && !(cpool.index(entt) < handler.current)) {
+                const auto other = std::forward_as_tuple(owner.storage<Other>()...);
 
-            const auto is_valid = ((std::is_same_v<Type, Owned> || std::get<storage_for_type<Owned> &>(cpools).contains(entt)) && ... && (std::is_same_v<Type, Other> || std::get<storage_for_type<Other> &>(cpools).contains(entt)))
-                                  && ((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ...)
-                                  && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...);
-
-            if(is_valid && !(std::get<0>(cpools).index(entt) < handler.current)) {
-                const auto pos = handler.current++;
-                std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt);
-                (std::get<storage_for_type<Other> &>(cpools).swap_elements(std::get<storage_for_type<Other> &>(cpools).data()[pos], entt), ...);
+                if(((std::is_same_v<Type, Other> || std::get<storage_for_type<Other> &>(other).contains(entt)) && ...) && ((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...)) {
+                    const auto pos = handler.current++;
+                    cpool.swap_elements(cpool.data()[pos], entt);
+                    (std::get<storage_for_type<Other> &>(other).swap_elements(std::get<storage_for_type<Other> &>(other).data()[pos], entt), ...);
+                }
             }
         }
 
         static void discard_if(group_handler &handler, basic_registry &owner, const Entity entt) {
-            if(const auto cpools = std::forward_as_tuple(owner.storage<Owned>(), owner.storage<Other>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < handler.current)) {
+            if(auto &cpool = owner.storage<Owned>(); cpool.contains(entt) && (cpool.index(entt) < handler.current)) {
                 const auto pos = --handler.current;
-                std::get<storage_for_type<Owned> &>(cpools).swap_elements(std::get<storage_for_type<Owned> &>(cpools).data()[pos], entt);
-                (std::get<storage_for_type<Other> &>(cpools).swap_elements(std::get<storage_for_type<Other> &>(cpools).data()[pos], entt), ...);
+                const auto other = std::forward_as_tuple(owner.storage<Other>()...);
+                cpool.swap_elements(cpool.data()[pos], entt);
+                (std::get<storage_for_type<Other> &>(other).swap_elements(std::get<storage_for_type<Other> &>(other).data()[pos], entt), ...);
             }
         }
     };
