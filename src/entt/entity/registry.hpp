@@ -297,7 +297,7 @@ class basic_registry {
             }
         }
 
-        static void discard_if(basic_common_type &set, [[maybe_unused]] basic_registry &owner, const Entity entt) {
+        static void discard_if(basic_common_type &set, const Entity entt) {
             set.remove(entt);
         }
     };
