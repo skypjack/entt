@@ -75,29 +75,44 @@ class delegate<Ret(Args...)> {
     template<auto Candidate, std::size_t... Index>
     [[nodiscard]] auto wrap(std::index_sequence<Index...>) noexcept {
         return [](const void *, Args... args) -> Ret {
-            static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), type_list_element_t<Index, type_list<Args...>>...>);
             [[maybe_unused]] const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
-            return static_cast<Ret>(std::invoke(Candidate, std::forward<type_list_element_t<Index, type_list<Args...>>>(std::get<Index>(arguments))...));
+
+            if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), type_list_element_t<Index, type_list<Args...>>...>) {
+                return static_cast<Ret>(std::invoke(Candidate, std::forward<type_list_element_t<Index, type_list<Args...>>>(std::get<Index>(arguments))...));
+            } else {
+                constexpr auto offset = sizeof...(Args) - sizeof...(Index);
+                return static_cast<Ret>(std::invoke(Candidate, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
+            }
         };
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
     [[nodiscard]] auto wrap(Type &, std::index_sequence<Index...>) noexcept {
         return [](const void *payload, Args... args) -> Ret {
-            static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type &, type_list_element_t<Index, type_list<Args...>>...>);
             [[maybe_unused]] const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
-            return static_cast<Ret>(std::invoke(Candidate, *curr, std::forward<type_list_element_t<Index, type_list<Args...>>>(std::get<Index>(arguments))...));
+
+            if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Type &, type_list_element_t<Index, type_list<Args...>>...>) {
+                return static_cast<Ret>(std::invoke(Candidate, *curr, std::forward<type_list_element_t<Index, type_list<Args...>>>(std::get<Index>(arguments))...));
+            } else {
+                constexpr auto offset = sizeof...(Args) - sizeof...(Index);
+                return static_cast<Ret>(std::invoke(Candidate, *curr, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
+            }
         };
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
     [[nodiscard]] auto wrap(Type *, std::index_sequence<Index...>) noexcept {
         return [](const void *payload, Args... args) -> Ret {
-            static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, type_list_element_t<Index, type_list<Args...>>...>);
             [[maybe_unused]] const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
-            return static_cast<Ret>(std::invoke(Candidate, curr, std::forward<type_list_element_t<Index, type_list<Args...>>>(std::get<Index>(arguments))...));
+
+            if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, type_list_element_t<Index, type_list<Args...>>...>) {
+                return static_cast<Ret>(std::invoke(Candidate, curr, std::forward<type_list_element_t<Index, type_list<Args...>>>(std::get<Index>(arguments))...));
+            } else {
+                constexpr auto offset = sizeof...(Args) - sizeof...(Index);
+                return static_cast<Ret>(std::invoke(Candidate, curr, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
+            }
         };
     }
 

@@ -5,16 +5,16 @@
 #include <entt/signal/delegate.hpp>
 #include "../common/config.h"
 
-int delegate_function(const int &i) {
+int power_of_two(const int &i) {
     return i * i;
 }
 
-int curried_by_ref(const int &i, int j) {
+int sum_with_ref(const int &i, int j) {
     return i + j;
 }
 
-int curried_by_ptr(const int *i, int j) {
-    return (*i) * j;
+int sum_with_ptr(const int *i, int j) {
+    return (*i) + j;
 }
 
 int non_const_reference(int &i) {
@@ -70,7 +70,7 @@ TEST(Delegate, Functionalities) {
     ASSERT_FALSE(mf_del);
     ASSERT_EQ(ff_del, mf_del);
 
-    ff_del.connect<&delegate_function>();
+    ff_del.connect<&power_of_two>();
     mf_del.connect<&delegate_functor::operator()>(functor);
     lf_del.connect([](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor);
 
@@ -138,44 +138,44 @@ TEST(Delegate, Comparison) {
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
 
-    lhs.connect<&delegate_function>();
+    lhs.connect<&power_of_two>();
 
-    ASSERT_EQ(lhs, entt::delegate<int(int)>{entt::connect_arg<&delegate_function>});
+    ASSERT_EQ(lhs, entt::delegate<int(int)>{entt::connect_arg<&power_of_two>});
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect<&delegate_function>();
+    rhs.connect<&power_of_two>();
 
-    ASSERT_EQ(rhs, entt::delegate<int(int)>{entt::connect_arg<&delegate_function>});
+    ASSERT_EQ(rhs, entt::delegate<int(int)>{entt::connect_arg<&power_of_two>});
     ASSERT_FALSE(lhs != rhs);
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
 
-    lhs.connect<&curried_by_ref>(value);
+    lhs.connect<&sum_with_ref>(value);
 
-    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_by_ref>, value}));
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&sum_with_ref>, value}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect<&curried_by_ref>(value);
+    rhs.connect<&sum_with_ref>(value);
 
-    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_by_ref>, value}));
+    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&sum_with_ref>, value}));
     ASSERT_FALSE(lhs != rhs);
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
 
-    lhs.connect<&curried_by_ptr>(&value);
+    lhs.connect<&sum_with_ptr>(&value);
 
-    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_by_ptr>, &value}));
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&sum_with_ptr>, &value}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect<&curried_by_ptr>(&value);
+    rhs.connect<&sum_with_ptr>(&value);
 
-    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_by_ptr>, &value}));
+    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&sum_with_ptr>, &value}));
     ASSERT_FALSE(lhs != rhs);
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
@@ -259,11 +259,11 @@ TEST(Delegate, DeductionGuide) {
     const_nonconst_noexcept functor;
     int value = 0;
 
-    entt::delegate func{entt::connect_arg<&delegate_function>};
-    entt::delegate curried_func_with_ref{entt::connect_arg<&curried_by_ref>, value};
-    entt::delegate curried_func_with_const_ref{entt::connect_arg<&curried_by_ref>, std::as_const(value)};
-    entt::delegate curried_func_with_ptr{entt::connect_arg<&curried_by_ptr>, &value};
-    entt::delegate curried_func_with_const_ptr{entt::connect_arg<&curried_by_ptr>, &std::as_const(value)};
+    entt::delegate plain_func{entt::connect_arg<&power_of_two>};
+    entt::delegate sum_func_with_ref{entt::connect_arg<&sum_with_ref>, value};
+    entt::delegate sum_func_with_const_ref{entt::connect_arg<&sum_with_ref>, std::as_const(value)};
+    entt::delegate sum_func_with_ptr{entt::connect_arg<&sum_with_ptr>, &value};
+    entt::delegate sum_func_with_const_ptr{entt::connect_arg<&sum_with_ptr>, &std::as_const(value)};
     entt::delegate member_func_f{entt::connect_arg<&const_nonconst_noexcept::f>, functor};
     entt::delegate member_func_g{entt::connect_arg<&const_nonconst_noexcept::g>, functor};
     entt::delegate member_func_h{entt::connect_arg<&const_nonconst_noexcept::h>, &functor};
@@ -275,11 +275,11 @@ TEST(Delegate, DeductionGuide) {
     entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, &std::as_const(functor)};
     entt::delegate lambda{+[](const void *, int) { return 0; }};
 
-    static_assert(std::is_same_v<typename decltype(func)::type, int(const int &)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_with_ref)::type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_with_const_ref)::type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_with_ptr)::type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_with_const_ptr)::type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(plain_func)::type, int(const int &)>);
+    static_assert(std::is_same_v<typename decltype(sum_func_with_ref)::type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(sum_func_with_const_ref)::type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(sum_func_with_ptr)::type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(sum_func_with_const_ptr)::type, int(int)>);
     static_assert(std::is_same_v<typename decltype(member_func_f)::type, void()>);
     static_assert(std::is_same_v<typename decltype(member_func_g)::type, void()>);
     static_assert(std::is_same_v<typename decltype(member_func_h)::type, void()>);
@@ -291,11 +291,11 @@ TEST(Delegate, DeductionGuide) {
     static_assert(std::is_same_v<typename decltype(data_member_v_const)::type, const int()>);
     static_assert(std::is_same_v<typename decltype(lambda)::type, int(int)>);
 
-    ASSERT_TRUE(func);
-    ASSERT_TRUE(curried_func_with_ref);
-    ASSERT_TRUE(curried_func_with_const_ref);
-    ASSERT_TRUE(curried_func_with_ptr);
-    ASSERT_TRUE(curried_func_with_const_ptr);
+    ASSERT_TRUE(plain_func);
+    ASSERT_TRUE(sum_func_with_ref);
+    ASSERT_TRUE(sum_func_with_const_ref);
+    ASSERT_TRUE(sum_func_with_ptr);
+    ASSERT_TRUE(sum_func_with_const_ptr);
     ASSERT_TRUE(member_func_f);
     ASSERT_TRUE(member_func_g);
     ASSERT_TRUE(member_func_h);
@@ -343,19 +343,46 @@ TEST(Delegate, MoveOnlyType) {
     ASSERT_FALSE(ptr);
 }
 
-TEST(Delegate, CurriedFunction) {
-    entt::delegate<int(int)> delegate;
+TEST(Delegate, DiscardLast) {
+    entt::delegate<int(int, const std::unique_ptr<int> &)> delegate;
     const auto value = 3;
+    const auto other = std::make_unique<int>(42);
 
-    delegate.connect<&curried_by_ref>(value);
-
-    ASSERT_TRUE(delegate);
-    ASSERT_EQ(delegate(1), 4);
-
-    delegate.connect<&curried_by_ptr>(&value);
+    delegate.connect<&power_of_two>();
 
     ASSERT_TRUE(delegate);
-    ASSERT_EQ(delegate(2), 6);
+    ASSERT_EQ(delegate(3, other), 9);
+
+    delegate.connect<&sum_with_ref>(value);
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(1, other), 4);
+
+    delegate.connect<&sum_with_ptr>(&value);
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(2, other), 5);
+}
+
+TEST(Delegate, SkipFirst) {
+    entt::delegate<int(const std::unique_ptr<int> &, int)> delegate;
+    const auto value = 3;
+    const auto other = std::make_unique<int>(42);
+
+    delegate.connect<&power_of_two>();
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(other, 3), 9);
+
+    delegate.connect<&sum_with_ref>(value);
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(other, 1), 4);
+
+    delegate.connect<&sum_with_ptr>(&value);
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(other, 2), 5);
 }
 
 TEST(Delegate, Constructors) {
@@ -363,9 +390,9 @@ TEST(Delegate, Constructors) {
     const auto value = 2;
 
     entt::delegate<int(int)> empty{};
-    entt::delegate<int(int)> func{entt::connect_arg<&delegate_function>};
-    entt::delegate<int(int)> ref{entt::connect_arg<&curried_by_ref>, value};
-    entt::delegate<int(int)> ptr{entt::connect_arg<&curried_by_ptr>, &value};
+    entt::delegate<int(int)> func{entt::connect_arg<&power_of_two>};
+    entt::delegate<int(int)> ref{entt::connect_arg<&sum_with_ref>, value};
+    entt::delegate<int(int)> ptr{entt::connect_arg<&sum_with_ptr>, &value};
     entt::delegate<int(int)> member{entt::connect_arg<&delegate_functor::operator()>, functor};
 
     ASSERT_FALSE(empty);
@@ -377,7 +404,7 @@ TEST(Delegate, Constructors) {
     ASSERT_EQ(5, ref(3));
 
     ASSERT_TRUE(ptr);
-    ASSERT_EQ(6, ptr(3));
+    ASSERT_EQ(5, ptr(3));
 
     ASSERT_TRUE(member);
     ASSERT_EQ(6, member(3));
@@ -386,7 +413,7 @@ TEST(Delegate, Constructors) {
 TEST(Delegate, VoidVsNonVoidReturnType) {
     delegate_functor functor;
 
-    entt::delegate<void(int)> func{entt::connect_arg<&delegate_function>};
+    entt::delegate<void(int)> func{entt::connect_arg<&power_of_two>};
     entt::delegate<void(int)> member{entt::connect_arg<&delegate_functor::operator()>, &functor};
     entt::delegate<void(int)> cmember{entt::connect_arg<&delegate_functor::identity>, &std::as_const(functor)};
 
@@ -416,8 +443,8 @@ TEST(Delegate, TheLessTheBetter) {
     entt::delegate<int(delegate_functor &, int, char)> unbound;
     delegate_functor functor;
 
-    // int delegate_function(const int &);
-    bound.connect<&delegate_function>();
+    // int power_of_two(const int &);
+    bound.connect<&power_of_two>();
 
     ASSERT_EQ(bound(3, 'c'), 9);
 
