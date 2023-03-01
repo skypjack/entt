@@ -223,11 +223,8 @@ TEST(StorageEntity, Emplace) {
 }
 
 TEST(StorageEntity, Insert) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::storage<entt::entity> pool;
     entt::entity entities[2u]{};
-    const entt::sparse_set &base = pool;
 
     pool.insert(std::begin(entities), std::end(entities));
 

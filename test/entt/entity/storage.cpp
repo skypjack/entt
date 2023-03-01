@@ -351,7 +351,6 @@ TEST_F(Storage, Insert) {
 TEST_F(Storage, InsertEmptyType) {
     entt::storage<empty_stable_type> pool;
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
-    const entt::sparse_set &base = pool;
 
     pool.insert(std::begin(entities), std::end(entities));
 
