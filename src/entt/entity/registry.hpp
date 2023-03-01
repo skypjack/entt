@@ -281,12 +281,8 @@ class basic_registry {
     };
 
     template<typename... Exclude, typename Get, typename... Other>
-    struct group_handler<exclude_t<Exclude...>, get_t<Get, Other...>> {
-        basic_common_type current{};
-
-        template<typename... Args>
-        group_handler(Args &&...args)
-            : current{std::forward<Args>(args)...} {}
+    struct group_handler<exclude_t<Exclude...>, get_t<Get, Other...>>: basic_common_type {
+        using basic_common_type::basic_common_type;
 
         template<typename Type>
         static void maybe_valid_if(basic_common_type &set, basic_registry &owner, const Entity entt) {
@@ -1373,21 +1369,21 @@ public:
 
             groups.push_back(std::move(candidate));
 
-            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(handler->current);
-            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(handler->current), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(handler->current), ...);
+            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
 
-            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::discard_if>(handler->current);
-            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::discard_if>(handler->current), ...);
-            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::discard_if>(handler->current), ...);
+            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::discard_if>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::discard_if>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::discard_if>(*handler), ...);
 
             for(const auto entity: view<Get, Other...>(exclude<Exclude...>)) {
-                handler->current.push(entity);
+                handler->push(entity);
             }
         }
 
         return {
-            handler->current,
+            *handler,
             std::get<storage_for_type<std::remove_const_t<Get>> &>(cpools),
             std::get<storage_for_type<std::remove_const_t<Other>> &>(cpools)...,
             assure<std::remove_const_t<Exclude>>()...};
@@ -1408,7 +1404,12 @@ public:
             return {};
         } else {
             using handler_type = group_handler<exclude_t<std::remove_const_t<Exclude>...>, get_t<std::remove_const_t<Get>...>, std::remove_const_t<Owned>...>;
-            return {static_cast<handler_type *>(it->handler.get())->current, assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
+
+            if constexpr (sizeof...(Owned) == 0u) {
+                return {*static_cast<handler_type *>(it->handler.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
+            } else {
+                return {static_cast<handler_type *>(it->handler.get())->current, assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
+            }
         }
     }
 
