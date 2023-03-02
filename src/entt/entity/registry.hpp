@@ -264,8 +264,8 @@ class basic_registry {
 
                 if(((std::is_same_v<Type, Other> || std::get<storage_for_type<Other> &>(other).contains(entt)) && ...) && ((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...)) {
                     const auto pos = handler.current++;
-                    cpool.swap_elements(cpool.data()[pos], entt);
                     (std::get<storage_for_type<Other> &>(other).swap_elements(std::get<storage_for_type<Other> &>(other).data()[pos], entt), ...);
+                    cpool.swap_elements(cpool.data()[pos], entt);
                 }
             }
         }
@@ -274,20 +274,20 @@ class basic_registry {
             if(auto &cpool = owner.storage<Owned>(); cpool.contains(entt) && (cpool.index(entt) < handler.current)) {
                 const auto pos = --handler.current;
                 const auto other = std::forward_as_tuple(owner.storage<Other>()...);
-                cpool.swap_elements(cpool.data()[pos], entt);
                 (std::get<storage_for_type<Other> &>(other).swap_elements(std::get<storage_for_type<Other> &>(other).data()[pos], entt), ...);
+                cpool.swap_elements(cpool.data()[pos], entt);
             }
         }
     };
 
-    template<typename Get, typename... Other, typename... Exclude>
-    struct group_handler<owned_t<>, get_t<Get, Other...>, exclude_t<Exclude...>>: basic_common_type {
+    template<typename... Get, typename... Exclude>
+    struct group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: basic_common_type {
         using basic_common_type::basic_common_type;
 
         template<typename Type>
         static void maybe_valid_if(basic_common_type &set, basic_registry &owner, const Entity entt) {
             if(!set.contains(entt)) {
-                if(((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ... && (std::is_same_v<Type, Other> || owner.storage<Other>().contains(entt))) && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...)) {
+                if(((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...)) {
                     set.push(entt);
                 }
             }
