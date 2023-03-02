@@ -261,14 +261,17 @@ class basic_registry {
             : pools{&opool..., &gpool..., &epool...} {}
 
         template<typename Type>
-        void maybe_valid_if(basic_registry &owner, const Entity entt) {
-            if(((std::is_same_v<Type, Owned> || std::get<Owned *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...) && !(std::get<0>(pools)->index(entt) < current)) {
+        void maybe_valid_if(const Entity entt) {
+            if(((std::is_same_v<Type, Owned> || std::get<Owned *>(pools)->contains(entt)) && ...)
+               && ((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...)
+               && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)
+               && !(std::get<0>(pools)->index(entt) < current)) {
                 const auto pos = current++;
                 (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
             }
         }
 
-        void discard_if(basic_registry &owner, const Entity entt) {
+        void discard_if(const Entity entt) {
             if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < current)) {
                 const auto pos = --current;
                 (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
@@ -287,8 +290,10 @@ class basic_registry {
               pools{&gpool..., &epool...} {}
 
         template<typename Type>
-        void maybe_valid_if(basic_registry &owner, const Entity entt) {
-            if(((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...) && !basic_common_type::contains(entt)) {
+        void maybe_valid_if(const Entity entt) {
+            if(((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...)
+               && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)
+               && !basic_common_type::contains(entt)) {
                 basic_common_type::push(entt);
             }
         }
@@ -1323,7 +1328,7 @@ public:
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
             for(auto *first = cpool.data(), *last = first + cpool.size(); first != last; ++first) {
-                handler->template maybe_valid_if<Owned>(*this, *first);
+                handler->template maybe_valid_if<Owned>(*first);
             }
         }
 
