@@ -285,7 +285,7 @@ class basic_registry {
         using basic_common_type::basic_common_type;
 
         template<typename Type>
-        static void maybe_valid_if(basic_common_type &set, basic_registry &owner, const Entity entt) {
+        static void maybe_valid_if(group_handler &set, basic_registry &owner, const Entity entt) {
             if(!set.contains(entt)) {
                 if(((std::is_same_v<Type, Get> || owner.storage<Get>().contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !owner.storage<Exclude>().contains(entt)) && ...)) {
                     set.push(entt);
@@ -293,7 +293,7 @@ class basic_registry {
             }
         }
 
-        static void discard_if(basic_common_type &set, const Entity entt) {
+        static void discard_if(group_handler &set, const Entity entt) {
             set.remove(entt);
         }
     };
