@@ -251,36 +251,32 @@ class basic_registry {
     template<typename, typename, typename>
     struct group_handler;
 
-    template<typename Owned, typename... Other, typename... Get, typename... Exclude>
-    struct group_handler<owned_t<Owned, Other...>, get_t<Get...>, exclude_t<Exclude...>> {
+    template<typename... Owned, typename... Get, typename... Exclude>
+    struct group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
         // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-        static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>, std::bool_constant<Other::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
+        static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
         std::size_t current{};
 
-        group_handler(Owned &owned, Other &...opool, Get &...gpool, Exclude &...epool)
-            : pools{&owned, &opool..., &gpool..., &epool...} {}
+        group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
+            : pools{&opool..., &gpool..., &epool...} {}
 
         template<typename Type>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
-            if((std::is_same_v<Type, Owned> || std::get<Owned *>(pools)->contains(entt)) && !(std::get<Owned *>(pools)->index(entt) < current)) {
-                if(((std::is_same_v<Type, Other> || std::get<Other *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)) {
-                    const auto pos = current++;
-                    (std::get<Other *>(pools)->swap_elements(std::get<Other *>(pools)->data()[pos], entt), ...);
-                    std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt);
-                }
+            if(((std::is_same_v<Type, Owned> || std::get<Owned *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...) && !(std::get<0>(pools)->index(entt) < current)) {
+                const auto pos = current++;
+                (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
             }
         }
 
         void discard_if(basic_registry &owner, const Entity entt) {
-            if(std::get<Owned *>(pools)->contains(entt) && (std::get<Owned *>(pools)->index(entt) < current)) {
+            if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < current)) {
                 const auto pos = --current;
-                (std::get<Other *>(pools)->swap_elements(std::get<Other *>(pools)->data()[pos], entt), ...);
-                std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt);
+                (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
             }
         }
 
     private:
-        std::tuple<Owned *, Other *..., Get *..., Exclude *...> pools;
+        std::tuple<Owned *..., Get *..., Exclude *...> pools;
     };
 
     template<typename... Get, typename... Exclude>
@@ -292,10 +288,8 @@ class basic_registry {
 
         template<typename Type>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
-            if(!basic_common_type::contains(entt)) {
-                if(((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)) {
-                    basic_common_type::push(entt);
-                }
+            if(((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...) && !basic_common_type::contains(entt)) {
+                basic_common_type::push(entt);
             }
         }
 
