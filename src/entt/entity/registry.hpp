@@ -262,8 +262,8 @@ class basic_registry {
 
         template<typename Type>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
-            if((std::is_same_v<Type, typename Owned::value_type> || std::get<Owned *>(pools)->contains(entt)) && !(std::get<Owned *>(pools)->index(entt) < current)) {
-                if(((std::is_same_v<Type, typename Other::value_type> || std::get<Other *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, typename Get::value_type> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, typename Exclude::value_type> || !std::get<Exclude *>(pools)->contains(entt)) && ...)) {
+            if((std::is_same_v<Type, Owned> || std::get<Owned *>(pools)->contains(entt)) && !(std::get<Owned *>(pools)->index(entt) < current)) {
+                if(((std::is_same_v<Type, Other> || std::get<Other *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)) {
                     const auto pos = current++;
                     (std::get<Other *>(pools)->swap_elements(std::get<Other *>(pools)->data()[pos], entt), ...);
                     std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt);
@@ -293,7 +293,7 @@ class basic_registry {
         template<typename Type>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
             if(!basic_common_type::contains(entt)) {
-                if(((std::is_same_v<Type, typename Get::value_type> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, typename Exclude::value_type> || !std::get<Exclude *>(pools)->contains(entt)) && ...)) {
+                if(((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...) && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)) {
                     basic_common_type::push(entt);
                 }
             }
@@ -1315,10 +1315,10 @@ public:
             discard_if = (prev == groups.crend() ? discard_if : prev->handler.get());
             groups.insert(next, std::move(candidate));
 
-            on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Owned>>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(*handler), ...);
-            (on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
+            on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Owned>>>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Other>>>>(*handler), ...);
+            (on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Get>>>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Exclude>>>>(*handler), ...);
 
             on_destroy<std::remove_const_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler);
             (on_destroy<std::remove_const_t<Other>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
@@ -1371,9 +1371,9 @@ public:
 
             groups.push_back(std::move(candidate));
 
-            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Get>>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Other>>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template maybe_valid_if<std::remove_const_t<Exclude>>>(*handler), ...);
+            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Get>>>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Other>>>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Exclude>>>>(*handler), ...);
 
             on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::discard_if>(*handler);
             (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::discard_if>(*handler), ...);
