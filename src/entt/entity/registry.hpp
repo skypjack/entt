@@ -248,64 +248,6 @@ class basic_registry {
     template<typename Type>
     using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
 
-    template<typename, typename, typename>
-    struct group_handler;
-
-    template<typename... Owned, typename... Get, typename... Exclude>
-    struct group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
-        // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-        static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
-        std::size_t current{};
-
-        group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
-            : pools{&opool..., &gpool..., &epool...} {}
-
-        template<typename Type>
-        void maybe_valid_if(const Entity entt) {
-            if(((std::is_same_v<Type, Owned> || std::get<Owned *>(pools)->contains(entt)) && ...)
-               && ((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...)
-               && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)
-               && !(std::get<0>(pools)->index(entt) < current)) {
-                const auto pos = current++;
-                (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
-            }
-        }
-
-        void discard_if(const Entity entt) {
-            if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < current)) {
-                const auto pos = --current;
-                (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
-            }
-        }
-
-    private:
-        std::tuple<Owned *..., Get *..., Exclude *...> pools;
-    };
-
-    template<typename... Get, typename... Exclude>
-    struct group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: basic_common_type {
-        template<typename Alloc>
-        group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
-            : basic_common_type{alloc},
-              pools{&gpool..., &epool...} {}
-
-        template<typename Type>
-        void maybe_valid_if(const Entity entt) {
-            if(((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...)
-               && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)
-               && !basic_common_type::contains(entt)) {
-                basic_common_type::push(entt);
-            }
-        }
-
-        void discard_if(const Entity entt) {
-            basic_common_type::remove(entt);
-        }
-
-    private:
-        std::tuple<Get *..., Exclude *...> pools;
-    };
-
     struct group_data {
         std::size_t size;
         std::shared_ptr<void> handler;
@@ -1267,7 +1209,7 @@ public:
     template<typename Owned, typename... Other, typename... Get, typename... Exclude>
     [[nodiscard]] basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get...> = {}, exclude_t<Exclude...> = {}) {
-        using handler_type = group_handler<owned_t<storage_for_type<std::remove_const_t<Owned>>, storage_for_type<std::remove_const_t<Other>>...>, get_t<storage_for_type<std::remove_const_t<Get>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
+        using handler_type = internal::group_handler<owned_t<storage_for_type<std::remove_const_t<Owned>>, storage_for_type<std::remove_const_t<Other>>...>, get_t<storage_for_type<std::remove_const_t<Get>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
         constexpr auto size = 1u + sizeof...(Other) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
@@ -1345,7 +1287,7 @@ public:
     template<typename Get, typename... Other, typename... Exclude>
     [[nodiscard]] basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get, Other...>, exclude_t<Exclude...> = {}) {
-        using handler_type = group_handler<owned_t<>, get_t<storage_for_type<std::remove_const_t<Get>>, storage_for_type<std::remove_const_t<Other>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
+        using handler_type = internal::group_handler<owned_t<>, get_t<storage_for_type<std::remove_const_t<Get>>, storage_for_type<std::remove_const_t<Other>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
         constexpr auto size = 1u + sizeof...(Other) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
@@ -1400,7 +1342,7 @@ public:
         if(it == groups.cend()) {
             return {};
         } else {
-            using handler_type = group_handler<owned_t<storage_for_type<std::remove_const_t<Owned>>...>, get_t<storage_for_type<std::remove_const_t<Get>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
+            using handler_type = internal::group_handler<owned_t<storage_for_type<std::remove_const_t<Owned>>...>, get_t<storage_for_type<std::remove_const_t<Get>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
 
             if constexpr(sizeof...(Owned) == 0u) {
                 return {*static_cast<handler_type *>(it->handler.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
