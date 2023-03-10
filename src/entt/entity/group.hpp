@@ -702,7 +702,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? (std::get<0>(pools)->base_type::end() - descriptor->current) : iterator{};
+        return *this ? (handle().base_type::end() - descriptor->current) : iterator{};
     }
 
     /**
@@ -716,7 +716,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? std::get<0>(pools)->base_type::end() : iterator{};
+        return *this ? handle().base_type::end() : iterator{};
     }
 
     /**
@@ -728,7 +728,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? std::get<0>(pools)->base_type::rbegin() : reverse_iterator{};
+        return *this ? handle().base_type::rbegin() : reverse_iterator{};
     }
 
     /**
@@ -743,7 +743,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? (std::get<0>(pools)->base_type::rbegin() + descriptor->current) : reverse_iterator{};
+        return *this ? (handle().base_type::rbegin() + descriptor->current) : reverse_iterator{};
     }
 
     /**
@@ -773,7 +773,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        const auto it = *this ? std::get<0>(pools)->find(entt) : iterator{};
+        const auto it = *this ? handle().find(entt) : iterator{};
         return it != end() && it >= begin() && *it == entt ? it : end();
     }
 
@@ -800,7 +800,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < (descriptor->current));
+        return *this && handle().contains(entt) && (handle().index(entt) < (descriptor->current));
     }
 
     /**
