@@ -122,9 +122,10 @@ struct group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
         }
     }
 
+    std::size_t current{};
+
 private:
     std::tuple<Owned *..., Get *..., Exclude *...> pools;
-    std::size_t current{};
 };
 
 template<typename... Get, typename... Exclude>
@@ -216,10 +217,12 @@ public:
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<Get...>>>;
+    /*! @brief Group handler type. */
+    using handler = internal::group_handler<owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
-        : handler{} {}
+        : set{} {}
 
     /**
      * @brief Constructs a group from a set of storage classes.
@@ -228,7 +231,7 @@ public:
      * @param epool The storage for the types used to filter the group.
      */
     basic_group(basic_common_type &ref, Get &...gpool, Exclude &...epool) noexcept
-        : handler{&ref},
+        : set{&ref},
           pools{&gpool...},
           filter{&epool...} {}
 
@@ -237,7 +240,7 @@ public:
      * @return A const reference to the underlying handler.
      */
     [[nodiscard]] const base_type &handle() const noexcept {
-        return *handler;
+        return *set;
     }
 
     /**
@@ -271,7 +274,7 @@ public:
      * @return Number of entities that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return *this ? handler->size() : size_type{};
+        return *this ? set->size() : size_type{};
     }
 
     /**
@@ -280,13 +283,13 @@ public:
      * @return Capacity of the group.
      */
     [[nodiscard]] size_type capacity() const noexcept {
-        return *this ? handler->capacity() : size_type{};
+        return *this ? set->capacity() : size_type{};
     }
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
         if(*this) {
-            handler->shrink_to_fit();
+            set->shrink_to_fit();
         }
     }
 
@@ -295,7 +298,7 @@ public:
      * @return True if the group is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !*this || handler->empty();
+        return !*this || set->empty();
     }
 
     /**
@@ -307,7 +310,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? handler->begin() : iterator{};
+        return *this ? set->begin() : iterator{};
     }
 
     /**
@@ -321,7 +324,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? handler->end() : iterator{};
+        return *this ? set->end() : iterator{};
     }
 
     /**
@@ -333,7 +336,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? handler->rbegin() : reverse_iterator{};
+        return *this ? set->rbegin() : reverse_iterator{};
     }
 
     /**
@@ -348,7 +351,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? handler->rend() : reverse_iterator{};
+        return *this ? set->rend() : reverse_iterator{};
     }
 
     /**
@@ -378,7 +381,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        const auto it = *this ? handler->find(entt) : iterator{};
+        const auto it = *this ? set->find(entt) : iterator{};
         return it != end() && *it == entt ? it : end();
     }
 
@@ -396,7 +399,7 @@ public:
      * @return True if the group is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return handler != nullptr;
+        return set != nullptr;
     }
 
     /**
@@ -405,7 +408,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && handler->contains(entt);
+        return *this && set->contains(entt);
     }
 
     /**
@@ -525,7 +528,7 @@ public:
         if(*this) {
             if constexpr(sizeof...(Type) == 0) {
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-                handler->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+                set->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
                 auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Type) == 1) {
@@ -535,7 +538,7 @@ public:
                     }
                 };
 
-                handler->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
+                set->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
             }
         }
     }
@@ -559,12 +562,12 @@ public:
     template<typename Type>
     void sort() const {
         if(*this) {
-            handler->respect(*std::get<index_of<Type>>(pools));
+            set->respect(*std::get<index_of<Type>>(pools));
         }
     }
 
 private:
-    base_type *handler;
+    base_type *set;
     std::tuple<Get *...> pools;
     std::tuple<Exclude *...> filter;
 };
@@ -621,6 +624,8 @@ public:
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<Owned...>, get_t<Get...>>>;
+    /*! @brief Group handler type. */
+    using handler = internal::group_handler<owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept

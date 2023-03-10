@@ -1209,7 +1209,9 @@ public:
     template<typename Owned, typename... Other, typename... Get, typename... Exclude>
     [[nodiscard]] basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get...> = {}, exclude_t<Exclude...> = {}) {
-        using handler_type = internal::group_handler<owned_t<storage_for_type<std::remove_const_t<Owned>>, storage_for_type<std::remove_const_t<Other>>...>, get_t<storage_for_type<std::remove_const_t<Get>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
+        using group_type = basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>;
+        using handler_type = typename group_type::handler;
+
         constexpr auto size = 1u + sizeof...(Other) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
@@ -1287,7 +1289,9 @@ public:
     template<typename Get, typename... Other, typename... Exclude>
     [[nodiscard]] basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get, Other...>, exclude_t<Exclude...> = {}) {
-        using handler_type = internal::group_handler<owned_t<>, get_t<storage_for_type<std::remove_const_t<Get>>, storage_for_type<std::remove_const_t<Other>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
+        using group_type = basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>;
+        using handler_type = typename group_type::handler;
+
         constexpr auto size = 1u + sizeof...(Other) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
@@ -1342,7 +1346,8 @@ public:
         if(it == groups.cend()) {
             return {};
         } else {
-            using handler_type = internal::group_handler<owned_t<storage_for_type<std::remove_const_t<Owned>>...>, get_t<storage_for_type<std::remove_const_t<Get>>...>, exclude_t<storage_for_type<std::remove_const_t<Exclude>>...>>;
+            using group_type = basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>;
+            using handler_type = typename group_type::handler;
 
             if constexpr(sizeof...(Owned) == 0u) {
                 return {*static_cast<handler_type *>(it->handler.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
