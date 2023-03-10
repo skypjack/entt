@@ -236,8 +236,8 @@ public:
           filter{&epool...} {}
 
     /**
-     * @brief Returns a const reference to the underlying handler.
-     * @return A const reference to the underlying handler.
+     * @brief Returns the leading storage of a group.
+     * @return The leading storage of the group.
      */
     [[nodiscard]] const base_type &handle() const noexcept {
         return *descriptor;
@@ -642,6 +642,14 @@ public:
         : descriptor{&ref},
           pools{&opool..., &gpool...},
           filter{&epool...} {}
+
+    /**
+     * @brief Returns the leading storage of a group.
+     * @return The leading storage of the group.
+     */
+    [[nodiscard]] const base_type &handle() const noexcept {
+        return *std::get<0>(pools);
+    }
 
     /**
      * @brief Returns the storage for a given component type.
