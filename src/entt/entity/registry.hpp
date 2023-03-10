@@ -1276,7 +1276,7 @@ public:
             }
         }
 
-        return {handler->current, assure<std::remove_const_t<Owned>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
+        return {*handler, assure<std::remove_const_t<Owned>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
 
     /**
@@ -1347,13 +1347,7 @@ public:
             return {};
         } else {
             using group_type = basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>;
-            using handler_type = typename group_type::handler;
-
-            if constexpr(sizeof...(Owned) == 0u) {
-                return {*static_cast<handler_type *>(it->handler.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
-            } else {
-                return {static_cast<handler_type *>(it->handler.get())->current, assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
-            }
+            return {*static_cast<typename group_type::handler *>(it->handler.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
         }
     }
 

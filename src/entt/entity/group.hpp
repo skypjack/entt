@@ -629,19 +629,19 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
-        : length{} {}
+        : descriptor{} {}
 
     /**
      * @brief Constructs a group from a set of storage classes.
-     * @param len The actual number of entities to iterate.
+     * @param ref A reference to a group handler.
      * @param opool The storage for the _owned_ types to iterate.
      * @param gpool The storage for the _observed_ types to iterate.
      * @param epool The storage for the types used to filter the group.
      */
-    basic_group(const std::size_t &len, Owned &...opool, Get &...gpool, Exclude &...epool) noexcept
-        : pools{&opool..., &gpool...},
-          filter{&epool...},
-          length{&len} {}
+    basic_group(handler &ref, Owned &...opool, Get &...gpool, Exclude &...epool) noexcept
+        : descriptor{&ref},
+          pools{&opool..., &gpool...},
+          filter{&epool...} {}
 
     /**
      * @brief Returns the storage for a given component type.
@@ -674,7 +674,7 @@ public:
      * @return Number of entities that that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return *this ? *length : size_type{};
+        return *this ? descriptor->current : size_type{};
     }
 
     /**
@@ -682,7 +682,7 @@ public:
      * @return True if the group is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !*this || !*length;
+        return !*this || !descriptor->current;
     }
 
     /**
@@ -694,7 +694,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? (std::get<0>(pools)->base_type::end() - *length) : iterator{};
+        return *this ? (std::get<0>(pools)->base_type::end() - descriptor->current) : iterator{};
     }
 
     /**
@@ -735,7 +735,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? (std::get<0>(pools)->base_type::rbegin() + *length) : reverse_iterator{};
+        return *this ? (std::get<0>(pools)->base_type::rbegin() + descriptor->current) : reverse_iterator{};
     }
 
     /**
@@ -783,7 +783,7 @@ public:
      * @return True if the group is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return length != nullptr;
+        return descriptor != nullptr;
     }
 
     /**
@@ -792,7 +792,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < (*length));
+        return *this && std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < (descriptor->current));
     }
 
     /**
@@ -912,7 +912,7 @@ public:
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
         if constexpr(sizeof...(Type) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            std::get<0>(pools)->sort_n(*length, std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            std::get<0>(pools)->sort_n(descriptor->current, std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
             auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Type) == 1) {
@@ -922,11 +922,11 @@ public:
                 }
             };
 
-            std::get<0>(pools)->sort_n(*length, std::move(comp), std::move(algo), std::forward<Args>(args)...);
+            std::get<0>(pools)->sort_n(descriptor->current, std::move(comp), std::move(algo), std::forward<Args>(args)...);
         }
 
         std::apply([this](auto *head, auto *...other) {
-            for(auto next = *length; next; --next) {
+            for(auto next = descriptor->current; next; --next) {
                 const auto pos = next - 1;
                 [[maybe_unused]] const auto entt = head->data()[pos];
                 (other->swap_elements(other->data()[pos], entt), ...);
@@ -936,9 +936,9 @@ public:
     }
 
 private:
+    handler *descriptor;
     std::tuple<Owned *..., Get *...> pools;
     std::tuple<Exclude *...> filter;
-    const size_type *length;
 };
 
 } // namespace entt
