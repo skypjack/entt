@@ -222,16 +222,16 @@ public:
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
-        : set{} {}
+        : descriptor{} {}
 
     /**
      * @brief Constructs a group from a set of storage classes.
-     * @param ref The actual entities to iterate.
+     * @param ref A reference to a group handler.
      * @param gpool The storage for the _observed_ types to iterate.
      * @param epool The storage for the types used to filter the group.
      */
-    basic_group(basic_common_type &ref, Get &...gpool, Exclude &...epool) noexcept
-        : set{&ref},
+    basic_group(handler &ref, Get &...gpool, Exclude &...epool) noexcept
+        : descriptor{&ref},
           pools{&gpool...},
           filter{&epool...} {}
 
@@ -240,7 +240,7 @@ public:
      * @return A const reference to the underlying handler.
      */
     [[nodiscard]] const base_type &handle() const noexcept {
-        return *set;
+        return *descriptor;
     }
 
     /**
@@ -274,7 +274,7 @@ public:
      * @return Number of entities that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return *this ? set->size() : size_type{};
+        return *this ? descriptor->size() : size_type{};
     }
 
     /**
@@ -283,13 +283,13 @@ public:
      * @return Capacity of the group.
      */
     [[nodiscard]] size_type capacity() const noexcept {
-        return *this ? set->capacity() : size_type{};
+        return *this ? descriptor->capacity() : size_type{};
     }
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
         if(*this) {
-            set->shrink_to_fit();
+            descriptor->shrink_to_fit();
         }
     }
 
@@ -298,7 +298,7 @@ public:
      * @return True if the group is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !*this || set->empty();
+        return !*this || descriptor->empty();
     }
 
     /**
@@ -310,7 +310,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? set->begin() : iterator{};
+        return *this ? descriptor->begin() : iterator{};
     }
 
     /**
@@ -324,7 +324,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? set->end() : iterator{};
+        return *this ? descriptor->end() : iterator{};
     }
 
     /**
@@ -336,7 +336,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? set->rbegin() : reverse_iterator{};
+        return *this ? descriptor->rbegin() : reverse_iterator{};
     }
 
     /**
@@ -351,7 +351,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? set->rend() : reverse_iterator{};
+        return *this ? descriptor->rend() : reverse_iterator{};
     }
 
     /**
@@ -381,7 +381,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        const auto it = *this ? set->find(entt) : iterator{};
+        const auto it = *this ? descriptor->find(entt) : iterator{};
         return it != end() && *it == entt ? it : end();
     }
 
@@ -399,7 +399,7 @@ public:
      * @return True if the group is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return set != nullptr;
+        return descriptor != nullptr;
     }
 
     /**
@@ -408,7 +408,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && set->contains(entt);
+        return *this && descriptor->contains(entt);
     }
 
     /**
@@ -528,7 +528,7 @@ public:
         if(*this) {
             if constexpr(sizeof...(Type) == 0) {
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-                set->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+                descriptor->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
                 auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Type) == 1) {
@@ -538,7 +538,7 @@ public:
                     }
                 };
 
-                set->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
+                descriptor->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
             }
         }
     }
@@ -562,12 +562,12 @@ public:
     template<typename Type>
     void sort() const {
         if(*this) {
-            set->respect(*std::get<index_of<Type>>(pools));
+            descriptor->respect(*std::get<index_of<Type>>(pools));
         }
     }
 
 private:
-    base_type *set;
+    handler *descriptor;
     std::tuple<Get *...> pools;
     std::tuple<Exclude *...> filter;
 };
