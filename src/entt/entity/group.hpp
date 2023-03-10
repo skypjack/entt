@@ -925,14 +925,15 @@ public:
             std::get<0>(pools)->sort_n(descriptor->current, std::move(comp), std::move(algo), std::forward<Args>(args)...);
         }
 
-        std::apply([this](auto *head, auto *...other) {
+        auto cb = [this](auto *head, auto *...other) {
             for(auto next = descriptor->current; next; --next) {
                 const auto pos = next - 1;
                 [[maybe_unused]] const auto entt = head->data()[pos];
                 (other->swap_elements(other->data()[pos], entt), ...);
             }
-        },
-                   pools);
+        };
+
+        std::apply(cb, pools);
     }
 
 private:
