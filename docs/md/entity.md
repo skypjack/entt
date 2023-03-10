@@ -203,17 +203,22 @@ and it's possible to force a _version_.
 In both cases, when an identifier is released, the registry can freely reuse it
 internally. In particular, the version of an entity is increased (unless the
 overload that forces a version is used instead of the default one).<br/>
-Users can then _inspect_ the identifiers by means of a registry:
+Users can then _test_ identifiers by means of a registry:
 
 ```cpp
 // returns true if the entity is still valid, false otherwise
 bool b = registry.valid(entity);
 
-// gets the version contained in the entity identifier
-auto version = registry.version(entity);
-
 // gets the actual version for the given entity
 auto curr = registry.current(entity);
+```
+
+Or _inspect_ them using some functions meant for parsing an identifier as-is,
+such as:
+
+```cpp
+// gets the version contained in the entity identifier
+auto version = entt::to_version(entity);
 ```
 
 Components are assigned to or removed from entities at any time.<br/>
