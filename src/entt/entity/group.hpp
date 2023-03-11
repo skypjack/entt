@@ -102,13 +102,14 @@ struct group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     using entity_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
 
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
-        : pools{&opool..., &gpool..., &epool...} {}
+        : pools{&opool..., &gpool...},
+          filter{&epool...} {}
 
     template<typename Type>
     void maybe_valid_if(const entity_type entt) {
         if(((std::is_same_v<Type, Owned> || std::get<Owned *>(pools)->contains(entt)) && ...)
            && ((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...)
-           && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)
+           && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(filter)->contains(entt)) && ...)
            && !(std::get<0>(pools)->index(entt) < current)) {
             const auto pos = current++;
             (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
@@ -125,7 +126,8 @@ struct group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     std::size_t current{};
 
 private:
-    std::tuple<Owned *..., Get *..., Exclude *...> pools;
+    std::tuple<Owned *..., Get *...> pools;
+    std::tuple<Exclude *...> filter;
 };
 
 template<typename... Get, typename... Exclude>
@@ -139,12 +141,13 @@ struct group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: std::comm
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
         : basic_common_type{alloc},
-          pools{&gpool..., &epool...} {}
+          pools{&gpool...},
+          filter{&epool...} {}
 
     template<typename Type>
     void maybe_valid_if(const entity_type entt) {
         if(((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...)
-           && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(pools)->contains(entt)) && ...)
+           && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(filter)->contains(entt)) && ...)
            && !basic_common_type::contains(entt)) {
             basic_common_type::push(entt);
         }
@@ -155,7 +158,8 @@ struct group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: std::comm
     }
 
 private:
-    std::tuple<Get *..., Exclude *...> pools;
+    std::tuple<Get *...> pools;
+    std::tuple<Exclude *...> filter;
 };
 
 } // namespace internal
