@@ -91,35 +91,40 @@ template<typename... Lhs, typename... Rhs>
 }
 
 template<typename, typename, typename>
-struct group_handler;
+class group_handler;
 
 template<typename... Owned, typename... Get, typename... Exclude>
-struct group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
+class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
     static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-    using entity_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
+    using underlying_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
+
+    template<std::size_t... Index>
+    void swap_elements(std::index_sequence<Index...>, const std::size_t pos, const underlying_type entt) {
+        (std::get<Index>(pools)->swap_elements(std::get<Index>(pools)->data()[pos], entt), ...);
+    }
+
+public:
+    using entity_type = underlying_type;
 
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
         : pools{&opool..., &gpool...},
           filter{&epool...} {}
 
-    template<typename Type>
-    void maybe_valid_if(const entity_type entt) {
-        if(((std::is_same_v<Type, Owned> || std::get<Owned *>(pools)->contains(entt)) && ...)
-           && ((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...)
-           && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(filter)->contains(entt)) && ...)
+    template<bool Expected>
+    void push_if(const entity_type entt) {
+        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (Expected == (0u + ... + cpool->contains(entt))); }, filter)
            && !(std::get<0>(pools)->index(entt) < current)) {
-            const auto pos = current++;
-            (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
+            swap_elements(std::index_sequence_for<Owned...>{}, current++, entt);
         }
     }
 
-    void discard_if(const entity_type entt) {
+    void remove_if(const entity_type entt) {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < current)) {
-            const auto pos = --current;
-            (std::get<Owned *>(pools)->swap_elements(std::get<Owned *>(pools)->data()[pos], entt), ...);
+            swap_elements(std::index_sequence_for<Owned...>{}, --current, entt);
         }
     }
 
@@ -131,12 +136,14 @@ private:
 };
 
 template<typename... Get, typename... Exclude>
-struct group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: std::common_type_t<typename Get::base_type..., typename Exclude::base_type...> {
+class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public std::common_type_t<typename Get::base_type..., typename Exclude::base_type...> {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-    using entity_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
     using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+
+public:
+    using entity_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
@@ -144,16 +151,16 @@ struct group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: std::comm
           pools{&gpool...},
           filter{&epool...} {}
 
-    template<typename Type>
-    void maybe_valid_if(const entity_type entt) {
-        if(((std::is_same_v<Type, Get> || std::get<Get *>(pools)->contains(entt)) && ...)
-           && ((std::is_same_v<Type, Exclude> || !std::get<Exclude *>(filter)->contains(entt)) && ...)
+    template<bool Expected>
+    void push_if(const entity_type entt) {
+        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (Expected == (0u + ... + cpool->contains(entt))); }, filter)
            && !basic_common_type::contains(entt)) {
             basic_common_type::push(entt);
         }
     }
 
-    void discard_if(const entity_type entt) {
+    void remove_if(const entity_type entt) {
         basic_common_type::remove(entt);
     }
 

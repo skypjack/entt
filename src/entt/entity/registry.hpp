@@ -1235,8 +1235,8 @@ public:
 
             handler = static_cast<handler_type *>(candidate.handler.get());
 
-            const void *maybe_valid_if = nullptr;
-            const void *discard_if = nullptr;
+            const void *push_if = nullptr;
+            const void *remove_if = nullptr;
 
             [[maybe_unused]] auto has_conflict = [size](const auto &gdata) {
                 const auto overlapping = (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value()));
@@ -1254,25 +1254,25 @@ public:
                 return (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value()));
             });
 
-            maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->handler.get());
-            discard_if = (prev == groups.crend() ? discard_if : prev->handler.get());
+            push_if = (next == groups.cend() ? push_if : next->handler.get());
+            remove_if = (prev == groups.crend() ? remove_if : prev->handler.get());
             groups.insert(next, std::move(candidate));
 
-            on_construct<std::remove_const_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Owned>>>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Other>>>>(*handler), ...);
-            (on_construct<std::remove_const_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Get>>>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Exclude>>>>(*handler), ...);
+            on_construct<std::remove_const_t<Owned>>().before(push_if).template connect<&handler_type::template push_if<0u>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().before(push_if).template connect<&handler_type::template push_if<0u>>(*handler), ...);
+            (on_construct<std::remove_const_t<Get>>().before(push_if).template connect<&handler_type::template push_if<0u>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().before(push_if).template connect<&handler_type::template push_if<1u>>(*handler), ...);
 
-            on_destroy<std::remove_const_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler);
-            (on_destroy<std::remove_const_t<Other>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
-            (on_destroy<std::remove_const_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            on_destroy<std::remove_const_t<Owned>>().before(remove_if).template connect<&handler_type::remove_if>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().before(remove_if).template connect<&handler_type::remove_if>(*handler), ...);
+            (on_destroy<std::remove_const_t<Get>>().before(remove_if).template connect<&handler_type::remove_if>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().before(remove_if).template connect<&handler_type::remove_if>(*handler), ...);
 
             auto &cpool = assure<std::remove_const_t<Owned>>();
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
             for(auto *first = cpool.data(), *last = first + cpool.size(); first != last; ++first) {
-                handler->template maybe_valid_if<Owned>(*first);
+                handler->template push_if<0u>(*first);
             }
         }
 
@@ -1316,13 +1316,13 @@ public:
 
             groups.push_back(std::move(candidate));
 
-            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Get>>>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Other>>>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template maybe_valid_if<storage_for_type<std::remove_const_t<Exclude>>>>(*handler), ...);
+            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template push_if<0u>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template push_if<0u>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template push_if<1u>>(*handler), ...);
 
-            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::discard_if>(*handler);
-            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::discard_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::discard_if>(*handler), ...);
+            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::remove_if>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::remove_if>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::remove_if>(*handler), ...);
 
             for(const auto entity: view<Get, Other...>(exclude<Exclude...>)) {
                 handler->push(entity);
