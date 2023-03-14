@@ -440,7 +440,7 @@ public:
         archive(length);
         archive(released);
 
-        entity_type entt{entt::null};
+        entity_type entt{null};
         std::size_t pos{};
 
         for(const auto last = length - released; pos < last; ++pos) {
