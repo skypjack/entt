@@ -130,7 +130,7 @@ public:
         }
     }
 
-    [[nodiscard]] std::size_t size() const noexcept {
+    [[nodiscard]] std::size_t length() const noexcept {
         return len;
     }
 
@@ -706,7 +706,7 @@ public:
      * @return Number of entities that that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return *this ? descriptor->size() : size_type{};
+        return *this ? descriptor->length() : size_type{};
     }
 
     /**
@@ -714,7 +714,7 @@ public:
      * @return True if the group is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !*this || !descriptor->size();
+        return !*this || !descriptor->length();
     }
 
     /**
@@ -726,7 +726,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? (handle().base_type::end() - descriptor->size()) : iterator{};
+        return *this ? (handle().base_type::end() - descriptor->length()) : iterator{};
     }
 
     /**
@@ -767,7 +767,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? (handle().base_type::rbegin() + descriptor->size()) : reverse_iterator{};
+        return *this ? (handle().base_type::rbegin() + descriptor->length()) : reverse_iterator{};
     }
 
     /**
@@ -824,7 +824,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && handle().contains(entt) && (handle().index(entt) < (descriptor->size()));
+        return *this && handle().contains(entt) && (handle().index(entt) < (descriptor->length()));
     }
 
     /**
@@ -944,7 +944,7 @@ public:
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
         if constexpr(sizeof...(Type) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            std::get<0>(pools)->sort_n(descriptor->size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            std::get<0>(pools)->sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
             auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Type) == 1) {
@@ -954,11 +954,11 @@ public:
                 }
             };
 
-            std::get<0>(pools)->sort_n(descriptor->size(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
+            std::get<0>(pools)->sort_n(descriptor->length(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
         }
 
         auto cb = [this](auto *head, auto *...other) {
-            for(auto next = descriptor->size(); next; --next) {
+            for(auto next = descriptor->length(); next; --next) {
                 const auto pos = next - 1;
                 [[maybe_unused]] const auto entt = head->data()[pos];
                 (other->swap_elements(other->data()[pos], entt), ...);
