@@ -242,8 +242,6 @@ class basic_registry {
 
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
-    // std::shared_ptr because of its type erased allocator which is useful here
-    using container_type = dense_map<id_type, std::shared_ptr<basic_common_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<basic_common_type>>>>;
 
     template<typename Type>
     using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
@@ -255,6 +253,10 @@ class basic_registry {
         bool (*get)(const id_type) noexcept;
         bool (*exclude)(const id_type) noexcept;
     };
+
+    // std::shared_ptr because of its type erased allocator which is useful here
+    using pool_container_type = dense_map<id_type, std::shared_ptr<basic_common_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<basic_common_type>>>>;
+    using group_container_type = dense_map<id_type, group_data, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, group_data>>>;
 
     template<typename Type>
     [[nodiscard]] auto &assure(const id_type id = type_hash<Type>::value()) {
@@ -332,8 +334,8 @@ public:
     basic_registry(const size_type count, const allocator_type &allocator = allocator_type{})
         : vars{allocator},
           pools{allocator},
-          shortcut{&assure<entity_type>()},
-          groups{allocator} {
+          groups{allocator},
+          shortcut{&assure<entity_type>()} {
         pools.reserve(count);
         rebind();
     }
@@ -345,8 +347,8 @@ public:
     basic_registry(basic_registry &&other) noexcept
         : vars{std::move(other.vars)},
           pools{std::move(other.pools)},
-          shortcut{std::move(other.shortcut)},
-          groups{std::move(other.groups)} {
+          groups{std::move(other.groups)},
+          shortcut{std::move(other.shortcut)} {
         rebind();
     }
 
@@ -358,8 +360,8 @@ public:
     basic_registry &operator=(basic_registry &&other) noexcept {
         vars = std::move(other.vars);
         pools = std::move(other.pools);
-        shortcut = std::move(other.shortcut);
         groups = std::move(other.groups);
+        shortcut = std::move(other.shortcut);
 
         rebind();
 
@@ -375,8 +377,8 @@ public:
 
         swap(vars, other.vars);
         swap(pools, other.pools);
-        swap(shortcut, other.shortcut);
         swap(groups, other.groups);
+        swap(shortcut, other.shortcut);
 
         rebind();
         other.rebind();
@@ -1209,21 +1211,13 @@ public:
     template<typename Owned, typename... Other, typename... Get, typename... Exclude>
     [[nodiscard]] basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get...> = {}, exclude_t<Exclude...> = {}) {
-        using group_type = basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>;
-        using handler_type = typename group_type::handler;
+        using handler_type = typename basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
 
         constexpr auto size = 1u + sizeof...(Other) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
-        auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-            return gdata.size == size
-                   && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ... && gdata.owned(type_hash<std::remove_const_t<Other>>::value()))
-                   && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
-                   && (gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()) && ...);
-        });
-
-        if(it != groups.cend()) {
-            handler = static_cast<handler_type *>(it->handler.get());
+        if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
+            handler = static_cast<handler_type *>(it->second.handler.get());
         } else {
             group_data candidate = {
                 size,
@@ -1234,39 +1228,44 @@ public:
             };
 
             handler = static_cast<handler_type *>(candidate.handler.get());
+            groups.emplace(type_hash<handler_type>::value(), std::move(candidate));
 
-            const void *push_if = nullptr;
-            const void *remove_if = nullptr;
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size](const auto &data) {
+                            const auto overlapping = (data.second.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + data.second.owned(type_hash<std::remove_const_t<Other>>::value()));
+                            const auto sz = overlapping + (0u + ... + data.second.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + data.second.exclude(type_hash<std::remove_const_t<Exclude>>::value()));
+                            return !overlapping || ((sz == size) || (sz == data.second.size));
+                        }),
+                        "Conflicting groups");
 
-            [[maybe_unused]] auto has_conflict = [size](const auto &gdata) {
-                const auto overlapping = (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value()));
-                const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()));
-                return !overlapping || ((sz == size) || (sz == gdata.size));
-            };
+            const void *prev = nullptr;
+            const void *next = nullptr;
 
-            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), std::move(has_conflict)), "Conflicting groups");
+            size_type prev_len{};
+            size_type next_len{};
 
-            const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-                return !(gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value())) || (size > gdata.size);
-            });
+            for(auto &&data: groups) {
+                if((data.second.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + data.second.owned(type_hash<std::remove_const_t<Other>>::value()))) {
+                    if(data.second.size < size && (prev == nullptr || prev_len < data.second.size)) {
+                        prev_len = data.second.size;
+                        prev = data.second.handler.get();
+                    }
 
-            const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &gdata) {
-                return (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + gdata.owned(type_hash<std::remove_const_t<Other>>::value()));
-            });
+                    if(data.second.size > size && (next == nullptr || next_len > data.second.size)) {
+                        next_len = data.second.size;
+                        next = data.second.handler.get();
+                    }
+                }
+            }
 
-            push_if = (next == groups.cend() ? push_if : next->handler.get());
-            remove_if = (prev == groups.crend() ? remove_if : prev->handler.get());
-            groups.insert(next, std::move(candidate));
+            on_construct<std::remove_const_t<Owned>>().before(next).template connect<&handler_type::template push_if<0u>>(*handler);
+            (on_construct<std::remove_const_t<Other>>().before(next).template connect<&handler_type::template push_if<0u>>(*handler), ...);
+            (on_construct<std::remove_const_t<Get>>().before(next).template connect<&handler_type::template push_if<0u>>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().before(next).template connect<&handler_type::template push_if<1u>>(*handler), ...);
 
-            on_construct<std::remove_const_t<Owned>>().before(push_if).template connect<&handler_type::template push_if<0u>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().before(push_if).template connect<&handler_type::template push_if<0u>>(*handler), ...);
-            (on_construct<std::remove_const_t<Get>>().before(push_if).template connect<&handler_type::template push_if<0u>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().before(push_if).template connect<&handler_type::template push_if<1u>>(*handler), ...);
-
-            on_destroy<std::remove_const_t<Owned>>().before(remove_if).template connect<&handler_type::remove_if>(*handler);
-            (on_destroy<std::remove_const_t<Other>>().before(remove_if).template connect<&handler_type::remove_if>(*handler), ...);
-            (on_destroy<std::remove_const_t<Get>>().before(remove_if).template connect<&handler_type::remove_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().before(remove_if).template connect<&handler_type::remove_if>(*handler), ...);
+            on_destroy<std::remove_const_t<Owned>>().before(prev).template connect<&handler_type::remove_if>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().before(prev).template connect<&handler_type::remove_if>(*handler), ...);
+            (on_destroy<std::remove_const_t<Get>>().before(prev).template connect<&handler_type::remove_if>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().before(prev).template connect<&handler_type::remove_if>(*handler), ...);
 
             auto &cpool = assure<std::remove_const_t<Owned>>();
 
@@ -1289,20 +1288,13 @@ public:
     template<typename Get, typename... Other, typename... Exclude>
     [[nodiscard]] basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get, Other...>, exclude_t<Exclude...> = {}) {
-        using group_type = basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>;
-        using handler_type = typename group_type::handler;
+        using handler_type = typename basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
 
         constexpr auto size = 1u + sizeof...(Other) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
-        auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-            return gdata.size == size
-                   && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ... && gdata.get(type_hash<std::remove_const_t<Other>>::value()))
-                   && (gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()) && ...);
-        });
-
-        if(it != groups.cend()) {
-            handler = static_cast<handler_type *>(it->handler.get());
+        if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
+            handler = static_cast<handler_type *>(it->second.handler.get());
         } else {
             group_data candidate = {
                 size,
@@ -1313,8 +1305,7 @@ public:
             };
 
             handler = static_cast<handler_type *>(candidate.handler.get());
-
-            groups.push_back(std::move(candidate));
+            groups.emplace(type_hash<handler_type>::value(), std::move(candidate));
 
             on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template push_if<0u>>(*handler);
             (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template push_if<0u>>(*handler), ...);
@@ -1336,18 +1327,12 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>
     group_if_exists(get_t<Get...> = {}, exclude_t<Exclude...> = {}) const {
-        auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
-            return gdata.size == (sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude))
-                   && (gdata.owned(type_hash<std::remove_const_t<Owned>>::value()) && ...)
-                   && (gdata.get(type_hash<std::remove_const_t<Get>>::value()) && ...)
-                   && (gdata.exclude(type_hash<std::remove_const_t<Exclude>>::value()) && ...);
-        });
+        using handler_type = typename basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>::handler;
 
-        if(it == groups.cend()) {
+        if(auto it = groups.find(type_hash<handler_type>::value()); it == groups.cend()) {
             return {};
         } else {
-            using group_type = basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>;
-            return {*static_cast<typename group_type::handler *>(it->handler.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
+            return {*static_cast<handler_type *>(it->second.handler.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
         }
     }
 
@@ -1359,7 +1344,7 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] bool owned() const {
-        return std::any_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::remove_const_t<Type>>::value()) || ...); });
+        return std::any_of(groups.cbegin(), groups.cend(), [](auto &&data) { return (data.second.owned(type_hash<std::remove_const_t<Type>>::value()) || ...); });
     }
 
     /**
@@ -1372,7 +1357,7 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] bool sortable(const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) noexcept {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        auto pred = [size](const auto &gdata) { return (0u + ... + gdata.owned(type_hash<typename Owned::value_type>::value())) && (size < gdata.size); };
+        auto pred = [size](const auto &data) { return (0u + ... + data.second.owned(type_hash<typename Owned::value_type>::value())) && (size < data.second.size); };
         return std::find_if(groups.cbegin(), groups.cend(), std::move(pred)) == groups.cend();
     }
 
@@ -1464,9 +1449,9 @@ public:
 
 private:
     context vars;
-    container_type pools;
+    pool_container_type pools;
+    group_container_type groups;
     storage_for_type<entity_type> *shortcut;
-    std::vector<group_data, typename alloc_traits::template rebind_alloc<group_data>> groups;
 };
 
 } // namespace entt
