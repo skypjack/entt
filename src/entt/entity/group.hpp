@@ -5,7 +5,9 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
+#include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -91,8 +93,10 @@ template<typename... Lhs, typename... Rhs>
 }
 
 struct basic_group_handler {
-    using size_type = std::size_t;
-    const size_type size;
+    const std::size_t size;
+    bool (*const owned)(const id_type) noexcept;
+    bool (*const get)(const id_type) noexcept;
+    bool (*const exclude)(const id_type) noexcept;
 };
 
 template<typename, typename, typename>
@@ -115,10 +119,12 @@ public:
     using entity_type = underlying_type;
 
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
-        : basic_group_handler{sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude)},
-          pools{&opool..., &gpool...},
-          filter{&epool...},
-          len{} {}
+        : basic_group_handler{
+            sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude),
+            +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Owned::value_type>::value()) || ...); },
+            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
+            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
+          pools{&opool..., &gpool...}, filter{&epool...}, len{} {}
 
     template<bool Expected>
     void push_if(const entity_type entt) {
@@ -156,10 +162,12 @@ public:
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
-        : basic_group_handler{sizeof...(Get) + sizeof...(Exclude)},
-          pools{&gpool...},
-          filter{&epool...},
-          elem{alloc} {}
+        : basic_group_handler{
+            sizeof...(Get) + sizeof...(Exclude),
+            +[](const id_type) noexcept { return false; },
+            +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
+            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
+          pools{&gpool...}, filter{&epool...}, elem{alloc} {}
 
     template<bool Expected>
     void push_if(const entity_type entt) {
