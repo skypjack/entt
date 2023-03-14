@@ -247,7 +247,6 @@ class basic_registry {
     using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
 
     struct group_data {
-        std::size_t size;
         std::shared_ptr<internal::basic_group_handler> handler;
         bool (*owned)(const id_type) noexcept;
         bool (*get)(const id_type) noexcept;
@@ -1212,15 +1211,12 @@ public:
     [[nodiscard]] basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get...> = {}, exclude_t<Exclude...> = {}) {
         using handler_type = typename basic_group<owned_t<storage_for_type<Owned>, storage_for_type<Other>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
-
-        constexpr auto size = 1u + sizeof...(Other) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
         if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
             handler = static_cast<handler_type *>(it->second.handler.get());
         } else {
             group_data candidate = {
-                size,
                 std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...),
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Owned>>::value()) || ... || (ctype == type_hash<std::remove_const_t<Other>>::value())); },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ...); },
@@ -1230,10 +1226,10 @@ public:
             handler = static_cast<handler_type *>(candidate.handler.get());
             groups.emplace(type_hash<handler_type>::value(), std::move(candidate));
 
-            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size](const auto &data) {
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size = handler->size()](const auto &data) {
                             const auto overlapping = (data.second.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + data.second.owned(type_hash<std::remove_const_t<Other>>::value()));
                             const auto sz = overlapping + (0u + ... + data.second.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + data.second.exclude(type_hash<std::remove_const_t<Exclude>>::value()));
-                            return !overlapping || ((sz == size) || (sz == data.second.size));
+                            return !overlapping || ((sz == size) || (sz == data.second.handler->size()));
                         }),
                         "Conflicting groups");
 
@@ -1245,14 +1241,14 @@ public:
 
             for(auto &&data: groups) {
                 if((data.second.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + data.second.owned(type_hash<std::remove_const_t<Other>>::value()))) {
-                    if(data.second.size < size && (prev == nullptr || prev_len < data.second.size)) {
-                        prev_len = data.second.size;
+                    if(const auto sz = data.second.handler->size(); sz < handler->size() && (prev == nullptr || prev_len < sz)) {
                         prev = data.second.handler.get();
+                        prev_len = sz;
                     }
 
-                    if(data.second.size > size && (next == nullptr || next_len > data.second.size)) {
-                        next_len = data.second.size;
+                    if(const auto sz = data.second.handler->size(); sz > handler->size() && (next == nullptr || next_len > sz)) {
                         next = data.second.handler.get();
+                        next_len = sz;
                     }
                 }
             }
@@ -1289,15 +1285,12 @@ public:
     [[nodiscard]] basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get, Other...>, exclude_t<Exclude...> = {}) {
         using handler_type = typename basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
-
-        constexpr auto size = 1u + sizeof...(Other) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
         if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
             handler = static_cast<handler_type *>(it->second.handler.get());
         } else {
             group_data candidate = {
-                size,
                 std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...),
                 []([[maybe_unused]] const id_type ctype) noexcept { return false; },
                 []([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == type_hash<std::remove_const_t<Get>>::value()) || ... || (ctype == type_hash<std::remove_const_t<Other>>::value())); },
@@ -1357,7 +1350,7 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] bool sortable(const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) noexcept {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        auto pred = [size](const auto &data) { return (0u + ... + data.second.owned(type_hash<typename Owned::value_type>::value())) && (size < data.second.size); };
+        auto pred = [size](const auto &data) { return (0u + ... + data.second.owned(type_hash<typename Owned::value_type>::value())) && (size < data.second.handler->size()); };
         return std::find_if(groups.cbegin(), groups.cend(), std::move(pred)) == groups.cend();
     }
 

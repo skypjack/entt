@@ -90,7 +90,19 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs == rhs);
 }
 
-struct basic_group_handler {};
+struct basic_group_handler {
+    using size_type = std::size_t;
+
+    basic_group_handler(const size_type cnt)
+        : sz{cnt} {}
+
+    size_type size() const noexcept {
+        return sz;
+    }
+
+private:
+    const size_type sz;
+};
 
 template<typename, typename, typename>
 class group_handler;
@@ -112,8 +124,10 @@ public:
     using entity_type = underlying_type;
 
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
-        : pools{&opool..., &gpool...},
-          filter{&epool...} {}
+        : basic_group_handler{sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude)},
+          pools{&opool..., &gpool...},
+          filter{&epool...},
+          len{} {}
 
     template<bool Expected>
     void push_if(const entity_type entt) {
@@ -137,7 +151,7 @@ public:
 private:
     std::tuple<Owned *..., Get *...> pools;
     std::tuple<Exclude *...> filter;
-    std::size_t len{};
+    std::size_t len;
 };
 
 template<typename... Get, typename... Exclude>
@@ -151,7 +165,8 @@ public:
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
-        : pools{&gpool...},
+        : basic_group_handler{sizeof...(Get) + sizeof...(Exclude)},
+          pools{&gpool...},
           filter{&epool...},
           elem{alloc} {}
 
