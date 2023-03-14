@@ -1226,10 +1226,10 @@ public:
             handler = static_cast<handler_type *>(candidate.handler.get());
             groups.emplace(type_hash<handler_type>::value(), std::move(candidate));
 
-            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size = handler->size()](const auto &data) {
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size = handler->size](const auto &data) {
                             const auto overlapping = (data.second.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + data.second.owned(type_hash<std::remove_const_t<Other>>::value()));
                             const auto sz = overlapping + (0u + ... + data.second.get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + data.second.exclude(type_hash<std::remove_const_t<Exclude>>::value()));
-                            return !overlapping || ((sz == size) || (sz == data.second.handler->size()));
+                            return !overlapping || ((sz == size) || (sz == data.second.handler->size));
                         }),
                         "Conflicting groups");
 
@@ -1241,12 +1241,12 @@ public:
 
             for(auto &&data: groups) {
                 if((data.second.owned(type_hash<std::remove_const_t<Owned>>::value()) || ... || data.second.owned(type_hash<std::remove_const_t<Other>>::value()))) {
-                    if(const auto sz = data.second.handler->size(); sz < handler->size() && (prev == nullptr || prev_len < sz)) {
+                    if(const auto sz = data.second.handler->size; sz < handler->size && (prev == nullptr || prev_len < sz)) {
                         prev = data.second.handler.get();
                         prev_len = sz;
                     }
 
-                    if(const auto sz = data.second.handler->size(); sz > handler->size() && (next == nullptr || next_len > sz)) {
+                    if(const auto sz = data.second.handler->size; sz > handler->size && (next == nullptr || next_len > sz)) {
                         next = data.second.handler.get();
                         next_len = sz;
                     }
@@ -1350,7 +1350,7 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] bool sortable(const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) noexcept {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        auto pred = [size](const auto &data) { return (data.second.owned(type_hash<typename Owned::value_type>::value()) || ...) && (size < data.second.handler->size()); };
+        auto pred = [size](const auto &data) { return (data.second.owned(type_hash<typename Owned::value_type>::value()) || ...) && (size < data.second.handler->size); };
         return std::find_if(groups.cbegin(), groups.cend(), std::move(pred)) == groups.cend();
     }
 

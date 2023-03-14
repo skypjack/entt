@@ -92,16 +92,7 @@ template<typename... Lhs, typename... Rhs>
 
 struct basic_group_handler {
     using size_type = std::size_t;
-
-    basic_group_handler(const size_type cnt)
-        : sz{cnt} {}
-
-    size_type size() const noexcept {
-        return sz;
-    }
-
-private:
-    const size_type sz;
+    const size_type size;
 };
 
 template<typename, typename, typename>
