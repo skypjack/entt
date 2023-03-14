@@ -139,37 +139,45 @@ private:
 };
 
 template<typename... Get, typename... Exclude>
-class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public std::common_type_t<typename Get::base_type..., typename Exclude::base_type...> {
+class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-    using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
-
 public:
-    using entity_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
+    using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+    using entity_type = typename basic_common_type::entity_type;
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
-        : basic_common_type{alloc},
-          pools{&gpool...},
-          filter{&epool...} {}
+        : pools{&gpool...},
+          filter{&epool...},
+          elem{alloc} {}
 
     template<bool Expected>
     void push_if(const entity_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (Expected == (0u + ... + cpool->contains(entt))); }, filter)
-           && !basic_common_type::contains(entt)) {
-            basic_common_type::push(entt);
+           && !elem.contains(entt)) {
+            elem.push(entt);
         }
     }
 
     void remove_if(const entity_type entt) {
-        basic_common_type::remove(entt);
+        elem.remove(entt);
+    }
+
+    basic_common_type &group() noexcept {
+        return elem;
+    }
+
+    const basic_common_type &group() const noexcept {
+        return elem;
     }
 
 private:
     std::tuple<Get *...> pools;
     std::tuple<Exclude *...> filter;
+    basic_common_type elem;
 };
 
 } // namespace internal
@@ -254,7 +262,7 @@ public:
      * @return The leading storage of the group.
      */
     [[nodiscard]] const base_type &handle() const noexcept {
-        return *descriptor;
+        return descriptor->group();
     }
 
     /**
@@ -288,7 +296,7 @@ public:
      * @return Number of entities that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return *this ? descriptor->size() : size_type{};
+        return *this ? descriptor->group().size() : size_type{};
     }
 
     /**
@@ -297,13 +305,13 @@ public:
      * @return Capacity of the group.
      */
     [[nodiscard]] size_type capacity() const noexcept {
-        return *this ? descriptor->capacity() : size_type{};
+        return *this ? descriptor->group().capacity() : size_type{};
     }
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
         if(*this) {
-            descriptor->shrink_to_fit();
+            descriptor->group().shrink_to_fit();
         }
     }
 
@@ -312,7 +320,7 @@ public:
      * @return True if the group is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !*this || descriptor->empty();
+        return !*this || descriptor->group().empty();
     }
 
     /**
@@ -324,7 +332,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? descriptor->begin() : iterator{};
+        return *this ? descriptor->group().begin() : iterator{};
     }
 
     /**
@@ -338,7 +346,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? descriptor->end() : iterator{};
+        return *this ? descriptor->group().end() : iterator{};
     }
 
     /**
@@ -350,7 +358,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? descriptor->rbegin() : reverse_iterator{};
+        return *this ? descriptor->group().rbegin() : reverse_iterator{};
     }
 
     /**
@@ -365,7 +373,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? descriptor->rend() : reverse_iterator{};
+        return *this ? descriptor->group().rend() : reverse_iterator{};
     }
 
     /**
@@ -395,7 +403,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        const auto it = *this ? descriptor->find(entt) : iterator{};
+        const auto it = *this ? descriptor->group().find(entt) : iterator{};
         return it != end() && *it == entt ? it : end();
     }
 
@@ -422,7 +430,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && descriptor->contains(entt);
+        return *this && descriptor->group().contains(entt);
     }
 
     /**
@@ -542,7 +550,7 @@ public:
         if(*this) {
             if constexpr(sizeof...(Type) == 0) {
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-                descriptor->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+                descriptor->group().sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
                 auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Type) == 1) {
@@ -552,7 +560,7 @@ public:
                     }
                 };
 
-                descriptor->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
+                descriptor->group().sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
             }
         }
     }
@@ -576,7 +584,7 @@ public:
     template<typename Type>
     void sort() const {
         if(*this) {
-            descriptor->respect(*std::get<index_of<Type>>(pools));
+            descriptor->group().respect(*std::get<index_of<Type>>(pools));
         }
     }
 

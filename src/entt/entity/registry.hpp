@@ -1316,7 +1316,7 @@ public:
             (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::remove_if>(*handler), ...);
 
             for(const auto entity: view<Get, Other...>(exclude<Exclude...>)) {
-                handler->push(entity);
+                handler->group().push(entity);
             }
         }
 
