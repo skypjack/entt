@@ -1240,7 +1240,7 @@ public:
             size_type next_len{};
 
             for(auto &&data: groups) {
-                if((data.second.owned(type_hash<std::remove_const_t<Owned>>::value()) + ... + data.second.owned(type_hash<std::remove_const_t<Other>>::value()))) {
+                if((data.second.owned(type_hash<std::remove_const_t<Owned>>::value()) || ... || data.second.owned(type_hash<std::remove_const_t<Other>>::value()))) {
                     if(const auto sz = data.second.handler->size(); sz < handler->size() && (prev == nullptr || prev_len < sz)) {
                         prev = data.second.handler.get();
                         prev_len = sz;
@@ -1350,7 +1350,7 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] bool sortable(const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) noexcept {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        auto pred = [size](const auto &data) { return (0u + ... + data.second.owned(type_hash<typename Owned::value_type>::value())) && (size < data.second.handler->size()); };
+        auto pred = [size](const auto &data) { return (data.second.owned(type_hash<typename Owned::value_type>::value()) || ...) && (size < data.second.handler->size()); };
         return std::find_if(groups.cbegin(), groups.cend(), std::move(pred)) == groups.cend();
     }
 
