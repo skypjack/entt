@@ -90,11 +90,13 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs == rhs);
 }
 
+struct basic_group_handler {};
+
 template<typename, typename, typename>
 class group_handler;
 
 template<typename... Owned, typename... Get, typename... Exclude>
-class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
+class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public basic_group_handler {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
     static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
@@ -139,7 +141,7 @@ private:
 };
 
 template<typename... Get, typename... Exclude>
-class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
+class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public basic_group_handler {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 

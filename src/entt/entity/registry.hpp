@@ -248,7 +248,7 @@ class basic_registry {
 
     struct group_data {
         std::size_t size;
-        std::shared_ptr<void> handler;
+        std::shared_ptr<internal::basic_group_handler> handler;
         bool (*owned)(const id_type) noexcept;
         bool (*get)(const id_type) noexcept;
         bool (*exclude)(const id_type) noexcept;
