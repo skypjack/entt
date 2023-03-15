@@ -1258,7 +1258,7 @@ public:
             }
         }
 
-        return {*handler, assure<std::remove_const_t<Owned>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
+        return {*handler, assure<std::remove_const_t<Owned>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Get>>()...};
     }
 
     /**
@@ -1294,7 +1294,7 @@ public:
             }
         }
 
-        return {*handler, assure<std::remove_const_t<Get>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
+        return {*handler, assure<std::remove_const_t<Get>>(), assure<std::remove_const_t<Other>>()...};
     }
 
     /*! @copydoc group */
@@ -1306,7 +1306,7 @@ public:
         if(auto it = groups.find(type_hash<handler_type>::value()); it == groups.cend()) {
             return {};
         } else {
-            return {*static_cast<handler_type *>(it->second.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...};
+            return {*static_cast<handler_type *>(it->second.get()), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...};
         }
     }
 

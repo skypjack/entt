@@ -152,6 +152,11 @@ public:
         return len;
     }
 
+    template<typename Type>
+    Type filter_as() const noexcept {
+        return filter;
+    }
+
 private:
     std::tuple<Owned *..., Get *...> pools;
     std::tuple<Exclude *...> filter;
@@ -202,6 +207,11 @@ public:
 
     const basic_common_type &group() const noexcept {
         return elem;
+    }
+
+    template<typename Type>
+    Type filter_as() const noexcept {
+        return filter;
     }
 
 private:
@@ -280,12 +290,10 @@ public:
      * @brief Constructs a group from a set of storage classes.
      * @param ref A reference to a group handler.
      * @param gpool The storage for the _observed_ types to iterate.
-     * @param epool The storage for the types used to filter the group.
      */
-    basic_group(handler &ref, Get &...gpool, Exclude &...epool) noexcept
+    basic_group(handler &ref, Get &...gpool) noexcept
         : descriptor{&ref},
-          pools{&gpool...},
-          filter{&epool...} {}
+          pools{&gpool...} {}
 
     /**
      * @brief Returns the leading storage of a group.
@@ -317,7 +325,7 @@ public:
         if constexpr(Index < offset) {
             return *std::get<Index>(pools);
         } else {
-            return *std::get<Index - offset>(filter);
+            return *std::get<Index - offset>(descriptor->template filter_as<std::tuple<Exclude *...>>());
         }
     }
 
@@ -621,7 +629,6 @@ public:
 private:
     handler *descriptor;
     std::tuple<Get *...> pools;
-    std::tuple<Exclude *...> filter;
 };
 
 /**
@@ -688,12 +695,10 @@ public:
      * @param ref A reference to a group handler.
      * @param opool The storage for the _owned_ types to iterate.
      * @param gpool The storage for the _observed_ types to iterate.
-     * @param epool The storage for the types used to filter the group.
      */
-    basic_group(handler &ref, Owned &...opool, Get &...gpool, Exclude &...epool) noexcept
+    basic_group(handler &ref, Owned &...opool, Get &...gpool) noexcept
         : descriptor{&ref},
-          pools{&opool..., &gpool...},
-          filter{&epool...} {}
+          pools{&opool..., &gpool...} {}
 
     /**
      * @brief Returns the leading storage of a group.
@@ -725,7 +730,7 @@ public:
         if constexpr(Index < offset) {
             return *std::get<Index>(pools);
         } else {
-            return *std::get<Index - offset>(filter);
+            return *std::get<Index - offset>(descriptor->template filter_as<std::tuple<Exclude *...>>());
         }
     }
 
@@ -999,7 +1004,6 @@ public:
 private:
     handler *descriptor;
     std::tuple<Owned *..., Get *...> pools;
-    std::tuple<Exclude *...> filter;
 };
 
 } // namespace entt
