@@ -1240,21 +1240,21 @@ public:
                 }
             }
 
-            on_construct<std::remove_const_t<Owned>>().before(next).template connect<&handler_type::template push_if<0u>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().before(next).template connect<&handler_type::template push_if<0u>>(*handler), ...);
-            (on_construct<std::remove_const_t<Get>>().before(next).template connect<&handler_type::template push_if<0u>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().before(next).template connect<&handler_type::template push_if<1u>>(*handler), ...);
+            on_construct<std::remove_const_t<Owned>>().before(next).template connect<&handler_type::push_on_construct>(*handler);
+            (on_construct<std::remove_const_t<Other>>().before(next).template connect<&handler_type::push_on_construct>(*handler), ...);
+            (on_construct<std::remove_const_t<Get>>().before(next).template connect<&handler_type::push_on_construct>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().before(next).template connect<&handler_type::push_on_destroy>(*handler), ...);
 
-            on_destroy<std::remove_const_t<Owned>>().before(prev).template connect<&handler_type::remove_if>(*handler);
-            (on_destroy<std::remove_const_t<Other>>().before(prev).template connect<&handler_type::remove_if>(*handler), ...);
-            (on_destroy<std::remove_const_t<Get>>().before(prev).template connect<&handler_type::remove_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().before(prev).template connect<&handler_type::remove_if>(*handler), ...);
+            on_destroy<std::remove_const_t<Owned>>().before(prev).template connect<&handler_type::remove>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().before(prev).template connect<&handler_type::remove>(*handler), ...);
+            (on_destroy<std::remove_const_t<Get>>().before(prev).template connect<&handler_type::remove>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().before(prev).template connect<&handler_type::remove>(*handler), ...);
 
             auto &cpool = assure<std::remove_const_t<Owned>>();
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
             for(auto *first = cpool.data(), *last = first + cpool.size(); first != last; ++first) {
-                handler->template push_if<0u>(*first);
+                handler->push_on_construct(*first);
             }
         }
 
@@ -1281,13 +1281,13 @@ public:
             groups.emplace(type_hash<handler_type>::value(), elem);
             handler = static_cast<handler_type *>(elem.get());
 
-            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::template push_if<0u>>(*handler);
-            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::template push_if<0u>>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::template push_if<1u>>(*handler), ...);
+            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::push_on_construct>(*handler);
+            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::push_on_construct>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::push_on_destroy>(*handler), ...);
 
-            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::remove_if>(*handler);
-            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::remove_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::remove_if>(*handler), ...);
+            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::remove>(*handler);
+            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::remove>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::remove>(*handler), ...);
 
             for(const auto entity: view<Get, Other...>(exclude<Exclude...>)) {
                 handler->group().push(entity);

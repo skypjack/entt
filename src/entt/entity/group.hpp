@@ -126,16 +126,23 @@ public:
             +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
           pools{&opool..., &gpool...}, filter{&epool...}, len{} {}
 
-    template<bool Expected>
-    void push_if(const entity_type entt) {
+    void push_on_construct(const entity_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (Expected == (0u + ... + cpool->contains(entt))); }, filter)
+           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
            && !(std::get<0>(pools)->index(entt) < len)) {
             swap_elements(std::index_sequence_for<Owned...>{}, len++, entt);
         }
     }
 
-    void remove_if(const entity_type entt) {
+    void push_on_destroy(const entity_type entt) {
+        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
+           && !(std::get<0>(pools)->index(entt) < len)) {
+            swap_elements(std::index_sequence_for<Owned...>{}, len++, entt);
+        }
+    }
+
+    void remove(const entity_type entt) {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < len)) {
             swap_elements(std::index_sequence_for<Owned...>{}, --len, entt);
         }
@@ -169,16 +176,23 @@ public:
             +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
           pools{&gpool...}, filter{&epool...}, elem{alloc} {}
 
-    template<bool Expected>
-    void push_if(const entity_type entt) {
+    void push_on_construct(const entity_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (Expected == (0u + ... + cpool->contains(entt))); }, filter)
+           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
            && !elem.contains(entt)) {
             elem.push(entt);
         }
     }
 
-    void remove_if(const entity_type entt) {
+    void push_on_destroy(const entity_type entt) {
+        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
+           && !elem.contains(entt)) {
+            elem.push(entt);
+        }
+    }
+
+    void remove(const entity_type entt) {
         elem.remove(entt);
     }
 
