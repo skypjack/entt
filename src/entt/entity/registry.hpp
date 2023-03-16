@@ -1196,8 +1196,8 @@ public:
      *
      * @tparam Owned Type of storage _owned_ by the group.
      * @tparam Other Other types of storage _owned_ by the group.
-     * @tparam Get Type of storage _observed_ by the group, if any.
-     * @tparam Exclude Type of storage used to filter the group, if any.
+     * @tparam Get Types of storage _observed_ by the group, if any.
+     * @tparam Exclude Types of storage used to filter the group, if any.
      * @return A newly created group.
      */
     template<typename Owned, typename... Other, typename... Get, typename... Exclude>
@@ -1263,35 +1263,30 @@ public:
 
     /**
      * @brief Returns a group for the given components.
-     * @tparam Get Type of storage _observed_ by the group.
-     * @tparam Other Other types of storage _observed_ by the group.
-     * @tparam Exclude Type of storage used to filter the group.
+     * @tparam Get Types of storage _observed_ by the group.
+     * @tparam Exclude Types of storage used to filter the group.
      * @return A newly created group.
      */
-    template<typename Get, typename... Other, typename... Exclude>
-    [[nodiscard]] basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
-    group(get_t<Get, Other...>, exclude_t<Exclude...> = {}) {
-        using handler_type = typename basic_group<owned_t<>, get_t<storage_for_type<Get>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
-        handler_type *handler = nullptr;
+    template<typename... Get, typename... Exclude>
+    [[nodiscard]] basic_group<owned_t<>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
+    group(get_t<Get...>, exclude_t<Exclude...> = {}) {
+        using handler_type = typename basic_group<owned_t<>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
 
         if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
-            handler = static_cast<handler_type *>(it->second.get());
-        } else {
-            const auto elem = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...);
-            groups.emplace(type_hash<handler_type>::value(), elem);
-            handler = static_cast<handler_type *>(elem.get());
+            return {static_cast<handler_type &>(*it->second)};
+        }
 
-            on_construct<std::remove_const_t<Get>>().template connect<&handler_type::push_on_construct>(*handler);
-            (on_construct<std::remove_const_t<Other>>().template connect<&handler_type::push_on_construct>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::push_on_destroy>(*handler), ...);
+        const auto handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
+        groups.emplace(type_hash<handler_type>::value(), handler);
 
-            on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::remove>(*handler);
-            (on_destroy<std::remove_const_t<Other>>().template connect<&handler_type::remove>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::remove>(*handler), ...);
+        (on_construct<std::remove_const_t<Get>>().template connect<&handler_type::push_on_construct>(*handler), ...);
+        (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::push_on_destroy>(*handler), ...);
 
-            for(const auto entity: view<Get, Other...>(exclude<Exclude...>)) {
-                handler->group().push(entity);
-            }
+        (on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::remove>(*handler), ...);
+        (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::remove>(*handler), ...);
+
+        for(const auto entity: view<Get...>(exclude<Exclude...>)) {
+            handler->group().push(entity);
         }
 
         return {*handler};
