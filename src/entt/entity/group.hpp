@@ -153,6 +153,11 @@ public:
     }
 
     template<typename Type>
+    Type pools_as() const noexcept {
+        return pools;
+    }
+
+    template<typename Type>
     Type filter_as() const noexcept {
         return filter;
     }
@@ -207,6 +212,11 @@ public:
 
     const basic_common_type &group() const noexcept {
         return elem;
+    }
+
+    template<typename Type>
+    Type pools_as() const noexcept {
+        return pools;
     }
 
     template<typename Type>
@@ -266,6 +276,14 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
 
+    auto pools() const noexcept {
+        return descriptor->template pools_as<std::tuple<Get *...>>();
+    }
+
+    auto filter() const noexcept {
+        return descriptor->template filter_as<std::tuple<Exclude *...>>();
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = underlying_type;
@@ -289,11 +307,9 @@ public:
     /**
      * @brief Constructs a group from a set of storage classes.
      * @param ref A reference to a group handler.
-     * @param gpool The storage for the _observed_ types to iterate.
      */
-    basic_group(handler &ref, Get &...gpool) noexcept
-        : descriptor{&ref},
-          pools{&gpool...} {}
+    basic_group(handler &ref) noexcept
+        : descriptor{&ref} {}
 
     /**
      * @brief Returns the leading storage of a group.
@@ -323,9 +339,9 @@ public:
         constexpr auto offset = sizeof...(Get);
 
         if constexpr(Index < offset) {
-            return *std::get<Index>(pools);
+            return *std::get<Index>(pools());
         } else {
-            return *std::get<Index - offset>(descriptor->template filter_as<std::tuple<Exclude *...>>());
+            return *std::get<Index - offset>(filter());
         }
     }
 
@@ -489,11 +505,11 @@ public:
     template<typename... Type>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Type) == 0) {
-            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools);
+            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools());
         } else if constexpr(sizeof...(Type) == 1) {
-            return (std::get<index_of<Type>>(pools)->get(entt), ...);
+            return (std::get<index_of<Type>>(pools())->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<index_of<Type>>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<index_of<Type>>(pools())->get_as_tuple(entt)...);
         }
     }
 
@@ -544,7 +560,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return iterable{{begin(), pools}, {end(), pools}};
+        return iterable{{begin(), pools()}, {end(), pools()}};
     }
 
     /**
@@ -592,9 +608,9 @@ public:
             } else {
                 auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Type) == 1) {
-                        return compare((std::get<index_of<Type>>(pools)->get(lhs), ...), (std::get<index_of<Type>>(pools)->get(rhs), ...));
+                        return compare((std::get<index_of<Type>>(pools())->get(lhs), ...), (std::get<index_of<Type>>(pools())->get(rhs), ...));
                     } else {
-                        return compare(std::forward_as_tuple(std::get<index_of<Type>>(pools)->get(lhs)...), std::forward_as_tuple(std::get<index_of<Type>>(pools)->get(rhs)...));
+                        return compare(std::forward_as_tuple(std::get<index_of<Type>>(pools())->get(lhs)...), std::forward_as_tuple(std::get<index_of<Type>>(pools())->get(rhs)...));
                     }
                 };
 
@@ -622,13 +638,12 @@ public:
     template<typename Type>
     void sort() const {
         if(*this) {
-            descriptor->group().respect(*std::get<index_of<Type>>(pools));
+            descriptor->group().respect(*std::get<index_of<Type>>(pools()));
         }
     }
 
 private:
     handler *descriptor;
-    std::tuple<Get *...> pools;
 };
 
 /**
@@ -670,6 +685,14 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type..., typename Exclude::value_type...>>;
 
+    auto pools() const noexcept {
+        return descriptor->template pools_as<std::tuple<Owned *..., Get *...>>();
+    }
+
+    auto filter() const noexcept {
+        return descriptor->template filter_as<std::tuple<Exclude *...>>();
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = underlying_type;
@@ -693,19 +716,16 @@ public:
     /**
      * @brief Constructs a group from a set of storage classes.
      * @param ref A reference to a group handler.
-     * @param opool The storage for the _owned_ types to iterate.
-     * @param gpool The storage for the _observed_ types to iterate.
      */
-    basic_group(handler &ref, Owned &...opool, Get &...gpool) noexcept
-        : descriptor{&ref},
-          pools{&opool..., &gpool...} {}
+    basic_group(handler &ref) noexcept
+        : descriptor{&ref} {}
 
     /**
      * @brief Returns the leading storage of a group.
      * @return The leading storage of the group.
      */
     [[nodiscard]] const base_type &handle() const noexcept {
-        return *std::get<0>(pools);
+        return *std::get<0>(pools());
     }
 
     /**
@@ -728,9 +748,9 @@ public:
         constexpr auto offset = sizeof...(Owned) + sizeof...(Get);
 
         if constexpr(Index < offset) {
-            return *std::get<Index>(pools);
+            return *std::get<Index>(pools());
         } else {
-            return *std::get<Index - offset>(descriptor->template filter_as<std::tuple<Exclude *...>>());
+            return *std::get<Index - offset>(filter());
         }
     }
 
@@ -878,11 +898,11 @@ public:
     template<typename... Type>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Type) == 0) {
-            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools);
+            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools());
         } else if constexpr(sizeof...(Type) == 1) {
-            return (std::get<index_of<Type>>(pools)->get(entt), ...);
+            return (std::get<index_of<Type>>(pools())->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<index_of<Type>>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<index_of<Type>>(pools())->get_as_tuple(entt)...);
         }
     }
 
@@ -933,7 +953,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return {{begin(), pools}, {end(), pools}};
+        return {{begin(), pools()}, {end(), pools()}};
     }
 
     /**
@@ -977,17 +997,17 @@ public:
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
         if constexpr(sizeof...(Type) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            std::get<0>(pools)->sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            std::get<0>(pools())->sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
             auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Type) == 1) {
-                    return compare((std::get<index_of<Type>>(pools)->get(lhs), ...), (std::get<index_of<Type>>(pools)->get(rhs), ...));
+                    return compare((std::get<index_of<Type>>(pools())->get(lhs), ...), (std::get<index_of<Type>>(pools())->get(rhs), ...));
                 } else {
-                    return compare(std::forward_as_tuple(std::get<index_of<Type>>(pools)->get(lhs)...), std::forward_as_tuple(std::get<index_of<Type>>(pools)->get(rhs)...));
+                    return compare(std::forward_as_tuple(std::get<index_of<Type>>(pools())->get(lhs)...), std::forward_as_tuple(std::get<index_of<Type>>(pools())->get(rhs)...));
                 }
             };
 
-            std::get<0>(pools)->sort_n(descriptor->length(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
+            std::get<0>(pools())->sort_n(descriptor->length(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
         }
 
         auto cb = [this](auto *head, auto *...other) {
@@ -998,12 +1018,11 @@ public:
             }
         };
 
-        std::apply(cb, pools);
+        std::apply(cb, pools());
     }
 
 private:
     handler *descriptor;
-    std::tuple<Owned *..., Get *...> pools;
 };
 
 } // namespace entt
