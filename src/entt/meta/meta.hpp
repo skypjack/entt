@@ -756,7 +756,7 @@ struct meta_prop {
           ctx{&area} {}
 
     /**
-     * @brief Returns the stored value by copy.
+     * @brief Returns the stored value by const reference.
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
