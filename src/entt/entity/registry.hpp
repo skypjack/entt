@@ -1232,33 +1232,28 @@ public:
                         }),
                         "Conflicting groups");
 
-            const void *prev = nullptr;
-            const void *next = nullptr;
-
-            size_type prev_len{};
-            size_type next_len{};
+            const internal::basic_group_handler *prev = nullptr;
+            const internal::basic_group_handler *next = nullptr;
 
             for(auto &&data: groups) {
                 if((data.second->owned(type_hash<std::remove_const_t<Owned>>::value()) || ...)) {
-                    if(const auto sz = data.second->size; sz < handler->size && (prev == nullptr || prev_len < sz)) {
+                    if(const auto sz = data.second->size; sz < handler->size && (prev == nullptr || prev->size < sz)) {
                         prev = data.second.get();
-                        prev_len = sz;
                     }
 
-                    if(const auto sz = data.second->size; sz > handler->size && (next == nullptr || next_len > sz)) {
+                    if(const auto sz = data.second->size; sz > handler->size && (next == nullptr || next->size > sz)) {
                         next = data.second.get();
-                        next_len = sz;
                     }
                 }
             }
 
-            (on_construct<std::remove_const_t<Owned>>().before(next).template connect<&handler_type::push_on_construct>(*handler), ...);
-            (on_construct<std::remove_const_t<Get>>().before(next).template connect<&handler_type::push_on_construct>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().before(next).template connect<&handler_type::push_on_destroy>(*handler), ...);
+            (on_construct<std::remove_const_t<Owned>>().before(*next).template connect<&handler_type::push_on_construct>(*handler), ...);
+            (on_construct<std::remove_const_t<Get>>().before(*next).template connect<&handler_type::push_on_construct>(*handler), ...);
+            (on_destroy<std::remove_const_t<Exclude>>().before(*next).template connect<&handler_type::push_on_destroy>(*handler), ...);
 
-            (on_destroy<std::remove_const_t<Owned>>().before(prev).template connect<&handler_type::remove>(*handler), ...);
-            (on_destroy<std::remove_const_t<Get>>().before(prev).template connect<&handler_type::remove>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().before(prev).template connect<&handler_type::remove>(*handler), ...);
+            (on_destroy<std::remove_const_t<Owned>>().before(*prev).template connect<&handler_type::remove>(*handler), ...);
+            (on_destroy<std::remove_const_t<Get>>().before(*prev).template connect<&handler_type::remove>(*handler), ...);
+            (on_construct<std::remove_const_t<Exclude>>().before(*prev).template connect<&handler_type::remove>(*handler), ...);
 
             auto &cpool = assure<type_list_element_t<0u, type_list<std::remove_const_t<Owned>...>>>();
 
