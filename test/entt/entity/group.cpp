@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <entt/entity/group.hpp>
 #include <entt/entity/registry.hpp>
+#include "../common/config.h"
 
 struct empty_type {};
 
@@ -718,6 +719,32 @@ TEST(NonOwningGroup, Storage) {
     ASSERT_FALSE(group.storage<3u>().contains(entity));
     ASSERT_TRUE((registry.all_of<char>(entity)));
     ASSERT_FALSE((registry.any_of<int, double, float>(entity)));
+}
+
+TEST(NonOwningGroup, Overlapping) {
+    entt::registry registry;
+
+    auto group = registry.group(entt::get<char>, entt::exclude<double>);
+    auto other = registry.group<int>(entt::get<char>, entt::exclude<double>);
+
+    ASSERT_TRUE(group.empty());
+    ASSERT_TRUE(other.empty());
+
+    const auto entity = registry.create();
+    registry.emplace<char>(entity, '1');
+
+    ASSERT_FALSE(group.empty());
+    ASSERT_TRUE(other.empty());
+
+    registry.emplace<int>(entity, 42);
+
+    ASSERT_FALSE(group.empty());
+    ASSERT_FALSE(other.empty());
+
+    registry.emplace<double>(entity, 3.);
+
+    ASSERT_TRUE(group.empty());
+    ASSERT_TRUE(other.empty());
 }
 
 TEST(OwningGroup, Functionalities) {
@@ -1551,4 +1578,31 @@ TEST(OwningGroup, Storage) {
     ASSERT_FALSE(group.storage<3u>().contains(entity));
     ASSERT_TRUE((registry.all_of<char>(entity)));
     ASSERT_FALSE((registry.any_of<int, double, float>(entity)));
+}
+
+TEST(OwningGroup, Overlapping) {
+    entt::registry registry;
+
+    auto group = registry.group<char>(entt::get<int>, entt::exclude<double>);
+    auto other = registry.group<char>(entt::get<int, float>, entt::exclude<double>);
+
+    ASSERT_TRUE(group.empty());
+    ASSERT_TRUE(other.empty());
+
+    const auto entity = registry.create();
+    registry.emplace<char>(entity, '1');
+    registry.emplace<int>(entity, 42);
+
+    ASSERT_FALSE(group.empty());
+    ASSERT_TRUE(other.empty());
+
+    registry.emplace<float>(entity, 7.f);
+
+    ASSERT_FALSE(group.empty());
+    ASSERT_FALSE(other.empty());
+
+    registry.emplace<double>(entity, 3.);
+
+    ASSERT_TRUE(group.empty());
+    ASSERT_TRUE(other.empty());
 }

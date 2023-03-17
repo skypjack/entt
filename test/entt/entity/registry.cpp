@@ -1353,6 +1353,13 @@ TEST(Registry, NestedGroups) {
     ASSERT_EQ(g3.size(), 0u);
 }
 
+ENTT_DEBUG_TEST(Registry, ConflictingGroups) {
+    entt::registry registry;
+
+    [[maybe_unused]] auto group = registry.group<char>(entt::get<int>, entt::exclude<double>);
+    ASSERT_DEATH(auto other = registry.group<char>(entt::get<float>, entt::exclude<double>), "");
+}
+
 TEST(Registry, SortSingle) {
     entt::registry registry;
 
