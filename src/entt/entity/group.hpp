@@ -490,13 +490,9 @@ public:
     /**
      * @brief Returns the components assigned to the given entity.
      *
-     * Prefer this function instead of `registry::get` during iterations. It has
-     * far better performance than its counterpart.
-     *
      * @warning
-     * Attempting to use an invalid component type results in a compilation
-     * error. Attempting to use an entity that doesn't belong to the group
-     * results in undefined behavior.
+     * Attempting to use an entity that doesn't belong to the group results in
+     * undefined behavior.
      *
      * @tparam Type Types of components to get.
      * @param entt A valid identifier.
@@ -883,13 +879,9 @@ public:
     /**
      * @brief Returns the components assigned to the given entity.
      *
-     * Prefer this function instead of `registry::get` during iterations. It has
-     * far better performance than its counterpart.
-     *
      * @warning
-     * Attempting to use an invalid component type results in a compilation
-     * error. Attempting to use an entity that doesn't belong to the group
-     * results in undefined behavior.
+     * Attempting to use an entity that doesn't belong to the group results in
+     * undefined behavior.
      *
      * @tparam Type Types of components to get.
      * @param entt A valid identifier.
