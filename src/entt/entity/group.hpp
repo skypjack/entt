@@ -142,7 +142,7 @@ public:
         }
     }
 
-    void remove(const entity_type entt) {
+    void remove_if(const entity_type entt) {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < len)) {
             swap_elements(std::index_sequence_for<Owned...>{}, --len, entt);
         }
@@ -202,7 +202,7 @@ public:
         }
     }
 
-    void remove(const entity_type entt) {
+    void remove_if(const entity_type entt) {
         elem.remove(entt);
     }
 
