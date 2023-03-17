@@ -87,9 +87,17 @@ struct func_t {
     inline static int value = 0;
 };
 
+double double_member(const double &value) {
+    return value * value;
+}
+
 struct MetaFunc: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
+
+        entt::meta<double>()
+            .type("double"_hs)
+            .func<&double_member>("member"_hs);
 
         entt::meta<base_t>()
             .type("base"_hs)
@@ -379,6 +387,30 @@ TEST_F(MetaFunc, StaticAsConstMember) {
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
     ASSERT_EQ(any.cast<int>(), 3);
+}
+
+TEST_F(MetaFunc, NonClassTypeMember) {
+    using namespace entt::literals;
+
+    double instance = 3.;
+    auto func = entt::resolve<double>().func("member"_hs);
+    auto any = func.invoke(instance);
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 0u);
+    ASSERT_TRUE(func.is_const());
+    ASSERT_FALSE(func.is_static());
+    ASSERT_EQ(func.ret(), entt::resolve<double>());
+    ASSERT_FALSE(func.arg(0u));
+
+    ASSERT_EQ(func.prop().cbegin(), func.prop().cend());
+
+    ASSERT_FALSE(func.invoke({}));
+    ASSERT_TRUE(func.invoke(instance));
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<double>());
+    ASSERT_EQ(any.cast<double>(), instance * instance);
 }
 
 TEST_F(MetaFunc, MetaAnyArgs) {
