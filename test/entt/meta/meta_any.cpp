@@ -78,9 +78,6 @@ struct MetaAny: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<double>()
-            .type("double"_hs);
-
         entt::meta<empty_t>()
             .type("empty"_hs)
             .dtor<empty_t::destroy>();

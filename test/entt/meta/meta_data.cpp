@@ -103,9 +103,6 @@ struct MetaData: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<double>()
-            .type("double"_hs);
-
         entt::meta<base_t>()
             .type("base"_hs)
             .dtor<base_t::destroy>()
