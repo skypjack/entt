@@ -8,7 +8,6 @@
 #include <gtest/gtest.h>
 #include <entt/entity/group.hpp>
 #include <entt/entity/registry.hpp>
-#include "../common/config.h"
 
 struct empty_type {};
 
