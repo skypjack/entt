@@ -602,11 +602,11 @@ public:
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
                 descriptor->group().sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
-                auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
+                auto comp = [&compare, cpools = std::forward_as_tuple(storage<index_of<Type>>()...)](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Type) == 1) {
-                        return compare((storage<index_of<Type>>().get(lhs), ...), (storage<index_of<Type>>().get(rhs), ...));
+                        return compare(std::get<0>(cpools).get(lhs), std::get<0>(cpools).get(rhs));
                     } else {
-                        return compare(std::forward_as_tuple(storage<index_of<Type>>().get(lhs)...), std::forward_as_tuple(storage<index_of<Type>>().get(rhs)...));
+                        return std::apply([&compare, lhs, rhs](auto &...cpool) { return compare(std::forward_as_tuple(cpool.get(lhs)...), std::forward_as_tuple(cpool.get(rhs)...)); }, cpools);
                     }
                 };
 
@@ -991,11 +991,11 @@ public:
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
             storage<0>().sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
-            auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
+            auto comp = [&compare, cpools = std::forward_as_tuple(storage<index_of<Type>>()...)](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Type) == 1) {
-                    return compare((storage<index_of<Type>>().get(lhs), ...), (storage<index_of<Type>>().get(rhs), ...));
+                    return compare(std::get<0>(cpools).get(lhs), std::get<0>(cpools).get(rhs));
                 } else {
-                    return compare(std::forward_as_tuple(storage<index_of<Type>>().get(lhs)...), std::forward_as_tuple(storage<index_of<Type>>().get(rhs)...));
+                    return std::apply([&compare, lhs, rhs](auto &...cpool) { return compare(std::forward_as_tuple(cpool.get(lhs)...), std::forward_as_tuple(cpool.get(rhs)...)); }, cpools);
                 }
             };
 
