@@ -503,9 +503,9 @@ public:
         if constexpr(sizeof...(Type) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools());
         } else if constexpr(sizeof...(Type) == 1) {
-            return (std::get<index_of<Type>>(pools())->get(entt), ...);
+            return (storage<index_of<Type>>().get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<index_of<Type>>(pools())->get_as_tuple(entt)...);
+            return std::tuple_cat(storage<index_of<Type>>().get_as_tuple(entt)...);
         }
     }
 
@@ -604,9 +604,9 @@ public:
             } else {
                 auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Type) == 1) {
-                        return compare((std::get<index_of<Type>>(pools())->get(lhs), ...), (std::get<index_of<Type>>(pools())->get(rhs), ...));
+                        return compare((storage<index_of<Type>>().get(lhs), ...), (storage<index_of<Type>>().get(rhs), ...));
                     } else {
-                        return compare(std::forward_as_tuple(std::get<index_of<Type>>(pools())->get(lhs)...), std::forward_as_tuple(std::get<index_of<Type>>(pools())->get(rhs)...));
+                        return compare(std::forward_as_tuple(storage<index_of<Type>>().get(lhs)...), std::forward_as_tuple(storage<index_of<Type>>().get(rhs)...));
                     }
                 };
 
@@ -634,7 +634,7 @@ public:
     template<typename Type>
     void sort() const {
         if(*this) {
-            descriptor->group().respect(*std::get<index_of<Type>>(pools()));
+            descriptor->group().respect(storage<index_of<Type>>());
         }
     }
 
@@ -721,7 +721,7 @@ public:
      * @return The leading storage of the group.
      */
     [[nodiscard]] const base_type &handle() const noexcept {
-        return *std::get<0>(pools());
+        return storage<0>();
     }
 
     /**
@@ -892,9 +892,9 @@ public:
         if constexpr(sizeof...(Type) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools());
         } else if constexpr(sizeof...(Type) == 1) {
-            return (std::get<index_of<Type>>(pools())->get(entt), ...);
+            return (storage<index_of<Type>>().get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<index_of<Type>>(pools())->get_as_tuple(entt)...);
+            return std::tuple_cat(storage<index_of<Type>>().get_as_tuple(entt)...);
         }
     }
 
@@ -989,17 +989,17 @@ public:
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
         if constexpr(sizeof...(Type) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            std::get<0>(pools())->sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            storage<0>().sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
             auto comp = [this, &compare](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Type) == 1) {
-                    return compare((std::get<index_of<Type>>(pools())->get(lhs), ...), (std::get<index_of<Type>>(pools())->get(rhs), ...));
+                    return compare((storage<index_of<Type>>().get(lhs), ...), (storage<index_of<Type>>().get(rhs), ...));
                 } else {
-                    return compare(std::forward_as_tuple(std::get<index_of<Type>>(pools())->get(lhs)...), std::forward_as_tuple(std::get<index_of<Type>>(pools())->get(rhs)...));
+                    return compare(std::forward_as_tuple(storage<index_of<Type>>().get(lhs)...), std::forward_as_tuple(storage<index_of<Type>>().get(rhs)...));
                 }
             };
 
-            std::get<0>(pools())->sort_n(descriptor->length(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
+            storage<0>().sort_n(descriptor->length(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
         }
 
         auto cb = [this](auto *head, auto *...other) {
