@@ -203,6 +203,12 @@ I hope this list can grow much more in the future:
     - ... And so on.
       [Check out](https://www.youtube.com/channel/UCQ-W1KE9EYfdxhL6S4twUNw) the
       _Game Engine Series_ by The Cherno for more videos.
+  * [Warmonger Dynasty devlog series](https://david-delassus.medium.com/list/warmonger-dynasty-devlogs-f64b71f556de)
+    by [linkdd](https://github.com/linkdd): an interesting walkthrough of
+    developing a game (also) with EnTT.
+  * [Use EnTT When You Need An ECS](https://www.codingwiththomas.com/blog/use-entt-when-you-need-an-ecs)
+    by [Thomas](https://www.codingwiththomas.com/): I couldn't have said it
+    better.
   * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
     huge space battle built entirely from scratch.
   * [Space Battle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
