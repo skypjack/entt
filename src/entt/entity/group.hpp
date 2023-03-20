@@ -575,7 +575,8 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return iterable{{begin(), pools()}, {end(), pools()}};
+        const auto cpools = pools();
+        return iterable{{begin(), cpools}, {end(), cpools}};
     }
 
     /**
@@ -983,7 +984,8 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return {{begin(), pools()}, {end(), pools()}};
+        const auto cpools = pools();
+        return {{begin(), cpools}, {end(), cpools}};
     }
 
     /**
@@ -1025,11 +1027,13 @@ public:
      */
     template<typename... Type, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
+        const auto cpools = pools();
+
         if constexpr(sizeof...(Type) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
             storage<0>().sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
-            auto comp = [&compare, cpools = pools()](const entity_type lhs, const entity_type rhs) {
+            auto comp = [&compare, &cpools](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Type) == 1) {
                     return compare((std::get<index_of<Type>>(cpools)->get(lhs), ...), (std::get<index_of<Type>>(cpools)->get(rhs), ...));
                 } else {
@@ -1048,7 +1052,7 @@ public:
             }
         };
 
-        std::apply(cb, pools());
+        std::apply(cb, cpools);
     }
 
 private:
