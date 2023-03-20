@@ -517,12 +517,14 @@ public:
      */
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
+        const auto cpools = pools();
+
         if constexpr(sizeof...(Index) == 0) {
-            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools());
+            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
         } else if constexpr(sizeof...(Index) == 1) {
-            return (storage<Index>().get(entt), ...);
+            return (std::get<Index>(cpools)->get(entt), ...);
         } else {
-            return std::tuple_cat(storage<Index>().get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<Index>(cpools)->get_as_tuple(entt)...);
         }
     }
 
@@ -923,12 +925,14 @@ public:
      */
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
+        const auto cpools = pools();
+
         if constexpr(sizeof...(Index) == 0) {
-            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools());
+            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
         } else if constexpr(sizeof...(Index) == 1) {
-            return (storage<Index>().get(entt), ...);
+            return (std::get<Index>(cpools)->get(entt), ...);
         } else {
-            return std::tuple_cat(storage<Index>().get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<Index>(cpools)->get_as_tuple(entt)...);
         }
     }
 
