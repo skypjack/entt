@@ -494,18 +494,35 @@ public:
      * Attempting to use an entity that doesn't belong to the group results in
      * undefined behavior.
      *
-     * @tparam Type Types of components to get.
+     * @tparam Type Type of the component to get.
+     * @tparam Other Other types of components to get.
      * @param entt A valid identifier.
      * @return The components assigned to the entity.
      */
-    template<typename... Type>
+    template<typename Type, typename... Other>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        if constexpr(sizeof...(Type) == 0) {
+        return get<index_of<Type>, index_of<Other>...>(entt);
+    }
+
+    /**
+     * @brief Returns the components assigned to the given entity.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the groups results in
+     * undefined behavior.
+     *
+     * @tparam Index Indexes of the components to get.
+     * @param entt A valid identifier.
+     * @return The components assigned to the entity.
+     */
+    template<std::size_t... Index>
+    [[nodiscard]] decltype(auto) get(const entity_type entt) const {
+        if constexpr(sizeof...(Index) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools());
-        } else if constexpr(sizeof...(Type) == 1) {
-            return (storage<index_of<Type>>().get(entt), ...);
+        } else if constexpr(sizeof...(Index) == 1) {
+            return (storage<Index>().get(entt), ...);
         } else {
-            return std::tuple_cat(storage<index_of<Type>>().get_as_tuple(entt)...);
+            return std::tuple_cat(storage<Index>().get_as_tuple(entt)...);
         }
     }
 
@@ -883,18 +900,35 @@ public:
      * Attempting to use an entity that doesn't belong to the group results in
      * undefined behavior.
      *
-     * @tparam Type Types of components to get.
+     * @tparam Type Type of the component to get.
+     * @tparam Other Other types of components to get.
      * @param entt A valid identifier.
      * @return The components assigned to the entity.
      */
-    template<typename... Type>
+    template<typename Type, typename... Other>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        if constexpr(sizeof...(Type) == 0) {
+        return get<index_of<Type>, index_of<Other>...>(entt);
+    }
+
+    /**
+     * @brief Returns the components assigned to the given entity.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the groups results in
+     * undefined behavior.
+     *
+     * @tparam Index Indexes of the components to get.
+     * @param entt A valid identifier.
+     * @return The components assigned to the entity.
+     */
+    template<std::size_t... Index>
+    [[nodiscard]] decltype(auto) get(const entity_type entt) const {
+        if constexpr(sizeof...(Index) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools());
-        } else if constexpr(sizeof...(Type) == 1) {
-            return (storage<index_of<Type>>().get(entt), ...);
+        } else if constexpr(sizeof...(Index) == 1) {
+            return (storage<Index>().get(entt), ...);
         } else {
-            return std::tuple_cat(storage<index_of<Type>>().get_as_tuple(entt)...);
+            return std::tuple_cat(storage<Index>().get_as_tuple(entt)...);
         }
     }
 
