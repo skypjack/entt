@@ -1376,7 +1376,7 @@ public:
     template<typename To, typename From>
     void sort() {
         ENTT_ASSERT(!owned<To>(), "Cannot sort owned storage");
-        assure<To>().respect(assure<From>());
+        assure<To>().sort_as(assure<From>());
     }
 
     /**

@@ -417,7 +417,7 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, SortAndRespect) {
     other.push(entt::entity{2});
 
     ASSERT_DEATH(pool.sort([](auto...) { return true; }), "");
-    ASSERT_DEATH(pool.respect(other), "");
+    ASSERT_DEATH(pool.sort_as(other), "");
 }
 
 TEST(StorageEntity, CustomAllocator) {

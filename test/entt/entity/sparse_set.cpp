@@ -1254,7 +1254,7 @@ TEST(SparseSet, RespectDisjoint) {
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
 
-    lhs.respect(rhs);
+    lhs.sort_as(rhs);
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
 }
@@ -1272,7 +1272,7 @@ TEST(SparseSet, RespectOverlap) {
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
 
-    lhs.respect(rhs);
+    lhs.sort_as(rhs);
 
     auto begin = lhs.begin();
     auto end = lhs.end();
@@ -1296,7 +1296,7 @@ TEST(SparseSet, RespectOrdered) {
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
 
-    rhs.respect(lhs);
+    rhs.sort_as(lhs);
 
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
 }
@@ -1314,7 +1314,7 @@ TEST(SparseSet, RespectReverse) {
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
 
-    rhs.respect(lhs);
+    rhs.sort_as(lhs);
 
     auto begin = rhs.begin();
     auto end = rhs.end();
@@ -1341,7 +1341,7 @@ TEST(SparseSet, RespectUnordered) {
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
 
-    rhs.respect(lhs);
+    rhs.sort_as(lhs);
 
     auto begin = rhs.begin();
     auto end = rhs.end();
@@ -1370,7 +1370,7 @@ TEST(SparseSet, RespectInvalid) {
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.begin(), lhs.end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.begin(), rhs.end()));
 
-    rhs.respect(lhs);
+    rhs.sort_as(lhs);
 
     auto begin = rhs.begin();
     auto end = rhs.end();

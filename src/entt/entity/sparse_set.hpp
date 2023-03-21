@@ -962,12 +962,12 @@ public:
      * sets by using one of them as a master and the other one as a slave.
      *
      * Iterating the sparse set with a couple of iterators returns elements in
-     * the expected order after a call to `respect`. See `begin` and `end` for
+     * the expected order after a call to `sort_as`. See `begin` and `end` for
      * more details.
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    void respect(const basic_sparse_set &other) {
+    void sort_as(const basic_sparse_set &other) {
         compact();
 
         const auto to = other.end();

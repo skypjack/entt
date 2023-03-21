@@ -645,7 +645,7 @@ public:
      */
     void sort_as(const base_type &other) const {
         if(*this) {
-            descriptor->group().respect(other);
+            descriptor->group().sort_as(other);
         }
     }
 

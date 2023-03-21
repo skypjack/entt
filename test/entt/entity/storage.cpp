@@ -1568,7 +1568,7 @@ TEST_F(Storage, RespectDisjoint) {
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
 
-    lhs.respect(rhs);
+    lhs.sort_as(rhs);
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entities), std::rend(lhs_entities), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -1592,7 +1592,7 @@ TEST_F(Storage, RespectOverlap) {
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
 
-    lhs.respect(rhs);
+    lhs.sort_as(rhs);
 
     auto begin = lhs.begin();
     auto end = lhs.end();
@@ -1625,7 +1625,7 @@ TEST_F(Storage, RespectOrdered) {
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
 
-    rhs.respect(lhs);
+    rhs.sort_as(lhs);
 
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
@@ -1649,7 +1649,7 @@ TEST_F(Storage, RespectReverse) {
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
 
-    rhs.respect(lhs);
+    rhs.sort_as(lhs);
 
     auto begin = rhs.begin();
     auto end = rhs.end();
@@ -1688,7 +1688,7 @@ TEST_F(Storage, RespectUnordered) {
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entities), std::rend(rhs_entities), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
 
-    rhs.respect(lhs);
+    rhs.sort_as(lhs);
 
     auto begin = rhs.begin();
     auto end = rhs.end();
