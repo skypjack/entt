@@ -326,7 +326,7 @@ TEST(NonOwningGroup, SortAsAPool) {
     }
 
     registry.sort<unsigned int>(std::less<unsigned int>{});
-    group.sort<unsigned int>();
+    group.sort_as(group.storage<unsigned int>());
 
     ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
     ASSERT_EQ((group.get<0, 1>(e1)), (std::make_tuple(1, 1u)));

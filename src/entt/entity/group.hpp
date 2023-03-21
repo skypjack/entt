@@ -636,25 +636,16 @@ public:
     }
 
     /**
-     * @brief Sort the shared pool of entities according to the given component.
+     * @brief Sort the shared pool of entities according to a given storage.
      *
-     * Non-owning groups of the same type share with the registry a pool of
-     * entities with its own order that doesn't depend on the order of any pool
-     * of components. Users can order the underlying data structure so that it
-     * respects the order of the pool of the given component.
-     *
-     * @note
      * The shared pool of entities and thus its order is affected by the changes
-     * to each and every pool that it tracks. Therefore changes to those pools
-     * can quickly ruin the order imposed to the pool of entities shared between
-     * the non-owning groups.
+     * to each and every pool that it tracks.
      *
-     * @tparam Type Type of component to use to impose the order.
+     * @param other The storage to use to impose the order.
      */
-    template<typename Type>
-    void sort() const {
+    void sort_as(const base_type &other) const {
         if(*this) {
-            descriptor->group().respect(storage<index_of<Type>>());
+            descriptor->group().respect(other);
         }
     }
 
