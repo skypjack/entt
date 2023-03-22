@@ -110,9 +110,8 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
 
     using underlying_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
 
-    template<std::size_t... Index>
-    void swap_elements(std::index_sequence<Index...>, const std::size_t pos, const underlying_type entt) {
-        (std::get<Index>(pools)->swap_elements(std::get<Index>(pools)->data()[pos], entt), ...);
+    void swap_elements(const std::size_t pos, const underlying_type entt) {
+        std::apply([pos, entt](auto *...cpool) { (cpool->swap_elements(cpool->data()[pos], entt), ...); }, pools);
     }
 
 public:
@@ -130,7 +129,7 @@ public:
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
            && !(std::get<0>(pools)->index(entt) < len)) {
-            swap_elements(std::index_sequence_for<Owned...>{}, len++, entt);
+            swap_elements(len++, entt);
         }
     }
 
@@ -138,13 +137,13 @@ public:
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
            && !(std::get<0>(pools)->index(entt) < len)) {
-            swap_elements(std::index_sequence_for<Owned...>{}, len++, entt);
+            swap_elements(len++, entt);
         }
     }
 
     void remove_if(const entity_type entt) {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < len)) {
-            swap_elements(std::index_sequence_for<Owned...>{}, --len, entt);
+            swap_elements(--len, entt);
         }
     }
 
