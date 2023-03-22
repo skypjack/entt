@@ -582,10 +582,6 @@ public:
     /**
      * @brief Sort a group according to the given comparison function.
      *
-     * Sort the group so that iterating it with a couple of iterators returns
-     * entities and components in the expected order. See `begin` and `end` for
-     * more details.
-     *
      * The comparison function object must return `true` if the first element
      * is _less_ than the second one, `false` otherwise. The signature of the
      * comparison function should be equivalent to one of the following:
@@ -981,10 +977,6 @@ public:
 
     /**
      * @brief Sort a group according to the given comparison function.
-     *
-     * Sort the group so that iterating it with a couple of iterators returns
-     * entities and components in the expected order. See `begin` and `end` for
-     * more details.
      *
      * The comparison function object must return `true` if the first element
      * is _less_ than the second one, `false` otherwise. The signature of the

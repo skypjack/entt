@@ -453,9 +453,7 @@ public:
     /**
      * @brief Returns the components assigned to the given entity.
      *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.
+     * @sa get
      *
      * @tparam Index Indexes of the components to get.
      * @param entt A valid identifier.
@@ -757,33 +755,23 @@ public:
      * Attempting to use an entity that doesn't belong to the view results in
      * undefined behavior.
      *
-     * @tparam Type Type of the component to get.
+     * @tparam Elem Type or index of the component to get.
      * @param entt A valid identifier.
      * @return The component assigned to the entity.
      */
-    template<typename Type>
+    template<typename Elem>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::value_type>, "Invalid component type");
+        static_assert(std::is_same_v<std::remove_const_t<Elem>, typename Get::value_type>, "Invalid component type");
         return get<0>(entt);
     }
 
-    /**
-     * @brief Returns the component assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.
-     *
-     * @tparam Index Index of the component to get.
-     * @param entt A valid identifier.
-     * @return The component assigned to the entity.
-     */
-    template<std::size_t... Index>
+    /*! @copydoc get */
+    template<std::size_t... Elem>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        if constexpr(sizeof...(Index) == 0) {
+        if constexpr(sizeof...(Elem) == 0) {
             return storage().get_as_tuple(entt);
         } else {
-            return storage<Index...>().get(entt);
+            return storage<Elem...>().get(entt);
         }
     }
 
