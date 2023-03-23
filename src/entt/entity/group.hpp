@@ -180,8 +180,8 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public bas
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-    using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
-    using entity_type = typename basic_common_type::entity_type;
+    using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+    using entity_type = typename base_type::entity_type;
 
     void push_on_construct(const entity_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
@@ -204,7 +204,7 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public bas
     }
 
 public:
-    using base_type = basic_common_type;
+    using common_type = base_type;
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
@@ -219,16 +219,16 @@ public:
         std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
         std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::remove_if>(*this), cpool->on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
 
-        for(const auto entity: static_cast<base_type &>(*std::get<0>(pools))) {
+        for(const auto entity: static_cast<common_type &>(*std::get<0>(pools))) {
             push_on_construct(entity);
         }
     }
 
-    base_type &group() noexcept {
+    common_type &group() noexcept {
         return elem;
     }
 
-    const base_type &group() const noexcept {
+    const common_type &group() const noexcept {
         return elem;
     }
 
@@ -245,7 +245,7 @@ public:
 private:
     std::tuple<Get *...> pools;
     std::tuple<Exclude *...> filter;
-    base_type elem;
+    common_type elem;
 };
 
 } // namespace internal
@@ -289,7 +289,7 @@ class basic_group;
 template<typename... Get, typename... Exclude>
 class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
-    using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+    using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
 
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
@@ -308,11 +308,11 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
+    using common_type = base_type;
     /*! @brief Random access iterator type. */
-    using iterator = typename base_type::iterator;
+    using iterator = typename common_type::iterator;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename base_type::reverse_iterator;
+    using reverse_iterator = typename common_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<Get...>>>;
     /*! @brief Group handler type. */
@@ -333,7 +333,7 @@ public:
      * @brief Returns the leading storage of a group.
      * @return The leading storage of the group.
      */
-    [[nodiscard]] const base_type &handle() const noexcept {
+    [[nodiscard]] const common_type &handle() const noexcept {
         return descriptor->group();
     }
 
@@ -676,7 +676,7 @@ public:
      *
      * @param other The storage to use to impose the order.
      */
-    void sort_as(const base_type &other) const {
+    void sort_as(const common_type &other) const {
         if(*this) {
             descriptor->group().sort_as(other);
         }
@@ -720,7 +720,7 @@ private:
 template<typename... Owned, typename... Get, typename... Exclude>
 class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
-    using basic_common_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
+    using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
 
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type..., typename Exclude::value_type...>>;
@@ -739,11 +739,11 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
+    using common_type = base_type;
     /*! @brief Random access iterator type. */
-    using iterator = typename base_type::iterator;
+    using iterator = typename common_type::iterator;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename base_type::reverse_iterator;
+    using reverse_iterator = typename common_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<Owned...>, get_t<Get...>>>;
     /*! @brief Group handler type. */
@@ -764,7 +764,7 @@ public:
      * @brief Returns the leading storage of a group.
      * @return The leading storage of the group.
      */
-    [[nodiscard]] const base_type &handle() const noexcept {
+    [[nodiscard]] const common_type &handle() const noexcept {
         return storage<0>();
     }
 
@@ -819,7 +819,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? (handle().base_type::end() - descriptor->length()) : iterator{};
+        return *this ? (handle().common_type::end() - descriptor->length()) : iterator{};
     }
 
     /**
@@ -833,7 +833,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? handle().base_type::end() : iterator{};
+        return *this ? handle().common_type::end() : iterator{};
     }
 
     /**
@@ -845,7 +845,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? handle().base_type::rbegin() : reverse_iterator{};
+        return *this ? handle().common_type::rbegin() : reverse_iterator{};
     }
 
     /**
@@ -860,7 +860,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? (handle().base_type::rbegin() + descriptor->length()) : reverse_iterator{};
+        return *this ? (handle().common_type::rbegin() + descriptor->length()) : reverse_iterator{};
     }
 
     /**
