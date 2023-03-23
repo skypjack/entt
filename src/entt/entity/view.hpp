@@ -200,7 +200,7 @@ class basic_view;
 template<typename... Get, typename... Exclude>
 class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
-    using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+    using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
 
     template<typename, typename, typename>
     friend class basic_view;
@@ -209,7 +209,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
 
     [[nodiscard]] auto opaque_check_set() const noexcept {
-        std::array<const base_type *, sizeof...(Get) - 1u> other{};
+        std::array<const common_type *, sizeof...(Get) - 1u> other{};
         std::apply([&other, pos = 0u, view = view](const auto *...curr) mutable { ((curr == view ? void() : void(other[pos++] = curr)), ...); }, pools);
         return other;
     }
@@ -247,9 +247,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
+    using common_type = base_type;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<base_type, sizeof...(Get) - 1u, sizeof...(Exclude)>;
+    using iterator = internal::view_iterator<common_type, sizeof...(Get) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
     using iterable = iterable_adaptor<internal::extended_view_iterator<iterator, Get...>>;
 
@@ -313,7 +313,7 @@ public:
      * @brief Returns the leading storage of a view.
      * @return The leading storage of the view.
      */
-    [[nodiscard]] const base_type &handle() const noexcept {
+    [[nodiscard]] const common_type &handle() const noexcept {
         return *view;
     }
 
@@ -522,8 +522,8 @@ public:
 
 private:
     std::tuple<Get *...> pools;
-    std::array<const base_type *, sizeof...(Exclude)> filter;
-    const base_type *view;
+    std::array<const common_type *, sizeof...(Exclude)> filter;
+    const common_type *view;
 };
 
 /**
@@ -558,11 +558,11 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = typename Get::base_type;
+    using common_type = typename Get::base_type;
     /*! @brief Random access iterator type. */
-    using iterator = typename base_type::iterator;
+    using iterator = typename common_type::iterator;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename base_type::reverse_iterator;
+    using reverse_iterator = typename common_type::reverse_iterator;
     /*! @brief Iterable view type. */
     using iterable = decltype(std::declval<Get>().each());
 
@@ -592,7 +592,7 @@ public:
      * @brief Returns the leading storage of a view.
      * @return The leading storage of the view.
      */
-    [[nodiscard]] const base_type &handle() const noexcept {
+    [[nodiscard]] const common_type &handle() const noexcept {
         return *view;
     }
 
@@ -843,8 +843,8 @@ public:
 
 private:
     std::tuple<Get *> pools;
-    std::array<const base_type *, 0u> filter;
-    const base_type *view;
+    std::array<const common_type *, 0u> filter;
+    const common_type *view;
 };
 
 /**
