@@ -154,9 +154,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = Type;
+    using common_type = Type;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::runtime_view_iterator<base_type>;
+    using iterator = internal::runtime_view_iterator<common_type>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_runtime_view() noexcept
@@ -235,7 +235,7 @@ public:
      * @param base An opaque reference to a storage object.
      * @return This runtime view.
      */
-    basic_runtime_view &iterate(base_type &base) {
+    basic_runtime_view &iterate(common_type &base) {
         if(pools.empty() || !(base.size() < pools[0u]->size())) {
             pools.push_back(&base);
         } else {
@@ -250,7 +250,7 @@ public:
      * @param base An opaque reference to a storage object.
      * @return This runtime view.
      */
-    basic_runtime_view &exclude(base_type &base) {
+    basic_runtime_view &exclude(common_type &base) {
         filter.push_back(&base);
         return *this;
     }
