@@ -108,13 +108,13 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
     static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-    using underlying_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
+    using entity_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
 
-    void swap_elements(const std::size_t pos, const underlying_type entt) {
+    void swap_elements(const std::size_t pos, const entity_type entt) {
         std::apply([pos, entt](auto *...cpool) { (cpool->swap_elements(cpool->data()[pos], entt), ...); }, pools);
     }
 
-    void push_on_construct(const underlying_type entt) {
+    void push_on_construct(const entity_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
            && !(std::get<0>(pools)->index(entt) < len)) {
@@ -122,7 +122,7 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
         }
     }
 
-    void push_on_destroy(const underlying_type entt) {
+    void push_on_destroy(const entity_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
            && !(std::get<0>(pools)->index(entt) < len)) {
@@ -130,22 +130,22 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
         }
     }
 
-    void remove_if(const underlying_type entt) {
+    void remove_if(const entity_type entt) {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < len)) {
             swap_elements(--len, entt);
         }
     }
 
 public:
-    using entity_type = underlying_type;
-
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool, const void *prev, const void *next)
         : basic_group_handler{
             sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude),
             +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Owned::value_type>::value()) || ...); },
             +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
             +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
-          pools{&opool..., &gpool...}, filter{&epool...}, len{} {
+          pools{&opool..., &gpool...},
+          filter{&epool...},
+          len{} {
         std::apply([this, prev, next](auto *...cpool) { ((cpool->on_construct().before(next).template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().before(prev).template connect<&group_handler::remove_if>(*this)), ...); }, pools);
         std::apply([this, prev, next](auto *...cpool) { ((cpool->on_construct().before(prev).template connect<&group_handler::remove_if>(*this), cpool->on_destroy().before(next).template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
 
@@ -181,9 +181,9 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public bas
     static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
     using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
-    using underlying_type = typename basic_common_type::entity_type;
+    using entity_type = typename basic_common_type::entity_type;
 
-    void push_on_construct(const underlying_type entt) {
+    void push_on_construct(const entity_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
            && !elem.contains(entt)) {
@@ -191,7 +191,7 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public bas
         }
     }
 
-    void push_on_destroy(const underlying_type entt) {
+    void push_on_destroy(const entity_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
            && !elem.contains(entt)) {
@@ -199,13 +199,12 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public bas
         }
     }
 
-    void remove_if(const underlying_type entt) {
+    void remove_if(const entity_type entt) {
         elem.remove(entt);
     }
 
 public:
     using base_type = basic_common_type;
-    using entity_type = underlying_type;
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
@@ -214,7 +213,9 @@ public:
             +[](const id_type) noexcept { return false; },
             +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
             +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
-          pools{&gpool...}, filter{&epool...}, elem{alloc} {
+          pools{&gpool...},
+          filter{&epool...},
+          elem{alloc} {
         std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
         std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::remove_if>(*this), cpool->on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
 
