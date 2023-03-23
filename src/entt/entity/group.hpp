@@ -172,9 +172,32 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public bas
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-public:
     using basic_common_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
-    using entity_type = typename basic_common_type::entity_type;
+    using underlying_type = typename basic_common_type::entity_type;
+
+    void push_on_construct(const underlying_type entt) {
+        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
+           && !elem.contains(entt)) {
+            elem.push(entt);
+        }
+    }
+
+    void push_on_destroy(const underlying_type entt) {
+        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
+           && !elem.contains(entt)) {
+            elem.push(entt);
+        }
+    }
+
+    void remove_if(const underlying_type entt) {
+        elem.remove(entt);
+    }
+
+public:
+    using base_type = basic_common_type;
+    using entity_type = underlying_type;
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
@@ -183,33 +206,20 @@ public:
             +[](const id_type) noexcept { return false; },
             +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
             +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
-          pools{&gpool...}, filter{&epool...}, elem{alloc} {}
+          pools{&gpool...}, filter{&epool...}, elem{alloc} {
+        std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
+        std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::remove_if>(*this), cpool->on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
 
-    void push_on_construct(const entity_type entt) {
-        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
-           && !elem.contains(entt)) {
-            elem.push(entt);
+        for(const auto entity: static_cast<base_type &>(*std::get<0>(pools))) {
+            push_on_construct(entity);
         }
     }
 
-    void push_on_destroy(const entity_type entt) {
-        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
-           && !elem.contains(entt)) {
-            elem.push(entt);
-        }
-    }
-
-    void remove_if(const entity_type entt) {
-        elem.remove(entt);
-    }
-
-    basic_common_type &group() noexcept {
+    base_type &group() noexcept {
         return elem;
     }
 
-    const basic_common_type &group() const noexcept {
+    const base_type &group() const noexcept {
         return elem;
     }
 
@@ -226,7 +236,7 @@ public:
 private:
     std::tuple<Get *...> pools;
     std::tuple<Exclude *...> filter;
-    basic_common_type elem;
+    base_type elem;
 };
 
 } // namespace internal

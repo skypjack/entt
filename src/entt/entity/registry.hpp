@@ -1212,16 +1212,6 @@ public:
 
         if constexpr(sizeof...(Owned) == 0u) {
             handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
-
-            (on_construct<std::remove_const_t<Get>>().template connect<&handler_type::push_on_construct>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().template connect<&handler_type::push_on_destroy>(*handler), ...);
-
-            (on_destroy<std::remove_const_t<Get>>().template connect<&handler_type::remove_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().template connect<&handler_type::remove_if>(*handler), ...);
-
-            for(const auto entity: view<Get...>(exclude<Exclude...>)) {
-                handler->group().push(entity);
-            }
         } else {
             handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
 
