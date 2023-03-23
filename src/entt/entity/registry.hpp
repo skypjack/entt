@@ -238,7 +238,7 @@ private:
  */
 template<typename Entity, typename Allocator>
 class basic_registry {
-    using basic_common_type = basic_sparse_set<Entity, Allocator>;
+    using base_type = basic_sparse_set<Entity, Allocator>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
@@ -247,7 +247,7 @@ class basic_registry {
     using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
 
     // std::shared_ptr because of its type erased allocator which is useful here
-    using pool_container_type = dense_map<id_type, std::shared_ptr<basic_common_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<basic_common_type>>>>;
+    using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
     using group_container_type = dense_map<id_type, std::shared_ptr<internal::basic_group_handler>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::basic_group_handler>>>>;
 
     template<typename Type>
@@ -293,7 +293,7 @@ class basic_registry {
 
 public:
     /*! @brief Entity traits. */
-    using traits_type = typename basic_common_type::traits_type;
+    using traits_type = typename base_type::traits_type;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
@@ -303,7 +303,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
-    using base_type = basic_common_type;
+    using common_type = base_type;
     /*! @brief Context type. */
     using context = internal::registry_context<allocator_type>;
 
@@ -406,8 +406,8 @@ public:
      * @param id Name used to map the storage within the registry.
      * @return A pointer to the storage if it exists, a null pointer otherwise.
      */
-    [[nodiscard]] base_type *storage(const id_type id) {
-        return const_cast<base_type *>(std::as_const(*this).storage(id));
+    [[nodiscard]] common_type *storage(const id_type id) {
+        return const_cast<common_type *>(std::as_const(*this).storage(id));
     }
 
     /**
@@ -415,7 +415,7 @@ public:
      * @param id Name used to map the storage within the registry.
      * @return A pointer to the storage if it exists, a null pointer otherwise.
      */
-    [[nodiscard]] const base_type *storage(const id_type id) const {
+    [[nodiscard]] const common_type *storage(const id_type id) const {
         const auto it = pools.find(id);
         return it == pools.cend() ? nullptr : it->second.get();
     }
@@ -856,9 +856,9 @@ public:
 
         if constexpr(sizeof...(Other) == 0u) {
             count += assure<Type>().remove(std::move(first), std::move(last));
-        } else if constexpr(std::is_same_v<It, typename base_type::iterator>) {
+        } else if constexpr(std::is_same_v<It, typename common_type::iterator>) {
             constexpr size_type len = sizeof...(Other) + 1u;
-            base_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
+            common_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
 
             for(size_type pos{}; pos < len; ++pos) {
                 if(cpools[pos]->data() == first.data()) {
@@ -907,9 +907,9 @@ public:
     void erase(It first, It last) {
         if constexpr(sizeof...(Other) == 0u) {
             assure<Type>().erase(std::move(first), std::move(last));
-        } else if constexpr(std::is_same_v<It, typename base_type::iterator>) {
+        } else if constexpr(std::is_same_v<It, typename common_type::iterator>) {
             constexpr size_type len = sizeof...(Other) + 1u;
-            base_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
+            common_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
 
             for(size_type pos{}; pos < len; ++pos) {
                 if(cpools[pos]->data() == first.data()) {

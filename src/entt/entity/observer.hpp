@@ -268,7 +268,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator = typename registry_type::base_type::iterator;
+    using iterator = typename registry_type::common_type::iterator;
 
     /*! @brief Default constructor. */
     basic_observer()
