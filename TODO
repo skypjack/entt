@@ -10,6 +10,7 @@ DOC:
 * custom storage/view
 * examples (and credits) from @alanjfs :)
 * update entity doc when the storage based model is in place
+* in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
 
 TODO (high prio):
 * check natvis files (periodically :)
@@ -19,13 +20,12 @@ TODO (high prio):
 * registry: replace destroy with a drop-all method that doesn't care about validity
 * registry: review assign mechanism, maybe it's worth to drop it
 * add patch + on_update signal to entity storage
+* basic_observer::base_type ignores registry allocator type (non-alloc-aware class yet)
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
 * basic_storage::bind for cross-registry setups (see and remove todo from entity_copy.cpp)
 * process scheduler: reviews, use free lists internally
-* dedicated entity storage, in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
-* custom allocators all over (registry, ...)
 * add test for maximum number of entities reached
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
