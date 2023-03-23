@@ -114,18 +114,7 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
         std::apply([pos, entt](auto *...cpool) { (cpool->swap_elements(cpool->data()[pos], entt), ...); }, pools);
     }
 
-public:
-    using entity_type = underlying_type;
-
-    group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
-        : basic_group_handler{
-            sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude),
-            +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Owned::value_type>::value()) || ...); },
-            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
-            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
-          pools{&opool..., &gpool...}, filter{&epool...}, len{} {}
-
-    void push_on_construct(const entity_type entt) {
+    void push_on_construct(const underlying_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
            && !(std::get<0>(pools)->index(entt) < len)) {
@@ -133,7 +122,7 @@ public:
         }
     }
 
-    void push_on_destroy(const entity_type entt) {
+    void push_on_destroy(const underlying_type entt) {
         if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
            && !(std::get<0>(pools)->index(entt) < len)) {
@@ -141,9 +130,28 @@ public:
         }
     }
 
-    void remove_if(const entity_type entt) {
+    void remove_if(const underlying_type entt) {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < len)) {
             swap_elements(--len, entt);
+        }
+    }
+
+public:
+    using entity_type = underlying_type;
+
+    group_handler(Owned &...opool, Get &...gpool, Exclude &...epool, const void *prev, const void *next)
+        : basic_group_handler{
+            sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude),
+            +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Owned::value_type>::value()) || ...); },
+            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
+            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
+          pools{&opool..., &gpool...}, filter{&epool...}, len{} {
+        std::apply([this, prev, next](auto *...cpool) { ((cpool->on_construct().before(next).template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().before(prev).template connect<&group_handler::remove_if>(*this)), ...); }, pools);
+        std::apply([this, prev, next](auto *...cpool) { ((cpool->on_construct().before(prev).template connect<&group_handler::remove_if>(*this), cpool->on_destroy().before(next).template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
+
+        // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
+        for(auto *first = std::get<0>(pools)->data(), *last = first + std::get<0>(pools)->size(); first != last; ++first) {
+            push_on_construct(*first);
         }
     }
 

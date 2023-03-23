@@ -1213,12 +1213,12 @@ public:
         if constexpr(sizeof...(Owned) == 0u) {
             handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
         } else {
-            handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
+            constexpr auto hsize = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
 
-            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size = handler->size](const auto &data) {
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [hsize](const auto &data) {
                             const auto overlapping = (0u + ... + data.second->owned(type_hash<std::remove_const_t<Owned>>::value()));
                             const auto sz = overlapping + (0u + ... + data.second->get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + data.second->exclude(type_hash<std::remove_const_t<Exclude>>::value()));
-                            return !overlapping || ((sz == size) || (sz == data.second->size));
+                            return !overlapping || ((sz == hsize) || (sz == data.second->size));
                         }),
                         "Conflicting groups");
 
@@ -1227,30 +1227,17 @@ public:
 
             for(auto &&data: groups) {
                 if((data.second->owned(type_hash<std::remove_const_t<Owned>>::value()) || ...)) {
-                    if(const auto sz = data.second->size; sz < handler->size && (prev == nullptr || prev->size < sz)) {
+                    if(const auto sz = data.second->size; sz < hsize && (prev == nullptr || prev->size < sz)) {
                         prev = data.second.get();
                     }
 
-                    if(const auto sz = data.second->size; sz > handler->size && (next == nullptr || next->size > sz)) {
+                    if(const auto sz = data.second->size; sz > hsize && (next == nullptr || next->size > sz)) {
                         next = data.second.get();
                     }
                 }
             }
 
-            (on_construct<std::remove_const_t<Owned>>().before(*next).template connect<&handler_type::push_on_construct>(*handler), ...);
-            (on_construct<std::remove_const_t<Get>>().before(*next).template connect<&handler_type::push_on_construct>(*handler), ...);
-            (on_destroy<std::remove_const_t<Exclude>>().before(*next).template connect<&handler_type::push_on_destroy>(*handler), ...);
-
-            (on_destroy<std::remove_const_t<Owned>>().before(*prev).template connect<&handler_type::remove_if>(*handler), ...);
-            (on_destroy<std::remove_const_t<Get>>().before(*prev).template connect<&handler_type::remove_if>(*handler), ...);
-            (on_construct<std::remove_const_t<Exclude>>().before(*prev).template connect<&handler_type::remove_if>(*handler), ...);
-
-            auto &cpool = assure<type_list_element_t<0u, type_list<std::remove_const_t<Owned>...>>>();
-
-            // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-            for(auto *first = cpool.data(), *last = first + cpool.size(); first != last; ++first) {
-                handler->push_on_construct(*first);
-            }
+            handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()..., prev, next);
         }
 
         groups.emplace(type_hash<handler_type>::value(), handler);
