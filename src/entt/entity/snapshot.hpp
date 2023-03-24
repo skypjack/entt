@@ -373,12 +373,10 @@ class basic_continuous_loader {
 
     template<typename Component>
     void remove_if_exists() {
-        for(auto &&ref: remloc) {
-            const auto local = ref.second.first;
+        auto &storage = reg->template storage<Component>();
 
-            if(reg->valid(local)) {
-                reg->template remove<Component>(local);
-            }
+        for(auto &&ref: remloc) {
+            storage.remove(ref.second.first);
         }
     }
 
