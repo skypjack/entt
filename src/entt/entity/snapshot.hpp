@@ -33,12 +33,12 @@ class basic_snapshot {
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
-        const auto view = reg->template view<const Component>();
+        const auto &storage = reg->template storage<Component>();
         archive(static_cast<typename traits_type::entity_type>(sz));
 
         for(auto it = first; it != last; ++it) {
-            if(view.contains(*it)) {
-                std::apply(archive, std::tuple_cat(std::make_tuple(*it), view.get(*it)));
+            if(storage.contains(*it)) {
+                std::apply(archive, std::tuple_cat(std::make_tuple(*it), storage.get_as_tuple(*it)));
             }
         }
     }
