@@ -37,7 +37,7 @@ class basic_snapshot {
         archive(static_cast<typename traits_type::entity_type>(sz));
 
         for(auto it = first; it != last; ++it) {
-            if(reg->template all_of<Component>(*it)) {
+            if(view.contains(*it)) {
                 std::apply(archive, std::tuple_cat(std::make_tuple(*it), view.get(*it)));
             }
         }
