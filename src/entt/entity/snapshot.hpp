@@ -163,6 +163,9 @@ class basic_snapshot_loader {
 
     template<typename Component, typename Archive>
     void assign(Archive &archive) const {
+        auto &storage = reg->template storage<entity_type>();
+        auto &elem = reg->template storage<Component>();
+
         typename traits_type::entity_type length{};
         entity_type entt;
 
@@ -171,18 +174,18 @@ class basic_snapshot_loader {
         if constexpr(std::is_empty_v<Component>) {
             while(length--) {
                 archive(entt);
-                const auto entity = reg->valid(entt) ? entt : reg->create(entt);
+                const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
                 ENTT_ASSERT(entity == entt, "Entity not available for use");
-                reg->template emplace<Component>(entity);
+                elem.emplace(entity);
             }
         } else {
             Component instance;
 
             while(length--) {
                 archive(entt, instance);
-                const auto entity = reg->valid(entt) ? entt : reg->create(entt);
+                const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
                 ENTT_ASSERT(entity == entt, "Entity not available for use");
-                reg->template emplace<Component>(entity, std::move(instance));
+                elem.emplace(entity, std::move(instance));
             }
         }
     }
