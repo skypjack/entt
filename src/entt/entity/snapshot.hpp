@@ -266,11 +266,11 @@ public:
      * @return A valid loader to continue restoring data.
      */
     const basic_snapshot_loader &orphans() const {
-        auto &entities = reg->template storage<entity_type>();
+        auto &storage = reg->template storage<entity_type>();
 
-        for(auto entt: entities) {
+        for(auto entt: storage) {
             if(reg->orphan(entt)) {
-                entities.erase(entt);
+                storage.erase(entt);
             }
         }
 
@@ -526,11 +526,11 @@ public:
      * @return A non-const reference to this loader.
      */
     basic_continuous_loader &orphans() {
-        auto &entities = reg->template storage<entity_type>();
+        auto &storage = reg->template storage<entity_type>();
 
-        for(auto entt: entities) {
+        for(auto entt: storage) {
             if(reg->orphan(entt)) {
-                entities.erase(entt);
+                storage.erase(entt);
             }
         }
 
