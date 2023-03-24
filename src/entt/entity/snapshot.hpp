@@ -385,6 +385,7 @@ class basic_continuous_loader {
 
     template<typename Component, typename Archive, typename... Other, typename... Member>
     void assign(Archive &archive, [[maybe_unused]] Member Other::*...member) {
+        auto &storage = reg->template storage<Component>();
         typename traits_type::entity_type length{};
         entity_type entt;
 
@@ -394,7 +395,10 @@ class basic_continuous_loader {
             while(length--) {
                 archive(entt);
                 restore(entt);
-                reg->template emplace_or_replace<Component>(map(entt));
+
+                if(!storage.contains(entt)) {
+                    storage.emplace(map(entt));
+                }
             }
         } else {
             Component instance;
@@ -403,7 +407,12 @@ class basic_continuous_loader {
                 archive(entt, instance);
                 (update(instance, member), ...);
                 restore(entt);
-                reg->template emplace_or_replace<Component>(map(entt), std::move(instance));
+
+                if(storage.contains(entt)) {
+                    storage.get(entt) = std::move(instance);
+                } else {
+                    storage.emplace(map(entt), std::move(instance));
+                }
             }
         }
     }
