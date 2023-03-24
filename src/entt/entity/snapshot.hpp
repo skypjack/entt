@@ -45,10 +45,11 @@ class basic_snapshot {
 
     template<typename... Component, typename Archive, typename It, std::size_t... Index>
     void component(Archive &archive, It first, It last, std::index_sequence<Index...>) const {
+        auto storage{std::forward_as_tuple(reg->template storage<Component>()...)};
         std::array<std::size_t, sizeof...(Index)> size{};
 
         for(auto it = first; it != last; ++it) {
-            ((reg->template all_of<Component>(*it) ? ++size[Index] : 0u), ...);
+            ((std::get<Index>(storage).contains(*it) ? ++size[Index] : 0u), ...);
         }
 
         (get<Component>(archive, size[Index], first, last), ...);
