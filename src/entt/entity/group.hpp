@@ -115,17 +115,15 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     }
 
     void push_on_construct(const entity_type entt) {
-        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
-           && !(std::get<0>(pools)->index(entt) < len)) {
+        if(std::apply([entt, len = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < len) && (other->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
             swap_elements(len++, entt);
         }
     }
 
     void push_on_destroy(const entity_type entt) {
-        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
-           && !(std::get<0>(pools)->index(entt) < len)) {
+        if(std::apply([entt, len = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < len) && (other->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
             swap_elements(len++, entt);
         }
     }
@@ -184,17 +182,17 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public bas
     using entity_type = typename base_type::entity_type;
 
     void push_on_construct(const entity_type entt) {
-        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)
-           && !elem.contains(entt)) {
+        if(!elem.contains(entt)
+           && std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
             elem.push(entt);
         }
     }
 
     void push_on_destroy(const entity_type entt) {
-        if(std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)
-           && !elem.contains(entt)) {
+        if(!elem.contains(entt)
+           && std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
             elem.push(entt);
         }
     }
