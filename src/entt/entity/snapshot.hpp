@@ -505,6 +505,7 @@ public:
      * @return A non-const reference to this loader.
      */
     basic_continuous_loader &shrink() {
+        const auto &storage = reg->template storage<entity_type>();
         auto it = remloc.begin();
 
         while(it != remloc.cend()) {
@@ -515,7 +516,7 @@ public:
                 dirty = false;
                 ++it;
             } else {
-                if(reg->valid(local)) {
+                if(storage.contains(local)) {
                     reg->destroy(local);
                 }
 
