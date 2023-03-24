@@ -157,10 +157,11 @@ inline constexpr basic_collector<> collector{};
  *
  * @tparam Registry Basic registry type.
  * @tparam Mask Mask type.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Registry, typename Mask>
-class basic_observer: private basic_storage<Mask, typename Registry::entity_type> {
-    using base_type = basic_storage<Mask, typename Registry::entity_type>;
+template<typename Registry, typename Mask, typename Allocator>
+class basic_observer: private basic_storage<Mask, typename Registry::entity_type, Allocator> {
+    using base_type = basic_storage<Mask, typename Registry::entity_type, Allocator>;
 
     template<typename>
     struct matcher_handler;
@@ -268,15 +269,26 @@ public:
     using entity_type = typename registry_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Random access iterator type. */
     using iterator = typename registry_type::common_type::iterator;
 
     /*! @brief Default constructor. */
     basic_observer()
-        : release{} {}
+        : basic_observer{allocator_type{}} {}
+
+    /**
+     * @brief Constructs an empty storage with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_observer(const allocator_type &allocator)
+        : base_type{allocator},
+          release{} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     basic_observer(const basic_observer &) = delete;
+
     /*! @brief Default move constructor, deleted on purpose. */
     basic_observer(basic_observer &&) = delete;
 
@@ -284,15 +296,13 @@ public:
      * @brief Creates an observer and connects it to a given registry.
      * @tparam Matcher Types of matchers to use to initialize the observer.
      * @param reg A valid reference to a registry.
+     * @param allocator The allocator to use.
      */
     template<typename... Matcher>
-    basic_observer(registry_type &reg, basic_collector<Matcher...>)
-        : basic_observer{} {
+    basic_observer(registry_type &reg, basic_collector<Matcher...>, const allocator_type &allocator = allocator_type{})
+        : basic_observer{allocator} {
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
     }
-
-    /*! @brief Default destructor. */
-    ~basic_observer() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.

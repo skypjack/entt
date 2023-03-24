@@ -79,7 +79,7 @@ class basic_runtime_view;
 template<typename, typename, typename>
 class basic_group;
 
-template<typename, typename = std::uint32_t>
+template<typename, typename Mask = std::uint32_t, typename = std::allocator<Mask>>
 class basic_observer;
 
 template<typename>
