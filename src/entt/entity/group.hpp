@@ -108,7 +108,8 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
     static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-    using entity_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
+    using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
+    using entity_type = typename base_type::entity_type;
 
     void swap_elements(const std::size_t pos, const entity_type entt) {
         std::apply([pos, entt](auto *...cpool) { (cpool->swap_elements(cpool->data()[pos], entt), ...); }, pools);
@@ -286,8 +287,8 @@ class basic_group;
  */
 template<typename... Get, typename... Exclude>
 class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
-    using underlying_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
     using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+    using underlying_type = typename base_type::entity_type;
 
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
@@ -717,8 +718,8 @@ private:
  */
 template<typename... Owned, typename... Get, typename... Exclude>
 class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
-    using underlying_type = std::common_type_t<typename Owned::entity_type..., typename Get::entity_type..., typename Exclude::entity_type...>;
     using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
+    using underlying_type = typename base_type::entity_type;
 
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type..., typename Exclude::value_type...>>;
