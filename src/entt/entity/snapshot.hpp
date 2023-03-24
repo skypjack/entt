@@ -86,13 +86,14 @@ public:
      */
     template<typename Archive>
     const basic_snapshot &entities(Archive &archive) const {
-        const auto sz = static_cast<typename traits_type::entity_type>(reg->size());
-        const auto released = static_cast<typename traits_type::entity_type>(reg->released());
+        const auto &storage = reg->template storage<entity_type>();
+        const auto sz = static_cast<typename traits_type::entity_type>(storage.size());
+        const auto released = static_cast<typename traits_type::entity_type>(sz - storage.in_use());
 
         archive(sz);
         archive(released);
 
-        for(auto first = reg->data(), last = first + sz; first != last; ++first) {
+        for(auto first = storage.data(), last = first + sz; first != last; ++first) {
             archive(*first);
         }
 
