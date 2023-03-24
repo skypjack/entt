@@ -199,8 +199,8 @@ class basic_view;
  */
 template<typename... Get, typename... Exclude>
 class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
-    using underlying_type = std::common_type_t<typename Get::entity_type..., typename Exclude::entity_type...>;
     using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+    using underlying_type = typename base_type::entity_type;
 
     template<typename, typename, typename>
     friend class basic_view;
