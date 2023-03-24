@@ -156,10 +156,11 @@ inline constexpr basic_collector<> collector{};
  * pointers.
  *
  * @tparam Registry Basic registry type.
+ * @tparam Mask Mask type.
  */
-template<typename Registry>
-class basic_observer: private basic_storage<std::uint32_t, typename Registry::entity_type> {
-    using base_type = basic_storage<std::uint32_t, typename Registry::entity_type>;
+template<typename Registry, typename Mask>
+class basic_observer: private basic_storage<Mask, typename Registry::entity_type> {
+    using base_type = basic_storage<Mask, typename Registry::entity_type>;
 
     template<typename>
     struct matcher_handler;

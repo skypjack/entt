@@ -79,7 +79,7 @@ class basic_runtime_view;
 template<typename, typename, typename>
 class basic_group;
 
-template<typename>
+template<typename, typename = std::uint32_t>
 class basic_observer;
 
 template<typename>
