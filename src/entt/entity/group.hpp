@@ -224,11 +224,11 @@ public:
         }
     }
 
-    common_type &group() noexcept {
+    common_type &handle() noexcept {
         return elem;
     }
 
-    const common_type &group() const noexcept {
+    const common_type &handle() const noexcept {
         return elem;
     }
 
@@ -334,7 +334,7 @@ public:
      * @return The leading storage of the group.
      */
     [[nodiscard]] const common_type &handle() const noexcept {
-        return descriptor->group();
+        return descriptor->handle();
     }
 
     /**
@@ -368,7 +368,7 @@ public:
      * @return Number of entities that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return *this ? descriptor->group().size() : size_type{};
+        return *this ? descriptor->handle().size() : size_type{};
     }
 
     /**
@@ -377,13 +377,13 @@ public:
      * @return Capacity of the group.
      */
     [[nodiscard]] size_type capacity() const noexcept {
-        return *this ? descriptor->group().capacity() : size_type{};
+        return *this ? descriptor->handle().capacity() : size_type{};
     }
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
         if(*this) {
-            descriptor->group().shrink_to_fit();
+            descriptor->handle().shrink_to_fit();
         }
     }
 
@@ -392,7 +392,7 @@ public:
      * @return True if the group is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !*this || descriptor->group().empty();
+        return !*this || descriptor->handle().empty();
     }
 
     /**
@@ -404,7 +404,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? descriptor->group().begin() : iterator{};
+        return *this ? descriptor->handle().begin() : iterator{};
     }
 
     /**
@@ -418,7 +418,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? descriptor->group().end() : iterator{};
+        return *this ? descriptor->handle().end() : iterator{};
     }
 
     /**
@@ -430,7 +430,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? descriptor->group().rbegin() : reverse_iterator{};
+        return *this ? descriptor->handle().rbegin() : reverse_iterator{};
     }
 
     /**
@@ -445,7 +445,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? descriptor->group().rend() : reverse_iterator{};
+        return *this ? descriptor->handle().rend() : reverse_iterator{};
     }
 
     /**
@@ -475,7 +475,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        const auto it = *this ? descriptor->group().find(entt) : iterator{};
+        const auto it = *this ? descriptor->handle().find(entt) : iterator{};
         return it != end() && *it == entt ? it : end();
     }
 
@@ -502,7 +502,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && descriptor->group().contains(entt);
+        return *this && descriptor->handle().contains(entt);
     }
 
     /**
@@ -653,7 +653,7 @@ public:
         if(*this) {
             if constexpr(sizeof...(Index) == 0) {
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-                descriptor->group().sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+                descriptor->handle().sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
                 auto comp = [&compare, cpools = pools()](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Index) == 1) {
@@ -663,7 +663,7 @@ public:
                     }
                 };
 
-                descriptor->group().sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
+                descriptor->handle().sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
             }
         }
     }
@@ -678,7 +678,7 @@ public:
      */
     void sort_as(const common_type &other) const {
         if(*this) {
-            descriptor->group().sort_as(other);
+            descriptor->handle().sort_as(other);
         }
     }
 
