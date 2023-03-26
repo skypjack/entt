@@ -129,6 +129,10 @@ TEST(ValueList, Functionalities) {
     static_assert(entt::value_list_element_v<0u, value> == 0);
     static_assert(entt::value_list_element_v<1u, value> == 2);
     static_assert(entt::value_list_element_v<0u, other> == 1);
+
+    static_assert(entt::value_list_index_v<0, value> == 0u);
+    static_assert(entt::value_list_index_v<2, value> == 1u);
+    static_assert(entt::value_list_index_v<1, other> == 0u);
 }
 
 TEST(IsApplicable, Functionalities) {
