@@ -532,6 +532,32 @@ struct value_list_unique<value_list<>> {
 template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
+/**
+ * @brief Provides the member constant `value` to true if a value list contains
+ * a given value, false otherwise.
+ * @tparam List Value list.
+ * @tparam Value Value to look for.
+ */
+template<typename List, auto Value>
+struct value_list_contains;
+
+/**
+ * @copybrief value_list_contains
+ * @tparam Value Values provided by the value list.
+ * @tparam Other Value to look for.
+ */
+template<auto... Value, auto Other>
+struct value_list_contains<value_list<Value...>, Other>
+    : std::bool_constant<((Value == Other) || ...)> {};
+
+/**
+ * @brief Helper variable template.
+ * @tparam List Value list.
+ * @tparam Value Value to look for.
+ */
+template<typename List, auto Value>
+inline constexpr bool value_list_contains_v = value_list_contains<List, Value>::value;
+
 /*! @brief Same as std::is_invocable, but with tuples. */
 template<typename, typename>
 struct is_applicable: std::false_type {};

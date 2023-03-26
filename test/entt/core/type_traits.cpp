@@ -127,6 +127,10 @@ TEST(ValueList, Functionalities) {
     static_assert(std::is_same_v<entt::value_list_cat_t<value, value>, entt::value_list<0, 2, 0, 2>>);
     static_assert(std::is_same_v<entt::value_list_unique_t<entt::value_list_cat_t<value, value>>, value>);
 
+    static_assert(entt::value_list_contains_v<value, 0>);
+    static_assert(entt::value_list_contains_v<value, 2>);
+    static_assert(!entt::value_list_contains_v<value, 1>);
+
     static_assert(entt::value_list_element_v<0u, value> == 0);
     static_assert(entt::value_list_element_v<1u, value> == 2);
     static_assert(entt::value_list_element_v<0u, other> == 1);
