@@ -138,6 +138,12 @@ TEST(ValueList, Functionalities) {
     static_assert(entt::value_list_index_v<0, value> == 0u);
     static_assert(entt::value_list_index_v<2, value> == 1u);
     static_assert(entt::value_list_index_v<1, other> == 0u);
+
+    static_assert(std::is_same_v<entt::value_list_diff_t<entt::value_list<0, 1, 2>, entt::value_list<3, 4>>, entt::value_list<0, 1, 2>>);
+    static_assert(std::is_same_v<entt::value_list_diff_t<entt::value_list<0, 1, 2>, entt::value_list<0, 1, 2>>, entt::value_list<>>);
+    static_assert(std::is_same_v<entt::value_list_diff_t<entt::value_list<0, 1, 2>, entt::value_list<0, 1>>, entt::value_list<2>>);
+    static_assert(std::is_same_v<entt::value_list_diff_t<entt::value_list<0, 1, 2>, entt::value_list<1, 2>>, entt::value_list<0>>);
+    static_assert(std::is_same_v<entt::value_list_diff_t<entt::value_list<0, 1, 2>, entt::value_list<1>>, entt::value_list<0, 2>>);
 }
 
 TEST(IsApplicable, Functionalities) {

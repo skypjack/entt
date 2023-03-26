@@ -558,6 +558,28 @@ struct value_list_contains<value_list<Value...>, Other>
 template<typename List, auto Value>
 inline constexpr bool value_list_contains_v = value_list_contains<List, Value>::value;
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct value_list_diff;
+
+/**
+ * @brief Computes the difference between two value lists.
+ * @tparam Value Values provided by the first value list.
+ * @tparam Other Values provided by the second value list.
+ */
+template<auto... Value, auto... Other>
+struct value_list_diff<value_list<Value...>, value_list<Other...>> {
+    /*! @brief A value list that is the difference between the two value lists. */
+    using type = value_list_cat_t<std::conditional_t<value_list_contains_v<value_list<Other...>, Value>, value_list<>, value_list<Value>>...>;
+};
+
+/**
+ * @brief Helper type.
+ * @tparam List Value lists between which to compute the difference.
+ */
+template<typename... List>
+using value_list_diff_t = typename value_list_diff<List...>::type;
+
 /*! @brief Same as std::is_invocable, but with tuples. */
 template<typename, typename>
 struct is_applicable: std::false_type {};
