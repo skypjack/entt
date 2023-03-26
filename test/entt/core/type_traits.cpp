@@ -89,7 +89,7 @@ TEST(TypeList, Functionalities) {
     static_assert(std::is_same_v<entt::type_list_cat_t<type, other, type, other>, entt::type_list<int, char, double, int, char, double>>);
     static_assert(std::is_same_v<entt::type_list_cat_t<type, other>, entt::type_list<int, char, double>>);
     static_assert(std::is_same_v<entt::type_list_cat_t<type, type>, entt::type_list<int, char, int, char>>);
-    static_assert(std::is_same_v<entt::type_list_unique_t<entt::type_list_cat_t<type, type>>, entt::type_list<int, char>>);
+    static_assert(std::is_same_v<entt::type_list_unique_t<entt::type_list_cat_t<type, type>>, type>);
 
     static_assert(entt::type_list_contains_v<type, int>);
     static_assert(entt::type_list_contains_v<type, char>);
@@ -125,7 +125,7 @@ TEST(ValueList, Functionalities) {
     static_assert(std::is_same_v<entt::value_list_cat_t<value, other, value, other>, entt::value_list<0, 2, 1, 0, 2, 1>>);
     static_assert(std::is_same_v<entt::value_list_cat_t<value, other>, entt::value_list<0, 2, 1>>);
     static_assert(std::is_same_v<entt::value_list_cat_t<value, value>, entt::value_list<0, 2, 0, 2>>);
-    static_assert(std::is_same_v<entt::value_list_unique_t<entt::value_list_cat_t<value, value>>, entt::value_list<0, 2>>);
+    static_assert(std::is_same_v<entt::value_list_unique_t<entt::value_list_cat_t<value, value>>, value>);
 
     static_assert(entt::value_list_element_v<0u, value> == 0);
     static_assert(entt::value_list_element_v<1u, value> == 2);
