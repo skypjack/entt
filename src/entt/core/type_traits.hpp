@@ -500,6 +500,38 @@ struct value_list_cat<value_list<Value...>> {
 template<typename... List>
 using value_list_cat_t = typename value_list_cat<List...>::type;
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename>
+struct value_list_unique;
+
+/**
+ * @brief Removes duplicates values from a value list.
+ * @tparam Value One of the values provided by the given value list.
+ * @tparam Other The other values provided by the given value list.
+ */
+template<auto Value, auto... Other>
+struct value_list_unique<value_list<Value, Other...>> {
+    /*! @brief A value list without duplicate types. */
+    using type = std::conditional_t<
+        ((Value == Other) || ...),
+        typename value_list_unique<value_list<Other...>>::type,
+        value_list_cat_t<value_list<Value>, typename value_list_unique<value_list<Other...>>::type>>;
+};
+
+/*! @brief Removes duplicates values from a value list. */
+template<>
+struct value_list_unique<value_list<>> {
+    /*! @brief A value list without duplicate types. */
+    using type = value_list<>;
+};
+
+/**
+ * @brief Helper type.
+ * @tparam Type A value list.
+ */
+template<typename Type>
+using value_list_unique_t = typename value_list_unique<Type>::type;
+
 /*! @brief Same as std::is_invocable, but with tuples. */
 template<typename, typename>
 struct is_applicable: std::false_type {};
