@@ -511,21 +511,16 @@ public:
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<std::remove_pointer_t<Type>>, void>>>
-    void disconnect(Type &value_or_instance) {
-        disconnect(&value_or_instance);
-    }
-
-    /**
-     * @brief Disconnects free functions with payload or bound members from a
-     * signal.
-     * @param value_or_instance A valid object that fits the purpose.
-     */
-    void disconnect(const void *value_or_instance) {
-        if(value_or_instance) {
-            auto &calls = signal->calls;
-            auto predicate = [value_or_instance](const auto &delegate) { return delegate.data() == value_or_instance; };
-            calls.erase(std::remove_if(calls.begin(), calls.end(), std::move(predicate)), calls.end());
+    template<typename Type>
+    void disconnect(Type &&value_or_instance) {
+        if constexpr(std::is_pointer_v<std::remove_reference_t<Type>>) {
+            if(value_or_instance) {
+                auto &calls = signal->calls;
+                auto predicate = [value_or_instance](const auto &delegate) { return delegate.data() == value_or_instance; };
+                calls.erase(std::remove_if(calls.begin(), calls.end(), std::move(predicate)), calls.end());
+            }
+        } else {
+            disconnect(&value_or_instance);
         }
     }
 
