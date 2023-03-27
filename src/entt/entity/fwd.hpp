@@ -102,7 +102,7 @@ class basic_continuous_loader;
  * @tparam Type List of types.
  */
 template<typename... Type>
-using exclude_t = type_list<Type...>;
+struct exclude_t final: type_list<Type...> {};
 
 /**
  * @brief Variable template for exclusion lists.
@@ -116,7 +116,7 @@ inline constexpr exclude_t<Type...> exclude{};
  * @tparam Type List of types.
  */
 template<typename... Type>
-using get_t = type_list<Type...>;
+struct get_t final: type_list<Type...> {};
 
 /**
  * @brief Variable template for lists of observed components.
@@ -130,7 +130,7 @@ inline constexpr get_t<Type...> get{};
  * @tparam Type List of types.
  */
 template<typename... Type>
-using owned_t = type_list<Type...>;
+struct owned_t final: type_list<Type...> {};
 
 /**
  * @brief Variable template for lists of owned components.
@@ -138,6 +138,39 @@ using owned_t = type_list<Type...>;
  */
 template<typename... Type>
 inline constexpr owned_t<Type...> owned{};
+
+/**
+ * @brief Applies a given _function_ to a get list and generate a new list.
+ * @tparam Type Types provided by the get list.
+ * @tparam Op Unary operation as template class with a type member named `type`.
+ */
+template<typename... Type, template<typename...> class Op>
+struct type_list_transform<get_t<Type...>, Op> {
+    /*! @brief Resulting get list after applying the transform function. */
+    using type = get_t<typename Op<Type>::type...>;
+};
+
+/**
+ * @brief Applies a given _function_ to an exclude list and generate a new list.
+ * @tparam Type Types provided by the exclude list.
+ * @tparam Op Unary operation as template class with a type member named `type`.
+ */
+template<typename... Type, template<typename...> class Op>
+struct type_list_transform<exclude_t<Type...>, Op> {
+    /*! @brief Resulting exclude list after applying the transform function. */
+    using type = exclude_t<typename Op<Type>::type...>;
+};
+
+/**
+ * @brief Applies a given _function_ to an owned list and generate a new list.
+ * @tparam Type Types provided by the owned list.
+ * @tparam Op Unary operation as template class with a type member named `type`.
+ */
+template<typename... Type, template<typename...> class Op>
+struct type_list_transform<owned_t<Type...>, Op> {
+    /*! @brief Resulting owned list after applying the transform function. */
+    using type = owned_t<typename Op<Type>::type...>;
+};
 
 /*! @brief Alias declaration for the most common use case. */
 using sparse_set = basic_sparse_set<>;
