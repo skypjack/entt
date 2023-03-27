@@ -560,7 +560,7 @@ inline constexpr bool value_list_contains_v = value_list_contains<List, Value>::
 
 /*! @brief Primary template isn't defined on purpose. */
 template<typename...>
-struct value_list_diff;
+class value_list_diff;
 
 /**
  * @brief Computes the difference between two value lists.
@@ -568,9 +568,12 @@ struct value_list_diff;
  * @tparam Other Values provided by the second value list.
  */
 template<auto... Value, auto... Other>
-struct value_list_diff<value_list<Value...>, value_list<Other...>> {
+class value_list_diff<value_list<Value...>, value_list<Other...>> {
+    using v141_toolset_workaround = value_list<Other...>;
+
+public:
     /*! @brief A value list that is the difference between the two value lists. */
-    using type = value_list_cat_t<std::conditional_t<value_list_contains_v<value_list<Other...>, Value>, value_list<>, value_list<Value>>...>;
+    using type = value_list_cat_t<std::conditional_t<value_list_contains_v<v141_toolset_workaround, Value>, value_list<>, value_list<Value>>...>;
 };
 
 /**
