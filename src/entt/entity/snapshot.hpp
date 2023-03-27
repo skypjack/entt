@@ -395,10 +395,7 @@ class basic_continuous_loader {
             while(length--) {
                 archive(entt);
                 restore(entt);
-
-                if(!storage.contains(entt)) {
-                    storage.emplace(map(entt));
-                }
+                storage.emplace(map(entt));
             }
         } else {
             Component instance;
@@ -407,12 +404,7 @@ class basic_continuous_loader {
                 archive(entt, instance);
                 (update(instance, member), ...);
                 restore(entt);
-
-                if(storage.contains(entt)) {
-                    storage.get(entt) = std::move(instance);
-                } else {
-                    storage.emplace(map(entt), std::move(instance));
-                }
+                storage.emplace(map(entt), std::move(instance));
             }
         }
     }
