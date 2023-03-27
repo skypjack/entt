@@ -56,7 +56,8 @@ class sigh<Ret(Args...), Allocator> {
     friend class sink<sigh<Ret(Args...), Allocator>>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
-    using container_type = std::vector<delegate<Ret(Args...)>, typename alloc_traits::template rebind_alloc<delegate<Ret(Args...)>>>;
+    using delegate_type = delegate<Ret(Args...)>;
+    using container_type = std::vector<delegate_type, typename alloc_traits::template rebind_alloc<delegate_type>>;
 
 public:
     /*! @brief Allocator type. */
@@ -358,6 +359,7 @@ private:
 template<typename Ret, typename... Args, typename Allocator>
 class sink<sigh<Ret(Args...), Allocator>> {
     using signal_type = sigh<Ret(Args...), Allocator>;
+    using delegate_type = typename signal_type::delegate_type;
     using difference_type = typename signal_type::container_type::difference_type;
 
     template<auto Candidate, typename Type>
@@ -370,7 +372,7 @@ class sink<sigh<Ret(Args...), Allocator>> {
         sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>();
     }
 
-    auto before(delegate<Ret(Args...)> call) {
+    auto before(delegate_type call) {
         const auto &calls = signal->calls;
         const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
 
@@ -404,7 +406,7 @@ public:
      */
     template<auto Function>
     [[nodiscard]] sink before() {
-        delegate<Ret(Args...)> call{};
+        delegate_type call{};
         call.template connect<Function>();
         return before(std::move(call));
     }
@@ -419,7 +421,7 @@ public:
      */
     template<auto Candidate, typename Type>
     [[nodiscard]] sink before(Type &&value_or_instance) {
-        delegate<Ret(Args...)> call{};
+        delegate_type call{};
         call.template connect<Candidate>(value_or_instance);
         return before(std::move(call));
     }
@@ -479,7 +481,7 @@ public:
     connection connect(Type &&...value_or_instance) {
         disconnect<Candidate>(value_or_instance...);
 
-        delegate<Ret(Args...)> call{};
+        delegate_type call{};
         call.template connect<Candidate>(value_or_instance...);
         signal->calls.insert(signal->calls.end() - offset, std::move(call));
 
@@ -498,7 +500,7 @@ public:
     template<auto Candidate, typename... Type>
     void disconnect(Type &&...value_or_instance) {
         auto &calls = signal->calls;
-        delegate<Ret(Args...)> call{};
+        delegate_type call{};
         call.template connect<Candidate>(value_or_instance...);
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(call)), calls.end());
     }
