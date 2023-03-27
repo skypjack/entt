@@ -87,13 +87,11 @@ public:
     template<typename Archive>
     const basic_snapshot &entities(Archive &archive) const {
         const auto &storage = reg->template storage<entity_type>();
-        const auto sz = static_cast<typename traits_type::entity_type>(storage.size());
-        const auto released = static_cast<typename traits_type::entity_type>(sz - storage.in_use());
 
-        archive(sz);
-        archive(released);
+        archive(static_cast<typename traits_type::entity_type>(storage.size()));
+        archive(static_cast<typename traits_type::entity_type>(storage.in_use()));
 
-        for(auto first = storage.data(), last = first + sz; first != last; ++first) {
+        for(auto first = storage.data(), last = first + storage.size(); first != last; ++first) {
             archive(*first);
         }
 
@@ -224,18 +222,22 @@ public:
      */
     template<typename Archive>
     const basic_snapshot_loader &entities(Archive &archive) const {
+        auto &storage = reg->template storage<entity_type>();
         typename traits_type::entity_type length{};
-        typename traits_type::entity_type released{};
+        typename traits_type::entity_type in_use{};
+        entity_type entity = null;
 
         archive(length);
-        archive(released);
-        std::vector<entity_type> all(length);
+        archive(in_use);
+
+        storage.reserve(length);
 
         for(std::size_t pos{}; pos < length; ++pos) {
-            archive(all[pos]);
+            archive(entity);
+            storage.emplace(entity);
         }
 
-        reg->assign(all.cbegin(), all.cend(), released);
+        storage.in_use(in_use);
 
         return *this;
     }
@@ -441,15 +443,15 @@ public:
     template<typename Archive>
     basic_continuous_loader &entities(Archive &archive) {
         typename traits_type::entity_type length{};
-        typename traits_type::entity_type released{};
+        typename traits_type::entity_type in_use{};
 
         archive(length);
-        archive(released);
+        archive(in_use);
 
         entity_type entt{null};
         std::size_t pos{};
 
-        for(const auto last = length - released; pos < last; ++pos) {
+        for(; pos < in_use; ++pos) {
             archive(entt);
             restore(entt);
         }
