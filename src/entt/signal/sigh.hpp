@@ -470,15 +470,6 @@ public:
     /**
      * @brief Connects a free function (with or without payload), a bound or an
      * unbound member to a signal.
-     *
-     * The signal isn't responsible for the connected object or the payload, if
-     * any. Users must guarantee that the lifetime of the instance overcomes the
-     * one of the signal. On the other side, the signal handler performs
-     * checks to avoid multiple connections for the same function.<br/>
-     * When used to connect a free function with payload, its signature must be
-     * such that the instance is the first argument before the ones used to
-     * define the signal itself.
-     *
      * @tparam Candidate Function or member to connect to the signal.
      * @tparam Type Type of class or type of payload, if any.
      * @param value_or_instance A valid object that fits the purpose, if any.
