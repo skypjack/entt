@@ -195,10 +195,10 @@ class basic_observer: private basic_storage<Mask, typename Registry::entity_type
         }
 
         static void disconnect(basic_observer &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().disconnect(obs), ...);
-            (reg.template on_construct<Reject>().disconnect(obs), ...);
-            reg.template on_update<AnyOf>().disconnect(obs);
-            reg.template on_destroy<AnyOf>().disconnect(obs);
+            (reg.template on_destroy<Require>().disconnect(&obs), ...);
+            (reg.template on_construct<Reject>().disconnect(&obs), ...);
+            reg.template on_update<AnyOf>().disconnect(&obs);
+            reg.template on_destroy<AnyOf>().disconnect(&obs);
         }
     };
 
@@ -241,12 +241,12 @@ class basic_observer: private basic_storage<Mask, typename Registry::entity_type
         }
 
         static void disconnect(basic_observer &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().disconnect(obs), ...);
-            (reg.template on_construct<Reject>().disconnect(obs), ...);
-            (reg.template on_construct<AllOf>().disconnect(obs), ...);
-            (reg.template on_destroy<NoneOf>().disconnect(obs), ...);
-            (reg.template on_destroy<AllOf>().disconnect(obs), ...);
-            (reg.template on_construct<NoneOf>().disconnect(obs), ...);
+            (reg.template on_destroy<Require>().disconnect(&obs), ...);
+            (reg.template on_construct<Reject>().disconnect(&obs), ...);
+            (reg.template on_construct<AllOf>().disconnect(&obs), ...);
+            (reg.template on_destroy<NoneOf>().disconnect(&obs), ...);
+            (reg.template on_destroy<AllOf>().disconnect(&obs), ...);
+            (reg.template on_construct<NoneOf>().disconnect(&obs), ...);
         }
     };
 

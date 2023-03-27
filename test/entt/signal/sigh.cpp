@@ -171,7 +171,7 @@ TEST_F(SigH, FunctionsWithPayload) {
     ASSERT_EQ(v, 0);
 
     sink.connect<&sigh_listener::f>(v);
-    sink.disconnect(v);
+    sink.disconnect(&v);
     sigh.publish();
 
     ASSERT_EQ(v, 0);
@@ -542,7 +542,7 @@ TEST_F(SigH, CustomAllocator) {
     sink.template connect<&sigh_listener::g>(listener);
 
     decltype(sigh) copy{sigh, allocator};
-    sink.disconnect(listener);
+    sink.disconnect(&listener);
 
     ASSERT_TRUE(sigh.empty());
     ASSERT_FALSE(copy.empty());
