@@ -43,7 +43,7 @@ struct basic_collector<> {
      * @return The updated collector.
      */
     template<typename... AllOf, typename... NoneOf>
-    static constexpr auto group(exclude_t<NoneOf...> = {}) noexcept {
+    static constexpr auto group(exclude_t<NoneOf...> = exclude_t{}) noexcept {
         return basic_collector<matcher<type_list<>, type_list<>, type_list<NoneOf...>, AllOf...>>{};
     }
 
@@ -78,7 +78,7 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
      * @return The updated collector.
      */
     template<typename... AllOf, typename... NoneOf>
-    static constexpr auto group(exclude_t<NoneOf...> = {}) noexcept {
+    static constexpr auto group(exclude_t<NoneOf...> = exclude_t{}) noexcept {
         return basic_collector<matcher<type_list<>, type_list<>, type_list<NoneOf...>, AllOf...>, current_type, Other...>{};
     }
 
@@ -99,7 +99,7 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
      * @return The updated collector.
      */
     template<typename... AllOf, typename... NoneOf>
-    static constexpr auto where(exclude_t<NoneOf...> = {}) noexcept {
+    static constexpr auto where(exclude_t<NoneOf...> = exclude_t{}) noexcept {
         using extended_type = matcher<type_list<Reject..., NoneOf...>, type_list<Require..., AllOf...>, Rule...>;
         return basic_collector<extended_type, Other...>{};
     }

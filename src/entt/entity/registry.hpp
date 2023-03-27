@@ -1176,14 +1176,14 @@ public:
      */
     template<typename Type, typename... Other, typename... Exclude>
     [[nodiscard]] basic_view<get_t<storage_for_type<const Type>, storage_for_type<const Other>...>, exclude_t<storage_for_type<const Exclude>...>>
-    view(exclude_t<Exclude...> = {}) const {
+    view(exclude_t<Exclude...> = exclude_t{}) const {
         return {assure<std::remove_const_t<Type>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
 
     /*! @copydoc view */
     template<typename Type, typename... Other, typename... Exclude>
     [[nodiscard]] basic_view<get_t<storage_for_type<Type>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
-    view(exclude_t<Exclude...> = {}) {
+    view(exclude_t<Exclude...> = exclude_t{}) {
         return {assure<std::remove_const_t<Type>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
     }
 
@@ -1201,7 +1201,7 @@ public:
      */
     template<typename... Owned, typename... Get, typename... Exclude>
     basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
-    group(get_t<Get...> = {}, exclude_t<Exclude...> = {}) {
+    group(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) {
         using handler_type = typename basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
 
         if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
@@ -1248,7 +1248,7 @@ public:
     /*! @copydoc group */
     template<typename... Owned, typename... Get, typename... Exclude>
     basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>
-    group_if_exists(get_t<Get...> = {}, exclude_t<Exclude...> = {}) const {
+    group_if_exists(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) const {
         using handler_type = typename basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>::handler;
 
         if(auto it = groups.find(type_hash<handler_type>::value()); it == groups.cend()) {

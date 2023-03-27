@@ -102,7 +102,10 @@ class basic_continuous_loader;
  * @tparam Type List of types.
  */
 template<typename... Type>
-struct exclude_t final: type_list<Type...> {};
+struct exclude_t final: type_list<Type...> {
+    /*! @brief Default constructor. */
+    explicit constexpr exclude_t() {}
+};
 
 /**
  * @brief Variable template for exclusion lists.
@@ -116,7 +119,10 @@ inline constexpr exclude_t<Type...> exclude{};
  * @tparam Type List of types.
  */
 template<typename... Type>
-struct get_t final: type_list<Type...> {};
+struct get_t final: type_list<Type...> {
+    /*! @brief Default constructor. */
+    explicit constexpr get_t() {}
+};
 
 /**
  * @brief Variable template for lists of observed components.
@@ -130,7 +136,10 @@ inline constexpr get_t<Type...> get{};
  * @tparam Type List of types.
  */
 template<typename... Type>
-struct owned_t final: type_list<Type...> {};
+struct owned_t final: type_list<Type...> {
+    /*! @brief Default constructor. */
+    explicit constexpr owned_t() {}
+};
 
 /**
  * @brief Variable template for lists of owned components.
