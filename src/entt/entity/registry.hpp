@@ -248,7 +248,8 @@ class basic_registry {
 
     // std::shared_ptr because of its type erased allocator which is useful here
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
-    using group_container_type = dense_map<id_type, std::shared_ptr<internal::basic_group_handler>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::basic_group_handler>>>>;
+    using owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::basic_group_handler>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::basic_group_handler>>>>;
+    using non_owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::basic_group_handler>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::basic_group_handler>>>>;
 
     template<typename Type>
     [[nodiscard]] auto &assure(const id_type id = type_hash<Type>::value()) {
@@ -1384,8 +1385,8 @@ public:
 private:
     context vars;
     pool_container_type pools;
-    group_container_type owning_groups;
-    group_container_type non_owning_groups;
+    owning_group_container_type owning_groups;
+    non_owning_group_container_type non_owning_groups;
     storage_for_type<entity_type> *shortcut;
 };
 
