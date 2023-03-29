@@ -92,7 +92,7 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs == rhs);
 }
 
-struct basic_group_handler {
+struct owning_group_descriptor {
     const std::size_t size;
     bool (*const owned)(const id_type) noexcept;
     bool (*const get)(const id_type) noexcept;
@@ -103,7 +103,7 @@ template<typename, typename, typename>
 class group_handler;
 
 template<typename... Owned, typename... Get, typename... Exclude>
-class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public basic_group_handler {
+class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public owning_group_descriptor {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
     static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
@@ -137,7 +137,7 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
 
 public:
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool, const void *prev, const void *next)
-        : basic_group_handler{
+        : owning_group_descriptor{
             sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude),
             +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Owned::value_type>::value()) || ...); },
             +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
