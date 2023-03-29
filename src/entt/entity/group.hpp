@@ -207,11 +207,7 @@ public:
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
-        : basic_group_handler{
-            sizeof...(Get) + sizeof...(Exclude),
-            +[](const id_type) noexcept { return false; },
-            +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
-            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
+        : basic_group_handler{/* temporary, to be removed */},
           pools{&gpool...},
           filter{&epool...},
           elem{alloc} {
