@@ -154,18 +154,14 @@ public:
         }
     }
 
-    void previous(const void *elem) {
-        if(elem) {
-            std::apply([this, elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(elem).template connect<&group_handler::remove_if>(*this)), ...); }, pools);
-            std::apply([this, elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(elem).template connect<&group_handler::remove_if>(*this)), ...); }, filter);
-        }
+    void previous(const owning_group_descriptor &elem) {
+        std::apply([this, &elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(&elem).template connect<&group_handler::remove_if>(*this)), ...); }, pools);
+        std::apply([this, &elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(&elem).template connect<&group_handler::remove_if>(*this)), ...); }, filter);
     }
 
-    void next(const void *elem) {
-        if(elem) {
-            std::apply([this, elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(elem).template connect<&group_handler::push_on_construct>(*this)), ...); }, pools);
-            std::apply([this, elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(elem).template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
-        }
+    void next(const owning_group_descriptor &elem) {
+        std::apply([this, &elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(&elem).template connect<&group_handler::push_on_construct>(*this)), ...); }, pools);
+        std::apply([this, &elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(&elem).template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
     }
 
     [[nodiscard]] std::size_t length() const noexcept {

@@ -1247,8 +1247,13 @@ public:
                 }
             }
 
-            handler->previous(prev);
-            handler->next(next);
+            if(prev) {
+                handler->previous(*prev);
+            }
+
+            if(next) {
+                handler->next(*next);
+            }
 
             return {*handler};
         }
