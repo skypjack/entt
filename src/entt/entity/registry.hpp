@@ -1222,9 +1222,10 @@ public:
                 return {*std::static_pointer_cast<handler_type>(it->second)};
             }
 
-            constexpr auto hsize = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
+            auto handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
+            owning_groups.emplace(type_hash<handler_type>::value(), handler);
 
-            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [hsize](const auto &data) {
+            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [hsize = handler->size](const auto &data) {
                             const auto overlapping = (0u + ... + data.second->owned(type_hash<std::remove_const_t<Owned>>::value()));
                             const auto sz = overlapping + (0u + ... + data.second->get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + data.second->exclude(type_hash<std::remove_const_t<Exclude>>::value()));
                             return !overlapping || ((sz == hsize) || (sz == data.second->size));
@@ -1236,18 +1237,19 @@ public:
 
             for(auto &&data: owning_groups) {
                 if((data.second->owned(type_hash<std::remove_const_t<Owned>>::value()) || ...)) {
-                    if(const auto sz = data.second->size; sz < hsize && (prev == nullptr || prev->size < sz)) {
+                    if(const auto sz = data.second->size; sz < handler->size && (prev == nullptr || prev->size < sz)) {
                         prev = data.second.get();
                     }
 
-                    if(const auto sz = data.second->size; sz > hsize && (next == nullptr || next->size > sz)) {
+                    if(const auto sz = data.second->size; sz > handler->size && (next == nullptr || next->size > sz)) {
                         next = data.second.get();
                     }
                 }
             }
 
-            auto handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()..., prev, next);
-            owning_groups.emplace(type_hash<handler_type>::value(), handler);
+            handler->previous(prev);
+            handler->next(next);
+
             return {*handler};
         }
     }

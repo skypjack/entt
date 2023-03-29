@@ -136,7 +136,7 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     }
 
 public:
-    group_handler(Owned &...opool, Get &...gpool, Exclude &...epool, const void *prev, const void *next)
+    group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
         : owning_group_descriptor{
             sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude),
             +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Owned::value_type>::value()) || ...); },
@@ -145,12 +145,26 @@ public:
           pools{&opool..., &gpool...},
           filter{&epool...},
           len{} {
-        std::apply([this, prev, next](auto *...cpool) { ((cpool->on_construct().before(next).template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().before(prev).template connect<&group_handler::remove_if>(*this)), ...); }, pools);
-        std::apply([this, prev, next](auto *...cpool) { ((cpool->on_construct().before(prev).template connect<&group_handler::remove_if>(*this), cpool->on_destroy().before(next).template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
+        std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
+        std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::remove_if>(*this), cpool->on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
 
         // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
         for(auto *first = std::get<0>(pools)->data(), *last = first + std::get<0>(pools)->size(); first != last; ++first) {
             push_on_construct(*first);
+        }
+    }
+
+    void previous(const void *elem) {
+        if(elem) {
+            std::apply([this, elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(elem).template connect<&group_handler::remove_if>(*this)), ...); }, pools);
+            std::apply([this, elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(elem).template connect<&group_handler::remove_if>(*this)), ...); }, filter);
+        }
+    }
+
+    void next(const void *elem) {
+        if(elem) {
+            std::apply([this, elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(elem).template connect<&group_handler::push_on_construct>(*this)), ...); }, pools);
+            std::apply([this, elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(elem).template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
         }
     }
 
