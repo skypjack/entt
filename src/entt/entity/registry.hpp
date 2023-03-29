@@ -249,7 +249,7 @@ class basic_registry {
     // std::shared_ptr because of its type erased allocator which is useful here
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
     using owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::basic_group_handler>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::basic_group_handler>>>>;
-    using non_owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::basic_group_handler>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::basic_group_handler>>>>;
+    using non_owning_group_container_type = dense_map<id_type, std::shared_ptr<void>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<void>>>>;
 
     template<typename Type>
     [[nodiscard]] auto &assure(const id_type id = type_hash<Type>::value()) {
@@ -1211,7 +1211,7 @@ public:
 
         if constexpr(sizeof...(Owned) == 0u) {
             if(auto it = non_owning_groups.find(type_hash<handler_type>::value()); it != non_owning_groups.cend()) {
-                return {static_cast<handler_type &>(*it->second)};
+                return {*std::static_pointer_cast<handler_type>(it->second)};
             }
 
             auto handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
@@ -1219,7 +1219,7 @@ public:
             return {*handler};
         } else {
             if(auto it = owning_groups.find(type_hash<handler_type>::value()); it != owning_groups.cend()) {
-                return {static_cast<handler_type &>(*it->second)};
+                return {*std::static_pointer_cast<handler_type>(it->second)};
             }
 
             constexpr auto hsize = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
@@ -1260,11 +1260,11 @@ public:
 
         if constexpr(sizeof...(Owned) == 0u) {
             if(auto it = non_owning_groups.find(type_hash<handler_type>::value()); it != non_owning_groups.cend()) {
-                return {static_cast<handler_type &>(*it->second)};
+                return {*std::static_pointer_cast<handler_type>(it->second)};
             }
         } else {
             if(auto it = owning_groups.find(type_hash<handler_type>::value()); it != owning_groups.cend()) {
-                return {static_cast<handler_type &>(*it->second)};
+                return {*std::static_pointer_cast<handler_type>(it->second)};
             }
         }
 
