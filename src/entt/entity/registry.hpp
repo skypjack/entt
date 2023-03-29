@@ -1222,12 +1222,13 @@ public:
                 return {*std::static_pointer_cast<handler_type>(it->second)};
             }
 
+            const id_type elem[]{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
             auto handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
             owning_groups.emplace(type_hash<handler_type>::value(), handler);
 
-            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [hsize = handler->size](const auto &data) {
-                            const auto overlapping = (0u + ... + data.second->owned(type_hash<std::remove_const_t<Owned>>::value()));
-                            const auto sz = overlapping + (0u + ... + data.second->get(type_hash<std::remove_const_t<Get>>::value())) + (0u + ... + data.second->exclude(type_hash<std::remove_const_t<Exclude>>::value()));
+            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [&elem, hsize = handler->size](const auto &data) {
+                            const auto overlapping = data.second->check(elem, sizeof...(Owned), 0u, 0u);
+                            const auto sz = data.second->check(elem, sizeof...(Owned), sizeof...(Get), sizeof...(Exclude));
                             return !overlapping || ((sz == hsize) || (sz == data.second->size));
                         }),
                         "Conflicting groups");
@@ -1236,7 +1237,7 @@ public:
             const internal::owning_group_descriptor *next = nullptr;
 
             for(auto &&data: owning_groups) {
-                if((data.second->owned(type_hash<std::remove_const_t<Owned>>::value()) || ...)) {
+                if(data.second->check(elem, sizeof...(Owned), 0u, 0u)) {
                     if(const auto sz = data.second->size; sz < handler->size && (prev == nullptr || prev->size < sz)) {
                         prev = data.second.get();
                     }
@@ -1280,13 +1281,15 @@ public:
 
     /**
      * @brief Checks whether the given components belong to any group.
-     * @tparam Type Types of components in which one is interested.
+     * @tparam Type Type of component in which one is interested.
+     * @tparam Other Other types of components in which one is interested.
      * @return True if the pools of the given components are _free_, false
      * otherwise.
      */
-    template<typename... Type>
+    template<typename Type, typename... Other>
     [[nodiscard]] bool owned() const {
-        return std::any_of(owning_groups.cbegin(), owning_groups.cend(), [](auto &&data) { return (data.second->owned(type_hash<std::remove_const_t<Type>>::value()) || ...); });
+        const id_type elem[]{type_hash<std::remove_const_t<Type>>::value(), type_hash<std::remove_const_t<Other>>::value()...};
+        return std::any_of(owning_groups.cbegin(), owning_groups.cend(), [&elem](auto &&data) { return data.second->check(elem, 1u + sizeof...(Other), 0u, 0u); });
     }
 
     /**
@@ -1299,7 +1302,8 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] bool sortable(const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) noexcept {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        auto pred = [size](const auto &data) { return (data.second->owned(type_hash<typename Owned::value_type>::value()) || ...) && (size < data.second->size); };
+        const id_type elem[]{type_hash<typename Owned::value_type>::value()...};
+        auto pred = [&elem, size](const auto &data) { return data.second->check(elem, sizeof...(Owned), 0u, 0u) && (size < data.second->size); };
         return std::find_if(owning_groups.cbegin(), owning_groups.cend(), std::move(pred)) == owning_groups.cend();
     }
 

@@ -93,10 +93,15 @@ template<typename... Lhs, typename... Rhs>
 }
 
 struct owning_group_descriptor {
-    const std::size_t size;
-    bool (*const owned)(const id_type) noexcept;
-    bool (*const get)(const id_type) noexcept;
-    bool (*const exclude)(const id_type) noexcept;
+    using size_type = std::size_t;
+
+    owning_group_descriptor(const size_type sz)
+        : size{sz} {}
+
+    virtual ~owning_group_descriptor() = default;
+    virtual size_type check(const id_type *, const size_type, const size_type, const size_type) const noexcept = 0;
+
+    const size_type size;
 };
 
 template<typename, typename, typename>
@@ -136,12 +141,10 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     }
 
 public:
+    using size_type = typename owning_group_descriptor::size_type;
+
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
-        : owning_group_descriptor{
-            sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude),
-            +[](const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Owned::value_type>::value()) || ...); },
-            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Get::value_type>::value()) || ...); },
-            +[]([[maybe_unused]] const id_type ctype) noexcept { return ((ctype == entt::type_hash<typename Exclude::value_type>::value()) || ...); }},
+        : owning_group_descriptor{sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude)},
           pools{&opool..., &gpool...},
           filter{&epool...},
           len{} {
@@ -152,6 +155,24 @@ public:
         for(auto *first = std::get<0>(pools)->data(), *last = first + std::get<0>(pools)->size(); first != last; ++first) {
             push_on_construct(*first);
         }
+    }
+
+    size_type check(const id_type *elem, const size_type olen, const size_type glen, const size_type elen) const noexcept final {
+        size_type cnt = 0u;
+
+        for(auto pos = 0u; pos < olen; ++pos) {
+            cnt += ((elem[pos] == entt::type_hash<typename Owned::value_type>::value()) || ...);
+        }
+
+        for(auto pos = 0u; pos < glen; ++pos) {
+            cnt += ((elem[olen + pos] == entt::type_hash<typename Get::value_type>::value()) || ...);
+        }
+
+        for(auto pos = 0u; pos < elen; ++pos) {
+            cnt += ((elem[olen + glen + pos] == entt::type_hash<typename Exclude::value_type>::value()) || ...);
+        }
+
+        return cnt;
     }
 
     void previous(const owning_group_descriptor &elem) {
