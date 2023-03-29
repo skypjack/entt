@@ -175,7 +175,7 @@ private:
 };
 
 template<typename... Get, typename... Exclude>
-class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>>: public basic_group_handler {
+class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
@@ -207,8 +207,7 @@ public:
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
-        : basic_group_handler{/* temporary, to be removed */},
-          pools{&gpool...},
+        : pools{&gpool...},
           filter{&epool...},
           elem{alloc} {
         std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
