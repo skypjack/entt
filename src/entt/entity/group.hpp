@@ -95,13 +95,9 @@ template<typename... Lhs, typename... Rhs>
 struct owning_group_descriptor {
     using size_type = std::size_t;
 
-    owning_group_descriptor(const size_type sz)
-        : size{sz} {}
-
     virtual ~owning_group_descriptor() = default;
     virtual size_type check(const id_type *, const size_type, const size_type, const size_type) const noexcept = 0;
-
-    const size_type size;
+    virtual size_type size() const noexcept = 0;
 };
 
 template<typename, typename, typename>
@@ -144,8 +140,7 @@ public:
     using size_type = typename owning_group_descriptor::size_type;
 
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
-        : owning_group_descriptor{sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude)},
-          pools{&opool..., &gpool...},
+        : pools{&opool..., &gpool...},
           filter{&epool...},
           len{} {
         std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
@@ -173,6 +168,10 @@ public:
         }
 
         return cnt;
+    }
+
+    size_type size() const noexcept final {
+        return sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
     }
 
     void previous(const owning_group_descriptor &elem) {

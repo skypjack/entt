@@ -1226,10 +1226,10 @@ public:
             auto handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
             owning_groups.emplace(type_hash<handler_type>::value(), handler);
 
-            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [&elem, hsize = handler->size](const auto &data) {
+            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [&elem, hsize = handler->size()](const auto &data) {
                             const auto overlapping = data.second->check(elem, sizeof...(Owned), 0u, 0u);
                             const auto sz = data.second->check(elem, sizeof...(Owned), sizeof...(Get), sizeof...(Exclude));
-                            return !overlapping || ((sz == hsize) || (sz == data.second->size));
+                            return !overlapping || ((sz == hsize) || (sz == data.second->size()));
                         }),
                         "Conflicting groups");
 
@@ -1237,12 +1237,12 @@ public:
             const internal::owning_group_descriptor *next = nullptr;
 
             for(auto &&data: owning_groups) {
-                if(data.second->check(elem, sizeof...(Owned), 0u, 0u)) {
-                    if(const auto sz = data.second->size; sz < handler->size && (prev == nullptr || prev->size < sz)) {
+                if(const auto sz = data.second->size(); data.second->check(elem, sizeof...(Owned), 0u, 0u)) {
+                    if(sz < handler->size() && (prev == nullptr || prev->size() < sz)) {
                         prev = data.second.get();
                     }
 
-                    if(const auto sz = data.second->size; sz > handler->size && (next == nullptr || next->size > sz)) {
+                    if(sz > handler->size() && (next == nullptr || next->size() > sz)) {
                         next = data.second.get();
                     }
                 }
@@ -1303,7 +1303,7 @@ public:
     [[nodiscard]] bool sortable(const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) noexcept {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         const id_type elem[]{type_hash<typename Owned::value_type>::value()...};
-        auto pred = [&elem, size](const auto &data) { return data.second->check(elem, sizeof...(Owned), 0u, 0u) && (size < data.second->size); };
+        auto pred = [&elem, size](const auto &data) { return data.second->check(elem, sizeof...(Owned), 0u, 0u) && (size < data.second->size()); };
         return std::find_if(owning_groups.cbegin(), owning_groups.cend(), std::move(pred)) == owning_groups.cend();
     }
 
