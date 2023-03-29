@@ -802,7 +802,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? (handle().common_type::end() - descriptor->length()) : iterator{};
+        return *this ? (handle().end() - descriptor->length()) : iterator{};
     }
 
     /**
@@ -816,7 +816,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? handle().common_type::end() : iterator{};
+        return *this ? handle().end() : iterator{};
     }
 
     /**
@@ -828,7 +828,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? handle().common_type::rbegin() : reverse_iterator{};
+        return *this ? handle().rbegin() : reverse_iterator{};
     }
 
     /**
@@ -843,7 +843,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? (handle().common_type::rbegin() + descriptor->length()) : reverse_iterator{};
+        return *this ? (handle().rbegin() + descriptor->length()) : reverse_iterator{};
     }
 
     /**
