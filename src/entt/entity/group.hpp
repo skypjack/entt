@@ -351,7 +351,7 @@ public:
      * @return Number of entities that are part of the group.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return *this ? descriptor->size() : size_type{};
+        return *this ? handle().size() : size_type{};
     }
 
     /**
@@ -360,7 +360,7 @@ public:
      * @return Capacity of the group.
      */
     [[nodiscard]] size_type capacity() const noexcept {
-        return *this ? descriptor->capacity() : size_type{};
+        return *this ? handle().capacity() : size_type{};
     }
 
     /*! @brief Requests the removal of unused capacity. */
@@ -375,7 +375,7 @@ public:
      * @return True if the group is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !*this || descriptor->empty();
+        return !*this || handle().empty();
     }
 
     /**
@@ -387,7 +387,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? descriptor->begin() : iterator{};
+        return *this ? handle().begin() : iterator{};
     }
 
     /**
@@ -401,7 +401,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? descriptor->end() : iterator{};
+        return *this ? handle().end() : iterator{};
     }
 
     /**
@@ -413,7 +413,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? descriptor->rbegin() : reverse_iterator{};
+        return *this ? handle().rbegin() : reverse_iterator{};
     }
 
     /**
@@ -428,7 +428,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? descriptor->rend() : reverse_iterator{};
+        return *this ? handle().rend() : reverse_iterator{};
     }
 
     /**
@@ -458,7 +458,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        const auto it = *this ? descriptor->find(entt) : iterator{};
+        const auto it = *this ? handle().find(entt) : iterator{};
         return it != end() && *it == entt ? it : end();
     }
 
@@ -485,7 +485,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && descriptor->contains(entt);
+        return *this && handle().contains(entt);
     }
 
     /**
