@@ -248,7 +248,7 @@ class basic_registry {
 
     // std::shared_ptr because of its type erased allocator which is useful here
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
-    using owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::owning_group_descriptor<base_type>>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::owning_group_descriptor<base_type>>>>>;
+    using owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::owning_group_descriptor>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::owning_group_descriptor>>>>;
     using non_owning_group_container_type = dense_map<id_type, std::shared_ptr<void>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<void>>>>;
 
     template<typename Type>

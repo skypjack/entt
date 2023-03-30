@@ -92,17 +92,10 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs == rhs);
 }
 
-template<typename Type>
 struct owning_group_descriptor {
-    using base_type = Type;
     using size_type = std::size_t;
-    using entity_type = typename Type::entity_type;
 
     virtual ~owning_group_descriptor() = default;
-
-    virtual void push_on_construct(const entity_type) = 0;
-    virtual void push_on_destroy(const entity_type) = 0;
-    virtual void remove_if(const entity_type) = 0;
 
     virtual size_type owned(const id_type *, const size_type) const noexcept = 0;
     virtual size_type size() const noexcept = 0;
@@ -112,40 +105,39 @@ template<typename, typename, typename>
 class group_handler;
 
 template<typename... Owned, typename... Get, typename... Exclude>
-class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public owning_group_descriptor<std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>> {
+class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public owning_group_descriptor {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
     static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-    using underlying_type = owning_group_descriptor<std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>>;
-    using entity_type = typename underlying_type::entity_type;
+    using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
+    using entity_type = typename base_type::entity_type;
 
     void swap_elements(const std::size_t pos, const entity_type entt) {
         std::apply([pos, entt](auto *...cpool) { (cpool->swap_elements(cpool->data()[pos], entt), ...); }, pools);
     }
 
-    void push_on_construct(const entity_type entt) final {
+    void push_on_construct(const entity_type entt) {
         if(std::apply([entt, len = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < len) && (other->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
             swap_elements(len++, entt);
         }
     }
 
-    void push_on_destroy(const entity_type entt) final {
+    void push_on_destroy(const entity_type entt) {
         if(std::apply([entt, len = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < len) && (other->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
             swap_elements(len++, entt);
         }
     }
 
-    void remove_if(const entity_type entt) final {
+    void remove_if(const entity_type entt) {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < len)) {
             swap_elements(--len, entt);
         }
     }
 
 public:
-    using base_type = underlying_type;
     using size_type = typename base_type::size_type;
 
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
@@ -175,7 +167,7 @@ public:
         return sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
     }
 
-    [[nodiscard]] std::size_t length() const noexcept {
+    [[nodiscard]] size_type length() const noexcept {
         return len;
     }
 
