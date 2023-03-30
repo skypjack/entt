@@ -99,6 +99,11 @@ struct owning_group_descriptor {
     using entity_type = typename Type::entity_type;
 
     virtual ~owning_group_descriptor() = default;
+
+    virtual void push_on_construct(const entity_type) = 0;
+    virtual void push_on_destroy(const entity_type) = 0;
+    virtual void remove_if(const entity_type) = 0;
+
     virtual size_type check(const id_type *, const size_type, const size_type, const size_type) const noexcept = 0;
     virtual size_type size() const noexcept = 0;
 };
@@ -119,21 +124,21 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
         std::apply([pos, entt](auto *...cpool) { (cpool->swap_elements(cpool->data()[pos], entt), ...); }, pools);
     }
 
-    void push_on_construct(const entity_type entt) {
+    void push_on_construct(const entity_type entt) final {
         if(std::apply([entt, len = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < len) && (other->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
             swap_elements(len++, entt);
         }
     }
 
-    void push_on_destroy(const entity_type entt) {
+    void push_on_destroy(const entity_type entt) final {
         if(std::apply([entt, len = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < len) && (other->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
             swap_elements(len++, entt);
         }
     }
 
-    void remove_if(const entity_type entt) {
+    void remove_if(const entity_type entt) final {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < len)) {
             swap_elements(--len, entt);
         }
