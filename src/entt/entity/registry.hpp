@@ -248,7 +248,7 @@ class basic_registry {
 
     // std::shared_ptr because of its type erased allocator which is useful here
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
-    using owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::owning_group_descriptor>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::owning_group_descriptor>>>>;
+    using owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::owning_group_descriptor<base_type>>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::owning_group_descriptor<base_type>>>>>;
     using non_owning_group_container_type = dense_map<id_type, std::shared_ptr<void>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<void>>>>;
 
     template<typename Type>
@@ -1233,8 +1233,8 @@ public:
                         }),
                         "Conflicting groups");
 
-            const internal::owning_group_descriptor *prev = nullptr;
-            const internal::owning_group_descriptor *next = nullptr;
+            const internal::owning_group_descriptor<base_type> *prev = nullptr;
+            const internal::owning_group_descriptor<base_type> *next = nullptr;
 
             for(auto &&data: owning_groups) {
                 if(const auto sz = data.second->size(); data.second->check(elem, sizeof...(Owned), 0u, 0u)) {

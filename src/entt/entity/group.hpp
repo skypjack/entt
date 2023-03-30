@@ -92,8 +92,11 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs == rhs);
 }
 
+template<typename Type>
 struct owning_group_descriptor {
+    using base_type = Type;
     using size_type = std::size_t;
+    using entity_type = typename Type::entity_type;
 
     virtual ~owning_group_descriptor() = default;
     virtual size_type check(const id_type *, const size_type, const size_type, const size_type) const noexcept = 0;
@@ -104,13 +107,13 @@ template<typename, typename, typename>
 class group_handler;
 
 template<typename... Owned, typename... Get, typename... Exclude>
-class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public owning_group_descriptor {
+class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public owning_group_descriptor<std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>> {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
     static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
-    using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
-    using entity_type = typename base_type::entity_type;
+    using underlying_type = owning_group_descriptor<std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>>;
+    using entity_type = typename underlying_type::entity_type;
 
     void swap_elements(const std::size_t pos, const entity_type entt) {
         std::apply([pos, entt](auto *...cpool) { (cpool->swap_elements(cpool->data()[pos], entt), ...); }, pools);
@@ -137,7 +140,7 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     }
 
     template<typename... Type>
-    auto check(const id_type *elem, const typename owning_group_descriptor::size_type len) const noexcept {
+    auto check(const id_type *elem, const typename underlying_type::size_type len) const noexcept {
         size_type cnt = 0u;
 
         for(auto pos = 0u; pos < len; ++pos) {
@@ -148,7 +151,8 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     }
 
 public:
-    using size_type = typename owning_group_descriptor::size_type;
+    using base_type = underlying_type;
+    using size_type = typename base_type::size_type;
 
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
         : pools{&opool..., &gpool...},
@@ -171,12 +175,12 @@ public:
         return sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
     }
 
-    void previous(const owning_group_descriptor &elem) {
+    void previous(const base_type &elem) {
         std::apply([this, &elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(&elem).template connect<&group_handler::remove_if>(*this)), ...); }, pools);
         std::apply([this, &elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(&elem).template connect<&group_handler::remove_if>(*this)), ...); }, filter);
     }
 
-    void next(const owning_group_descriptor &elem) {
+    void next(const base_type &elem) {
         std::apply([this, &elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(&elem).template connect<&group_handler::push_on_construct>(*this)), ...); }, pools);
         std::apply([this, &elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(&elem).template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
     }
