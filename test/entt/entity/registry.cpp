@@ -1250,107 +1250,14 @@ TEST(Registry, CleanPartialOwningGroupViewAfterRemoveAndClear) {
     ASSERT_EQ(group.size(), 0u);
 }
 
-TEST(Registry, NestedGroups) {
+ENTT_DEBUG_TEST(Registry, NestedGroups) {
     entt::registry registry;
-    entt::entity entities[10];
+    registry.group<int, double>(entt::get<char>);
 
-    registry.create(std::begin(entities), std::end(entities));
-    registry.insert<int>(std::begin(entities), std::end(entities));
-    registry.insert<char>(std::begin(entities), std::end(entities));
-    const auto g1 = registry.group<int>(entt::get<char>, entt::exclude<double>);
-
-    ASSERT_TRUE(registry.sortable(g1));
-    ASSERT_EQ(g1.size(), 10u);
-
-    const auto g2 = registry.group<int>(entt::get<char>);
-
-    ASSERT_TRUE(registry.sortable(g1));
-    ASSERT_FALSE(registry.sortable(g2));
-    ASSERT_EQ(g1.size(), 10u);
-    ASSERT_EQ(g2.size(), 10u);
-
-    for(auto i = 0u; i < 5u; ++i) {
-        ASSERT_TRUE(g1.contains(entities[i * 2 + 1]));
-        ASSERT_TRUE(g1.contains(entities[i * 2]));
-        ASSERT_TRUE(g2.contains(entities[i * 2 + 1]));
-        ASSERT_TRUE(g2.contains(entities[i * 2]));
-        registry.emplace<double>(entities[i * 2]);
-    }
-
-    ASSERT_EQ(g1.size(), 5u);
-    ASSERT_EQ(g2.size(), 10u);
-
-    for(auto i = 0u; i < 5u; ++i) {
-        ASSERT_TRUE(g1.contains(entities[i * 2 + 1]));
-        ASSERT_FALSE(g1.contains(entities[i * 2]));
-        ASSERT_TRUE(g2.contains(entities[i * 2 + 1]));
-        ASSERT_TRUE(g2.contains(entities[i * 2]));
-        registry.erase<int>(entities[i * 2 + 1]);
-    }
-
-    ASSERT_EQ(g1.size(), 0u);
-    ASSERT_EQ(g2.size(), 5u);
-
-    const auto g3 = registry.group<int, float>(entt::get<char>, entt::exclude<double>);
-
-    ASSERT_FALSE(registry.sortable(g1));
-    ASSERT_FALSE(registry.sortable(g2));
-    ASSERT_TRUE(registry.sortable(g3));
-
-    ASSERT_EQ(g1.size(), 0u);
-    ASSERT_EQ(g2.size(), 5u);
-    ASSERT_EQ(g3.size(), 0u);
-
-    for(auto i = 0u; i < 5u; ++i) {
-        ASSERT_FALSE(g1.contains(entities[i * 2 + 1]));
-        ASSERT_FALSE(g1.contains(entities[i * 2]));
-        ASSERT_FALSE(g2.contains(entities[i * 2 + 1]));
-        ASSERT_TRUE(g2.contains(entities[i * 2]));
-        ASSERT_FALSE(g3.contains(entities[i * 2 + 1]));
-        ASSERT_FALSE(g3.contains(entities[i * 2]));
-        registry.emplace<int>(entities[i * 2 + 1]);
-    }
-
-    ASSERT_EQ(g1.size(), 5u);
-    ASSERT_EQ(g2.size(), 10u);
-    ASSERT_EQ(g3.size(), 0u);
-
-    for(auto i = 0u; i < 5u; ++i) {
-        ASSERT_TRUE(g1.contains(entities[i * 2 + 1]));
-        ASSERT_FALSE(g1.contains(entities[i * 2]));
-        ASSERT_TRUE(g2.contains(entities[i * 2 + 1]));
-        ASSERT_TRUE(g2.contains(entities[i * 2]));
-        ASSERT_FALSE(g3.contains(entities[i * 2 + 1]));
-        ASSERT_FALSE(g3.contains(entities[i * 2]));
-        registry.emplace<float>(entities[i * 2]);
-    }
-
-    ASSERT_EQ(g1.size(), 5u);
-    ASSERT_EQ(g2.size(), 10u);
-    ASSERT_EQ(g3.size(), 0u);
-
-    for(auto i = 0u; i < 5u; ++i) {
-        registry.erase<double>(entities[i * 2]);
-    }
-
-    ASSERT_EQ(g1.size(), 10u);
-    ASSERT_EQ(g2.size(), 10u);
-    ASSERT_EQ(g3.size(), 5u);
-
-    for(auto i = 0u; i < 5u; ++i) {
-        ASSERT_TRUE(g1.contains(entities[i * 2 + 1]));
-        ASSERT_TRUE(g1.contains(entities[i * 2]));
-        ASSERT_TRUE(g2.contains(entities[i * 2 + 1]));
-        ASSERT_TRUE(g2.contains(entities[i * 2]));
-        ASSERT_FALSE(g3.contains(entities[i * 2 + 1]));
-        ASSERT_TRUE(g3.contains(entities[i * 2]));
-        registry.erase<int>(entities[i * 2 + 1]);
-        registry.erase<int>(entities[i * 2]);
-    }
-
-    ASSERT_EQ(g1.size(), 0u);
-    ASSERT_EQ(g2.size(), 0u);
-    ASSERT_EQ(g3.size(), 0u);
+    ASSERT_DEATH(registry.group<int>(entt::get<char>), "");
+    ASSERT_DEATH(registry.group<int>(entt::get<char, double>), "");
+    ASSERT_DEATH(registry.group<int>(entt::get<char>, entt::exclude<double>), "");
+    ASSERT_DEATH((registry.group<int, double>()), "");
 }
 
 ENTT_DEBUG_TEST(Registry, ConflictingGroups) {

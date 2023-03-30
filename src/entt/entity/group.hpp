@@ -104,7 +104,7 @@ struct owning_group_descriptor {
     virtual void push_on_destroy(const entity_type) = 0;
     virtual void remove_if(const entity_type) = 0;
 
-    virtual size_type check(const id_type *, const size_type, const size_type, const size_type) const noexcept = 0;
+    virtual size_type owned(const id_type *, const size_type) const noexcept = 0;
     virtual size_type size() const noexcept = 0;
 };
 
@@ -144,17 +144,6 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
         }
     }
 
-    template<typename... Type>
-    auto check(const id_type *elem, const typename underlying_type::size_type len) const noexcept {
-        size_type cnt = 0u;
-
-        for(auto pos = 0u; pos < len; ++pos) {
-            cnt += ((elem[pos] == entt::type_hash<typename Type::value_type>::value()) || ...);
-        }
-
-        return cnt;
-    }
-
 public:
     using base_type = underlying_type;
     using size_type = typename base_type::size_type;
@@ -172,22 +161,18 @@ public:
         }
     }
 
-    size_type check(const id_type *elem, const size_type olen, const size_type glen, const size_type elen) const noexcept final {
-        return check<Owned...>(elem, olen) + check<Get...>(elem + olen, glen) + check<Exclude...>(elem + olen + glen, elen);
+    size_type owned(const id_type *elem, size_type len) const noexcept final {
+        size_type cnt = 0u;
+
+        for(auto pos = 0u; pos < len; ++pos) {
+            cnt += ((elem[pos] == entt::type_hash<typename Owned::value_type>::value()) || ...);
+        }
+
+        return cnt;
     }
 
     size_type size() const noexcept final {
         return sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-    }
-
-    void previous(const base_type &elem) {
-        std::apply([this, &elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(&elem).template connect<&group_handler::remove_if>(*this)), ...); }, pools);
-        std::apply([this, &elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(&elem).template connect<&group_handler::remove_if>(*this)), ...); }, filter);
-    }
-
-    void next(const base_type &elem) {
-        std::apply([this, &elem](auto *...cpool) { ((cpool->on_construct().disconnect(this), cpool->on_construct().before(&elem).template connect<&group_handler::push_on_construct>(*this)), ...); }, pools);
-        std::apply([this, &elem](auto *...cpool) { ((cpool->on_destroy().disconnect(this), cpool->on_destroy().before(&elem).template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
     }
 
     [[nodiscard]] std::size_t length() const noexcept {

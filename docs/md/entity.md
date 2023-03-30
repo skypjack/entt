@@ -50,7 +50,6 @@
     * [Full-owning groups](#full-owning-groups)
     * [Partial-owning groups](#partial-owning-groups)
     * [Non-owning groups](#non-owning-groups)
-    * [Nested groups](#nested-groups)
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
   * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
@@ -1420,9 +1419,7 @@ groups_ and _non-owning groups_. The main difference between them is in terms of
 performance.<br/>
 Groups can literally _own_ one or more component types. They are allowed to
 rearrange pools so as to speed up iterations. Roughly speaking: the more
-components a group owns, the faster it is to iterate them.<br/>
-A given component can belong to multiple groups only if they are _nested_. Users
-have to define groups carefully to get the best out of them.
+components a group owns, the faster it is to iterate them.
 
 ## Views
 
@@ -1795,83 +1792,6 @@ the only one that can be used in any situation to slightly improve performance.
 
 Non-owning groups are sorted using their `sort` member functions. Sorting a
 non-owning group affects all its instances.
-
-### Nested groups
-
-A type of component cannot be owned by two or more conflicting groups such as:
-
-* `registry.group<transform, sprite>()`.
-* `registry.group<transform, rotation>()`.
-
-However, the same type can be owned by groups belonging to the same _family_,
-also called _nested groups_, such as:
-
-* `registry.group<sprite, transform>()`.
-* `registry.group<sprite, transform, rotation>()`.
-
-Fortunately, these are also very common cases if not the most common ones.<br/>
-It allows to increase performance on a greater number of component combinations.
-
-Two nested groups are such that they own at least one component type and the list
-of component types involved by one of them is contained entirely in that of the
-other. More specifically, this applies independently to all component lists used
-to define a group.<br/>
-Therefore, the rules for defining whether two or more groups are nested is:
-
-* One of the groups involves one or more additional component types with respect
-  to the other, whether they are owned, observed or excluded.
-
-* The list of component types owned by the most restrictive group is the same or
-  contains entirely that of the others. This also applies to the list of
-  observed and excluded components.
-
-This means that nested groups _extend_ their parents by adding more conditions
-in the form of new components.
-
-As mentioned, the components don't necessarily have to be all _owned_ so that
-two groups can be considered nested. The following definitions are fully valid:
-
-* `registry.group<sprite>(entt::get<renderable>)`.
-* `registry.group<sprite, transform>(entt::get<renderable>)`.
-* `registry.group<sprite, transform>(entt::get<renderable, rotation>)`.
-
-Exclusion lists also play their part in this respect. When it comes to defining
-nested groups, an excluded component type `T` is treated as being an observed
-type `not_T`. Therefore, consider these two definitions:
-
-* `registry.group<sprite, transform>()`.
-* `registry.group<sprite, transform>({}, entt::exclude<rotation>)`.
-
-They are treated as if users were defining the following groups:
-
-* `group<sprite, transform>()`.
-* `group<sprite, transform>(entt::get<not_rotation>)`.
-
-Where `not_rotation` is an empty tag present only when `rotation` is not.
-
-Because of this, to define a new group that is more restrictive than an existing
-one, it's enough to extend the component list of another group by adding new
-types that are either owned, observed or excluded.<br/>
-The opposite is also true. To define a _larger_ group, it's enough to remove
-_constraints_ from its parent.<br/>
-Note that the greater the number of component types involved by a group, the
-more restrictive it is.
-
-Despite the extreme flexibility of nested groups which allow to independently
-use component types either owned, observed or excluded, the real strength of
-this tool lies in the possibility of defining a greater number of groups that
-**own** the same components, thus offering the best performance in more
-cases.<br/>
-In fact, given a list of component types involved by a group, the greater the
-number of those owned, the greater the performance of the group itself.
-
-As a side note, it's no longer possible to sort all groups when defining nested
-ones. This is because the most restrictive group shares its elements with the
-less restrictive ones and ordering the latter would invalidate the former.<br/>
-However, given a family of nested groups, it's still possible to sort the most
-restrictive of them. To prevent users from having to remember which of their
-groups is the most restrictive, the registry class offers the `sortable` member
-function to know if a group supports sorting it or not.
 
 ## Types: const, non-const and all in between
 

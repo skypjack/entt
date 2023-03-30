@@ -1222,40 +1222,10 @@ public:
                 return {*std::static_pointer_cast<handler_type>(it->second)};
             }
 
-            const id_type elem[]{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
             auto handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
+            [[maybe_unused]] const id_type elem[]{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
+            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [&elem, hsize = handler->size()](const auto &data) { return data.second->owned(elem, sizeof...(Owned)) == 0u; }), "Conflicting groups");
             owning_groups.emplace(type_hash<handler_type>::value(), handler);
-
-            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [&elem, hsize = handler->size()](const auto &data) {
-                            const auto overlapping = data.second->check(elem, sizeof...(Owned), 0u, 0u);
-                            const auto sz = data.second->check(elem, sizeof...(Owned), sizeof...(Get), sizeof...(Exclude));
-                            return !overlapping || ((sz == hsize) || (sz == data.second->size()));
-                        }),
-                        "Conflicting groups");
-
-            const internal::owning_group_descriptor<base_type> *prev = nullptr;
-            const internal::owning_group_descriptor<base_type> *next = nullptr;
-
-            for(auto &&data: owning_groups) {
-                if(const auto sz = data.second->size(); data.second->check(elem, sizeof...(Owned), 0u, 0u)) {
-                    if(sz < handler->size() && (prev == nullptr || prev->size() < sz)) {
-                        prev = data.second.get();
-                    }
-
-                    if(sz > handler->size() && (next == nullptr || next->size() > sz)) {
-                        next = data.second.get();
-                    }
-                }
-            }
-
-            if(prev) {
-                handler->previous(*prev);
-            }
-
-            if(next) {
-                handler->next(*next);
-            }
-
             return {*handler};
         }
     }
@@ -1289,22 +1259,7 @@ public:
     template<typename Type, typename... Other>
     [[nodiscard]] bool owned() const {
         const id_type elem[]{type_hash<std::remove_const_t<Type>>::value(), type_hash<std::remove_const_t<Other>>::value()...};
-        return std::any_of(owning_groups.cbegin(), owning_groups.cend(), [&elem](auto &&data) { return data.second->check(elem, 1u + sizeof...(Other), 0u, 0u); });
-    }
-
-    /**
-     * @brief Checks whether a group can be sorted.
-     * @tparam Owned Type of storage _owned_ by the group.
-     * @tparam Get Type of storage _observed_ by the group.
-     * @tparam Exclude Type of storage used to filter the group.
-     * @return True if the group can be sorted, false otherwise.
-     */
-    template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] bool sortable(const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> &) noexcept {
-        constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        const id_type elem[]{type_hash<typename Owned::value_type>::value()...};
-        auto pred = [&elem, size](const auto &data) { return data.second->check(elem, sizeof...(Owned), 0u, 0u) && (size < data.second->size()); };
-        return std::find_if(owning_groups.cbegin(), owning_groups.cend(), std::move(pred)) == owning_groups.cend();
+        return std::any_of(owning_groups.cbegin(), owning_groups.cend(), [&elem](auto &&data) { return data.second->owned(elem, 1u + sizeof...(Other)); });
     }
 
     /**

@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <entt/entity/group.hpp>
 #include <entt/entity/registry.hpp>
+#include "../common/config.h"
 
 struct empty_type {};
 
@@ -1601,29 +1602,11 @@ TEST(OwningGroup, Storage) {
     ASSERT_FALSE((registry.any_of<int, double, float>(entity)));
 }
 
-TEST(OwningGroup, Overlapping) {
+ENTT_DEBUG_TEST(OwningGroup, Overlapping) {
     entt::registry registry;
+    registry.group<char>(entt::get<int>, entt::exclude<double>);
 
-    auto group = registry.group<char>(entt::get<int>, entt::exclude<double>);
-    auto other = registry.group<char>(entt::get<int, float>, entt::exclude<double>);
-
-    ASSERT_TRUE(group.empty());
-    ASSERT_TRUE(other.empty());
-
-    const auto entity = registry.create();
-    registry.emplace<char>(entity, '1');
-    registry.emplace<int>(entity, 42);
-
-    ASSERT_FALSE(group.empty());
-    ASSERT_TRUE(other.empty());
-
-    registry.emplace<float>(entity, 7.f);
-
-    ASSERT_FALSE(group.empty());
-    ASSERT_FALSE(other.empty());
-
-    registry.emplace<double>(entity, 3.);
-
-    ASSERT_TRUE(group.empty());
-    ASSERT_TRUE(other.empty());
+    ASSERT_DEATH((registry.group<char, float>(entt::get<float>, entt::exclude<double>)), "");
+    ASSERT_DEATH(registry.group<char>(entt::get<int, float>, entt::exclude<double>), "");
+    ASSERT_DEATH(registry.group<char>(entt::get<int>, entt::exclude<double, float>), "");
 }
