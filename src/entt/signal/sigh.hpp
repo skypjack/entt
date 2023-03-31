@@ -372,23 +372,13 @@ class sink<sigh<Ret(Args...), Allocator>> {
         sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>();
     }
 
-    auto before(delegate_type call) {
-        const auto &calls = signal->calls;
-        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
-
-        sink other{*this};
-        other.offset = calls.cend() - it;
-        return other;
-    }
-
 public:
     /**
      * @brief Constructs a sink that is allowed to modify a given signal.
      * @param ref A valid reference to a signal object.
      */
     sink(sigh<Ret(Args...), Allocator> &ref) noexcept
-        : offset{},
-          signal{&ref} {}
+        : signal{&ref} {}
 
     /**
      * @brief Returns false if at least a listener is connected to the sink.
@@ -396,77 +386,6 @@ public:
      */
     [[nodiscard]] bool empty() const noexcept {
         return signal->calls.empty();
-    }
-
-    /**
-     * @brief Returns a sink that connects before a given free function or an
-     * unbound member.
-     * @tparam Function A valid free function pointer.
-     * @return A properly initialized sink object.
-     */
-    template<auto Function>
-    [[nodiscard]] sink before() {
-        delegate_type call{};
-        call.template connect<Function>();
-        return before(std::move(call));
-    }
-
-    /**
-     * @brief Returns a sink that connects before a free function with payload
-     * or a bound member.
-     * @tparam Candidate Member or free function to look for.
-     * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid object that fits the purpose.
-     * @return A properly initialized sink object.
-     */
-    template<auto Candidate, typename Type>
-    [[nodiscard]] sink before(Type &&value_or_instance) {
-        delegate_type call{};
-        call.template connect<Candidate>(value_or_instance);
-        return before(std::move(call));
-    }
-
-    /**
-     * @brief Returns a sink that connects before a given instance or specific
-     * payload.
-     * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid object that fits the purpose.
-     * @return A properly initialized sink object.
-     */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<std::remove_pointer_t<Type>>, void>, sink>>
-    [[nodiscard]] sink before(Type &value_or_instance) {
-        return before(&value_or_instance);
-    }
-
-    /**
-     * @brief Returns a sink that connects before a given instance or specific
-     * payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
-     * @return A properly initialized sink object.
-     */
-    [[nodiscard]] sink before(const void *value_or_instance) {
-        sink other{*this};
-
-        if(value_or_instance) {
-            const auto &calls = signal->calls;
-            const auto it = std::find_if(calls.cbegin(), calls.cend(), [value_or_instance](const auto &delegate) {
-                return delegate.data() == value_or_instance;
-            });
-
-            other.offset = calls.cend() - it;
-        }
-
-        return other;
-    }
-
-    /**
-     * @brief Returns a sink that connects before anything else.
-     * @return A properly initialized sink object.
-     */
-    [[nodiscard]] sink before() {
-        sink other{*this};
-        other.offset = signal->calls.size();
-        return other;
     }
 
     /**
@@ -483,7 +402,7 @@ public:
 
         delegate_type call{};
         call.template connect<Candidate>(value_or_instance...);
-        signal->calls.insert(signal->calls.end() - offset, std::move(call));
+        signal->calls.push_back(std::move(call));
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate, Type...>>(value_or_instance...);
@@ -524,7 +443,6 @@ public:
     }
 
 private:
-    difference_type offset;
     signal_type *signal;
 };
 
