@@ -153,10 +153,10 @@ public:
         }
     }
 
-    size_type owned(const id_type *elem, size_type len) const noexcept final {
+    size_type owned(const id_type *elem, size_type length) const noexcept final {
         size_type cnt = 0u;
 
-        for(auto pos = 0u; pos < len; ++pos) {
+        for(auto pos = 0u; pos < length; ++pos) {
             cnt += ((elem[pos] == entt::type_hash<typename Owned::value_type>::value()) || ...);
         }
 
