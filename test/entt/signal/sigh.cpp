@@ -45,6 +45,12 @@ struct const_nonconst_noexcept {
     mutable int cnt{0};
 };
 
+void connect_and_auto_disconnect(entt::sigh<void(int &)> &sigh, const int &) {
+    entt::sink sink{sigh};
+    sink.connect<sigh_listener::f>();
+    sink.disconnect<&connect_and_auto_disconnect>(sigh);
+}
+
 TEST(SigH, Lifetime) {
     using signal = entt::sigh<void(void)>;
 
@@ -425,6 +431,32 @@ TEST(SigH, UnboundMemberFunction) {
     sigh.publish(&listener, 42);
 
     ASSERT_TRUE(listener.k);
+}
+
+TEST(SigH, ConnectAndAutoDisconnect) {
+    sigh_listener listener;
+    entt::sigh<void(int &)> sigh;
+    entt::sink sink{sigh};
+    int v = 0;
+
+    sink.connect<&sigh_listener::g>(listener);
+    sink.connect<&connect_and_auto_disconnect>(sigh);
+
+    ASSERT_FALSE(listener.k);
+    ASSERT_EQ(sigh.size(), 2u);
+    ASSERT_EQ(v, 0);
+
+    sigh.publish(v);
+
+    ASSERT_TRUE(listener.k);
+    ASSERT_EQ(sigh.size(), 2u);
+    ASSERT_EQ(v, 0);
+
+    sigh.publish(v);
+
+    ASSERT_FALSE(listener.k);
+    ASSERT_EQ(sigh.size(), 2u);
+    ASSERT_EQ(v, 42);
 }
 
 TEST(SigH, CustomAllocator) {

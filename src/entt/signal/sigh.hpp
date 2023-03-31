@@ -1,8 +1,8 @@
 #ifndef ENTT_SIGNAL_SIGH_HPP
 #define ENTT_SIGNAL_SIGH_HPP
 
-#include <algorithm>
-#include <functional>
+#include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -169,8 +169,8 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) const {
-        for(auto &&call: std::as_const(calls)) {
-            call(args...);
+        for(auto pos = calls.size(); pos; --pos) {
+            calls[pos - 1u](args...);
         }
     }
 
@@ -190,9 +190,9 @@ public:
      */
     template<typename Func>
     void collect(Func func, Args... args) const {
-        for(auto &&call: calls) {
+        for(auto pos = calls.size(); pos; --pos) {
             if constexpr(std::is_void_v<Ret> || !std::is_invocable_v<Func, Ret>) {
-                call(args...);
+                calls[pos - 1u](args...);
 
                 if constexpr(std::is_invocable_r_v<bool, Func>) {
                     if(func()) {
@@ -203,11 +203,11 @@ public:
                 }
             } else {
                 if constexpr(std::is_invocable_r_v<bool, Func, Ret>) {
-                    if(func(call(args...))) {
+                    if(func(calls[pos - 1u](args...))) {
                         break;
                     }
                 } else {
-                    func(call(args...));
+                    func(calls[pos - 1u](args...));
                 }
             }
         }
@@ -372,6 +372,16 @@ class sink<sigh<Ret(Args...), Allocator>> {
         sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>();
     }
 
+    template<typename Func>
+    void disconnect_if(Func callback) {
+        for(auto pos = signal->calls.size(); pos; --pos) {
+            if(auto &elem = signal->calls[pos - 1u]; callback(elem)) {
+                elem = std::move(signal->calls.back());
+                signal->calls.pop_back();
+            }
+        }
+    }
+
 public:
     /**
      * @brief Constructs a sink that is allowed to modify a given signal.
@@ -418,10 +428,9 @@ public:
      */
     template<auto Candidate, typename... Type>
     void disconnect(Type &&...value_or_instance) {
-        auto &calls = signal->calls;
         delegate_type call{};
         call.template connect<Candidate>(value_or_instance...);
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(call)), calls.end());
+        disconnect_if([&call](const auto &elem) { return elem == call; });
     }
 
     /**
@@ -431,9 +440,7 @@ public:
      */
     void disconnect(const void *value_or_instance) {
         if(value_or_instance) {
-            auto &calls = signal->calls;
-            auto predicate = [value_or_instance](const auto &delegate) { return delegate.data() == value_or_instance; };
-            calls.erase(std::remove_if(calls.begin(), calls.end(), std::move(predicate)), calls.end());
+            disconnect_if([value_or_instance](const auto &elem) { return elem.data() == value_or_instance; });
         }
     }
 
