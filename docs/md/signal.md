@@ -315,7 +315,7 @@ sink.disconnect<&foo>();
 sink.disconnect<&listener::bar>(instance);
 
 // disconnect all member functions of an instance, if any
-sink.disconnect(instance);
+sink.disconnect(&instance);
 
 // discards all listeners at once
 sink.disconnect();
@@ -425,7 +425,7 @@ of them at once:
 
 ```cpp
 dispatcher.sink<an_event>().disconnect<&listener::receive>(listener);
-dispatcher.sink<another_event>().disconnect(listener);
+dispatcher.sink<another_event>().disconnect(&listener);
 ```
 
 The `trigger` member function serves the purpose of sending an immediate event
