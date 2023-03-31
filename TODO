@@ -20,6 +20,7 @@ TODO (high prio):
 * registry: replace destroy with a drop-all method that doesn't care about validity
 * registry: review assign mechanism, maybe it's worth to drop it
 * add patch + on_update signal to entity storage
+* use alloc traits destroy rather than destroy_at directly
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
