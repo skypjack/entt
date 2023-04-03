@@ -24,15 +24,6 @@ struct derived_service: base_service {
     static inline bool invoked{};
 };
 
-struct ServiceLocator: ::testing::Test {
-    void SetUp() override {
-        null_service::invoked = false;
-        derived_service::invoked = false;
-    }
-};
-
-using ServiceLocatorDeathTest = ServiceLocator;
-
 TEST(ServiceLocator, Functionalities) {
     ASSERT_FALSE(entt::locator<base_service>::has_value());
     ASSERT_FALSE(derived_service::invoked);
