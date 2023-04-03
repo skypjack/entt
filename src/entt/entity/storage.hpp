@@ -251,12 +251,12 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
         if(!(idx < payload.size())) {
             auto curr = payload.size();
-            allocator_type page_allocator{get_allocator()};
+            allocator_type allocator{get_allocator()};
             payload.resize(idx + 1u, nullptr);
 
             ENTT_TRY {
                 for(const auto last = payload.size(); curr < last; ++curr) {
-                    payload[curr] = alloc_traits::allocate(page_allocator, traits_type::page_size);
+                    payload[curr] = alloc_traits::allocate(allocator, traits_type::page_size);
                 }
             }
             ENTT_CATCH {
@@ -285,21 +285,21 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
     void shrink_to_size(const std::size_t sz) {
+        const auto from = (sz + traits_type::page_size - 1u) / traits_type::page_size;
+        allocator_type allocator{get_allocator()};
+
         for(auto pos = sz, length = base_type::size(); pos < length; ++pos) {
             if constexpr(traits_type::in_place_delete) {
                 if(base_type::at(pos) != tombstone) {
-                    std::destroy_at(std::addressof(element_at(pos)));
+                    alloc_traits::destroy(allocator, std::addressof(element_at(pos)));
                 }
             } else {
-                std::destroy_at(std::addressof(element_at(pos)));
+                alloc_traits::destroy(allocator, std::addressof(element_at(pos)));
             }
         }
 
-        allocator_type page_allocator{get_allocator()};
-        const auto from = (sz + traits_type::page_size - 1u) / traits_type::page_size;
-
         for(auto pos = from, last = payload.size(); pos < last; ++pos) {
-            alloc_traits::deallocate(page_allocator, payload[pos], traits_type::page_size);
+            alloc_traits::deallocate(allocator, payload[pos], traits_type::page_size);
         }
 
         payload.resize(from);
@@ -319,8 +319,9 @@ private:
 
             if constexpr(traits_type::in_place_delete) {
                 if(base_type::operator[](to) == tombstone) {
-                    entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), get_allocator(), std::move(elem));
-                    std::destroy_at(std::addressof(elem));
+                    allocator_type allocator{get_allocator()};
+                    entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), allocator, std::move(elem));
+                    alloc_traits::destroy(allocator, std::addressof(elem));
                     return;
                 }
             }
@@ -337,18 +338,18 @@ protected:
      * @param last An iterator past the last element of the range of entities.
      */
     void pop(underlying_iterator first, underlying_iterator last) override {
-        for(; first != last; ++first) {
+        for(allocator_type allocator{get_allocator()}; first != last; ++first) {
             // cannot use first.index() because it would break with cross iterators
             auto &elem = element_at(base_type::index(*first));
 
             if constexpr(traits_type::in_place_delete) {
                 base_type::in_place_pop(first);
-                std::destroy_at(std::addressof(elem));
+                alloc_traits::destroy(allocator, std::addressof(elem));
             } else {
                 auto &other = element_at(base_type::size() - 1u);
                 // destroying on exit allows reentrant destructors
                 [[maybe_unused]] auto unused = std::exchange(elem, std::move(other));
-                std::destroy_at(std::addressof(other));
+                alloc_traits::destroy(allocator, std::addressof(other));
                 base_type::swap_and_pop(first);
             }
         }
@@ -356,15 +357,17 @@ protected:
 
     /*! @brief Erases all entities of a storage. */
     void pop_all() override {
+        allocator_type allocator{get_allocator()};
+
         for(auto first = base_type::begin(); !(first.index() < 0); ++first) {
             if constexpr(traits_type::in_place_delete) {
                 if(*first != tombstone) {
                     base_type::in_place_pop(first);
-                    std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
+                    alloc_traits::destroy(allocator, std::addressof(element_at(static_cast<size_type>(first.index()))));
                 }
             } else {
                 base_type::swap_and_pop(first);
-                std::destroy_at(std::addressof(element_at(static_cast<size_type>(first.index()))));
+                alloc_traits::destroy(allocator, std::addressof(element_at(static_cast<size_type>(first.index()))));
             }
         }
     }
