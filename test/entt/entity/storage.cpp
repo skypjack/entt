@@ -312,6 +312,52 @@ ENTT_DEBUG_TEST_F(StorageDeathTest, EmptyType) {
     ASSERT_DEATH([[maybe_unused]] auto tup = pool.get_as_tuple(entt::entity{3}), "");
 }
 
+TEST_F(Storage, Patch) {
+    entt::storage<int> pool;
+    entt::entity entity{42};
+    auto callback = [](int &value) { ++value; };
+
+    pool.emplace(entity, 0);
+
+    ASSERT_EQ(pool.get(entity), 0);
+
+    pool.patch(entity);
+    pool.patch(entity, callback);
+    pool.patch(entity, callback, callback);
+
+    ASSERT_EQ(pool.get(entity), 3);
+}
+
+ENTT_DEBUG_TEST_F(StorageDeathTest, Patch) {
+    entt::storage<int> pool;
+
+    ASSERT_DEATH(pool.patch(entt::null), "");
+}
+
+TEST_F(Storage, PatchEmptyType) {
+    entt::storage<empty_stable_type> pool;
+    entt::entity entity{42};
+
+    int counter = 0;
+    auto callback = [&counter]() { ++counter; };
+
+    pool.emplace(entity);
+
+    ASSERT_EQ(counter, 0);
+
+    pool.patch(entity);
+    pool.patch(entity, callback);
+    pool.patch(entity, callback, callback);
+
+    ASSERT_EQ(counter, 3);
+}
+
+ENTT_DEBUG_TEST_F(StorageDeathTest, PatchEmptyType) {
+    entt::storage<empty_stable_type> pool;
+
+    ASSERT_DEATH(pool.patch(entt::null), "");
+}
+
 TEST_F(Storage, Insert) {
     entt::storage<stable_type> pool;
     entt::entity entities[2u]{entt::entity{3}, entt::entity{42}};
