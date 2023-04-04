@@ -378,7 +378,10 @@ TEST_F(MetaType, Invoke) {
     clazz_t instance{};
 
     ASSERT_TRUE(type.invoke("member"_hs, instance));
-    ASSERT_FALSE(type.invoke("rebmem"_hs, {}));
+    ASSERT_FALSE(type.invoke("rebmem"_hs, instance));
+
+    ASSERT_TRUE(type.invoke("func"_hs, {}));
+    ASSERT_FALSE(type.invoke("cnuf"_hs, {}));
 }
 
 TEST_F(MetaType, InvokeFromBase) {
