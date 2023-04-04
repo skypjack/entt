@@ -222,6 +222,28 @@ TEST(StorageEntity, Emplace) {
     ASSERT_EQ(entities[1u], entt::entity{8});
 }
 
+TEST(StorageEntity, Patch) {
+    entt::storage<entt::entity> pool;
+    const auto entity = pool.emplace();
+
+    int counter = 0;
+    auto callback = [&counter]() { ++counter; };
+
+    ASSERT_EQ(counter, 0);
+
+    pool.patch(entity);
+    pool.patch(entity, callback);
+    pool.patch(entity, callback, callback);
+
+    ASSERT_EQ(counter, 3);
+}
+
+ENTT_DEBUG_TEST(StorageEntityDeathTest, Patch) {
+    entt::storage<entt::entity> pool;
+
+    ASSERT_DEATH(pool.patch(entt::null), "");
+}
+
 TEST(StorageEntity, Insert) {
     entt::storage<entt::entity> pool;
     entt::entity entities[2u]{};
