@@ -170,6 +170,12 @@ TEST_F(MetaFunc, Functionalities) {
     func_t instance{};
 
     ASSERT_TRUE(func);
+
+    ASSERT_EQ(func, func);
+    ASSERT_NE(func, entt::meta_func{});
+    ASSERT_FALSE(func != func);
+    ASSERT_TRUE(func == func);
+
     ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());

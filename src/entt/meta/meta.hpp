@@ -1053,10 +1053,25 @@ struct meta_func {
         return (node != nullptr);
     }
 
+    /*! @copydoc meta_prop::operator== */
+    [[nodiscard]] bool operator==(const meta_func &other) const noexcept {
+        return (ctx == other.ctx && node == other.node);
+    }
+
 private:
     const internal::meta_func_node *node;
     const meta_ctx *ctx;
 };
+
+/**
+ * @brief Checks if two objects refer to the same type.
+ * @param lhs An object, either valid or not.
+ * @param rhs An object, either valid or not.
+ * @return False if the objects refer to the same node, true otherwise.
+ */
+[[nodiscard]] inline bool operator!=(const meta_func &lhs, const meta_func &rhs) noexcept {
+    return !(lhs == rhs);
+}
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
