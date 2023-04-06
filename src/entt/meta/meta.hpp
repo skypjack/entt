@@ -789,10 +789,29 @@ struct meta_prop {
         return (node != nullptr);
     }
 
+    /**
+     * @brief Checks if two objects refer to the same type.
+     * @param other The object with which to compare.
+     * @return True if the objects refer to the same type, false otherwise.
+     */
+    [[nodiscard]] bool operator==(const meta_prop &other) const noexcept {
+        return (ctx == other.ctx && node == other.node);
+    }
+
 private:
     const internal::meta_prop_node *node;
     const meta_ctx *ctx;
 };
+
+/**
+ * @brief Checks if two objects refer to the same type.
+ * @param lhs An object, either valid or not.
+ * @param rhs An object, either valid or not.
+ * @return False if the objects refer to the same node, true otherwise.
+ */
+[[nodiscard]] inline bool operator!=(const meta_prop &lhs, const meta_prop &rhs) noexcept {
+    return !(lhs == rhs);
+}
 
 /*! @brief Opaque wrapper for data members. */
 struct meta_data {

@@ -50,6 +50,11 @@ TEST_F(MetaProp, Functionalities) {
 
     ASSERT_TRUE(prop);
 
+    ASSERT_EQ(prop, prop);
+    ASSERT_NE(prop, entt::meta_prop{});
+    ASSERT_FALSE(prop != prop);
+    ASSERT_TRUE(prop == prop);
+
     auto value = prop.value();
     auto cvalue = std::as_const(prop).value();
 
