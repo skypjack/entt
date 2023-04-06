@@ -44,11 +44,21 @@ TEST_F(MetaHandle, Functionalities) {
     ASSERT_FALSE(handle);
     ASSERT_FALSE(chandle);
 
+    ASSERT_EQ(handle, chandle);
+    ASSERT_EQ(handle, entt::meta_handle{});
+    ASSERT_FALSE(handle != handle);
+    ASSERT_TRUE(handle == handle);
+
     handle = entt::meta_handle{instance};
     chandle = entt::meta_handle{std::as_const(instance)};
 
     ASSERT_TRUE(handle);
     ASSERT_TRUE(chandle);
+
+    ASSERT_EQ(handle, chandle);
+    ASSERT_NE(handle, entt::meta_handle{});
+    ASSERT_FALSE(handle != handle);
+    ASSERT_TRUE(handle == handle);
 
     ASSERT_TRUE(handle->invoke("incr"_hs));
     ASSERT_FALSE(chandle->invoke("incr"_hs));
