@@ -188,7 +188,7 @@ private:
 };
 
 template<typename... Get, typename... Exclude>
-class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final: public std::common_type_t<typename Get::base_type..., typename Exclude::base_type...> {
+class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
     static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
@@ -196,37 +196,47 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final: publ
     using entity_type = typename base_type::entity_type;
 
     void push_on_construct(const entity_type entt) {
-        if(!this->contains(entt)
+        if(!elem.contains(entt)
            && std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
-            this->push(entt);
+            elem.push(entt);
         }
     }
 
     void push_on_destroy(const entity_type entt) {
-        if(!this->contains(entt)
+        if(!elem.contains(entt)
            && std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
-            this->push(entt);
+            elem.push(entt);
         }
     }
 
     void remove_if(const entity_type entt) {
-        this->remove(entt);
+        elem.remove(entt);
     }
 
 public:
+    using common_type = base_type;
+
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
-        : base_type{alloc},
-          pools{&gpool...},
-          filter{&epool...} {
+        : pools{&gpool...},
+          filter{&epool...},
+          elem{alloc} {
         std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
         std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::remove_if>(*this), cpool->on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
 
         for(const auto entity: static_cast<base_type &>(*std::get<0>(pools))) {
             push_on_construct(entity);
         }
+    }
+
+    common_type &handle() noexcept {
+        return elem;
+    }
+
+    const common_type &handle() const noexcept {
+        return elem;
     }
 
     template<typename Type>
@@ -242,6 +252,7 @@ public:
 private:
     std::tuple<Get *...> pools;
     std::tuple<Exclude *...> filter;
+    base_type elem;
 };
 
 } // namespace internal
@@ -330,7 +341,7 @@ public:
      * @return The leading storage of the group.
      */
     [[nodiscard]] const common_type &handle() const noexcept {
-        return *descriptor;
+        return descriptor->handle();
     }
 
     /**
@@ -379,7 +390,7 @@ public:
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() {
         if(*this) {
-            descriptor->shrink_to_fit();
+            descriptor->handle().shrink_to_fit();
         }
     }
 
@@ -649,7 +660,7 @@ public:
         if(*this) {
             if constexpr(sizeof...(Index) == 0) {
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-                descriptor->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+                descriptor->handle().sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
                 auto comp = [&compare, cpools = pools()](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Index) == 1) {
@@ -659,7 +670,7 @@ public:
                     }
                 };
 
-                descriptor->sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
+                descriptor->handle().sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
             }
         }
     }
@@ -674,7 +685,7 @@ public:
      */
     void sort_as(const common_type &other) const {
         if(*this) {
-            descriptor->sort_as(other);
+            descriptor->handle().sort_as(other);
         }
     }
 
