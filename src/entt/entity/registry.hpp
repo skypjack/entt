@@ -248,8 +248,7 @@ class basic_registry {
 
     // std::shared_ptr because of its type erased allocator which is useful here
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
-    using owning_group_container_type = dense_map<id_type, std::shared_ptr<internal::owning_group_descriptor>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::owning_group_descriptor>>>>;
-    using non_owning_group_container_type = dense_map<id_type, std::shared_ptr<void>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<void>>>>;
+    using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
 
     template<typename Type>
     [[nodiscard]] auto &assure(const id_type id = type_hash<Type>::value()) {
@@ -327,8 +326,7 @@ public:
     basic_registry(const size_type count, const allocator_type &allocator = allocator_type{})
         : vars{allocator},
           pools{allocator},
-          owning_groups{allocator},
-          non_owning_groups{allocator},
+          groups{allocator},
           shortcut{&assure<entity_type>()} {
         pools.reserve(count);
         rebind();
@@ -341,8 +339,7 @@ public:
     basic_registry(basic_registry &&other) noexcept
         : vars{std::move(other.vars)},
           pools{std::move(other.pools)},
-          owning_groups{std::move(other.owning_groups)},
-          non_owning_groups{std::move(other.non_owning_groups)},
+          groups{std::move(other.groups)},
           shortcut{std::move(other.shortcut)} {
         rebind();
     }
@@ -355,8 +352,7 @@ public:
     basic_registry &operator=(basic_registry &&other) noexcept {
         vars = std::move(other.vars);
         pools = std::move(other.pools);
-        owning_groups = std::move(other.owning_groups);
-        non_owning_groups = std::move(other.non_owning_groups);
+        groups = std::move(other.groups);
         shortcut = std::move(other.shortcut);
 
         rebind();
@@ -373,8 +369,7 @@ public:
 
         swap(vars, other.vars);
         swap(pools, other.pools);
-        swap(owning_groups, other.owning_groups);
-        swap(non_owning_groups, other.non_owning_groups);
+        swap(groups, other.groups);
         swap(shortcut, other.shortcut);
 
         rebind();
@@ -1209,25 +1204,22 @@ public:
     group(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) {
         using handler_type = typename basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
 
-        if constexpr(sizeof...(Owned) == 0u) {
-            if(auto it = non_owning_groups.find(type_hash<handler_type>::value()); it != non_owning_groups.cend()) {
-                return {*std::static_pointer_cast<handler_type>(it->second)};
-            }
-
-            auto handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
-            non_owning_groups.emplace(type_hash<handler_type>::value(), handler);
-            return {*handler};
-        } else {
-            if(auto it = owning_groups.find(type_hash<handler_type>::value()); it != owning_groups.cend()) {
-                return {*std::static_pointer_cast<handler_type>(it->second)};
-            }
-
-            auto handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
-            [[maybe_unused]] const id_type elem[]{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
-            ENTT_ASSERT(std::all_of(owning_groups.cbegin(), owning_groups.cend(), [&elem, hsize = handler->size()](const auto &data) { return data.second->owned(elem, sizeof...(Owned)) == 0u; }), "Conflicting groups");
-            owning_groups.emplace(type_hash<handler_type>::value(), handler);
-            return {*handler};
+        if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
+            return {*std::static_pointer_cast<handler_type>(it->second)};
         }
+
+        std::shared_ptr<handler_type> handler{};
+
+        if constexpr(sizeof...(Owned) == 0u) {
+            handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
+        } else {
+            handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
+            [[maybe_unused]] const id_type elem[]{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&elem](const auto &data) { return data.second->owned(elem, sizeof...(Owned)) == 0u; }), "Conflicting groups");
+        }
+
+        groups.emplace(type_hash<handler_type>::value(), handler);
+        return {*handler};
     }
 
     /*! @copydoc group */
@@ -1236,14 +1228,8 @@ public:
     group_if_exists(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) const {
         using handler_type = typename basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>::handler;
 
-        if constexpr(sizeof...(Owned) == 0u) {
-            if(auto it = non_owning_groups.find(type_hash<handler_type>::value()); it != non_owning_groups.cend()) {
-                return {*std::static_pointer_cast<handler_type>(it->second)};
-            }
-        } else {
-            if(auto it = owning_groups.find(type_hash<handler_type>::value()); it != owning_groups.cend()) {
-                return {*std::static_pointer_cast<handler_type>(it->second)};
-            }
+        if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
+            return {*std::static_pointer_cast<handler_type>(it->second)};
         }
 
         return {};
@@ -1259,7 +1245,7 @@ public:
     template<typename Type, typename... Other>
     [[nodiscard]] bool owned() const {
         const id_type elem[]{type_hash<std::remove_const_t<Type>>::value(), type_hash<std::remove_const_t<Other>>::value()...};
-        return std::any_of(owning_groups.cbegin(), owning_groups.cend(), [&elem](auto &&data) { return data.second->owned(elem, 1u + sizeof...(Other)); });
+        return std::any_of(groups.cbegin(), groups.cend(), [&elem](auto &&data) { return data.second->owned(elem, 1u + sizeof...(Other)); });
     }
 
     /**
@@ -1351,8 +1337,7 @@ public:
 private:
     context vars;
     pool_container_type pools;
-    owning_group_container_type owning_groups;
-    non_owning_group_container_type non_owning_groups;
+    group_container_type groups;
     storage_for_type<entity_type> *shortcut;
 };
 
