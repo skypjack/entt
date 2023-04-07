@@ -584,7 +584,7 @@ public:
      * @param destroyed The number of released entities.
      */
     template<typename It>
-    void assign(It first, It last, const size_type destroyed) {
+    [[deprecated("use .storage<Entity>().push(first, last) and .storage<Entity>().in_use(len) instead")]] void assign(It first, It last, const size_type destroyed) {
         ENTT_ASSERT(!shortcut->in_use(), "Non-empty registry");
         shortcut->push(first, last);
         shortcut->in_use(shortcut->size() - destroyed);

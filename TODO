@@ -18,7 +18,6 @@ TODO (high prio):
 * pop_if to improve further destroying entities (drastically)
 * doc: exclude only views, storage entity (and diff between iterator and each based iteration), bump entities, signals on entity creation/destruction
 * registry: replace destroy with a drop-all method that doesn't care about validity
-* registry: review assign mechanism, maybe it's worth to drop it
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
