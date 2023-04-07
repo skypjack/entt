@@ -73,11 +73,11 @@ struct destruction_order {
     destruction_order(const entt::registry &ref, bool &ctx)
         : registry{&ref},
           ctx_check{&ctx} {
-        *ctx_check = (registry->ctx().find<int>() != nullptr);
+        *ctx_check = (registry->ctx().find<ctx_check_type>() != nullptr);
     }
 
     ~destruction_order() {
-        *ctx_check = *ctx_check && (registry->ctx().find<int>() != nullptr);
+        *ctx_check = *ctx_check && (registry->ctx().find<ctx_check_type>() != nullptr);
     }
 
 private:
