@@ -85,6 +85,22 @@ private:
     bool *ctx_check{};
 };
 
+enum class small_entity : std::uint32_t {};
+
+struct small_entity_traits {
+    using value_type = small_entity;
+    using entity_type = uint32_t;
+    using version_type = uint16_t;
+    static constexpr entity_type entity_mask = 0xFF;
+    static constexpr entity_type version_mask = 0x00;
+};
+
+template<>
+struct entt::entt_traits<small_entity>: entt::basic_entt_traits<small_entity_traits> {
+    using base_type = entt::basic_entt_traits<small_entity_traits>;
+    static constexpr auto page_size = ENTT_SPARSE_PAGE;
+};
+
 TEST(Registry, Context) {
     entt::registry registry;
     auto &ctx = registry.ctx();
@@ -638,6 +654,14 @@ TEST(Registry, CreateDestroyReleaseCornerCase) {
 
     ASSERT_EQ(registry.current(e0), 1u);
     ASSERT_EQ(registry.current(e1), 1u);
+}
+
+ENTT_DEBUG_TEST(RegistryDeathTest, CreateTooManyEntities) {
+    entt::basic_registry<small_entity> registry;
+    std::vector<small_entity> entities(entt::entt_traits<small_entity>::to_entity(entt::null));
+    registry.create(entities.begin(), entities.end());
+
+    ASSERT_DEATH([[maybe_unused]] const auto entity = registry.create(), "");
 }
 
 TEST(Registry, DestroyVersion) {
