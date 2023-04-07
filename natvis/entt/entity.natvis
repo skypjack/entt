@@ -20,8 +20,7 @@
 					</IndexListItems>
 				</Expand>
 			</Synthetic>
-			<Item Name="[owning_groups]" ExcludeView="simple">owning_groups.size()</Item>
-			<Item Name="[non_owning_groups]" ExcludeView="simple">non_owning_groups.size()</Item>
+			<Item Name="[groups]" ExcludeView="simple">groups.size()</Item>
 			<Synthetic Name="[vars]">
 				<DisplayString>{ vars.ctx.size() }</DisplayString>
 				<Expand>
