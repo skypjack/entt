@@ -30,15 +30,18 @@ class sigh_mixin final: public Type {
     using sigh_type = sigh<void(basic_registry_type &, const typename Type::entity_type), typename Type::allocator_type>;
     using underlying_iterator = typename Type::base_type::basic_iterator;
 
+    basic_registry_type &owner_or_assert() const noexcept {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        return *owner;
+    }
+
     void pop(underlying_iterator first, underlying_iterator last) final {
-        if(destruction.empty()) {
+        if(auto &registry = owner_or_assert(); destruction.empty()) {
             Type::pop(first, last);
         } else {
-            ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-
             for(; first != last; ++first) {
                 const auto entt = *first;
-                destruction.publish(*owner, entt);
+                destruction.publish(registry, entt);
                 const auto it = Type::find(entt);
                 Type::pop(it, it + 1u);
             }
@@ -46,16 +49,14 @@ class sigh_mixin final: public Type {
     }
 
     void pop_all() final {
-        if(!destruction.empty()) {
-            ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-
+        if(auto &registry = owner_or_assert(); !destruction.empty()) {
             for(auto pos = Type::each().begin().base().index(); !(pos < 0); --pos) {
                 if constexpr(Type::traits_type::in_place_delete) {
                     if(const auto entt = Type::operator[](static_cast<typename Type::size_type>(pos)); entt != tombstone) {
-                        destruction.publish(*owner, entt);
+                        destruction.publish(registry, entt);
                     }
                 } else {
-                    destruction.publish(*owner, Type::operator[](static_cast<typename Type::size_type>(pos)));
+                    destruction.publish(registry, Type::operator[](static_cast<typename Type::size_type>(pos)));
                 }
             }
         }
@@ -66,9 +67,8 @@ class sigh_mixin final: public Type {
     underlying_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         const auto it = Type::try_emplace(entt, force_back, value);
 
-        if(it != Type::base_type::end()) {
-            ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-            construction.publish(*owner, *it);
+        if(auto &registry = owner_or_assert(); it != Type::base_type::end()) {
+            construction.publish(registry, *it);
         }
 
         return it;
@@ -202,9 +202,8 @@ public:
      * @return A return value as returned by the underlying storage.
      */
     auto emplace() {
-        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         const auto entt = Type::emplace();
-        construction.publish(*owner, entt);
+        construction.publish(owner_or_assert(), entt);
         return entt;
     }
 
@@ -222,15 +221,13 @@ public:
      */
     template<typename... Args>
     decltype(auto) emplace(const entity_type hint, Args &&...args) {
-        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-
         if constexpr(std::is_same_v<typename Type::value_type, typename Type::entity_type>) {
             const auto entt = Type::emplace(hint, std::forward<Args>(args)...);
-            construction.publish(*owner, entt);
+            construction.publish(owner_or_assert(), entt);
             return entt;
         } else {
             Type::emplace(hint, std::forward<Args>(args)...);
-            construction.publish(*owner, hint);
+            construction.publish(owner_or_assert(), hint);
             return this->get(hint);
         }
     }
@@ -244,9 +241,8 @@ public:
      */
     template<typename... Func>
     decltype(auto) patch(const entity_type entt, Func &&...func) {
-        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         Type::patch(entt, std::forward<Func>(func)...);
-        update.publish(*owner, entt);
+        update.publish(owner_or_assert(), entt);
         return this->get(entt);
     }
 
@@ -267,11 +263,9 @@ public:
     void insert(It first, It last, Args &&...args) {
         Type::insert(first, last, std::forward<Args>(args)...);
 
-        if(!construction.empty()) {
-            ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-
+        if(auto &registry = owner_or_assert(); !construction.empty()) {
             for(; first != last; ++first) {
-                construction.publish(*owner, *first);
+                construction.publish(registry, *first);
             }
         }
     }
