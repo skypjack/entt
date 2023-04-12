@@ -1258,8 +1258,6 @@ public:
     /**
      * @brief Sorts the elements of a given component.
      *
-     * The order remains valid until a component of the given type is assigned
-     * to or removed from an entity.<br/>
      * The comparison function object returns `true` if the first element is
      * _less_ than the second one, `false` otherwise. Its signature is also
      * equivalent to one of the following:
