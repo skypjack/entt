@@ -655,7 +655,14 @@ public:
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entt) {
-        return destroy(entt, traits_type::to_version(traits_type::next(entt)));
+        ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
+        ENTT_ASSERT(shortcut->contains(entt), "Invalid entity");
+
+        for(size_type pos = pools.size(); pos; --pos) {
+            pools.begin()[pos - 1u].second->remove(entt);
+        }
+
+        return shortcut->current(entt);
     }
 
     /**
