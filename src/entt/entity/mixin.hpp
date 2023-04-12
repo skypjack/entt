@@ -77,6 +77,8 @@ class sigh_mixin final: public Type {
 public:
     /*! @brief Allocator type. */
     using allocator_type = typename Type::allocator_type;
+    /*! @brief Component traits. */
+    using traits_type = typename Type::traits_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
     /*! @brief Expected registry type. */
@@ -89,9 +91,10 @@ public:
     /**
      * @brief Constructs an empty storage with a given allocator.
      * @param allocator The allocator to use.
+     * @param traits The type_traits to use.
      */
-    explicit sigh_mixin(const allocator_type &allocator)
-        : Type{allocator},
+    explicit sigh_mixin(const allocator_type &allocator, traits_type traits = {})
+        : Type{allocator, std::move(traits)},
           owner{},
           construction{allocator},
           destruction{allocator},

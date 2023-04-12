@@ -222,6 +222,16 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
     }
 };
 
+/**
+ * @brief deduces to a true type if the allocator provides a resource method.
+ */
+template<typename Allocator, typename = void>
+struct is_polymorphic_allocator: std::false_type {
+};
+template<typename Allocator>
+struct is_polymorphic_allocator<Allocator, std::void_t<decltype(std::declval<Allocator &>().resource())>>: std::true_type {
+};
+
 } // namespace internal
 
 /**
@@ -280,8 +290,25 @@ constexpr Type make_obj_using_allocator(const Allocator &allocator, Args &&...ar
  * @return A pointer to the newly created object of the given type.
  */
 template<typename Type, typename Allocator, typename... Args>
-constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
-    return std::apply([value](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
+constexpr Type *uninitialized_construct_using_allocator(Type *value, Allocator &allocator, Args &&...args) {
+    return std::apply([value, &allocator](auto &&...curr) mutable -> Type * {
+        using alloc_type = std::decay_t<Allocator>;
+        using alloc_traits = std::allocator_traits<alloc_type>;
+
+        static_assert(std::is_convertible_v<Type *, typename alloc_traits::value_type *>,
+                      "Expected the allocator to allocate elements convertible to type Type!");
+
+        // Workaround for polymorphic allocator not propagating this prio to C++20
+        // when calling std::polymorphic_allocator::construct (at least on MSVC).
+        // This workaround can be removed once entt requires C++20.
+        if constexpr(internal::is_polymorphic_allocator<alloc_type>::value) {
+            new(value) Type(std::forward<decltype(curr)>(curr)...);
+        } else {
+            alloc_traits::construct(allocator, value, std::forward<decltype(curr)>(curr)...);
+        }
+
+        return value;
+    }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
 
 } // namespace entt

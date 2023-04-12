@@ -2282,3 +2282,236 @@ TEST(Registry, CtxAndPoolMemberDestructionOrder) {
 
     ASSERT_TRUE(ctx_check);
 }
+
+template<typename T>
+class dynamic_allocator {
+    template<typename Other>
+    friend class dynamic_allocator;
+
+    using base_type = std::byte;
+    using base = std::allocator<base_type>;
+
+public:
+    using value_type = T;
+    using pointer = value_type *;
+    using const_pointer = const value_type *;
+    using propagate_on_container_move_assignment = std::true_type;
+    using propagate_on_container_swap = std::true_type;
+    using size_type = std::size_t;
+
+    static constexpr size_type minimum_size = sizeof(T);
+
+    template<typename Other>
+    struct rebind {
+        using other = std::conditional_t<!std::is_same_v<T, Other>, std::allocator<Other>, dynamic_allocator<Other>>;
+    };
+
+    dynamic_allocator() = default;
+    dynamic_allocator(std::size_t dynamic_size)
+        : dynamic_size_(dynamic_size) {}
+
+    template<typename Other>
+    dynamic_allocator(const dynamic_allocator<Other> &other)
+        : dynamic_size_(other.dynamic_size_) {}
+    template<typename Other>
+    dynamic_allocator &operator=(const dynamic_allocator<Other> &other) {
+        dynamic_size_ = other.dynamic_size_;
+        return *this;
+    }
+
+    pointer allocate(std::size_t length) {
+        ENTT_ASSERT(dynamic_size_ >= minimum_size, "Requires the minimum dynamic size!");
+
+        std::size_t const size = length * dynamic_size_;
+        return reinterpret_cast<pointer>(base{}.allocate(size));
+    }
+
+    void deallocate(pointer mem, std::size_t length) {
+        ENTT_ASSERT(dynamic_size_ >= minimum_size, "Requires the minimum dynamic size!");
+
+        std::size_t const size = length * dynamic_size_;
+        base{}.deallocate(reinterpret_cast<base_type *>(mem), size);
+    }
+
+    bool operator==(const dynamic_allocator<T> &other) const {
+        return dynamic_size_ == other.dynamic_size_;
+    }
+
+    bool operator!=(const dynamic_allocator<T> &other) const {
+        return !(*this == other);
+    }
+
+    template<typename... Args>
+    void construct(pointer address, Args &&...args) {
+        ENTT_ASSERT(dynamic_size_ >= minimum_size, "Requires the minimum dynamic size!");
+
+        // Zerofill for now on construction
+        std::fill_n(raw(address), dynamic_size_, static_cast<std::byte>(0));
+
+        // Construct with placement new, do not use uninitialized_construct_using_allocator,
+        // since this can cause infinite recursive calls!
+        new(address) T(std::forward<Args>(args)...);
+    }
+
+    void destroy(pointer address) {
+        ENTT_ASSERT(dynamic_size_ >= minimum_size, "Requires the minimum dynamic size!");
+
+        // Do nothing for trivial types
+        (void)address;
+    }
+
+    template<typename Other>
+    operator std::allocator<Other>() const {
+        return {};
+    }
+
+    [[nodiscard]] static constexpr std::byte *raw(T *address) noexcept {
+        return reinterpret_cast<std::byte *>(address);
+    }
+
+private:
+    std::size_t dynamic_size_{sizeof(T)};
+};
+
+template<typename T>
+struct dynamic_component_traits: entt::component_traits<std::underlying_type_t<T>> {
+    using base_trait = entt::component_traits<std::underlying_type_t<T>>;
+    using size_type = std::size_t;
+    using pointer = T *;
+
+    static constexpr size_type minimum_size = sizeof(T);
+    static constexpr bool has_dynamic_size = true;
+
+    static_assert(std::is_trivial_v<T>, "Currently only trivial types are supported!");
+    static_assert((sizeof(T) % alignof(T)) == 0);
+
+    explicit dynamic_component_traits() = default;
+    explicit dynamic_component_traits(size_type object_size)
+        : dynamic_size_(object_size) {}
+
+    [[nodiscard]] constexpr size_type dynamic_size() const noexcept {
+        return dynamic_size_;
+    }
+
+    T &element_at(T *const page, const std::size_t pos) const {
+        ENTT_ASSERT(dynamic_size_ >= minimum_size, "Requires the minimum dynamic size!");
+
+        std::uintptr_t const base = reinterpret_cast<std::uintptr_t>(page);
+        std::uintptr_t const offset = dynamic_size_ * pos;
+
+        return *reinterpret_cast<T *>(base + offset);
+    }
+
+    void swap_element(T &left, T &right) {
+        ENTT_ASSERT(dynamic_size_ >= minimum_size, "Requires the minimum dynamic size!");
+
+        std::byte *const l = raw(std::addressof(left));
+        std::byte *const r = raw(std::addressof(right));
+
+        if(l == r) {
+            // The elements to swap can alias!
+            return;
+        }
+
+        std::swap_ranges(l, l + dynamic_size_, r);
+    }
+
+    void move_element(T &left, T &&right) {
+        ENTT_ASSERT(dynamic_size_ >= minimum_size, "Requires the minimum dynamic size!");
+
+        std::byte *const l = raw(std::addressof(left));
+        std::byte *const r = raw(std::addressof(right));
+
+        if(l == r) {
+            // The elements to move can alias!
+            return;
+        }
+
+        std::copy_n(r, dynamic_size_, l);
+    }
+
+    bool operator==(const dynamic_component_traits<T> &other) const {
+        return dynamic_size_ == other.dynamic_size_;
+    }
+
+    bool operator!=(const dynamic_component_traits<T> &other) const {
+        return !(*this == other);
+    }
+
+private:
+    [[nodiscard]] static constexpr std::byte *raw(T *address) noexcept {
+        return reinterpret_cast<std::byte *>(address);
+    }
+
+    size_type dynamic_size_{minimum_size};
+};
+
+enum class dynamic_data : std::uint8_t;
+
+template<>
+struct entt::component_traits<dynamic_data, void>: dynamic_component_traits<dynamic_data> {
+    using dynamic_component_traits::dynamic_component_traits;
+};
+
+template<typename Entity, typename Allocator>
+struct entt::storage_for<dynamic_data, Entity, Allocator> {
+    using type = sigh_mixin<basic_storage<dynamic_data, Entity, dynamic_allocator<dynamic_data>>>;
+};
+
+template<typename Entity, typename Allocator>
+struct entt::storage_for<dynamic_data const,
+                         Entity, Allocator>: entt::storage_for<dynamic_data, Entity, Allocator> {};
+
+TEST(Registry, StorageDynamic) {
+    entt::registry registry;
+
+    // Create a dynamic trait object
+    entt::component_traits<dynamic_data> const traits(32);
+    ASSERT_EQ(traits.dynamic_size(), 32);
+
+    // Create an allocator which supplies objects of the dynamic size
+    dynamic_allocator<dynamic_data> const alloc{traits.dynamic_size()};
+
+    // Create the storage for the dynamic sized data,
+    // and assert that it was created with the specified parameters.
+    ASSERT_TRUE(registry.try_create_storage<dynamic_data>(alloc, traits));
+
+    auto &storage = registry.storage<dynamic_data>();
+
+    // Ensure that the allocator matches the provided one
+    ASSERT_EQ(storage.get_allocator(), alloc);
+
+    // Ensure that the trait matches the provided one
+    ASSERT_EQ(storage.get_traits(), traits);
+
+    entt::entity const e1 = registry.create();
+    entt::entity const e2 = registry.create();
+
+    {
+        dynamic_data &d1 = registry.emplace<dynamic_data>(e1);
+        dynamic_data &d2 = registry.emplace<dynamic_data>(e2);
+
+        auto const view = registry.view<dynamic_data>();
+        ASSERT_EQ(std::distance(view.begin(), view.end()), 2U);
+
+        std::fill_n(reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d1), traits.dynamic_size(), static_cast<std::underlying_type_t<dynamic_data>>(121));
+        std::fill_n(reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d2), traits.dynamic_size(), static_cast<std::underlying_type_t<dynamic_data>>(232));
+        std::fill_n(reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d1), traits.dynamic_size(), static_cast<std::underlying_type_t<dynamic_data>>(121));
+        std::fill_n(reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d2), traits.dynamic_size(), static_cast<std::underlying_type_t<dynamic_data>>(232));
+
+        ASSERT_TRUE(std::all_of(reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d1), reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d1) + traits.dynamic_size(), [](auto data) { return data == 121; }));
+        ASSERT_TRUE(std::all_of(reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d2), reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d2) + traits.dynamic_size(), [](auto data) { return data == 232; }));
+    }
+
+    registry.destroy(e1);
+
+    dynamic_data &d2 = registry.get<dynamic_data>(e2);
+
+    ASSERT_TRUE(std::all_of(reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d2), reinterpret_cast<std::underlying_type_t<dynamic_data> *>(&d2) + traits.dynamic_size(), [](auto data) { return data == 232; }));
+
+    registry.destroy(e2);
+
+    auto const view = registry.view<dynamic_data>();
+
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 0U);
+}

@@ -247,23 +247,41 @@ class basic_registry {
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
     using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
 
+    template<typename Type, typename AllocatorType>
+    void create_storage(const id_type id, const AllocatorType &allocator,
+                        component_traits<Type> traits) {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
+
+        auto &cpool = pools[id];
+        ENTT_ASSERT(!cpool, "Expected the pool not to be set!");
+
+        cpool = std::allocate_shared<storage_for_type<std::remove_const_t<Type>>>(get_allocator(), allocator, std::move(traits));
+        cpool->bind(forward_as_any(*this));
+
+        ENTT_ASSERT(!!cpool, "Expected the pool to be set after construction!");
+    }
+
     template<typename Type>
     [[nodiscard]] auto &assure(const id_type id = type_hash<Type>::value()) {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
+
         auto &cpool = pools[id];
 
         if(!cpool) {
             using storage_type = storage_for_type<Type>;
-            using alloc_type = typename storage_type::allocator_type;
+            using storage_allocator = typename storage_type::allocator_type;
+            using storage_traits_type = typename storage_type::traits_type;
 
-            if constexpr(std::is_same_v<Type, void> && !std::is_constructible_v<alloc_type, allocator_type>) {
+            if constexpr(!std::is_constructible_v<storage_allocator, allocator_type const &>) {
                 // std::allocator<void> has no cross constructors (waiting for C++20)
-                cpool = std::allocate_shared<storage_type>(get_allocator(), alloc_type{});
+                // Afterwards, the ability to default construct the storage_allocator that
+                // are not compatible to the owning registries allocator_type must be preserved.
+                create_storage<Type>(id, storage_allocator{}, storage_traits_type{});
             } else {
-                cpool = std::allocate_shared<storage_type>(get_allocator(), get_allocator());
+                create_storage<Type>(id, allocator_type{get_allocator()}, storage_traits_type{});
             }
 
-            cpool->bind(forward_as_any(*this));
+            ENTT_ASSERT(!!cpool, "Expected the pool to be set after construction!");
         }
 
         ENTT_ASSERT(cpool->type() == type_id<Type>(), "Unexpected type");
@@ -444,6 +462,35 @@ public:
     template<typename Type>
     const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
         return assure<Type>(id);
+    }
+
+    /**
+     * @brief Tries to create a storage for a component with the given arguments.
+     *
+     * @warning
+     * If a storage for the given component exist already, false is returned!
+     *
+     * @tparam Type Type of component of which to return the storage.
+     * @param allocator The allocator passed to the storage.
+     * @param traits Optional component traits type passed to the storage.
+     * @param id Optional name used to map the storage within the registry.
+     * @return Returns true if the component could be created successfully.
+     *         If the component existed already the creation is skipped and false is returned.
+     */
+    template<typename Type>
+    bool try_create_storage(const typename storage_for_type<Type>::allocator_type &allocator,
+                            component_traits<Type> traits = {},
+                            const id_type id = type_hash<Type>::value()) {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
+
+        if(!!storage(id)) {
+            // If the storage already exists return false
+            return false;
+        }
+
+        // Otherwise create the storage
+        create_storage(id, allocator, traits);
+        return true;
     }
 
     /**

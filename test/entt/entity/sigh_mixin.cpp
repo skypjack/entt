@@ -35,7 +35,7 @@ struct empty_each_tag final {};
 
 template<>
 struct entt::basic_storage<empty_each_tag, entt::entity, std::allocator<empty_each_tag>>: entt::basic_storage<void, entt::entity, std::allocator<void>> {
-    basic_storage(const std::allocator<empty_each_tag> &) {}
+    using basic_storage<void, entt::entity, std::allocator<void>>::basic_storage;
 
     [[nodiscard]] iterable each() noexcept {
         return {internal::extended_storage_iterator{base_type::end()}, internal::extended_storage_iterator{base_type::end()}};
