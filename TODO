@@ -15,9 +15,9 @@ DOC:
 TODO (high prio):
 * check natvis files (periodically :)
 * remove the static storage from the const assure in the registry
-* pop_if to improve further destroying entities (drastically)
 * doc: exclude only views, storage entity (and diff between iterator and each based iteration), bump entities, signals on entity creation/destruction
 * registry: replace destroy with a drop-all method that doesn't care about validity
+* resource cache: avoid using shared ptr with loader and the others
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
