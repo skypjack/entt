@@ -1083,7 +1083,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) const {
+    [[deprecated("use .storage<Entity>().each() instead")]] void each(Func func) const {
         for(auto [entt]: shortcut->each()) {
             func(entt);
         }
