@@ -12,7 +12,6 @@
   * [Pay per use](#pay-per-use)
   * [All or nothing](#all-or-nothing)
 * [Vademecum](#vademecum)
-* [Storage](#storage)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
     * [Listeners disconnection](#listeners-disconnection)
@@ -29,18 +28,20 @@
     * [Organizer](#organizer)
   * [Context variables](#context-variables)
     * [Aliased properties](#aliased-properties)
-  * [Component traits](#component-traits)
-  * [Pointer stability](#pointer-stability)
-    * [In-place delete](#in-place-delete)
-    * [Hierarchies and the like](#hierarchies-and-the-like)
-  * [Meet the runtime](#meet-the-runtime)
-    * [A base class to rule them all](#a-base-class-to-rule-them-all)
-    * [Beam me up, registry](#beam-me-up-registry)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
     * [Continuous loader](#continuous-loader)
     * [Archives](#archives)
     * [One example to rule them all](#one-example-to-rule-them-all)
+* [Storage](#storage)
+  * [Component traits](#component-traits)
+  * [Empty type optimization](#empty-type-optimization)
+  * [Pointer stability](#pointer-stability)
+    * [In-place delete](#in-place-delete)
+    * [Hierarchies and the like](#hierarchies-and-the-like)
+* [Meet the runtime](#meet-the-runtime)
+  * [A base class to rule them all](#a-base-class-to-rule-them-all)
+  * [Beam me up, registry](#beam-me-up-registry)
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
     * [View pack](#view-pack)
@@ -54,7 +55,6 @@
   * [Give me everything](#give-me-everything)
   * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
     * [More performance, more constraints](#more-performance-more-constraints)
-* [Empty type optimization](#empty-type-optimization)
 * [Multithreading](#multithreading)
   * [Iterators](#iterators)
   * [Const registry](#const-registry)
@@ -142,20 +142,9 @@ of the `EnTT` library.<br/>
 This module is likely larger than what is described below. For more details,
 please refer to the inline documentation.
 
-# Storage
-
-Pools of components are a sort of _specialized version_ of a sparse set. Each
-pool contains all the instances of a single component type and all the entities
-to which it's assigned.<br/>
-Sparse arrays are _paged_ to avoid wasting memory. Packed arrays of components
-are also paged to have pointer stability upon additions. Packed arrays of
-entities are not instead.<br/>
-All pools rearranges their items in order to keep the internal arrays tightly
-packed and maximize performance, unless pointer stability is enabled.
-
 # The Registry, the Entity and the Component
 
-A registry stores and manages entities (or better, identifiers) and pools.<br/>
+A registry stores and manages entities (or _identifiers_) and components.<br/>
 The class template `basic_registry` lets users decide what the preferred type to
 represent an entity is. Because `std::uint32_t` is large enough for almost any
 case, there also exists the enum class `entt::entity` that _wraps_ it and the
@@ -965,237 +954,6 @@ const my_type &var = registry.ctx().get<const my_type>();
 Aliased properties are erased as it happens with any other variable. Similarly,
 it's also possible to assign them a _name_.
 
-## Component traits
-
-In `EnTT`, almost everything is customizable. Components are no exception.<br/>
-In this case, the _standardized_ way to access all component properties is the
-`component_traits` class.
-
-Various parts of the library access component properties through this class. It
-makes it possible to use any type as a component, as long as its specialization
-of `component_traits` implements all the required functionalities.<br/>
-The non-specialized version of this class contains the following members:
-
-* `in_place_delete`: `Type::in_place_delete` if present, true for non-movable
-  types and false otherwise.
-
-* `page_size`: `Type::page_size` if present, `ENTT_PACKED_PAGE` for non-empty
-  types and 0 otherwise.
-
-Where `Type` is any type of component. Properties are customized by specializing
-the above class and defining its members, or by adding only those of interest to
-a component definition:
-
-```cpp
-struct transform {
-    static constexpr auto in_place_delete = true;
-    // ... other data members ...
-};
-```
-
-The `component_traits` class template takes care of _extracting_ the properties
-from the supplied type.<br/>
-Plus, it's _sfinae-friendly_ and also supports feature-based specializations.
-
-## Pointer stability
-
-The ability to achieve pointer stability for one, several or all components is a
-direct consequence of the design of `EnTT` and of its default storage.<br/>
-In fact, although it contains what is commonly referred to as a _packed array_,
-the default storage is paged and doesn't suffer from invalidation of references
-when it runs out of space and has to reallocate.<br/>
-However, this isn't enough to ensure pointer stability in case of deletion. For
-this reason, a _stable_ deletion method is also offered. This one is such that
-the position of the elements is preserved by creating tombstones upon deletion
-rather than trying to fill the holes that are created.
-
-For performance reasons, `EnTT` favors storage compaction in all cases, although
-often accessing a component occurs mostly randomly or traversing pools in a
-non-linear order on the user side (as in the case of a hierarchy).<br/>
-In other words, pointer stability is not automatic but is enabled on request.
-
-### In-place delete
-
-The library offers out of the box support for in-place deletion, thus offering
-storage with completely stable pointers. This is achieved by specializing the
-`component_traits` class or by adding the required properties to the component
-definition when needed.<br/>
-Views and groups adapt accordingly when they detect a storage with a different
-deletion policy than the default. In particular:
-
-* Groups are incompatible with stable storage and even refuse to compile.
-* Multi type and runtime views are completely transparent to storage policies.
-* Single type views for stable storage types offer the same interface of multi
-  type views. For example, only `size_hint` is available.
-
-In other words, the more generic version of a view is provided in case of stable
-storage, even for a single type view.<br/>
-In no case a tombstone is returned from the view itself. Likewise, non-existent
-components aren't returned, which could otherwise result in an UB.
-
-### Hierarchies and the like
-
-`EnTT` doesn't attempt in any way to offer built-in methods with hidden or
-unclear costs to facilitate the creation of hierarchies.<br/>
-There are various solutions to the problem, such as using the following class:
-
-```cpp
-struct relationship {
-    std::size_t children{};
-    entt::entity first{entt::null};
-    entt::entity prev{entt::null};
-    entt::entity next{entt::null};
-    entt::entity parent{entt::null};
-    // ... other data members ...
-};
-```
-
-However, it should be pointed out that the possibility of having stable pointers
-for one, many or all types solves the problem of hierarchies at the root in many
-cases.<br/>
-In fact, if a certain type of component is visited mainly in random order or
-according to hierarchical relationships, using direct pointers has many
-advantages:
-
-```cpp
-struct transform {
-    static constexpr auto in_place_delete = true;
-
-    transform *parent;
-    // ... other data members ...
-};
-```
-
-Furthermore, it's quite common for a group of elements to be created close in
-time and therefore fallback into adjacent positions, thus favoring locality even
-on random accesses. Locality that isn't sacrificed over time given the stability
-of storage positions, with undoubted performance advantages.
-
-## Meet the runtime
-
-`EnTT` takes advantage of what the language offers at compile-time. However,
-this can have its downsides (well known to those familiar with type erasure
-techniques).<br/>
-To fill the gap, the library also provides a bunch of utilities and feature that
-are very useful to handle types and pools at runtime.
-
-### A base class to rule them all
-
-Storage classes are fully self-contained types. They are _extended_ via mixins
-to add more functionalities (generic or type specific). In addition, they offer
-a basic set of functions that already allow users to go very far.<br/>
-The aim is to limit the need for customizations as much as possible, offering
-what is usually necessary for the vast majority of cases.
-
-When a storage is used through its base class (for example, when its actual type
-isn't known), there is always the possibility of receiving a `type_info` object
-for the type of elements associated with the entities (if any):
-
-```cpp
-if(entt::type_id<velocity>() == base.type()) {
-    // ...
-}
-```
-
-Furthermore, all features rely on internal functions that forward the calls to
-the mixins. The latter can then make use of any information, which is set via
-`bind`:
-
-```cpp
-base.bind(entt::forward_as_any(registry));
-```
-
-The `bind` function accepts an `entt::any` object, that is a _typed type-erased_
-value.<br/>
-This is how a registry _passes_ itself to all pools that support signals and
-also why a storage keeps sending events without requiring the registry to be
-passed to it every time.
-
-Alongside these more specific things, there are also a couple of functions
-designed to address some common requirements such as copying an entity.<br/>
-In particular, the base class behind a storage offers the possibility to _take_
-the value associated with an entity through an opaque pointer:
-
-```cpp
-const void *instance = base.value(entity);
-```
-
-Similarly, the non-specialized `push` function accepts an optional opaque
-pointer and behaves differently depending on the case:
-
-* When the pointer is null, the function tries to default-construct an instance
-  of the object to bind to the entity and returns true on success.
-
-* When the pointer is non-null, the function tries to copy-construct an instance
-  of the object to bind to the entity and returns true on success.
-
-This means that, starting from a reference to the base, it's possible to bind
-components with entities without knowing their actual type and even initialize
-them by copy if needed:
-
-```cpp
-// create a copy of an entity component by component
-for(auto &&curr: registry.storage()) {
-    if(auto &storage = curr.second; storage.contains(src)) {
-        storage.push(dst, storage.value(src));
-    }
-}
-```
-
-This is particularly useful to clone entities in an opaque way. In addition, the
-decoupling of features allows for filtering or use of different copying policies
-depending on the type.
-
-### Beam me up, registry
-
-`EnTT` allows the user to assign a _name_ (or rather, a numeric identifier) to a
-type and then create multiple pools of the same type:
-
-```cpp
-using namespace entt::literals;
-auto &&storage = registry.storage<velocity>("second pool"_hs);
-```
-
-If a name isn't provided, the default storage associated with the given type is
-always returned.<br/>
-Since the storage are also self-contained, the registry doesn't _duplicate_ its
-own API for them. However, there is still no limit to the possibilities of use:
-
-```cpp
-auto &&other = registry.storage<velocity>("other"_hs);
-
-registry.emplace<velocity>(entity);
-storage.push(entity);
-```
-
-Anything that can be done via the registry interface can also be done directly
-on the reference storage.<br/>
-On the other hand, those calls involving all storage are guaranteed to also
-_reach_ manually created ones:
-
-```cpp
-// removes the entity from both storage
-registry.destroy(entity);
-```
-
-Finally, a storage of this type works with any view (which also accepts multiple
-storages of the same type, if necessary):
-
-```cpp
-// direct initialization
-entt::basic_view direct{
-    registry.storage<velocity>(),
-    registry.storage<velocity>("other"_hs)
-};
-
-// concatenation
-auto join = registry.view<velocity>() | entt::basic_view{registry.storage<velocity>("other"_hs)};
-```
-
-The possibility of direct use of storage combined with the freedom of being able
-to create and use more than one of the same type opens the door to the use of
-`EnTT` _at runtime_, which was previously quite limited.
-
 ## Snapshot: complete vs continuous
 
 This module comes with bare minimum support to serialization.<br/>
@@ -1398,6 +1156,272 @@ The code **isn't** production-ready and it isn't neither the only nor (probably)
 the best way to do it. However, feel free to use it at your own risk.<br/>
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
+
+# Storage
+
+Pools of components are _specialized versions_ of the sparse set class. Each
+pool contains all the instances of a single component type and all the entities
+to which it's assigned.<br/>
+Sparse arrays are _paged_ to avoid wasting memory. Packed arrays of components
+are also paged to have pointer stability upon additions. Packed arrays of
+entities are not instead.<br/>
+All pools rearranges their items in order to keep the internal arrays tightly
+packed and maximize performance, unless pointer stability is enabled.
+
+## Component traits
+
+In `EnTT`, almost everything is customizable. Pools are no exception.<br/>
+In this case, the _standardized_ way to access all component properties is the
+`component_traits` class.
+
+Various parts of the library access component properties through this class. It
+makes it possible to use any type as a component, as long as its specialization
+of `component_traits` implements all the required functionalities.<br/>
+The non-specialized version of this class contains the following members:
+
+* `in_place_delete`: `Type::in_place_delete` if present, true for non-movable
+  types and false otherwise.
+
+* `page_size`: `Type::page_size` if present, `ENTT_PACKED_PAGE` for non-empty
+  types and 0 otherwise.
+
+Where `Type` is any type of component. Properties are customized by specializing
+the above class and defining its members, or by adding only those of interest to
+a component definition:
+
+```cpp
+struct transform {
+    static constexpr auto in_place_delete = true;
+    // ... other data members ...
+};
+```
+
+The `component_traits` class template takes care of _extracting_ the properties
+from the supplied type.<br/>
+Plus, it's _sfinae-friendly_ and also supports feature-based specializations.
+
+## Empty type optimization
+
+An empty type `T` is such that `std::is_empty_v<T>` returns true. They also are
+the same types for which _empty base optimization_ (EBO) is possible.<br/>
+`EnTT` handles these types in a special way, optimizing both in terms of
+performance and memory usage. However, this also has consequences that are worth
+mentioning.
+
+When an empty type is detected, it's not instantiated by default. Therefore,
+only the entities to which it's assigned are made available. There doesn't exist
+a way to _get_ empty types from a storage or a registry. Views and groups never
+return their instances too (for example, during a call to `each`).<br/>
+On the other hand, iterations are faster because only the entities to which the
+type is assigned are considered. Moreover, less memory is used, mainly because
+there doesn't exist any instance of the component, no matter how many entities
+it is assigned to.
+
+More in general, none of the feature offered by the library is affected, but for
+the ones that require to return actual instances.<br/>
+This optimization is disabled by defining the `ENTT_NO_ETO` macro. In this case,
+empty types are treated like all other types. Setting a page size at component
+level via the `component_traits` class template is another way to disable this
+optimization selectively rather than globally.
+
+## Pointer stability
+
+The ability to achieve pointer stability for one, several or all components is a
+direct consequence of the design of `EnTT` and of its default storage.<br/>
+In fact, although it contains what is commonly referred to as a _packed array_,
+the default storage is paged and doesn't suffer from invalidation of references
+when it runs out of space and has to reallocate.<br/>
+However, this isn't enough to ensure pointer stability in case of deletion. For
+this reason, a _stable_ deletion method is also offered. This one is such that
+the position of the elements is preserved by creating tombstones upon deletion
+rather than trying to fill the holes that are created.
+
+For performance reasons, `EnTT` favors storage compaction in all cases, although
+often accessing a component occurs mostly randomly or traversing pools in a
+non-linear order on the user side (as in the case of a hierarchy).<br/>
+In other words, pointer stability is not automatic but is enabled on request.
+
+### In-place delete
+
+The library offers out of the box support for in-place deletion, thus offering
+storage with completely stable pointers. This is achieved by specializing the
+`component_traits` class or by adding the required properties to the component
+definition when needed.<br/>
+Views and groups adapt accordingly when they detect a storage with a different
+deletion policy than the default. In particular:
+
+* Groups are incompatible with stable storage and even refuse to compile.
+* Multi type and runtime views are completely transparent to storage policies.
+* Single type views for stable storage types offer the same interface of multi
+  type views. For example, only `size_hint` is available.
+
+In other words, the more generic version of a view is provided in case of stable
+storage, even for a single type view.<br/>
+In no case a tombstone is returned from the view itself. Likewise, non-existent
+components aren't returned, which could otherwise result in an UB.
+
+### Hierarchies and the like
+
+`EnTT` doesn't attempt in any way to offer built-in methods with hidden or
+unclear costs to facilitate the creation of hierarchies.<br/>
+There are various solutions to the problem, such as using the following class:
+
+```cpp
+struct relationship {
+    std::size_t children{};
+    entt::entity first{entt::null};
+    entt::entity prev{entt::null};
+    entt::entity next{entt::null};
+    entt::entity parent{entt::null};
+    // ... other data members ...
+};
+```
+
+However, it should be pointed out that the possibility of having stable pointers
+for one, many or all types solves the problem of hierarchies at the root in many
+cases.<br/>
+In fact, if a certain type of component is visited mainly in random order or
+according to hierarchical relationships, using direct pointers has many
+advantages:
+
+```cpp
+struct transform {
+    static constexpr auto in_place_delete = true;
+
+    transform *parent;
+    // ... other data members ...
+};
+```
+
+Furthermore, it's quite common for a group of elements to be created close in
+time and therefore fallback into adjacent positions, thus favoring locality even
+on random accesses. Locality that isn't sacrificed over time given the stability
+of storage positions, with undoubted performance advantages.
+
+# Meet the runtime
+
+`EnTT` takes advantage of what the language offers at compile-time. However,
+this can have its downsides (well known to those familiar with type erasure
+techniques).<br/>
+To fill the gap, the library also provides a bunch of utilities and feature that
+are very useful to handle types and pools at runtime.
+
+## A base class to rule them all
+
+Storage classes are fully self-contained types. They are _extended_ via mixins
+to add more functionalities (generic or type specific). In addition, they offer
+a basic set of functions that already allow users to go very far.<br/>
+The aim is to limit the need for customizations as much as possible, offering
+what is usually necessary for the vast majority of cases.
+
+When a storage is used through its base class (for example, when its actual type
+isn't known), there is always the possibility of receiving a `type_info` object
+for the type of elements associated with the entities (if any):
+
+```cpp
+if(entt::type_id<velocity>() == base.type()) {
+    // ...
+}
+```
+
+Furthermore, all features rely on internal functions that forward the calls to
+the mixins. The latter can then make use of any information, which is set via
+`bind`:
+
+```cpp
+base.bind(entt::forward_as_any(registry));
+```
+
+The `bind` function accepts an `entt::any` object, that is a _typed type-erased_
+value.<br/>
+This is how a registry _passes_ itself to all pools that support signals and
+also why a storage keeps sending events without requiring the registry to be
+passed to it every time.
+
+Alongside these more specific things, there are also a couple of functions
+designed to address some common requirements such as copying an entity.<br/>
+In particular, the base class behind a storage offers the possibility to _take_
+the value associated with an entity through an opaque pointer:
+
+```cpp
+const void *instance = base.value(entity);
+```
+
+Similarly, the non-specialized `push` function accepts an optional opaque
+pointer and behaves differently depending on the case:
+
+* When the pointer is null, the function tries to default-construct an instance
+  of the object to bind to the entity and returns true on success.
+
+* When the pointer is non-null, the function tries to copy-construct an instance
+  of the object to bind to the entity and returns true on success.
+
+This means that, starting from a reference to the base, it's possible to bind
+components with entities without knowing their actual type and even initialize
+them by copy if needed:
+
+```cpp
+// create a copy of an entity component by component
+for(auto &&curr: registry.storage()) {
+    if(auto &storage = curr.second; storage.contains(src)) {
+        storage.push(dst, storage.value(src));
+    }
+}
+```
+
+This is particularly useful to clone entities in an opaque way. In addition, the
+decoupling of features allows for filtering or use of different copying policies
+depending on the type.
+
+## Beam me up, registry
+
+`EnTT` allows the user to assign a _name_ (or rather, a numeric identifier) to a
+type and then create multiple pools of the same type:
+
+```cpp
+using namespace entt::literals;
+auto &&storage = registry.storage<velocity>("second pool"_hs);
+```
+
+If a name isn't provided, the default storage associated with the given type is
+always returned.<br/>
+Since the storage are also self-contained, the registry doesn't _duplicate_ its
+own API for them. However, there is still no limit to the possibilities of use:
+
+```cpp
+auto &&other = registry.storage<velocity>("other"_hs);
+
+registry.emplace<velocity>(entity);
+storage.push(entity);
+```
+
+Anything that can be done via the registry interface can also be done directly
+on the reference storage.<br/>
+On the other hand, those calls involving all storage are guaranteed to also
+_reach_ manually created ones:
+
+```cpp
+// removes the entity from both storage
+registry.destroy(entity);
+```
+
+Finally, a storage of this type works with any view (which also accepts multiple
+storages of the same type, if necessary):
+
+```cpp
+// direct initialization
+entt::basic_view direct{
+    registry.storage<velocity>(),
+    registry.storage<velocity>("other"_hs)
+};
+
+// concatenation
+auto join = registry.view<velocity>() | entt::basic_view{registry.storage<velocity>("other"_hs)};
+```
+
+The possibility of direct use of storage combined with the freedom of being able
+to create and use more than one of the same type opens the door to the use of
+`EnTT` _at runtime_, which was previously quite limited.
 
 # Views and Groups
 
@@ -1974,30 +1998,6 @@ This happens because groups own the pools of their components and organize the
 data internally to maximize performance. Because of that, full consistency for
 owned components is guaranteed only when they are iterated as part of their
 groups or as free types with multi type views and groups in general.
-
-# Empty type optimization
-
-An empty type `T` is such that `std::is_empty_v<T>` returns true. They also are
-the same types for which _empty base optimization_ (EBO) is possible.<br/>
-`EnTT` handles these types in a special way, optimizing both in terms of
-performance and memory usage. However, this also has consequences that are worth
-mentioning.
-
-When an empty type is detected, it's not instantiated by default. Therefore,
-only the entities to which it's assigned are made available. There doesn't exist
-a way to _get_ empty types from a registry. Views and groups never return their
-instances (for example, during a call to `each`).<br/>
-On the other hand, iterations are faster because only the entities to which the
-type is assigned are considered. Moreover, less memory is used, mainly because
-there doesn't exist any instance of the component, no matter how many entities
-it is assigned to.
-
-More in general, none of the feature offered by the library is affected, but for
-the ones that require to return actual instances.<br/>
-This optimization is disabled by defining the `ENTT_NO_ETO` macro. In this case,
-empty types are treated like all other types. Setting a page size at component
-level via the `component_traits` class template is another way to disable this
-optimization selectively rather than globally.
 
 # Multithreading
 
