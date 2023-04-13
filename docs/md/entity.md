@@ -34,9 +34,9 @@
     * [Archives](#archives)
     * [One example to rule them all](#one-example-to-rule-them-all)
 * [Storage](#storage)
-  * [Void storage](#void-storage)
   * [Component traits](#component-traits)
   * [Empty type optimization](#empty-type-optimization)
+  * [Void storage](#void-storage)
   * [Pointer stability](#pointer-stability)
     * [In-place delete](#in-place-delete)
     * [Hierarchies and the like](#hierarchies-and-the-like)
@@ -1167,15 +1167,7 @@ Sparse arrays are _paged_ to avoid wasting memory. Packed arrays of components
 are also paged to have pointer stability upon additions. Packed arrays of
 entities are not instead.<br/>
 All pools rearranges their items in order to keep the internal arrays tightly
-packed and maximize performance, unless pointer stability is enabled.
-
-## Void storage
-
-A void storage, or `storage<void>`, is a fully functional storage type used to
-create pools not associated with a particular component type.<br/>
-This should be preferred to using a simple sparse set. In particular, a void
-storage offers all those feature normally offered by all other storage types.
-Therefore, it's a perfectly valid pool for use with views or within a registry.
+packed and maximize performance, unless full pointer stability is enabled.
 
 ## Component traits
 
@@ -1232,6 +1224,19 @@ This optimization is disabled by defining the `ENTT_NO_ETO` macro. In this case,
 empty types are treated like all other types. Setting a page size at component
 level via the `component_traits` class template is another way to disable this
 optimization selectively rather than globally.
+
+## Void storage
+
+A void storage (also known as `storage<void>` or `basic_storage<Type, void>`),
+is a fully functional storage type used to create pools not associated with a
+particular component type.<br/>
+From a technical point of view, it's in all respects similar to a storage for
+empty types when their optimization is enabled. Pagination is disabled as well
+as pointer stability (as not necessary).<br/>
+However, this should be preferred to using a simple sparse set. In particular,
+a void storage offers all those feature normally offered by other storage types.
+Therefore, it's a perfectly valid pool for use with views and groups or within a
+registry.
 
 ## Pointer stability
 
