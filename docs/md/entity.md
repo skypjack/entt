@@ -34,6 +34,7 @@
     * [Archives](#archives)
     * [One example to rule them all](#one-example-to-rule-them-all)
 * [Storage](#storage)
+  * [Void storage](#void-storage)
   * [Component traits](#component-traits)
   * [Empty type optimization](#empty-type-optimization)
   * [Pointer stability](#pointer-stability)
@@ -1167,6 +1168,14 @@ are also paged to have pointer stability upon additions. Packed arrays of
 entities are not instead.<br/>
 All pools rearranges their items in order to keep the internal arrays tightly
 packed and maximize performance, unless pointer stability is enabled.
+
+## Void storage
+
+A void storage, or `storage<void>`, is a fully functional storage type used to
+create pools not associated with a particular component type.<br/>
+This should be preferred to using a simple sparse set. In particular, a void
+storage offers all those feature normally offered by all other storage types.
+Therefore, it's a perfectly valid pool for use with views or within a registry.
 
 ## Component traits
 
