@@ -2154,22 +2154,6 @@ TEST(Registry, Storage) {
     ASSERT_EQ(cit->first, entt::type_id<entt::entity>().hash());
 }
 
-TEST(Registry, VoidType) {
-    using namespace entt::literals;
-
-    entt::registry registry;
-    const auto entity = registry.create();
-    auto &storage = registry.storage<void>("custom"_hs);
-    storage.emplace(entity);
-
-    ASSERT_TRUE(registry.storage<void>().empty());
-    ASSERT_FALSE(registry.storage<void>("custom"_hs).empty());
-    ASSERT_TRUE(registry.storage<void>("custom"_hs).contains(entity));
-
-    ASSERT_EQ(registry.storage<void>().type(), entt::type_id<void>());
-    ASSERT_EQ(registry.storage<void>("custom"_hs).type(), entt::type_id<void>());
-}
-
 TEST(Registry, RegistryStorageIterator) {
     entt::registry registry;
     const auto entity = registry.create();
@@ -2249,6 +2233,22 @@ TEST(Registry, RegistryStorageIteratorConversion) {
     ASSERT_GE(cit, it);
     ASSERT_EQ(it, cit);
     ASSERT_NE(++cit, it);
+}
+
+TEST(Registry, VoidType) {
+    using namespace entt::literals;
+
+    entt::registry registry;
+    const auto entity = registry.create();
+    auto &storage = registry.storage<void>("custom"_hs);
+    storage.emplace(entity);
+
+    ASSERT_TRUE(registry.storage<void>().empty());
+    ASSERT_FALSE(registry.storage<void>("custom"_hs).empty());
+    ASSERT_TRUE(registry.storage<void>("custom"_hs).contains(entity));
+
+    ASSERT_EQ(registry.storage<void>().type(), entt::type_id<void>());
+    ASSERT_EQ(registry.storage<void>("custom"_hs).type(), entt::type_id<void>());
 }
 
 TEST(Registry, NoEtoType) {
