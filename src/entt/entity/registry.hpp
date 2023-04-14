@@ -243,9 +243,6 @@ class basic_registry {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
 
-    template<typename Type>
-    using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
-
     // std::shared_ptr because of its type erased allocator which is useful here
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
     using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
@@ -307,6 +304,13 @@ public:
     using common_type = base_type;
     /*! @brief Context type. */
     using context = internal::registry_context<allocator_type>;
+
+    /**
+     * @copybrief storage_for
+     * @tparam Type Storage value type, eventually const.
+     */
+    template<typename Type>
+    using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
 
     /*! @brief Default constructor. */
     basic_registry()
