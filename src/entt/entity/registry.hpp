@@ -256,7 +256,7 @@ class basic_registry {
         auto &cpool = pools[id];
 
         if(!cpool) {
-            using storage_type = storage_for_type<std::remove_const_t<Type>>;
+            using storage_type = storage_for_type<Type>;
             using alloc_type = typename storage_type::allocator_type;
 
             if constexpr(std::is_same_v<Type, void> && !std::is_constructible_v<alloc_type, allocator_type>) {
