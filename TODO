@@ -6,7 +6,6 @@ EXAMPLES
 * support to polymorphic types (see #859)
 
 DOC:
-* storage<entity>
 * custom storage/view
 * examples (and credits) from @alanjfs :)
 * update entity doc when the storage based model is in place

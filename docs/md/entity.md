@@ -37,6 +37,7 @@
   * [Component traits](#component-traits)
   * [Empty type optimization](#empty-type-optimization)
   * [Void storage](#void-storage)
+  * [Entity storage](#entity-storage)
   * [Pointer stability](#pointer-stability)
     * [In-place delete](#in-place-delete)
     * [Hierarchies and the like](#hierarchies-and-the-like)
@@ -1227,7 +1228,7 @@ optimization selectively rather than globally.
 
 ## Void storage
 
-A void storage (also known as `storage<void>` or `basic_storage<Type, void>`),
+A void storage (or `entt::storage<void>` or `entt::basic_storage<Type, void>`),
 is a fully functional storage type used to create pools not associated with a
 particular component type.<br/>
 From a technical point of view, it's in all respects similar to a storage for
@@ -1237,6 +1238,39 @@ However, this should be preferred to using a simple sparse set. In particular,
 a void storage offers all those feature normally offered by other storage types.
 Therefore, it's a perfectly valid pool for use with views and groups or within a
 registry.
+
+## Entity storage
+
+This storage is such that the component type is the same as the entity type, for
+example `entt::storage<entt::entity>` or `entt::basic_storage<Type, Type>`.<br/>
+For this type of pools, there is a specific specialization within `EnTT`. In
+fact, entities are subject to different rules with respect to components
+(although still customizable by the user if needed). In particular:
+
+* Entities are never truly _deleted_. They are moved out of the list of entities
+  _in use_ and their versions are updated automatically.
+
+* `emplace` as well as `insert` have a slightly different meaning than their
+  counterparts for components. In the case of an entity storage, these functions
+  _generate_ or _recycle_ identifiers rather than allowing them to be _assigned_
+  to existing entities.
+
+* The `each` function iterates only the entities _in use_, that is, those not
+  marked as _ready for reuse_. To iterate all the entities it's necessary to
+  iterate the underlying sparse set instead.
+
+Moreover, the entity storage offers a couple of additional utilities such as:
+
+* The `in_use` function which is used to know how many entities are still
+  _in use_. When combined with `size`, it also makes it possible to know how
+  many entities are available for recycling.
+
+* The `pack` function which is used to make a given set of entities contiguous.
+  This is particularly useful to pass valid lists of entities via iterators
+  (with access usually optimized within the library).
+
+This kind of storage is designed to be used where any other storage is fine and
+can therefore be combined with views, groups and so on.
 
 ## Pointer stability
 
