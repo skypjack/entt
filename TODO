@@ -1,6 +1,3 @@
-* debugging tools (#60): the issue online already contains interesting tips on this, look at it
-* work stealing job system (see #100) + mt scheduler based on const awareness for types
-
 EXAMPLES
 * filter on runtime values/variables (not only types)
 * support to polymorphic types (see #859)
@@ -14,7 +11,7 @@ DOC:
 TODO (high prio):
 * check natvis files (periodically :)
 * remove the static storage from the const assure in the registry
-* doc: exclude only views, storage entity (and diff between iterator and each based iteration), bump entities, signals on entity creation/destruction
+* doc: exclude only views, bump entities, signals on entity creation/destruction
 * registry: replace destroy with a drop-all method that doesn't care about validity
 * resource cache: avoid using shared ptr with loader and the others
 
@@ -24,3 +21,5 @@ WIP:
 * basic_storage::bind for cross-registry setups (see and remove todo from entity_copy.cpp)
 * process scheduler: reviews, use free lists internally
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
+* bring nested groups back in place (see bd34e7f)
+* work stealing job system (see #100) + mt scheduler based on const awareness for types
