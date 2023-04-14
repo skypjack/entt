@@ -428,7 +428,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Type>
-    decltype(auto) storage(const id_type id = type_hash<Type>::value()) {
+    storage_for_type<Type> &storage(const id_type id = type_hash<Type>::value()) {
         return assure<Type>(id);
     }
 
@@ -444,7 +444,7 @@ public:
      * @return The storage for the given component type.
      */
     template<typename Type>
-    decltype(auto) storage(const id_type id = type_hash<Type>::value()) const {
+    const storage_for_type<Type> &storage(const id_type id = type_hash<Type>::value()) const {
         return assure<Type>(id);
     }
 
