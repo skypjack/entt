@@ -297,11 +297,13 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
 
     auto pools() const noexcept {
-        return descriptor->template pools_as<std::tuple<Get *...>>();
+        using return_type = std::tuple<Get *...>;
+        return descriptor ? descriptor->template pools_as<return_type>() : return_type{};
     }
 
     auto filter() const noexcept {
-        return descriptor->template filter_as<std::tuple<Exclude *...>>();
+        using return_type = std::tuple<Exclude *...>;
+        return descriptor ? descriptor->template filter_as<return_type>() : return_type{};
     }
 
 public:
@@ -340,28 +342,28 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type.
+     * @brief Returns the storage for a given component type, if any.
      * @tparam Type Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
     template<typename Type>
-    [[nodiscard]] decltype(auto) storage() const noexcept {
+    [[nodiscard]] auto *storage() const noexcept {
         return storage<index_of<Type>>();
     }
 
     /**
-     * @brief Returns the storage for a given index.
+     * @brief Returns the storage for a given index, if any.
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
     template<std::size_t Index>
-    [[nodiscard]] decltype(auto) storage() const noexcept {
+    [[nodiscard]] auto *storage() const noexcept {
         constexpr auto offset = sizeof...(Get);
 
         if constexpr(Index < offset) {
-            return *std::get<Index>(pools());
+            return std::get<Index>(pools());
         } else {
-            return *std::get<Index - offset>(filter());
+            return std::get<Index - offset>(filter());
         }
     }
 
@@ -728,11 +730,13 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type..., typename Exclude::value_type...>>;
 
     auto pools() const noexcept {
-        return descriptor->template pools_as<std::tuple<Owned *..., Get *...>>();
+        using return_type = std::tuple<Owned *..., Get *...>;
+        return descriptor ? descriptor->template pools_as<return_type>() : return_type{};
     }
 
     auto filter() const noexcept {
-        return descriptor->template filter_as<std::tuple<Exclude *...>>();
+        using return_type = std::tuple<Exclude *...>;
+        return descriptor ? descriptor->template filter_as<return_type>() : return_type{};
     }
 
 public:
@@ -767,32 +771,32 @@ public:
      * @return The leading storage of the group.
      */
     [[nodiscard]] const common_type &handle() const noexcept {
-        return storage<0>();
+        return *storage<0>();
     }
 
     /**
-     * @brief Returns the storage for a given component type.
+     * @brief Returns the storage for a given component type, if any.
      * @tparam Type Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
     template<typename Type>
-    [[nodiscard]] decltype(auto) storage() const noexcept {
+    [[nodiscard]] auto *storage() const noexcept {
         return storage<index_of<Type>>();
     }
 
     /**
-     * @brief Returns the storage for a given index.
+     * @brief Returns the storage for a given index, if any.
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
     template<std::size_t Index>
-    [[nodiscard]] decltype(auto) storage() const noexcept {
+    [[nodiscard]] auto *storage() const noexcept {
         constexpr auto offset = sizeof...(Owned) + sizeof...(Get);
 
         if constexpr(Index < offset) {
-            return *std::get<Index>(pools());
+            return std::get<Index>(pools());
         } else {
-            return *std::get<Index - offset>(filter());
+            return std::get<Index - offset>(filter());
         }
     }
 
@@ -1072,7 +1076,7 @@ public:
 
         if constexpr(sizeof...(Index) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            storage<0>().sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            storage<0>()->sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
             auto comp = [&compare, &cpools](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Index) == 1) {
@@ -1082,7 +1086,7 @@ public:
                 }
             };
 
-            storage<0>().sort_n(descriptor->length(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
+            storage<0>()->sort_n(descriptor->length(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
         }
 
         auto cb = [this](auto *head, auto *...other) {
