@@ -219,14 +219,14 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
         if constexpr(Curr == Other) {
             return std::forward_as_tuple(std::get<Args>(curr)...);
         } else {
-            return storage<Other>().get_as_tuple(std::get<0>(curr));
+            return storage<Other>()->get_as_tuple(std::get<0>(curr));
         }
     }
 
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
-        for(const auto curr: storage<Curr>().each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || storage<Index>().contains(entt)) && ...) && internal::none_of(filter, entt)) {
+        for(const auto curr: storage<Curr>()->each()) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || storage<Index>()->contains(entt)) && ...) && internal::none_of(filter, entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
@@ -238,7 +238,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
 
     template<typename Func, std::size_t... Index>
     void pick_and_each(Func &func, std::index_sequence<Index...> seq) const {
-        ((&storage<Index>() == view ? each<Index>(func, seq) : void()), ...);
+        ((storage<Index>() == view ? each<Index>(func, seq) : void()), ...);
     }
 
 public:
@@ -297,7 +297,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] basic_view use() const noexcept {
         basic_view other{*this};
-        other.view = &storage<Index>();
+        other.view = storage<Index>();
         return other;
     }
 
@@ -318,28 +318,28 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type.
+     * @brief Returns the storage for a given component type, if any.
      * @tparam Type Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
     template<typename Type>
-    [[nodiscard]] decltype(auto) storage() const noexcept {
+    [[nodiscard]] auto *storage() const noexcept {
         return storage<index_of<Type>>();
     }
 
     /**
-     * @brief Returns the storage for a given index.
+     * @brief Returns the storage for a given index, if any.
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
     template<std::size_t Index>
-    [[nodiscard]] decltype(auto) storage() const noexcept {
+    [[nodiscard]] auto *storage() const noexcept {
         constexpr auto offset = sizeof...(Get);
 
         if constexpr(Index < offset) {
-            return *std::get<Index>(pools);
+            return std::get<Index>(pools);
         } else {
-            return *std::get<Index - offset>(internal::filter_as_tuple<Exclude...>(filter));
+            return std::get<Index - offset>(internal::filter_as_tuple<Exclude...>(filter));
         }
     }
 
@@ -464,9 +464,9 @@ public:
         if constexpr(sizeof...(Index) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, pools);
         } else if constexpr(sizeof...(Index) == 1) {
-            return (storage<Index>().get(entt), ...);
+            return (storage<Index>()->get(entt), ...);
         } else {
-            return std::tuple_cat(storage<Index>().get_as_tuple(entt)...);
+            return std::tuple_cat(storage<Index>()->get_as_tuple(entt)...);
         }
     }
 
@@ -597,24 +597,24 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type.
+     * @brief Returns the storage for a given component type, if any.
      * @tparam Type Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
     template<typename Type = typename Get::value_type>
-    [[nodiscard]] decltype(auto) storage() const noexcept {
+    [[nodiscard]] auto *storage() const noexcept {
         static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::value_type>, "Invalid component type");
         return storage<0>();
     }
 
     /**
-     * @brief Returns the storage for a given index.
+     * @brief Returns the storage for a given index, if any.
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
     template<std::size_t Index>
-    [[nodiscard]] decltype(auto) storage() const noexcept {
-        return *std::get<Index>(pools);
+    [[nodiscard]] auto *storage() const noexcept {
+        return std::get<Index>(pools);
     }
 
     /**
@@ -728,7 +728,7 @@ public:
      * @return The component assigned to the given entity.
      */
     [[nodiscard]] decltype(auto) operator[](const entity_type entt) const {
-        return storage().get(entt);
+        return storage()->get(entt);
     }
 
     /**
@@ -769,9 +769,9 @@ public:
     template<std::size_t... Elem>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Elem) == 0) {
-            return storage().get_as_tuple(entt);
+            return storage()->get_as_tuple(entt);
         } else {
-            return storage<Elem...>().get(entt);
+            return storage<Elem...>()->get(entt);
         }
     }
 
@@ -808,7 +808,7 @@ public:
                 func();
             }
         } else {
-            for(auto &&component: storage()) {
+            for(auto &&component: *storage()) {
                 func(component);
             }
         }
@@ -824,7 +824,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return storage().each();
+        return storage()->each();
     }
 
     /**
