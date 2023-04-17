@@ -691,6 +691,8 @@ TEST(NonOwningGroup, Storage) {
     static_assert(std::is_same_v<decltype(group.storage<float>()), const entt::storage_type_t<float> *>);
     static_assert(std::is_same_v<decltype(group.storage<const float>()), const entt::storage_type_t<float> *>);
 
+    ASSERT_TRUE(group);
+
     ASSERT_NE(group.storage<int>(), nullptr);
     ASSERT_NE(group.storage<1u>(), nullptr);
     ASSERT_NE(group.storage<double>(), nullptr);
@@ -735,6 +737,8 @@ TEST(NonOwningGroup, Storage) {
     ASSERT_FALSE((registry.any_of<int, double, float>(entity)));
 
     group = {};
+
+    ASSERT_FALSE(group);
 
     ASSERT_EQ(group.storage<0u>(), nullptr);
     ASSERT_EQ(group.storage<const char>(), nullptr);
@@ -1575,6 +1579,8 @@ TEST(OwningGroup, Storage) {
     static_assert(std::is_same_v<decltype(group.storage<float>()), const entt::storage_type_t<float> *>);
     static_assert(std::is_same_v<decltype(group.storage<const float>()), const entt::storage_type_t<float> *>);
 
+    ASSERT_TRUE(group);
+
     ASSERT_NE(group.storage<int>(), nullptr);
     ASSERT_NE(group.storage<1u>(), nullptr);
     ASSERT_NE(group.storage<double>(), nullptr);
@@ -1619,6 +1625,8 @@ TEST(OwningGroup, Storage) {
     ASSERT_FALSE((registry.any_of<int, double, float>(entity)));
 
     group = {};
+
+    ASSERT_FALSE(group);
 
     ASSERT_EQ(group.storage<0u>(), nullptr);
     ASSERT_EQ(group.storage<const char>(), nullptr);

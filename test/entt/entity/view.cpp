@@ -473,6 +473,9 @@ TEST(SingleComponentView, Storage) {
     static_assert(std::is_same_v<decltype(cview.storage<char>()), const entt::storage_type_t<char> *>);
     static_assert(std::is_same_v<decltype(cview.storage<const char>()), const entt::storage_type_t<char> *>);
 
+    ASSERT_TRUE(view);
+    ASSERT_TRUE(cview);
+
     ASSERT_NE(view.storage<int>(), nullptr);
     ASSERT_NE(cview.storage<0u>(), nullptr);
 
@@ -498,6 +501,9 @@ TEST(SingleComponentView, Storage) {
 
     view = {};
     cview = {};
+
+    ASSERT_FALSE(view);
+    ASSERT_FALSE(cview);
 
     ASSERT_EQ(view.storage<0u>(), nullptr);
     ASSERT_EQ(cview.storage<const char>(), nullptr);
@@ -1260,6 +1266,8 @@ TEST(MultiComponentView, Storage) {
     static_assert(std::is_same_v<decltype(view.storage<float>()), const entt::storage_type_t<float> *>);
     static_assert(std::is_same_v<decltype(view.storage<const float>()), const entt::storage_type_t<float> *>);
 
+    ASSERT_TRUE(view);
+
     ASSERT_NE(view.storage<int>(), nullptr);
     ASSERT_NE(view.storage<1u>(), nullptr);
 
@@ -1302,6 +1310,8 @@ TEST(MultiComponentView, Storage) {
     ASSERT_FALSE((registry.any_of<int, double, float>(entity)));
 
     view = {};
+
+    ASSERT_FALSE(view);
 
     ASSERT_EQ(view.storage<0u>(), nullptr);
     ASSERT_EQ(view.storage<const char>(), nullptr);
