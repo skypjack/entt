@@ -995,8 +995,11 @@ TEST(Registry, View) {
     ASSERT_EQ(mview.size_hint(), 3u);
     ASSERT_EQ(fview.size_hint(), 3u);
 
-    ASSERT_EQ(mview.refresh().size_hint(), 2u);
-    ASSERT_EQ(fview.refresh().size_hint(), 3u);
+    mview.refresh();
+    fview.refresh();
+
+    ASSERT_EQ(mview.size_hint(), 2u);
+    ASSERT_EQ(fview.size_hint(), 3u);
 
     ASSERT_NE(mview.begin(), mview.end());
     ASSERT_NE(fview.begin(), fview.end());

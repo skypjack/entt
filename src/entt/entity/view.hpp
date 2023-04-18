@@ -268,7 +268,7 @@ public:
         : pools{&value...},
           filter{&excl...},
           view{std::get<0>(pools)} {
-        ((view = value.size() < view->size() ? &value : view), ...);
+        refresh();
     }
 
     /**
@@ -301,12 +301,9 @@ public:
         return other;
     }
 
-    /**
-     * @brief Updates the internal leading view if required.
-     * @return A newly created and internally optimized view.
-     */
-    [[nodiscard]] basic_view refresh() const noexcept {
-        return std::apply([](auto *...elem) { return basic_view{*elem...}; }, std::tuple_cat(pools, internal::filter_as_tuple<Exclude...>(filter)));
+    /*! @brief Updates the internal leading view if required. */
+    void refresh() noexcept {
+        std::apply([this](auto *...elem) { ((view = elem->size() < view->size() ? elem : view), ...); }, pools);
     }
 
     /**
