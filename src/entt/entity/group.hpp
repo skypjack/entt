@@ -152,7 +152,7 @@ public:
         }
     }
 
-    size_type owned(const id_type *elem, size_type length) const noexcept final {
+    size_type owned(const id_type *elem, const size_type length) const noexcept final {
         size_type cnt = 0u;
 
         for(auto pos = 0u; pos < length; ++pos) {
