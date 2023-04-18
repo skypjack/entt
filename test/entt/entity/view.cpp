@@ -1287,6 +1287,8 @@ TEST(MultiComponentView, Storage) {
 
     ASSERT_NE(view.storage<int>(), nullptr);
     ASSERT_NE(view.storage<1u>(), nullptr);
+    ASSERT_NE(view.storage<double>(), nullptr);
+    ASSERT_NE(view.storage<3u>(), nullptr);
 
     ASSERT_EQ(view.size_hint(), 0u);
 
@@ -1332,6 +1334,8 @@ TEST(MultiComponentView, Storage) {
 
     ASSERT_EQ(view.storage<0u>(), nullptr);
     ASSERT_EQ(view.storage<const char>(), nullptr);
+    ASSERT_EQ(view.storage<2u>(), nullptr);
+    ASSERT_EQ(view.storage<const float>(), nullptr);
 }
 
 TEST(View, Pipe) {
