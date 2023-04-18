@@ -191,7 +191,7 @@ class basic_view;
  *   or removed from it).
  * * The entity currently pointed is destroyed.
  *
- * In all other cases, modifying the pools iterated by the view in any way
+ * In all other cases, modifying the storage iterated by the view in any way
  * invalidates all the iterators and using them results in undefined behavior.
  *
  * @tparam Get Types of storage iterated by the view.
@@ -542,7 +542,7 @@ private:
  *   or removed from it).
  * * The entity currently pointed is destroyed.
  *
- * In all other cases, modifying the pool iterated by the view in any way
+ * In all other cases, modifying the storage iterated by the view in any way
  * invalidates all the iterators and using them results in undefined behavior.
  *
  * @tparam Get Type of storage iterated by the view.
