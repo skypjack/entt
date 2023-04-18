@@ -280,25 +280,21 @@ public:
         : basic_view{std::make_from_tuple<basic_view>(std::tuple_cat(value, excl))} {}
 
     /**
-     * @brief Creates a new view driven by a given component in its iterations.
+     * @brief Forces a view to use a given component to drive iterations
      * @tparam Type Type of component used to drive the iteration.
-     * @return A new view driven by the given component in its iterations.
      */
     template<typename Type>
-    [[nodiscard]] basic_view use() const noexcept {
+    void use() noexcept {
         return use<index_of<Type>>();
     }
 
     /**
-     * @brief Creates a new view driven by a given component in its iterations.
+     * @brief Forces a view to use a given component to drive iterations
      * @tparam Index Index of the component used to drive the iteration.
-     * @return A new view driven by the given component in its iterations.
      */
     template<std::size_t Index>
-    [[nodiscard]] basic_view use() const noexcept {
-        basic_view other{*this};
-        other.view = storage<Index>();
-        return other;
+    void use() noexcept {
+        view = storage<Index>();
     }
 
     /*! @brief Updates the internal leading view if required. */

@@ -590,7 +590,7 @@ TEST(MultiComponentView, Handle) {
     ASSERT_EQ(&other, &view.handle());
     ASSERT_NE(&handle, &other);
 
-    view = view.use<int>();
+    view.use<int>();
 
     ASSERT_NE(&other, &view.handle());
     ASSERT_EQ(&handle, &view.handle());
@@ -770,6 +770,7 @@ TEST(MultiComponentView, Each) {
 
 TEST(MultiComponentView, EachWithSuggestedType) {
     entt::registry registry;
+    auto view = registry.view<int, char>();
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
@@ -781,7 +782,8 @@ TEST(MultiComponentView, EachWithSuggestedType) {
     const auto entity = registry.create();
     registry.emplace<int>(entity, 99);
 
-    registry.view<int, char>().use<int>().each([value = 2](const auto curr, const auto) mutable {
+    view.use<int>();
+    view.each([value = 2](const auto curr, const auto) mutable {
         ASSERT_EQ(curr, value--);
     });
 
@@ -789,7 +791,8 @@ TEST(MultiComponentView, EachWithSuggestedType) {
         return lhs < rhs;
     });
 
-    registry.view<int, char>().use<0u>().each([value = 0](const auto curr, const auto) mutable {
+    view.use<0u>();
+    view.each([value = 0](const auto curr, const auto) mutable {
         ASSERT_EQ(curr, value++);
     });
 
@@ -808,8 +811,9 @@ TEST(MultiComponentView, EachWithSuggestedType) {
     });
 
     value = {};
+    view.use<int>();
 
-    for(auto &&curr: registry.view<int, char>().use<int>().each()) {
+    for(auto &&curr: view.each()) {
         ASSERT_EQ(std::get<1>(curr), static_cast<int>(value++));
     }
 }
@@ -976,6 +980,10 @@ TEST(MultiComponentView, ExcludedComponents) {
 TEST(MultiComponentView, EmptyTypes) {
     entt::registry registry;
 
+    auto v1 = registry.view<int, char, empty_type>(entt::exclude<double>);
+    auto v2 = registry.view<int, empty_type, char>(entt::exclude<double>);
+    auto v3 = registry.view<empty_type, int, char>(entt::exclude<double>);
+
     const auto entity = registry.create();
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
@@ -991,57 +999,61 @@ TEST(MultiComponentView, EmptyTypes) {
     registry.emplace<int>(ignored);
     registry.emplace<char>(ignored);
 
-    registry.view<int, char, empty_type>(entt::exclude<double>).each([entity](const auto entt, int, char) {
+    v1.each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto [entt, iv, cv]: registry.view<int, char, empty_type>(entt::exclude<double>).each()) {
+    for(auto [entt, iv, cv]: v1.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
         ASSERT_EQ(entity, entt);
     }
 
-    registry.view<int, empty_type, char>(entt::exclude<double>).each([check = true](int, char) mutable {
+    v2.each([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
-    for(auto [entt, iv, cv]: registry.view<int, empty_type, char>(entt::exclude<double>).each()) {
+    for(auto [entt, iv, cv]: v2.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
         ASSERT_EQ(entity, entt);
     }
 
-    registry.view<empty_type, int, char>(entt::exclude<double>).each([entity](const auto entt, int, char) {
+    v3.each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto [entt, iv, cv]: registry.view<empty_type, int, char>(entt::exclude<double>).each()) {
+    for(auto [entt, iv, cv]: v3.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
         ASSERT_EQ(entity, entt);
     }
 
-    registry.view<empty_type, int, char>(entt::exclude<double>).use<empty_type>().each([entity](const auto entt, int, char) {
+    v3.use<empty_type>();
+    v3.each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto [entt, iv, cv]: registry.view<empty_type, int, char>(entt::exclude<double>).use<0u>().each()) {
+    v3.use<0u>();
+    for(auto [entt, iv, cv]: v3.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
         ASSERT_EQ(entity, entt);
     }
 
-    registry.view<int, empty_type, char>(entt::exclude<double>).use<1u>().each([check = true](int, char) mutable {
+    v2.use<1u>();
+    v2.each([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
-    for(auto [entt, iv, cv]: registry.view<int, empty_type, char>(entt::exclude<double>).use<empty_type>().each()) {
+    v2.use<empty_type>();
+    for(auto [entt, iv, cv]: v2.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -1132,7 +1144,7 @@ TEST(MultiComponentView, StableType) {
 
     ASSERT_EQ(view.size_hint(), 1u);
 
-    view = view.use<stable_type>();
+    view.use<stable_type>();
 
     ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_FALSE(view.contains(entity));
@@ -1167,7 +1179,9 @@ TEST(MultiComponentView, StableType) {
 
 TEST(MultiComponentView, StableTypeWithExcludedComponent) {
     entt::registry registry;
-    auto view = registry.view<stable_type>(entt::exclude<int>).use<stable_type>();
+    auto view = registry.view<stable_type>(entt::exclude<int>);
+
+    view.use<stable_type>();
 
     const auto entity = registry.create();
     const auto other = registry.create();
@@ -1245,7 +1259,10 @@ TEST(MultiComponentView, SameComponentTypes) {
     }
 
     ASSERT_EQ(&view.handle(), &storage);
-    ASSERT_EQ(&view.use<1u>().handle(), &other);
+
+    view.use<1u>();
+
+    ASSERT_EQ(&view.handle(), &other);
 }
 
 TEST(MultiComponentView, Storage) {
