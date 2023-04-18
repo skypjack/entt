@@ -114,7 +114,7 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const value_type value) noexcept {
-        return (to_integral(value) >> length);
+        return static_cast<version_type>(to_integral(value) >> length);
     }
 
     /**
