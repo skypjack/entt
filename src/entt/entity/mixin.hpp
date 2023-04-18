@@ -36,12 +36,12 @@ class sigh_mixin final: public Type {
     }
 
     void pop(underlying_iterator first, underlying_iterator last) final {
-        if(auto &registry = owner_or_assert(); destruction.empty()) {
+        if(auto &reg = owner_or_assert(); destruction.empty()) {
             Type::pop(first, last);
         } else {
             for(; first != last; ++first) {
                 const auto entt = *first;
-                destruction.publish(registry, entt);
+                destruction.publish(reg, entt);
                 const auto it = Type::find(entt);
                 Type::pop(it, it + 1u);
             }
@@ -49,14 +49,14 @@ class sigh_mixin final: public Type {
     }
 
     void pop_all() final {
-        if(auto &registry = owner_or_assert(); !destruction.empty()) {
+        if(auto &reg = owner_or_assert(); !destruction.empty()) {
             for(auto pos = Type::each().begin().base().index(); !(pos < 0); --pos) {
                 if constexpr(Type::traits_type::in_place_delete) {
                     if(const auto entt = Type::operator[](static_cast<typename Type::size_type>(pos)); entt != tombstone) {
-                        destruction.publish(registry, entt);
+                        destruction.publish(reg, entt);
                     }
                 } else {
-                    destruction.publish(registry, Type::operator[](static_cast<typename Type::size_type>(pos)));
+                    destruction.publish(reg, Type::operator[](static_cast<typename Type::size_type>(pos)));
                 }
             }
         }
@@ -67,8 +67,8 @@ class sigh_mixin final: public Type {
     underlying_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
         const auto it = Type::try_emplace(entt, force_back, value);
 
-        if(auto &registry = owner_or_assert(); it != Type::base_type::end()) {
-            construction.publish(registry, *it);
+        if(auto &reg = owner_or_assert(); it != Type::base_type::end()) {
+            construction.publish(reg, *it);
         }
 
         return it;
@@ -263,9 +263,9 @@ public:
     void insert(It first, It last, Args &&...args) {
         Type::insert(first, last, std::forward<Args>(args)...);
 
-        if(auto &registry = owner_or_assert(); !construction.empty()) {
+        if(auto &reg = owner_or_assert(); !construction.empty()) {
             for(; first != last; ++first) {
-                construction.publish(registry, *first);
+                construction.publish(reg, *first);
             }
         }
     }
