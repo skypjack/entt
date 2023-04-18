@@ -299,7 +299,7 @@ public:
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
-        std::apply([this](auto *...elem) { ((view = elem->size() < view->size() ? elem : view), ...); }, pools);
+        std::apply([this](auto *...elem) { ((this->view = elem->size() < this->view->size() ? elem : this->view), ...); }, pools);
     }
 
     /**
