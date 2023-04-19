@@ -199,6 +199,7 @@ class basic_view;
  */
 template<typename... Get, typename... Exclude>
 class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
+    static constexpr auto offset = sizeof...(Get);
     using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = typename base_type::entity_type;
 
@@ -267,7 +268,7 @@ public:
     basic_view(Get &...value, Exclude &...excl) noexcept
         : pools{&value...},
           filter{&excl...},
-          view{std::get<0>(pools)} {
+          view{} {
         refresh();
     }
 
@@ -299,7 +300,8 @@ public:
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
-        std::apply([this](auto *...elem) { ((this->view = elem->size() < this->view->size() ? elem : this->view), ...); }, pools);
+        view = std::get<0>(pools);
+        std::apply([this](auto *, auto *...other) { ((this->view = other->size() < this->view->size() ? other : this->view), ...); }, pools);
     }
 
     /**
@@ -327,12 +329,40 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
-        constexpr auto offset = sizeof...(Get);
-
         if constexpr(Index < offset) {
             return std::get<Index>(pools);
         } else {
             return std::get<Index - offset>(internal::filter_as_tuple<Exclude...>(filter));
+        }
+    }
+
+    /**
+     * @brief Assigns a storage to a view.
+     * @tparam Type Type of storage to assign to the view.
+     * @param elem A storage to assign to the view.
+     */
+    template<typename Type>
+    void storage(Type &elem) noexcept {
+        storage<index_of<typename Type::value_type>>(elem);
+    }
+
+    /**
+     * @brief Assigns a storage to a view.
+     * @tparam Index Index of the storage to assign to the view.
+     * @tparam Type Type of storage to assign to the view.
+     * @param elem A storage to assign to the view.
+     */
+    template<std::size_t Index, typename Type>
+    void storage(Type &elem) noexcept {
+        if constexpr(Index < offset) {
+            view = (std::get<Index>(pools) == view ? nullptr : view);
+            std::get<Index>(pools) = &elem;
+        } else {
+            std::get<Index - offset>(filter) = &elem;
+        }
+
+        if(view == nullptr && std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools)) {
+            refresh();
         }
     }
 
@@ -608,6 +638,24 @@ public:
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         return std::get<Index>(pools);
+    }
+
+    /**
+     * @brief Assigns a storage to a view.
+     * @param elem A storage to assign to the view.
+     */
+    void storage(Get &elem) noexcept {
+        storage<0>(elem);
+    }
+
+    /**
+     * @brief Assigns a storage to a view.
+     * @tparam Index Index of the storage to assign to the view.
+     * @param elem A storage to assign to the view.
+     */
+    template<std::size_t Index>
+    void storage(Get &elem) noexcept {
+        view = std::get<Index>(pools) = &elem;
     }
 
     /**

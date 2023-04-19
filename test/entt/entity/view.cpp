@@ -509,6 +509,41 @@ TEST(SingleComponentView, Storage) {
     ASSERT_EQ(cview.storage<const char>(), nullptr);
 }
 
+TEST(SingleComponentView, SwapStorage) {
+    using namespace entt::literals;
+
+    entt::registry registry;
+    entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<>> view;
+    entt::basic_view<entt::get_t<const entt::storage<int>>, entt::exclude_t<>> cview;
+
+    ASSERT_FALSE(view);
+    ASSERT_FALSE(cview);
+    ASSERT_EQ(view.storage<0u>(), nullptr);
+    ASSERT_EQ(cview.storage<const int>(), nullptr);
+
+    const entt::entity entity{42u};
+    registry.emplace<int>(entity);
+
+    view.storage(registry.storage<int>());
+    cview.storage(registry.storage<int>());
+
+    ASSERT_TRUE(view);
+    ASSERT_TRUE(cview);
+    ASSERT_NE(view.storage<0u>(), nullptr);
+    ASSERT_NE(cview.storage<const int>(), nullptr);
+
+    ASSERT_EQ(view.size(), 1u);
+    ASSERT_EQ(cview.size(), 1u);
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_TRUE(cview.contains(entity));
+
+    view.storage(registry.storage<int>("other"_hs));
+    cview.storage(registry.storage<int>("other"_hs));
+
+    ASSERT_TRUE(view.empty());
+    ASSERT_TRUE(cview.empty());
+}
+
 TEST(MultiComponentView, Functionalities) {
     entt::registry registry;
     auto view = registry.view<int, char>();
@@ -1336,6 +1371,40 @@ TEST(MultiComponentView, Storage) {
     ASSERT_EQ(view.storage<const char>(), nullptr);
     ASSERT_EQ(view.storage<2u>(), nullptr);
     ASSERT_EQ(view.storage<const float>(), nullptr);
+}
+
+TEST(MultiComponentView, SwapStorage) {
+    using namespace entt::literals;
+
+    entt::registry registry;
+    entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<const entt::storage<char>>> view;
+
+    ASSERT_FALSE(view);
+    ASSERT_EQ(view.storage<0u>(), nullptr);
+    ASSERT_EQ(view.storage<const char>(), nullptr);
+
+    const entt::entity entity{42u};
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+
+    view.storage(registry.storage<int>());
+    view.storage<1u>(registry.storage<char>());
+
+    ASSERT_TRUE(view);
+    ASSERT_NE(view.storage<int>(), nullptr);
+    ASSERT_NE(view.storage<1u>(), nullptr);
+
+    ASSERT_EQ(view.size_hint(), 1u);
+    ASSERT_FALSE(view.contains(entity));
+
+    view.storage(registry.storage<char>("other"_hs));
+
+    ASSERT_EQ(view.size_hint(), 1u);
+    ASSERT_TRUE(view.contains(entity));
+
+    view.storage(registry.storage<int>("empty"_hs));
+
+    ASSERT_EQ(view.size_hint(), 0u);
 }
 
 TEST(View, Pipe) {

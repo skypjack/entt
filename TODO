@@ -7,6 +7,7 @@ DOC:
 * examples (and credits) from @alanjfs :)
 * update entity doc when the storage based model is in place
 * in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
+* storage swap on views and empty views (once the static storage in the registry is removed)
 
 TODO (high prio):
 * check natvis files (periodically :)
