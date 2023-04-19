@@ -22,7 +22,7 @@ namespace entt {
 namespace internal {
 
 template<typename... Args, typename Type, std::size_t N>
-auto filter_as_tuple(const std::array<const Type *, N> &filter) noexcept {
+[[nodiscard]] auto filter_as_tuple(const std::array<const Type *, N> &filter) noexcept {
     return std::apply([](const auto *...curr) { return std::make_tuple(static_cast<Args *>(const_cast<constness_as_t<Type, Args> *>(curr))...); }, filter);
 }
 
