@@ -309,6 +309,7 @@ public:
      * @return The leading storage of the view.
      */
     [[nodiscard]] const common_type &handle() const noexcept {
+        ENTT_ASSERT(view != nullptr, "Handle not available");
         return *view;
     }
 
@@ -616,6 +617,7 @@ public:
      * @return The leading storage of the view.
      */
     [[nodiscard]] const common_type &handle() const noexcept {
+        ENTT_ASSERT(view != nullptr, "Handle not available");
         return *view;
     }
 
