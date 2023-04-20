@@ -35,7 +35,7 @@ template<typename... Get, typename... Exclude, std::size_t... Index>
 [[nodiscard]] auto view_pack(const std::tuple<Get *...> value, const std::tuple<Exclude *...> excl, std::index_sequence<Index...>) {
     const auto pools = std::tuple_cat(value, excl);
     basic_view<get_t<Get...>, exclude_t<Exclude...>> elem{};
-    (((std::get<Index>(pools) != nullptr) ? elem.storage<Index>(*std::get<Index>(pools)) : void()), ...);
+    (((std::get<Index>(pools) != nullptr) ? elem.template storage<Index>(*std::get<Index>(pools)) : void()), ...);
     return elem;
 }
 
