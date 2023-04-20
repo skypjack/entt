@@ -1421,10 +1421,10 @@ TEST(View, Pipe) {
     registry.emplace<char>(other);
     registry.emplace<stable_type>(other);
 
-    const auto view1 = registry.view<int>(entt::exclude<const double>);
-    const auto view2 = registry.view<const char>(entt::exclude<float>);
-    const auto view3 = registry.view<empty_type>();
-    const auto view4 = registry.view<stable_type>();
+    auto view1 = registry.view<int>(entt::exclude<const double>);
+    auto view2 = registry.view<const char>(entt::exclude<float>);
+    auto view3 = registry.view<empty_type>();
+    auto view4 = registry.view<stable_type>();
 
     static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<char>>, entt::exclude_t<const entt::storage_type_t<double>, entt::storage_type_t<float>>>, decltype(view1 | view2)>);
     static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<char>, entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<float>, const entt::storage_type_t<double>>>, decltype(view2 | view1)>);
@@ -1441,4 +1441,26 @@ TEST(View, Pipe) {
 
     ASSERT_FALSE((view1 | view4 | view2).contains(entity));
     ASSERT_TRUE((view1 | view4 | view2).contains(other));
+
+    view1 = {};
+    view3 = {};
+
+    ASSERT_FALSE(view1);
+    ASSERT_TRUE(view2);
+    ASSERT_FALSE(view3);
+    ASSERT_TRUE(view4);
+
+    auto pack14 = view1 | view4;
+    auto pack32 = view3 | view2;
+
+    ASSERT_FALSE(pack14);
+    ASSERT_FALSE(pack32);
+
+    ASSERT_EQ(pack14.storage<int>(), nullptr);
+    ASSERT_EQ(pack14.storage<const double>(), nullptr);
+    ASSERT_NE(pack14.storage<stable_type>(), nullptr);
+
+    ASSERT_EQ(pack32.storage<empty_type>(), nullptr);
+    ASSERT_NE(pack32.storage<const char>(), nullptr);
+    ASSERT_NE(pack32.storage<float>(), nullptr);
 }

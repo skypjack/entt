@@ -31,6 +31,14 @@ template<typename Type, std::size_t N>
     return std::apply([entt](const auto *...curr) { return (!curr->contains(entt) && ...); }, filter);
 }
 
+template<typename... Get, typename... Exclude, std::size_t... Index>
+[[nodiscard]] auto view_pack(const std::tuple<Get *...> value, const std::tuple<Exclude *...> excl, std::index_sequence<Index...>) {
+    const auto pools = std::tuple_cat(value, excl);
+    basic_view<get_t<Get...>, exclude_t<Exclude...>> elem{};
+    (((std::get<Index>(pools) != nullptr) ? elem.storage<Index>(*std::get<Index>(pools)) : void()), ...);
+    return elem;
+}
+
 template<typename Type, std::size_t Get, std::size_t Exclude>
 class view_iterator final {
     using iterator_type = typename Type::const_iterator;
@@ -539,9 +547,10 @@ public:
      */
     template<typename... OGet, typename... OExclude>
     [[nodiscard]] auto operator|(const basic_view<get_t<OGet...>, exclude_t<OExclude...>> &other) const noexcept {
-        return std::apply(
-            [](auto *...curr) { return basic_view<get_t<Get..., OGet...>, exclude_t<Exclude..., OExclude...>>{*curr...}; },
-            std::tuple_cat(pools, other.pools, internal::filter_as_tuple<Exclude...>(filter), internal::filter_as_tuple<OExclude...>(other.filter)));
+        return internal::view_pack(
+            std::tuple_cat(pools, other.pools),
+            std::tuple_cat(internal::filter_as_tuple<Exclude...>(filter), internal::filter_as_tuple<OExclude...>(other.filter)),
+            std::index_sequence_for<Get..., OGet..., Exclude..., OExclude...>{});
     }
 
 private:
@@ -879,9 +888,10 @@ public:
      */
     template<typename... OGet, typename... OExclude>
     [[nodiscard]] auto operator|(const basic_view<get_t<OGet...>, exclude_t<OExclude...>> &other) const noexcept {
-        return std::apply(
-            [](auto *...curr) { return basic_view<get_t<Get, OGet...>, exclude_t<OExclude...>>{*curr...}; },
-            std::tuple_cat(pools, other.pools, internal::filter_as_tuple<OExclude...>(other.filter)));
+        return internal::view_pack(
+            std::tuple_cat(pools, other.pools),
+            internal::filter_as_tuple<OExclude...>(other.filter),
+            std::index_sequence_for<Get, OGet..., OExclude...>{});
     }
 
 private:
