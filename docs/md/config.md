@@ -17,7 +17,6 @@
     * [ENTT_DISABLE_ASSERT](#entt_disable_assert)
   * [ENTT_NO_ETO](#entt_no_eto)
   * [ENTT_STANDARD_CPP](#entt_standard_cpp)
-
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->

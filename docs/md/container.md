@@ -9,7 +9,6 @@
 * [Containers](#containers)
   * [Dense map](#dense-map)
   * [Dense set](#dense-set)
-
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
