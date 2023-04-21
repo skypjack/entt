@@ -762,7 +762,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? handle().find(entt) : end();
+        return handle().find(entt);
     }
 
     /**
