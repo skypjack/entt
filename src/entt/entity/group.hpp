@@ -479,8 +479,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        const auto it = *this ? handle().find(entt) : iterator{};
-        return it != end() && *it == entt ? it : end();
+        return *this ? handle().find(entt) : iterator{};
     }
 
     /**
@@ -897,7 +896,7 @@ public:
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
         const auto it = *this ? handle().find(entt) : iterator{};
-        return it != end() && it >= begin() && *it == entt ? it : end();
+        return it >= begin() ? it : iterator{};
     }
 
     /**
