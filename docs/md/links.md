@@ -1,5 +1,22 @@
 # EnTT in Action
 
+<!--
+@cond TURN_OFF_DOXYGEN
+-->
+# Table of Contents
+
+* [Introduction](#introduction)
+* [EnTT in Action](#entt-in-action)
+  * [Games](#games)
+  * [Engines and the like](#engines-and-the-like)
+  * [Articles, videos and blog posts](#articles-videos-and-blog-posts)
+  * [Any Other Business](#any-other-business)
+<!--
+@endcond TURN_OFF_DOXYGEN
+-->
+
+# Introduction
+
 `EnTT` is widely used in private and commercial applications. I cannot even
 mention most of them because of some signatures I put on some documents time
 ago. Fortunately, there are also people who took the time to implement open
@@ -7,13 +24,18 @@ source projects based on `EnTT` and didn't hold back when it came to documenting
 them.
 
 Below an incomplete list of games, applications and articles that can be used as
-a reference. Where I put the word _apparently_ means that the use of `EnTT` is
-documented but the authors didn't make explicit announcements or contacted me
-directly.
+a reference.<br/>
+Where I put the word _apparently_ means that the use of `EnTT` is documented but
+the authors didn't make explicit announcements or contacted me directly.
 
-I hope this list can grow much more in the future:
+If you know of other resources out there that are about `EnTT`, feel free to
+open an issue or a PR and I'll be glad to add them to this page.<br/>
+I hope the following lists can grow much more in the future.
 
-* Games:
+# EnTT in Action
+
+## Games
+
   * [Minecraft](https://minecraft.net/en-us/attribution/) by
     [Mojang](https://mojang.com/): of course, **that** Minecraft, see the
     open source attributions page for more details.
@@ -103,7 +125,8 @@ I hope this list can grow much more in the future:
   * [Confetti Party](https://github.com/hexerei/entt-confetti): C++ sample
     application as a starting point using `EnTT` and `SDL2`.
 
-* Engines and the like:
+## Engines and the like:
+
   * [Aether Engine](https://hadean.com/spatial-simulation/)
     [v1.1+](https://docs.hadean.com/v1.1/Licenses/) by
     [Hadean](https://hadean.com/): a library designed for spatially partitioning
@@ -179,7 +202,8 @@ I hope this list can grow much more in the future:
   * [Kengine](https://github.com/phisko/kengine): the _Koala engine_ is a game
     engine entirely implemented as an entity-component-ystem.
 
-* Articles, videos and blog posts:
+## Articles, videos and blog posts:
+
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
     [blog](https://skypjack.github.io/) are about `EnTT`, for those who want to
     know **more** on this project.
@@ -235,7 +259,8 @@ I hope this list can grow much more in the future:
     MMO(RPG)s and its [follow-up](https://youtu.be/yGlZeopx2hU) episode about
     player bots and full external ECS: a series definitely worth looking at.
 
-* Any Other Business:
+## Any Other Business:
+
   * [ArcGIS Runtime SDKs](https://developers.arcgis.com/arcgis-runtime/) by
     [Esri](https://www.esri.com/): they use `EnTT` for the internal ECS and the
     cross platform C++ rendering engine. The SDKs are utilized by a lot of
@@ -277,6 +302,3 @@ I hope this list can grow much more in the future:
   * GitHub contains also
     [many other examples](https://github.com/search?o=desc&q=%22skypjack%2Fentt%22&s=indexed&type=Code)
     of use of `EnTT` from which to take inspiration if interested.
-
-If you know of other resources out there that are about `EnTT`, feel free to
-open an issue or a PR and I'll be glad to add them to this page.
