@@ -330,32 +330,34 @@ public:
     template<auto Data, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-            using data_type = std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>;
+            using data_type = std::invoke_result_t<decltype(Data), Type &>;
+            static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
             auto &&elem = internal::meta_extend(
                 internal::owner(*ctx, *info),
                 id,
                 internal::meta_data_node{
                     /* this is never static */
-                    std::is_const_v<data_type> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
+                    std::is_const_v<std::remove_reference_t<data_type>> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
-                    &internal::resolve<std::remove_cv_t<data_type>>,
-                    &meta_arg<type_list<std::remove_cv_t<data_type>>>,
+                    &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
+                    &meta_arg<type_list<std::remove_cv_t<std::remove_reference_t<data_type>>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
 
             bucket = &elem.prop;
         } else {
-            using data_type = std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>;
+            using data_type = std::remove_pointer_t<decltype(Data)>;
+            static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
             auto &&elem = internal::meta_extend(
                 internal::owner(*ctx, *info),
                 id,
                 internal::meta_data_node{
-                    ((std::is_same_v<Type, std::remove_cv_t<data_type>> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
+                    ((std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<data_type>>> || std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
-                    &internal::resolve<std::remove_cv_t<data_type>>,
-                    &meta_arg<type_list<std::remove_cv_t<data_type>>>,
+                    &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
+                    &meta_arg<type_list<std::remove_cv_t<std::remove_reference_t<data_type>>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
 
