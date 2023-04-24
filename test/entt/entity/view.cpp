@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
+#include "../common/config.h"
 
 struct empty_type {};
 
@@ -68,6 +69,12 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
     ASSERT_FALSE(invalid);
+}
+
+ENTT_DEBUG_TEST(SingleComponentViewDeathTest, InvalidView) {
+    entt::view<entt::get_t<int>> view{};
+
+    ASSERT_DEATH([[maybe_unused]] auto &&handle = view.handle(), "");
 }
 
 TEST(SingleComponentView, Constructors) {
@@ -584,6 +591,12 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
     ASSERT_FALSE(invalid);
+}
+
+ENTT_DEBUG_TEST(MultiComponentViewDeathTest, InvalidView) {
+    entt::view<entt::get_t<int>, entt::exclude_t<char>> view{};
+
+    ASSERT_DEATH([[maybe_unused]] auto &&handle = view.handle(), "");
 }
 
 TEST(MultiComponentView, Constructors) {
