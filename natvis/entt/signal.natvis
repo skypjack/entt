@@ -50,7 +50,6 @@
 		<DisplayString>{{ type={ "$T1" } }}</DisplayString>
 		<Expand>
 			<Item Name="[signal]">signal,na</Item>
-			<Item Name="[offset]">offset</Item>
 		</Expand>
 	</Type>
 </AutoVisualizer>
