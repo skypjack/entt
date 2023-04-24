@@ -136,7 +136,7 @@ template<typename Lhs, typename Rhs, std::size_t Size>
 
 template<typename Lhs, typename Rhs, std::size_t Size>
 [[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs, Size> &lhs, const storage_iterator<Rhs, Size> &rhs) noexcept {
-    return lhs.index() < rhs.index();
+    return rhs < lhs;
 }
 
 template<typename Lhs, typename Rhs, std::size_t Size>

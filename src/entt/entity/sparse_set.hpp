@@ -123,7 +123,7 @@ template<typename Container>
 
 template<typename Container>
 [[nodiscard]] constexpr bool operator>(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
-    return lhs.index() < rhs.index();
+    return rhs < lhs;
 }
 
 template<typename Container>
@@ -350,7 +350,7 @@ public:
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
-    using const_reverse_iterator = reverse_iterator;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     /*! @brief Default constructor. */
     basic_sparse_set()
