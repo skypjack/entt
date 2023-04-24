@@ -1277,7 +1277,7 @@ TEST(Registry, CleanPartialOwningGroupViewAfterRemoveAndClear) {
     ASSERT_EQ(group.size(), 0u);
 }
 
-ENTT_DEBUG_TEST(Registry, NestedGroups) {
+ENTT_DEBUG_TEST(RegistryDeathTest, NestedGroups) {
     entt::registry registry;
     registry.group<int, double>(entt::get<char>);
 
@@ -1287,7 +1287,7 @@ ENTT_DEBUG_TEST(Registry, NestedGroups) {
     ASSERT_DEATH((registry.group<int, double>()), "");
 }
 
-ENTT_DEBUG_TEST(Registry, ConflictingGroups) {
+ENTT_DEBUG_TEST(RegistryDeathTest, ConflictingGroups) {
     entt::registry registry;
 
     registry.group<char>(entt::get<int>, entt::exclude<double>);

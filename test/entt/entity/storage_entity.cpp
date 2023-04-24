@@ -386,7 +386,7 @@ TEST(StorageEntity, ConstIterable) {
     }
 }
 
-ENTT_DEBUG_TEST(StorageEntity, SwapElements) {
+TEST(StorageEntity, SwapElements) {
     entt::storage<entt::entity> pool;
 
     pool.push(entt::entity{0});

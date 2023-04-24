@@ -1634,7 +1634,7 @@ TEST(OwningGroup, Storage) {
     ASSERT_EQ(group.storage<const float>(), nullptr);
 }
 
-ENTT_DEBUG_TEST(OwningGroup, Overlapping) {
+ENTT_DEBUG_TEST(OwningGroupDeathTest, Overlapping) {
     entt::registry registry;
     registry.group<char>(entt::get<int>, entt::exclude<double>);
 
