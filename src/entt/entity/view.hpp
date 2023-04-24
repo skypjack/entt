@@ -380,7 +380,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const noexcept {
-        return handle().size();
+        return view->size();
     }
 
     /**
@@ -392,7 +392,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return iterator{handle().begin(), handle().end(), opaque_check_set(), filter};
+        return iterator{view->begin(), view->end(), opaque_check_set(), filter};
     }
 
     /**
@@ -405,7 +405,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return iterator{handle().end(), handle().end(), opaque_check_set(), filter};
+        return iterator{view->end(), view->end(), opaque_check_set(), filter};
     }
 
     /**
@@ -424,9 +424,9 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const noexcept {
-        auto it = handle().rbegin();
-        for(const auto last = handle().rend(); it != last && !contains(*it); ++it) {}
-        return it == handle().rend() ? null : *it;
+        auto it = view->rbegin();
+        for(const auto last = view->rend(); it != last && !contains(*it); ++it) {}
+        return it == view->rend() ? null : *it;
     }
 
     /**
@@ -436,7 +436,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{handle().find(entt), handle().end(), opaque_check_set(), filter} : end();
+        return contains(entt) ? iterator{view->find(entt), view->end(), opaque_check_set(), filter} : end();
     }
 
     /**
@@ -674,7 +674,7 @@ public:
      * @return Number of entities that have the given component.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return handle().size();
+        return view->size();
     }
 
     /**
@@ -682,7 +682,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return handle().empty();
+        return view->empty();
     }
 
     /**
@@ -694,7 +694,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return handle().begin();
+        return view->begin();
     }
 
     /**
@@ -707,7 +707,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return handle().end();
+        return view->end();
     }
 
     /**
@@ -719,7 +719,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return handle().rbegin();
+        return view->rbegin();
     }
 
     /**
@@ -734,7 +734,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return handle().rend();
+        return view->rend();
     }
 
     /**
@@ -762,7 +762,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return handle().find(entt);
+        return view->find(entt);
     }
 
     /**
@@ -797,7 +797,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return handle().contains(entt);
+        return view->contains(entt);
     }
 
     /**
