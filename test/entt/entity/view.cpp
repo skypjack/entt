@@ -78,6 +78,7 @@ TEST(SingleComponentView, InvalidView) {
 
     ASSERT_EQ(view.size(), 0u);
     ASSERT_TRUE(view.empty());
+    ASSERT_FALSE(view.contains(entt::null));
 
     entt::storage<int> storage;
     view.storage(storage);

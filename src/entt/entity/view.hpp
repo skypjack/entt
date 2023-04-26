@@ -798,7 +798,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return view->contains(entt);
+        return view && view->contains(entt);
     }
 
     /**
