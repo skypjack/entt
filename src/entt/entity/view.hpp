@@ -683,7 +683,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return view->empty();
+        return !view || view->empty();
     }
 
     /**
