@@ -71,6 +71,17 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(SingleComponentView, InvalidView) {
+    entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<>> view{};
+
+    ASSERT_FALSE(view);
+
+    entt::storage<int> storage;
+    view.storage(storage);
+
+    ASSERT_TRUE(view);
+}
+
 ENTT_DEBUG_TEST(SingleComponentViewDeathTest, InvalidView) {
     entt::view<entt::get_t<int>> view{};
 
@@ -591,6 +602,22 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
     ASSERT_FALSE(invalid);
+}
+
+TEST(MultiComponentView, InvalidView) {
+    entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<entt::storage<char>>> view{};
+
+    ASSERT_FALSE(view);
+
+    entt::storage<int> storage;
+    view.storage(storage);
+
+    ASSERT_FALSE(view);
+
+    entt::storage<char> other;
+    view.storage(other);
+
+    ASSERT_TRUE(view);
 }
 
 ENTT_DEBUG_TEST(MultiComponentViewDeathTest, InvalidView) {

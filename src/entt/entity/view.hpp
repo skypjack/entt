@@ -449,11 +449,12 @@ public:
     }
 
     /**
-     * @brief Checks if a view is properly initialized.
-     * @return True if the view is properly initialized, false otherwise.
+     * @brief Checks if a view is fully initialized.
+     * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return view != nullptr;
+        return std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools)
+               && std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, filter);
     }
 
     /**
@@ -784,11 +785,11 @@ public:
     }
 
     /**
-     * @brief Checks if a view is properly initialized.
-     * @return True if the view is properly initialized, false otherwise.
+     * @brief Checks if a view is fully initialized.
+     * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return view != nullptr;
+        return (std::get<0>(pools) != nullptr);
     }
 
     /**
