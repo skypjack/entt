@@ -675,7 +675,7 @@ public:
      * @return Number of entities that have the given component.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return view->size();
+        return view ? view->size() : size_type{};
     }
 
     /**
