@@ -15,6 +15,7 @@ TODO (high prio):
 * doc: exclude only views, bump entities, signals on entity creation/destruction
 * registry: replace destroy with a drop-all method that doesn't care about validity
 * resource cache: avoid using shared ptr with loader and the others
+* make view::handle return a pointer (similar to ::storage)
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
