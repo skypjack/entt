@@ -695,7 +695,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return view->begin();
+        return view ? view->begin() : iterator{};
     }
 
     /**
@@ -708,7 +708,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return view->end();
+        return view ? view->end() : iterator{};
     }
 
     /**
