@@ -90,6 +90,11 @@ TEST(SingleComponentView, InvalidView) {
     ASSERT_EQ(view.rbegin(), typename decltype(view)::reverse_iterator{});
     ASSERT_EQ(view.rbegin(), view.rend());
 
+    auto iterable = view.each();
+
+    ASSERT_EQ(iterable.begin(), iterable.end());
+    ASSERT_EQ(iterable.cbegin(), iterable.cend());
+
     entt::storage<int> storage;
     view.storage(storage);
 

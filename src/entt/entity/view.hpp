@@ -877,7 +877,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return std::get<0>(pools)->each();
+        return view ? std::get<0>(pools)->each() : iterable{};
     }
 
     /**
