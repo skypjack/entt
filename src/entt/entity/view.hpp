@@ -720,7 +720,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return view->rbegin();
+        return view ? view->rbegin() : reverse_iterator{};
     }
 
     /**
@@ -735,7 +735,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return view->rend();
+        return view ? view->rend() : reverse_iterator{};
     }
 
     /**
