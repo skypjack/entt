@@ -763,7 +763,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return view->find(entt);
+        return view ? view->find(entt) : iterator{};
     }
 
     /**

@@ -79,6 +79,7 @@ TEST(SingleComponentView, InvalidView) {
     ASSERT_EQ(view.size(), 0u);
     ASSERT_TRUE(view.empty());
     ASSERT_FALSE(view.contains(entt::null));
+    ASSERT_EQ(view.find(entt::null), view.end());
 
     ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(view.back(), static_cast<entt::entity>(entt::null));
