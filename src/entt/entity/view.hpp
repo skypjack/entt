@@ -28,7 +28,7 @@ template<typename... Args, typename Type, std::size_t N>
 
 template<typename Type, std::size_t N>
 [[nodiscard]] auto none_of(const std::array<const Type *, N> &filter, const typename Type::entity_type entt) noexcept {
-    return std::apply([entt](const auto *...curr) { return (!curr->contains(entt) && ...); }, filter);
+    return std::apply([entt](const auto *...curr) { return (!(curr && curr->contains(entt)) && ...); }, filter);
 }
 
 template<typename... Get, typename... Exclude, std::size_t... Index>
