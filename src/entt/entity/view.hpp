@@ -379,7 +379,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const noexcept {
-        return view->size();
+        return view ? view->size() : size_type{};
     }
 
     /**

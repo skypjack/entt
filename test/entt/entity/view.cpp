@@ -630,6 +630,8 @@ TEST(MultiComponentView, InvalidView) {
 
     ASSERT_FALSE(view);
 
+    ASSERT_EQ(view.size_hint(), 0u);
+
     entt::storage<int> storage;
     view.storage(storage);
 
