@@ -294,7 +294,7 @@ public:
      */
     template<typename Type>
     void use() noexcept {
-        return use<index_of<Type>>();
+        use<index_of<Type>>();
     }
 
     /**
