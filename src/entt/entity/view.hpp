@@ -850,6 +850,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
+        if(view) {
         if constexpr(is_applicable_v<Func, decltype(*each().begin())>) {
             for(const auto pack: each()) {
                 std::apply(func, pack);
@@ -863,6 +864,7 @@ public:
                 func(component);
             }
         }
+    }
     }
 
     /**

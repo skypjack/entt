@@ -94,10 +94,16 @@ TEST(SingleComponentView, InvalidView) {
     ASSERT_EQ(iterable.begin(), iterable.end());
     ASSERT_EQ(iterable.cbegin(), iterable.cend());
 
+    view.each([](const int &) { FAIL(); });
+    view.each([](const entt::entity, const int &) { FAIL(); });
+
     entt::storage<int> storage;
     view.storage(storage);
 
     ASSERT_TRUE(view);
+
+    view.each([](const int &) { FAIL(); });
+    view.each([](const entt::entity, const int &) { FAIL(); });
 }
 
 TEST(SingleComponentView, Constructors) {
