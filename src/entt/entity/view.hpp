@@ -391,7 +391,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return iterator{view->begin(), view->end(), opaque_check_set(), filter};
+        return view ? iterator{view->begin(), view->end(), opaque_check_set(), filter} : iterator{};
     }
 
     /**
@@ -404,7 +404,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return iterator{view->end(), view->end(), opaque_check_set(), filter};
+        return view ? iterator{view->end(), view->end(), opaque_check_set(), filter} : iterator{};
     }
 
     /**
