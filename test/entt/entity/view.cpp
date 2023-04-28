@@ -632,6 +632,10 @@ TEST(MultiComponentView, InvalidView) {
 
     ASSERT_EQ(view.size_hint(), 0u);
     ASSERT_FALSE(view.contains(entt::null));
+    ASSERT_EQ(view.find(entt::null), view.end());
+
+    ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(view.back(), static_cast<entt::entity>(entt::null));
 
     ASSERT_EQ(view.begin(), typename decltype(view)::iterator{});
     ASSERT_EQ(view.begin(), view.end());
