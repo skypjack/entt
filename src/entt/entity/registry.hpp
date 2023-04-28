@@ -978,7 +978,7 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] bool any_of(const entity_type entt) const {
-        return (assure<std::remove_const_t<Type>>()->contains(entt) || ...);
+        return (all_of<Type>(entt) || ...);
     }
 
     /**
