@@ -295,7 +295,7 @@ public:
 
     /**
      * @brief Forces a view to use a given component to drive iterations
-     * @tparam Type Type of component used to drive the iteration.
+     * @tparam Type Type of component to use to drive iterations.
      */
     template<typename Type>
     void use() noexcept {
@@ -304,11 +304,13 @@ public:
 
     /**
      * @brief Forces a view to use a given component to drive iterations
-     * @tparam Index Index of the component used to drive the iteration.
+     * @tparam Index Index of the component to use to drive iterations.
      */
     template<std::size_t Index>
     void use() noexcept {
+        if(view) {
         view = std::get<Index>(pools);
+    }
     }
 
     /*! @brief Updates the internal leading view if required. */
