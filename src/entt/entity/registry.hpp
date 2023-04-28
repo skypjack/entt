@@ -961,7 +961,12 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] bool all_of(const entity_type entt) const {
-        return (assure<std::remove_const_t<Type>>()->contains(entt) && ...);
+        if constexpr(sizeof...(Type) == 1u) {
+            auto *cpool = assure<std::remove_const_t<Type>...>();
+            return cpool && cpool->contains(entt);
+        } else {
+            return (all_of<Type>(entt) && ...);
+    }
     }
 
     /**
