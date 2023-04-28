@@ -944,7 +944,7 @@ public:
      */
     template<typename... Type>
     void compact() {
-        if constexpr(sizeof...(Type) == 0) {
+        if constexpr(sizeof...(Type) == 0u) {
             for(auto &&curr: pools) {
                 curr.second->compact();
             }
@@ -1042,7 +1042,7 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) const {
-        if constexpr(sizeof...(Type) == 1) {
+        if constexpr(sizeof...(Type) == 1u) {
             const auto &cpool = assure<std::remove_const_t<Type>...>();
             return cpool->contains(entt) ? std::addressof(cpool->get(entt)) : nullptr;
         } else {
@@ -1053,7 +1053,7 @@ public:
     /*! @copydoc try_get */
     template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) {
-        if constexpr(sizeof...(Type) == 1) {
+        if constexpr(sizeof...(Type) == 1u) {
             return (const_cast<Type *>(std::as_const(*this).template try_get<Type>(entt)), ...);
         } else {
             return std::make_tuple(try_get<Type>(entt)...);
@@ -1066,7 +1066,7 @@ public:
      */
     template<typename... Type>
     void clear() {
-        if constexpr(sizeof...(Type) == 0) {
+        if constexpr(sizeof...(Type) == 0u) {
             ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
 
             for(size_type pos = pools.size() - 1u; pos; --pos) {
