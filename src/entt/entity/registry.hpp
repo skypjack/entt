@@ -271,16 +271,16 @@ class basic_registry {
     }
 
     template<typename Type>
-    [[nodiscard]] const auto &assure(const id_type id = type_hash<Type>::value()) const {
+    [[nodiscard]] const auto *assure(const id_type id = type_hash<Type>::value()) const {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
 
         if(const auto it = pools.find(id); it != pools.cend()) {
             ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
-            return static_cast<const storage_for_type<Type> &>(*it->second);
+            return static_cast<const storage_for_type<Type> *>(it->second.get());
         }
 
         static storage_for_type<Type> placeholder{};
-        return placeholder;
+        return &placeholder;
     }
 
     void rebind() {
@@ -449,7 +449,7 @@ public:
      */
     template<typename Type>
     const storage_for_type<Type> &storage(const id_type id = type_hash<Type>::value()) const {
-        return assure<Type>(id);
+        return *assure<Type>(id);
     }
 
     /**
@@ -961,7 +961,7 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] bool all_of(const entity_type entt) const {
-        return (assure<std::remove_const_t<Type>>().contains(entt) && ...);
+        return (assure<std::remove_const_t<Type>>()->contains(entt) && ...);
     }
 
     /**
@@ -973,7 +973,7 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] bool any_of(const entity_type entt) const {
-        return (assure<std::remove_const_t<Type>>().contains(entt) || ...);
+        return (assure<std::remove_const_t<Type>>()->contains(entt) || ...);
     }
 
     /**
@@ -990,7 +990,7 @@ public:
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         if constexpr(sizeof...(Type) == 1u) {
-            return (assure<std::remove_const_t<Type>>().get(entt), ...);
+            return (assure<std::remove_const_t<Type>>()->get(entt), ...);
         } else {
             return std::forward_as_tuple(get<Type>(entt)...);
         }
@@ -1044,7 +1044,7 @@ public:
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) const {
         if constexpr(sizeof...(Type) == 1) {
             const auto &cpool = assure<std::remove_const_t<Type>...>();
-            return cpool.contains(entt) ? std::addressof(cpool.get(entt)) : nullptr;
+            return cpool->contains(entt) ? std::addressof(cpool->get(entt)) : nullptr;
         } else {
             return std::make_tuple(try_get<Type>(entt)...);
         }
@@ -1189,7 +1189,7 @@ public:
     template<typename Type, typename... Other, typename... Exclude>
     [[nodiscard]] basic_view<get_t<storage_for_type<const Type>, storage_for_type<const Other>...>, exclude_t<storage_for_type<const Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) const {
-        return {assure<std::remove_const_t<Type>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
+        return {*assure<std::remove_const_t<Type>>(), *assure<std::remove_const_t<Other>>()..., *assure<std::remove_const_t<Exclude>>()...};
     }
 
     /*! @copydoc view */
