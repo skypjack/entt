@@ -309,8 +309,8 @@ public:
     template<std::size_t Index>
     void use() noexcept {
         if(view) {
-        view = std::get<Index>(pools);
-    }
+            view = std::get<Index>(pools);
+        }
     }
 
     /*! @brief Updates the internal leading view if required. */
@@ -371,14 +371,10 @@ public:
     template<std::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
         if constexpr(Index < offset) {
-            view = (std::get<Index>(pools) == view ? nullptr : view);
             std::get<Index>(pools) = &elem;
+            view ? unchecked_refresh() : refresh();
         } else {
             std::get<Index - offset>(filter) = &elem;
-        }
-
-        if(view == nullptr && std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools)) {
-            refresh();
         }
     }
 
@@ -432,10 +428,10 @@ public:
      */
     [[nodiscard]] entity_type back() const noexcept {
         if(view) {
-        auto it = view->rbegin();
-        for(const auto last = view->rend(); it != last && !contains(*it); ++it) {}
-        return it == view->rend() ? null : *it;
-    }
+            auto it = view->rbegin();
+            for(const auto last = view->rend(); it != last && !contains(*it); ++it) {}
+            return it == view->rend() ? null : *it;
+        }
 
         return null;
     }
@@ -863,20 +859,20 @@ public:
     template<typename Func>
     void each(Func func) const {
         if(view) {
-        if constexpr(is_applicable_v<Func, decltype(*each().begin())>) {
-            for(const auto pack: each()) {
-                std::apply(func, pack);
-            }
-        } else if constexpr(Get::traits_type::page_size == 0u) {
-            for(size_type pos{}, last = size(); pos < last; ++pos) {
-                func();
-            }
-        } else {
-            for(auto &&component: *std::get<0>(pools)) {
-                func(component);
+            if constexpr(is_applicable_v<Func, decltype(*each().begin())>) {
+                for(const auto pack: each()) {
+                    std::apply(func, pack);
+                }
+            } else if constexpr(Get::traits_type::page_size == 0u) {
+                for(size_type pos{}, last = size(); pos < last; ++pos) {
+                    func();
+                }
+            } else {
+                for(auto &&component: *std::get<0>(pools)) {
+                    func(component);
+                }
             }
         }
-    }
     }
 
     /**
