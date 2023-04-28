@@ -223,6 +223,11 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
         return other;
     }
 
+    void unchecked_refresh() noexcept {
+        view = std::get<0>(pools);
+        std::apply([this](auto *, auto *...other) { ((this->view = other->size() < this->view->size() ? other : this->view), ...); }, pools);
+    }
+
     template<std::size_t Curr, std::size_t Other, typename... Args>
     [[nodiscard]] auto dispatch_get(const std::tuple<underlying_type, Args...> &curr) const {
         if constexpr(Curr == Other) {
@@ -277,7 +282,7 @@ public:
         : pools{&value...},
           filter{&excl...},
           view{} {
-        refresh();
+        unchecked_refresh();
     }
 
     /**
@@ -308,8 +313,9 @@ public:
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
-        view = std::get<0>(pools);
-        std::apply([this](auto *, auto *...other) { ((this->view = other->size() < this->view->size() ? other : this->view), ...); }, pools);
+        if(std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools)) {
+            unchecked_refresh();
+        }
     }
 
     /**
