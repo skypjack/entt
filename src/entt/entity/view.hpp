@@ -313,12 +313,11 @@ public:
     }
 
     /**
-     * @brief Returns the leading storage of a view.
+     * @brief Returns the leading storage of a view, if any.
      * @return The leading storage of the view.
      */
-    [[nodiscard]] const common_type &handle() const noexcept {
-        ENTT_ASSERT(view != nullptr, "Handle not available");
-        return *view;
+    [[nodiscard]] const common_type *handle() const noexcept {
+        return view;
     }
 
     /**
@@ -623,12 +622,11 @@ public:
         : basic_view{std::get<0>(value)} {}
 
     /**
-     * @brief Returns the leading storage of a view.
+     * @brief Returns the leading storage of a view, if any.
      * @return The leading storage of the view.
      */
-    [[nodiscard]] const common_type &handle() const noexcept {
-        ENTT_ASSERT(view != nullptr, "Handle not available");
-        return *view;
+    [[nodiscard]] const common_type *handle() const noexcept {
+        return view;
     }
 
     /**

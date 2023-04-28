@@ -6,7 +6,6 @@
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
-#include "../common/config.h"
 
 struct empty_type {};
 
@@ -101,12 +100,6 @@ TEST(SingleComponentView, InvalidView) {
     ASSERT_TRUE(view);
 }
 
-ENTT_DEBUG_TEST(SingleComponentViewDeathTest, InvalidView) {
-    entt::view<entt::get_t<int>> view{};
-
-    ASSERT_DEATH([[maybe_unused]] auto &&handle = view.handle(), "");
-}
-
 TEST(SingleComponentView, Constructors) {
     entt::storage<int> storage{};
 
@@ -118,7 +111,8 @@ TEST(SingleComponentView, Constructors) {
     ASSERT_TRUE(from_storage);
     ASSERT_TRUE(from_tuple);
 
-    ASSERT_EQ(&from_storage.handle(), &from_tuple.handle());
+    ASSERT_NE(from_storage.handle(), nullptr);
+    ASSERT_EQ(from_storage.handle(), from_tuple.handle());
 }
 
 TEST(SingleComponentView, Handle) {
@@ -126,17 +120,19 @@ TEST(SingleComponentView, Handle) {
     const auto entity = registry.create();
 
     auto view = registry.view<int>();
-    auto &&handle = view.handle();
+    auto *handle = view.handle();
 
-    ASSERT_TRUE(handle.empty());
-    ASSERT_FALSE(handle.contains(entity));
-    ASSERT_EQ(&handle, &view.handle());
+    ASSERT_NE(handle, nullptr);
+
+    ASSERT_TRUE(handle->empty());
+    ASSERT_FALSE(handle->contains(entity));
+    ASSERT_EQ(handle, view.handle());
 
     registry.emplace<int>(entity);
 
-    ASSERT_FALSE(handle.empty());
-    ASSERT_TRUE(handle.contains(entity));
-    ASSERT_EQ(&handle, &view.handle());
+    ASSERT_FALSE(handle->empty());
+    ASSERT_TRUE(handle->contains(entity));
+    ASSERT_EQ(handle, view.handle());
 }
 
 TEST(SingleComponentView, LazyTypeFromConstRegistry) {
@@ -639,12 +635,6 @@ TEST(MultiComponentView, InvalidView) {
     ASSERT_TRUE(view);
 }
 
-ENTT_DEBUG_TEST(MultiComponentViewDeathTest, InvalidView) {
-    entt::view<entt::get_t<int>, entt::exclude_t<char>> view{};
-
-    ASSERT_DEATH([[maybe_unused]] auto &&handle = view.handle(), "");
-}
-
 TEST(MultiComponentView, Constructors) {
     entt::storage<int> storage{};
 
@@ -656,7 +646,8 @@ TEST(MultiComponentView, Constructors) {
     ASSERT_TRUE(from_storage);
     ASSERT_TRUE(from_tuple);
 
-    ASSERT_EQ(&from_storage.handle(), &from_tuple.handle());
+    ASSERT_NE(from_storage.handle(), nullptr);
+    ASSERT_EQ(from_storage.handle(), from_tuple.handle());
 }
 
 TEST(MultiComponentView, Handle) {
@@ -664,30 +655,34 @@ TEST(MultiComponentView, Handle) {
     const auto entity = registry.create();
 
     auto view = registry.view<int, char>();
-    auto &&handle = view.handle();
+    auto *handle = view.handle();
 
-    ASSERT_TRUE(handle.empty());
-    ASSERT_FALSE(handle.contains(entity));
-    ASSERT_EQ(&handle, &view.handle());
+    ASSERT_NE(handle, nullptr);
+
+    ASSERT_TRUE(handle->empty());
+    ASSERT_FALSE(handle->contains(entity));
+    ASSERT_EQ(handle, view.handle());
 
     registry.emplace<int>(entity);
 
-    ASSERT_FALSE(handle.empty());
-    ASSERT_TRUE(handle.contains(entity));
-    ASSERT_EQ(&handle, &view.handle());
+    ASSERT_FALSE(handle->empty());
+    ASSERT_TRUE(handle->contains(entity));
+    ASSERT_EQ(handle, view.handle());
 
     view.refresh();
-    auto &&other = view.handle();
+    auto *other = view.handle();
 
-    ASSERT_TRUE(other.empty());
-    ASSERT_FALSE(other.contains(entity));
-    ASSERT_EQ(&other, &view.handle());
-    ASSERT_NE(&handle, &other);
+    ASSERT_NE(other, nullptr);
+
+    ASSERT_TRUE(other->empty());
+    ASSERT_FALSE(other->contains(entity));
+    ASSERT_EQ(other, view.handle());
+    ASSERT_NE(handle, other);
 
     view.use<int>();
 
-    ASSERT_NE(&other, &view.handle());
-    ASSERT_EQ(&handle, &view.handle());
+    ASSERT_NE(other, view.handle());
+    ASSERT_EQ(handle, view.handle());
 }
 
 TEST(MultiComponentView, LazyTypesFromConstRegistry) {
@@ -1352,11 +1347,11 @@ TEST(MultiComponentView, SameComponentTypes) {
         ASSERT_EQ(second, 9);
     }
 
-    ASSERT_EQ(&view.handle(), &storage);
+    ASSERT_EQ(view.handle(), &storage);
 
     view.use<1u>();
 
-    ASSERT_EQ(&view.handle(), &other);
+    ASSERT_EQ(view.handle(), &other);
 }
 
 TEST(MultiComponentView, Storage) {
