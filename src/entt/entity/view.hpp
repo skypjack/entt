@@ -534,7 +534,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        pick_and_each(func, std::index_sequence_for<Get...>{});
+        view ? pick_and_each(func, std::index_sequence_for<Get...>{}) : void();
     }
 
     /**
