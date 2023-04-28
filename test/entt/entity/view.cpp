@@ -640,15 +640,29 @@ TEST(MultiComponentView, InvalidView) {
     ASSERT_EQ(view.begin(), typename decltype(view)::iterator{});
     ASSERT_EQ(view.begin(), view.end());
 
+    auto iterable = view.each();
+
+    ASSERT_EQ(iterable.begin(), iterable.end());
+    ASSERT_EQ(iterable.cbegin(), iterable.cend());
+
+    view.each([](const int &) { FAIL(); });
+    view.each([](const entt::entity, const int &) { FAIL(); });
+
     entt::storage<int> storage;
     view.storage(storage);
 
     ASSERT_FALSE(view);
 
+    view.each([](const int &) { FAIL(); });
+    view.each([](const entt::entity, const int &) { FAIL(); });
+
     entt::storage<char> other;
     view.storage(other);
 
     ASSERT_TRUE(view);
+
+    view.each([](const int &) { FAIL(); });
+    view.each([](const entt::entity, const int &) { FAIL(); });
 }
 
 TEST(MultiComponentView, Constructors) {
