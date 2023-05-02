@@ -160,7 +160,7 @@ class basic_snapshot_loader {
     using traits_type = typename Registry::traits_type;
 
     template<typename Component, typename Archive>
-    void assign(Archive &archive) const {
+    void assign(Archive &archive) {
         auto &storage = reg->template storage<entity_type>();
         auto &elem = reg->template storage<Component>();
 
@@ -221,7 +221,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename Archive>
-    const basic_snapshot_loader &entities(Archive &archive) const {
+    basic_snapshot_loader &entities(Archive &archive) {
         auto &storage = reg->template storage<entity_type>();
         typename traits_type::entity_type length{};
         typename traits_type::entity_type in_use{};
@@ -256,7 +256,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename... Component, typename Archive>
-    const basic_snapshot_loader &component(Archive &archive) const {
+    basic_snapshot_loader &component(Archive &archive) {
         (assign<Component>(archive), ...);
         return *this;
     }
@@ -271,7 +271,7 @@ public:
      *
      * @return A valid loader to continue restoring data.
      */
-    const basic_snapshot_loader &orphans() const {
+    basic_snapshot_loader &orphans() {
         auto &storage = reg->template storage<entity_type>();
 
         for(auto entt: storage) {
