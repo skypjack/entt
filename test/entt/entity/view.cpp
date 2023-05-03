@@ -24,7 +24,6 @@ TEST(SingleComponentView, Functionalities) {
 
     ASSERT_TRUE(view.empty());
 
-    registry.emplace<int>(e1);
     registry.emplace<char>(e1);
 
     ASSERT_NO_FATAL_FAILURE(view.begin()++);
@@ -203,14 +202,6 @@ TEST(SingleComponentView, Contains) {
 
 TEST(SingleComponentView, Empty) {
     entt::registry registry;
-
-    const auto e0 = registry.create();
-    registry.emplace<char>(e0);
-    registry.emplace<double>(e0);
-
-    const auto e1 = registry.create();
-    registry.emplace<char>(e1);
-
     auto view = registry.view<int>();
 
     ASSERT_EQ(view.size(), 0u);
@@ -375,15 +366,13 @@ TEST(SingleComponentView, Find) {
 
 TEST(SingleComponentView, EmptyTypes) {
     entt::registry registry;
-    entt::entity entities[2u];
+    entt::entity entity = registry.create();
 
-    registry.create(std::begin(entities), std::end(entities));
-    registry.emplace<int>(entities[0u], 0);
-    registry.emplace<empty_type>(entities[0u]);
-    registry.emplace<char>(entities[1u], 'c');
+    registry.emplace<int>(entity, 0);
+    registry.emplace<empty_type>(entity);
 
     registry.view<empty_type>().each([&](const auto entt) {
-        ASSERT_EQ(entities[0u], entt);
+        ASSERT_EQ(entity, entt);
     });
 
     registry.view<empty_type>().each([check = true]() mutable {
@@ -393,11 +382,11 @@ TEST(SingleComponentView, EmptyTypes) {
 
     for(auto [entt]: registry.view<empty_type>().each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        ASSERT_EQ(entities[0u], entt);
+        ASSERT_EQ(entity, entt);
     }
 
     registry.view<int>().each([&](const auto entt, int) {
-        ASSERT_EQ(entities[0u], entt);
+        ASSERT_EQ(entity, entt);
     });
 
     registry.view<int>().each([check = true](int) mutable {
@@ -408,7 +397,7 @@ TEST(SingleComponentView, EmptyTypes) {
     for(auto [entt, iv]: registry.view<int>().each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
-        ASSERT_EQ(entities[0u], entt);
+        ASSERT_EQ(entity, entt);
     }
 }
 
@@ -821,7 +810,6 @@ TEST(MultiComponentView, SizeHint) {
     entt::registry registry;
 
     const auto e0 = registry.create();
-    registry.emplace<double>(e0);
     registry.emplace<int>(e0);
     registry.emplace<float>(e0);
 
