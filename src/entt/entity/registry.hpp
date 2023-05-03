@@ -279,8 +279,7 @@ class basic_registry {
             return static_cast<const storage_for_type<Type> *>(it->second.get());
         }
 
-        static storage_for_type<Type> placeholder{};
-        return &placeholder;
+        return static_cast<const storage_for_type<Type> *>(nullptr);
     }
 
     void rebind() {
@@ -961,7 +960,7 @@ public:
             return cpool && cpool->contains(entt);
         } else {
             return (all_of<Type>(entt) && ...);
-    }
+        }
     }
 
     /**

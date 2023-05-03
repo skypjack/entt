@@ -150,8 +150,8 @@ TEST(SingleComponentView, LazyTypeFromConstRegistry) {
     registry.emplace<empty_type>(entity);
     registry.emplace<int>(entity);
 
-    ASSERT_TRUE(cview);
-    ASSERT_TRUE(eview);
+    ASSERT_FALSE(cview);
+    ASSERT_FALSE(eview);
 
     ASSERT_TRUE(cview.empty());
     ASSERT_EQ(eview.size(), 0u);
@@ -723,7 +723,7 @@ TEST(MultiComponentView, LazyTypesFromConstRegistry) {
     registry.emplace<empty_type>(entity);
     registry.emplace<int>(entity);
 
-    ASSERT_TRUE(view);
+    ASSERT_FALSE(view);
 
     ASSERT_EQ(view.size_hint(), 0u);
     ASSERT_FALSE(view.contains(entity));
@@ -742,7 +742,7 @@ TEST(MultiComponentView, LazyExcludedTypeFromConstRegistry) {
 
     auto view = std::as_const(registry).view<const int>(entt::exclude<char>);
 
-    ASSERT_TRUE(view);
+    ASSERT_FALSE(view);
 
     ASSERT_EQ(view.size_hint(), 1u);
     ASSERT_TRUE(view.contains(entity));
