@@ -572,8 +572,8 @@ TEST(Snapshot, SyncDataMembers) {
     ASSERT_EQ(component.bar, loader.map(parent));
     ASSERT_EQ(component.quux[0], loader.map(child));
 
-    const auto &foobar = dst.get<map_component>(loader.map(child));
-    ASSERT_EQ(foobar.keys.at(loader.map(child)), 10);
-    ASSERT_EQ(foobar.values.at(10), loader.map(child));
-    ASSERT_EQ(foobar.both.at(loader.map(child)), loader.map(child));
+    const auto &elem = dst.get<map_component>(loader.map(child));
+    ASSERT_EQ(elem.keys.at(loader.map(child)), 10);
+    ASSERT_EQ(elem.values.at(10), loader.map(child));
+    ASSERT_EQ(elem.both.at(loader.map(child)), loader.map(child));
 }
