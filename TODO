@@ -11,11 +11,12 @@ DOC:
 
 TODO (high prio):
 * check natvis files (periodically :)
-* remove the static storage from the const assure in the registry
 * doc: exclude only views, bump entities, signals on entity creation/destruction
 * registry: replace destroy with a drop-all method that doesn't care about validity
 * resource cache: avoid using shared ptr with loader and the others
 * rework view tests with typed tests and whatnot
+* further optimize exclusion lists in multi type views (no existence check)
+* further improve the snapshot stuff, ie component functions
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
