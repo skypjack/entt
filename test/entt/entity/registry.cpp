@@ -2087,7 +2087,7 @@ TEST(Registry, RuntimePools) {
     const auto entity = registry.create();
 
     static_assert(std::is_same_v<decltype(registry.storage<empty_type>()), entt::storage_type_t<empty_type> &>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const entt::storage_type_t<empty_type> &>);
+    static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const entt::storage_type_t<empty_type> *>);
 
     static_assert(std::is_same_v<decltype(registry.storage("other"_hs)), entt::storage_type_t<empty_type>::base_type *>);
     static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)), const entt::storage_type_t<empty_type>::base_type *>);
@@ -2096,7 +2096,7 @@ TEST(Registry, RuntimePools) {
     ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), nullptr);
 
     ASSERT_EQ(&registry.storage<empty_type>("other"_hs), &storage);
-    ASSERT_NE(&std::as_const(registry).storage<empty_type>(), &storage);
+    ASSERT_NE(std::as_const(registry).storage<empty_type>(), &storage);
 
     ASSERT_FALSE(registry.any_of<empty_type>(entity));
     ASSERT_FALSE(storage.contains(entity));

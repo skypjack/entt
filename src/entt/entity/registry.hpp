@@ -437,19 +437,14 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type.
-     *
-     * @warning
-     * If a storage for the given component doesn't exist yet, a temporary
-     * placeholder is returned instead.
-     *
+     * @brief Returns the storage for a given component type, if any.
      * @tparam Type Type of component of which to return the storage.
      * @param id Optional name used to map the storage within the registry.
      * @return The storage for the given component type.
      */
     template<typename Type>
-    const storage_for_type<Type> &storage(const id_type id = type_hash<Type>::value()) const {
-        return *assure<Type>(id);
+    const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
+        return assure<Type>(id);
     }
 
     /**

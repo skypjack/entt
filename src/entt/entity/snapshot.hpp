@@ -33,23 +33,23 @@ class basic_snapshot {
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
-        const auto &storage = reg->template storage<Component>();
+        const auto view = reg->template view<Component>();
         archive(static_cast<typename traits_type::entity_type>(sz));
 
         for(auto it = first; it != last; ++it) {
-            if(storage.contains(*it)) {
-                std::apply(archive, std::tuple_cat(std::make_tuple(*it), storage.get_as_tuple(*it)));
+            if(view.contains(*it)) {
+                std::apply(archive, std::tuple_cat(std::make_tuple(*it), view.get(*it)));
             }
         }
     }
 
     template<typename... Component, typename Archive, typename It, std::size_t... Index>
     void component(Archive &archive, It first, It last, std::index_sequence<Index...>) const {
-        auto storage{std::forward_as_tuple(reg->template storage<Component>()...)};
+        const auto view{std::make_tuple(reg->template view<Component>()...)};
         std::array<std::size_t, sizeof...(Index)> size{};
 
         for(auto it = first; it != last; ++it) {
-            ((std::get<Index>(storage).contains(*it) ? ++size[Index] : 0u), ...);
+            ((std::get<Index>(view).contains(*it) ? ++size[Index] : 0u), ...);
         }
 
         (get<Component>(archive, size[Index], first, last), ...);
@@ -86,12 +86,13 @@ public:
      */
     template<typename Archive>
     const basic_snapshot &entities(Archive &archive) const {
-        const auto &storage = reg->template storage<entity_type>();
+        const auto *storage = reg->template storage<entity_type>();
+        ENTT_ASSERT(storage, "No entity storage available");
 
-        archive(static_cast<typename traits_type::entity_type>(storage.size()));
-        archive(static_cast<typename traits_type::entity_type>(storage.in_use()));
+        archive(static_cast<typename traits_type::entity_type>(storage->size()));
+        archive(static_cast<typename traits_type::entity_type>(storage->in_use()));
 
-        for(auto first = storage.data(), last = first + storage.size(); first != last; ++first) {
+        for(auto first = storage->data(), last = first + storage->size(); first != last; ++first) {
             archive(*first);
         }
 
