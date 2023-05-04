@@ -46,6 +46,7 @@
   * [Beam me up, registry](#beam-me-up-registry)
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
+    * [Create once, reuse many times](#create-once-reuse-many-times)
     * [View pack](#view-pack)
     * [Iteration order](#iteration-order)
     * [Runtime views](#runtime-views)
@@ -1591,6 +1592,62 @@ for(auto entity: view) {
 
 **Note**: prefer the `get` member function of a view instead of that of a
 registry during iterations to get the types iterated by the view itself.
+
+### Create once, reuse many times
+
+Views support lazy initialization as well as _storage swapping_.<br/>
+An empty (or partially initialized) view is such that it returns false when
+converted to bool (to let the user know that it isn't fully initialized) but it
+also works as-is like any other view.
+
+In order to initialize a view one piece at a time, it allows users to inject
+storage classes when available:
+
+```cpp
+entt::storage_for_t<velocity> storage{};
+entt::view<entt::get_t<position, velocity>> view{};
+
+view.storage(storage);
+```
+
+If there are multiple storages of the same type, it's possible to disambiguate
+using the _index_ of the element to be replaced:
+
+```cpp
+view.storage<1>(storage);
+```
+
+The ability to literally _replace_ a storage in a view also opens up its reuse
+with different sets of entities.<br/>
+For example, to _filter_ a view based on two groups of entities with different
+characteristics, there will be no need to reinitialize anything:
+
+```cpp
+entt::view<entt::get<my_type, void>> view{registry.storage<my_type>>()};
+
+entt::storage_for_t<void> the_good{};
+entt::storage_for_t<void> the_bad{};
+
+// initialize the sets above as needed
+
+view.storage(the_good);
+
+for(auto [entt, elem]: view) {
+  // the good entities with their components here
+}
+
+view.storage(the_bad);
+
+for(auto [entt, elem]: view) {
+  // the bad entities with their components here
+}
+```
+
+Finally, it should be noted that the lack of a storage is treated to all intents
+and purposes as if it were an _empty_ element.<br/>
+Thus, a _get_ storage (as in `entt::get_t`) makes the view empty automatically
+while an _exclude_ storage (as in `entt::exclude_t`) is ignored as if that part
+of the filter didn't exist.
 
 ### View pack
 
