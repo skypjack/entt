@@ -1515,10 +1515,8 @@ Refer to the inline documentation for all the details.
 Storing aside views isn't required as they are extremely cheap to construct. In
 fact, this is even discouraged when creating a view from a const registry. Since
 all storage are lazily initialized, they may not exist when the view is created.
-Therefore, the view can refer to empty _placeholders_ and is never re-assigned
-the actual storage.<br/>
-In all cases, views return newly created and correctly initialized iterators for
-the storage they refer to when `begin` or `end` are invoked.
+Thus, while perfectly usable, the view may contain pending references that are
+never reinitialized with the actual storage.
 
 Views share the way they are created by means of a registry:
 
@@ -1736,8 +1734,7 @@ though valid groups can be copied without problems and reused freely.<br/>
 A group performs an initialization step the very first time it's requested and
 this could be quite costly. To avoid it, consider creating the group when no
 components have been assigned yet. If the registry is empty, preparation is
-extremely fast. Groups also return newly created and correctly initialized
-iterators whenever `begin` or `end` are invoked.
+extremely fast.
 
 To iterate a group, either use it in a range-for loop:
 
@@ -2129,27 +2126,24 @@ lazily initialize a missing storage when a view is generated.<br/>
 The reason for this is easy to explain. To avoid requiring types to be
 _announced_ in advance, a registry lazily creates the storage objects for the
 different components. However, this isn't possible for a thread safe const
-registry.<br/>
-On the other side, all pools must necessarily _exist_ when creating a view.
-Therefore, static _placeholders_ for missing storage are used to fill the gap.
+registry.
 
-Note that returned views are always valid and behave as expected in the context
-of the caller. The only difference is that static _placeholders_ (if any) are
-never renewed.<br/>
-As a result, a view created from a const registry may behave incorrectly over
-time if it's kept for a second use.<br/>
+Returned views are always valid and behave as expected in the context of the
+caller. However, they may contain dangling references to non-existing storage
+when created from a const registry.<br/>
+As a result, such a view may misbehave over time if it's kept aside for a second
+use.<br/>
 Therefore, if the general advice is to create views when necessary and discard
 them immediately afterwards, this becomes almost a rule when it comes to views
 generated from a const registry.
 
 Fortunately, there is also a way to instantiate storage classes early when in
 doubt or when there are special requirements.<br/>
-Calling the `storage` method is equivalent to _announcing_ the existence of a
-particular storage, to avoid running into problems. For those interested, there
-are also alternative approaches, such as a single threaded tick for the registry
-warm-up, but these are not always applicable.<br/>
-In this case, no placeholders are used since all storage exist. In other words,
-views never risk becoming _invalid_.
+Calling the `storage` method is equivalent to _announcing_ a particular storage,
+so as to avoid running into problems. For those interested, there are also
+alternative approaches, such as a single threaded tick for the registry warm-up,
+but these are not always applicable.<br/>
+In this case, views never risk becoming _invalid_.
 
 # Beyond this document
 
