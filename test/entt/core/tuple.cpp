@@ -54,3 +54,9 @@ TEST(ValueList, TupleSize) {
     ASSERT_EQ(std::tuple_size_v<entt::value_list<42>>, 1u);
     ASSERT_EQ((std::tuple_size_v<entt::value_list<42, 'a'>>), 2u);
 }
+
+TEST(ValueList, TupleElement) {
+    ASSERT_TRUE((std::is_same_v<int, std::tuple_element_t<0, entt::value_list<42>>>));
+    ASSERT_TRUE((std::is_same_v<int, std::tuple_element_t<0, entt::value_list<42, 'a'>>>));
+    ASSERT_TRUE((std::is_same_v<char, std::tuple_element_t<1, entt::value_list<42, 'a'>>>));
+}
