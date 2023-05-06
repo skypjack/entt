@@ -387,7 +387,18 @@ template<auto Value, auto... Other>
 struct value_list_element<0u, value_list<Value, Other...>> {
     /*! @brief Searched value. */
     static constexpr auto value = Value;
+
+    /*! @brief Searched type. */
+    using type = decltype(Value);
 };
+
+/**
+ * @brief Helper type.
+ * @tparam Index Index of the type to return.
+ * @tparam List Value list to search into.
+ */
+template<std::size_t Index, typename List>
+using value_list_element_t = typename value_list_element<Index, List>::type;
 
 /**
  * @brief Helper type.
