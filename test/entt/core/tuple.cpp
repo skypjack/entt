@@ -36,3 +36,9 @@ TEST(Tuple, ForwardApply) {
     ASSERT_EQ(entt::forward_apply{[](int i) { return i; }}(std::make_tuple(42)), 42);
     ASSERT_EQ(entt::forward_apply{[](auto... args) { return (args + ...); }}(std::make_tuple('a', 1)), 'b');
 }
+
+TEST(TypeList, TupleSize) {
+    ASSERT_EQ(std::tuple_size_v<entt::type_list<>>, 0u);
+    ASSERT_EQ(std::tuple_size_v<entt::type_list<int>>, 1u);
+    ASSERT_EQ((std::tuple_size_v<entt::type_list<int, float>>), 2u);
+}

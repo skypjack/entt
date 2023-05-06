@@ -4,6 +4,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "type_traits.hpp"
 
 namespace entt {
 
@@ -99,5 +100,8 @@ template<typename Func>
 forward_apply(Func) -> forward_apply<std::remove_reference_t<std::remove_cv_t<Func>>>;
 
 } // namespace entt
+
+template <typename... Type>
+struct std::tuple_size<entt::type_list<Type...>>: std::integral_constant<std::size_t,  entt::type_list<Type...>::size> {};
 
 #endif
