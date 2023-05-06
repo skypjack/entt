@@ -335,13 +335,14 @@ struct type_list_transform;
 
 /**
  * @brief Applies a given _function_ to a type list and generate a new list.
+ * @tparam Container Template type containing types.
  * @tparam Type Types provided by the type list.
  * @tparam Op Unary operation as template class with a type member named `type`.
  */
-template<typename... Type, template<typename...> class Op>
-struct type_list_transform<type_list<Type...>, Op> {
+template<template<typename...> class Container, typename... Type, template<typename...> class Op>
+struct type_list_transform<Container<Type...>, Op> {
     /*! @brief Resulting type list after applying the transform function. */
-    using type = type_list<typename Op<Type>::type...>;
+    using type = Container<typename Op<Type>::type...>;
 };
 
 /**
