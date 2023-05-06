@@ -102,6 +102,9 @@ forward_apply(Func) -> forward_apply<std::remove_reference_t<std::remove_cv_t<Fu
 } // namespace entt
 
 template <typename... Type>
-struct std::tuple_size<entt::type_list<Type...>>: std::integral_constant<std::size_t,  entt::type_list<Type...>::size> {};
+struct std::tuple_size<entt::type_list<Type...>>: std::integral_constant<std::size_t, entt::type_list<Type...>::size> {};
+
+template <std::size_t Index, typename... Type>
+struct std::tuple_element<Index, entt::type_list<Type...>>: entt::type_list_element<Index, entt::type_list<Type...>> {};
 
 #endif

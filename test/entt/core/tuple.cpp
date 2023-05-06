@@ -42,3 +42,9 @@ TEST(TypeList, TupleSize) {
     ASSERT_EQ(std::tuple_size_v<entt::type_list<int>>, 1u);
     ASSERT_EQ((std::tuple_size_v<entt::type_list<int, float>>), 2u);
 }
+
+TEST(TypeList, TupleElement) {
+    ASSERT_TRUE((std::is_same_v<int, std::tuple_element_t<0, entt::type_list<int>>>));
+    ASSERT_TRUE((std::is_same_v<int, std::tuple_element_t<0, entt::type_list<int, float>>>));
+    ASSERT_TRUE((std::is_same_v<float, std::tuple_element_t<1, entt::type_list<int, float>>>));
+}
