@@ -107,4 +107,7 @@ struct std::tuple_size<entt::type_list<Type...>>: std::integral_constant<std::si
 template <std::size_t Index, typename... Type>
 struct std::tuple_element<Index, entt::type_list<Type...>>: entt::type_list_element<Index, entt::type_list<Type...>> {};
 
+template <auto... Value>
+struct std::tuple_size<entt::value_list<Value...>>: std::integral_constant<std::size_t, entt::value_list<Value...>::size> {};
+
 #endif
