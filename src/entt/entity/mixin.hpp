@@ -26,9 +26,10 @@ namespace entt {
  */
 template<typename Type>
 class sigh_mixin final: public Type {
-    using basic_registry_type = basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>;
-    using sigh_type = sigh<void(basic_registry_type &, const typename Type::entity_type), typename Type::allocator_type>;
-    using underlying_iterator = typename Type::base_type::basic_iterator;
+    using underlying_type = Type;
+    using basic_registry_type = basic_registry<typename underlying_type::entity_type, typename underlying_type::base_type::allocator_type>;
+    using sigh_type = sigh<void(basic_registry_type &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
+    using underlying_iterator = typename underlying_type::base_type::basic_iterator;
 
     basic_registry_type &owner_or_assert() const noexcept {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
@@ -37,37 +38,37 @@ class sigh_mixin final: public Type {
 
     void pop(underlying_iterator first, underlying_iterator last) final {
         if(auto &reg = owner_or_assert(); destruction.empty()) {
-            Type::pop(first, last);
+            underlying_type::pop(first, last);
         } else {
             for(; first != last; ++first) {
                 const auto entt = *first;
                 destruction.publish(reg, entt);
-                const auto it = Type::find(entt);
-                Type::pop(it, it + 1u);
+                const auto it = underlying_type::find(entt);
+                underlying_type::pop(it, it + 1u);
             }
         }
     }
 
     void pop_all() final {
         if(auto &reg = owner_or_assert(); !destruction.empty()) {
-            for(auto pos = Type::each().begin().base().index(); !(pos < 0); --pos) {
-                if constexpr(Type::traits_type::in_place_delete) {
-                    if(const auto entt = Type::operator[](static_cast<typename Type::size_type>(pos)); entt != tombstone) {
+            for(auto pos = underlying_type::each().begin().base().index(); !(pos < 0); --pos) {
+                if constexpr(underlying_type::traits_type::in_place_delete) {
+                    if(const auto entt = underlying_type::operator[](static_cast<typename underlying_type::size_type>(pos)); entt != tombstone) {
                         destruction.publish(reg, entt);
                     }
                 } else {
-                    destruction.publish(reg, Type::operator[](static_cast<typename Type::size_type>(pos)));
+                    destruction.publish(reg, underlying_type::operator[](static_cast<typename underlying_type::size_type>(pos)));
                 }
             }
         }
 
-        Type::pop_all();
+        underlying_type::pop_all();
     }
 
-    underlying_iterator try_emplace(const typename Type::entity_type entt, const bool force_back, const void *value) final {
-        const auto it = Type::try_emplace(entt, force_back, value);
+    underlying_iterator try_emplace(const typename underlying_type::entity_type entt, const bool force_back, const void *value) final {
+        const auto it = underlying_type::try_emplace(entt, force_back, value);
 
-        if(auto &reg = owner_or_assert(); it != Type::base_type::end()) {
+        if(auto &reg = owner_or_assert(); it != underlying_type::base_type::end()) {
             construction.publish(reg, *it);
         }
 
@@ -76,9 +77,9 @@ class sigh_mixin final: public Type {
 
 public:
     /*! @brief Allocator type. */
-    using allocator_type = typename Type::allocator_type;
+    using allocator_type = typename underlying_type::allocator_type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename Type::entity_type;
+    using entity_type = typename underlying_type::entity_type;
     /*! @brief Expected registry type. */
     using registry_type = basic_registry_type;
 
@@ -91,7 +92,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit sigh_mixin(const allocator_type &allocator)
-        : Type{allocator},
+        : underlying_type{allocator},
           owner{},
           construction{allocator},
           destruction{allocator},
@@ -102,7 +103,7 @@ public:
      * @param other The instance to move from.
      */
     sigh_mixin(sigh_mixin &&other) noexcept
-        : Type{std::move(other)},
+        : underlying_type{std::move(other)},
           owner{other.owner},
           construction{std::move(other.construction)},
           destruction{std::move(other.destruction)},
@@ -114,7 +115,7 @@ public:
      * @param allocator The allocator to use.
      */
     sigh_mixin(sigh_mixin &&other, const allocator_type &allocator) noexcept
-        : Type{std::move(other), allocator},
+        : underlying_type{std::move(other), allocator},
           owner{other.owner},
           construction{std::move(other.construction), allocator},
           destruction{std::move(other.destruction), allocator},
@@ -126,7 +127,7 @@ public:
      * @return This storage.
      */
     sigh_mixin &operator=(sigh_mixin &&other) noexcept {
-        Type::operator=(std::move(other));
+        underlying_type::operator=(std::move(other));
         owner = other.owner;
         construction = std::move(other.construction);
         destruction = std::move(other.destruction);
@@ -140,7 +141,7 @@ public:
      */
     void swap(sigh_mixin &other) {
         using std::swap;
-        Type::swap(other);
+        underlying_type::swap(other);
         swap(owner, other.owner);
         swap(construction, other.construction);
         swap(destruction, other.destruction);
@@ -202,7 +203,7 @@ public:
      * @return A return value as returned by the underlying storage.
      */
     auto emplace() {
-        const auto entt = Type::emplace();
+        const auto entt = underlying_type::emplace();
         construction.publish(owner_or_assert(), entt);
         return entt;
     }
@@ -221,12 +222,12 @@ public:
      */
     template<typename... Args>
     decltype(auto) emplace(const entity_type hint, Args &&...args) {
-        if constexpr(std::is_same_v<typename Type::value_type, typename Type::entity_type>) {
-            const auto entt = Type::emplace(hint, std::forward<Args>(args)...);
+        if constexpr(std::is_same_v<typename underlying_type::value_type, typename underlying_type::entity_type>) {
+            const auto entt = underlying_type::emplace(hint, std::forward<Args>(args)...);
             construction.publish(owner_or_assert(), entt);
             return entt;
         } else {
-            Type::emplace(hint, std::forward<Args>(args)...);
+            underlying_type::emplace(hint, std::forward<Args>(args)...);
             construction.publish(owner_or_assert(), hint);
             return this->get(hint);
         }
@@ -241,7 +242,7 @@ public:
      */
     template<typename... Func>
     decltype(auto) patch(const entity_type entt, Func &&...func) {
-        Type::patch(entt, std::forward<Func>(func)...);
+        underlying_type::patch(entt, std::forward<Func>(func)...);
         update.publish(owner_or_assert(), entt);
         return this->get(entt);
     }
@@ -261,7 +262,7 @@ public:
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...args) {
-        Type::insert(first, last, std::forward<Args>(args)...);
+        underlying_type::insert(first, last, std::forward<Args>(args)...);
 
         if(auto &reg = owner_or_assert(); !construction.empty()) {
             for(; first != last; ++first) {
@@ -277,7 +278,7 @@ public:
     void bind(any value) noexcept final {
         auto *reg = any_cast<basic_registry_type>(&value);
         owner = reg ? reg : owner;
-        Type::bind(std::move(value));
+        underlying_type::bind(std::move(value));
     }
 
 private:
