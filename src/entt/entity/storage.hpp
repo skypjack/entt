@@ -341,7 +341,7 @@ class basic_storage
 
         if(!(idx < payload.size())) {
             auto curr = payload.size();
-            allocator_type allocator{get_allocator()};
+            allocator_type &allocator = get_allocator();
             payload.resize(idx + 1u, nullptr);
 
             ENTT_TRY {
@@ -371,7 +371,7 @@ class basic_storage
 
         ENTT_TRY {
             auto elem = assure_at_least(static_cast<size_type>(it.index()));
-            allocator_type allocator{get_allocator()};
+            allocator_type &allocator = get_allocator();
             entt::uninitialized_construct_using_allocator(to_address(elem), allocator, std::forward<Args>(args)...);
         }
         ENTT_CATCH {
@@ -384,7 +384,7 @@ class basic_storage
 
     void shrink_to_size(const std::size_t sz) {
         const auto from = (sz + traits_type::page_size - 1u) / traits_type::page_size;
-        allocator_type allocator{get_allocator()};
+        allocator_type &allocator = get_allocator();
 
         for(auto pos = sz, length = base_type::size(); pos < length; ++pos) {
             if constexpr(traits_type::in_place_delete) {
@@ -417,7 +417,7 @@ private:
 
             if constexpr(traits_type::in_place_delete) {
                 if(base_type::operator[](to) == tombstone) {
-                    allocator_type allocator{get_allocator()};
+                    allocator_type &allocator = get_allocator();
                     entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), allocator, std::move(elem));
                     alloc_traits::destroy(allocator, std::addressof(elem));
                     return;
@@ -440,7 +440,7 @@ protected:
      * @param last An iterator past the last element of the range of entities.
      */
     void pop(underlying_iterator first, underlying_iterator last) override {
-        for(allocator_type allocator{get_allocator()}; first != last; ++first) {
+        for(allocator_type &allocator = get_allocator(); first != last; ++first) {
             // cannot use first.index() because it would break with cross iterators
             auto &elem = element_at(base_type::index(*first));
 
@@ -467,7 +467,7 @@ protected:
 
     /*! @brief Erases all entities of a storage. */
     void pop_all() override {
-        allocator_type allocator{get_allocator()};
+        allocator_type &allocator = get_allocator();
 
         for(auto first = base_type::begin(); !(first.index() < 0); ++first) {
             if constexpr(traits_type::in_place_delete) {
@@ -610,8 +610,16 @@ public:
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
-    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return static_cast<allocator_type const &>(*this);
+    [[nodiscard]] constexpr allocator_type &get_allocator() noexcept {
+        return *this;
+    }
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type const &get_allocator() const noexcept {
+        return *this;
     }
 
     /**
