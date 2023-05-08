@@ -136,7 +136,7 @@ public:
     template<typename Base>
     auto base() noexcept {
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
-        const auto *func = +[](const void *instance) noexcept { return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance))); };
+        auto *const func = +[](const void *instance) noexcept { return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance))); };
         internal::owner(*ctx, *info).details->base.insert_or_assign(type_id<Base>().hash(), internal::meta_base_node{&internal::resolve<Base>, func});
         bucket = nullptr;
         return *this;
@@ -157,7 +157,7 @@ public:
     template<auto Candidate>
     auto conv() noexcept {
         using conv_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
-        const auto *func = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, std::invoke(Candidate, *static_cast<const Type *>(instance))); };
+        auto *const func = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, std::invoke(Candidate, *static_cast<const Type *>(instance))); };
         internal::owner(*ctx, *info).details->conv.insert_or_assign(type_id<conv_type>().hash(), internal::meta_conv_node{func});
         bucket = nullptr;
         return *this;
@@ -175,7 +175,7 @@ public:
     template<typename To>
     auto conv() noexcept {
         using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
-        const auto *func = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, static_cast<To>(*static_cast<const Type *>(instance))); };
+        auto *const func = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, static_cast<To>(*static_cast<const Type *>(instance))); };
         internal::owner(*ctx, *info).details->conv.insert_or_assign(type_id<conv_type>().hash(), internal::meta_conv_node{func});
         bucket = nullptr;
         return *this;
@@ -247,7 +247,7 @@ public:
     template<auto Func>
     auto dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
-        const auto *func = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
+        auto *const func = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
         internal::owner(*ctx, *info).dtor = internal::meta_dtor_node{func};
         bucket = nullptr;
         return *this;
