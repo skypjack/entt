@@ -1,10 +1,45 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/storage.hpp>
+#include <entt/meta/factory.hpp>
+#include <entt/meta/resolve.hpp>
 
 enum class my_entity : entt::id_type {};
 
-TEST(Example, EntityCopy) {
+template<typename Type>
+struct meta_mixin: Type {
+    using allocator_type = typename Type::allocator_type;
+    using value_type = typename Type::value_type;
+
+    explicit meta_mixin(const allocator_type &allocator)
+        : Type{allocator} {
+        using namespace entt::literals;
+
+        entt::meta<value_type>()
+            // cross registry, same type
+            .func<entt::overload<entt::storage_for_t<value_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<value_type>), entt::as_ref_t>("storage"_hs)
+            // cross registry, different types
+            .func<entt::overload<entt::storage_for_t<value_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<value_type>), entt::as_ref_t>("storage"_hs);
+    }
+};
+
+template<typename Type, typename Entity>
+struct entt::storage_type<Type, Entity> {
+    using type = meta_mixin<basic_storage<Type, Entity>>;
+};
+
+template<typename Type>
+struct EntityCopy: testing::Test {
+    using type = Type;
+};
+
+using EntityCopyTypes = ::testing::Types<entt::basic_registry<entt::entity>, entt::basic_registry<my_entity>>;
+
+TYPED_TEST_SUITE(EntityCopy, EntityCopyTypes, );
+
+TEST(EntityCopy, SameRegistry) {
     using namespace entt::literals;
 
     entt::registry registry{};
@@ -12,52 +47,40 @@ TEST(Example, EntityCopy) {
 
     const auto src = registry.create();
     const auto dst = registry.create();
-    const auto other = registry.create();
 
     custom.emplace(src, 1.);
     registry.emplace<int>(src, 42);
     registry.emplace<char>(src, 'c');
-    registry.emplace<double>(other, 3.);
 
+    ASSERT_EQ(registry.size(), 2u);
     ASSERT_TRUE(custom.contains(src));
-    ASSERT_FALSE(registry.all_of<double>(src));
-    ASSERT_TRUE((registry.all_of<int, char>(src)));
-    ASSERT_FALSE((registry.any_of<int, char, double>(dst)));
     ASSERT_FALSE(custom.contains(dst));
+    ASSERT_TRUE((registry.all_of<int, char>(src)));
+    ASSERT_FALSE((registry.any_of<int, char>(dst)));
 
-    for(auto [id, storage]: registry.storage()) {
+    for(auto it = ++registry.storage().begin(), last = registry.storage().end(); it != last; ++it) {
         // discard the custom storage because why not, this is just an example after all
-        if(id != "custom"_hs && storage.contains(src)) {
+        if(auto [id, storage] = *it; id != "custom"_hs && storage.contains(src)) {
             storage.push(dst, storage.value(src));
         }
     }
 
-    ASSERT_TRUE((registry.all_of<int, char>(dst)));
-    ASSERT_FALSE((registry.all_of<double>(dst)));
+    ASSERT_EQ(registry.size(), 2u);
+    ASSERT_TRUE(custom.contains(src));
     ASSERT_FALSE(custom.contains(dst));
+    ASSERT_TRUE((registry.all_of<int, char>(src)));
+    ASSERT_TRUE((registry.all_of<int, char>(dst)));
 
     ASSERT_EQ(registry.get<int>(dst), 42);
     ASSERT_EQ(registry.get<char>(dst), 'c');
 }
 
-TEST(Example, DifferentRegistryTypes) {
+TYPED_TEST(EntityCopy, CrossRegistry) {
     using namespace entt::literals;
 
     entt::basic_registry<entt::entity> src{};
-    entt::basic_registry<my_entity> dst{};
-
-    /*
-        TODO These are currently needed to ensure that the source and
-             target registries have the proper storage initialized
-             prior to copying, as this isn't done automatically
-             when emplacing storages (as is done below).
-
-             There is an open issue about this, and these two
-             lines should be removed when a fix is properly landed.
-             https://github.com/skypjack/entt/issues/827
-    */
-    static_cast<void>(src.storage<double>());
-    static_cast<void>(dst.storage<int>());
+    // other registry type, see typed test suite
+    typename TestFixture::type dst{};
 
     const auto entity = src.create();
     const auto copy = dst.create();
@@ -65,14 +88,31 @@ TEST(Example, DifferentRegistryTypes) {
     src.emplace<int>(entity, 42);
     src.emplace<char>(entity, 'c');
 
-    for(auto [id, storage]: src.storage()) {
-        if(auto *other = dst.storage(id); other && storage.contains(entity)) {
+    ASSERT_EQ(src.size(), 1u);
+    ASSERT_EQ(dst.size(), 1u);
+
+    ASSERT_TRUE((src.all_of<int, char>(entity)));
+    ASSERT_FALSE((dst.all_of<int, char>(copy)));
+
+    for(auto it = ++src.storage().begin(), last = src.storage().end(); it != last; ++it) {
+        if(auto [id, storage] = *it; storage.contains(entity)) {
+            auto *other = dst.storage(id);
+
+            if(!other) {
+                using namespace entt::literals;
+                entt::resolve(storage.type()).invoke("storage"_hs, {}, entt::forward_as_meta(dst), id);
+                other = dst.storage(id);
+            }
+
             other->push(copy, storage.value(entity));
         }
     }
 
+    ASSERT_EQ(src.size(), 1u);
+    ASSERT_EQ(dst.size(), 1u);
+
     ASSERT_TRUE((src.all_of<int, char>(entity)));
-    ASSERT_FALSE(dst.all_of<char>(copy));
-    ASSERT_TRUE(dst.all_of<int>(copy));
+    ASSERT_TRUE((dst.all_of<int, char>(copy)));
     ASSERT_EQ(dst.get<int>(copy), 42);
+    ASSERT_EQ(dst.get<char>(copy), 'c');
 }
