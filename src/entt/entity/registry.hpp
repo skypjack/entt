@@ -331,8 +331,10 @@ public:
         : vars{allocator},
           pools{allocator},
           groups{allocator},
-          shortcut{&assure<entity_type>()} {
+          entities{allocator},
+          shortcut{&entities} {
         pools.reserve(count);
+        pools[type_hash<entity_type>::value()] = std::shared_ptr<base_type>{shortcut, [](const void *) {}};
         rebind();
     }
 
@@ -344,6 +346,7 @@ public:
         : vars{std::move(other.vars)},
           pools{std::move(other.pools)},
           groups{std::move(other.groups)},
+          entities{std::move(other.entities)},
           shortcut{std::move(other.shortcut)} {
         rebind();
     }
@@ -357,6 +360,7 @@ public:
         vars = std::move(other.vars);
         pools = std::move(other.pools);
         groups = std::move(other.groups);
+        entities = std::move(other.entities);
         shortcut = std::move(other.shortcut);
 
         rebind();
@@ -374,6 +378,7 @@ public:
         swap(vars, other.vars);
         swap(pools, other.pools);
         swap(groups, other.groups);
+        swap(entities, other.entities);
         swap(shortcut, other.shortcut);
 
         rebind();
@@ -1351,6 +1356,7 @@ private:
     context vars;
     pool_container_type pools;
     group_container_type groups;
+    storage_for_type<entity_type> entities;
     storage_for_type<entity_type> *shortcut;
 };
 
