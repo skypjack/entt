@@ -188,17 +188,17 @@ class basic_observer: private basic_storage<Mask, typename Registry::entity_type
 
         template<std::size_t Index>
         static void connect(basic_observer &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
-            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
-            reg.template on_update<AnyOf>().template connect<&maybe_valid_if<Index>>(obs);
-            reg.template on_destroy<AnyOf>().template connect<&discard_if<Index>>(obs);
+            (reg.template storage<Require>().on_destroy().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template storage<Reject>().on_construct().template connect<&discard_if<Index>>(obs), ...);
+            reg.template storage<AnyOf>().on_update().template connect<&maybe_valid_if<Index>>(obs);
+            reg.template storage<AnyOf>().on_destroy().template connect<&discard_if<Index>>(obs);
         }
 
         static void disconnect(basic_observer &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().disconnect(&obs), ...);
-            (reg.template on_construct<Reject>().disconnect(&obs), ...);
-            reg.template on_update<AnyOf>().disconnect(&obs);
-            reg.template on_destroy<AnyOf>().disconnect(&obs);
+            (reg.template storage<Require>().on_destroy().disconnect(&obs), ...);
+            (reg.template storage<Reject>().on_construct().disconnect(&obs), ...);
+            reg.template storage<AnyOf>().on_update().disconnect(&obs);
+            reg.template storage<AnyOf>().on_destroy().disconnect(&obs);
         }
     };
 
@@ -232,21 +232,21 @@ class basic_observer: private basic_storage<Mask, typename Registry::entity_type
 
         template<std::size_t Index>
         static void connect(basic_observer &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
-            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
-            (reg.template on_construct<AllOf>().template connect<&maybe_valid_if<Index>>(obs), ...);
-            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if<Index, NoneOf>>(obs), ...);
-            (reg.template on_destroy<AllOf>().template connect<&discard_if<Index>>(obs), ...);
-            (reg.template on_construct<NoneOf>().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template storage<Require>().on_destroy().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template storage<Reject>().on_construct().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template storage<AllOf>().on_construct().template connect<&maybe_valid_if<Index>>(obs), ...);
+            (reg.template storage<NoneOf>().on_destroy().template connect<&maybe_valid_if<Index, NoneOf>>(obs), ...);
+            (reg.template storage<AllOf>().on_destroy().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template storage<NoneOf>().on_construct().template connect<&discard_if<Index>>(obs), ...);
         }
 
         static void disconnect(basic_observer &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().disconnect(&obs), ...);
-            (reg.template on_construct<Reject>().disconnect(&obs), ...);
-            (reg.template on_construct<AllOf>().disconnect(&obs), ...);
-            (reg.template on_destroy<NoneOf>().disconnect(&obs), ...);
-            (reg.template on_destroy<AllOf>().disconnect(&obs), ...);
-            (reg.template on_construct<NoneOf>().disconnect(&obs), ...);
+            (reg.template storage<Require>().on_destroy().disconnect(&obs), ...);
+            (reg.template storage<Reject>().on_construct().disconnect(&obs), ...);
+            (reg.template storage<AllOf>().on_construct().disconnect(&obs), ...);
+            (reg.template storage<NoneOf>().on_destroy().disconnect(&obs), ...);
+            (reg.template storage<AllOf>().on_destroy().disconnect(&obs), ...);
+            (reg.template storage<NoneOf>().on_construct().disconnect(&obs), ...);
         }
     };
 

@@ -193,7 +193,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
     using sigh_helper<Registry>::sigh_helper;
 
     /**
-     * @brief Forwards the call to `on_construct` on the underlying registry.
+     * @brief Forwards the call to `on_construct` on the underlying storage.
      * @tparam Candidate Function or member to connect.
      * @tparam Args Type of class or type of payload, if any.
      * @param args A valid object that fits the purpose, if any.
@@ -201,12 +201,12 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_construct(Args &&...args) {
-        this->registry().template on_construct<Type>().template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template storage<Type>().on_construct().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
 
     /**
-     * @brief Forwards the call to `on_update` on the underlying registry.
+     * @brief Forwards the call to `on_update` on the underlying storage.
      * @tparam Candidate Function or member to connect.
      * @tparam Args Type of class or type of payload, if any.
      * @param args A valid object that fits the purpose, if any.
@@ -214,12 +214,12 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_update(Args &&...args) {
-        this->registry().template on_update<Type>().template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template storage<Type>().on_update().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
 
     /**
-     * @brief Forwards the call to `on_destroy` on the underlying registry.
+     * @brief Forwards the call to `on_destroy` on the underlying storage.
      * @tparam Candidate Function or member to connect.
      * @tparam Args Type of class or type of payload, if any.
      * @param args A valid object that fits the purpose, if any.
@@ -227,7 +227,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_destroy(Args &&...args) {
-        this->registry().template on_destroy<Type>().template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template storage<Type>().on_destroy().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
 };

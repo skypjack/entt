@@ -43,7 +43,7 @@ TEST(Helper, Invoke) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
+    registry.storage<clazz>().on_construct().connect<entt::invoke<&clazz::func>>();
     registry.emplace<clazz>(entity);
 
     ASSERT_EQ(entity, registry.get<clazz>(entity).entt);
