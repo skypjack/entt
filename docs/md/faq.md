@@ -193,7 +193,7 @@ to mitigate the problem makes it manageable.
 
 ## Which functions trigger which signals
 
-The `registry` class offers three signals that are emitted following specific
+Storage classes offer three _signals_ that are emitted following specific
 operations. Maybe not everyone knows what these operations are, though.<br/>
 If this isn't clear, below you can find a _vademecum_ for this purpose:
 

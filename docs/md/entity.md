@@ -348,16 +348,16 @@ when a new instance of a given component type is created:
 
 ```cpp
 // connects a free function
-registry.on_construct<position>().connect<&my_free_function>();
+registry.storage<position>().on_construct().connect<&my_free_function>();
 
 // connects a member function
-registry.on_construct<position>().connect<&my_class::member>(instance);
+registry.storage<position>().on_construct().connect<&my_class::member>(instance);
 
 // disconnects a free function
-registry.on_construct<position>().disconnect<&my_free_function>();
+registry.storage<position>().on_construct().disconnect<&my_free_function>();
 
 // disconnects a member function
-registry.on_construct<position>().disconnect<&my_class::member>(instance);
+registry.storage<position>().on_construct().disconnect<&my_class::member>(instance);
 ```
 
 Similarly, `on_destroy` and `on_update` are used to receive notifications about
@@ -671,20 +671,20 @@ For example, the following adds (or replaces) the component `a_type` whenever
 `my_type` is assigned to an entity:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::emplace_or_replace<a_type>>();
+registry.storage<my_type>().on_construct().connect<&entt::registry::emplace_or_replace<a_type>>();
 ```
 
 Similarly, the code below removes `a_type` from an entity whenever `my_type` is
 assigned to it:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>();
+registry.storage<my_type>().on_construct().connect<&entt::registry::remove<a_type>>();
 ```
 
 A dependency is easily _broken_ as follows:
 
 ```cpp
-registry.on_construct<my_type>().disconnect<&entt::registry::emplace_or_replace<a_type>>();
+registry.storage<my_type>().on_construct().disconnect<&entt::registry::emplace_or_replace<a_type>>();
 ```
 
 There are many other types of _dependencies_. In general, most of the functions
@@ -697,7 +697,7 @@ The `invoke` helper allows to _propagate_ a signal to a member function of a
 component without having to _extend_ it:
 
 ```cpp
-registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
+registry.storage<clazz>().on_construct().connect<entt::invoke<&clazz::func>>();
 ```
 
 All it does is pick up the _right_ component for the received entity and invoke
