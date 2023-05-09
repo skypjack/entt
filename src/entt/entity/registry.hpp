@@ -456,7 +456,7 @@ public:
      * @return Number of entities created so far.
      */
     [[deprecated("use .storage<Entity>().size() instead")]] [[nodiscard]] size_type size() const noexcept {
-        return shortcut->size();
+        return entities.size();
     }
 
     /**
@@ -464,7 +464,7 @@ public:
      * @return Number of entities still in use.
      */
     [[deprecated("use .storage<Entity>().in_use() instead")]] [[nodiscard]] size_type alive() const {
-        return shortcut->in_use();
+        return entities.in_use();
     }
 
     /**
@@ -472,7 +472,7 @@ public:
      * @param cap Desired capacity.
      */
     [[deprecated("use .storage<Entity>().reserve(cap) instead")]] void reserve(const size_type cap) {
-        shortcut->reserve(cap);
+        entities.reserve(cap);
     }
 
     /**
@@ -481,7 +481,7 @@ public:
      * @return Capacity of the registry.
      */
     [[deprecated("use .storage<Entity>().capacity() instead")]] [[nodiscard]] size_type capacity() const noexcept {
-        return shortcut->capacity();
+        return entities.capacity();
     }
 
     /**
@@ -505,7 +505,7 @@ public:
      * @return A pointer to the array of entities.
      */
     [[deprecated("use .storage<Entity>().data() instead")]] [[nodiscard]] const entity_type *data() const noexcept {
-        return shortcut->data();
+        return entities.data();
     }
 
     /**
@@ -513,7 +513,7 @@ public:
      * @return The number of released entities.
      */
     [[deprecated("use .storage<Entity>().size() and .storage<Entity>().in_use() instead")]] [[nodiscard]] size_type released() const noexcept {
-        return (shortcut->size() - shortcut->in_use());
+        return (entities.size() - entities.in_use());
     }
 
     /**
@@ -522,7 +522,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entt) const {
-        return shortcut->contains(entt);
+        return entities.contains(entt);
     }
 
     /**
@@ -532,7 +532,7 @@ public:
      * version otherwise.
      */
     [[nodiscard]] version_type current(const entity_type entt) const {
-        return shortcut->current(entt);
+        return entities.current(entt);
     }
 
     /**
@@ -540,7 +540,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
-        return shortcut->emplace();
+        return entities.emplace();
     }
 
     /**
@@ -553,7 +553,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
-        return shortcut->emplace(hint);
+        return entities.emplace(hint);
     }
 
     /**
@@ -567,7 +567,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        shortcut->insert(std::move(first), std::move(last));
+        entities.insert(std::move(first), std::move(last));
     }
 
     /**
@@ -589,9 +589,9 @@ public:
      */
     template<typename It>
     [[deprecated("use .storage<Entity>().push(first, last) and .storage<Entity>().in_use(len) instead")]] void assign(It first, It last, const size_type destroyed) {
-        ENTT_ASSERT(!shortcut->in_use(), "Non-empty registry");
-        shortcut->push(first, last);
-        shortcut->in_use(shortcut->size() - destroyed);
+        ENTT_ASSERT(!entities.in_use(), "Non-empty registry");
+        entities.push(first, last);
+        entities.in_use(entities.size() - destroyed);
     }
 
     /**
@@ -607,8 +607,8 @@ public:
      */
     [[deprecated("use .orphan(entt) and .storage<Entity>().erase(entt) instead")]] version_type release(const entity_type entt) {
         ENTT_ASSERT(orphan(entt), "Non-orphan entity");
-        shortcut->erase(entt);
-        return shortcut->current(entt);
+        entities.erase(entt);
+        return entities.current(entt);
     }
 
     /**
@@ -625,9 +625,9 @@ public:
      */
     [[deprecated("use .orphan(entt), then .storage<Entity>().erase(entt)/.bump(next) instead")]] version_type release(const entity_type entt, const version_type version) {
         ENTT_ASSERT(orphan(entt), "Non-orphan entity");
-        shortcut->erase(entt);
+        entities.erase(entt);
         const auto elem = traits_type::construct(traits_type::to_entity(entt), version);
-        return shortcut->bump((elem == tombstone) ? traits_type::next(elem) : elem);
+        return entities.bump((elem == tombstone) ? traits_type::next(elem) : elem);
     }
 
     /**
@@ -642,7 +642,7 @@ public:
     template<typename It>
     [[deprecated("use .orphan(entt) and .storage<Entity>().erase(first, last) instead")]] void release(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return orphan(entt); }), "Non-orphan entity");
-        shortcut->erase(std::move(first), std::move(last));
+        entities.erase(std::move(first), std::move(last));
     }
 
     /**
@@ -660,13 +660,13 @@ public:
      */
     version_type destroy(const entity_type entt) {
         ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
-        ENTT_ASSERT(shortcut->contains(entt), "Invalid entity");
+        ENTT_ASSERT(entities.contains(entt), "Invalid entity");
 
         for(size_type pos = pools.size(); pos; --pos) {
             pools.begin()[pos - 1u].second->remove(entt);
         }
 
-        return shortcut->current(entt);
+        return entities.current(entt);
     }
 
     /**
@@ -683,14 +683,14 @@ public:
      */
     version_type destroy(const entity_type entt, const version_type version) {
         ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
-        ENTT_ASSERT(shortcut->contains(entt), "Invalid entity");
+        ENTT_ASSERT(entities.contains(entt), "Invalid entity");
 
         for(size_type pos = pools.size(); pos; --pos) {
             pools.begin()[pos - 1u].second->remove(entt);
         }
 
         const auto elem = traits_type::construct(traits_type::to_entity(entt), version);
-        return shortcut->bump((elem == tombstone) ? traits_type::next(elem) : elem);
+        return entities.bump((elem == tombstone) ? traits_type::next(elem) : elem);
     }
 
     /**
@@ -705,8 +705,8 @@ public:
     template<typename It>
     void destroy(It first, It last) {
         ENTT_ASSERT(!pools.empty() && (pools.begin()->second.get() == shortcut), "Misplaced entity pool");
-        const auto from = shortcut->each().cbegin().base();
-        const auto to = from + shortcut->pack(first, last);
+        const auto from = entities.each().cbegin().base();
+        const auto to = from + entities.pack(first, last);
 
         for(size_type pos = pools.size(); pos; --pos) {
             pools.begin()[pos - 1u].second->remove(from, to);
@@ -1078,8 +1078,8 @@ public:
                 pools.begin()[pos].second->clear();
             }
 
-            auto iterable = shortcut->each();
-            shortcut->erase(iterable.begin().base(), iterable.end().base());
+            auto iterable = entities.each();
+            entities.erase(iterable.begin().base(), iterable.end().base());
         } else {
             (assure<Type>().clear(), ...);
         }
@@ -1101,7 +1101,7 @@ public:
      */
     template<typename Func>
     [[deprecated("use .storage<Entity>().each() instead")]] void each(Func func) const {
-        for(auto [entt]: shortcut->each()) {
+        for(auto [entt]: entities.each()) {
             func(entt);
         }
     }
