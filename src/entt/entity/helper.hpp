@@ -164,11 +164,12 @@ struct sigh_helper<Registry> {
     /**
      * @brief Binds a properly initialized helper to a given signal type.
      * @tparam Type Type of signal to bind the helper to.
+     * @param id Optional name for the underlying storage to use.
      * @return A helper for a given registry and signal type.
      */
     template<typename Type>
-    auto with() noexcept {
-        return sigh_helper<registry_type, Type>{*bucket};
+    auto with(const id_type id = type_hash<Type>::value()) noexcept {
+        return sigh_helper<registry_type, Type>{*bucket, id};
     }
 
     /**
@@ -190,7 +191,17 @@ private:
  */
 template<typename Registry, typename Type>
 struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
-    using sigh_helper<Registry>::sigh_helper;
+    /*! @brief Registry type. */
+    using registry_type = Registry;
+
+    /**
+     * @brief Constructs a helper for a given registry.
+     * @param ref A valid reference to a registry.
+     * @param id Optional name for the underlying storage to use.
+     */
+    sigh_helper(registry_type &ref, const id_type id = type_hash<Type>::value())
+        : sigh_helper<Registry>{ref},
+          name{id} {}
 
     /**
      * @brief Forwards the call to `on_construct` on the underlying storage.
@@ -201,7 +212,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_construct(Args &&...args) {
-        this->registry().template storage<Type>().on_construct().template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template storage<Type>(name).on_construct().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
 
@@ -214,7 +225,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_update(Args &&...args) {
-        this->registry().template storage<Type>().on_update().template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template storage<Type>(name).on_update().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
 
@@ -227,9 +238,12 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_destroy(Args &&...args) {
-        this->registry().template storage<Type>().on_destroy().template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template storage<Type>(name).on_destroy().template connect<Candidate>(std::forward<Args>(args)...);
         return *this;
     }
+
+private:
+    id_type name;
 };
 
 /**

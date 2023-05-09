@@ -130,6 +130,8 @@ TEST(Helper, ToEntityStableType) {
 }
 
 TEST(Helper, SighHelper) {
+    using namespace entt::literals;
+
     entt::registry registry{};
     const auto entt = registry.create();
     entt::sigh_helper helper{registry};
@@ -144,9 +146,26 @@ TEST(Helper, SighHelper) {
 
     ASSERT_EQ(counter, 0);
 
-    registry.emplace<int>(entt, 42);
-    registry.replace<int>(entt, 0);
+    registry.emplace<int>(entt);
+    registry.replace<int>(entt);
     registry.erase<int>(entt);
 
     ASSERT_EQ(counter, 3);
+
+    helper.with<double>("other"_hs)
+        .on_construct<&sigh_callback>(counter)
+        .on_update<&sigh_callback>(counter)
+        .on_destroy<&sigh_callback>(counter);
+
+    registry.emplace<double>(entt);
+    registry.replace<double>(entt);
+    registry.erase<double>(entt);
+
+    ASSERT_EQ(counter, 3);
+
+    registry.storage<double>("other"_hs).emplace(entt);
+    registry.storage<double>("other"_hs).patch(entt);
+    registry.storage<double>("other"_hs).erase(entt);
+
+    ASSERT_EQ(counter, 6);
 }
