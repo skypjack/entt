@@ -19,9 +19,9 @@ struct meta_mixin: Type {
 
         entt::meta<value_type>()
             // cross registry, same type
-            .func<entt::overload<entt::storage_for_t<value_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<value_type>), entt::as_ref_t>("storage"_hs)
+            .template func<entt::overload<entt::storage_for_t<value_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<value_type>), entt::as_ref_t>("storage"_hs)
             // cross registry, different types
-            .func<entt::overload<entt::storage_for_t<value_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<value_type>), entt::as_ref_t>("storage"_hs);
+            .template func<entt::overload<entt::storage_for_t<value_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<value_type>), entt::as_ref_t>("storage"_hs);
     }
 };
 
@@ -92,7 +92,7 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
     ASSERT_EQ(dst.size(), 1u);
 
     ASSERT_TRUE((src.all_of<int, char>(entity)));
-    ASSERT_FALSE((dst.all_of<int, char>(copy)));
+    ASSERT_FALSE((dst.template all_of<int, char>(copy)));
 
     for(auto it = ++src.storage().begin(), last = src.storage().end(); it != last; ++it) {
         if(auto [id, storage] = *it; storage.contains(entity)) {
@@ -112,7 +112,7 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
     ASSERT_EQ(dst.size(), 1u);
 
     ASSERT_TRUE((src.all_of<int, char>(entity)));
-    ASSERT_TRUE((dst.all_of<int, char>(copy)));
-    ASSERT_EQ(dst.get<int>(copy), 42);
-    ASSERT_EQ(dst.get<char>(copy), 'c');
+    ASSERT_TRUE((dst.template all_of<int, char>(copy)));
+    ASSERT_EQ(dst.template get<int>(copy), 42);
+    ASSERT_EQ(dst.template get<char>(copy), 'c');
 }
