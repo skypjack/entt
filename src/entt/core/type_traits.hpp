@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
@@ -341,8 +342,10 @@ struct type_list_transform;
  */
 template<template<typename...> class Container, typename... Type, template<typename...> class Op>
 struct type_list_transform<Container<Type...>, Op> {
+    //static_assert(std::is_base_of_v<type_list<Type...>, Container<Type...>>, "The provided List must be entt::type_list or a derived class.");
+
     /*! @brief Resulting type list after applying the transform function. */
-    using type = Container<typename Op<Type>::type...>;
+    using type = std::enable_if_t<std::is_base_of_v<type_list<Type...>, Container<Type...>>, Container<typename Op<Type>::type...>>;
 };
 
 /**
@@ -905,5 +908,17 @@ template<std::size_t Index, auto Candidate>
 using nth_argument_t = typename nth_argument<Index, Candidate>::type;
 
 } // namespace entt
+
+template <typename... Type>
+struct std::tuple_size<entt::type_list<Type...>>: std::integral_constant<std::size_t, entt::type_list<Type...>::size> {};
+
+template <std::size_t Index, typename... Type>
+struct std::tuple_element<Index, entt::type_list<Type...>>: entt::type_list_element<Index, entt::type_list<Type...>> {};
+
+template <auto... Value>
+struct std::tuple_size<entt::value_list<Value...>>: std::integral_constant<std::size_t, entt::value_list<Value...>::size> {};
+
+template <std::size_t Index, auto... Value>
+struct std::tuple_element<Index, entt::value_list<Value...>>: entt::value_list_element<Index, entt::value_list<Value...>> {};
 
 #endif

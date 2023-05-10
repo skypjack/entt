@@ -36,27 +36,3 @@ TEST(Tuple, ForwardApply) {
     ASSERT_EQ(entt::forward_apply{[](int i) { return i; }}(std::make_tuple(42)), 42);
     ASSERT_EQ(entt::forward_apply{[](auto... args) { return (args + ...); }}(std::make_tuple('a', 1)), 'b');
 }
-
-TEST(TypeList, TupleSize) {
-    ASSERT_EQ(std::tuple_size_v<entt::type_list<>>, 0u);
-    ASSERT_EQ(std::tuple_size_v<entt::type_list<int>>, 1u);
-    ASSERT_EQ((std::tuple_size_v<entt::type_list<int, float>>), 2u);
-}
-
-TEST(TypeList, TupleElement) {
-    ASSERT_TRUE((std::is_same_v<int, std::tuple_element_t<0, entt::type_list<int>>>));
-    ASSERT_TRUE((std::is_same_v<int, std::tuple_element_t<0, entt::type_list<int, float>>>));
-    ASSERT_TRUE((std::is_same_v<float, std::tuple_element_t<1, entt::type_list<int, float>>>));
-}
-
-TEST(ValueList, TupleSize) {
-    ASSERT_EQ(std::tuple_size_v<entt::value_list<>>, 0u);
-    ASSERT_EQ(std::tuple_size_v<entt::value_list<42>>, 1u);
-    ASSERT_EQ((std::tuple_size_v<entt::value_list<42, 'a'>>), 2u);
-}
-
-TEST(ValueList, TupleElement) {
-    ASSERT_TRUE((std::is_same_v<int, std::tuple_element_t<0, entt::value_list<42>>>));
-    ASSERT_TRUE((std::is_same_v<int, std::tuple_element_t<0, entt::value_list<42, 'a'>>>));
-    ASSERT_TRUE((std::is_same_v<char, std::tuple_element_t<1, entt::value_list<42, 'a'>>>));
-}
