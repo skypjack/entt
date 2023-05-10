@@ -171,17 +171,10 @@ TEST(BasicHandle, Component) {
     ASSERT_TRUE(registry.storage<double>().empty());
     ASSERT_EQ(0u, (handle.remove<char, double>()));
 
-    auto it = handle.storage().begin();
-
-    ASSERT_NE(it, handle.storage().end());
-    ASSERT_EQ(it->first, entt::type_id<entt::entity>().hash());
-    ASSERT_TRUE(it->second.contains(handle.entity()));
-
-    ASSERT_NE(++it, handle.storage().end());
-    ASSERT_EQ(it->first, entt::type_id<int>().hash());
-    ASSERT_TRUE(it->second.contains(handle.entity()));
-
-    ASSERT_EQ(++it, handle.storage().end());
+    for(auto [id, pool]: handle.storage()) {
+        ASSERT_EQ(id, entt::type_id<int>().hash());
+        ASSERT_TRUE(pool.contains(handle.entity()));
+    }
 
     ASSERT_TRUE((handle.any_of<int, char, double>()));
     ASSERT_FALSE((handle.all_of<int, char, double>()));
@@ -260,37 +253,20 @@ TEST(BasicHandle, Storage) {
     static_assert(std::is_same_v<decltype(*handle.storage().begin()), std::pair<entt::id_type, entt::sparse_set &>>);
     static_assert(std::is_same_v<decltype(*chandle.storage().begin()), std::pair<entt::id_type, const entt::sparse_set &>>);
 
-    auto it = handle.storage().begin();
-    auto cit = chandle.storage().begin();
-
-    ASSERT_NE(it, handle.storage().end());
-    ASSERT_EQ(++it, handle.storage().end());
-
-    ASSERT_NE(cit, chandle.storage().end());
-    ASSERT_EQ(++cit, chandle.storage().end());
+    ASSERT_EQ(handle.storage().begin(), handle.storage().end());
+    ASSERT_EQ(chandle.storage().begin(), chandle.storage().end());
 
     registry.storage<double>();
     registry.emplace<int>(entity);
 
-    it = handle.storage().begin();
-    cit = chandle.storage().begin();
+    ASSERT_NE(handle.storage().begin(), handle.storage().end());
+    ASSERT_NE(chandle.storage().begin(), chandle.storage().end());
 
-    ASSERT_EQ(it++, handle.storage().begin());
-    ASSERT_NE(it, handle.storage().end());
-    ASSERT_EQ(++it, handle.storage().end());
+    ASSERT_EQ(++handle.storage().begin(), handle.storage().end());
+    ASSERT_EQ(++chandle.storage().begin(), chandle.storage().end());
 
-    ASSERT_EQ(cit++, chandle.storage().begin());
-    ASSERT_NE(cit, chandle.storage().end());
-    ASSERT_EQ(++cit, chandle.storage().end());
-
-    it = handle.storage().begin();
-    cit = chandle.storage().begin();
-
-    ASSERT_EQ(it->second.type(), entt::type_id<entt::entity>());
-    ASSERT_EQ((++it)->second.type(), entt::type_id<int>());
-
-    ASSERT_EQ(cit->second.type(), entt::type_id<entt::entity>());
-    ASSERT_EQ((++cit)->second.type(), entt::type_id<int>());
+    ASSERT_EQ(handle.storage().begin()->second.type(), entt::type_id<int>());
+    ASSERT_EQ(chandle.storage().begin()->second.type(), entt::type_id<int>());
 }
 
 TEST(BasicHandle, HandleStorageIterator) {

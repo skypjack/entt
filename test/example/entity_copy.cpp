@@ -61,9 +61,9 @@ TEST(EntityCopy, SameRegistry) {
     ASSERT_TRUE((registry.all_of<int, char>(src)));
     ASSERT_FALSE((registry.any_of<int, char>(dst)));
 
-    for(auto it = ++registry.storage().begin(), last = registry.storage().end(); it != last; ++it) {
+    for(auto [id, storage]: registry.storage()) {
         // discard the custom storage because why not, this is just an example after all
-        if(auto [id, storage] = *it; id != "custom"_hs && storage.contains(src)) {
+        if(id != "custom"_hs && storage.contains(src)) {
             storage.push(dst, storage.value(src));
         }
     }
@@ -97,8 +97,8 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
     ASSERT_TRUE((src.all_of<int, char>(entity)));
     ASSERT_FALSE((dst.template all_of<int, char>(copy)));
 
-    for(auto it = ++src.storage().begin(), last = src.storage().end(); it != last; ++it) {
-        if(auto [id, storage] = *it; storage.contains(entity)) {
+    for(auto [id, storage]: src.storage()) {
+        if(storage.contains(entity)) {
             auto *other = dst.storage(id);
 
             if(!other) {
