@@ -38,6 +38,7 @@
   * [Empty type optimization](#empty-type-optimization)
   * [Void storage](#void-storage)
   * [Entity storage](#entity-storage)
+    * [One of a kind to the registry](#one-of-a-kind-to-the-registry)
   * [Pointer stability](#pointer-stability)
     * [In-place delete](#in-place-delete)
     * [Hierarchies and the like](#hierarchies-and-the-like)
@@ -1272,6 +1273,54 @@ Moreover, the entity storage offers a couple of additional utilities such as:
 
 This kind of storage is designed to be used where any other storage is fine and
 can therefore be combined with views, groups and so on.
+
+### One of a kind to the registry
+
+Within the registry, an entity storage is treated in all respects like any other
+storage.<br/>
+Therefore, it's possible to add mixins to it as well as retrieve it via the
+`storage` function. It can also be used as storage in a view (for exclude-only
+views for example):
+
+```cpp
+auto view = registry.view<entt::entity>(entt::exclude<my_type>);
+```
+
+However, it's also subject to a couple of exceptions, partly out of necessity
+and partly for ease of use.
+
+In particular, it's not possible to create multiple elements of this type.<br/>
+This means that the _name_ used to retrieve this kind of storage is ignored and
+the registry will only ever return the same element to the caller. For example:
+
+```cpp
+auto &other = registry.storage<entt::entity>("custom"_hs);
+```
+
+In this case, the identifier is discarded as is. The call is in all respects
+equivalent to the following:
+
+```cpp
+auto &storage = registry.storage<entt::entity>();
+```
+
+Because entity storage doesn't have a name, it can't be retrieved via the opaque
+`storage` function either.<br/>
+It would make no sense to try anyway, given that the type of the registry and
+therefore its entity type are known regardless.
+
+Finally, when the user asks the registry for an iterable object to visit all the
+storage elements inside it as follows:
+
+```cpp
+for(auto [id, storage]: registry.each()) {
+    // ...
+}
+```
+
+Entity storage is never returned. This simplifies many tasks (such as copying an
+entity) and fits perfectly with the fact that this type of storage doesn't have
+an identifier inside the registry.
 
 ## Pointer stability
 
