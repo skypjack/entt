@@ -126,7 +126,7 @@ class basic_organizer final {
         if constexpr(std::is_same_v<Type, Registry>) {
             return reg;
         } else if constexpr(internal::is_view_v<Type>) {
-            return as_view{reg};
+            return static_cast<Type>(as_view{reg});
         } else {
             return reg.ctx().template emplace<std::remove_reference_t<Type>>();
         }
