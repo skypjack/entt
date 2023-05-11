@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/organizer.hpp>
@@ -364,11 +365,9 @@ TEST(Organizer, Prepare) {
     ASSERT_FALSE(registry.ctx().contains<char>());
     ASSERT_FALSE(registry.ctx().contains<double>());
 
-    for(auto &&[name, cpool]: registry.storage()) {
-        ASSERT_NE(cpool.type(), entt::type_id<int>());
-        ASSERT_NE(cpool.type(), entt::type_id<char>());
-        ASSERT_NE(cpool.type(), entt::type_id<double>());
-    }
+    ASSERT_EQ(std::as_const(registry).storage<int>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).storage<char>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).storage<double>(), nullptr);
 
     for(auto &&vertex: graph) {
         vertex.prepare(registry);
@@ -378,21 +377,9 @@ TEST(Organizer, Prepare) {
     ASSERT_FALSE(registry.ctx().contains<char>());
     ASSERT_TRUE(registry.ctx().contains<double>());
 
-    bool created_int_pool = false;
-    bool created_char_pool = false;
-    bool created_double_pool = false;
-    for(auto &&[name, cpool]: registry.storage()) {
-        if(cpool.type() == entt::type_id<int>()) {
-            created_int_pool = true;
-        } else if(cpool.type() == entt::type_id<char>()) {
-            created_char_pool = true;
-        } else if(cpool.type() == entt::type_id<double>()) {
-            created_double_pool = true;
-        }
-    }
-    ASSERT_TRUE(created_int_pool);
-    ASSERT_TRUE(created_char_pool);
-    ASSERT_FALSE(created_double_pool);
+    ASSERT_NE(std::as_const(registry).storage<int>(), nullptr);
+    ASSERT_NE(std::as_const(registry).storage<char>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).storage<double>(), nullptr);
 }
 
 TEST(Organizer, Dependencies) {
