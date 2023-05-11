@@ -714,12 +714,15 @@ entt::sigh_helper{registry}
     .with<position>()
         .on_construct<&a_listener>()
         .on_destroy<&another_listener>()
-    .with<velocity>()
+    .with<velocity>("other"_hs)
         .on_update<yet_another_listener>();
 ```
 
-Obviously, it doesn't make the code disappear but it should at least reduce it
-in the most complex cases.
+Runtime pools are also supported by providing an identifier when calling `with`,
+as shown in the previous snippet. Refer to the following sections for more
+information about runtime pools.<br/>
+Obviously, this helper doesn't make the code disappear but it should at least
+reduce the boilerplate in the most complex cases.
 
 ### Handle
 
@@ -1294,7 +1297,7 @@ This means that the _name_ used to retrieve this kind of storage is ignored and
 the registry will only ever return the same element to the caller. For example:
 
 ```cpp
-auto &other = registry.storage<entt::entity>("custom"_hs);
+auto &other = registry.storage<entt::entity>("other"_hs);
 ```
 
 In this case, the identifier is discarded as is. The call is in all respects
