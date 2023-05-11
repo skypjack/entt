@@ -1130,7 +1130,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Type>
-    [[deprecated("use .storage<Type>().on_construct() and .storage<Type>(id).on_construct() instead")]] [[nodiscard]] auto on_construct() {
+    [[nodiscard]] auto on_construct() {
         return assure<Type>().on_construct();
     }
 
@@ -1153,7 +1153,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Type>
-    [[deprecated("use .storage<Type>().on_update() and .storage<Type>(id).on_update() instead")]] [[nodiscard]] auto on_update() {
+    [[nodiscard]] auto on_update() {
         return assure<Type>().on_update();
     }
 
@@ -1176,7 +1176,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Type>
-    [[deprecated("use .storage<Type>().on_destroy() and .storage<Type>(id).on_destroy() instead")]] [[nodiscard]] auto on_destroy() {
+    [[nodiscard]] auto on_destroy() {
         return assure<Type>().on_destroy();
     }
 
