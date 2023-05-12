@@ -366,7 +366,15 @@ the destruction and update of an instance, respectively.<br/>
 Because of how C++ works, listeners attached to `on_update` are only invoked
 following a call to `replace`, `emplace_or_replace` or `patch`.
 
-The function type of a listener is equivalent to the following:
+Runtime pools are also supported by providing an identifier to the functions
+above:
+
+```cpp
+registry.on_construct<position>("other"_hs).connect<&my_free_function>();
+```
+
+Refer to the following sections for more information about runtime pools.<br/>
+In all cases, the function type of a listener is equivalent to the following:
 
 ```cpp
 void(entt::registry &, entt::entity);
