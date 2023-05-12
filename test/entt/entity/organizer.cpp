@@ -1,5 +1,7 @@
 #include <cstddef>
+#include <utility>
 #include <gtest/gtest.h>
+#include <entt/core/type_info.hpp>
 #include <entt/entity/organizer.hpp>
 #include <entt/entity/registry.hpp>
 
@@ -363,6 +365,10 @@ TEST(Organizer, Prepare) {
     ASSERT_FALSE(registry.ctx().contains<char>());
     ASSERT_FALSE(registry.ctx().contains<double>());
 
+    ASSERT_EQ(std::as_const(registry).storage<int>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).storage<char>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).storage<double>(), nullptr);
+
     for(auto &&vertex: graph) {
         vertex.prepare(registry);
     }
@@ -370,6 +376,10 @@ TEST(Organizer, Prepare) {
     ASSERT_FALSE(registry.ctx().contains<int>());
     ASSERT_FALSE(registry.ctx().contains<char>());
     ASSERT_TRUE(registry.ctx().contains<double>());
+
+    ASSERT_NE(std::as_const(registry).storage<int>(), nullptr);
+    ASSERT_NE(std::as_const(registry).storage<char>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).storage<double>(), nullptr);
 }
 
 TEST(Organizer, Dependencies) {
