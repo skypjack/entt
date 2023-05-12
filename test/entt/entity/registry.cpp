@@ -1489,9 +1489,9 @@ TEST(Registry, SignalsOnRuntimePool) {
     const auto entity = registry.create();
     listener listener;
 
-    registry.on_construct<int>("custom"_hs).connect<&listener::decr>(listener);
-    registry.on_update<int>("custom"_hs).connect<&listener::decr>(listener);
-    registry.on_destroy<int>("custom"_hs).connect<&listener::decr>(listener);
+    registry.on_construct<int>("custom"_hs).connect<&listener::incr>(listener);
+    registry.on_update<int>("custom"_hs).connect<&listener::incr>(listener);
+    registry.on_destroy<int>("custom"_hs).connect<&listener::incr>(listener);
 
     ASSERT_EQ(listener.counter, 0);
 
