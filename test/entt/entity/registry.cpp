@@ -1482,6 +1482,32 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.last, entities[0u]);
 }
 
+TEST(Registry, SignalsOnRuntimePool) {
+    using namespace entt::literals;
+
+    entt::registry registry;
+    const auto entity = registry.create();
+    listener listener;
+
+    registry.on_construct<int>("custom"_hs).connect<&listener::decr>(listener);
+    registry.on_update<int>("custom"_hs).connect<&listener::decr>(listener);
+    registry.on_destroy<int>("custom"_hs).connect<&listener::decr>(listener);
+
+    ASSERT_EQ(listener.counter, 0);
+
+    registry.emplace<int>(entity);
+    registry.patch<int>(entity);
+    registry.erase<int>(entity);
+
+    ASSERT_EQ(listener.counter, 0);
+
+    registry.storage<int>("custom"_hs).emplace(entity);
+    registry.storage<int>("custom"_hs).patch(entity);
+    registry.storage<int>("custom"_hs).erase(entity);
+
+    ASSERT_EQ(listener.counter, 3);
+}
+
 TEST(Registry, SignalsOnEntity) {
     entt::registry registry;
     listener listener;

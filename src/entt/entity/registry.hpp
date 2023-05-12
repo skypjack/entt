@@ -1127,11 +1127,12 @@ public:
      * @sa sink
      *
      * @tparam Type Type of component of which to get the sink.
+     * @param id Optional name used to map the storage within the registry.
      * @return A temporary sink object.
      */
     template<typename Type>
-    [[nodiscard]] auto on_construct() {
-        return assure<Type>().on_construct();
+    [[nodiscard]] auto on_construct(const id_type id = type_hash<Type>::value()) {
+        return assure<Type>(id).on_construct();
     }
 
     /**
@@ -1150,11 +1151,12 @@ public:
      * @sa sink
      *
      * @tparam Type Type of component of which to get the sink.
+     * @param id Optional name used to map the storage within the registry.
      * @return A temporary sink object.
      */
     template<typename Type>
-    [[nodiscard]] auto on_update() {
-        return assure<Type>().on_update();
+    [[nodiscard]] auto on_update(const id_type id = type_hash<Type>::value()) {
+        return assure<Type>(id).on_update();
     }
 
     /**
@@ -1173,11 +1175,12 @@ public:
      * @sa sink
      *
      * @tparam Type Type of component of which to get the sink.
+     * @param id Optional name used to map the storage within the registry.
      * @return A temporary sink object.
      */
     template<typename Type>
-    [[nodiscard]] auto on_destroy() {
-        return assure<Type>().on_destroy();
+    [[nodiscard]] auto on_destroy(const id_type id = type_hash<Type>::value()) {
+        return assure<Type>(id).on_destroy();
     }
 
     /**
