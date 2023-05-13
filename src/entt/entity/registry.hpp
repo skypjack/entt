@@ -821,7 +821,6 @@ public:
 
     /**
      * @brief Removes the given components from an entity.
-     *
      * @tparam Type Type of component to remove.
      * @tparam Other Other types of components to remove.
      * @param entt A valid identifier.
@@ -1193,11 +1192,6 @@ public:
 
     /**
      * @brief Returns a group for the given components.
-     *
-     * Group owned component pools can no longer be sorted.<br/>
-     * The group takes the ownership of the pools and arrange components so as
-     * to iterate them as fast as possible.
-     *
      * @tparam Owned Types of storage _owned_ by the group.
      * @tparam Get Types of storage _observed_ by the group, if any.
      * @tparam Exclude Types of storage used to filter the group, if any.
