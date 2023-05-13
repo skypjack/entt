@@ -264,8 +264,7 @@ public:
      * @brief Returns an iterator to the end.
      *
      * The returned iterator points to the element following the last instance
-     * of the cache. Attempting to dereference the returned iterator results in
-     * undefined behavior.
+     * of the cache.
      *
      * @return An iterator to the element following the last instance of the
      * internal cache.

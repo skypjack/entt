@@ -283,7 +283,7 @@ class basic_group;
  * * The entity currently pointed is destroyed.
  *
  * In all other cases, modifying the pools iterated by the group in any way
- * invalidates all the iterators and using them results in undefined behavior.
+ * invalidates all the iterators.
  *
  * @tparam Get Types of storage _observed_ by the group.
  * @tparam Exclude Types of storage used to filter the group.
@@ -415,8 +415,7 @@ public:
      * @brief Returns an iterator that is past the last entity of the group.
      *
      * The returned iterator points to the entity following the last entity of
-     * the group. Attempting to dereference the returned iterator results in
-     * undefined behavior.
+     * the group.
      *
      * @return An iterator to the entity following the last entity of the
      * group.
@@ -442,8 +441,7 @@ public:
      * group.
      *
      * The returned iterator points to the entity following the last entity of
-     * the reversed group. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * the reversed group.
      *
      * @return An iterator to the entity following the last entity of the
      * reversed group.
@@ -714,7 +712,7 @@ private:
  * * The entity currently pointed is destroyed.
  *
  * In all other cases, modifying the pools iterated by the group in any way
- * invalidates all the iterators and using them results in undefined behavior.
+ * invalidates all the iterators.
  *
  * @tparam Owned Types of storage _owned_ by the group.
  * @tparam Get Types of storage _observed_ by the group.
@@ -831,8 +829,7 @@ public:
      * @brief Returns an iterator that is past the last entity of the group.
      *
      * The returned iterator points to the entity following the last entity of
-     * the group. Attempting to dereference the returned iterator results in
-     * undefined behavior.
+     * the group.
      *
      * @return An iterator to the entity following the last entity of the
      * group.
@@ -858,8 +855,7 @@ public:
      * group.
      *
      * The returned iterator points to the entity following the last entity of
-     * the reversed group. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * the reversed group.
      *
      * @return An iterator to the entity following the last entity of the
      * reversed group.

@@ -123,8 +123,7 @@ private:
  * * The entity currently pointed is destroyed.
  *
  * In all the other cases, modifying the pools of the given components in any
- * way invalidates all the iterators and using them results in undefined
- * behavior.
+ * way invalidates all the iterators.
  *
  * @note
  * Views share references to the underlying data structures of the registry that
@@ -282,8 +281,7 @@ public:
      * given components.
      *
      * The returned iterator points to the entity following the last entity that
-     * has the given components. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * has the given components.
      *
      * @return An iterator to the entity following the last entity that has the
      * given components.

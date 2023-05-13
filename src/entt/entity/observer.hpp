@@ -146,8 +146,7 @@ inline constexpr basic_collector<> collector{};
  * * The entity currently pointed is destroyed.
  *
  * In all the other cases, modifying the pools of the given components in any
- * way invalidates all the iterators and using them results in undefined
- * behavior.
+ * way invalidates all the iterators.
  *
  * @warning
  * Lifetime of an observer doesn't necessarily have to overcome that of the
@@ -384,8 +383,7 @@ public:
      * @brief Returns an iterator that is past the last entity of the observer.
      *
      * The returned iterator points to the entity following the last entity of
-     * the observer. Attempting to dereference the returned iterator results in
-     * undefined behavior.
+     * the observer.
      *
      * @return An iterator to the entity following the last entity of the
      * observer.

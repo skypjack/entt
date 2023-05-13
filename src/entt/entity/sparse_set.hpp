@@ -562,8 +562,7 @@ public:
      * @brief Returns an iterator to the end.
      *
      * The returned iterator points to the element following the last entity in
-     * a sparse set. Attempting to dereference the returned iterator results in
-     * undefined behavior.
+     * a sparse set.
      *
      * @return An iterator to the element following the last entity of a sparse
      * set.
@@ -600,8 +599,7 @@ public:
      * @brief Returns a reverse iterator to the end.
      *
      * The returned iterator points to the element following the last entity in
-     * the reversed sparse set. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * the reversed sparse set.
      *
      * @return An iterator to the element following the last entity of the
      * reversed sparse set.

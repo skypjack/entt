@@ -487,8 +487,7 @@ public:
      * @brief Returns an iterator to the end.
      *
      * The returned iterator points to the element following the last instance
-     * of the internal array. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * of the internal array.
      *
      * @return An iterator to the element following the last instance of the
      * internal array.

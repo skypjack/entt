@@ -200,7 +200,7 @@ class basic_view;
  * * The entity currently pointed is destroyed.
  *
  * In all other cases, modifying the storage iterated by the view in any way
- * invalidates all the iterators and using them results in undefined behavior.
+ * invalidates all the iterators.
  *
  * @tparam Get Types of storage iterated by the view.
  * @tparam Exclude Types of storage used to filter the view.
@@ -402,8 +402,7 @@ public:
      * @brief Returns an iterator that is past the last entity of the view.
      *
      * The returned iterator points to the entity following the last entity of
-     * the view. Attempting to dereference the returned iterator results in
-     * undefined behavior.
+     * the view.
      *
      * @return An iterator to the entity following the last entity of the view.
      */
@@ -584,7 +583,7 @@ private:
  * * The entity currently pointed is destroyed.
  *
  * In all other cases, modifying the storage iterated by the view in any way
- * invalidates all the iterators and using them results in undefined behavior.
+ * invalidates all the iterators.
  *
  * @tparam Get Type of storage iterated by the view.
  */
@@ -708,8 +707,7 @@ public:
      * @brief Returns an iterator that is past the last entity of the view.
      *
      * The returned iterator points to the entity following the last entity of
-     * the view. Attempting to dereference the returned iterator results in
-     * undefined behavior.
+     * the view.
      *
      * @return An iterator to the entity following the last entity of the view.
      */
@@ -734,8 +732,7 @@ public:
      * view.
      *
      * The returned iterator points to the entity following the last entity of
-     * the reversed view. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * the reversed view.
      *
      * @return An iterator to the entity following the last entity of the
      * reversed view.
