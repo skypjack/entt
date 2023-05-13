@@ -604,9 +604,6 @@ public:
      *
      * The version is updated and the identifier can be recycled at any time.
      *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.
-     *
      * @param entt A valid identifier.
      * @return The version of the recycled entity.
      */
@@ -657,8 +654,7 @@ public:
      *
      * @warning
      * Adding or removing components to an entity that is being destroyed can
-     * result in undefined behavior. Attempting to use an invalid entity results
-     * in undefined behavior.
+     * result in undefined behavior.
      *
      * @param entt A valid identifier.
      * @return The version of the recycled entity.
@@ -794,13 +790,8 @@ public:
      * void(Type &);
      * @endcode
      *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned. However, this function can be used to trigger an update signal
-     * for them.
-     *
      * @warning
-     * Attempting to to patch a component of an entity that doesn't own it
+     * Attempting to patch a component of an entity that doesn't own it
      * results in undefined behavior.
      *
      * @tparam Type Type of component to patch.
