@@ -619,8 +619,6 @@ public:
      * The suggested version or the valid version closest to the suggested one
      * is used instead of the implicitly generated version.
      *
-     * @sa release
-     *
      * @param entt A valid identifier.
      * @param version A desired version upon destruction.
      * @return The version actually assigned to the entity.
@@ -635,8 +633,6 @@ public:
     /**
      * @brief Releases all identifiers in a range.
      *
-     * @sa release
-     *
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
@@ -649,8 +645,6 @@ public:
 
     /**
      * @brief Destroys an entity and releases its identifier.
-     *
-     * @sa release
      *
      * @warning
      * Adding or removing components to an entity that is being destroyed can
