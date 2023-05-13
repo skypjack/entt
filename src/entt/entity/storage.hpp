@@ -539,7 +539,6 @@ public:
     /**
      * @brief Returns an iterator to the beginning.
      *
-     * The returned iterator points to the first instance of the internal array.
      * If the storage is empty, the returned iterator will be equal to `end()`.
      *
      * @return An iterator to the first instance of the internal array.
@@ -562,10 +561,6 @@ public:
 
     /**
      * @brief Returns an iterator to the end.
-     *
-     * The returned iterator points to the element following the last instance
-     * of the internal array.
-     *
      * @return An iterator to the element following the last instance of the
      * internal array.
      */
@@ -586,9 +581,7 @@ public:
     /**
      * @brief Returns a reverse iterator to the beginning.
      *
-     * The returned iterator points to the first instance of the reversed
-     * internal array. If the storage is empty, the returned iterator will be
-     * equal to `rend()`.
+     * If the storage is empty, the returned iterator will be equal to `rend()`.
      *
      * @return An iterator to the first instance of the reversed internal array.
      */
@@ -608,10 +601,6 @@ public:
 
     /**
      * @brief Returns a reverse iterator to the end.
-     *
-     * The returned iterator points to the element following the last instance
-     * of the reversed internal array.
-     *
      * @return An iterator to the element following the last instance of the
      * reversed internal array.
      */

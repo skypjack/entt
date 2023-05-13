@@ -542,8 +542,7 @@ public:
     /**
      * @brief Returns an iterator to the beginning.
      *
-     * The returned iterator points to the first entity of the internal packed
-     * array. If the sparse set is empty, the returned iterator will be equal to
+     * If the sparse set is empty, the returned iterator will be equal to
      * `end()`.
      *
      * @return An iterator to the first entity of the sparse set.
@@ -560,10 +559,6 @@ public:
 
     /**
      * @brief Returns an iterator to the end.
-     *
-     * The returned iterator points to the element following the last entity in
-     * a sparse set.
-     *
      * @return An iterator to the element following the last entity of a sparse
      * set.
      */
@@ -579,9 +574,8 @@ public:
     /**
      * @brief Returns a reverse iterator to the beginning.
      *
-     * The returned iterator points to the first entity of the reversed internal
-     * packed array. If the sparse set is empty, the returned iterator will be
-     * equal to `rend()`.
+     * If the sparse set is empty, the returned iterator will be equal to
+     * `rend()`.
      *
      * @return An iterator to the first entity of the reversed internal packed
      * array.
@@ -597,10 +591,6 @@ public:
 
     /**
      * @brief Returns a reverse iterator to the end.
-     *
-     * The returned iterator points to the element following the last entity in
-     * the reversed sparse set.
-     *
      * @return An iterator to the element following the last entity of the
      * reversed sparse set.
      */

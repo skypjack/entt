@@ -389,8 +389,7 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the view.
      *
-     * The returned iterator points to the first entity of the view. If the view
-     * is empty, the returned iterator will be equal to `end()`.
+     * If the view is empty, the returned iterator will be equal to `end()`.
      *
      * @return An iterator to the first entity of the view.
      */
@@ -400,10 +399,6 @@ public:
 
     /**
      * @brief Returns an iterator that is past the last entity of the view.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the view.
-     *
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
@@ -694,8 +689,7 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the view.
      *
-     * The returned iterator points to the first entity of the view. If the view
-     * is empty, the returned iterator will be equal to `end()`.
+     * If the view is empty, the returned iterator will be equal to `end()`.
      *
      * @return An iterator to the first entity of the view.
      */
@@ -705,10 +699,6 @@ public:
 
     /**
      * @brief Returns an iterator that is past the last entity of the view.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the view.
-     *
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
@@ -718,8 +708,7 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the reversed view.
      *
-     * The returned iterator points to the first entity of the reversed view. If
-     * the view is empty, the returned iterator will be equal to `rend()`.
+     * If the view is empty, the returned iterator will be equal to `rend()`.
      *
      * @return An iterator to the first entity of the reversed view.
      */
@@ -730,10 +719,6 @@ public:
     /**
      * @brief Returns an iterator that is past the last entity of the reversed
      * view.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the reversed view.
-     *
      * @return An iterator to the entity following the last entity of the
      * reversed view.
      */

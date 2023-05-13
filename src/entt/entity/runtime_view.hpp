@@ -266,9 +266,7 @@ public:
      * @brief Returns an iterator to the first entity that has the given
      * components.
      *
-     * The returned iterator points to the first entity that has the given
-     * components. If the view is empty, the returned iterator will be equal to
-     * `end()`.
+     * If the view is empty, the returned iterator will be equal to `end()`.
      *
      * @return An iterator to the first entity that has the given components.
      */
@@ -279,10 +277,6 @@ public:
     /**
      * @brief Returns an iterator that is past the last entity that has the
      * given components.
-     *
-     * The returned iterator points to the entity following the last entity that
-     * has the given components.
-     *
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */

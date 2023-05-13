@@ -370,8 +370,7 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the observer.
      *
-     * The returned iterator points to the first entity of the observer. If the
-     * container is empty, the returned iterator will be equal to `end()`.
+     * If the observer is empty, the returned iterator will be equal to `end()`.
      *
      * @return An iterator to the first entity of the observer.
      */
@@ -381,10 +380,6 @@ public:
 
     /**
      * @brief Returns an iterator that is past the last entity of the observer.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the observer.
-     *
      * @return An iterator to the entity following the last entity of the
      * observer.
      */

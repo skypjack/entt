@@ -402,8 +402,7 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the group.
      *
-     * The returned iterator points to the first entity of the group. If the
-     * group is empty, the returned iterator will be equal to `end()`.
+     * If the group is empty, the returned iterator will be equal to `end()`.
      *
      * @return An iterator to the first entity of the group.
      */
@@ -413,10 +412,6 @@ public:
 
     /**
      * @brief Returns an iterator that is past the last entity of the group.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the group.
-     *
      * @return An iterator to the entity following the last entity of the
      * group.
      */
@@ -427,7 +422,6 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the reversed group.
      *
-     * The returned iterator points to the first entity of the reversed group.
      * If the group is empty, the returned iterator will be equal to `rend()`.
      *
      * @return An iterator to the first entity of the reversed group.
@@ -439,10 +433,6 @@ public:
     /**
      * @brief Returns an iterator that is past the last entity of the reversed
      * group.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the reversed group.
-     *
      * @return An iterator to the entity following the last entity of the
      * reversed group.
      */
@@ -816,8 +806,7 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the group.
      *
-     * The returned iterator points to the first entity of the group. If the
-     * group is empty, the returned iterator will be equal to `end()`.
+     * If the group is empty, the returned iterator will be equal to `end()`.
      *
      * @return An iterator to the first entity of the group.
      */
@@ -827,10 +816,6 @@ public:
 
     /**
      * @brief Returns an iterator that is past the last entity of the group.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the group.
-     *
      * @return An iterator to the entity following the last entity of the
      * group.
      */
@@ -841,7 +826,6 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the reversed group.
      *
-     * The returned iterator points to the first entity of the reversed group.
      * If the group is empty, the returned iterator will be equal to `rend()`.
      *
      * @return An iterator to the first entity of the reversed group.
@@ -853,10 +837,6 @@ public:
     /**
      * @brief Returns an iterator that is past the last entity of the reversed
      * group.
-     *
-     * The returned iterator points to the entity following the last entity of
-     * the reversed group.
-     *
      * @return An iterator to the entity following the last entity of the
      * reversed group.
      */
