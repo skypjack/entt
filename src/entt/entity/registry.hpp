@@ -847,15 +847,12 @@ public:
     size_type remove(It first, It last) {
         size_type count{};
 
-        if constexpr(sizeof...(Other) == 0u) {
-            count += assure<Type>().remove(std::move(first), std::move(last));
-        } else if constexpr(std::is_same_v<It, typename common_type::iterator>) {
-            constexpr size_type len = sizeof...(Other) + 1u;
-            common_type *cpools[len]{&assure<Type>(), &assure<Other>()...};
+        if constexpr(std::is_same_v<It, typename common_type::iterator>) {
+            common_type *cpools[sizeof...(Other) + 1u]{&assure<Type>(), &assure<Other>()...};
 
-            for(size_type pos{}; pos < len; ++pos) {
-                if(cpools[pos]->data() == first.data()) {
-                    std::swap(cpools[pos], cpools[len - 1u]);
+            for(size_type pos{}, len = sizeof...(Other) + 1u; pos < len; ++pos) {
+                if(!(sizeof...(Other) == 0u) && cpools[pos]->data() == first.data()) {
+                    std::swap(cpools[pos], cpools[sizeof...(Other)]);
                 }
 
                 count += cpools[pos]->remove(first, last);
