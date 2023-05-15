@@ -1526,7 +1526,7 @@ TEST(Registry, SignalsOnEntity) {
     ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, other);
 
-    registry.on_construct<entt::entity>().disconnect<&listener::incr>(listener);
+    registry.on_construct<entt::entity>().disconnect(&listener);
 
     other = registry.create();
     entity = registry.create();
@@ -1535,17 +1535,29 @@ TEST(Registry, SignalsOnEntity) {
     ASSERT_NE(listener.last, entity);
     ASSERT_NE(listener.last, other);
 
-    registry.on_destroy<entt::entity>().connect<&listener::decr>(listener);
-
-    registry.destroy(entity);
+    registry.on_update<entt::entity>().connect<&listener::decr>(listener);
+    registry.patch<entt::entity>(entity);
 
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, entity);
 
-    registry.storage<entt::entity>().erase(other);
+    registry.on_update<entt::entity>().disconnect(&listener);
+    registry.patch<entt::entity>(other);
+
+    ASSERT_EQ(listener.counter, 1);
+    ASSERT_NE(listener.last, other);
+
+    registry.on_destroy<entt::entity>().connect<&listener::decr>(listener);
+    registry.destroy(entity);
 
     ASSERT_EQ(listener.counter, 0);
-    ASSERT_EQ(listener.last, other);
+    ASSERT_EQ(listener.last, entity);
+
+    registry.on_destroy<entt::entity>().disconnect(&listener);
+    registry.destroy(other);
+
+    ASSERT_EQ(listener.counter, 0);
+    ASSERT_NE(listener.last, other);
 }
 
 TEST(Registry, SignalWhenDestroying) {
