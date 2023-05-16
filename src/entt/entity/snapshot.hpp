@@ -87,7 +87,6 @@ public:
     template<typename Archive>
     const basic_snapshot &entities(Archive &archive) const {
         const auto *storage = reg->template storage<entity_type>();
-        ENTT_ASSERT(storage, "No entity storage available");
 
         archive(static_cast<typename traits_type::entity_type>(storage->size()));
         archive(static_cast<typename traits_type::entity_type>(storage->in_use()));
