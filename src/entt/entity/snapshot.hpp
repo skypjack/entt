@@ -267,7 +267,7 @@ public:
      * In case all the entities were serialized but only part of the components
      * was saved, it could happen that some of the entities have no components
      * once restored.<br/>
-     * This functions helps to identify and destroy those entities.
+     * This function helps to identify and destroy those entities.
      *
      * @return A valid loader to continue restoring data.
      */
@@ -297,7 +297,7 @@ private:
  * Identifiers that entities originally had are not transferred to the target.
  * Instead, the loader maps remote identifiers to local ones while restoring a
  * snapshot.<br/>
- * An example of use is the implementation of a client-server applications with
+ * An example of use is the implementation of a client-server application with
  * the requirement of transferring somehow parts of the representation side to
  * side.
  *
@@ -527,7 +527,7 @@ public:
      * In case all the entities were serialized but only part of the components
      * was saved, it could happen that some of the entities have no components
      * once restored.<br/>
-     * This functions helps to identify and destroy those entities.
+     * This function helps to identify and destroy those entities.
      *
      * @return A non-const reference to this loader.
      */
