@@ -49,6 +49,7 @@
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
     * [Create once, reuse many times](#create-once-reuse-many-times)
+    * [Exclude-only](#exclude-only)
     * [View pack](#view-pack)
     * [Iteration order](#iteration-order)
     * [Runtime views](#runtime-views)
@@ -1736,6 +1737,25 @@ and purposes as if it were an _empty_ element.<br/>
 Thus, a _get_ storage (as in `entt::get_t`) makes the view empty automatically
 while an _exclude_ storage (as in `entt::exclude_t`) is ignored as if that part
 of the filter didn't exist.
+
+### Exclude-only
+
+_Exclude-only_ views aren't really a thing in `EnTT`.<br/>
+However, the same result can be achieved by combining the right storage into a
+simple view.
+
+If one gets to the root of the problem, the purpose of an exclude-only view is
+to return entities that don't meet certain requirements.<br/>
+Since entity storage, unlike exclude-only views, **is** a thing in `EnTT`, users
+can leverage it for these kinds of queries. It's also guaranteed to be unique
+within a registry and is always accessible when creating a view:
+
+```cpp
+auto view = registry.view<entt::entity>(entt::exclude<my_type>);
+```
+
+The returned view is such that it will return only the entities that don't have
+the `my_type` component, regardless of what other components they have.
 
 ### View pack
 
