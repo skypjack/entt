@@ -14,6 +14,7 @@
 * [Vademecum](#vademecum)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
+    * [Entity lifecycle](#entity-lifecycle)
     * [Listeners disconnection](#listeners-disconnection)
     * [They call me Reactive System](#they-call-me-reactive-system)
   * [Sorting: is it possible?](#sorting-is-it-possible)
@@ -413,6 +414,33 @@ features it offers.<br/>
 There are many useful but less known functionalities that aren't described here,
 such as the connection objects or the possibility to attach listeners with a
 list of parameters that is shorter than that of the signal itself.
+
+### Entity lifecycle
+
+Observing entities is also possible. In this case, the user must use the entity
+type instead of the component type:
+
+```cpp
+registry.on_construct<entt::entity>().connect<&my_listener>();
+```
+
+Since entity storage is unique within a registry, if a _name_ is provided it's
+ignored and therefore discarded.<br/>
+As for the function signature, this is exactly the same as the components.
+
+Entities support all types of signals: construct, destroy and update. The latter
+is perhaps ambiguous as an entity is not truly _updated_. Rather, its identifier
+is created and finally released.<br/>
+Indeed, the update signal is meant to send _general notifications_ regarding an
+entity. It can be triggered via the `patch` function, as is the case with
+components:
+
+```cpp
+registry.patch<entt::entity>(entity);
+```
+
+Destroying an entity and then updating the version of an identifier **does not**
+give rise to these types of signals under any circumstances instead.
 
 ### Listeners disconnection
 
