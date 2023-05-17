@@ -2134,6 +2134,9 @@ and components during iterations, nor to have pointer stability.<br/>
   returned. Destroying entities and components is always allowed instead, even
   if not currently iterated, without the risk of invalidating any references.
 
+* In case of reverse iterations, adding or removing elements is not allowed
+  under any circumstances. It could quickly lead to undefined behaviors.
+
 In other terms, iterators are rarely invalidated. Also, component references
 aren't invalidated when a new element is added while they could be invalidated
 upon destruction due to the _swap-and-pop_ policy, unless the type leading the
