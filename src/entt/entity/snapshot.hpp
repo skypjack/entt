@@ -75,11 +75,7 @@ public:
     basic_snapshot &operator=(basic_snapshot &&) noexcept = default;
 
     /**
-     * @brief Puts aside all the entities from the underlying registry.
-     *
-     * Entities are serialized along with their versions. Destroyed entities are
-     * taken in consideration as well by this function.
-     *
+     * @brief Serializes all identifiers, including those to be recycled.
      * @tparam Archive Type of output archive.
      * @param archive A valid reference to an output archive.
      * @return An object of this type to continue creating the snapshot.
@@ -99,11 +95,7 @@ public:
     }
 
     /**
-     * @brief Puts aside the given components.
-     *
-     * Each instance is serialized together with the entity to which it belongs.
-     * Entities are serialized along with their versions.
-     *
+     * @brief Serializes all required components with associated identifiers.
      * @tparam Component Types of components to serialize.
      * @tparam Archive Type of output archive.
      * @param archive A valid reference to an output archive.
@@ -122,11 +114,8 @@ public:
     }
 
     /**
-     * @brief Puts aside the given components for the entities in a range.
-     *
-     * Each instance is serialized together with the entity to which it belongs.
-     * Entities are serialized along with their versions.
-     *
+     * @brief Serializes all required components with associated identifiers for
+     * the entities in a range.
      * @tparam Component Types of components to serialize.
      * @tparam Archive Type of output archive.
      * @tparam It Type of input iterator.
@@ -211,11 +200,7 @@ public:
     basic_snapshot_loader &operator=(basic_snapshot_loader &&) noexcept = default;
 
     /**
-     * @brief Restores entities that were in use during serialization.
-     *
-     * This function restores the entities that were in use during serialization
-     * and gives them the versions they originally had.
-     *
+     * @brief Restores all identifiers, including those to be recycled.
      * @tparam Archive Type of input archive.
      * @param archive A valid reference to an input archive.
      * @return A valid loader to continue restoring data.
@@ -243,12 +228,10 @@ public:
     }
 
     /**
-     * @brief Restores components and assigns them to the right entities.
+     * @brief Restores all required components with associated identifiers.
      *
      * The template parameter list must be exactly the same used during
-     * serialization. In the event that the entity to which the component is
-     * assigned doesn't exist yet, the loader will take care to create it with
-     * the version it originally had.
+     * serialization.
      *
      * @tparam Component Types of components to restore.
      * @tparam Archive Type of input archive.
@@ -431,10 +414,9 @@ public:
     basic_continuous_loader &operator=(basic_continuous_loader &&) = default;
 
     /**
-     * @brief Restores entities that were in use during serialization.
+     * @brief Restores all identifiers, including those to be recycled.
      *
-     * This function restores the entities that were in use during serialization
-     * and creates local counterparts for them if required.
+     * It creates local counterparts for remote elements as needed.
      *
      * @tparam Archive Type of input archive.
      * @param archive A valid reference to an input archive.
@@ -465,15 +447,12 @@ public:
     }
 
     /**
-     * @brief Restores components and assigns them to the right entities.
+     * @brief Serializes all required components with associated identifiers.
      *
-     * The template parameter list must be exactly the same used during
-     * serialization. In the event that the entity to which the component is
-     * assigned doesn't exist yet, the loader will take care to create a local
-     * counterpart for it.<br/>
-     * Members can be either data members of type entity_type or containers of
-     * entities. In both cases, the loader will visit them and update the
-     * entities by replacing each one with its local counterpart.
+     * It creates local counterparts for remote elements as needed.<br/>
+     * Members are either data members of type entity_type or containers of
+     * entities. In both cases, a loader visits them and replaces entities with
+     * their local counterpart.
      *
      * @tparam Component Type of component to restore.
      * @tparam Archive Type of input archive.
