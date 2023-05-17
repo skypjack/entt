@@ -106,11 +106,11 @@ public:
         if constexpr(sizeof...(Component) == 1u) {
             const auto view = reg->template view<const Component...>();
             (component<Component>(archive, view.rbegin(), view.rend()), ...);
-            return *this;
         } else {
             (component<Component>(archive), ...);
-            return *this;
         }
+
+        return *this;
     }
 
     /**
@@ -537,14 +537,11 @@ public:
      * @return The local identifier if any, the null entity otherwise.
      */
     [[nodiscard]] entity_type map(entity_type entt) const noexcept {
-        const auto it = remloc.find(entt);
-        entity_type other = null;
-
-        if(it != remloc.cend()) {
-            other = it->second.first;
+        if(const auto it = remloc.find(entt); it != remloc.cend()) {
+            return it->second.first;
         }
 
-        return other;
+        return null;
     }
 
 private:
