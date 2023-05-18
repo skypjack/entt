@@ -851,8 +851,10 @@ public:
             common_type *cpools[sizeof...(Other) + 1u]{&assure<Type>(), &assure<Other>()...};
 
             for(size_type pos{}, len = sizeof...(Other) + 1u; pos < len; ++pos) {
-                if(!(sizeof...(Other) == 0u) && cpools[pos]->data() == first.data()) {
-                    std::swap(cpools[pos], cpools[sizeof...(Other)]);
+                if constexpr(sizeof...(Other) != 0u) {
+                    if(cpools[pos]->data() == first.data()) {
+                        std::swap(cpools[pos], cpools[sizeof...(Other)]);
+                    }
                 }
 
                 count += cpools[pos]->remove(first, last);
@@ -899,8 +901,10 @@ public:
             common_type *cpools[sizeof...(Other) + 1u]{&assure<Type>(), &assure<Other>()...};
 
             for(size_type pos{}, len = sizeof...(Other) + 1u; pos < len; ++pos) {
-                if(!(sizeof...(Other) == 0u) && cpools[pos]->data() == first.data()) {
-                    std::swap(cpools[pos], cpools[sizeof...(Other)]);
+                if constexpr(sizeof...(Other) != 0u) {
+                    if(cpools[pos]->data() == first.data()) {
+                        std::swap(cpools[pos], cpools[sizeof...(Other)]);
+                    }
                 }
 
                 cpools[pos]->erase(first, last);
