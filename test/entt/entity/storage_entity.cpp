@@ -386,6 +386,142 @@ TEST(StorageEntity, ConstIterable) {
     }
 }
 
+TEST(StorageEntity, IterableIteratorConversion) {
+    entt::storage<entt::entity> pool;
+    pool.emplace(entt::entity{3});
+
+    typename entt::storage<entt::entity>::iterable::iterator it = pool.each().begin();
+    typename entt::storage<entt::entity>::const_iterable::iterator cit = it;
+
+    static_assert(std::is_same_v<decltype(*it), std::tuple<entt::entity>>);
+    static_assert(std::is_same_v<decltype(*cit), std::tuple<entt::entity>>);
+
+    ASSERT_EQ(it, cit);
+    ASSERT_NE(++cit, it);
+}
+
+TEST(StorageEntity, IterableAlgorithmCompatibility) {
+    entt::storage<entt::entity> pool;
+    pool.emplace(entt::entity{3});
+
+    const auto iterable = pool.each();
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
+
+    ASSERT_EQ(std::get<0>(*it), entt::entity{3});
+}
+
+TEST(StorageEntity, ReverseIterable) {
+    using iterator = typename entt::storage<entt::entity>::reverse_iterable::iterator;
+
+    static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity>>);
+    static_assert(std::is_same_v<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>);
+    static_assert(std::is_same_v<typename iterator::reference, typename iterator::value_type>);
+
+    entt::storage<entt::entity> pool;
+
+    pool.emplace(entt::entity{1});
+    pool.emplace(entt::entity{3});
+    pool.emplace(entt::entity{42});
+
+    pool.erase(entt::entity{3});
+
+    auto iterable = pool.reach();
+
+    iterator end{iterable.begin()};
+    iterator begin{};
+    begin = iterable.end();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, iterable.begin());
+    ASSERT_EQ(end, iterable.end());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin.base(), pool.rbegin());
+    ASSERT_EQ(end.base(), pool.rbegin() + pool.in_use());
+    ASSERT_NE(end.base(), pool.rend());
+
+    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
+    ASSERT_EQ(std::get<0>(*begin), entt::entity{1});
+
+    ASSERT_EQ(begin++, iterable.begin());
+    ASSERT_EQ(begin.base(), pool.rbegin() + 1);
+    ASSERT_EQ(++begin, iterable.end());
+    ASSERT_EQ(begin.base(), pool.rbegin() + 2);
+
+    for(auto [entity]: iterable) {
+        static_assert(std::is_same_v<decltype(entity), entt::entity>);
+        ASSERT_TRUE(entity != entt::entity{3});
+    }
+}
+
+TEST(StorageEntity, ReverseConstIterable) {
+    using iterator = typename entt::storage<entt::entity>::const_reverse_iterable::iterator;
+
+    static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity>>);
+    static_assert(std::is_same_v<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>);
+    static_assert(std::is_same_v<typename iterator::reference, typename iterator::value_type>);
+
+    entt::storage<entt::entity> pool;
+
+    pool.emplace(entt::entity{1});
+    pool.emplace(entt::entity{3});
+    pool.emplace(entt::entity{42});
+
+    pool.erase(entt::entity{3});
+
+    auto iterable = std::as_const(pool).reach();
+
+    iterator end{iterable.cbegin()};
+    iterator begin{};
+    begin = iterable.cend();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, iterable.cbegin());
+    ASSERT_EQ(end, iterable.cend());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin.base(), pool.rbegin());
+    ASSERT_EQ(end.base(), pool.rbegin() + pool.in_use());
+    ASSERT_NE(end.base(), pool.rend());
+
+    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
+    ASSERT_EQ(std::get<0>(*begin), entt::entity{1});
+
+    ASSERT_EQ(begin++, iterable.begin());
+    ASSERT_EQ(begin.base(), pool.rbegin() + 1);
+    ASSERT_EQ(++begin, iterable.end());
+    ASSERT_EQ(begin.base(), pool.rbegin() + 2);
+
+    for(auto [entity]: iterable) {
+        static_assert(std::is_same_v<decltype(entity), entt::entity>);
+        ASSERT_TRUE(entity != entt::entity{3});
+    }
+}
+
+TEST(StorageEntity, ReverseIterableIteratorConversion) {
+    entt::storage<entt::entity> pool;
+    pool.emplace(entt::entity{3});
+
+    typename entt::storage<entt::entity>::reverse_iterable::iterator it = pool.reach().begin();
+    typename entt::storage<entt::entity>::const_reverse_iterable::iterator cit = it;
+
+    static_assert(std::is_same_v<decltype(*it), std::tuple<entt::entity>>);
+    static_assert(std::is_same_v<decltype(*cit), std::tuple<entt::entity>>);
+
+    ASSERT_EQ(it, cit);
+    ASSERT_NE(++cit, it);
+}
+
+TEST(StorageEntity, ReverseIterableAlgorithmCompatibility) {
+    entt::storage<entt::entity> pool;
+    pool.emplace(entt::entity{3});
+
+    const auto iterable = pool.reach();
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
+
+    ASSERT_EQ(std::get<0>(*it), entt::entity{3});
+}
+
 TEST(StorageEntity, SwapElements) {
     entt::storage<entt::entity> pool;
 
