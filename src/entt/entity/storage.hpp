@@ -424,6 +424,10 @@ public:
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator, iterator>>;
     /*! @brief Constant extended iterable storage proxy. */
     using const_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_iterator, const_iterator>>;
+    /*! @brief Extended reverse iterable storage proxy. */
+    using reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::reverse_iterator, reverse_iterator>>;
+    /*! @brief Constant extended reverse iterable storage proxy. */
+    using const_reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_reverse_iterator, const_reverse_iterator>>;
 
     /*! @brief Default constructor. */
     basic_storage()
@@ -751,6 +755,22 @@ public:
         return {internal::extended_storage_iterator{base_type::cbegin(), cbegin()}, internal::extended_storage_iterator{base_type::cend(), cend()}};
     }
 
+    /**
+     * @brief Returns a reverse iterable object to use to _visit_ a storage.
+     *
+     * @sa each
+     *
+     * @return A reverse iterable object to use to _visit_ the storage.
+     */
+    [[nodiscard]] reverse_iterable reach() noexcept {
+        return {internal::extended_storage_iterator{base_type::rbegin(), rbegin()}, internal::extended_storage_iterator{base_type::rend(), rend()}};
+    }
+
+    /*! @copydoc reach */
+    [[nodiscard]] const_reverse_iterable reach() const noexcept {
+        return {internal::extended_storage_iterator{base_type::crbegin(), crbegin()}, internal::extended_storage_iterator{base_type::crend(), crend()}};
+    }
+
 private:
     container_type payload;
 };
@@ -779,6 +799,10 @@ public:
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
     /*! @brief Constant extended iterable storage proxy. */
     using const_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_iterator>>;
+    /*! @brief Extended reverse iterable storage proxy. */
+    using reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::reverse_iterator>>;
+    /*! @brief Constant extended reverse iterable storage proxy. */
+    using const_reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_reverse_iterator>>;
 
     /*! @brief Default constructor. */
     basic_storage()
@@ -904,6 +928,22 @@ public:
     [[nodiscard]] const_iterable each() const noexcept {
         return {internal::extended_storage_iterator{base_type::cbegin()}, internal::extended_storage_iterator{base_type::cend()}};
     }
+
+    /**
+     * @brief Returns a reverse iterable object to use to _visit_ a storage.
+     *
+     * @sa each
+     *
+     * @return A reverse iterable object to use to _visit_ the storage.
+     */
+    [[nodiscard]] reverse_iterable reach() noexcept {
+        return {internal::extended_storage_iterator{base_type::rbegin()}, internal::extended_storage_iterator{base_type::rend()}};
+    }
+
+    /*! @copydoc reach */
+    [[nodiscard]] const_reverse_iterable reach() const noexcept {
+        return {internal::extended_storage_iterator{base_type::crbegin()}, internal::extended_storage_iterator{base_type::crend()}};
+    }
 };
 
 /**
@@ -980,6 +1020,10 @@ public:
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
     /*! @brief Constant extended iterable storage proxy. */
     using const_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_iterator>>;
+    /*! @brief Extended reverse iterable storage proxy. */
+    using reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::reverse_iterator>>;
+    /*! @brief Constant extended reverse iterable storage proxy. */
+    using const_reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_reverse_iterator>>;
 
     /*! @brief Default constructor. */
     basic_storage()
@@ -1183,6 +1227,22 @@ public:
     /*! @copydoc each */
     [[nodiscard]] const_iterable each() const noexcept {
         return {internal::extended_storage_iterator{base_type::cend() - length}, internal::extended_storage_iterator{base_type::cend()}};
+    }
+
+    /**
+     * @brief Returns a reverse iterable object to use to _visit_ a storage.
+     *
+     * @sa each
+     *
+     * @return A reverse iterable object to use to _visit_ the storage.
+     */
+    [[nodiscard]] reverse_iterable reach() noexcept {
+        return {internal::extended_storage_iterator{base_type::rbegin()}, internal::extended_storage_iterator{base_type::rbegin() + length}};
+    }
+
+    /*! @copydoc reach */
+    [[nodiscard]] const_reverse_iterable reach() const noexcept {
+        return {internal::extended_storage_iterator{base_type::crbegin()}, internal::extended_storage_iterator{base_type::crbegin() + length}};
     }
 
 private:
