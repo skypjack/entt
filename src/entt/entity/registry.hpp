@@ -1008,7 +1008,7 @@ public:
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) {
         if constexpr(sizeof...(Type) == 1u) {
-            return (const_cast<Type &>(std::as_const(*this).template get<Type>(entt)), ...);
+            return (static_cast<storage_for_type<Type> &>(assure<std::remove_const_t<Type>>()).get(entt), ...);
         } else {
             return std::forward_as_tuple(get<Type>(entt)...);
         }
