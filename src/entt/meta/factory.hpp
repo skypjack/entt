@@ -287,7 +287,12 @@ public:
             bucket = &elem.prop;
         } else {
             using data_type = std::remove_pointer_t<decltype(Data)>;
-            static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
+
+            if constexpr(std::is_pointer_v<decltype(Data)>) {
+                static_assert(Policy::template value<decltype(*Data)>, "Invalid return type for the given policy");
+            } else {
+                static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
+            }
 
             auto &&elem = internal::meta_extend(
                 internal::owner(*ctx, *info),
