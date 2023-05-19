@@ -1735,6 +1735,39 @@ TEST(Registry, StableErase) {
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 }
 
+TEST(Registry, EraseIf) {
+    using namespace entt::literals;
+
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.emplace<int>(entity);
+    registry.storage<int>("other"_hs).emplace(entity);
+    registry.emplace<char>(entity);
+
+    ASSERT_TRUE(registry.storage<int>().contains(entity));
+    ASSERT_TRUE(registry.storage<int>("other"_hs).contains(entity));
+    ASSERT_TRUE(registry.storage<char>().contains(entity));
+
+    registry.erase_if(entity, [](auto &&...) { return false; });
+
+    ASSERT_TRUE(registry.storage<int>().contains(entity));
+    ASSERT_TRUE(registry.storage<int>("other"_hs).contains(entity));
+    ASSERT_TRUE(registry.storage<char>().contains(entity));
+
+    registry.erase_if(entity, [](entt::id_type id, auto &&...) { return id == "other"_hs; });
+
+    ASSERT_TRUE(registry.storage<int>().contains(entity));
+    ASSERT_FALSE(registry.storage<int>("other"_hs).contains(entity));
+    ASSERT_TRUE(registry.storage<char>().contains(entity));
+
+    registry.erase_if(entity, [](auto, const auto &storage) { return storage.type() == entt::type_id<char>(); });
+
+    ASSERT_TRUE(registry.storage<int>().contains(entity));
+    ASSERT_FALSE(registry.storage<int>("other"_hs).contains(entity));
+    ASSERT_FALSE(registry.storage<char>().contains(entity));
+}
+
 TEST(Registry, Remove) {
     entt::registry registry;
     const auto iview = registry.view<int>();

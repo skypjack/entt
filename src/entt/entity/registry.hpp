@@ -917,6 +917,30 @@ public:
     }
 
     /**
+     * @brief Erases components satisfying specific criteria from an entity.
+     *
+     * The function type is equivalent to:
+     *
+     * @code{.cpp}
+     * void(const id_type, typename basic_registry<Entity>::base_type &);
+     * @endcode
+     *
+     * Only storages where the entity exists are passed to the function.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param entt A valid identifier.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void erase_if(const entity_type entt, Func func) {
+        for(auto [id, cpool]: storage()) {
+            if(cpool.contains(entt) && func(id, std::as_const(cpool))) {
+                cpool.erase(entt);
+            }
+        }
+    }
+
+    /**
      * @brief Removes all tombstones from a registry or only the pools for the
      * given components.
      * @tparam Type Types of components for which to clear all tombstones.
