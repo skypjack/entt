@@ -1293,15 +1293,9 @@ public:
     /**
      * @brief Sorts two pools of components in the same way.
      *
-     * Being `To` and `From` the two sets, after invoking this function an
-     * iterator for `To` returns elements according to the following rules:
-     *
-     * * All entities in `To` that are also in `From` are returned first
-     *   according to the order they have in `From`.
-     * * All entities in `To` that are not in `From` are returned in no
-     *   particular order after all the other entities.
-     *
-     * Any subsequent change to `From` won't affect the order in `To`.
+     * Entities and components in `To` which are part of both storage are sorted
+     * internally with the order they have in `From`. The others follow in no
+     * particular order.
      *
      * @warning
      * Pools of components owned by a group cannot be sorted.
