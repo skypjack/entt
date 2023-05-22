@@ -83,6 +83,7 @@ public:
     template<typename Archive>
     const basic_snapshot &entities(Archive &archive) const {
         const auto *storage = reg->template storage<entity_type>();
+        ENTT_ASSERT(storage != nullptr, "No entity storage, no party");
 
         archive(static_cast<typename traits_type::entity_type>(storage->size()));
         archive(static_cast<typename traits_type::entity_type>(storage->in_use()));
@@ -215,16 +216,16 @@ public:
     template<typename Archive>
     basic_snapshot_loader &entities(Archive &archive) {
         auto &storage = reg->template storage<entity_type>();
+
         typename traits_type::entity_type length{};
         typename traits_type::entity_type in_use{};
-        entity_type entity = null;
 
         archive(length);
         archive(in_use);
 
         storage.reserve(length);
 
-        for(std::size_t pos{}; pos < length; ++pos) {
+        for(entity_type entity = null; length; --length) {
             archive(entity);
             storage.emplace(entity);
         }
