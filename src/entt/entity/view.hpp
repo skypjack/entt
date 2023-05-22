@@ -315,7 +315,7 @@ public:
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
-        if(std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools)) {
+        if(view || std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools)) {
             unchecked_refresh();
         }
     }
@@ -372,7 +372,7 @@ public:
     void storage(Type &elem) noexcept {
         if constexpr(Index < offset) {
             std::get<Index>(pools) = &elem;
-            view ? unchecked_refresh() : refresh();
+            refresh();
         } else {
             std::get<Index - offset>(filter) = &elem;
         }
