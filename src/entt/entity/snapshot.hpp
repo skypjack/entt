@@ -104,8 +104,15 @@ public:
     template<typename... Component, typename Archive>
     const basic_snapshot &component(Archive &archive) const {
         if constexpr(sizeof...(Component) == 1u) {
-            const auto view = reg->template view<const Component...>();
-            (component<Component>(archive, view.rbegin(), view.rend()), ...);
+            if(const auto *storage = reg->template storage<Component...>(); storage) {
+                archive(static_cast<typename traits_type::entity_type>(storage->size()));
+
+                for(auto elem: storage->reach()) {
+                    std::apply(archive, elem);
+                }
+            } else {
+                archive(typename traits_type::entity_type{});
+            }
         } else {
             (component<Component>(archive), ...);
         }
