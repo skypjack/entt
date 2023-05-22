@@ -10,15 +10,12 @@ DOC:
 
 TODO (high prio):
 * check natvis files (periodically :)
-* doc: exclude only views, bump entities, signals on entity creation/destruction
-* registry: replace destroy with a drop-all method that doesn't care about validity
 * resource cache: avoid using shared ptr with loader and the others
-* rework view tests with typed tests and whatnot
 * further optimize exclusion lists in multi type views (no existence check)
 * further improve the snapshot stuff, ie component functions
-* do not include entity storage in the storage list (37f396bfe385d78b3ff67605e261ec20f16acb76)
 * use fixture for storage tests to reduce loc number and duplication as much as possible
 * basic_view<...>::reach(...)
+* doc: bump entities
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
