@@ -925,7 +925,7 @@ public:
      * void(const id_type, typename basic_registry<Entity>::base_type &);
      * @endcode
      *
-     * Only storages where the entity exists are passed to the function.
+     * Only storage where the entity exists are passed to the function.
      *
      * @tparam Func Type of the function object to invoke.
      * @param entt A valid identifier.
