@@ -102,7 +102,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename First, typename Second, typename... Other, typename Archive>
-    [[deprecated("use .component<Type>() instead")]] const basic_snapshot &component(Archive &archive) const {
+    [[deprecated("use .component<Type>(archive) instead")]] const basic_snapshot &component(Archive &archive) const {
         component<First>(archive);
         component<Second>(archive);
         (component<Other>(archive), ...);
@@ -154,7 +154,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename First, typename Second, typename... Other, typename Archive, typename It>
-    const basic_snapshot &component(Archive &archive, It first, It last) const {
+    [[deprecated("use .component<Type>(archive, first, last) instead")]] const basic_snapshot &component(Archive &archive, It first, It last) const {
         component<First>(archive, first, last);
         component<Second>(archive, first, last);
         (component<Other>(archive, first, last), ...);
