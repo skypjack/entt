@@ -145,9 +145,30 @@ public:
      * @param last An iterator past the last element of the range to serialize.
      * @return An object of this type to continue creating the snapshot.
      */
-    template<typename... Component, typename Archive, typename It>
+    template<typename Component, typename Archive, typename It>
     const basic_snapshot &component(Archive &archive, It first, It last) const {
-        component<Component...>(archive, first, last, std::index_sequence_for<Component...>{});
+        component<Component>(archive, first, last, std::index_sequence_for<Component>{});
+        return *this;
+    }
+
+    /**
+     * @brief Serializes all required components with associated identifiers for
+     * the entities in a range.
+     * @tparam First First type of component to serialize.
+     * @tparam Second Second type of component to serialize.
+     * @tparam Other Other types of components to serialize.
+     * @tparam Archive Type of output archive.
+     * @tparam It Type of input iterator.
+     * @param archive A valid reference to an output archive.
+     * @param first An iterator to the first element of the range to serialize.
+     * @param last An iterator past the last element of the range to serialize.
+     * @return An object of this type to continue creating the snapshot.
+     */
+    template<typename First, typename Second, typename... Other, typename Archive, typename It>
+    const basic_snapshot &component(Archive &archive, It first, It last) const {
+        component<First>(archive, first, last);
+        component<Second>(archive, first, last);
+        (component<Other>(archive, first, last), ...);
         return *this;
     }
 
