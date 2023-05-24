@@ -96,28 +96,41 @@ public:
     }
 
     /**
-     * @brief Serializes all required components with associated identifiers.
-     * @tparam Component Types of components to serialize.
+     * @brief Serializes all elements of a type with associated identifiers.
+     * @tparam Component Type of component to serialize.
      * @tparam Archive Type of output archive.
      * @param archive A valid reference to an output archive.
      * @return An object of this type to continue creating the snapshot.
      */
-    template<typename... Component, typename Archive>
+    template<typename Component, typename Archive>
     const basic_snapshot &component(Archive &archive) const {
-        if constexpr(sizeof...(Component) == 1u) {
-            if(const auto *storage = reg->template storage<Component...>(); storage) {
-                archive(static_cast<typename traits_type::entity_type>(storage->size()));
+        if(const auto *storage = reg->template storage<Component>(); storage) {
+            archive(static_cast<typename traits_type::entity_type>(storage->size()));
 
-                for(auto elem: storage->reach()) {
-                    std::apply(archive, elem);
-                }
-            } else {
-                archive(typename traits_type::entity_type{});
+            for(auto elem: storage->reach()) {
+                std::apply(archive, elem);
             }
         } else {
-            (component<Component>(archive), ...);
+            archive(typename traits_type::entity_type{});
         }
 
+        return *this;
+    }
+
+    /**
+     * @brief Serializes all required components with associated identifiers.
+     * @tparam First First type of component to serialize.
+     * @tparam Second Second type of component to serialize.
+     * @tparam Other Other types of components to serialize.
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
+     */
+    template<typename First, typename Second, typename... Other, typename Archive>
+    [[deprecated("use .component<Type>() instead")]] const basic_snapshot &component(Archive &archive) const {
+        component<First>(archive);
+        component<Second>(archive);
+        (component<Other>(archive), ...);
         return *this;
     }
 
