@@ -1,7 +1,6 @@
 #ifndef ENTT_ENTITY_SNAPSHOT_HPP
 #define ENTT_ENTITY_SNAPSHOT_HPP
 
-#include <array>
 #include <cstddef>
 #include <iterator>
 #include <tuple>
@@ -30,30 +29,6 @@ namespace entt {
 template<typename Registry>
 class basic_snapshot {
     using traits_type = typename Registry::traits_type;
-
-    template<typename Component, typename Archive, typename It>
-    void get(Archive &archive, std::size_t sz, It first, It last) const {
-        const auto view = reg->template view<Component>();
-        archive(static_cast<typename traits_type::entity_type>(sz));
-
-        for(auto it = first; it != last; ++it) {
-            if(view.contains(*it)) {
-                std::apply(archive, std::tuple_cat(std::make_tuple(*it), view.get(*it)));
-            }
-        }
-    }
-
-    template<typename... Component, typename Archive, typename It, std::size_t... Index>
-    void component(Archive &archive, It first, It last, std::index_sequence<Index...>) const {
-        const auto view{std::make_tuple(reg->template view<Component>()...)};
-        std::array<std::size_t, sizeof...(Index)> size{};
-
-        for(auto it = first; it != last; ++it) {
-            ((std::get<Index>(view).contains(*it) ? ++size[Index] : 0u), ...);
-        }
-
-        (get<Component>(archive, size[Index], first, last), ...);
-    }
 
 public:
     /*! Basic registry type. */
@@ -147,7 +122,21 @@ public:
      */
     template<typename Component, typename Archive, typename It>
     const basic_snapshot &component(Archive &archive, It first, It last) const {
-        component<Component>(archive, first, last, std::index_sequence_for<Component>{});
+        const auto view = reg->template view<Component>();
+        std::size_t size{};
+
+        for(auto it = first; it != last; ++it) {
+            size += view.contains(*it);
+        }
+
+        archive(static_cast<typename traits_type::entity_type>(size));
+
+        for(auto it = first; it != last; ++it) {
+            if(view.contains(*it)) {
+                std::apply(archive, std::tuple_cat(std::make_tuple(*it), view.get(*it)));
+            }
+        }
+
         return *this;
     }
 
