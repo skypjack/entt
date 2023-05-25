@@ -110,7 +110,7 @@ public:
     }
 
     /**
-     * @brief Serializes all required components with associated identifiers for
+     * @brief Serializes all elements of a type with associated identifiers for
      * the entities in a range.
      * @tparam Component Types of components to serialize.
      * @tparam Archive Type of output archive.
