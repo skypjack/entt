@@ -340,9 +340,11 @@ class basic_continuous_loader {
 
     void destroy(typename Registry::entity_type entt) {
         if(const auto it = remloc.find(entt); it == remloc.cend()) {
-            const auto local = reg->create();
+            auto &storage = reg->template storage<entity_type>();
+            const auto local = storage.emplace();
+
             remloc.emplace(entt, std::make_pair(local, true));
-            reg->destroy(local);
+            storage.erase(local);
         }
     }
 
