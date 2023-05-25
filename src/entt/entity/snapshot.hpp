@@ -495,7 +495,7 @@ public:
     }
 
     /**
-     * @brief Serializes all required components with associated identifiers.
+     * @brief Serializes all elements of a type with associated identifiers.
      *
      * It creates local counterparts for remote elements as needed.<br/>
      * Members are either data members of type entity_type or containers of
@@ -504,16 +504,46 @@ public:
      *
      * @tparam Component Type of component to restore.
      * @tparam Archive Type of input archive.
-     * @tparam Other Types of components to update with local counterparts.
      * @tparam Member Types of members to update with their local counterparts.
      * @param archive A valid reference to an input archive.
      * @param member Members to update with their local counterparts.
      * @return A non-const reference to this loader.
      */
-    template<typename... Component, typename Archive, typename... Other, typename... Member>
-    basic_continuous_loader &component(Archive &archive, Member Other::*...member) {
-        (remove_if_exists<Component>(), ...);
-        (assign<Component>(archive, member...), ...);
+    template<typename Component, typename Archive, typename... Member>
+    basic_continuous_loader &component(Archive &archive, Member Component::*...member) {
+        remove_if_exists<Component>();
+        assign<Component>(archive, member...);
+        return *this;
+    }
+
+    /**
+     * @brief Serializes all required components with associated identifiers.
+     *
+     * It creates local counterparts for remote elements as needed.<br/>
+     * Members are either data members of type entity_type or containers of
+     * entities. In both cases, a loader visits them and replaces entities with
+     * their local counterpart.
+     *
+     * @tparam First First type of component to serialize.
+     * @tparam Second Second type of component to serialize.
+     * @tparam Other Other types of components to serialize.
+     * @tparam Archive Type of input archive.
+     * @tparam Clazz Types of components to update with local counterparts.
+     * @tparam Member Types of members to update with their local counterparts.
+     * @param archive A valid reference to an input archive.
+     * @param member Members to update with their local counterparts.
+     * @return A non-const reference to this loader.
+     */
+    template<typename First, typename Second, typename... Other, typename Archive, typename... Clazz, typename... Member>
+    [[deprecated("use .component<Type>(archive, members...) instead")]] basic_continuous_loader &component(Archive &archive, Member Clazz::*...member) {
+        remove_if_exists<First>();
+        remove_if_exists<Second>();
+        (remove_if_exists<Other>(), ...);
+
+        assign<First>(archive, member...);
+        assign<Second>(archive, member...);
+        (assign<Other>(archive, member...), ...);
+
         return *this;
     }
 
