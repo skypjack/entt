@@ -548,7 +548,7 @@ public:
     }
 
     /**
-     * @brief Helps to purge entities that no longer have a conterpart.
+     * @brief Helps to purge entities that no longer have a counterpart.
      *
      * Users should invoke this member function after restoring each snapshot,
      * unless they know exactly what they are doing.
