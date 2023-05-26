@@ -1022,7 +1022,8 @@ output_archive output;
 
 entt::snapshot{registry}
     .entities(output)
-    .component<a_component, another_component>(output);
+    .component<a_component>(output)
+    .component<another_component>(output);
 ```
 
 It isn't necessary to invoke all functions each and every time. What functions
@@ -1033,16 +1034,16 @@ those still alive and those released) along with their versions.<br/>
 On the other hand, the `component` member function template is meant to store
 aside components.<br/>
 There exists also another version of the `component` member function that
-accepts a range of entities to serialize. This version is a bit slower than the
-other one, mainly because it iterates the range of entities more than once for
-internal purposes. However, it can be used to filter out those entities that
-shouldn't be serialized for some reasons:
+accepts a range of entities to serialize. It can be used to _filter_ out those
+entities that shouldn't be serialized for some reasons:
 
 ```cpp
 const auto view = registry.view<serialize>();
 output_archive output;
 
-entt::snapshot{registry}.component<a_component, another_component>(output, view.begin(), view.end());
+entt::snapshot{registry}
+    .component<a_component>(output, view.begin(), view.end())
+    .component<another_component>(output, view.begin(), view.end());
 ```
 
 Note that `component` stores items along with entities. It means that it works
@@ -1063,7 +1064,8 @@ input_archive input;
 
 entt::snapshot_loader{registry}
     .entities(input)
-    .component<a_component, another_component>(input)
+    .component<a_component>(input)
+    .component<another_component>(input)
     .orphans();
 ```
 
@@ -1100,7 +1102,9 @@ entt::continuous_loader loader{registry};
 input_archive input;
 
 loader.entities(input)
-    .component<a_component, another_component, dirty_component>(input, &dirty_component::parent, &dirty_component::child)
+    .component<a_component>(input)
+    .component<another_component>(input)
+    .component<dirty_component>(input, &dirty_component::parent, &dirty_component::child)
     .orphans()
     .shrink();
 ```
@@ -1149,12 +1153,12 @@ In particular:
   void operator()(std::underlying_type_t<entt::entity>);
   ```
 
-  In addition, an archive accepts a pair of entity and component for each type
+  In addition, an archive accepts (const) references to the types of component
   to serialize. Therefore, given a type `T`, the archive offers a function call
   operator with the following signature:
 
   ```cpp
-  void operator()(entt::entity, const T &);
+  void operator()(const T &);
   ```
 
   The output archive can freely decide how to serialize the data. The registry
@@ -1178,16 +1182,16 @@ In particular:
   void operator()(std::underlying_type_t<entt::entity> &);
   ```
 
-  In addition, the archive accepts a pair of references to an entity and its
-  component for each type to restore. Therefore, given a type `T`, the archive
-  contains a function call operator with the following signature:
+  In addition, an archive accepts references to the types of component to
+  restore. Therefore, given a type `T`, the archive contains a function call
+  operator with the following signature:
 
   ```cpp
-  void operator()(entt::entity &, T &);
+  void operator()(T &);
   ```
 
-  Every time this operator is invoked, the archive reads the next elements from
-  the underlying storage and copies them in the given variables.
+  Every time this operator is invoked, the archive reads the next element from
+  the underlying storage and copies it in the given variable.
 
 ### One example to rule them all
 
