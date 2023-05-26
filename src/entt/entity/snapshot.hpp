@@ -83,7 +83,7 @@ public:
             archive(static_cast<typename traits_type::entity_type>(storage->size()));
 
             for(auto elem: storage->reach()) {
-                std::apply(archive, elem);
+                std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
             }
         } else {
             archive(typename traits_type::entity_type{});
@@ -122,18 +122,14 @@ public:
      */
     template<typename Component, typename Archive, typename It>
     const basic_snapshot &component(Archive &archive, It first, It last) const {
-        const auto view = reg->template view<Component>();
-        std::size_t size{};
+        archive(static_cast<typename traits_type::entity_type>(std::distance(first, last)));
 
-        for(auto it = first; it != last; ++it) {
-            size += view.contains(*it);
-        }
-
-        archive(static_cast<typename traits_type::entity_type>(size));
-
-        for(auto it = first; it != last; ++it) {
-            if(view.contains(*it)) {
-                std::apply(archive, std::tuple_cat(std::make_tuple(*it), view.get(*it)));
+        for(const auto view = reg->template view<Component>(); first != last; ++first) {
+            if(const auto entt = *first; view.contains(entt)) {
+                archive(entt);
+                std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, view.get(entt));
+            } else {
+                archive(static_cast<entity_type>(null));
             }
         }
 
@@ -252,19 +248,22 @@ public:
 
         if constexpr(Registry::template storage_for_type<Component>::traits_type::page_size == 0u) {
             while(length--) {
-                archive(entt);
-                const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
-                ENTT_ASSERT(entity == entt, "Entity not available for use");
-                elem.emplace(entity);
+                if(archive(entt); entt != null) {
+                    const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
+                    ENTT_ASSERT(entity == entt, "Entity not available for use");
+                    elem.emplace(entity);
+                }
             }
         } else {
             Component instance;
 
             while(length--) {
-                archive(entt, instance);
-                const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
-                ENTT_ASSERT(entity == entt, "Entity not available for use");
-                elem.emplace(entity, std::move(instance));
+                if(archive(entt); entt != null) {
+                    archive(instance);
+                    const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
+                    ENTT_ASSERT(entity == entt, "Entity not available for use");
+                    elem.emplace(entity, std::move(instance));
+                }
             }
         }
 
@@ -428,18 +427,21 @@ class basic_continuous_loader {
 
         if constexpr(Registry::template storage_for_type<Component>::traits_type::page_size == 0u) {
             while(length--) {
-                archive(entt);
-                restore(entt);
-                storage.emplace(map(entt));
+                if(archive(entt); entt != null) {
+                    restore(entt);
+                    storage.emplace(map(entt));
+                }
             }
         } else {
             Component instance;
 
             while(length--) {
-                archive(entt, instance);
-                (update(instance, member), ...);
-                restore(entt);
-                storage.emplace(map(entt), std::move(instance));
+                if(archive(entt); entt != null) {
+                    archive(instance);
+                    (update(instance, member), ...);
+                    restore(entt);
+                    storage.emplace(map(entt), std::move(instance));
+                }
             }
         }
     }

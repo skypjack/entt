@@ -15,13 +15,13 @@ struct output_archive {
     output_archive(Storage &instance)
         : storage{instance} {}
 
-    template<typename... Value>
-    void operator()(const Value &...value) {
-        (std::get<std::queue<Value>>(storage).push(value), ...);
+    template<typename Value>
+    void operator()(const Value &value) {
+        std::get<std::queue<Value>>(storage).push(value);
     }
 
-    void operator()(const entt::entity &entity, const std::unique_ptr<int> &instance) {
-        (*this)(entity, *instance);
+    void operator()(const std::unique_ptr<int> &instance) {
+        (*this)(*instance);
     }
 
 private:
@@ -33,20 +33,20 @@ struct input_archive {
     input_archive(Storage &instance)
         : storage{instance} {}
 
-    template<typename... Value>
-    void operator()(Value &...value) {
+    template<typename Value>
+    void operator()(Value &value) {
         auto assign = [this](auto &val) {
             auto &queue = std::get<std::queue<std::decay_t<decltype(val)>>>(storage);
             val = queue.front();
             queue.pop();
         };
 
-        (assign(value), ...);
+        assign(value);
     }
 
-    void operator()(entt::entity &entity, std::unique_ptr<int> &instance) {
+    void operator()(std::unique_ptr<int> &instance) {
         instance = std::make_unique<int>();
-        (*this)(entity, *instance);
+        (*this)(*instance);
     }
 
 private:
