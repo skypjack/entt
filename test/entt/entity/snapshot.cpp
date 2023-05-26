@@ -213,11 +213,11 @@ TEST(Snapshot, Iterator) {
 
     for(auto i = 0; i < 50; ++i) {
         const auto entity = registry.create();
-        registry.emplace<another_component>(entity, i, i);
-        registry.emplace<std::unique_ptr<int>>(entity, std::make_unique<int>(i));
+        registry.emplace<a_component>(entity);
 
         if(i % 2) {
-            registry.emplace<a_component>(entity);
+            registry.emplace<another_component>(entity, i, i);
+            registry.emplace<std::unique_ptr<int>>(entity, std::make_unique<int>(i));
         }
     }
 
@@ -238,7 +238,7 @@ TEST(Snapshot, Iterator) {
     registry.clear();
     entt::snapshot_loader{registry}.component<another_component, std::unique_ptr<int>>(input);
 
-    ASSERT_EQ(registry.view<another_component>().size(), size);
+    ASSERT_EQ(registry.view<another_component>().size(), size / 2u);
 
     registry.view<another_component>().each([](const auto entity, const auto &) {
         ASSERT_NE(entt::to_integral(entity) % 2u, 0u);
