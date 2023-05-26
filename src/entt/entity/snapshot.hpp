@@ -250,7 +250,7 @@ public:
 
         archive(length);
 
-        if constexpr(std::is_empty_v<Component>) {
+        if constexpr(Registry::template storage_for_type<Component>::traits_type::page_size == 0u) {
             while(length--) {
                 archive(entt);
                 const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
@@ -426,7 +426,7 @@ class basic_continuous_loader {
 
         archive(length);
 
-        if constexpr(std::is_empty_v<Component>) {
+        if constexpr(Registry::template storage_for_type<Component>::traits_type::page_size == 0u) {
             while(length--) {
                 archive(entt);
                 restore(entt);
