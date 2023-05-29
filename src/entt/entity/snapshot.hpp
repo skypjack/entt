@@ -50,40 +50,61 @@ public:
     basic_snapshot &operator=(basic_snapshot &&) noexcept = default;
 
     /**
-     * @brief Serializes all identifiers, including those to be recycled.
+     * @brief Serializes all elements of a type with associated identifiers.
+     * @tparam Type Type of elements to serialize.
      * @tparam Archive Type of output archive.
      * @param archive A valid reference to an output archive.
+     * @param id Optional name used to map the storage within the registry.
      * @return An object of this type to continue creating the snapshot.
      */
-    template<typename Archive>
-    const basic_snapshot &entities(Archive &archive) const {
-        const auto *storage = reg->template storage<entity_type>();
-        ENTT_ASSERT(storage != nullptr, "No entity storage, no party");
-
+    template<typename Type, typename Archive>
+    const basic_snapshot &get(Archive &archive, const id_type id = type_hash<Type>::value()) const {
+        if(const auto *storage = reg->template storage<Type>(id); storage) {
         archive(static_cast<typename traits_type::entity_type>(storage->size()));
+
+            if constexpr(std::is_same_v<Type, entity_type>) {
         archive(static_cast<typename traits_type::entity_type>(storage->in_use()));
 
         for(auto first = storage->data(), last = first + storage->size(); first != last; ++first) {
             archive(*first);
+        }
+            } else {
+                for(auto elem: storage->reach()) {
+                    std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
+                }
+            }
+        } else {
+            ENTT_ASSERT((!std::is_same_v<Type, entity_type>), "No entity storage, no party");
+            archive(typename traits_type::entity_type{});
         }
 
         return *this;
     }
 
     /**
-     * @brief Serializes all elements of a type with associated identifiers.
-     * @tparam Component Type of component to serialize.
+     * @brief Serializes all elements of a type with associated identifiers for
+     * the entities in a range.
+     * @tparam Type Types of elements to serialize.
      * @tparam Archive Type of output archive.
+     * @tparam It Type of input iterator.
      * @param archive A valid reference to an output archive.
+     * @param first An iterator to the first element of the range to serialize.
+     * @param last An iterator past the last element of the range to serialize.
+     * @param id Optional name used to map the storage within the registry.
      * @return An object of this type to continue creating the snapshot.
      */
-    template<typename Component, typename Archive>
-    const basic_snapshot &component(Archive &archive) const {
-        if(const auto *storage = reg->template storage<Component>(); storage) {
-            archive(static_cast<typename traits_type::entity_type>(storage->size()));
+    template<typename Type, typename Archive, typename It>
+    const basic_snapshot &get_sparse(Archive &archive, It first, It last, const id_type id = type_hash<Type>::value()) const {
+        if(const auto *storage = reg->template storage<Type>(id); storage && !storage->empty()) {
+            archive(static_cast<typename traits_type::entity_type>(std::distance(first, last)));
 
-            for(auto elem: storage->reach()) {
-                std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
+            for(; first != last; ++first) {
+                if(const auto entt = *first; storage->contains(entt)) {
+                    archive(entt);
+                    std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
+                } else {
+                    archive(static_cast<entity_type>(null));
+            }
             }
         } else {
             archive(typename traits_type::entity_type{});
@@ -93,21 +114,27 @@ public:
     }
 
     /**
-     * @brief Serializes all required components with associated identifiers.
-     * @tparam First First type of component to serialize.
-     * @tparam Second Second type of component to serialize.
-     * @tparam Other Other types of components to serialize.
+     * @brief Serializes all identifiers, including those to be recycled.
      * @tparam Archive Type of output archive.
      * @param archive A valid reference to an output archive.
      * @return An object of this type to continue creating the snapshot.
      */
-    template<typename First, typename Second, typename... Other, typename Archive>
-    [[deprecated("use .component<Type>(archive) instead")]] const basic_snapshot &component(Archive &archive) const {
-        component<First>(archive);
-        component<Second>(archive);
-        (component<Other>(archive), ...);
-        return *this;
+    template<typename Archive>
+    [[deprecated("use .get<Entity>(archive) instead")]] const basic_snapshot &entities(Archive &archive) const {
+        return get<entity_type>(archive);
     }
+
+    /**
+     * @brief Serializes all elements of a type with associated identifiers.
+     * @tparam Component Types of components to serialize.
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
+     */
+    template<typename... Component, typename Archive>
+    [[deprecated("use .get<Type>(archive) instead")]] const basic_snapshot &component(Archive &archive) const {
+        return (get<Component>(archive), ...);
+            }
 
     /**
      * @brief Serializes all elements of a type with associated identifiers for
@@ -120,41 +147,9 @@ public:
      * @param last An iterator past the last element of the range to serialize.
      * @return An object of this type to continue creating the snapshot.
      */
-    template<typename Component, typename Archive, typename It>
-    const basic_snapshot &component(Archive &archive, It first, It last) const {
-        archive(static_cast<typename traits_type::entity_type>(std::distance(first, last)));
-
-        for(const auto view = reg->template view<Component>(); first != last; ++first) {
-            if(const auto entt = *first; view.contains(entt)) {
-                archive(entt);
-                std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, view.get(entt));
-            } else {
-                archive(static_cast<entity_type>(null));
-            }
-        }
-
-        return *this;
-    }
-
-    /**
-     * @brief Serializes all required components with associated identifiers for
-     * the entities in a range.
-     * @tparam First First type of component to serialize.
-     * @tparam Second Second type of component to serialize.
-     * @tparam Other Other types of components to serialize.
-     * @tparam Archive Type of output archive.
-     * @tparam It Type of input iterator.
-     * @param archive A valid reference to an output archive.
-     * @param first An iterator to the first element of the range to serialize.
-     * @param last An iterator past the last element of the range to serialize.
-     * @return An object of this type to continue creating the snapshot.
-     */
-    template<typename First, typename Second, typename... Other, typename Archive, typename It>
-    [[deprecated("use .component<Type>(archive, first, last) instead")]] const basic_snapshot &component(Archive &archive, It first, It last) const {
-        component<First>(archive, first, last);
-        component<Second>(archive, first, last);
-        (component<Other>(archive, first, last), ...);
-        return *this;
+    template<typename... Component, typename Archive, typename It>
+    [[deprecated("use .get_sparse<Type>(archive, first, last) instead")]] const basic_snapshot &component(Archive &archive, It first, It last) const {
+        return (get_sparse<Component>(archive, first, last), ...);
     }
 
 private:
