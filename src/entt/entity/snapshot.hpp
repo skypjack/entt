@@ -195,22 +195,25 @@ public:
     basic_snapshot_loader &operator=(basic_snapshot_loader &&) noexcept = default;
 
     /**
-     * @brief Restores all identifiers, including those to be recycled.
+     * @brief Restores all elements of a type with associated identifiers.
+     * @tparam Type Type of elements to restore.
      * @tparam Archive Type of input archive.
      * @param archive A valid reference to an input archive.
+     * @param id Optional name used to map the storage within the registry.
      * @return A valid loader to continue restoring data.
      */
-    template<typename Archive>
-    basic_snapshot_loader &entities(Archive &archive) {
-        auto &storage = reg->template storage<entity_type>();
-
+    template<typename Type, typename Archive>
+    basic_snapshot_loader &get([[maybe_unused]] Archive &archive, const id_type id = type_hash<Type>::value()) {
+        auto &storage = reg->template storage<Type>(id);
         typename traits_type::entity_type length{};
-        typename traits_type::entity_type in_use{};
 
         archive(length);
-        archive(in_use);
+
+        if constexpr(std::is_same_v<Type, entity_type>) {
+            typename traits_type::entity_type in_use{};
 
         storage.reserve(length);
+            archive(in_use);
 
         for(entity_type entity = null; length; --length) {
             archive(entity);
@@ -218,8 +221,36 @@ public:
         }
 
         storage.in_use(in_use);
+        } else {
+            auto &other = reg->template storage<entity_type>();
+            entity_type entt{null};
+
+            while(length--) {
+                if(archive(entt); entt != null) {
+                    const auto entity = other.contains(entt) ? entt : other.emplace(entt);
+                    ENTT_ASSERT(entity == entt, "Entity not available for use");
+
+                    if constexpr(Registry::template storage_for_type<Type>::traits_type::page_size == 0u) {
+                        storage.emplace(entity);
+                    } else {
+                        archive(storage.emplace(entity));
+                }
+            }
+        }
+        }
 
         return *this;
+    }
+
+    /**
+     * @brief Restores all identifiers, including those to be recycled.
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A valid loader to continue restoring data.
+     */
+    template<typename Archive>
+    [[deprecated("use .get<Entity>(archive) instead")]] basic_snapshot_loader &entities(Archive &archive) {
+        return get<entity_type>(archive);
     }
 
     /**
@@ -233,59 +264,9 @@ public:
      * @param archive A valid reference to an input archive.
      * @return A valid loader to continue restoring data.
      */
-    template<typename Component, typename Archive>
-    basic_snapshot_loader &component(Archive &archive) {
-        auto &storage = reg->template storage<entity_type>();
-        auto &elem = reg->template storage<Component>();
-
-        typename traits_type::entity_type length{};
-        entity_type entt;
-
-        archive(length);
-
-        if constexpr(Registry::template storage_for_type<Component>::traits_type::page_size == 0u) {
-            while(length--) {
-                if(archive(entt); entt != null) {
-                    const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
-                    ENTT_ASSERT(entity == entt, "Entity not available for use");
-                    elem.emplace(entity);
-                }
-            }
-        } else {
-            Component instance;
-
-            while(length--) {
-                if(archive(entt); entt != null) {
-                    archive(instance);
-                    const auto entity = storage.contains(entt) ? entt : storage.emplace(entt);
-                    ENTT_ASSERT(entity == entt, "Entity not available for use");
-                    elem.emplace(entity, std::move(instance));
-                }
-            }
-        }
-
-        return *this;
-    }
-
-    /**
-     * @brief Restores all required components with associated identifiers.
-     *
-     * The template parameter list must be exactly the same used during
-     * serialization.
-     *
-     * @tparam First First type of component to serialize.
-     * @tparam Second Second type of component to serialize.
-     * @tparam Other Other types of components to serialize.
-     * @tparam Archive Type of input archive.
-     * @param archive A valid reference to an input archive.
-     * @return A valid loader to continue restoring data.
-     */
-    template<typename First, typename Second, typename... Other, typename Archive>
-    [[deprecated("use .component<Type>(archive) instead")]] basic_snapshot_loader &component(Archive &archive) {
-        component<First>(archive);
-        component<Second>(archive);
-        (component<Other>(archive), ...);
-        return *this;
+    template<typename... Component, typename Archive>
+    [[deprecated("use .get<Type>(archive) instead")]] basic_snapshot_loader &component(Archive &archive) {
+        return (get<Component>(archive), ...);
     }
 
     /**
