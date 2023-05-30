@@ -84,7 +84,7 @@ public:
     /**
      * @brief Serializes all elements of a type with associated identifiers for
      * the entities in a range.
-     * @tparam Type Types of elements to serialize.
+     * @tparam Type Type of elements to serialize.
      * @tparam Archive Type of output archive.
      * @tparam It Type of input iterator.
      * @param archive A valid reference to an output archive.
