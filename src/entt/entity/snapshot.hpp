@@ -94,7 +94,9 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename Type, typename Archive, typename It>
-    const basic_snapshot &get_sparse(Archive &archive, It first, It last, const id_type id = type_hash<Type>::value()) const {
+    const basic_snapshot &get(Archive &archive, It first, It last, const id_type id = type_hash<Type>::value()) const {
+        static_assert(!std::is_same_v<Type, entity_type>, "Entity types not supported");
+
         if(const auto *storage = reg->template storage<Type>(id); storage && !storage->empty()) {
             archive(static_cast<typename traits_type::entity_type>(std::distance(first, last)));
 
@@ -148,8 +150,8 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Component, typename Archive, typename It>
-    [[deprecated("use .get_sparse<Type>(archive, first, last) instead")]] const basic_snapshot &component(Archive &archive, It first, It last) const {
-        return (get_sparse<Component>(archive, first, last), ...);
+    [[deprecated("use .get<Type>(archive, first, last) instead")]] const basic_snapshot &component(Archive &archive, It first, It last) const {
+        return (get<Component>(archive, first, last), ...);
     }
 
 private:
