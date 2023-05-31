@@ -460,6 +460,8 @@ public:
      */
     template<typename Type, auto... Member, typename Archive>
     basic_continuous_loader &get([[maybe_unused]] Archive &archive, const id_type id = type_hash<Type>::value()) {
+        static_assert((std::is_same_v<member_class_t<decltype(Member)>, Type> && ...), "Wrong class type");
+
         auto &storage = reg->template storage<Type>(id);
 
         if constexpr(std::is_same_v<Type, entity_type>) {
