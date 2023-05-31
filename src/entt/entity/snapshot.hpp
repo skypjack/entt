@@ -384,22 +384,16 @@ class basic_continuous_loader {
 
         archive(length);
 
-        if constexpr(Registry::template storage_for_type<Component>::traits_type::page_size == 0u) {
-            while(length--) {
-                if(archive(entt); entt != null) {
-                    restore(entt);
-                    storage.emplace(map(entt));
-                }
-            }
-        } else {
-            Component instance;
+        while(length--) {
+            if(archive(entt); entt != null) {
+                restore(entt);
 
-            while(length--) {
-                if(archive(entt); entt != null) {
-                    archive(instance);
-                    (update(instance, member), ...);
-                    restore(entt);
-                    storage.emplace(map(entt), std::move(instance));
+                if constexpr(Registry::template storage_for_type<Component>::traits_type::page_size == 0u) {
+                    storage.emplace(map(entt));
+                } else {
+                    auto &elem = storage.emplace(map(entt));
+                    archive(elem);
+                    (update(elem, member), ...);
                 }
             }
         }
