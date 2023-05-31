@@ -315,16 +315,6 @@ template<typename Registry>
 class basic_continuous_loader {
     using traits_type = typename Registry::traits_type;
 
-    void destroy(typename Registry::entity_type entt) {
-        if(const auto it = remloc.find(entt); it == remloc.cend()) {
-            auto &storage = reg->template storage<entity_type>();
-            const auto local = storage.emplace();
-
-            remloc.emplace(entt, std::make_pair(local, true));
-            storage.erase(local);
-        }
-    }
-
     void restore(typename Registry::entity_type entt) {
         const auto it = remloc.find(entt);
 
@@ -473,7 +463,12 @@ public:
 
             for(std::size_t pos = in_use; pos < length; ++pos) {
                 archive(entt);
-                destroy(entt);
+
+                if(const auto it = remloc.find(entt); it == remloc.cend()) {
+                    const auto local = storage.emplace();
+                    remloc.emplace(entt, std::make_pair(local, true));
+                    storage.erase(local);
+                }
             }
         } else {
             for(auto &&ref: remloc) {
@@ -517,10 +512,10 @@ public:
      */
     template<typename... Component, typename Archive, typename... Member, typename... Clazz>
     [[deprecated("use .component<Type>(archive, members...) instead")]] basic_continuous_loader &component(Archive &archive, Member Clazz::*...member) {
-        auto storage{std::forward_as_tuple(reg->template storage<Component>())...};
+        auto storage{std::forward_as_tuple(reg->template storage<Component>()...)};
 
         for(auto &&ref: remloc) {
-            std::apply([&ref](auto &&...elem) { elem.remove(ref.second.first); }, storage);
+            std::apply([&ref](auto &&...elem) { (elem.remove(ref.second.first), ...); }, storage);
         }
 
         (assign<Component>(archive, member...), ...);
