@@ -386,15 +386,6 @@ class basic_continuous_loader {
         }
     }
 
-    template<typename Component>
-    void remove_if_exists() {
-        auto &storage = reg->template storage<Component>();
-
-        for(auto &&ref: remloc) {
-            storage.remove(ref.second.first);
-        }
-    }
-
     template<typename Component, typename Archive, typename... Other, typename... Member>
     void assign(Archive &archive, [[maybe_unused]] Member Other::*...member) {
         auto &storage = reg->template storage<Component>();
@@ -485,7 +476,10 @@ public:
                 destroy(entt);
             }
         } else {
-            remove_if_exists<Type>();
+            for(auto &&ref: remloc) {
+                storage.remove(ref.second.first);
+            }
+
             assign<Type>(archive, Member...);
         }
 
@@ -523,7 +517,12 @@ public:
      */
     template<typename... Component, typename Archive, typename... Member, typename... Clazz>
     [[deprecated("use .component<Type>(archive, members...) instead")]] basic_continuous_loader &component(Archive &archive, Member Clazz::*...member) {
-        (remove_if_exists<Component>(), ...);
+        auto storage{std::forward_as_tuple(reg->template storage<Component>())...};
+
+        for(auto &&ref: remloc) {
+            std::apply([&ref](auto &&...elem) { elem.remove(ref.second.first); }, storage);
+        }
+
         (assign<Component>(archive, member...), ...);
         return *this;
     }
