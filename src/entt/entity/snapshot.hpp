@@ -60,14 +60,14 @@ public:
     template<typename Type, typename Archive>
     const basic_snapshot &get(Archive &archive, const id_type id = type_hash<Type>::value()) const {
         if(const auto *storage = reg->template storage<Type>(id); storage) {
-        archive(static_cast<typename traits_type::entity_type>(storage->size()));
+            archive(static_cast<typename traits_type::entity_type>(storage->size()));
 
             if constexpr(std::is_same_v<Type, entity_type>) {
-        archive(static_cast<typename traits_type::entity_type>(storage->in_use()));
+                archive(static_cast<typename traits_type::entity_type>(storage->in_use()));
 
-        for(auto first = storage->data(), last = first + storage->size(); first != last; ++first) {
-            archive(*first);
-        }
+                for(auto first = storage->data(), last = first + storage->size(); first != last; ++first) {
+                    archive(*first);
+                }
             } else {
                 for(auto elem: storage->reach()) {
                     std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
@@ -106,7 +106,7 @@ public:
                     std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
                 } else {
                     archive(static_cast<entity_type>(null));
-            }
+                }
             }
         } else {
             archive(typename traits_type::entity_type{});
@@ -136,7 +136,7 @@ public:
     template<typename... Component, typename Archive>
     [[deprecated("use .get<Type>(archive) instead")]] const basic_snapshot &component(Archive &archive) const {
         return (get<Component>(archive), ...);
-            }
+    }
 
     /**
      * @brief Serializes all elements of a type with associated identifiers for
@@ -212,15 +212,15 @@ public:
         if constexpr(std::is_same_v<Type, entity_type>) {
             typename traits_type::entity_type in_use{};
 
-        storage.reserve(length);
+            storage.reserve(length);
             archive(in_use);
 
-        for(entity_type entity = null; length; --length) {
-            archive(entity);
-            storage.emplace(entity);
-        }
+            for(entity_type entity = null; length; --length) {
+                archive(entity);
+                storage.emplace(entity);
+            }
 
-        storage.in_use(in_use);
+            storage.in_use(in_use);
         } else {
             auto &other = reg->template storage<entity_type>();
             entity_type entt{null};
@@ -234,9 +234,9 @@ public:
                         storage.emplace(entity);
                     } else {
                         archive(storage.emplace(entity));
+                    }
                 }
             }
-        }
         }
 
         return *this;
@@ -444,6 +444,53 @@ public:
     basic_continuous_loader &operator=(basic_continuous_loader &&) = default;
 
     /**
+     * @brief Restores all elements of a type with associated identifiers.
+     *
+     * It creates local counterparts for remote elements as needed.<br/>
+     * Members are either data members of type entity_type or containers of
+     * entities. In both cases, a loader visits them and replaces entities with
+     * their local counterpart.
+     *
+     * @tparam Type Type of elements to restore.
+     * @tparam Member Optional members to update with their local counterparts.
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @param id Optional name used to map the storage within the registry.
+     * @return A valid loader to continue restoring data.
+     */
+    template<typename Type, auto... Member, typename Archive>
+    basic_continuous_loader &get([[maybe_unused]] Archive &archive, const id_type id = type_hash<Type>::value()) {
+        auto &storage = reg->template storage<Type>(id);
+
+        if constexpr(std::is_same_v<Type, entity_type>) {
+            typename traits_type::entity_type in_use{};
+            typename traits_type::entity_type length{};
+
+            entity_type entt{null};
+
+            archive(length);
+            archive(in_use);
+
+            storage.reserve(length);
+
+            for(std::size_t pos{}; pos < in_use; ++pos) {
+                archive(entt);
+                restore(entt);
+            }
+
+            for(std::size_t pos = in_use; pos < length; ++pos) {
+                archive(entt);
+                destroy(entt);
+            }
+        } else {
+            remove_if_exists<Type>();
+            assign<Type>(archive, Member...);
+        }
+
+        return *this;
+    }
+
+    /**
      * @brief Restores all identifiers, including those to be recycled.
      *
      * It creates local counterparts for remote elements as needed.
@@ -453,27 +500,8 @@ public:
      * @return A non-const reference to this loader.
      */
     template<typename Archive>
-    basic_continuous_loader &entities(Archive &archive) {
-        typename traits_type::entity_type length{};
-        typename traits_type::entity_type in_use{};
-
-        archive(length);
-        archive(in_use);
-
-        entity_type entt{null};
-        std::size_t pos{};
-
-        for(; pos < in_use; ++pos) {
-            archive(entt);
-            restore(entt);
-        }
-
-        for(; pos < length; ++pos) {
-            archive(entt);
-            destroy(entt);
-        }
-
-        return *this;
+    [[deprecated("use .get<Entity>(archive) instead")]] basic_continuous_loader &entities(Archive &archive) {
+        return get<entity_type>(archive);
     }
 
     /**
@@ -491,41 +519,10 @@ public:
      * @param member Members to update with their local counterparts.
      * @return A non-const reference to this loader.
      */
-    template<typename Component, typename Archive, typename... Member>
-    basic_continuous_loader &component(Archive &archive, Member Component::*...member) {
-        remove_if_exists<Component>();
-        assign<Component>(archive, member...);
-        return *this;
-    }
-
-    /**
-     * @brief Serializes all required components with associated identifiers.
-     *
-     * It creates local counterparts for remote elements as needed.<br/>
-     * Members are either data members of type entity_type or containers of
-     * entities. In both cases, a loader visits them and replaces entities with
-     * their local counterpart.
-     *
-     * @tparam First First type of component to serialize.
-     * @tparam Second Second type of component to serialize.
-     * @tparam Other Other types of components to serialize.
-     * @tparam Archive Type of input archive.
-     * @tparam Clazz Types of components to update with local counterparts.
-     * @tparam Member Types of members to update with their local counterparts.
-     * @param archive A valid reference to an input archive.
-     * @param member Members to update with their local counterparts.
-     * @return A non-const reference to this loader.
-     */
-    template<typename First, typename Second, typename... Other, typename Archive, typename... Clazz, typename... Member>
+    template<typename... Component, typename Archive, typename... Member, typename... Clazz>
     [[deprecated("use .component<Type>(archive, members...) instead")]] basic_continuous_loader &component(Archive &archive, Member Clazz::*...member) {
-        remove_if_exists<First>();
-        remove_if_exists<Second>();
-        (remove_if_exists<Other>(), ...);
-
-        assign<First>(archive, member...);
-        assign<Second>(archive, member...);
-        (assign<Other>(archive, member...), ...);
-
+        (remove_if_exists<Component>(), ...);
+        (assign<Component>(archive, member...), ...);
         return *this;
     }
 
