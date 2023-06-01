@@ -376,29 +376,6 @@ class basic_continuous_loader {
         }
     }
 
-    template<typename Component, typename Archive, typename... Other, typename... Member>
-    void assign(Archive &archive, [[maybe_unused]] Member Other::*...member) {
-        auto &storage = reg->template storage<Component>();
-        typename traits_type::entity_type length{};
-        entity_type entt;
-
-        archive(length);
-
-        while(length--) {
-            if(archive(entt); entt != null) {
-                restore(entt);
-
-                if constexpr(Registry::template storage_for_type<Component>::traits_type::page_size == 0u) {
-                    storage.emplace(map(entt));
-                } else {
-                    auto &elem = storage.emplace(map(entt));
-                    archive(elem);
-                    (update(elem, member), ...);
-                }
-            }
-        }
-    }
-
 public:
     /*! Basic registry type. */
     using registry_type = Registry;
@@ -436,19 +413,17 @@ public:
     template<typename Type, auto... Member, typename Archive>
     basic_continuous_loader &get([[maybe_unused]] Archive &archive, const id_type id = type_hash<Type>::value()) {
         static_assert((std::is_same_v<member_class_t<decltype(Member)>, Type> && ...), "Wrong class type");
-
         auto &storage = reg->template storage<Type>(id);
+        typename traits_type::entity_type length{};
+        entity_type entt{null};
+
+        archive(length);
 
         if constexpr(std::is_same_v<Type, entity_type>) {
             typename traits_type::entity_type in_use{};
-            typename traits_type::entity_type length{};
-
-            entity_type entt{null};
-
-            archive(length);
-            archive(in_use);
 
             storage.reserve(length);
+            archive(in_use);
 
             for(std::size_t pos{}; pos < in_use; ++pos) {
                 archive(entt);
@@ -469,7 +444,19 @@ public:
                 storage.remove(ref.second.first);
             }
 
-            assign<Type>(archive, Member...);
+            while(length--) {
+                if(archive(entt); entt != null) {
+                    restore(entt);
+
+                    if constexpr(Registry::template storage_for_type<Type>::traits_type::page_size == 0u) {
+                        storage.emplace(map(entt));
+                    } else {
+                        auto &elem = storage.emplace(map(entt));
+                        archive(elem);
+                        (update(elem, Member), ...);
+                    }
+                }
+            }
         }
 
         return *this;
@@ -506,13 +493,32 @@ public:
      */
     template<typename... Component, typename Archive, typename... Member, typename... Clazz>
     [[deprecated("use .component<Type>(archive, members...) instead")]] basic_continuous_loader &component(Archive &archive, Member Clazz::*...member) {
-        auto storage{std::forward_as_tuple(reg->template storage<Component>()...)};
+        ([&](auto &storage) {
+            for(auto &&ref: remloc) {
+                storage.remove(ref.second.first);
+            }
 
-        for(auto &&ref: remloc) {
-            std::apply([&ref](auto &&...elem) { (elem.remove(ref.second.first), ...); }, storage);
-        }
+            typename traits_type::entity_type length{};
+            entity_type entt{null};
 
-        (assign<Component>(archive, member...), ...);
+            archive(length);
+
+            while(length--) {
+                if(archive(entt); entt != null) {
+                    restore(entt);
+
+                    if constexpr(std::remove_reference_t<decltype(storage)>::traits_type::page_size == 0u) {
+                        storage.emplace(map(entt));
+                    } else {
+                        auto &elem = storage.emplace(map(entt));
+                        archive(elem);
+                        (update(elem, member), ...);
+                    }
+                }
+            }
+        }(reg->template storage<Component>()),
+         ...);
+
         return *this;
     }
 
