@@ -106,7 +106,14 @@ TEST(Snapshot, Dump) {
     output_archive<archive_type> output{storage};
     input_archive<archive_type> input{storage};
 
-    entt::snapshot{registry}.entities(output).component<int, char, double, a_component, another_component>(output);
+    entt::snapshot{registry}
+        .get<entt::entity>(output)
+        .get<int>(output)
+        .get<char>(output)
+        .get<double>(output)
+        .get<a_component>(output)
+        .get<another_component>(output);
+
     registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
@@ -114,7 +121,14 @@ TEST(Snapshot, Dump) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    entt::snapshot_loader{registry}.entities(input).component<int, char, double, a_component, another_component>(input).orphans();
+    entt::snapshot_loader{registry}
+        .get<entt::entity>(input)
+        .get<int>(input)
+        .get<char>(input)
+        .get<double>(input)
+        .get<a_component>(input)
+        .get<another_component>(input)
+        .orphans();
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -168,7 +182,11 @@ TEST(Snapshot, Partial) {
     output_archive<archive_type> output{storage};
     input_archive<archive_type> input{storage};
 
-    entt::snapshot{registry}.entities(output).component<char, int>(output);
+    entt::snapshot{registry}
+        .get<entt::entity>(output)
+        .get<char>(output)
+        .get<int>(output);
+
     registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
@@ -176,7 +194,10 @@ TEST(Snapshot, Partial) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    entt::snapshot_loader{registry}.entities(input).component<char, int>(input);
+    entt::snapshot_loader{registry}
+        .get<entt::entity>(input)
+        .get<char>(input)
+        .get<int>(input);
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -190,7 +211,9 @@ TEST(Snapshot, Partial) {
     ASSERT_EQ(registry.get<int>(e2), 3);
     ASSERT_EQ(registry.get<char>(e3), '0');
 
-    entt::snapshot{registry}.entities(output);
+    entt::snapshot{registry}
+        .get<entt::entity>(output);
+
     registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
@@ -198,7 +221,9 @@ TEST(Snapshot, Partial) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    entt::snapshot_loader{registry}.entities(input).orphans();
+    entt::snapshot_loader{registry}
+        .get<entt::entity>(input)
+        .orphans();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -234,9 +259,15 @@ TEST(Snapshot, Iterator) {
     const auto view = registry.view<a_component>();
     const auto size = view.size();
 
-    entt::snapshot{registry}.component<another_component, std::unique_ptr<int>>(output, view.begin(), view.end());
+    entt::snapshot{registry}
+        .get<another_component>(output, view.begin(), view.end())
+        .get<std::unique_ptr<int>>(output, view.begin(), view.end());
+
     registry.clear();
-    entt::snapshot_loader{registry}.component<another_component, std::unique_ptr<int>>(input);
+
+    entt::snapshot_loader{registry}
+        .get<another_component>(input)
+        .get<std::unique_ptr<int>>(input);
 
     ASSERT_EQ(registry.view<another_component>().size(), size / 2u);
 
@@ -307,16 +338,21 @@ TEST(Snapshot, Continuous) {
     dst.emplace<another_component>(entity, -1, -1);
     dst.emplace<std::unique_ptr<int>>(entity, std::make_unique<int>(-1));
 
-    entt::snapshot{src}.entities(output).component<a_component, another_component, what_a_component, map_component, std::unique_ptr<int>>(output);
+    entt::snapshot{src}
+        .get<entt::entity>(output)
+        .get<a_component>(output)
+        .get<another_component>(output)
+        .get<what_a_component>(output)
+        .get<map_component>(output)
+        .get<std::unique_ptr<int>>(output);
 
-    loader.entities(input)
-        .component<a_component, another_component, what_a_component, map_component, std::unique_ptr<int>>(
-            input,
-            &what_a_component::bar,
-            &what_a_component::quux,
-            &map_component::keys,
-            &map_component::values,
-            &map_component::both)
+    loader
+        .get<entt::entity>(input)
+        .get<a_component>(input)
+        .get<another_component>(input)
+        .get<what_a_component, &what_a_component::bar, &what_a_component::quux>(input)
+        .get<map_component, &map_component::keys, &map_component::values, &map_component::both>(input)
+        .get<std::unique_ptr<int>>(input)
         .orphans();
 
     decltype(dst.size()) a_component_cnt{};
@@ -373,16 +409,19 @@ TEST(Snapshot, Continuous) {
 
     auto size = dst.size();
 
-    entt::snapshot{src}.entities(output).component<a_component, what_a_component, map_component, another_component>(output);
+    entt::snapshot{src}
+        .get<entt::entity>(output)
+        .get<a_component>(output)
+        .get<what_a_component>(output)
+        .get<map_component>(output)
+        .get<another_component>(output);
 
-    loader.entities(input)
-        .component<a_component, what_a_component, map_component, another_component>(
-            input,
-            &what_a_component::bar,
-            &what_a_component::quux,
-            &map_component::keys,
-            &map_component::values,
-            &map_component::both)
+    loader
+        .get<entt::entity>(input)
+        .get<a_component>(input)
+        .get<what_a_component, &what_a_component::bar, &what_a_component::quux>(input)
+        .get<map_component, &map_component::keys, &map_component::values, &map_component::both>(input)
+        .get<another_component>(input)
         .orphans();
 
     ASSERT_EQ(size, dst.size());
@@ -403,16 +442,19 @@ TEST(Snapshot, Continuous) {
         component.bar = entity;
     });
 
-    entt::snapshot{src}.entities(output).component<what_a_component, map_component, a_component, another_component>(output);
+    entt::snapshot{src}
+        .get<entt::entity>(output)
+        .get<a_component>(output)
+        .get<what_a_component>(output)
+        .get<map_component>(output)
+        .get<another_component>(output);
 
-    loader.entities(input)
-        .component<what_a_component, map_component, a_component, another_component>(
-            input,
-            &what_a_component::bar,
-            &what_a_component::quux,
-            &map_component::keys,
-            &map_component::values,
-            &map_component::both)
+    loader
+        .get<entt::entity>(input)
+        .get<a_component>(input)
+        .get<what_a_component, &what_a_component::bar, &what_a_component::quux>(input)
+        .get<map_component, &map_component::keys, &map_component::values, &map_component::both>(input)
+        .get<another_component>(input)
         .orphans();
 
     dst.view<what_a_component>().each([&loader, entity](auto, auto &component) {
@@ -427,16 +469,19 @@ TEST(Snapshot, Continuous) {
     src.destroy(entity);
     loader.shrink();
 
-    entt::snapshot{src}.entities(output).component<a_component, another_component, what_a_component, map_component>(output);
+    entt::snapshot{src}
+        .get<entt::entity>(output)
+        .get<a_component>(output)
+        .get<another_component>(output)
+        .get<what_a_component>(output)
+        .get<map_component>(output);
 
-    loader.entities(input)
-        .component<a_component, another_component, what_a_component, map_component>(
-            input,
-            &what_a_component::bar,
-            &what_a_component::quux,
-            &map_component::keys,
-            &map_component::values,
-            &map_component::both)
+    loader
+        .get<entt::entity>(input)
+        .get<a_component>(input)
+        .get<another_component>(input)
+        .get<what_a_component, &what_a_component::bar, &what_a_component::quux>(input)
+        .get<map_component, &map_component::keys, &map_component::values, &map_component::both>(input)
         .orphans()
         .shrink();
 
@@ -455,16 +500,19 @@ TEST(Snapshot, Continuous) {
     dst.clear<a_component>();
     a_component_cnt = src.storage<a_component>().size();
 
-    entt::snapshot{src}.entities(output).component<a_component, what_a_component, map_component, another_component>(output);
+    entt::snapshot{src}
+        .get<entt::entity>(output)
+        .get<a_component>(output)
+        .get<what_a_component>(output)
+        .get<map_component>(output)
+        .get<another_component>(output);
 
-    loader.entities(input)
-        .component<a_component, what_a_component, map_component, another_component>(
-            input,
-            &what_a_component::bar,
-            &what_a_component::quux,
-            &map_component::keys,
-            &map_component::values,
-            &map_component::both)
+    loader
+        .get<entt::entity>(input)
+        .get<a_component>(input)
+        .get<what_a_component, &what_a_component::bar, &what_a_component::quux>(input)
+        .get<map_component, &map_component::keys, &map_component::values, &map_component::both>(input)
+        .get<another_component>(input)
         .orphans();
 
     ASSERT_EQ(dst.storage<a_component>().size(), a_component_cnt);
@@ -472,16 +520,19 @@ TEST(Snapshot, Continuous) {
     src.clear<a_component>();
     a_component_cnt = {};
 
-    entt::snapshot{src}.entities(output).component<what_a_component, map_component, a_component, another_component>(output);
+    entt::snapshot{src}
+        .get<entt::entity>(output)
+        .get<what_a_component>(output)
+        .get<map_component>(output)
+        .get<a_component>(output)
+        .get<another_component>(output);
 
-    loader.entities(input)
-        .component<what_a_component, map_component, a_component, another_component>(
-            input,
-            &what_a_component::bar,
-            &what_a_component::quux,
-            &map_component::keys,
-            &map_component::values,
-            &map_component::both)
+    loader
+        .get<entt::entity>(input)
+        .get<what_a_component, &what_a_component::bar, &what_a_component::quux>(input)
+        .get<map_component, &map_component::keys, &map_component::values, &map_component::both>(input)
+        .get<a_component>(input)
+        .get<another_component>(input)
         .orphans();
 
     ASSERT_EQ(dst.storage<a_component>().size(), a_component_cnt);
@@ -504,8 +555,13 @@ TEST(Snapshot, MoreOnShrink) {
     input_archive<archive_type> input{storage};
 
     auto entity = src.create();
-    entt::snapshot{src}.entities(output);
-    loader.entities(input).shrink();
+
+    entt::snapshot{src}
+        .get<entt::entity>(output);
+
+    loader
+        .get<entt::entity>(input)
+        .shrink();
 
     ASSERT_TRUE(dst.valid(entity));
 
@@ -549,15 +605,15 @@ TEST(Snapshot, SyncDataMembers) {
         decltype(map_component::values){{{10, child}}},
         decltype(map_component::both){{{child, child}}});
 
-    entt::snapshot{src}.entities(output).component<what_a_component, map_component>(output);
+    entt::snapshot{src}
+        .get<entt::entity>(output)
+        .get<what_a_component>(output)
+        .get<map_component>(output);
 
-    loader.entities(input).component<what_a_component, map_component>(
-        input,
-        &what_a_component::bar,
-        &what_a_component::quux,
-        &map_component::keys,
-        &map_component::values,
-        &map_component::both);
+    loader
+        .get<entt::entity>(input)
+        .get<what_a_component, &what_a_component::bar, &what_a_component::quux>(input)
+        .get<map_component, &map_component::keys, &map_component::values, &map_component::both>(input);
 
     ASSERT_FALSE(dst.valid(parent));
     ASSERT_FALSE(dst.valid(child));
