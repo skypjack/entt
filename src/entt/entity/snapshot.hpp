@@ -28,6 +28,7 @@ namespace entt {
  */
 template<typename Registry>
 class basic_snapshot {
+    static_assert(!std::is_const_v<Registry>, "Non-const registry type required");
     using traits_type = typename Registry::traits_type;
 
 public:
@@ -170,6 +171,7 @@ private:
  */
 template<typename Registry>
 class basic_snapshot_loader {
+    static_assert(!std::is_const_v<Registry>, "Non-const registry type required");
     using traits_type = typename Registry::traits_type;
 
 public:
@@ -313,6 +315,7 @@ private:
  */
 template<typename Registry>
 class basic_continuous_loader {
+    static_assert(!std::is_const_v<Registry>, "Non-const registry type required");
     using traits_type = typename Registry::traits_type;
 
     void restore(typename Registry::entity_type entt) {
