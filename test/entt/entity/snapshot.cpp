@@ -6,9 +6,167 @@
 #include <type_traits>
 #include <vector>
 #include <gtest/gtest.h>
+#include <entt/core/any.hpp>
+#include <entt/core/hashed_string.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
+
+TEST(BasicSnapshot, Constructors) {
+    static_assert(!std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>);
+    static_assert(!std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>);
+    static_assert(!std::is_copy_assignable_v<entt::basic_snapshot<entt::registry>>);
+    static_assert(std::is_move_constructible_v<entt::basic_snapshot<entt::registry>>);
+    static_assert(std::is_move_assignable_v<entt::basic_snapshot<entt::registry>>);
+
+    entt::registry registry;
+    entt::basic_snapshot snapshot{registry};
+    entt::basic_snapshot other{std::move(snapshot)};
+
+    ASSERT_NO_FATAL_FAILURE(snapshot = std::move(other));
+}
+
+TEST(BasicSnapshot, GetEntityType) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_snapshot snapshot{registry};
+    const auto &storage = registry.storage<entt::entity>();
+
+    std::vector<entt::any> data{};
+    auto archive = [&data](auto &&value) { data.emplace_back(std::forward<decltype(value)>(value)); };
+
+    snapshot.get<entt::entity>(archive);
+
+    ASSERT_EQ(data.size(), 2u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.in_use());
+
+    entt::entity entities[3u];
+
+    registry.create(std::begin(entities), std::end(entities));
+    registry.destroy(entities[1u]);
+
+    data.clear();
+    snapshot.get<entt::entity>(archive, "ignored"_hs);
+
+    ASSERT_EQ(data.size(), 5u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.in_use());
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[2u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[2u]), storage.data()[0u]);
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[3u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), storage.data()[1u]);
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[4u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[4u]), storage.data()[2u]);
+}
+
+TEST(BasicSnapshot, GetType) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_snapshot snapshot{registry};
+    const auto &storage = registry.storage<int>();
+
+    entt::entity entities[3u];
+    const int values[3u]{1, 2, 3};
+
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<int>(std::begin(entities), std::end(entities), std::begin(values));
+    registry.destroy(entities[1u]);
+
+    std::vector<entt::any> data{};
+    auto archive = [&data](auto &&value) { data.emplace_back(std::forward<decltype(value)>(value)); };
+
+    snapshot.get<int>(archive, "other"_hs);
+
+    ASSERT_EQ(data.size(), 1u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
+
+    data.clear();
+    snapshot.get<int>(archive);
+
+    ASSERT_EQ(data.size(), 5u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entities[0u]);
+
+    ASSERT_NE(entt::any_cast<int>(&data[2u]), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(data[2u]), values[0u]);
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[3u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), entities[2u]);
+
+    ASSERT_NE(entt::any_cast<int>(&data[4u]), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(data[4u]), values[2u]);
+}
+
+TEST(BasicSnapshot, GetTypeSparse) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_snapshot snapshot{registry};
+    const auto &storage = registry.storage<int>();
+
+    entt::entity entities[3u];
+    const int values[3u]{1, 2, 3};
+
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<int>(std::begin(entities), std::end(entities), std::begin(values));
+    registry.destroy(entities[1u]);
+
+    std::vector<entt::any> data{};
+    auto archive = [&data](auto &&value) { data.emplace_back(std::forward<decltype(value)>(value)); };
+
+    snapshot.get<int>(archive, std::begin(entities), std::end(entities), "other"_hs);
+
+    ASSERT_EQ(data.size(), 1u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
+
+    data.clear();
+    snapshot.get<int>(archive, std::begin(entities), std::end(entities));
+
+    ASSERT_EQ(data.size(), 6u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), static_cast<typename traits_type::entity_type>(std::distance(std::begin(entities), std::end(entities))));
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entities[0u]);
+
+    ASSERT_NE(entt::any_cast<int>(&data[2u]), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(data[2u]), values[0u]);
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[3u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), static_cast<entt::entity>(entt::null));
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[4u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[4u]), entities[2u]);
+
+    ASSERT_NE(entt::any_cast<int>(&data[5u]), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(data[5u]), values[2u]);
+}
 
 template<typename Storage>
 struct output_archive {
