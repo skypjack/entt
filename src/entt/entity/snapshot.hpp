@@ -585,7 +585,7 @@ public:
      * @return True if `entity` is managed by the loader, false otherwise.
      */
     [[nodiscard]] bool contains(entity_type entt) const noexcept {
-        return (remloc.find(entt) != remloc.cend());
+        return remloc.contains(entt);
     }
 
     /**
