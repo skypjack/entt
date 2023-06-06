@@ -319,18 +319,16 @@ class basic_continuous_loader {
     using traits_type = typename Registry::traits_type;
 
     void restore(typename Registry::entity_type entt) {
-        const auto it = remloc.find(entt);
-
-        if(it == remloc.cend()) {
-            const auto local = reg->create();
-            remloc.emplace(entt, std::make_pair(local, true));
-        } else {
+        if(remloc.contains(entt)) {
             if(!reg->valid(remloc[entt].first)) {
                 remloc[entt].first = reg->create();
             }
 
             // set the dirty flag
             remloc[entt].second = true;
+        } else {
+            const auto local = reg->create();
+            remloc.emplace(entt, std::make_pair(local, true));
         }
     }
 
@@ -437,7 +435,7 @@ public:
             for(std::size_t pos = in_use; pos < length; ++pos) {
                 archive(entt);
 
-                if(const auto it = remloc.find(entt); it == remloc.cend()) {
+                if(!remloc.contains(entt)) {
                     const auto local = storage.emplace();
                     remloc.emplace(entt, std::make_pair(local, true));
                     storage.erase(local);
