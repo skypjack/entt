@@ -125,7 +125,6 @@ TEST(BasicSnapshot, GetTypeSparse) {
 
     entt::registry registry;
     entt::basic_snapshot snapshot{registry};
-    const auto &storage = registry.storage<int>();
 
     entt::entity entities[3u];
     const int values[3u]{1, 2, 3};
