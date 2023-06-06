@@ -390,7 +390,8 @@ public:
      * @param source A valid reference to a registry.
      */
     basic_continuous_loader(registry_type &source) noexcept
-        : reg{&source} {}
+        : remloc{source.get_allocator()},
+          reg{&source} {}
 
     /*! @brief Default move constructor. */
     basic_continuous_loader(basic_continuous_loader &&) = default;
