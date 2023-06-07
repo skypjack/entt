@@ -17,6 +17,31 @@
 namespace entt {
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+template<typename Registry>
+void orphans(Registry &registry) {
+    auto view = registry.template view<typename Registry::entity_type>();
+
+    for(auto entt: view) {
+        if(registry.orphan(entt)) {
+            view.storage()->erase(entt);
+        }
+    }
+}
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
  * @brief Utility class to create snapshots from a registry.
  *
  * A _snapshot_ can be either a dump of the entire registry or a narrower
@@ -282,14 +307,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     basic_snapshot_loader &orphans() {
-        auto &storage = reg->template storage<entity_type>();
-
-        for(auto entt: storage) {
-            if(reg->orphan(entt)) {
-                storage.erase(entt);
-            }
-        }
-
+        internal::orphans(*reg);
         return *this;
     }
 
@@ -566,14 +584,7 @@ public:
      * @return A non-const reference to this loader.
      */
     basic_continuous_loader &orphans() {
-        auto &storage = reg->template storage<entity_type>();
-
-        for(auto entt: storage) {
-            if(reg->orphan(entt)) {
-                storage.erase(entt);
-            }
-        }
-
+        internal::orphans(*reg);
         return *this;
     }
 
