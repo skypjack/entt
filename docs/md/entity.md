@@ -1021,33 +1021,35 @@ To take a snapshot of a registry, use the `snapshot` class:
 output_archive output;
 
 entt::snapshot{registry}
-    .entities(output)
-    .component<a_component>(output)
-    .component<another_component>(output);
+    .get<entt::entity>(output)
+    .get<a_component>(output)
+    .get<another_component>(output);
 ```
 
 It isn't necessary to invoke all functions each and every time. What functions
 to use in which case mostly depends on the goal.
 
-The `entities` member function makes the snapshot serialize all entities (both
-those still alive and those released) along with their versions.<br/>
-On the other hand, the `component` member function template is meant to store
-aside components.<br/>
-There exists also another version of the `component` member function that
-accepts a range of entities to serialize. It can be used to _filter_ out those
-entities that shouldn't be serialized for some reasons:
+When _getting_ an entity type, the snapshot class serializes all entities along
+with their versions.<br/>
+In all other case, entities and components from a given storage are passed to
+the archive. Named pools are also supported:
+
+```cpp
+entt::snapshot{registry}.get<a_component>(output, "other"_hs);
+```
+
+There exists another version of the `get` member function that accepts a range
+of entities to serialize. It can be used to _filter_ out those entities that
+shouldn't be serialized for some reasons:
 
 ```cpp
 const auto view = registry.view<serialize>();
 output_archive output;
 
 entt::snapshot{registry}
-    .component<a_component>(output, view.begin(), view.end())
-    .component<another_component>(output, view.begin(), view.end());
+    .get<a_component>(output, view.begin(), view.end())
+    .get<another_component>(output, view.begin(), view.end());
 ```
-
-Note that `component` stores items along with entities. It means that it works
-properly without a call to the `entities` member function.
 
 Once a snapshot is created, there exist mainly two _ways_ to load it: as a whole
 and in a kind of _continuous mode_.<br/>
@@ -1063,9 +1065,9 @@ originally had:
 input_archive input;
 
 entt::snapshot_loader{registry}
-    .entities(input)
-    .component<a_component>(input)
-    .component<another_component>(input)
+    .get<entt::entity>(input)
+    .get<a_component>(input)
+    .get<another_component>(input)
     .orphans();
 ```
 
@@ -1074,13 +1076,18 @@ to use in which case mostly depends on the goal.<br/>
 For obvious reasons, what is important is that the data are restored in exactly
 the same order in which they were serialized.
 
-The `entities` member function restores the sets of entities and the versions
-that they originally had at the source.<br/>
-The `component` member function restores all and only the components specified
-and assigns them to the right entities. The template parameter list must be the
-same used during the serialization.<br/>
-The `orphans` member function releases the entities that have no components, if
-any.
+When _getting_ an entity type, a snapshot loader restores all entities with the
+versions that they originally had at the source.<br/>
+In all other cases, entities and components are restored in a given storage. If
+the registry doesn't contain the entity, it's also created accordingly. As for
+the snapshot class, named pools are supported too:
+
+```cpp
+entt::snapshot_loader{registry}.get<a_component>(input, "other"_hs);
+```
+
+Finally, the `orphans` member function releases the entities that have no
+components after a restore, if any.
 
 ### Continuous loader
 
@@ -1101,12 +1108,12 @@ limit its lifetime to that of a temporary object:
 entt::continuous_loader loader{registry};
 input_archive input;
 
-loader.entities(input)
-    .component<a_component>(input)
-    .component<another_component>(input)
-    .component<dirty_component>(input, &dirty_component::parent, &dirty_component::child)
-    .orphans()
-    .shrink();
+loader
+    .get<entt::entity>(input)
+    .get<a_component>(input)
+    .get<another_component>(input)
+    .get<dirty_component, &dirty_component::parent, &dirty_component::child>(input)
+    .orphans();
 ```
 
 It isn't necessary to invoke all functions each and every time. What functions
@@ -1114,20 +1121,22 @@ to use in which case mostly depends on the goal.<br/>
 For obvious reasons, what is important is that the data are restored in exactly
 the same order in which they were serialized.
 
-The `entities` member function restores groups of entities and maps each entity
-to a local counterpart when required. For each remote entity identifier not yet
-registered by the loader, a local identifier is created so as to keep the local
-entity in sync with the remote one.<br/>
-The `component` member function restores all and only the components specified
-and assigns them to the right entities. In case the component contains entities
-itself (either as data members of type `entt::entity` or in a container), the
-loader can update them automatically. To do that, it's enough to specify the
-data members to update as shown in the example.<br/>
-The `orphans` member function releases the entities that have no components
-after a restore.<br/>
-Finally, `shrink` helps to purge local entities that no longer have a remote
-conterpart. Users should invoke this member function after restoring each
-snapshot, unless they know exactly what they are doing.
+When _getting_ an entity type, a loader restores groups of entities and maps
+each entity to a local counterpart when required. For each remote identifier not
+yet registered by the loader, a local identifier is created so as to keep the
+local entity in sync with the remote one.<br/>
+In all other cases, entities and components are restored in a given storage. In
+case the component contains entities itself (either as data members of type
+`entt::entity` or in a container), the loader can update them automatically.
+To do that, it's enough to specify the data members to update as shown in the
+example. Named pools are supported too:
+
+```cpp
+loader.get<a_component>(input, "other"_hs);
+```
+
+Finally, the `orphans` member function releases the entities that have no
+components after a restore, if any.
 
 ### Archives
 
