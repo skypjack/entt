@@ -12,6 +12,8 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
 
+struct empty {};
+
 TEST(BasicSnapshot, Constructors) {
     static_assert(!std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>);
     static_assert(!std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>);
@@ -117,6 +119,45 @@ TEST(BasicSnapshot, GetType) {
 
     ASSERT_NE(entt::any_cast<int>(&data[4u]), nullptr);
     ASSERT_EQ(entt::any_cast<int>(data[4u]), values[2u]);
+}
+
+TEST(BasicSnapshot, GetEmptySparse) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_snapshot snapshot{registry};
+    const auto &storage = registry.storage<empty>();
+
+    entt::entity entities[3u];
+
+    registry.create(std::begin(entities), std::end(entities));
+    registry.insert<empty>(std::begin(entities), std::end(entities));
+    registry.destroy(entities[1u]);
+
+    std::vector<entt::any> data{};
+    auto archive = [&data](auto &&value) { data.emplace_back(std::forward<decltype(value)>(value)); };
+
+    snapshot.get<empty>(archive, "other"_hs);
+
+    ASSERT_EQ(data.size(), 1u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
+
+    data.clear();
+    snapshot.get<empty>(archive);
+
+    ASSERT_EQ(data.size(), 3u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entities[0u]);
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[2u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[2u]), entities[2u]);
 }
 
 TEST(BasicSnapshot, GetTypeSparse) {
@@ -264,6 +305,98 @@ TEST(BasicSnapshotLoader, GetType) {
 
     data.emplace_back(entities[0u]);
     data.emplace_back(values[0u]);
+
+    data.emplace_back(entities[1u]);
+    data.emplace_back(values[1u]);
+
+    loader.get<int>(archive);
+
+    ASSERT_TRUE(registry.valid(entities[0u]));
+    ASSERT_TRUE(registry.valid(entities[1u]));
+
+    ASSERT_EQ(storage.size(), 2u);
+    ASSERT_TRUE(storage.contains(entities[0u]));
+    ASSERT_TRUE(storage.contains(entities[1u]));
+    ASSERT_EQ(storage.get(entities[0u]), values[0u]);
+    ASSERT_EQ(storage.get(entities[1u]), values[1u]);
+}
+
+TEST(BasicSnapshotLoader, GetEmptySparse) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_snapshot_loader loader{registry};
+    const auto &storage = registry.storage<empty>();
+
+    std::vector<entt::any> data{};
+    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+
+    ASSERT_FALSE(registry.valid(entities[0u]));
+    ASSERT_FALSE(registry.valid(entities[1u]));
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(entities[0u]);
+
+    loader.get<empty>(archive, "other"_hs);
+
+    ASSERT_TRUE(registry.valid(entities[0u]));
+    ASSERT_FALSE(registry.valid(entities[1u]));
+
+    ASSERT_EQ(storage.size(), 0u);
+    ASSERT_EQ(registry.storage<empty>("other"_hs).size(), 1u);
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+
+    data.emplace_back(entities[0u]);
+    data.emplace_back(entities[1u]);
+
+    loader.get<empty>(archive);
+
+    ASSERT_TRUE(registry.valid(entities[0u]));
+    ASSERT_TRUE(registry.valid(entities[1u]));
+
+    ASSERT_EQ(storage.size(), 2u);
+    ASSERT_TRUE(storage.contains(entities[0u]));
+    ASSERT_TRUE(storage.contains(entities[1u]));
+}
+
+TEST(BasicSnapshotLoader, GetTypeSparse) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_snapshot_loader loader{registry};
+    const auto &storage = registry.storage<int>();
+
+    std::vector<entt::any> data{};
+    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const int values[2u]{1, 3};
+
+    ASSERT_FALSE(registry.valid(entities[0u]));
+    ASSERT_FALSE(registry.valid(entities[1u]));
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<entt::entity>(entt::null));
+    data.emplace_back(entities[0u]);
+    data.emplace_back(values[0u]);
+
+    loader.get<int>(archive, "other"_hs);
+
+    ASSERT_TRUE(registry.valid(entities[0u]));
+    ASSERT_FALSE(registry.valid(entities[1u]));
+
+    ASSERT_EQ(storage.size(), 0u);
+    ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
+
+    data.emplace_back(entities[0u]);
+    data.emplace_back(values[0u]);
+
+    data.emplace_back(static_cast<entt::entity>(entt::null));
 
     data.emplace_back(entities[1u]);
     data.emplace_back(values[1u]);
