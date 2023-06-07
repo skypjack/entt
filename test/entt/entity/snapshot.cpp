@@ -121,7 +121,7 @@ TEST(BasicSnapshot, GetType) {
     ASSERT_EQ(entt::any_cast<int>(data[4u]), values[2u]);
 }
 
-TEST(BasicSnapshot, GetEmptySparse) {
+TEST(BasicSnapshot, GetEmptyType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -321,7 +321,7 @@ TEST(BasicSnapshotLoader, GetType) {
     ASSERT_EQ(storage.get(entities[1u]), values[1u]);
 }
 
-TEST(BasicSnapshotLoader, GetEmptySparse) {
+TEST(BasicSnapshotLoader, GetEmptyType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
