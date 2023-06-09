@@ -412,6 +412,43 @@ TEST(BasicSnapshotLoader, GetTypeSparse) {
     ASSERT_EQ(storage.get(entities[0u]), values[0u]);
     ASSERT_EQ(storage.get(entities[1u]), values[1u]);
 }
+TEST(BasicSnapshotLoader, Orphans) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_snapshot_loader loader{registry};
+
+    std::vector<entt::any> data{};
+    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const int value = 42;
+
+    ASSERT_FALSE(registry.valid(entities[0u]));
+    ASSERT_FALSE(registry.valid(entities[1u]));
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+
+    data.emplace_back(entities[0u]);
+    data.emplace_back(entities[1u]);
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(entities[0u]);
+    data.emplace_back(value);
+
+    loader.get<entt::entity>(archive);
+    loader.get<int>(archive);
+
+    ASSERT_TRUE(registry.valid(entities[0u]));
+    ASSERT_TRUE(registry.valid(entities[1u]));
+
+    loader.orphans();
+
+    ASSERT_TRUE(registry.valid(entities[0u]));
+    ASSERT_FALSE(registry.valid(entities[1u]));
+}
+
 
 template<typename Storage>
 struct output_archive {
