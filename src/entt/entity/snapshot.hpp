@@ -100,7 +100,6 @@ public:
                 }
             }
         } else {
-            ENTT_ASSERT((!std::is_same_v<Type, entity_type>), "No entity storage, no party");
             archive(typename traits_type::entity_type{});
         }
 
