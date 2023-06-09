@@ -336,16 +336,12 @@ class basic_continuous_loader {
     using traits_type = typename Registry::traits_type;
 
     void restore(typename Registry::entity_type entt) {
-        if(remloc.contains(entt)) {
-            if(!reg->valid(remloc[entt].first)) {
-                remloc[entt].first = reg->create();
+        if(const auto entity = to_entity(entt); remloc.contains(entity) && remloc[entity].first == entt) {
+            if(!reg->valid(remloc[entity].second)) {
+                remloc[entity].second = reg->create();
             }
-
-            // set the dirty flag
-            remloc[entt].second = true;
         } else {
-            const auto local = reg->create();
-            remloc.emplace(entt, std::make_pair(local, true));
+            remloc.insert_or_assign(entity, std::make_pair(entt, reg->create()));
         }
     }
 
@@ -452,15 +448,17 @@ public:
             for(std::size_t pos = in_use; pos < length; ++pos) {
                 archive(entt);
 
-                if(!remloc.contains(entt)) {
-                    const auto local = storage.emplace();
-                    remloc.emplace(entt, std::make_pair(local, true));
-                    storage.erase(local);
+                if(const auto entity = to_entity(entt); remloc.contains(entity)) {
+                    if(reg->valid(remloc[entity].second)) {
+                        reg->destroy(remloc[entity].second);
+                    }
+
+                    remloc.erase(entity);
                 }
             }
         } else {
             for(auto &&ref: remloc) {
-                storage.remove(ref.second.first);
+                storage.remove(ref.second.second);
             }
 
             while(length--) {
@@ -514,7 +512,7 @@ public:
     [[deprecated("use .component<Type>(archive, members...) instead")]] basic_continuous_loader &component(Archive &archive, Member Clazz::*...member) {
         ([&](auto &storage) {
             for(auto &&ref: remloc) {
-                storage.remove(ref.second.first);
+                storage.remove(ref.second.second);
             }
 
             typename traits_type::entity_type length{};
@@ -549,26 +547,7 @@ public:
      *
      * @return A non-const reference to this loader.
      */
-    basic_continuous_loader &shrink() {
-        const auto &storage = reg->template storage<entity_type>();
-        auto it = remloc.begin();
-
-        while(it != remloc.cend()) {
-            const auto local = it->second.first;
-            bool &dirty = it->second.second;
-
-            if(dirty) {
-                dirty = false;
-                ++it;
-            } else {
-                if(storage.contains(local)) {
-                    reg->destroy(local);
-                }
-
-                it = remloc.erase(it);
-            }
-        }
-
+    [[deprecated("use .get<Entity>(archive) instead")]] basic_continuous_loader &shrink() {
         return *this;
     }
 
@@ -593,7 +572,8 @@ public:
      * @return True if `entity` is managed by the loader, false otherwise.
      */
     [[nodiscard]] bool contains(entity_type entt) const noexcept {
-        return remloc.contains(entt);
+        const auto it = remloc.find(to_entity(entt));
+        return it != remloc.cend() && it->second.first == entt;
     }
 
     /**
@@ -602,15 +582,15 @@ public:
      * @return The local identifier if any, the null entity otherwise.
      */
     [[nodiscard]] entity_type map(entity_type entt) const noexcept {
-        if(const auto it = remloc.find(entt); it != remloc.cend()) {
-            return it->second.first;
+        if(const auto it = remloc.find(to_entity(entt)); it != remloc.cend() && it->second.first == entt) {
+            return it->second.second;
         }
 
         return null;
     }
 
 private:
-    dense_map<entity_type, std::pair<entity_type, bool>> remloc;
+    dense_map<typename traits_type::entity_type, std::pair<entity_type, entity_type>> remloc;
     registry_type *reg;
 };
 

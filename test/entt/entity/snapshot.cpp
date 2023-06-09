@@ -978,38 +978,6 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(dst.storage<a_component>().size(), a_component_cnt);
 }
 
-TEST(Snapshot, MoreOnShrink) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
-    entt::registry src;
-    entt::registry dst;
-
-    entt::continuous_loader loader{dst};
-
-    using archive_type = std::tuple<
-        std::queue<typename traits_type::entity_type>,
-        std::queue<entt::entity>>;
-
-    archive_type storage;
-    output_archive<archive_type> output{storage};
-    input_archive<archive_type> input{storage};
-
-    auto entity = src.create();
-
-    entt::snapshot{src}
-        .get<entt::entity>(output);
-
-    loader
-        .get<entt::entity>(input)
-        .shrink();
-
-    ASSERT_TRUE(dst.valid(entity));
-
-    loader.shrink();
-
-    ASSERT_FALSE(dst.valid(entity));
-}
-
 TEST(Snapshot, SyncDataMembers) {
     using traits_type = entt::entt_traits<entt::entity>;
 
