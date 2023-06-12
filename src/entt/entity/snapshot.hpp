@@ -419,15 +419,13 @@ public:
      * their local counterpart.
      *
      * @tparam Type Type of elements to restore.
-     * @tparam Member Optional members to update with their local counterparts.
      * @tparam Archive Type of input archive.
      * @param archive A valid reference to an input archive.
      * @param id Optional name used to map the storage within the registry.
      * @return A valid loader to continue restoring data.
      */
-    template<typename Type, auto... Member, typename Archive>
+    template<typename Type, typename Archive>
     basic_continuous_loader &get([[maybe_unused]] Archive &archive, const id_type id = type_hash<Type>::value()) {
-        static_assert((std::is_same_v<member_class_t<decltype(Member)>, Type> && ...), "Wrong class type");
         auto &storage = reg->template storage<Type>(id);
         typename traits_type::entity_type length{};
         entity_type entt{null};
@@ -468,9 +466,7 @@ public:
                     if constexpr(Registry::template storage_for_type<Type>::traits_type::page_size == 0u) {
                         storage.emplace(map(entt));
                     } else {
-                        auto &elem = storage.emplace(map(entt));
-                        archive(elem);
-                        (update(elem, Member), ...);
+                        archive(storage.emplace(map(entt)));
                     }
                 }
             }
