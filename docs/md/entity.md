@@ -1097,9 +1097,8 @@ than one snapshot in a sort of _continuous loading_ that updates the destination
 one step at a time.<br/>
 Identifiers that entities originally had are not transferred to the target.
 Instead, the loader maps remote identifiers to local ones while restoring a
-snapshot. Because of that, this kind of loader offers a way to update
-automatically identifiers that are part of components (as an example, as data
-members or gathered in a container).<br/>
+snapshot. Wrapping the archive is a conveninent way of updating identifiers that
+are part of components automatically (see the example below).<br/>
 Another difference with the snapshot loader is that the continuous loader has an
 internal state that must persist over time. Therefore, there is no reason to
 limit its lifetime to that of a temporary object:
@@ -1108,11 +1107,20 @@ limit its lifetime to that of a temporary object:
 entt::continuous_loader loader{registry};
 input_archive input;
 
+auto archive = [&loader, &input](auto &value) {
+    input(value);
+
+    if constexpr(std::is_same_v<std::remove_reference_t<decltype(value)>, dirty_component>) {
+        value.parent = loader.map(value.parent);
+        value.child = loader.map(value.child);
+    }
+};
+
 loader
     .get<entt::entity>(input)
     .get<a_component>(input)
     .get<another_component>(input)
-    .get<dirty_component, &dirty_component::parent, &dirty_component::child>(input)
+    .get<dirty_component>(input)
     .orphans();
 ```
 
@@ -1125,11 +1133,9 @@ When _getting_ an entity type, a loader restores groups of entities and maps
 each entity to a local counterpart when required. For each remote identifier not
 yet registered by the loader, a local identifier is created so as to keep the
 local entity in sync with the remote one.<br/>
-In all other cases, entities and components are restored in a given storage. In
-case the component contains entities itself (either as data members of type
-`entt::entity` or in a container), the loader can update them automatically.
-To do that, it's enough to specify the data members to update as shown in the
-example. Named pools are supported too:
+In all other cases, entities and components are restored in a given storage. If
+the registry doesn't contain the entity, it's also tracked accordingly. As for
+the snapshot class, named pools are supported too:
 
 ```cpp
 loader.get<a_component>(input, "other"_hs);
