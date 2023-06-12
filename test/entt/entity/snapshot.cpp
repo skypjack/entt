@@ -14,6 +14,10 @@
 
 struct empty {};
 
+struct shadow {
+    entt::entity target{entt::null};
+};
+
 TEST(BasicSnapshot, Constructors) {
     static_assert(!std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>);
     static_assert(!std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>);
@@ -654,6 +658,59 @@ TEST(BasicContinuousLoader, GetType) {
     ASSERT_TRUE(storage.contains(loader.map(entities[1u])));
     ASSERT_EQ(storage.get(loader.map(entities[0u])), values[0u]);
     ASSERT_EQ(storage.get(loader.map(entities[1u])), values[1u]);
+}
+
+TEST(BasicContinuousLoader, GetTypeExtended) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_continuous_loader loader{registry};
+    const auto &storage = registry.storage<shadow>();
+
+    std::vector<entt::any> data{};
+    const entt::entity entities[2u]{traits_type::construct(0u, 1u), traits_type::construct(1u, 1u)};
+    const shadow value{entities[0u]};
+
+    auto archive = [&loader, &data, pos = 0u](auto &value) mutable {
+        value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]);
+
+        if constexpr(std::is_same_v<std::remove_reference_t<decltype(value)>, shadow>) {
+            value.target = loader.map(value.target);
+        }
+    };
+
+    ASSERT_FALSE(loader.contains(entities[0u]));
+    ASSERT_FALSE(loader.contains(entities[1u]));
+
+    ASSERT_FALSE(registry.valid(loader.map(entities[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+
+    data.emplace_back(entities[0u]);
+    data.emplace_back(entities[1u]);
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(entities[1u]);
+    data.emplace_back(value);
+
+    loader.get<entt::entity>(archive);
+    loader.get<shadow>(archive);
+
+    ASSERT_TRUE(loader.contains(entities[0u]));
+    ASSERT_TRUE(loader.contains(entities[1u]));
+
+    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
+    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
+
+    ASSERT_FALSE(registry.valid(entities[0u]));
+    ASSERT_FALSE(registry.valid(entities[1u]));
+
+    ASSERT_EQ(storage.size(), 1u);
+    ASSERT_TRUE(storage.contains(loader.map(entities[1u])));
+    ASSERT_EQ(storage.get(loader.map(entities[1u])).target, loader.map(entities[0u]));
 }
 
 TEST(BasicContinuousLoader, GetEmptyType) {
