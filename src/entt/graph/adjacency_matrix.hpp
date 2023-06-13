@@ -258,7 +258,7 @@ public:
     [[nodiscard]] iterable_adaptor<out_edge_iterator> out_edges(const vertex_type vertex) const noexcept {
         const auto it = matrix.cbegin();
         const auto from = vertex * vert;
-        const auto to = vertex * vert + vert;
+        const auto to = from + vert;
         return {{it, vert, from, to, 1u}, {it, vert, to, to, 1u}};
     }
 
@@ -270,7 +270,7 @@ public:
     [[nodiscard]] iterable_adaptor<in_edge_iterator> in_edges(const vertex_type vertex) const noexcept {
         const auto it = matrix.cbegin();
         const auto from = vertex;
-        const auto to = vert * (vert - 1u) + vertex;
+        const auto to = vert * vert + from;
         return {{it, vert, from, to, vert}, {it, vert, to, to, vert}};
     }
 
