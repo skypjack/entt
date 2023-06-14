@@ -2,6 +2,7 @@
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 
 template<typename Type, typename Entity>

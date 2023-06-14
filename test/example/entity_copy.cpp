@@ -4,6 +4,8 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
 #include <entt/meta/factory.hpp>
+#include <entt/meta/meta.hpp>
+#include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 
 enum class my_entity : entt::id_type {};
