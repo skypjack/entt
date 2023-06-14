@@ -41,7 +41,7 @@ TEST(BasicSnapshot, GetEntityType) {
     const auto &storage = registry.storage<entt::entity>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data](auto &&value) { data.emplace_back(std::forward<decltype(value)>(value)); };
+    auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
 
     snapshot.get<entt::entity>(archive);
 
@@ -95,7 +95,7 @@ TEST(BasicSnapshot, GetType) {
     registry.destroy(entities[1u]);
 
     std::vector<entt::any> data{};
-    auto archive = [&data](auto &&value) { data.emplace_back(std::forward<decltype(value)>(value)); };
+    auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
 
     snapshot.get<int>(archive, "other"_hs);
 
@@ -140,7 +140,7 @@ TEST(BasicSnapshot, GetEmptyType) {
     registry.destroy(entities[1u]);
 
     std::vector<entt::any> data{};
-    auto archive = [&data](auto &&value) { data.emplace_back(std::forward<decltype(value)>(value)); };
+    auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
 
     snapshot.get<empty>(archive, "other"_hs);
 
@@ -179,7 +179,7 @@ TEST(BasicSnapshot, GetTypeSparse) {
     registry.destroy(entities[1u]);
 
     std::vector<entt::any> data{};
-    auto archive = [&data](auto &&value) { data.emplace_back(std::forward<decltype(value)>(value)); };
+    auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
 
     snapshot.get<int>(archive, std::begin(entities), std::end(entities), "other"_hs);
 
@@ -235,7 +235,7 @@ TEST(BasicSnapshotLoader, GetEntityType) {
     const auto &storage = registry.storage<entt::entity>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[3u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u), traits_type::construct(1u, 1u)};
 
     ASSERT_FALSE(registry.valid(entities[0u]));
@@ -286,7 +286,7 @@ TEST(BasicSnapshotLoader, GetType) {
     const auto &storage = registry.storage<int>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int values[2u]{1, 3};
 
@@ -334,7 +334,7 @@ TEST(BasicSnapshotLoader, GetEmptyType) {
     const auto &storage = registry.storage<empty>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
 
     ASSERT_FALSE(registry.valid(entities[0u]));
@@ -375,7 +375,7 @@ TEST(BasicSnapshotLoader, GetTypeSparse) {
     const auto &storage = registry.storage<int>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int values[2u]{1, 3};
 
@@ -425,7 +425,7 @@ TEST(BasicSnapshotLoader, Orphans) {
     entt::basic_snapshot_loader loader{registry};
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int value = 42;
 
@@ -477,7 +477,7 @@ TEST(BasicContinuousLoader, GetEntityType) {
     const auto &storage = registry.storage<entt::entity>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[3u]{traits_type::construct(1u, 0u), traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
 
     ASSERT_FALSE(registry.valid(entities[0u]));
@@ -612,7 +612,7 @@ TEST(BasicContinuousLoader, GetType) {
     const auto &storage = registry.storage<int>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int values[2u]{1, 3};
 
@@ -672,11 +672,11 @@ TEST(BasicContinuousLoader, GetTypeExtended) {
     const entt::entity entities[2u]{traits_type::construct(0u, 1u), traits_type::construct(1u, 1u)};
     const shadow value{entities[0u]};
 
-    auto archive = [&loader, &data, pos = 0u](auto &value) mutable {
-        value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]);
+    auto archive = [&loader, &data, pos = 0u](auto &elem) mutable {
+        elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]);
 
-        if constexpr(std::is_same_v<std::remove_reference_t<decltype(value)>, shadow>) {
-            value.target = loader.map(value.target);
+        if constexpr(std::is_same_v<std::remove_reference_t<decltype(elem)>, shadow>) {
+            elem.target = loader.map(elem.target);
         }
     };
 
@@ -722,7 +722,7 @@ TEST(BasicContinuousLoader, GetEmptyType) {
     const auto &storage = registry.storage<empty>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
 
     ASSERT_FALSE(loader.contains(entities[0u]));
@@ -772,7 +772,7 @@ TEST(BasicContinuousLoader, GetTypeSparse) {
     const auto &storage = registry.storage<int>();
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int values[2u]{1, 3};
 
@@ -838,7 +838,7 @@ TEST(BasicContinuousLoader, Orphans) {
     entt::basic_continuous_loader loader{registry};
 
     std::vector<entt::any> data{};
-    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
     const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int value = 42;
 
