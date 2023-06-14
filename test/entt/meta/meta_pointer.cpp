@@ -2,9 +2,11 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/meta/adl_pointer.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/pointer.hpp>
 #include <entt/meta/resolve.hpp>
+#include <entt/meta/type_traits.hpp>
 #include "../common/config.h"
 
 template<typename Type>

@@ -4,8 +4,10 @@
 #include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/locator/locator.hpp>
+#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
+#include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 
 struct base_t {

@@ -3,6 +3,7 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/template.hpp>
+#include <entt/meta/type_traits.hpp>
 
 template<typename>
 struct function_type;

@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/type_traits.hpp>
 #include <entt/meta/meta.hpp>
+#include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/utility.hpp>
 #include "../common/config.h"
