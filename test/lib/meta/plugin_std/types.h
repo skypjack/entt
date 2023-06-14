@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
+#include <entt/meta/context.hpp>
 #include <entt/meta/meta.hpp>
 
 template<typename>

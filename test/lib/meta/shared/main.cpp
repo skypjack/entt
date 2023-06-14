@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <entt/core/attribute.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
+#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
