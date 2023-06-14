@@ -6,6 +6,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/resource/cache.hpp>
 #include <entt/resource/loader.hpp>
+#include <entt/resource/resource.hpp>
 #include "../common/throwing_allocator.hpp"
 
 struct broken_tag {};
