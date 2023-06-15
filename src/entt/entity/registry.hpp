@@ -457,14 +457,6 @@ public:
     }
 
     /**
-     * @brief Returns the number of entities created so far.
-     * @return Number of entities created so far.
-     */
-    [[deprecated("use .storage<Entity>().size() instead")]] [[nodiscard]] size_type size() const noexcept {
-        return entities.size();
-    }
-
-    /**
      * @brief Returns the number of entities still in use.
      * @return Number of entities still in use.
      */

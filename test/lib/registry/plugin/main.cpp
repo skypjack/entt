@@ -19,7 +19,7 @@ TEST(Lib, Registry) {
     cr_plugin_update(ctx);
 
     ASSERT_EQ(registry.storage<position>().size(), registry.storage<velocity>().size());
-    ASSERT_EQ(registry.storage<position>().size(), registry.size());
+    ASSERT_EQ(registry.storage<position>().size(), registry.storage<entt::entity>().size());
 
     registry.view<position>().each([](auto entity, auto &position) {
         ASSERT_EQ(position.x, static_cast<int>(entt::to_integral(entity) + 16u));
