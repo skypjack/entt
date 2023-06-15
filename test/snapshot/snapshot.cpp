@@ -64,21 +64,23 @@ TEST(Snapshot, Full) {
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
+
         entt::snapshot{source}
-            .entities(output)
-            .component<position>(output)
-            .component<timer>(output)
-            .component<relationship>(output)
-            .component<entt::tag<"empty"_hs>>(output);
+            .get<entt::entity>(output)
+            .get<position>(output)
+            .get<timer>(output)
+            .get<relationship>(output)
+            .get<entt::tag<"empty"_hs>>(output);
     }
 
     cereal::JSONInputArchive input{storage};
+
     entt::snapshot_loader{destination}
-        .entities(input)
-        .component<position>(input)
-        .component<timer>(input)
-        .component<relationship>(input)
-        .component<entt::tag<"empty"_hs>>(input);
+        .get<entt::entity>(input)
+        .get<position>(input)
+        .get<timer>(input)
+        .get<relationship>(input)
+        .get<entt::tag<"empty"_hs>>(input);
 
     ASSERT_TRUE(destination.valid(e0));
     ASSERT_TRUE(destination.all_of<position>(e0));
@@ -139,22 +141,32 @@ TEST(Snapshot, Continuous) {
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
+
         entt::snapshot{source}
-            .component<entt::entity>(output)
-            .component<position>(output)
-            .component<relationship>(output)
-            .component<timer>(output)
-            .component<entt::tag<"empty"_hs>>(output);
+            .get<entt::entity>(output)
+            .get<position>(output)
+            .get<relationship>(output)
+            .get<timer>(output)
+            .get<entt::tag<"empty"_hs>>(output);
     }
 
     cereal::JSONInputArchive input{storage};
     entt::continuous_loader loader{destination};
+
+    auto archive = [&input, &loader](auto &value) {
+        input(value);
+
+        if constexpr(std::is_same_v<std::remove_reference_t<decltype(value)>, relationship>) {
+            value.parent = loader.map(value.parent);
+        }
+    };
+
     loader
-        .entities(input)
-        .component<position>(input)
-        .component<relationship>(input, &relationship::parent)
-        .component<timer>(input)
-        .component<entt::tag<"empty"_hs>>(input);
+        .get<entt::entity>(input)
+        .get<position>(input)
+        .get<relationship>(archive)
+        .get<timer>(input)
+        .get<entt::tag<"empty"_hs>>(input);
 
     ASSERT_FALSE(destination.valid(e0));
     ASSERT_TRUE(loader.contains(e0));
