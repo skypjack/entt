@@ -1,5 +1,5 @@
-<map id="entt::basic_observer&lt; Registry &gt;" name="entt::basic_observer&lt; Registry &gt;">
-<area shape="rect" id="node1" title="Observer." alt="" coords="459,35,597,76"/>
-<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title=" " alt="" coords="248,27,411,83"/>
-<area shape="rect" id="node3" href="$classentt_1_1basic__sparse__set.html" title=" " alt="" coords="5,5,200,105"/>
+<map id="entt::basic_observer&lt; Registry, Mask, Allocator &gt;" name="entt::basic_observer&lt; Registry, Mask, Allocator &gt;">
+<area shape="rect" id="node1" title="Observer." alt="" coords="5,196,199,236"/>
+<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title=" " alt="" coords="21,93,183,148"/>
+<area shape="rect" id="node3" href="$classentt_1_1basic__sparse__set.html" title="Basic sparse set implementation." alt="" coords="20,5,184,45"/>
 </map>

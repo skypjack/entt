@@ -1,6 +1,29 @@
-/*---------------- Search Box */
+/*---------------- Search Box positioning */
+
+#main-menu > li:last-child {
+    /* This <li> object is the parent of the search bar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 36px;
+    margin-right: 1em;
+}
+
+/*---------------- Search box styling */
+
+.SRPage * {
+    font-weight: normal;
+    line-height: normal;
+}
+
+dark-mode-toggle {
+    margin-left: 5px;
+    display: flex;
+    float: right;
+}
 
 #MSearchBox {
+    display: inline-block;
     white-space : nowrap;
     background: white;
     border-radius: 0.65em;
@@ -17,10 +40,23 @@
 #MSearchSelect {
     display: inline-block;
     vertical-align: middle;
+    width: 20px;
     height: 19px;
-    padding: 0 0 0 0.3em;
-    margin: 0;
+    background-image: url('mag_sel.svg');
+    margin: 0 0 0 0.3em;
+    padding: 0;
 }
+
+#MSearchSelectExt {
+    display: inline-block;
+    vertical-align: middle;
+    width: 10px;
+    height: 19px;
+    background-image: url('mag.svg');
+    margin: 0 0 0 0.5em;
+    padding: 0;
+}
+
 
 #MSearchField {
     display: inline-block;
@@ -33,7 +69,7 @@
     border:none;
     color: #909090;
     outline: none;
-    font-family: Arial, Verdana, sans-serif;
+    font-family: Arial,Verdana,sans-serif;
     -webkit-border-radius: 0px;
     border-radius: 0px;
     background: none;
@@ -65,23 +101,15 @@
 }
 
 #MSearchCloseImg {
-    height: 1.4em;
     padding: 0.3em;
     margin: 0;
 }
 
 .MSearchBoxActive #MSearchField {
-    color: #000000;
+    color: black;
 }
 
-#main-menu > li:last-child {
-    /* This <li> object is the parent of the search bar */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 36px;
-    margin-right: 1em;
-}
+
 
 /*---------------- Search filter selection */
 
@@ -103,7 +131,7 @@
 }
 
 .SelectItem {
-    font: 8pt Arial, Verdana, sans-serif;
+    font: 8pt Arial,Verdana,sans-serif;
     padding-left:  2px;
     padding-right: 12px;
     border: 0px;
@@ -111,7 +139,7 @@
 
 span.SelectionMark {
     margin-right: 4px;
-    font-family: monospace;
+    font-family: monospace,fixed;
     outline-style: none;
     text-decoration: none;
 }
@@ -119,7 +147,7 @@ span.SelectionMark {
 a.SelectItem {
     display: block;
     outline-style: none;
-    color: #000000; 
+    color: black;
     text-decoration: none;
     padding-left:   6px;
     padding-right: 12px;
@@ -127,13 +155,13 @@ a.SelectItem {
 
 a.SelectItem:focus,
 a.SelectItem:active {
-    color: #000000; 
+    color: black;
     outline-style: none;
     text-decoration: none;
 }
 
 a.SelectItem:hover {
-    color: #FFFFFF;
+    color: white;
     background-color: #3D578C;
     outline-style: none;
     text-decoration: none;
@@ -152,9 +180,12 @@ iframe#MSearchResults {
     display: none;
     position: absolute;
     left: 0; top: 0;
-    border: 1px solid #000;
+    border: 1px solid black;
     background-color: #EEF1F7;
     z-index:10000;
+    width: 300px;
+    height: 400px;
+    overflow: auto;
 }
 
 /* ----------------------------------- */
@@ -162,7 +193,6 @@ iframe#MSearchResults {
 
 #SRIndex {
     clear:both; 
-    padding-bottom: 15px;
 }
 
 .SREntry {
@@ -175,8 +205,9 @@ iframe#MSearchResults {
     padding: 1px 5px;
 }
 
-body.SRPage {
+div.SRPage {
     margin: 5px 2px;
+    background-color: #EEF1F7;
 }
 
 .SRChildren {
@@ -188,17 +219,18 @@ body.SRPage {
 }
 
 .SRSymbol {
-    font-weight: bold; 
+    font-weight: bold;
     color: #425E97;
-    font-family: Arial, Verdana, sans-serif;
+    font-family: Arial,Verdana,sans-serif;
     text-decoration: none;
     outline: none;
 }
 
 a.SRScope {
     display: block;
-    color: #425E97; 
-    font-family: Arial, Verdana, sans-serif;
+    color: #425E97;
+    font-family: Arial,Verdana,sans-serif;
+    font-size: 8pt;
     text-decoration: none;
     outline: none;
 }
@@ -210,14 +242,14 @@ a.SRScope:focus, a.SRScope:active {
 
 span.SRScope {
     padding-left: 4px;
-    font-family: Arial, Verdana, sans-serif;
+    font-family: Arial,Verdana,sans-serif;
 }
 
 .SRPage .SRStatus {
     padding: 2px 5px;
     font-size: 8pt;
     font-style: italic;
-    font-family: Arial, Verdana, sans-serif;
+    font-family: Arial,Verdana,sans-serif;
 }
 
 .SRResult {
@@ -230,10 +262,6 @@ div.searchresults {
 }
 
 /*---------------- External search page results */
-
-.searchresult {
-    background-color: #F0F3F8;
-}
 
 .pages b {
    color: white;

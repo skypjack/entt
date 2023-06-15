@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['reserved_0',['reserved',['../classentt_1_1entt__traits.html#a376f015afde8d69c3e6f52a5da9429d1',1,'entt::entt_traits']]]
+  ['size_0',['size',['../structentt_1_1type__list.html#a430c0675bdbcbb40be9b8f13f7259484',1,'entt::type_list::size()'],['../structentt_1_1value__list.html#a26bdc12c949cf22068f1bd411acf6cc7',1,'entt::value_list::size()']]],
+  ['size_5fof_5fv_1',['size_of_v',['../namespaceentt.html#a15f9a70cbdd5a64f897a012ab2b5834f',1,'entt']]]
 ];

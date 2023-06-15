@@ -1,0 +1,6 @@
+<map id="entt::basic_sparse_set&lt; Entity, Allocator &gt;" name="entt::basic_sparse_set&lt; Entity, Allocator &gt;">
+<area shape="rect" id="node1" title="Basic sparse set implementation." alt="" coords="5,49,169,89"/>
+<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title=" " alt="" coords="227,5,389,60"/>
+<area shape="rect" id="node4" href="$classentt_1_1basic__storage_3_01Entity_00_01Entity_00_01Allocator_01_4.html" title="Swap&#45;only entity storage specialization." alt="" coords="217,85,399,125"/>
+<area shape="rect" id="node3" href="$classentt_1_1basic__observer.html" title="Observer." alt="" coords="447,13,640,53"/>
+</map>

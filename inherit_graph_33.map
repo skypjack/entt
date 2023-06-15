@@ -1,3 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1basic__view_3_01get__t_3_01Get_01_4_00_01exclude__t_3_4_00_01std_1_1void__t_3_01std94c1472c52e119e81095a53d4557cdae.html" title="Single component view specialization." alt="" coords="5,5,205,105"/>
+<area shape="rect" id="node1" href="$classentt_1_1basic__sparse__set.html" title="Basic sparse set implementation." alt="" coords="5,49,169,89"/>
+<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title=" " alt="" coords="227,5,389,60"/>
+<area shape="rect" id="node4" href="$classentt_1_1basic__storage_3_01Entity_00_01Entity_00_01Allocator_01_4.html" title="Swap&#45;only entity storage specialization." alt="" coords="217,85,399,125"/>
+<area shape="rect" id="node3" href="$classentt_1_1basic__observer.html" title="Observer." alt="" coords="447,13,640,53"/>
 </map>

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['size_0',['size',['../structentt_1_1type__list.html#a430c0675bdbcbb40be9b8f13f7259484',1,'entt::type_list::size()'],['../structentt_1_1value__list.html#a26bdc12c949cf22068f1bd411acf6cc7',1,'entt::value_list::size()']]],
-  ['size_5fof_5fv_1',['size_of_v',['../namespaceentt.html#a15f9a70cbdd5a64f897a012ab2b5834f',1,'entt']]]
+  ['tombstone_0',['tombstone',['../namespaceentt.html#a674269102fdfe3fd6d7766210a828862',1,'entt']]],
+  ['type_5flist_5fcontains_5fv_1',['type_list_contains_v',['../namespaceentt.html#a988ce063936d499bf2d69406c391fd5c',1,'entt']]],
+  ['type_5flist_5findex_5fv_2',['type_list_index_v',['../namespaceentt.html#a3a9e46d106b526d281a35901da1edea6',1,'entt']]]
 ];

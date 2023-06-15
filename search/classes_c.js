@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['radix_5fsort_0',['radix_sort',['../structentt_1_1radix__sort.html',1,'entt']]],
-  ['resource_1',['resource',['../classentt_1_1resource.html',1,'entt']]],
-  ['resource_5fcache_2',['resource_cache',['../classentt_1_1resource__cache.html',1,'entt']]],
-  ['resource_5floader_3',['resource_loader',['../structentt_1_1resource__loader.html',1,'entt']]]
+  ['poly_5fbase_0',['poly_base',['../structentt_1_1poly__base.html',1,'entt']]],
+  ['poly_5finspector_1',['poly_inspector',['../structentt_1_1poly__inspector.html',1,'entt']]],
+  ['poly_5fvtable_2',['poly_vtable',['../classentt_1_1poly__vtable.html',1,'entt']]],
+  ['process_3',['process',['../classentt_1_1process.html',1,'entt']]],
+  ['process_3c_20process_5fadaptor_3c_20func_2c_20delta_20_3e_2c_20delta_20_3e_4',['process&lt; process_adaptor&lt; Func, Delta &gt;, Delta &gt;',['../classentt_1_1process.html',1,'entt']]],
+  ['process_5fadaptor_5',['process_adaptor',['../structentt_1_1process__adaptor.html',1,'entt']]]
 ];
