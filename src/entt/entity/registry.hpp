@@ -457,14 +457,6 @@ public:
     }
 
     /**
-     * @brief Increases the capacity (number of entities) of the registry.
-     * @param cap Desired capacity.
-     */
-    [[deprecated("use .storage<Entity>().reserve(cap) instead")]] void reserve(const size_type cap) {
-        entities.reserve(cap);
-    }
-
-    /**
      * @brief Returns the number of entities that a registry has currently
      * allocated space for.
      * @return Capacity of the registry.
