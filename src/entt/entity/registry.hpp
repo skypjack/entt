@@ -482,14 +482,6 @@ public:
     }
 
     /**
-     * @brief Checks whether the registry is empty (no entities still in use).
-     * @return True if the registry is empty, false otherwise.
-     */
-    [[deprecated("use .storage<Entity>().in_use() instead")]] [[nodiscard]] bool empty() const {
-        return !alive();
-    }
-
-    /**
      * @brief Direct access to the list of entities of a registry.
      *
      * The returned pointer is such that range `[data(), data() + size())` is

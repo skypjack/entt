@@ -245,7 +245,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.alive(), 0u);
     ASSERT_NO_FATAL_FAILURE(registry.reserve(42));
     ASSERT_EQ(registry.capacity(), 42u);
-    ASSERT_TRUE(registry.empty());
+    ASSERT_TRUE(registry.storage<entt::entity>().empty());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
@@ -325,7 +325,7 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
     ASSERT_EQ(registry.alive(), 3u);
-    ASSERT_FALSE(registry.empty());
+    ASSERT_NE(registry.storage<entt::entity>().in_use(), 0u);
 
     ASSERT_EQ(traits_type::to_version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 0u);
@@ -339,13 +339,14 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
     ASSERT_EQ(registry.alive(), 2u);
-    ASSERT_FALSE(registry.empty());
+    ASSERT_NE(registry.storage<entt::entity>().in_use(), 0u);
 
     ASSERT_NO_FATAL_FAILURE(registry.clear());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
     ASSERT_EQ(registry.alive(), 0u);
-    ASSERT_TRUE(registry.empty());
+    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
+    ASSERT_FALSE(registry.storage<entt::entity>().empty());
 
     const auto e3 = registry.create();
 
@@ -391,8 +392,8 @@ TEST(Registry, Constructors) {
     entt::registry registry;
     entt::registry other{42};
 
-    ASSERT_TRUE(registry.empty());
-    ASSERT_TRUE(other.empty());
+    ASSERT_TRUE(registry.storage<entt::entity>().empty());
+    ASSERT_TRUE(other.storage<entt::entity>().empty());
 
     ASSERT_EQ(registry.released(), 0u);
     ASSERT_EQ(other.released(), 0u);
