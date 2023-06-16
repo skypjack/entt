@@ -457,15 +457,6 @@ public:
     }
 
     /**
-     * @brief Returns the number of entities that a registry has currently
-     * allocated space for.
-     * @return Capacity of the registry.
-     */
-    [[deprecated("use .storage<Entity>().capacity() instead")]] [[nodiscard]] size_type capacity() const noexcept {
-        return entities.capacity();
-    }
-
-    /**
      * @brief Direct access to the list of entities of a registry.
      *
      * The returned pointer is such that range `[data(), data() + size())` is

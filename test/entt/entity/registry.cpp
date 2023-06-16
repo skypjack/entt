@@ -244,7 +244,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.storage<entt::entity>().size(), 0u);
     ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
     ASSERT_NO_FATAL_FAILURE(registry.storage<entt::entity>().reserve(42));
-    ASSERT_EQ(registry.capacity(), 42u);
+    ASSERT_EQ(registry.storage<entt::entity>().capacity(), 42u);
     ASSERT_TRUE(registry.storage<entt::entity>().empty());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
