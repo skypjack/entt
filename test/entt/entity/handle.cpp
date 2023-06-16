@@ -218,9 +218,9 @@ TEST(BasicHandle, Lifetime) {
     ASSERT_FALSE(registry.storage<int>().empty());
     ASSERT_NE(registry.storage<entt::entity>().in_use(), 0u);
 
-    registry.each([handle](const auto e) {
-        ASSERT_EQ(handle->entity(), e);
-    });
+    for(auto [entt]: registry.storage<entt::entity>().each()) {
+        ASSERT_EQ(handle->entity(), entt);
+    }
 
     delete handle;
 

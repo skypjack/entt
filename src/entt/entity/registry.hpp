@@ -1047,27 +1047,6 @@ public:
     }
 
     /**
-     * @brief Iterates all the entities that are still in use.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const Entity);
-     * @endcode
-     *
-     * It's not defined whether entities created during iteration are returned.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    [[deprecated("use .storage<Entity>().each() instead")]] void each(Func func) const {
-        for(auto [entt]: entities.each()) {
-            func(entt);
-        }
-    }
-
-    /**
      * @brief Checks if an entity has components assigned.
      * @param entt A valid identifier.
      * @return True if the entity has no components assigned, false otherwise.

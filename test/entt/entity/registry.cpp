@@ -648,7 +648,7 @@ TEST(Registry, CreateDestroyReleaseCornerCase) {
     registry.destroy(e0);
     registry.release(e1);
 
-    registry.each([](auto) { FAIL(); });
+    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
 
     ASSERT_EQ(registry.current(e0), 1u);
     ASSERT_EQ(registry.current(e1), 1u);
@@ -895,59 +895,6 @@ TEST(Registry, TombstoneVersion) {
     ASSERT_NE(registry.create(required), required);
 }
 
-TEST(Registry, Each) {
-    entt::registry registry;
-    entt::registry::size_type tot;
-    entt::registry::size_type match;
-
-    static_cast<void>(registry.create());
-    registry.emplace<int>(registry.create());
-    static_cast<void>(registry.create());
-    registry.emplace<int>(registry.create());
-    static_cast<void>(registry.create());
-
-    tot = 0u;
-    match = 0u;
-
-    registry.each([&](auto entity) {
-        match += registry.all_of<int>(entity);
-        static_cast<void>(registry.create());
-        ++tot;
-    });
-
-    ASSERT_EQ(tot, 5u);
-    ASSERT_EQ(match, 2u);
-
-    tot = 0u;
-    match = 0u;
-
-    registry.each([&](auto entity) {
-        if(registry.all_of<int>(entity)) {
-            registry.destroy(entity);
-            ++match;
-        }
-
-        ++tot;
-    });
-
-    ASSERT_EQ(tot, 10u);
-    ASSERT_EQ(match, 2u);
-
-    tot = 0u;
-    match = 0u;
-
-    registry.each([&](auto entity) {
-        match += registry.all_of<int>(entity);
-        registry.destroy(entity);
-        ++tot;
-    });
-
-    ASSERT_EQ(tot, 8u);
-    ASSERT_EQ(match, 0u);
-
-    registry.each([&](auto) { FAIL(); });
-}
-
 TEST(Registry, Orphans) {
     entt::registry registry;
     entt::entity entities[3u]{};
@@ -956,16 +903,16 @@ TEST(Registry, Orphans) {
     registry.emplace<int>(entities[0u]);
     registry.emplace<int>(entities[2u]);
 
-    registry.each([&](const auto entt) {
+    for(auto [entt]: registry.storage<entt::entity>().each()) {
         ASSERT_TRUE(entt != entities[1u] || registry.orphan(entt));
-    });
+    }
 
     registry.erase<int>(entities[0u]);
     registry.erase<int>(entities[2u]);
 
-    registry.each([&](const auto entt) {
+    for(auto [entt]: registry.storage<entt::entity>().each()) {
         ASSERT_TRUE(registry.orphan(entt));
-    });
+    }
 }
 
 TEST(Registry, View) {

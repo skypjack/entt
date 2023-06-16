@@ -63,23 +63,25 @@ void pathological_with(Func func) {
     }
 
     for(auto i = 0; i < 10; ++i) {
-        registry.each([i = 0, &registry](const auto entity) mutable {
-            if(!(++i % 7)) {
+        auto curr = 0;
+
+        for(auto [entity]: registry.storage<entt::entity>().each()) {
+            if(!(++curr % 7)) {
                 registry.remove<position>(entity);
             }
 
-            if(!(++i % 11)) {
+            if(!(++curr % 11)) {
                 registry.remove<velocity>(entity);
             }
 
-            if(!(++i % 13)) {
+            if(!(++curr % 13)) {
                 registry.remove<comp<0>>(entity);
             }
 
-            if(!(++i % 17)) {
+            if(!(++curr % 17)) {
                 registry.destroy(entity);
             }
-        });
+        }
 
         for(std::uint64_t j = 0; j < 50000L; j++) {
             const auto entity = registry.create();
