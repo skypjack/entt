@@ -1372,7 +1372,7 @@ Finally, when the user asks the registry for an iterable object to visit all the
 storage elements inside it as follows:
 
 ```cpp
-for(auto [id, storage]: registry.each()) {
+for(auto [id, storage]: registry.storage()) {
     // ...
 }
 ```
