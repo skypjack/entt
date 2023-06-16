@@ -242,7 +242,7 @@ TEST(Registry, Functionalities) {
     ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = registry.get_allocator());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 0u);
-    ASSERT_EQ(registry.alive(), 0u);
+    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
     ASSERT_NO_FATAL_FAILURE(registry.reserve(42));
     ASSERT_EQ(registry.capacity(), 42u);
     ASSERT_TRUE(registry.storage<entt::entity>().empty());
@@ -324,8 +324,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(static_cast<const entt::registry &>(registry).get<int>(e1), 1);
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
-    ASSERT_EQ(registry.alive(), 3u);
-    ASSERT_NE(registry.storage<entt::entity>().in_use(), 0u);
+    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 3u);
 
     ASSERT_EQ(traits_type::to_version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 0u);
@@ -338,13 +337,11 @@ TEST(Registry, Functionalities) {
     ASSERT_FALSE(registry.valid(e2));
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
-    ASSERT_EQ(registry.alive(), 2u);
-    ASSERT_NE(registry.storage<entt::entity>().in_use(), 0u);
+    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 2u);
 
     ASSERT_NO_FATAL_FAILURE(registry.clear());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
-    ASSERT_EQ(registry.alive(), 0u);
     ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
     ASSERT_FALSE(registry.storage<entt::entity>().empty());
 

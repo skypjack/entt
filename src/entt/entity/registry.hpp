@@ -457,14 +457,6 @@ public:
     }
 
     /**
-     * @brief Returns the number of entities still in use.
-     * @return Number of entities still in use.
-     */
-    [[deprecated("use .storage<Entity>().in_use() instead")]] [[nodiscard]] size_type alive() const {
-        return entities.in_use();
-    }
-
-    /**
      * @brief Increases the capacity (number of entities) of the registry.
      * @param cap Desired capacity.
      */
