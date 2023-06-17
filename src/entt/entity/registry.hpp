@@ -457,22 +457,6 @@ public:
     }
 
     /**
-     * @brief Direct access to the list of entities of a registry.
-     *
-     * The returned pointer is such that range `[data(), data() + size())` is
-     * always a valid range, even if the registry is empty.
-     *
-     * @warning
-     * This list contains both valid and destroyed entities and isn't suitable
-     * for direct use.
-     *
-     * @return A pointer to the array of entities.
-     */
-    [[deprecated("use .storage<Entity>().data() instead")]] [[nodiscard]] const entity_type *data() const noexcept {
-        return entities.data();
-    }
-
-    /**
      * @brief Returns the number of released entities.
      * @return The number of released entities.
      */

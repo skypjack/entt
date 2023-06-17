@@ -496,24 +496,6 @@ TEST(Registry, Identifiers) {
     ASSERT_EQ(registry.current(invalid), traits_type::to_version(entt::tombstone));
 }
 
-TEST(Registry, Data) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
-    entt::registry registry;
-
-    ASSERT_EQ(std::as_const(registry).data(), nullptr);
-
-    const auto entity = registry.create();
-
-    ASSERT_EQ(*std::as_const(registry).data(), entity);
-
-    const auto other = registry.create();
-    registry.release(entity);
-
-    ASSERT_EQ(*std::as_const(registry).data(), other);
-    ASSERT_EQ(*(std::as_const(registry).data() + 1u), traits_type::next(entity));
-}
-
 TEST(Registry, CreateManyEntitiesAtOnce) {
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -2067,7 +2049,7 @@ TEST(Registry, AssignEntities) {
     registry.release(entities[2]);
 
     entt::registry other;
-    const auto *data = registry.data();
+    const auto *data = registry.storage<entt::entity>().data();
     other.assign(data, data + registry.storage<entt::entity>().size(), registry.released());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), other.storage<entt::entity>().size());
