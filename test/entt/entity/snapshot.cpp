@@ -11,11 +11,16 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
+#include <entt/signal/sigh.hpp>
 
 struct empty {};
 
 struct shadow {
     entt::entity target{entt::null};
+
+    static void listener(entt::entity &elem, entt::registry &registry, const entt::entity entt) {
+        elem = registry.get<shadow>(entt).target;
+    }
 };
 
 TEST(BasicSnapshot, Constructors) {
@@ -415,6 +420,33 @@ TEST(BasicSnapshotLoader, GetTypeSparse) {
     ASSERT_TRUE(storage.contains(entities[1u]));
     ASSERT_EQ(storage.get(entities[0u]), values[0u]);
     ASSERT_EQ(storage.get(entities[1u]), values[1u]);
+}
+
+TEST(BasicSnapshotLoader, GetTypeWithListener) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_snapshot_loader loader{registry};
+    entt::entity check{entt::null};
+
+    std::vector<entt::any> data{};
+    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    const auto entity{traits_type::construct(1u, 1u)};
+    const shadow value{entity};
+
+    ASSERT_FALSE(registry.valid(entity));
+    ASSERT_EQ(check, static_cast<entt::entity>(entt::null));
+
+    registry.on_construct<shadow>().connect<&shadow::listener>(check);
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(entity);
+    data.emplace_back(value);
+
+    loader.get<shadow>(archive);
+
+    ASSERT_TRUE(registry.valid(entity));
+    ASSERT_EQ(check, entity);
 }
 
 TEST(BasicSnapshotLoader, Orphans) {
@@ -821,6 +853,33 @@ TEST(BasicContinuousLoader, GetTypeSparse) {
     ASSERT_TRUE(storage.contains(loader.map(entities[1u])));
     ASSERT_EQ(storage.get(loader.map(entities[0u])), values[0u]);
     ASSERT_EQ(storage.get(loader.map(entities[1u])), values[1u]);
+}
+
+TEST(BasicContinuousLoader, GetTypeWithListener) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    entt::basic_continuous_loader loader{registry};
+    entt::entity check{entt::null};
+
+    std::vector<entt::any> data{};
+    auto archive = [&data, pos = 0u](auto &value) mutable { value = entt::any_cast<std::remove_reference_t<decltype(value)>>(data[pos++]); };
+    const auto entity{traits_type::construct(1u, 1u)};
+    const shadow value{entity};
+
+    ASSERT_FALSE(registry.valid(loader.map(entity)));
+    ASSERT_EQ(check, static_cast<entt::entity>(entt::null));
+
+    registry.on_construct<shadow>().connect<&shadow::listener>(check);
+
+    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(entity);
+    data.emplace_back(value);
+
+    loader.get<shadow>(archive);
+
+    ASSERT_TRUE(registry.valid(loader.map(entity)));
+    ASSERT_EQ(check, entity);
 }
 
 TEST(BasicContinuousLoader, Orphans) {

@@ -222,7 +222,9 @@ public:
                     if constexpr(Registry::template storage_for_type<Type>::traits_type::page_size == 0u) {
                         storage.emplace(entity);
                     } else {
-                        archive(storage.emplace(entity));
+                        Type elem{};
+                        archive(elem);
+                        storage.emplace(entity, std::move(elem));
                     }
                 }
             }
@@ -402,7 +404,9 @@ public:
                     if constexpr(Registry::template storage_for_type<Type>::traits_type::page_size == 0u) {
                         storage.emplace(map(entt));
                     } else {
-                        archive(storage.emplace(map(entt)));
+                        Type elem{};
+                        archive(elem);
+                        storage.emplace(map(entt), std::move(elem));
                     }
                 }
             }
