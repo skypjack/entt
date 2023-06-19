@@ -2002,8 +2002,11 @@ TEST(Registry, AssignEntities) {
     registry.destroy(entities[2]);
 
     entt::registry other;
-    const auto *data = registry.storage<entt::entity>().data();
-    other.assign(data, data + registry.storage<entt::entity>().size(), registry.storage<entt::entity>().size() - registry.storage<entt::entity>().in_use());
+    auto &src = registry.storage<entt::entity>();
+    auto &dst = other.storage<entt::entity>();
+
+    dst.push(src.rbegin(), src.rend());
+    dst.in_use(src.in_use());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), other.storage<entt::entity>().size());
     ASSERT_TRUE(other.valid(entities[0]));
