@@ -387,13 +387,13 @@ TEST(Registry, Functionalities) {
 
 TEST(Registry, Constructors) {
     entt::registry registry;
-    entt::registry other{42};
+    entt::registry other{42u};
 
     ASSERT_TRUE(registry.storage<entt::entity>().empty());
     ASSERT_TRUE(other.storage<entt::entity>().empty());
 
-    ASSERT_EQ(registry.released(), 0u);
-    ASSERT_EQ(other.released(), 0u);
+    ASSERT_EQ(registry.storage().begin(), registry.storage().end());
+    ASSERT_EQ(other.storage().begin(), other.storage().end());
 }
 
 TEST(Registry, Move) {
@@ -2050,7 +2050,7 @@ TEST(Registry, AssignEntities) {
 
     entt::registry other;
     const auto *data = registry.storage<entt::entity>().data();
-    other.assign(data, data + registry.storage<entt::entity>().size(), registry.released());
+    other.assign(data, data + registry.storage<entt::entity>().size(), registry.storage<entt::entity>().size() - registry.storage<entt::entity>().in_use());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), other.storage<entt::entity>().size());
     ASSERT_TRUE(other.valid(entities[0]));

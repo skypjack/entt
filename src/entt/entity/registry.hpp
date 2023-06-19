@@ -457,14 +457,6 @@ public:
     }
 
     /**
-     * @brief Returns the number of released entities.
-     * @return The number of released entities.
-     */
-    [[deprecated("use .storage<Entity>().size() and .storage<Entity>().in_use() instead")]] [[nodiscard]] size_type released() const noexcept {
-        return (entities.size() - entities.in_use());
-    }
-
-    /**
      * @brief Checks if an identifier refers to a valid entity.
      * @param entt An identifier, either valid or not.
      * @return True if the identifier is valid, false otherwise.
