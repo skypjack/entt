@@ -535,20 +535,6 @@ public:
     }
 
     /**
-     * @brief Releases an identifier.
-     *
-     * The version is updated and the identifier can be recycled at any time.
-     *
-     * @param entt A valid identifier.
-     * @return The version of the recycled entity.
-     */
-    [[deprecated("use .orphan(entt) and .storage<Entity>().erase(entt) instead")]] version_type release(const entity_type entt) {
-        ENTT_ASSERT(orphan(entt), "Non-orphan entity");
-        entities.erase(entt);
-        return entities.current(entt);
-    }
-
-    /**
      * @brief Destroys an entity and releases its identifier.
      *
      * @warning

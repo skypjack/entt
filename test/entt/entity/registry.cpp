@@ -481,7 +481,7 @@ TEST(Registry, Identifiers) {
 
     ASSERT_EQ(traits_type::to_integral(pre), traits_type::to_entity(pre));
 
-    registry.release(pre);
+    registry.destroy(pre);
     const auto post = registry.create();
 
     ASSERT_NE(pre, post);
@@ -503,9 +503,9 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
     entt::entity entities[3];
 
     const auto entity = registry.create();
-    registry.release(registry.create());
-    registry.release(entity);
-    registry.release(registry.create());
+    registry.destroy(registry.create());
+    registry.destroy(entity);
+    registry.destroy(registry.create());
 
     registry.create(std::begin(entities), std::end(entities));
 
@@ -560,7 +560,7 @@ TEST(Registry, CreateWithHint) {
     ASSERT_TRUE(registry.valid(entt::entity{2}));
     ASSERT_EQ(e3, entt::entity{3});
 
-    registry.release(e2);
+    registry.destroy(e2);
 
     ASSERT_EQ(traits_type::to_version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 1u);
@@ -574,8 +574,8 @@ TEST(Registry, CreateWithHint) {
     ASSERT_EQ(traits_type::to_entity(e1), 2u);
     ASSERT_EQ(traits_type::to_version(e1), 0u);
 
-    registry.release(e1);
-    registry.release(e2);
+    registry.destroy(e1);
+    registry.destroy(e2);
     auto e0 = registry.create(entt::entity{0});
 
     ASSERT_EQ(e0, entt::entity{0});
@@ -628,7 +628,7 @@ TEST(Registry, CreateDestroyReleaseCornerCase) {
     const auto e1 = registry.create();
 
     registry.destroy(e0);
-    registry.release(e1);
+    registry.storage<entt::entity>().erase(e1);
 
     ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
 
@@ -1998,8 +1998,8 @@ TEST(Registry, AssignEntities) {
     entt::registry registry;
     entt::entity entities[3];
     registry.create(std::begin(entities), std::end(entities));
-    registry.release(entities[1]);
-    registry.release(entities[2]);
+    registry.destroy(entities[1]);
+    registry.destroy(entities[2]);
 
     entt::registry other;
     const auto *data = registry.storage<entt::entity>().data();
