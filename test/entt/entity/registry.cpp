@@ -814,27 +814,6 @@ ENTT_DEBUG_TEST(RegistryDeathTest, ReleaseVersion) {
     ASSERT_DEATH(registry.release(entity, 3), "");
 }
 
-TEST(Registry, ReleaseRange) {
-    entt::registry registry;
-    entt::entity entities[3u];
-
-    registry.create(std::begin(entities), std::end(entities));
-
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_TRUE(registry.valid(entities[1u]));
-    ASSERT_TRUE(registry.valid(entities[2u]));
-
-    registry.release(std::begin(entities), std::end(entities) - 1u);
-
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
-    ASSERT_TRUE(registry.valid(entities[2u]));
-
-    registry.release(std::end(entities) - 1u, std::end(entities));
-
-    ASSERT_FALSE(registry.valid(entities[2u]));
-}
-
 TEST(Registry, VersionOverflow) {
     using traits_type = entt::entt_traits<entt::entity>;
 

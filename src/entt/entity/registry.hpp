@@ -566,19 +566,6 @@ public:
     }
 
     /**
-     * @brief Releases all identifiers in a range.
-     *
-     * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename It>
-    [[deprecated("use .orphan(entt) and .storage<Entity>().erase(first, last) instead")]] void release(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return orphan(entt); }), "Non-orphan entity");
-        entities.erase(std::move(first), std::move(last));
-    }
-
-    /**
      * @brief Destroys an entity and releases its identifier.
      *
      * @warning
