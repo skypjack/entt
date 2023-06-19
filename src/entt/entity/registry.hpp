@@ -511,30 +511,6 @@ public:
     }
 
     /**
-     * @brief Assigns identifiers to an empty registry.
-     *
-     * This function is intended for use in conjunction with `data`, `size` and
-     * `released`.<br/>
-     * Don't try to inject ranges of randomly generated entities nor the _wrong_
-     * head for the list of destroyed entities. There is no guarantee that a
-     * registry will continue to work properly in this case.
-     *
-     * @warning
-     * There must be no entities still alive for this to work properly.
-     *
-     * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     * @param destroyed The number of released entities.
-     */
-    template<typename It>
-    [[deprecated("use .storage<Entity>().push(first, last) and .storage<Entity>().in_use(len) instead")]] void assign(It first, It last, const size_type destroyed) {
-        ENTT_ASSERT(!entities.in_use(), "Non-empty registry");
-        entities.push(first, last);
-        entities.in_use(entities.size() - destroyed);
-    }
-
-    /**
      * @brief Destroys an entity and releases its identifier.
      *
      * @warning
