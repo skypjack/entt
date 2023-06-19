@@ -549,23 +549,6 @@ public:
     }
 
     /**
-     * @brief Releases an identifier.
-     *
-     * The suggested version or the valid version closest to the suggested one
-     * is used instead of the implicitly generated version.
-     *
-     * @param entt A valid identifier.
-     * @param version A desired version upon destruction.
-     * @return The version actually assigned to the entity.
-     */
-    [[deprecated("use .orphan(entt), then .storage<Entity>().erase(entt)/.bump(next) instead")]] version_type release(const entity_type entt, const version_type version) {
-        ENTT_ASSERT(orphan(entt), "Non-orphan entity");
-        entities.erase(entt);
-        const auto elem = traits_type::construct(traits_type::to_entity(entt), version);
-        return entities.bump((elem == tombstone) ? traits_type::next(elem) : elem);
-    }
-
-    /**
      * @brief Destroys an entity and releases its identifier.
      *
      * @warning
