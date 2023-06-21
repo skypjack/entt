@@ -124,6 +124,8 @@ I hope the following lists can grow much more in the future.
     multi-player arcade shooter game prototype.
   * [Confetti Party](https://github.com/hexerei/entt-confetti): C++ sample
     application as a starting point using `EnTT` and `SDL2`.
+  * [Hellbound](https://buas.itch.io/hellbound): a top-down action rogue-like
+    where you fight colossal demons in procedurally generated levels of hell.
 
 ## Engines and the like:
 
