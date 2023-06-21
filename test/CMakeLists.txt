@@ -180,7 +180,7 @@ if(ENTT_BUILD_SNAPSHOT)
     FetchContent_Declare(
         cereal
         GIT_REPOSITORY https://github.com/USCiLab/cereal.git
-        GIT_TAG v1.2.2
+        GIT_TAG v1.3.2
         GIT_SHALLOW 1
     )
 
