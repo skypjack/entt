@@ -50,6 +50,7 @@ public:
      */
     template<typename Type>
     void rebind(any instance) noexcept {
+        ENTT_ASSERT(instance.type() == type_id<Type>(), "Unexpected type");
         value_type_node = &internal::resolve<typename Type::value_type>;
         size_fn = &meta_sequence_container_traits<Type>::size;
         resize_fn = &meta_sequence_container_traits<Type>::resize;
@@ -103,6 +104,8 @@ public:
      */
     template<typename Type>
     void rebind(any instance) noexcept {
+        ENTT_ASSERT(instance.type() == type_id<Type>(), "Unexpected type");
+
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
             mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
