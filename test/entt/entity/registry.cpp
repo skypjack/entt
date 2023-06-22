@@ -556,8 +556,8 @@ TEST(Registry, CreateWithHint) {
     auto e2 = registry.create(entt::entity{3});
 
     ASSERT_EQ(e2, entt::entity{1});
-    ASSERT_TRUE(registry.valid(entt::entity{0}));
-    ASSERT_TRUE(registry.valid(entt::entity{2}));
+    ASSERT_FALSE(registry.valid(entt::entity{0}));
+    ASSERT_FALSE(registry.valid(entt::entity{2}));
     ASSERT_EQ(e3, entt::entity{3});
 
     registry.destroy(e2);

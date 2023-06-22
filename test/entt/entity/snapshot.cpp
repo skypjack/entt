@@ -270,7 +270,7 @@ TEST(BasicSnapshotLoader, GetEntityType) {
 
     ASSERT_TRUE(registry.valid(entities[0u]));
     ASSERT_TRUE(registry.valid(entities[1u]));
-    ASSERT_TRUE(registry.valid(entities[2u]));
+    ASSERT_FALSE(registry.valid(entities[2u]));
 
     ASSERT_EQ(storage.size(), 3u);
     ASSERT_EQ(storage.in_use(), 2u);
