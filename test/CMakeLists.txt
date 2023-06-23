@@ -65,8 +65,16 @@ function(SETUP_TARGET TARGET_NAME)
                 # documentation diagnostic turned on for clang-cl only
                 $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wdocumentation>
                 /EHsc /wd4324 /wd4996
-                $<$<CONFIG:Debug>:/Od>
+                # disabling INCREMENTAL is required by SizeBench
+                $<$<CONFIG:Debug>:/Od /INCREMENTAL:NO>
                 $<$<CONFIG:Release>:/O2>
+        )
+
+        target_link_options(
+            ${TARGET_NAME}
+            PRIVATE
+                # disabling INCREMENTAL is required by SizeBench
+                $<$<CONFIG:Debug>:/INCREMENTAL:NO>
         )
     else()
         target_compile_options(
