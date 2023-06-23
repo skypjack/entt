@@ -12,10 +12,8 @@ TODO (high prio):
 * check natvis files (periodically :)
 * resource cache: avoid using shared ptr with loader and the others
 * further optimize exclusion lists in multi type views (no existence check)
-* further improve the snapshot stuff, ie component functions
-* use fixture for storage tests to reduce loc number and duplication as much as possible
-* basic_view<...>::reach(...)
 * doc: bump entities
+* deprecate/drop snapshot orphans function, make it a general purpose one
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
@@ -24,3 +22,5 @@ WIP:
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
+* review/refine ENTT_ASSERT_CONSTEXPR usage
+* bump: tombstone aware and return version
