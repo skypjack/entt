@@ -1,21 +1,15 @@
-#
 # EnTT
-#
 
 cmake_minimum_required(VERSION 3.15.7)
 
-#
 # Read project version
-#
 
 set(ENTT_VERSION_REGEX "#define ENTT_VERSION_.*[ \t]+(.+)")
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/entt/config/version.h" ENTT_VERSION REGEX ${ENTT_VERSION_REGEX})
 list(TRANSFORM ENTT_VERSION REPLACE ${ENTT_VERSION_REGEX} "\\1")
 string(JOIN "." ENTT_VERSION ${ENTT_VERSION})
 
-#
 # Project configuration
-#
 
 project(
     EnTT
@@ -34,15 +28,11 @@ message(VERBOSE "* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message(VERBOSE "* Copyright (c) 2017-2023 Michele Caini <michele.caini@gmail.com>")
 message(VERBOSE "*")
 
-#
 # CMake stuff
-#
 
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
-#
 # Compiler stuff
-#
 
 option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if available." OFF)
 option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if available." OFF)
@@ -80,9 +70,7 @@ if(ENTT_USE_SANITIZER)
     endif()
 endif()
 
-#
 # Add EnTT target
-#
 
 option(ENTT_INCLUDE_HEADERS "Add all EnTT headers to the EnTT target." OFF)
 option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
@@ -220,9 +208,7 @@ if(ENTT_HAS_LIBCPP)
     target_compile_options(EnTT BEFORE INTERFACE -stdlib=libc++)
 endif()
 
-#
 # Install pkg-config file
-#
 
 include(JoinPaths)
 
@@ -241,9 +227,7 @@ install(
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
-#
 # Install EnTT
-#
 
 include(CMakePackageConfigHelpers)
 
@@ -289,9 +273,7 @@ install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 export(PACKAGE EnTT)
 
-#
 # Tests
-#
 
 option(ENTT_BUILD_TESTING "Enable building tests." OFF)
 
@@ -310,9 +292,7 @@ if(ENTT_BUILD_TESTING)
     add_subdirectory(test)
 endif()
 
-#
 # Documentation
-#
 
 option(ENTT_BUILD_DOCS "Enable building with documentation." OFF)
 
