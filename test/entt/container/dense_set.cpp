@@ -280,6 +280,112 @@ TEST(DenseSet, ConstIterator) {
     ASSERT_EQ(cbegin[1u], 42);
 }
 
+TEST(DenseSet, ReverseIterator) {
+    using iterator = typename entt::dense_set<int>::reverse_iterator;
+
+    static_assert(std::is_same_v<iterator::value_type, int>);
+    static_assert(std::is_same_v<iterator::pointer, const int *>);
+    static_assert(std::is_same_v<iterator::reference, const int &>);
+
+    entt::dense_set<int> set;
+    set.emplace(3);
+
+    iterator end{set.rbegin()};
+    iterator begin{};
+    begin = set.rend();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, set.rbegin());
+    ASSERT_EQ(end, set.rend());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin++, set.rbegin());
+    ASSERT_EQ(begin--, set.rend());
+
+    ASSERT_EQ(begin + 1, set.rend());
+    ASSERT_EQ(end - 1, set.rbegin());
+
+    ASSERT_EQ(++begin, set.rend());
+    ASSERT_EQ(--begin, set.rbegin());
+
+    ASSERT_EQ(begin += 1, set.rend());
+    ASSERT_EQ(begin -= 1, set.rbegin());
+
+    ASSERT_EQ(begin + (end - begin), set.rend());
+    ASSERT_EQ(begin - (begin - end), set.rend());
+
+    ASSERT_EQ(end - (end - begin), set.rbegin());
+    ASSERT_EQ(end + (begin - end), set.rbegin());
+
+    ASSERT_EQ(begin[0u], *set.rbegin().operator->());
+    ASSERT_EQ(begin[0u], *set.rbegin());
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, set.rbegin());
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, set.rend());
+
+    set.emplace(42);
+    begin = set.rbegin();
+
+    ASSERT_EQ(begin[0u], 42);
+    ASSERT_EQ(begin[1u], 3);
+}
+
+TEST(DenseSet, ConstReverseIterator) {
+    using iterator = typename entt::dense_set<int>::const_reverse_iterator;
+
+    static_assert(std::is_same_v<iterator::value_type, int>);
+    static_assert(std::is_same_v<iterator::pointer, const int *>);
+    static_assert(std::is_same_v<iterator::reference, const int &>);
+
+    entt::dense_set<int> set;
+    set.emplace(3);
+
+    iterator cend{set.crbegin()};
+    iterator cbegin{};
+    cbegin = set.crend();
+    std::swap(cbegin, cend);
+
+    ASSERT_EQ(cbegin, set.crbegin());
+    ASSERT_EQ(cend, set.crend());
+    ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(cbegin++, set.crbegin());
+    ASSERT_EQ(cbegin--, set.crend());
+
+    ASSERT_EQ(cbegin + 1, set.crend());
+    ASSERT_EQ(cend - 1, set.crbegin());
+
+    ASSERT_EQ(++cbegin, set.crend());
+    ASSERT_EQ(--cbegin, set.crbegin());
+
+    ASSERT_EQ(cbegin += 1, set.crend());
+    ASSERT_EQ(cbegin -= 1, set.crbegin());
+
+    ASSERT_EQ(cbegin + (cend - cbegin), set.crend());
+    ASSERT_EQ(cbegin - (cbegin - cend), set.crend());
+
+    ASSERT_EQ(cend - (cend - cbegin), set.crbegin());
+    ASSERT_EQ(cend + (cbegin - cend), set.crbegin());
+
+    ASSERT_EQ(cbegin[0u], *set.crbegin().operator->());
+    ASSERT_EQ(cbegin[0u], *set.crbegin());
+
+    ASSERT_LT(cbegin, cend);
+    ASSERT_LE(cbegin, set.crbegin());
+
+    ASSERT_GT(cend, cbegin);
+    ASSERT_GE(cend, set.crend());
+
+    set.emplace(42);
+    cbegin = set.crbegin();
+
+    ASSERT_EQ(cbegin[0u], 42);
+    ASSERT_EQ(cbegin[1u], 3);
+}
+
 TEST(DenseSet, IteratorConversion) {
     entt::dense_set<int> set;
     set.emplace(3);
