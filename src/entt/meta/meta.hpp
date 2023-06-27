@@ -421,10 +421,6 @@ public:
 
     /**
      * @brief Tries to cast an instance to a given type.
-     *
-     * @warning
-     * Attempting to perform an invalid cast results is undefined behavior.
-     *
      * @tparam Type Type to which to cast the instance.
      * @return A reference to the contained instance.
      */
@@ -1468,7 +1464,6 @@ public:
 
     /**
      * @copybrief invoke
-     *
      * @param id Unique identifier.
      * @tparam Args Types of arguments to use to invoke the function.
      * @param instance An opaque instance of the underlying type.
