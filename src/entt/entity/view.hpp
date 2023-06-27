@@ -21,16 +21,14 @@ namespace entt {
 
 namespace internal {
 
-template<typename... Args, typename Type, std::size_t N>
-[[nodiscard]] auto filter_as_tuple(const std::array<const Type *, N> &filter) noexcept {
-    return std::apply([](const auto *...curr) { return std::make_tuple(static_cast<Args *>(const_cast<constness_as_t<Type, Args> *>(curr))...); }, filter);
+template<typename... Args, typename Type, std::size_t N, std::size_t... Index>
+[[nodiscard]] auto filter_as_tuple(const std::array<const Type *, N> &filter, std::index_sequence<Index...>) noexcept {
+    return std::make_tuple(static_cast<Args *>(const_cast<constness_as_t<Type, Args> *>(std::get<Index>(filter)))...);
 }
 
-template<typename Type, std::size_t N>
-[[nodiscard]] auto none_of(const std::array<const Type *, N> &filter, const typename Type::entity_type entt) noexcept {
-    std::size_t pos{};
-    for(; pos < N && !(filter[pos] && filter[pos]->contains(entt)); ++pos) {}
-    return (pos == N);
+template<typename Type, std::size_t N, std::size_t... Index>
+[[nodiscard]] auto none_of(const std::array<const Type *, N> &filter, const typename Type::entity_type entt, std::index_sequence<Index...>) noexcept {
+    return (!(filter[Index] && filter[Index]->contains(entt)) && ...);
 }
 
 template<typename... Get, typename... Exclude, std::size_t... Index>
@@ -45,10 +43,10 @@ template<typename Type, std::size_t Get, std::size_t Exclude>
 class view_iterator final {
     using iterator_type = typename Type::const_iterator;
 
-    [[nodiscard]] bool valid() const noexcept {
-        return ((Get != 0u) || (*it != tombstone))
-               && std::apply([entt = *it](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
-               && none_of(filter, *it);
+    [[nodiscard]] bool valid(const typename iterator_type::value_type entt) const noexcept {
+        return ((Get != 0u) || (entt != tombstone))
+               && std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
+               && none_of(filter, entt, std::make_index_sequence<Exclude>{});
     }
 
 public:
@@ -69,13 +67,13 @@ public:
           last{to},
           pools{value},
           filter{excl} {
-        while(it != last && !valid()) {
+        while(it != last && !valid(*it)) {
             ++it;
         }
     }
 
     view_iterator &operator++() noexcept {
-        while(++it != last && !valid()) {}
+        while(++it != last && !valid(*it)) {}
         return *this;
     }
 
@@ -242,7 +240,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: std::get<Curr>(pools)->each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || std::get<Index>(pools)->contains(entt)) && ...) && internal::none_of(filter, entt)) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || std::get<Index>(pools)->contains(entt)) && ...) && internal::none_of(filter, entt, std::index_sequence_for<Exclude...>{})) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
@@ -350,7 +348,7 @@ public:
         if constexpr(Index < offset) {
             return std::get<Index>(pools);
         } else {
-            return std::get<Index - offset>(internal::filter_as_tuple<Exclude...>(filter));
+            return std::get<Index - offset>(internal::filter_as_tuple<Exclude...>(filter, std::index_sequence_for<Exclude...>{}));
         }
     }
 
@@ -466,7 +464,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return view && std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools) && internal::none_of(filter, entt);
+        return view && std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools) && internal::none_of(filter, entt, std::index_sequence_for<Exclude...>{});
     }
 
     /**
@@ -553,7 +551,7 @@ public:
     [[nodiscard]] auto operator|(const basic_view<get_t<OGet...>, exclude_t<OExclude...>> &other) const noexcept {
         return internal::view_pack(
             std::tuple_cat(pools, other.pools),
-            std::tuple_cat(internal::filter_as_tuple<Exclude...>(filter), internal::filter_as_tuple<OExclude...>(other.filter)),
+            std::tuple_cat(internal::filter_as_tuple<Exclude...>(filter, std::index_sequence_for<Exclude...>{}), internal::filter_as_tuple<OExclude...>(other.filter, std::index_sequence_for<OExclude...>{})),
             std::index_sequence_for<Get..., OGet..., Exclude..., OExclude...>{});
     }
 
@@ -883,7 +881,7 @@ public:
     [[nodiscard]] auto operator|(const basic_view<get_t<OGet...>, exclude_t<OExclude...>> &other) const noexcept {
         return internal::view_pack(
             std::tuple_cat(pools, other.pools),
-            internal::filter_as_tuple<OExclude...>(other.filter),
+            internal::filter_as_tuple<OExclude...>(other.filter, std::index_sequence_for<OExclude...>{}),
             std::index_sequence_for<Get, OGet..., OExclude...>{});
     }
 
