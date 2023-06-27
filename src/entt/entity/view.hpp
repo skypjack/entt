@@ -27,6 +27,13 @@ template<typename... Args, typename Type, std::size_t N, std::size_t... Index>
 }
 
 template<typename Type, std::size_t N>
+[[nodiscard]] auto all_of(const std::array<const Type *, N> &filter, const typename Type::entity_type entt) noexcept {
+    std::size_t pos{};
+    for(; pos < N && filter[pos]->contains(entt); ++pos) {}
+    return pos == N;
+}
+
+template<typename Type, std::size_t N>
 [[nodiscard]] auto none_of(const std::array<const Type *, N> &filter, const typename Type::entity_type entt) noexcept {
     std::size_t pos{};
     for(; pos < N && !(filter[pos] && filter[pos]->contains(entt)); ++pos) {}
@@ -53,9 +60,7 @@ class view_iterator final {
     using iterator_type = typename Type::const_iterator;
 
     [[nodiscard]] bool valid(const typename iterator_type::value_type entt) const noexcept {
-        return ((Get != 0u) || (entt != tombstone))
-               && std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
-               && none_of(filter, entt);
+        return ((Get != 0u) || (entt != tombstone)) && (all_of(pools, entt)) && none_of(filter, entt);
     }
 
 public:
