@@ -26,9 +26,11 @@ template<typename... Args, typename Type, std::size_t N, std::size_t... Index>
     return std::make_tuple(static_cast<Args *>(const_cast<constness_as_t<Type, Args> *>(std::get<Index>(filter)))...);
 }
 
-template<typename Type, std::size_t N, std::size_t... Index>
-[[nodiscard]] auto none_of(const std::array<const Type *, N> &filter, const typename Type::entity_type entt, std::index_sequence<Index...>) noexcept {
-    return (!(filter[Index] && filter[Index]->contains(entt)) && ...);
+template<typename Type, std::size_t N>
+[[nodiscard]] auto none_of(const std::array<const Type *, N> &filter, const typename Type::entity_type entt) noexcept {
+    std::size_t pos{};
+    for(; pos < N && !(filter[pos] && filter[pos]->contains(entt)); ++pos) {}
+    return pos == N;
 }
 
 template<typename Type, std::size_t N>
@@ -53,7 +55,7 @@ class view_iterator final {
     [[nodiscard]] bool valid(const typename iterator_type::value_type entt) const noexcept {
         return ((Get != 0u) || (entt != tombstone))
                && std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools)
-               && none_of(filter, entt, std::make_index_sequence<Exclude>{});
+               && none_of(filter, entt);
     }
 
 public:
@@ -247,7 +249,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: std::get<Curr>(pools)->each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || std::get<Index>(pools)->contains(entt)) && ...) && internal::none_of(filter, entt, std::index_sequence_for<Exclude...>{})) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || std::get<Index>(pools)->contains(entt)) && ...) && internal::none_of(filter, entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
@@ -470,7 +472,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return view && std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools) && internal::none_of(filter, entt, std::index_sequence_for<Exclude...>{});
+        return view && std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools) && internal::none_of(filter, entt);
     }
 
     /**
