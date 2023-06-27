@@ -31,6 +31,13 @@ template<typename Type, std::size_t N, std::size_t... Index>
     return (!(filter[Index] && filter[Index]->contains(entt)) && ...);
 }
 
+template<typename Type, std::size_t N>
+[[nodiscard]] auto fully_initialized(const std::array<const Type *, N> &filter) noexcept {
+    std::size_t pos{};
+    for(; pos < N && filter[pos] != nullptr; ++pos) {}
+    return pos == N;
+}
+
 template<typename... Get, typename... Exclude, std::size_t... Index>
 [[nodiscard]] auto view_pack(const std::tuple<Get *...> value, const std::tuple<Exclude *...> excl, std::index_sequence<Index...>) {
     const auto pools = std::tuple_cat(value, excl);
@@ -454,8 +461,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools)
-               && std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, filter);
+        return std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools) && internal::fully_initialized(filter);
     }
 
     /**
