@@ -482,11 +482,6 @@ public:
 
     /**
      * @brief Returns the components assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.
-     *
      * @tparam Type Type of the component to get.
      * @tparam Other Other types of components to get.
      * @param entt A valid identifier.
@@ -804,11 +799,6 @@ public:
 
     /**
      * @brief Returns the component assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.
-     *
      * @tparam Elem Type or index of the component to get.
      * @param entt A valid identifier.
      * @return The component assigned to the entity.

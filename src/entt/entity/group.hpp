@@ -498,11 +498,6 @@ public:
 
     /**
      * @brief Returns the components assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the group results in
-     * undefined behavior.
-     *
      * @tparam Type Type of the component to get.
      * @tparam Other Other types of components to get.
      * @param entt A valid identifier.
@@ -515,11 +510,6 @@ public:
 
     /**
      * @brief Returns the components assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the groups results in
-     * undefined behavior.
-     *
      * @tparam Index Indexes of the components to get.
      * @param entt A valid identifier.
      * @return The components assigned to the entity.
@@ -903,11 +893,6 @@ public:
 
     /**
      * @brief Returns the components assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the group results in
-     * undefined behavior.
-     *
      * @tparam Type Type of the component to get.
      * @tparam Other Other types of components to get.
      * @param entt A valid identifier.
@@ -920,11 +905,6 @@ public:
 
     /**
      * @brief Returns the components assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the groups results in
-     * undefined behavior.
-     *
      * @tparam Index Indexes of the components to get.
      * @param entt A valid identifier.
      * @return The components assigned to the entity.
