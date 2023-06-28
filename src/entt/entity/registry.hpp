@@ -395,7 +395,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return pools.get_allocator();
+        return entities.get_allocator();
     }
 
     /**
