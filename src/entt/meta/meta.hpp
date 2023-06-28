@@ -1658,24 +1658,16 @@ inline bool meta_any::assign(meta_any &&other) {
 class meta_sequence_container::meta_iterator final {
     friend class meta_sequence_container;
 
-    enum class operation : std::uint8_t {
-        incr,
-        deref
-    };
-
-    using vtable_type = void(const operation, const any &, const std::ptrdiff_t, meta_any *);
+    using vtable_type = void(const bool, const any &, const std::ptrdiff_t, meta_any *);
 
     template<typename It>
-    static void basic_vtable(const operation op, const any &value, const std::ptrdiff_t offset, meta_any *other) {
-        switch(op) {
-        case operation::incr: {
+    static void basic_vtable(const bool incr_or_deref, const any &value, const std::ptrdiff_t offset, meta_any *other) {
+        if(incr_or_deref) {
             auto &it = any_cast<It &>(const_cast<any &>(value));
             it = std::next(it, offset);
-        } break;
-        case operation::deref: {
+        } else {
             const auto &it = any_cast<const It &>(value);
             other->emplace<decltype(*it)>(*it);
-        } break;
         }
     }
 
@@ -1698,30 +1690,30 @@ public:
           handle{iter} {}
 
     meta_iterator &operator++() noexcept {
-        vtable(operation::incr, handle, 1, nullptr);
+        vtable(true, handle, 1, nullptr);
         return *this;
     }
 
     meta_iterator operator++(int value) noexcept {
         meta_iterator orig = *this;
-        vtable(operation::incr, handle, ++value, nullptr);
+        vtable(true, handle, ++value, nullptr);
         return orig;
     }
 
     meta_iterator &operator--() noexcept {
-        vtable(operation::incr, handle, -1, nullptr);
+        vtable(true, handle, -1, nullptr);
         return *this;
     }
 
     meta_iterator operator--(int value) noexcept {
         meta_iterator orig = *this;
-        vtable(operation::incr, handle, --value, nullptr);
+        vtable(true, handle, --value, nullptr);
         return orig;
     }
 
     [[nodiscard]] reference operator*() const {
         reference other{meta_ctx_arg, *ctx};
-        vtable(operation::deref, handle, 0, &other);
+        vtable(false, handle, 0, &other);
         return other;
     }
 
@@ -1748,20 +1740,13 @@ private:
 };
 
 class meta_associative_container::meta_iterator final {
-    enum class operation : std::uint8_t {
-        incr,
-        deref
-    };
-
-    using vtable_type = void(const operation, const any &, std::pair<meta_any, meta_any> *);
+    using vtable_type = void(const bool, const any &, std::pair<meta_any, meta_any> *);
 
     template<bool KeyOnly, typename It>
-    static void basic_vtable(const operation op, const any &value, std::pair<meta_any, meta_any> *other) {
-        switch(op) {
-        case operation::incr:
+    static void basic_vtable(const bool incr_or_deref, const any &value, std::pair<meta_any, meta_any> *other) {
+        if(incr_or_deref) {
             ++any_cast<It &>(const_cast<any &>(value));
-            break;
-        case operation::deref:
+        } else {
             const auto &it = any_cast<const It &>(value);
             if constexpr(KeyOnly) {
                 other->first.emplace<decltype(*it)>(*it);
@@ -1769,7 +1754,6 @@ class meta_associative_container::meta_iterator final {
                 other->first.emplace<decltype((it->first))>(it->first);
                 other->second.emplace<decltype((it->second))>(it->second);
             }
-            break;
         }
     }
 
@@ -1792,7 +1776,7 @@ public:
           handle{iter} {}
 
     meta_iterator &operator++() noexcept {
-        vtable(operation::incr, handle, nullptr);
+        vtable(true, handle, nullptr);
         return *this;
     }
 
@@ -1803,7 +1787,7 @@ public:
 
     [[nodiscard]] reference operator*() const {
         reference other{{meta_ctx_arg, *ctx}, {meta_ctx_arg, *ctx}};
-        vtable(operation::deref, handle, &other);
+        vtable(false, handle, &other);
         return other;
     }
 
