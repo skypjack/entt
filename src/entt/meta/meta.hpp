@@ -1849,8 +1849,7 @@ inline bool meta_sequence_container::resize(const size_type sz) {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
-    void *elem = storage.data();
-    return elem && resize_fn(elem, 0u);
+    return resize(0u);
 }
 
 /**
