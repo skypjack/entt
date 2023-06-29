@@ -51,13 +51,11 @@ struct basic_meta_sequence_container_traits {
 
     [[nodiscard]] static bool resize([[maybe_unused]] any &container, [[maybe_unused]] size_type sz) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
-            if(auto *const cont = any_cast<Type>(&container); cont) {
-                cont->resize(sz);
-                return true;
-            }
+            any_cast<Type &>(container).resize(sz);
+            return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     [[nodiscard]] static iterator iter(const meta_ctx &ctx, any &container, const bool as_end) {

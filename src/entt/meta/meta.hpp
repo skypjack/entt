@@ -1840,7 +1840,7 @@ private:
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::resize(const size_type sz) {
-    return resize_fn(storage, sz);
+    return storage.data() && resize_fn(storage, sz);
 }
 
 /**
@@ -1848,7 +1848,7 @@ inline bool meta_sequence_container::resize(const size_type sz) {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
-    return resize_fn(storage, 0u);
+    return storage.data() && resize_fn(storage, 0u);
 }
 
 /**
