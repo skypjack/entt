@@ -45,8 +45,8 @@ struct basic_meta_sequence_container_traits {
     using iterator = meta_sequence_container::iterator;
     using size_type = std::size_t;
 
-    [[nodiscard]] static size_type size(const any &container) noexcept {
-        return any_cast<const Type &>(container).size();
+    [[nodiscard]] static size_type size(const void *container) noexcept {
+        return static_cast<const Type *>(container)->size();
     }
 
     [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] size_type sz) {
