@@ -49,9 +49,9 @@ struct basic_meta_sequence_container_traits {
         return any_cast<const Type &>(container).size();
     }
 
-    [[nodiscard]] static bool resize([[maybe_unused]] any &container, [[maybe_unused]] size_type sz) {
+    [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] size_type sz) {
         if constexpr(is_dynamic_sequence_container<Type>::value) {
-            any_cast<Type &>(container).resize(sz);
+            static_cast<Type *>(container)->resize(sz);
             return true;
         } else {
             return false;

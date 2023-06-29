@@ -74,7 +74,7 @@ private:
     const meta_ctx *ctx{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const any &) noexcept {};
-    bool (*resize_fn)(any &, size_type){};
+    bool (*resize_fn)(void *, size_type){};
     iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
     iterator (*insert_or_erase_fn)(const meta_ctx &, any &, const any &, meta_any &){};
     any storage{};
@@ -1840,7 +1840,8 @@ private:
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::resize(const size_type sz) {
-    return storage.data() && resize_fn(storage, sz);
+    void *elem = storage.data();
+    return elem && resize_fn(elem, sz);
 }
 
 /**
@@ -1848,7 +1849,8 @@ inline bool meta_sequence_container::resize(const size_type sz) {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
-    return storage.data() && resize_fn(storage, 0u);
+    void *elem = storage.data();
+    return elem && resize_fn(elem, 0u);
 }
 
 /**
