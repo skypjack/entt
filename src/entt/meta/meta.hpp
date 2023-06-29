@@ -73,7 +73,7 @@ public:
 private:
     const meta_ctx *ctx{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    size_type (*size_fn)(const any &) noexcept {};
+    size_type (*size_fn)(const void *) noexcept {};
     bool (*resize_fn)(void *, size_type){};
     iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
     iterator (*insert_or_erase_fn)(const meta_ctx &, any &, const any &, meta_any &){};
@@ -1831,7 +1831,7 @@ private:
  * @return The size of the container.
  */
 [[nodiscard]] inline meta_sequence_container::size_type meta_sequence_container::size() const noexcept {
-    return size_fn(storage);
+    return size_fn(storage.data());
 }
 
 /**
