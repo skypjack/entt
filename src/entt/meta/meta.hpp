@@ -1851,8 +1851,7 @@ private:
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::resize(const size_type sz) {
-    void *elem = storage.data();
-    return elem && resize_fn(elem, sz);
+    return (storage.policy() != any_policy::cref) && resize_fn(storage.data(), sz);
 }
 
 /**
