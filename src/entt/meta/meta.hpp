@@ -149,6 +149,9 @@ private:
     any storage{};
 };
 
+/*! @brief Possible modes of a meta any object. */
+using meta_any_policy = any_policy;
+
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
     enum class operation : std::uint8_t {
@@ -197,7 +200,7 @@ class meta_any {
     }
 
     void release() {
-        if(node.dtor.dtor && owner()) {
+        if(node.dtor.dtor && (storage.policy() == any_policy::owner)) {
             node.dtor.dtor(storage.data());
         }
     }
@@ -455,7 +458,7 @@ public:
      */
     [[nodiscard]] bool allow_cast(const meta_type &type) {
         if(auto other = std::as_const(*this).allow_cast(type); other) {
-            if(other.owner()) {
+            if((other.storage.policy() == any_policy::owner)) {
                 std::swap(*this, other);
             }
 
@@ -593,8 +596,16 @@ public:
     }
 
     /*! @copydoc any::owner */
-    [[nodiscard]] bool owner() const noexcept {
-        return storage.owner();
+    [[deprecated("use policy() and meta_any_policy instead")]] [[nodiscard]] bool owner() const noexcept {
+        return (storage.policy() == any_policy::owner);
+    }
+
+    /**
+     * @brief Returns the current mode of a meta any object.
+     * @return The current mode of the meta any object.
+     */
+    [[nodiscard]] meta_any_policy policy() const noexcept {
+        return storage.policy();
     }
 
 private:
