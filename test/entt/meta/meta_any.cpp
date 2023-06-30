@@ -110,6 +110,7 @@ TEST_F(MetaAny, SBO) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::owner);
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<char>(), 'c');
     ASSERT_NE(any.data(), nullptr);
@@ -123,6 +124,7 @@ TEST_F(MetaAny, NoSBO) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::owner);
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<fat_t>(), instance);
     ASSERT_NE(any.data(), nullptr);
@@ -168,6 +170,7 @@ TEST_F(MetaAny, SBOAsRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::ref);
     ASSERT_EQ(any.type(), entt::resolve<int>());
 
     ASSERT_FALSE(any.try_cast<std::size_t>());
@@ -204,6 +207,7 @@ TEST_F(MetaAny, SBOAsConstRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::cref);
     ASSERT_EQ(any.type(), entt::resolve<int>());
 
     ASSERT_FALSE(any.try_cast<std::size_t>());
@@ -436,6 +440,7 @@ TEST_F(MetaAny, NoSBOAsRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::ref);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
 
     ASSERT_FALSE(any.try_cast<std::size_t>());
@@ -470,6 +475,7 @@ TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::cref);
     ASSERT_EQ(any.type(), entt::resolve<fat_t>());
 
     ASSERT_FALSE(any.try_cast<std::size_t>());
@@ -707,6 +713,7 @@ TEST_F(MetaAny, VoidInPlaceTypeConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::owner);
     ASSERT_FALSE(any.try_cast<char>());
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(any.type(), entt::resolve<void>());
