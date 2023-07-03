@@ -145,7 +145,7 @@ private:
     bool (*clear_fn)(any &){};
     iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
     size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &){};
-    iterator (*find_fn)(const meta_ctx &, any &, meta_any &){};
+    iterator (*find_fn)(const meta_ctx &, void *, const void *, meta_any &){};
     any storage{};
 };
 
@@ -2001,7 +2001,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  * @return An iterator to the element with the given key, if any.
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
-    return find_fn(*ctx, storage, key);
+    return find_fn(*ctx, storage.data(), std::as_const(storage).data(), key);
 }
 
 /**

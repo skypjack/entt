@@ -139,13 +139,13 @@ struct basic_meta_associative_container_traits {
         return 0u;
     }
 
-    [[nodiscard]] static iterator find(const meta_ctx &ctx, any &container, meta_any &key) {
+    [[nodiscard]] static iterator find(const meta_ctx &ctx, void *container, const void *as_const, meta_any &key) {
         if(key.allow_cast<const typename Type::key_type &>()) {
-            if(auto *const cont = any_cast<Type>(&container); cont) {
+            if(auto *const cont = static_cast<Type *>(container); cont) {
                 return iterator{ctx, std::bool_constant<key_only>{}, cont->find(key.cast<const typename Type::key_type &>())};
             }
 
-            return iterator{ctx, std::bool_constant<key_only>{}, any_cast<const Type &>(container).find(key.cast<const typename Type::key_type &>())};
+            return iterator{ctx, std::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->find(key.cast<const typename Type::key_type &>())};
         }
 
         return iterator{};
