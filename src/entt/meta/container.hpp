@@ -58,13 +58,13 @@ struct basic_meta_sequence_container_traits {
         }
     }
 
-    [[nodiscard]] static iterator iter(const meta_ctx &ctx, any &container, const bool as_end) {
-        if(auto *const cont = any_cast<Type>(&container); cont) {
+    [[nodiscard]] static iterator iter(const meta_ctx &ctx, void *container, const void *as_const, const bool as_end) {
+        if(auto *const cont = static_cast<Type *>(container); cont) {
             return iterator{ctx, as_end ? cont->end() : cont->begin()};
         }
 
-        const Type &as_const = any_cast<const Type &>(container);
-        return iterator{ctx, as_end ? as_const.end() : as_const.begin()};
+        auto *const cont = static_cast<const Type *>(as_const);
+        return iterator{ctx, as_end ? cont->end() : cont->begin()};
     }
 
     [[nodiscard]] static iterator insert_or_erase([[maybe_unused]] const meta_ctx &ctx, [[maybe_unused]] any &container, [[maybe_unused]] const any &handle, [[maybe_unused]] meta_any &value) {

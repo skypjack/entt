@@ -75,7 +75,7 @@ private:
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *) noexcept {};
     bool (*resize_fn)(void *, size_type){};
-    iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
+    iterator (*iter_fn)(const meta_ctx &, void *, const void *, const bool){};
     iterator (*insert_or_erase_fn)(const meta_ctx &, any &, const any &, meta_any &){};
     any storage{};
 };
@@ -1867,7 +1867,7 @@ inline bool meta_sequence_container::clear() {
  * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
-    return iter_fn(*ctx, storage, false);
+    return iter_fn(*ctx, storage.data(), std::as_const(storage).data(), false);
 }
 
 /**
@@ -1875,7 +1875,7 @@ inline bool meta_sequence_container::clear() {
  * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
-    return iter_fn(*ctx, storage, true);
+    return iter_fn(*ctx, storage.data(), std::as_const(storage).data(), true);
 }
 
 /**
