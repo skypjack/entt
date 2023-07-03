@@ -76,7 +76,7 @@ private:
     size_type (*size_fn)(const void *) noexcept {};
     bool (*resize_fn)(void *, size_type){};
     iterator (*iter_fn)(const meta_ctx &, void *, const void *, const bool){};
-    iterator (*insert_or_erase_fn)(const meta_ctx &, any &, const any &, meta_any &){};
+    iterator (*insert_or_erase_fn)(const meta_ctx &, void *, const any &, meta_any &){};
     any storage{};
 };
 
@@ -1885,7 +1885,7 @@ inline bool meta_sequence_container::clear() {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return insert_or_erase_fn(*ctx, storage, it.handle, value);
+    return (storage.policy() != any_policy::cref) ? insert_or_erase_fn(*ctx, storage.data(), it.handle, value) : iterator{};
 }
 
 /**
