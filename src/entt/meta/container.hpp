@@ -101,8 +101,8 @@ struct basic_meta_associative_container_traits {
 
     static constexpr auto key_only = is_key_only_meta_associative_container<Type>::value;
 
-    [[nodiscard]] static size_type size(const any &container) noexcept {
-        return any_cast<const Type &>(container).size();
+    [[nodiscard]] static size_type size(const void *container) noexcept {
+        return static_cast<const Type *>(container)->size();
     }
 
     [[nodiscard]] static bool clear(any &container) {

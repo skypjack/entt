@@ -141,7 +141,7 @@ private:
     internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    size_type (*size_fn)(const any &) noexcept {};
+    size_type (*size_fn)(const void *) noexcept {};
     bool (*clear_fn)(any &){};
     iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
     size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &){};
@@ -1948,7 +1948,7 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 
 /*! @copydoc meta_sequence_container::size */
 [[nodiscard]] inline meta_associative_container::size_type meta_associative_container::size() const noexcept {
-    return size_fn(storage);
+    return size_fn(storage.data());
 }
 
 /*! @copydoc meta_sequence_container::clear */
