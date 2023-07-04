@@ -143,7 +143,7 @@ private:
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *) noexcept {};
     bool (*clear_fn)(void *){};
-    iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
+    iterator (*iter_fn)(const meta_ctx &, void *, const void *, const bool){};
     size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &){};
     iterator (*find_fn)(const meta_ctx &, void *, const void *, meta_any &){};
     any storage{};
@@ -1958,12 +1958,12 @@ inline bool meta_associative_container::clear() {
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
-    return iter_fn(*ctx, storage, false);
+    return iter_fn(*ctx, storage.data(), std::as_const(storage).data(), false);
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
-    return iter_fn(*ctx, storage, true);
+    return iter_fn(*ctx, storage.data(), std::as_const(storage).data(), true);
 }
 
 /**

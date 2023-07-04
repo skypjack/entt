@@ -110,13 +110,13 @@ struct basic_meta_associative_container_traits {
         return true;
     }
 
-    [[nodiscard]] static iterator iter(const meta_ctx &ctx, any &container, const bool as_end) {
-        if(auto *const cont = any_cast<Type>(&container); cont) {
+    [[nodiscard]] static iterator iter(const meta_ctx &ctx, void *container, const void *as_const, const bool as_end) {
+        if(auto *const cont = static_cast<Type *>(container); cont) {
             return iterator{ctx, std::bool_constant<key_only>{}, as_end ? cont->end() : cont->begin()};
         }
 
-        const auto &as_const = any_cast<const Type &>(container);
-        return iterator{ctx, std::bool_constant<key_only>{}, as_end ? as_const.end() : as_const.begin()};
+        auto *const cont = static_cast<const Type *>(as_const);
+        return iterator{ctx, std::bool_constant<key_only>{}, as_end ? cont->end() : cont->begin()};
     }
 
     [[nodiscard]] static size_type insert_or_erase(any &container, meta_any &key, meta_any &value) {
