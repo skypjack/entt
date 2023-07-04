@@ -142,7 +142,7 @@ private:
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *) noexcept {};
-    bool (*clear_fn)(any &){};
+    bool (*clear_fn)(void *){};
     iterator (*iter_fn)(const meta_ctx &, any &, const bool){};
     size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &){};
     iterator (*find_fn)(const meta_ctx &, void *, const void *, meta_any &){};
@@ -1953,7 +1953,7 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 
 /*! @copydoc meta_sequence_container::clear */
 inline bool meta_associative_container::clear() {
-    return clear_fn(storage);
+    return (storage.policy() != any_policy::cref) && clear_fn(storage.data());
 }
 
 /*! @copydoc meta_sequence_container::begin */
