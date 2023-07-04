@@ -144,7 +144,7 @@ private:
     size_type (*size_fn)(const void *) noexcept {};
     bool (*clear_fn)(void *){};
     iterator (*iter_fn)(const meta_ctx &, void *, const void *, const bool){};
-    size_type (*insert_or_erase_fn)(any &, meta_any &, meta_any &){};
+    size_type (*insert_or_erase_fn)(void *, meta_any &, meta_any &){};
     iterator (*find_fn)(const meta_ctx &, void *, const void *, meta_any &){};
     any storage{};
 };
@@ -1973,7 +1973,7 @@ inline bool meta_associative_container::clear() {
  */
 inline bool meta_associative_container::insert(meta_any key) {
     meta_any value{*ctx, std::in_place_type<void>};
-    return (insert_or_erase_fn(storage, key, value) != 0u);
+    return (storage.policy() != any_policy::cref) && (insert_or_erase_fn(storage.data(), key, value) != 0u);
 }
 
 /**
@@ -1983,7 +1983,7 @@ inline bool meta_associative_container::insert(meta_any key) {
  * @return A bool denoting whether the insertion took place.
  */
 inline bool meta_associative_container::insert(meta_any key, meta_any value) {
-    return (insert_or_erase_fn(storage, key, value) != 0u);
+    return (storage.policy() != any_policy::cref) && (insert_or_erase_fn(storage.data(), key, value) != 0u);
 }
 
 /**
