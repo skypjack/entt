@@ -119,8 +119,8 @@ struct basic_meta_associative_container_traits {
         return iterator{ctx, std::bool_constant<key_only>{}, as_end ? cont->end() : cont->begin()};
     }
 
-    [[nodiscard]] static size_type insert_or_erase(any &container, meta_any &key, meta_any &value) {
-        if(auto *const cont = any_cast<Type>(&container); cont && key.allow_cast<const typename Type::key_type &>()) {
+    [[nodiscard]] static size_type insert_or_erase(void *container, meta_any &key, meta_any &value) {
+        if(auto *const cont = static_cast<Type *>(container); key.allow_cast<const typename Type::key_type &>()) {
             if(value) {
                 if constexpr(key_only) {
                     return cont->insert(key.cast<const typename Type::key_type &>()).second;
