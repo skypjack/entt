@@ -75,7 +75,7 @@ private:
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *) noexcept {};
     bool (*resize_fn)(void *, size_type){};
-    iterator (*iter_fn)(const meta_ctx &, void *, const void *, const bool){};
+    iterator (*iter_fn)(const meta_ctx &, const void *, const bool, const bool){};
     iterator (*insert_or_erase_fn)(const meta_ctx &, void *, const any &, meta_any &){};
     any storage{};
 };
@@ -143,9 +143,9 @@ private:
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *) noexcept {};
     bool (*clear_fn)(void *){};
-    iterator (*iter_fn)(const meta_ctx &, void *, const void *, const bool){};
+    iterator (*iter_fn)(const meta_ctx &, const void *, const bool, const bool){};
     size_type (*insert_or_erase_fn)(void *, meta_any &, meta_any &){};
-    iterator (*find_fn)(const meta_ctx &, void *, const void *, meta_any &){};
+    iterator (*find_fn)(const meta_ctx &, const void *, const bool, meta_any &){};
     any storage{};
 };
 
@@ -1867,7 +1867,7 @@ inline bool meta_sequence_container::clear() {
  * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
-    return iter_fn(*ctx, storage.data(), std::as_const(storage).data(), false);
+    return iter_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), false);
 }
 
 /**
@@ -1875,7 +1875,7 @@ inline bool meta_sequence_container::clear() {
  * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
-    return iter_fn(*ctx, storage.data(), std::as_const(storage).data(), true);
+    return iter_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), true);
 }
 
 /**
@@ -1958,12 +1958,12 @@ inline bool meta_associative_container::clear() {
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
-    return iter_fn(*ctx, storage.data(), std::as_const(storage).data(), false);
+    return iter_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), false);
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
-    return iter_fn(*ctx, storage.data(), std::as_const(storage).data(), true);
+    return iter_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), true);
 }
 
 /**
@@ -2001,7 +2001,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  * @return An iterator to the element with the given key, if any.
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
-    return find_fn(*ctx, storage.data(), std::as_const(storage).data(), key);
+    return find_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), key);
 }
 
 /**

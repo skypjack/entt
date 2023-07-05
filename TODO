@@ -14,7 +14,6 @@ TODO (high prio):
 * further optimize exclusion lists in multi type views (no existence check)
 * doc: bump entities
 * deprecate/drop snapshot orphans function, make it a general purpose one
-* avoid invoking ::data twice if possible ie within meta_associative_container::begin()
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
