@@ -1674,17 +1674,17 @@ class meta_sequence_container::meta_iterator final {
         deref
     };
 
-    using vtable_type = void(const operation, const any &, const std::ptrdiff_t, meta_any *);
+    using vtable_type = void(const operation, const void *, const std::ptrdiff_t, meta_any *);
 
     template<typename It>
-    static void basic_vtable(const operation op, const any &value, const std::ptrdiff_t offset, meta_any *other) {
+    static void basic_vtable(const operation op, const void *value, const std::ptrdiff_t offset, meta_any *other) {
         switch(op) {
         case operation::incr: {
-            auto &it = any_cast<It &>(const_cast<any &>(value));
+            auto &it = *static_cast<It *>(const_cast<void *>(value));
             it = std::next(it, offset);
         } break;
         case operation::deref: {
-            const auto &it = any_cast<const It &>(value);
+            const auto &it = *static_cast<const It *>(value);
             other->emplace<decltype(*it)>(*it);
         } break;
         }
@@ -1709,30 +1709,30 @@ public:
           handle{iter} {}
 
     meta_iterator &operator++() noexcept {
-        vtable(operation::incr, handle, 1, nullptr);
+        vtable(operation::incr, handle.data(), 1, nullptr);
         return *this;
     }
 
     meta_iterator operator++(int value) noexcept {
         meta_iterator orig = *this;
-        vtable(operation::incr, handle, ++value, nullptr);
+        vtable(operation::incr, handle.data(), ++value, nullptr);
         return orig;
     }
 
     meta_iterator &operator--() noexcept {
-        vtable(operation::incr, handle, -1, nullptr);
+        vtable(operation::incr, handle.data(), -1, nullptr);
         return *this;
     }
 
     meta_iterator operator--(int value) noexcept {
         meta_iterator orig = *this;
-        vtable(operation::incr, handle, --value, nullptr);
+        vtable(operation::incr, handle.data(), --value, nullptr);
         return orig;
     }
 
     [[nodiscard]] reference operator*() const {
         reference other{meta_ctx_arg, *ctx};
-        vtable(operation::deref, handle, 0, &other);
+        vtable(operation::deref, handle.data(), 0, &other);
         return other;
     }
 
