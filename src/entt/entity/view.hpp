@@ -221,12 +221,12 @@ class basic_view;
  */
 template<typename... Get, typename... Exclude>
 class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
+    template<typename, typename, typename>
+    friend class basic_view;
+
     static constexpr auto offset = sizeof...(Get);
     using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = typename base_type::entity_type;
-
-    template<typename, typename, typename>
-    friend class basic_view;
 
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
