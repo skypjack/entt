@@ -1764,16 +1764,16 @@ class meta_associative_container::meta_iterator final {
         deref
     };
 
-    using vtable_type = void(const operation, const any &, std::pair<meta_any, meta_any> *);
+    using vtable_type = void(const operation, const void *, std::pair<meta_any, meta_any> *);
 
     template<bool KeyOnly, typename It>
-    static void basic_vtable(const operation op, const any &value, std::pair<meta_any, meta_any> *other) {
+    static void basic_vtable(const operation op, const void *value, std::pair<meta_any, meta_any> *other) {
         switch(op) {
         case operation::incr:
-            ++any_cast<It &>(const_cast<any &>(value));
+            ++(*static_cast<It *>(const_cast<void *>(value)));
             break;
         case operation::deref:
-            const auto &it = any_cast<const It &>(value);
+            const auto &it = *static_cast<const It *>(value);
             if constexpr(KeyOnly) {
                 other->first.emplace<decltype(*it)>(*it);
             } else {
@@ -1803,7 +1803,7 @@ public:
           handle{iter} {}
 
     meta_iterator &operator++() noexcept {
-        vtable(operation::incr, handle, nullptr);
+        vtable(operation::incr, handle.data(), nullptr);
         return *this;
     }
 
@@ -1814,7 +1814,7 @@ public:
 
     [[nodiscard]] reference operator*() const {
         reference other{{meta_ctx_arg, *ctx}, {meta_ctx_arg, *ctx}};
-        vtable(operation::deref, handle, &other);
+        vtable(operation::deref, handle.data(), &other);
         return other;
     }
 
