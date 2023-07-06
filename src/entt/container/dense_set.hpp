@@ -886,7 +886,7 @@ public:
             sparse.first().resize(sz);
 
             for(auto &&elem: sparse.first()) {
-                elem = std::numeric_limits<size_type>::max();
+                elem = (std::numeric_limits<size_type>::max)();
             }
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
