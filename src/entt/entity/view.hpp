@@ -740,7 +740,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type front() const noexcept {
-        return (!view || view->empty()) ? null : *view->begin();
+        return empty() ? null : *view->begin();
     }
 
     /**
@@ -749,7 +749,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const noexcept {
-        return (!view || view->empty()) ? null : *view->rbegin();
+        return empty() ? null : *view->rbegin();
     }
 
     /**
