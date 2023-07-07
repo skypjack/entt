@@ -128,7 +128,9 @@ I hope the following lists can grow much more in the future.
   * [Confetti Party](https://github.com/hexerei/entt-confetti): C++ sample
     application as a starting point using `EnTT` and `SDL2`.
   * [Hellbound](https://buas.itch.io/hellbound): a top-down action rogue-like
-    where you fight colossal demons in procedurally generated levels of hell.
+    where to fight colossal demons in procedurally generated levels of hell.
+  * [Saurian Sorcery](https://github.com/cajallen/spellbook): a tower defense
+    game where to assemble a tribe of lizards to defend against robot invaders.
 
 ## Engines and the like:
 
