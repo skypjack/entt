@@ -1534,6 +1534,37 @@ TEST(MultiComponentView, StorageEntity) {
     });
 }
 
+TEST(MultiComponentView, StorageEntityWithExcludedComponent) {
+    entt::registry registry;
+    auto view = registry.view<entt::entity, int>(entt::exclude<char>);
+
+    const auto entity = registry.create();
+    const auto other = registry.create();
+    const auto excluded = registry.create();
+
+    registry.emplace<int>(entity);
+    registry.emplace<int>(other);
+    registry.emplace<int>(excluded);
+
+    registry.emplace<char>(excluded);
+
+    registry.destroy(entity, entt::to_version(entity));
+
+    ASSERT_EQ(view.size_hint(), 3u);
+    ASSERT_NE(view.begin(), view.end());
+
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
+    ASSERT_EQ(*view.begin(), other);
+
+    for(auto elem: view.each()) {
+        ASSERT_EQ(std::get<0>(elem), other);
+    }
+
+    view.each([other](auto entt, auto &&...) {
+        ASSERT_EQ(entt, other);
+    });
+}
+
 TEST(View, Pipe) {
     entt::registry registry;
     const auto entity = registry.create();
