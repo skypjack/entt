@@ -572,6 +572,34 @@ TEST(SingleComponentView, SwapStorage) {
     ASSERT_TRUE(cview.empty());
 }
 
+TEST(SingleComponentView, StorageEntity) {
+    entt::registry registry;
+    auto view = registry.view<entt::entity>();
+
+    const auto entity = registry.create();
+    const auto other = registry.create();
+
+    registry.destroy(entity, entt::to_version(entity));
+
+    ASSERT_EQ(view.size(), 2u);
+    ASSERT_NE(view.begin(), view.end());
+
+    // returns all matching identifiers, both in-use and available ones
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 2);
+    ASSERT_EQ(*view.begin(), entity);
+    ASSERT_EQ(*(++view.begin()), other);
+
+    // skips available identifiers automatically, only returns in-use elements
+    for(auto [entt]: view.each()) {
+        ASSERT_EQ(entt, other);
+    }
+
+    // skips available identifiers automatically, only returns in-use elements
+    view.each([other](auto entt) {
+        ASSERT_EQ(entt, other);
+    });
+}
+
 TEST(MultiComponentView, Functionalities) {
     entt::registry registry;
     auto view = registry.view<int, char>();
@@ -1477,6 +1505,33 @@ TEST(MultiComponentView, SwapStorage) {
     view.storage(registry.storage<int>("empty"_hs));
 
     ASSERT_EQ(view.size_hint(), 0u);
+}
+
+TEST(MultiComponentView, StorageEntity) {
+    entt::registry registry;
+    auto view = registry.view<entt::entity, int>();
+
+    const auto entity = registry.create();
+    const auto other = registry.create();
+
+    registry.emplace<int>(entity);
+    registry.emplace<int>(other);
+
+    registry.destroy(entity, entt::to_version(entity));
+
+    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_NE(view.begin(), view.end());
+
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
+    ASSERT_EQ(*view.begin(), other);
+
+    for(auto elem: view.each()) {
+        ASSERT_EQ(std::get<0>(elem), other);
+    }
+
+    view.each([other](auto entt, auto &&...) {
+        ASSERT_EQ(entt, other);
+    });
 }
 
 TEST(View, Pipe) {
