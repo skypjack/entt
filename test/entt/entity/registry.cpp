@@ -918,7 +918,7 @@ TEST(Registry, ExcludeOnlyView) {
     ASSERT_EQ(std::distance(view.begin(), view.end()), 2);
 
     // skips available identifiers automatically, only returns in-use elements
-    view.each([&entities](auto entity, auto &&...) {
+    view.each([&entities](auto entity) {
         ASSERT_EQ(entity, entities[1u]);
     });
 }
