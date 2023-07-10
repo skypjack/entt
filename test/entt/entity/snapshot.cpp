@@ -12,6 +12,7 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
 #include <entt/signal/sigh.hpp>
+#include "../common/config.h"
 
 struct empty {};
 
@@ -229,6 +230,13 @@ TEST(BasicSnapshotLoader, Constructors) {
     entt::basic_snapshot_loader other{std::move(loader)};
 
     ASSERT_NO_FATAL_FAILURE(loader = std::move(other));
+}
+
+ENTT_DEBUG_TEST(BasicSnapshotLoaderDeathTest, Constructors) {
+    entt::registry registry;
+    registry.emplace<int>(registry.create());
+
+    ASSERT_DEATH([[maybe_unused]] entt::basic_snapshot_loader loader{registry}, "");
 }
 
 TEST(BasicSnapshotLoader, GetEntityType) {
