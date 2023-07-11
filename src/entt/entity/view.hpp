@@ -676,7 +676,7 @@ public:
      * @return Number of entities that have the given component.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return *this ? handle()->size() : size_type{};
+        return handle() ? handle()->size() : size_type{};
     }
 
     /**
@@ -684,7 +684,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !*this || handle()->empty();
+        return !handle() || handle()->empty();
     }
 
     /**
@@ -695,7 +695,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? handle()->begin() : iterator{};
+        return handle() ? handle()->begin() : iterator{};
     }
 
     /**
@@ -703,7 +703,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return *this ? handle()->end() : iterator{};
+        return handle() ? handle()->end() : iterator{};
     }
 
     /**
@@ -714,7 +714,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return *this ? handle()->rbegin() : reverse_iterator{};
+        return handle() ? handle()->rbegin() : reverse_iterator{};
     }
 
     /**
@@ -724,7 +724,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? handle()->rend() : reverse_iterator{};
+        return handle() ? handle()->rend() : reverse_iterator{};
     }
 
     /**
@@ -752,7 +752,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return *this ? handle()->find(entt) : iterator{};
+        return handle() ? handle()->find(entt) : iterator{};
     }
 
     /**
@@ -787,7 +787,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return *this && handle()->contains(entt);
+        return handle() && handle()->contains(entt);
     }
 
     /**
@@ -836,9 +836,9 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if(*this) {
-            if constexpr(is_applicable_v<Func, decltype(*each().begin())>) {
-                for(const auto pack: each()) {
+        if(auto *view = storage(); view) {
+            if constexpr(is_applicable_v<Func, decltype(*view->each().begin())>) {
+                for(const auto pack: view->each()) {
                     std::apply(func, pack);
                 }
             } else if constexpr(Get::traits_type::page_size == 0u) {
@@ -846,7 +846,7 @@ public:
                     func();
                 }
             } else {
-                for(auto &&component: *storage()) {
+                for(auto &&component: *view) {
                     func(component);
                 }
             }
@@ -863,7 +863,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return *this ? storage()->each() : iterable{};
+        return storage() ? storage()->each() : iterable{};
     }
 
     /**
